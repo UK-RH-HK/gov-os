@@ -1060,8 +1060,8 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-11T00:42:16Z daff0c20fa1299bd2e5189fe7ab561cc1fffea9e975613d4e4fc40e0f4487f07
-git head: 622e9b7413c9743c9be4d28bfea2c273d9be6734
+generated: 2026-11-11T03:25:07Z 4a1bf4c3c2913624dd1783bd879d3d31f31abd36b22d5c779bd045e988d0f22c
+git head: 3718f395caa1d90aacd57389247d8526f836e2fd
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
@@ -1091,7 +1091,7 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-n0wb [in_progress] - W2-92 The knowledge graph and the code graph as routes of plain-question retrieval <- [DAEO-s9qc, DAEO-ym8a]
   DAEO-nqa2 [in_progress] - W2-90b W2-90's next round <- [DAEO-0mtg]
   DAEO-o5x1 [in_progress] - W2-152 gov brief (W2-128's code half, part 1)
-  DAEO-ongl [in_progress] - W2-139 CAP-45.a to Wave 3: the Contract edit (version 4.3) <- [DAEO-5ce2]
+  DAEO-ongl [in_progress] - W2-139 CAP-45.a to Wave 3: the Contract edit (version 4.3)
   DAEO-ouet [in_progress] - W2-96 The opaque acceptance runner
   DAEO-p3ln [in_progress] - W2-136 gov plan: the dependency map and the launch batches <- [DAEO-t8mp, DAEO-r30l]
   DAEO-q7lk [in_progress] - W2-129 gov links: link integrity, cheap and incremental (DEC-1073 (5)(b)) <- [DAEO-n0wb, DAEO-arrl]
@@ -1102,7 +1102,7 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-r8vq [in_progress] - W2-131 A register chunk carries its own entry's id
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
-  DAEO-t8mp [in_progress] - W2-128 The templates (P1-7, R3-TEMPLATES §D)
+  DAEO-t8mp [in_progress] - W2-128 The templates (P1-7, R3-TEMPLATES §D) <- [DAEO-o5x1, DAEO-8s85]
   DAEO-u4oz [in_progress] - W2-04 gov context bounded and reproducible <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-vhad [in_progress] - W1-01b A listed merge is exempt for its own changes
   DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
@@ -1113,13 +1113,13 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS                                                                              622e9b741 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS                                                                              3718f395c [w2/integrate]
   /home/usain/gov-os-worktrees/D6-F-tests                                                                                 2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue                                                                                  04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records                                                                        66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record                                                                               4c1b891d8 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a                                                                              078e972d5 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b                                                                              622e9b741 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record                                                                               542865993 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a                                                                              f63c1d9b7 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b                                                                              3718f395c (detached HEAD)
   /home/usain/gov-os-worktrees/W2-104                                                                                     909d7ff0a [w2/W2-104]
   /home/usain/gov-os-worktrees/W2-105                                                                                     fa653609c [w2/W2-105]
   /home/usain/gov-os-worktrees/W2-11                                                                                      c9f99b28b [w2/W2-11]

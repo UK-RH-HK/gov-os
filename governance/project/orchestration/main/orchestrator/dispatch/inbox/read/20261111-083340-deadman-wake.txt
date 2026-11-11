@@ -1,0 +1,5 @@
+log: deadman.log
+Deadman: wake
+status: DEADMAN WAKE | the CTO session is idle since 06:33, 120 min
+
+check the helpers and resume them (their transcripts: subagents/agent-*.jsonl; tools/helper_watch.py)

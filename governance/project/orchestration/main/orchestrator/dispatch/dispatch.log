@@ -364,3 +364,13 @@
 2026-11-10 23:35:06 incident T1 opened: 19.96 busy cores above the band 14-18 -> 2026-11-10-2335-T1.md, inbox/20261110-233506-incident-T1-2335.txt
 2026-11-10 23:56:04 incident T1 closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-2335-T1.md)
 2026-11-11 00:01:04 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-2309-outside-slot.md)
+2026-11-11 09:33:04 guard refusals: 9 new
+2026-11-11 14:21:07 embedding server shared: NOT RUNNING since 2026-11-11 14:21:07 (nothing listens on port 11434 (3 passes))
+2026-11-11 14:21:07 embedding server query: NOT RUNNING since 2026-11-11 14:21:07 (nothing listens on port 11435 (3 passes))
+2026-11-11 15:04:05 gpu watch: the shared log was truncated or rotated (offset 82613917, size 1737): from 0
+2026-11-11 15:04:05 embedding server shared: IDLE again after NOT RUNNING since 2026-11-11 14:21:07
+2026-11-11 15:04:05 embedding server query: IDLE again after NOT RUNNING since 2026-11-11 14:21:07
+2026-11-11 15:04:05 gpu watch: the shared log was truncated or rotated (offset 82613917, size 1737): from 0
+2026-11-11 15:17:16 would start W2-170 (DAEO-61vm) W2-170-A5-tests.md -> W2-170-A5-tests.json
+2026-11-11 15:18:03 started W2-170 (DAEO-61vm) W2-170-A5-tests.md -> W2-170-A5-tests.json (launcher exit 0)
+2026-11-11 15:20:05 return: W2-170-A5-tests.json -> inbox/20261111-152005-W2-170-A5-tests.txt

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-3/rehearsal/x2/tmp/gov-os-emg-*/**)",
+      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-3/rehearsal/x2/tmp/gov-os-emg-*/**)"
+    ]
+  }
+}

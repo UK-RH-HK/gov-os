@@ -1,0 +1,6 @@
+ACT-CLAUDE-COPIES-1          builds=1 own_blocks=1 act_rounds=1 ready_new=True []
+ACT-CLAUDE-COPIES-2          builds=1 own_blocks=1 act_rounds=1 ready_new=True []
+ACT-CLAUDE-COPIES-3          builds=1 own_blocks=1 act_rounds=1 ready_new=True []
+ACT-DEADMAN-STANDBY-1        builds=1 own_blocks=1 act_rounds=1 ready_new=True []
+ACT-DEADMAN-WAKE-1           builds=1 own_blocks=2 act_rounds=2 ready_new=True []
+ACT-EFFORT-HIGH-2            builds=1 own_blocks=1 act_rounds=1 ready_new=True []

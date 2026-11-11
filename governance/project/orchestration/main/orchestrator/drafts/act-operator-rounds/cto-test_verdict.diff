@@ -1,0 +1,48 @@
+--- before/cto-test_verdict.py	2026-11-11 15:12:39.286766732 +0000
++++ after/cto-test_verdict.py	2026-11-11 15:13:48.329615599 +0000
+@@ -11,7 +11,7 @@
+ 
+ 
+ def test_out_of_scope_and_other_findings_do_not_block():
+-    ok, why = ready(rec([{"kpi": "S1", "verdict": "fail", "findings": [
++    ok, why = ready(rec([{"kpi": "S1", "verdict": "pass", "findings": [
+         {"id": "F1", "scope": "out", "ordinary_work": "yes", "consequence": "fails open"},
+         {"id": "F3", "scope": "in", "ordinary_work": "no", "consequence": "other"}]}]))
+     assert ok and why == []
+@@ -20,7 +20,7 @@
+ def test_an_in_scope_ordinary_fail_open_blocks():
+     ok, why = ready(rec([{"kpi": "S2", "verdict": "fail", "findings": [
+         {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "loses work"}]}]))
+-    assert not ok and "F2 blocks" in why[0]
++    assert not ok and any("F2 blocks" in w for w in why)
+ 
+ 
+ def test_the_last_block_decides_a_second_round():
+@@ -36,3 +36,27 @@
+     assert ready("```verdict\nnot json\n```")[0] is False
+     assert ready(rec([{"kpi": "S1", "verdict": "pass", "findings": [{"id": "F1", "scope": "in"}]}]))[0] is False
+     assert ready(rec([]))[0] is False
++
++
++def test_a_kpi_line_marked_fail_blocks_with_no_finding_or_with_non_blocking_ones():
++    """DEC-1131 (3): READY needs no KPI line marked fail."""
++    ok, why = ready(rec([{"kpi": "S1", "verdict": "fail", "findings": []}]))
++    assert ok is False and "S1" in why[0] and "marked fail" in why[0]
++    ok, why = ready(rec([{"kpi": "S1", "verdict": "fail", "findings": [
++        {"id": "F1", "scope": "out", "ordinary_work": "yes", "consequence": "fails open"}]}]))
++    assert ok is False and "marked fail" in why[0]
++    ok, why = ready(rec([{"kpi": "S1", "verdict": "pass", "findings": []}, {"kpi": "S2", "verdict": "fail"}]))
++    assert ok is False and why == ["S2: the KPI line is marked fail"]
++
++
++def test_a_kpi_line_with_no_or_an_unknown_verdict_blocks_fail_closed():
++    for v in ({"kpi": "S1", "findings": []}, {"kpi": "S1", "verdict": "partial"}, {"kpi": "S1", "verdict": "PASS"}):
++        ok, why = ready(rec([v]))
++        assert ok is False and "neither pass nor fail" in why[0]
++
++
++def test_the_last_block_decides_when_a_later_round_clears_the_failed_line():
++    failed = rec([{"kpi": "A", "verdict": "fail", "findings": []}])
++    passed = rec([{"kpi": "A", "verdict": "pass", "findings": []}])
++    assert ready(failed + "round 2\n" + passed) == (True, [])
++    assert ready(passed + "round 2\n" + failed)[0] is False

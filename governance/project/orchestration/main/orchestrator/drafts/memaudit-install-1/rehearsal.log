@@ -1,0 +1,167 @@
+
+== prepare: the clone, the planted HOME and sets root (14:17:44)
+start 2026-11-11T14:17:44Z
+clone at bb9d29093fd5; the launch script 90b943aef8be
+planted: a memory set (3 hidden files, XCHECK-r1.md), runs/e0/misses.jsonl, set-up A's tuning half
+planted list 6b923cb4d552 (the list ACT-W2-149-INSTALL-1 left; rebuilt, 23 lines)
+ok: APPROVED.before is the recorded 6b923cb4d552
+dea29d869ca0  apply.sh
+e4eeb32db2ca  freeze.py
+69b5f39eadda  install_check.py
+f2035ea05c86  rehearse.sh
+6b923cb4d552  APPROVED.before
+41e3969aa969  APPROVED.after
+37be41c3fb2f  briefs/auditor.md
+cea517b8da7d  briefs/checker.md
+bc0894230e31  briefs/writer.md
+tracked before: governance/project/indep-briefs/sgx1/labeller-2.md
+tracked before: governance/project/indep-briefs/sgx1/labeller.md
+tracked before: governance/project/indep-briefs/sgx1/overlap-auditor.md
+tracked before: governance/project/indep-briefs/sgx1/writer-heldout.md
+tracked before: governance/project/indep-briefs/sgx1/writer-tuning.md
+
+== before this ACT: the briefs where the owner approved them are refused (10: no line on the list) (14:17:45)
+launch writer writer.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   writer: refused 10 before the install
+launch checker checker.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   checker: refused 10 before the install
+launch auditor auditor.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   auditor: refused 10 before the install
+
+== check refusals (each must stop, change nothing) (14:17:46)
+ok: check: ready to apply on the clean clone
+apply.sh: the live list is not 6b923cb4d552 (the list ACT-W2-149-INSTALL-1 left; sha256 67cd817b0f63): the CTO looks first; nothing more is done
+ok: refused: the live list is not the one the last ACT left
+ok: apply refused too; no backup made
+ok: nothing written (no backup, no brief files)
+ok: refused: a draft brief changed by one byte
+ok: refused: a template file differs from its list line
+ok: refused: the path map names no indep-briefs namespace
+ok: refused: set-up A's briefs not in the tree (ACT-W2-149-INSTALL-1 first)
+after the refusals: check: ready to apply
+
+== this ACT: check, apply, a second apply, check, the commit (14:17:46)
+state: before (the list 6b923cb4d552)
+check: ready to apply
+ok: check: ready
+ok: check from a folder holding runs/x/misses.jsonl: still ready
+the list as the launch script reads it: 6 template lines, 10 brief lines (auditor, checker, labeller, operator, writer); the memory audit's: auditor, checker, writer; template mismatches 0; brief mismatches 0
+the list 41e3969aa969cec58bf6bc09e770f037acf97ca0ebdd2e8d893e8a1ac2d938e0
+state applied
+ok: applied
+ok: no bytecode cache written into the tree
+ok: the launch script's parser reads the list: 6 template lines, 10 brief lines, 0 mismatches
+ok: a second apply: refused (apply.sh: not in the before state (applied); nothing more is done)
+the list as the launch script reads it: 6 template lines, 10 brief lines (auditor, checker, labeller, operator, writer); the memory audit's: auditor, checker, writer; template mismatches 0; brief mismatches 0
+check: already applied
+ok: check: already applied
+A	governance/project/indep-briefs/memory-audit/auditor.md
+A	governance/project/indep-briefs/memory-audit/checker.md
+A	governance/project/indep-briefs/memory-audit/writer.md
+ok: exactly 3 A: the three briefs
+ 3 files changed, 433 insertions(+)
+0a901a6bd ACT-MEMORY-AUDIT-INSTALL-1: the memory audit's three fixed briefs as the owner approved them (DEC-1129 (2)), and their lines in the launch script's approved list
+Task: DAEO-sdxk
+Implements: DEC-1101, DEC-1129
+Role: owner
+
+the planted list after: 41e3969aa969
+700 <root>/indep-walls
+400 <root>/indep-walls/APPROVED
+ok: the list is 0400 after the apply
+ok: the folder is 0700 still
+ok: the list is APPROVED.after byte for byte
+
+== the launch script's stage-10 checks on every line, at the ACT's commit (its own code) (14:17:48)
+list: 6 template lines, 10 brief lines
+  labeller  governance/project/indep-briefs/sgx1/labeller.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-labeller-result.schema.json' from entry, sample 0 from entry)
+  labeller  governance/project/indep-briefs/sgx1/labeller-2.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-labeller-2-result.schema.json' from entry, sample 0 from entry)
+  writer    governance/project/indep-briefs/sgx1/writer-tuning.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-writer-tuning-result.schema.json' from entry, sample 400 from front matter)
+  writer    governance/project/indep-briefs/sgx1/writer-heldout.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-writer-heldout-result.schema.json' from entry, sample 400 from front matter)
+  auditor   governance/project/indep-briefs/sgx1/overlap-auditor.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-overlap-auditor-result.schema.json' from entry, sample 0 from entry)
+  operator  governance/project/operator/brief.md: approved line ok; not a launch kind (the script refuses --kind operator with 17): a record only
+  operator  governance/project/operator/reviewer-brief.md: approved line ok; not a launch kind (the script refuses --kind operator with 17): a record only
+  writer    governance/project/indep-briefs/memory-audit/writer.md: approved line ok; front matter ok (model 'claude-sonnet-5-5' from front matter, result_schema 'writer-result.schema.json' from front matter, sample 300 from front matter)
+  checker   governance/project/indep-briefs/memory-audit/checker.md: approved line ok; front matter ok (model 'claude-opus-5-5' from front matter, result_schema 'checker-result.schema.json' from front matter, sample 0 from front matter)
+  auditor   governance/project/indep-briefs/memory-audit/auditor.md: approved line ok; front matter ok (model 'claude-opus-5-5' from front matter, result_schema 'auditor-result.schema.json' from front matter, sample 0 from front matter)
+approved lines that match their bytes at the commit: 10 of 10
+ok: every brief line (10) matches its bytes at the commit
+ok: the three memory briefs and the five set-up A briefs pass stage 10's front matter (8 of 8)
+
+== the three memory briefs: a dry launch under each, each must pass the approved check and build its wall (0) (14:17:48)
+launch writer writer.md round 1: exit 0; indep_launch: dry 0
+ok:   writer round 1: exit 0 (dry)
+  WALL.json: {'brief_id': None, 'flow': None, 'model': 'claude-sonnet-5-5', 'result_schema': 'writer-result.schema.json', 'round': 1} input/: ['selection.json']
+ok:   brief.md is byte for byte the approved brief (writer.md)
+ok:   the tree holds no governance/project/indep-briefs/ (tree-exclude.txt)
+  (observed, not a check) the tree still holds packages/MEMORY-AUDIT-1/briefs: yes
+launch writer writer.md round 2: exit 0; indep_launch: dry 0
+ok:   writer round 2: exit 0 (dry)
+  WALL.json: {'brief_id': None, 'flow': None, 'model': 'claude-sonnet-5-5', 'result_schema': 'writer-result.schema.json', 'round': 2} input/: ['notes.md', 'selection.json', 'set']
+ok:   brief.md is byte for byte the approved brief (writer.md)
+ok:   the tree holds no governance/project/indep-briefs/ (tree-exclude.txt)
+  (observed, not a check) the tree still holds packages/MEMORY-AUDIT-1/briefs: yes
+launch checker checker.md round 1: exit 0; indep_launch: dry 0
+ok:   checker: exit 0 (dry)
+  WALL.json: {'brief_id': None, 'flow': None, 'model': 'claude-opus-5-5', 'result_schema': 'checker-result.schema.json', 'round': 1} input/: ['selection.json', 'set']
+ok:   brief.md is byte for byte the approved brief (checker.md)
+ok:   the tree holds no governance/project/indep-briefs/ (tree-exclude.txt)
+  (observed, not a check) the tree still holds packages/MEMORY-AUDIT-1/briefs: yes
+launch auditor auditor.md round 1: exit 0; indep_launch: dry 0
+ok:   auditor: exit 0 (dry)
+  WALL.json: {'brief_id': None, 'flow': None, 'model': 'claude-opus-5-5', 'result_schema': 'auditor-result.schema.json', 'round': 1} input/: ['misses.jsonl', 'selection.json', 'set']
+ok:   brief.md is byte for byte the approved brief (auditor.md)
+ok:   the tree holds no governance/project/indep-briefs/ (tree-exclude.txt)
+  (observed, not a check) the tree still holds packages/MEMORY-AUDIT-1/briefs: yes
+
+== set-up A's five briefs still pass (a dry launch under each, tuning half) (14:17:55)
+launch labeller labeller.md round 1: exit 0; indep_launch: dry 0
+ok:   labeller.md: exit 0 (dry)
+launch labeller labeller-2.md round 1: exit 0; indep_launch: dry 0
+ok:   labeller-2.md: exit 0 (dry)
+launch writer writer-tuning.md round 1: exit 0; indep_launch: dry 0
+ok:   writer-tuning.md: exit 0 (dry)
+launch writer writer-heldout.md round 1: exit 0; indep_launch: dry 0
+ok:   writer-heldout.md: exit 0 (dry)
+launch auditor overlap-auditor.md round 1: exit 0; indep_launch: dry 0
+ok:   overlap-auditor.md: exit 0 (dry)
+
+== a changed byte is refused (10), at a second commit in the clone only (14:18:11)
+launch writer writer.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   the old sha256 against the changed bytes: refused 10 (bytes)
+launch writer writer.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   the new sha256 (a changed byte not on the list): refused 10 (approved)
+ok:   (by the script's own functions: the bytes at the commit do hash to the new sha256, and no list line holds it: the refusal is the approved check)
+launch checker checker.md round 1: exit 0; indep_launch: dry 0
+launch writer checker.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   checker.md under --kind checker: 0; under --kind writer (a kind its line does not give): refused 10
+launch writer writer.md round 1: exit 0; indep_launch: dry 0
+ok:   control: writer.md restored, launches again (0)
+launch checker checker.md round 1: exit 10; indep_launch: refused 10 brief
+ok:   a list line with one hex digit changed: refused 10
+ok: the planted list put back as APPROVED.after
+
+== the path map's structural pass over the new tracked paths (the lesson of ACT-PATHMAP-NS-2) (14:18:18)
+ok: gov.check.pathmap at the commit with the three briefs tracked: exit 0, no finding (3 files under indep-briefs/memory-audit/ each in one namespace)
+
+== undo: apply.sh undo, the removal committed as the package's undo line says (no git add), then check (14:18:20)
+the list 6b923cb4d552077f99924fd5df38f1a448b21f863c4755c9ff4e0dcfb28ed959
+state before (undone)
+ok: undone
+ 3 files changed, 433 deletions(-)
+D	governance/project/indep-briefs/memory-audit/auditor.md
+D	governance/project/indep-briefs/memory-audit/checker.md
+D	governance/project/indep-briefs/memory-audit/writer.md
+ok: the undo commit: exactly 3 D
+ok: the list byte for byte as before (6b923cb4d552)
+ok: set-up A's folder untouched; memory-audit/ gone
+check: ready to apply
+ok: check: ready to apply again
+launch writer writer.md round 1: exit 10; indep_launch: refused 10 brief
+ok: after the undo a launch under the brief is refused again (10)
+
+== live files: unchanged (14:18:21)
+ok: live files unchanged (24 lines hashed; the main tree's status and head the same)
+end 2026-11-11T14:18:21Z
+checks passed: 57; failures: 0
+work/ removed

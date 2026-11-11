@@ -1,0 +1,7 @@
+log: mem-guard.txt
+Memory: rg-stopped
+status: P1: mem_guard killed 30 rg (they were 30; available 829 MB; stall 0.0%); the spawner follows
+
+parents (children, pid, cwd, command):
+     30 children  parent 290416  cwd /home/usain/Dynamic-Agentic-Engineering-OS  /usr/bin/bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse_inner.sh 
+  rg binaries (of the first 200): /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse/decoy/rg x30

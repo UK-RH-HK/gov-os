@@ -1,0 +1,17 @@
+log: mem-guard.txt
+Memory: memory-low
+status: P1: available 837 MB; nothing was killed
+
+top memory users (pid, name, MB):
+  290432  python3  159
+  290468  python3  11
+  290416  bash  3
+  290430  claude  1
+  290431  ollama  1
+  290469  sleep  1
+per-name totals (count, MB), largest 8:
+  python3  2  171
+  bash  1  3
+  claude  1  1
+  ollama  1  1
+  sleep  1  1

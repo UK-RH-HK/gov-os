@@ -1,0 +1,1 @@
+2026-11-11 15:41:42 guard started (pid 309921; watch>100 mark>150 stop>300 rg; stop ON; period 1.0s)

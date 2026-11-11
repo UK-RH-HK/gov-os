@@ -1,0 +1,36 @@
+  - commit: "6ed6a5aed04740dc834b21d6cd085dc2f9c8ee1c"
+    decision: DEC-1127  # 2026-11-02T13:07Z; Merge emg/query: the DEC-1033 emergency patch (fix b): a question's vector accepted from a
+  - commit: "1296a57bc60b961e6ee446302026446c1ad65079"
+    decision: DEC-1127  # 2026-11-03T16:09Z; Merge w2/W2-91 into w2/W2-91-tests: the engineer's merge of integrate and its evidence rec
+  - commit: "24b3bf2f67e5ae7ec8b2ce48a291bc56bd7901cf"
+    decision: DEC-1127  # 2026-11-06T15:21Z; Merge w2/integrate into w2/W2-134-tests (the CTO): the W2-134 ticket
+  - commit: "ffbf0392d236992a87ff127a6e63729de2fbc01d"
+    decision: DEC-1127  # 2026-11-06T21:53Z; Merge w2/integrate into w2/W2-32 (the CTO): S11 re-worded (DEC-1086 A), for its merge befo
+  - commit: "e3355def9f99977defeec32d164944d4966cf87a"
+    decision: DEC-1127  # 2026-11-06T22:08Z; Merge w2/W2-32 into w2/integrate (the CTO, DEC-1086 A, DEC-1087 (1)): S11 the candidate po
+  - commit: "afea87dca49d3279c19315865d766f591a677746"
+    decision: DEC-1127  # 2026-11-06T22:08Z; Merge w2/integrate into w2/W2-135-tests (the CTO): W2-32 S11 merged; S3's reference blob t
+  - commit: "2bb3705dbd0f277666ea793a98134914e46288c6"
+    decision: DEC-1127  # 2026-11-06T22:19Z; Merge w2/integrate into w2/W2-129 (the CTO): TESTS-READY and the settled points
+  - commit: "2b733c4589b8d56d5c0f541d5044bfc016a4d64c"
+    decision: DEC-1127  # 2026-11-06T22:19Z; Merge w2/integrate into w2/W2-116 (the CTO): TESTS-READY and the widened paths
+  - commit: "87cadea156e4d010a751d6669a1be55e371412e9"
+    decision: DEC-1127  # 2026-11-06T22:51Z; Merge w2/integrate into w2/W2-129-tests (the CTO): S16 added (DEC-1088 (6))
+  - commit: "75acb0ff22e78323d0c3f0c0a18bb0a8784a00e0"
+    decision: DEC-1127  # 2026-11-06T23:21Z; Merge w2/W2-116 into w2/integrate (the CTO, DEC-1087 (3)): the integration store in the pr
+  - commit: "419f828a8b51edacdab1f369980893a5f50af4e1"
+    decision: DEC-1127  # 2026-11-06T23:24Z; Merge w2/integrate into w2/W2-129 (the CTO)
+  - commit: "ff64f14835f6233c514c35182f4a6401b44aac6d"
+    decision: DEC-1127  # 2026-11-06T23:30Z; Merge w2/W2-135 into w2/integrate (the CTO, DEC-1086 B, DEC-1087 (1)): a line over 4,000 c
+  - commit: "5bf20b53224de001da851b047181479885ced074"
+    decision: DEC-1127  # 2026-11-06T23:34Z; Merge w2/integrate into w2/W2-112 (the CTO): the memory release for re-pin window 4 brough
+  - commit: "f67e57deb9dd6876c7f7e502c6a9adccba8340a6"
+    decision: DEC-1127  # 2026-11-09T19:25Z; W2-128 tests: integrate merged (the interface's ref and string items, d1f50e2f)
+  - commit: "befa57695c3877cfc7cc64cb5c9c03988828c300"
+    decision: DEC-1127  # 2026-11-09T22:22Z; Merge w2/integrate into W2-56: the ticket's round-2 points (P-S7), before the review
+  - commit: "3f93c137a4b6c207ae422359513fd2882cef7656"
+    decision: DEC-1127  # 2026-11-10T00:05Z; W2-153-tests: integrate merged (ACT-SETS-GLOBS-1's hook 74f8dbea4761 and path map, 9cce743
+  - commit: "c667bc49ca0a2bec2561ad67a7c9951a44538001"
+    decision: DEC-1127  # 2026-11-10T01:52Z; W2-153-tests: integrate merged (round 2b, f3c15908d)
+  - commit: "08c31e7ffee0acac7f7f2cde87758ecf55c580a8"
+    decision: DEC-1127  # 2026-11-10T12:23Z; scratch: the designer's S-D10a/b cases beside the engineer's code, for the review (not for

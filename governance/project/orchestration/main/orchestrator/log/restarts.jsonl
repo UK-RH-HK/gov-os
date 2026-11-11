@@ -9,3 +9,6 @@
 {"at": "2026-11-07 22:28:14", "class": 3, "reason": "the E4 scoring window ended (E3-E5-DESIGN §1)", "check": "rerank.by service"}
 {"at": "2026-11-08 18:20:07", "class": "on-demand", "reason": "the shared reranker exited after 12 h idle (14:13:08); started by one probe search before the fresh 80", "check": "rerank.by service", "pid_after": "840293"}
 {"at": "2026-11-08 21:25:10", "class": 3, "reason": "the fresh 80 E4 scoring window ended (data only, DEC-1097 (1)(c))", "check": "rerank.by service"}
+{"at": "2026-11-11 15:04:30", "class": 1, "server": "127.0.0.1:11434", "reason": "WSL distro restarted ~14:21; NOT RUNNING since 14:21:07", "pid_before": null, "pid_after": 30803, "check": "affinity, nice, 29/29 layers, model in VRAM: pass", "by": "CTO 8ddb8b14"}
+{"at": "2026-11-11 15:04:30", "class": 2, "server": "127.0.0.1:11435", "reason": "WSL distro restarted ~14:21; NOT RUNNING since 14:21:07", "pid_before": null, "pid_after": 30809, "check": "affinity, nice, 29/29 layers, model in VRAM: pass", "by": "CTO 8ddb8b14"}
+{"at": "2026-11-11 15:05:07", "class": 3, "server": "rerank_service", "reason": "WSL distro restarted ~14:21", "pid_before": null, "pid_after": "32310", "check": "rerank.by service; store bb9d29093", "by": "CTO 8ddb8b14"}

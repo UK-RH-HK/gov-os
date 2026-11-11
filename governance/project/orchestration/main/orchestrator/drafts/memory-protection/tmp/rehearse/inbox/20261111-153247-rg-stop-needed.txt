@@ -1,0 +1,7 @@
+log: mem-guard.txt
+Memory: rg-stop-needed
+status: P1: 70 rg processes (level 3, stop is OFF (MG_STOP=0)); available 822 MB; stall 0.0%
+
+parents (children, pid, cwd, command):
+     70 children  parent 290416  cwd /home/usain/Dynamic-Agentic-Engineering-OS  /usr/bin/bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse_inner.sh 
+  rg binaries (of the first 200): /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse/decoy/rg x70

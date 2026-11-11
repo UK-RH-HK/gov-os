@@ -1,0 +1,7 @@
+log: mem-guard.txt
+Memory: rg-watch
+status: P1: 20 rg processes (level 2); available 831 MB; stall 0.0%
+
+parents (children, pid, cwd, command):
+     20 children  parent 290416  cwd /home/usain/Dynamic-Agentic-Engineering-OS  /usr/bin/bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse_inner.sh 
+  rg binaries (of the first 200): /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/memory-protection/tmp/rehearse/decoy/rg x20

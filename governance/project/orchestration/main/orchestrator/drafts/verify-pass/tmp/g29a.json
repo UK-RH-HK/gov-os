@@ -1,0 +1,8 @@
+[
+["Adoption writes the project", "a planted repository is adopted with no hand edit: the project's config then holds `coordination_ticket` equal to the id of the coordination ticket adoption created; the guard decision for an install by the session on that ticket is ask, and for any other session is refuse."],
+["Both copies of the template", "grep of `template/governance/kernel/roles/orchestrator.md` and `template/.rulesync/subagents/orchestrator.md` finds in each the CTO-only install rule, the key name and `GOV_TICKET`, and finds no sentence saying the guard asks on every install."],
+["The refusal, when the rule cannot run", "planted projects with no key and with a key naming no ticket: the install refusal text names `GOV_TICKET` and says how to set the key, the decision is still a refusal, and the text does not claim a key was set when none was."],
+["An adopted project whose CTO", "a freshly adopted planted repository: the CTO session's install is asked at once (not refused) with no key edited by hand; a refusal there is the failure."],
+["A role file that tells the CTO the old rule", "grep of both orchestrator role file copies for the old wording (the guard asks on every install) finds 0 lines."],
+["Any session but the CTO", "planted engineer, test-designer, auditor and a second orchestrator session on another ticket each attempt an install in the adopted planted repository: each is refused, none is asked or let through."]
+]

@@ -1,0 +1,24 @@
+2026-11-11 15:32:45 guard started (pid 290468; watch>20 mark>40 stop>60 rg; stop OFF; period 0.2s)
+2026-11-11 15:32:45 ALERT memory low or name storm: available 837 MB, storm []
+2026-11-11 15:32:45 MARK 10 rg set to oom_score_adj 1000 (rg 10, available 834 MB, stall 0.0%)
+2026-11-11 15:32:45 level 2: 10 rg, available 834 MB, stall 0.0%
+2026-11-11 15:32:46 ALERT memory low or name storm: available 830 MB, storm []
+2026-11-11 15:32:46 level 3: 60 rg, available 824 MB, stall 0.0%
+2026-11-11 15:32:47 ALERT memory low or name storm: available 822 MB, storm []
+2026-11-11 15:32:47 MARK 60 rg set to oom_score_adj 1000 (rg 70, available 822 MB, stall 0.0%)
+2026-11-11 15:32:47 level 3: 70 rg, available 822 MB, stall 0.0%
+2026-11-11 15:32:48 ALERT memory low or name storm: available 822 MB, storm []
+2026-11-11 15:32:49 guard started (pid 290856; watch>20 mark>40 stop>60 rg; stop ON; period 0.2s)
+2026-11-11 15:32:49 ALERT memory low or name storm: available 836 MB, storm []
+2026-11-11 15:32:49 MARK 30 rg set to oom_score_adj 1000 (rg 30, available 829 MB, stall 0.0%)
+2026-11-11 15:32:49 STOP 30 rg killed by pid (rg 30, available 829 MB, stall 0.0%); first pids [290865, 290866, 290867, 290868, 290869, 290870, 290871, 290872, 290873, 290874, 290894, 290895]
+2026-11-11 15:32:50 STOP 40 rg killed by pid (rg 40, available 827 MB, stall 0.0%); first pids [290922, 290923, 290924, 290925, 290926, 290927, 290928, 290929, 290930, 290931, 290933, 290934]
+2026-11-11 15:32:50 STOP 30 rg killed by pid (rg 30, available 829 MB, stall 0.0%); first pids [290966, 290967, 290968, 290969, 290970, 290971, 290972, 290973, 290974, 290975, 290978, 290979]
+2026-11-11 15:32:50 ALERT memory low or name storm: available 829 MB, storm []
+2026-11-11 15:32:50 STOP 40 rg killed by pid (rg 40, available 827 MB, stall 0.0%); first pids [291004, 291005, 291006, 291007, 291008, 291009, 291010, 291011, 291012, 291013, 291015, 291016]
+2026-11-11 15:32:50 STOP 40 rg killed by pid (rg 40, available 827 MB, stall 0.0%); first pids [291058, 291059, 291060, 291061, 291062, 291063, 291064, 291065, 291066, 291067, 291069, 291070]
+2026-11-11 15:32:50 level 2: 20 rg, available 831 MB, stall 0.0%
+2026-11-11 15:32:51 ALERT memory low or name storm: available 831 MB, storm []
+2026-11-11 15:32:51 MARK 20 rg set to oom_score_adj 1000 (rg 20, available 831 MB, stall 0.0%)
+2026-11-11 15:32:51 level 2: 20 rg, available 831 MB, stall 0.0%
+2026-11-11 15:32:52 ALERT memory low or name storm: available 831 MB, storm []

@@ -2,3 +2,5 @@
 # Parked: ready.parked-by-stop-1821.txt, ready.parked-by-freeze.txt.
 # W2-112 returned PACKAGES 21:17 (P-W2-112-F9 with the owner); its resume waits for the answer.
 # W2-112 r3 STOPPED by the owner (DEC-1051), resumes after the refactoring and the re-pins.
+# 11-11 15:50, session 8ddb8b14 (DEC-1126 (2): usage (A) ended; DEC-1128 (6): the memory audit before 11-23): W2-170 first; its brief by gov brief (code)
+W2-170 DAEO-61vm W2-170-A5-tests.md W2-170-A5-tests.json

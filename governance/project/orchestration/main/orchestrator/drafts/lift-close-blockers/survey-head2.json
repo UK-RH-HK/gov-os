@@ -1,0 +1,307 @@
+{
+ "DAEO-blwa": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-blwa.md, src/gov/rebuild/command.py: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 419f828a8b51 names no task and changes src/gov/rebuild/command.py: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 75acb0ff22e7 names no task and changes src/gov/rebuild/command.py: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-blwa.md: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-blwa.md: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-blwa.md, docs/changes/W2-122-evidence.md, src/gov/rebuild/command.py, src/gov/rebuild/seed.py, tests/acceptance/W2-122/README.md, tests/acceptance/W2-122/conftest.py, tests/acceptance/W2-122/test_w2_122_answer_and_record.py, tests/acceptance/W2-122/test_w2_122_configured_base.py, tests/acceptance/W2-122/test_w2_122_evidence.py, tests/acceptance/W2-122/test_w2_122_fail_closed.py, tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py, tests/acceptance/W2-122/w2_122_support.py, tests/unit/rebuild/test_w2_122_seed.py: work on DAEO-blwa that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-blwa profile=STANDARD ticket_commits=22 range_others=1747 brought=0 recorded=123",
+   "why": ""
+  }
+ ],
+ "DAEO-qzrq": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-qzrq.md, src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 87cadea156e4 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2b733c4589b8 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2bb3705dbd0f names no task and changes src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit afea87dca49d names no task and changes src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit e3355def9f99 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-qzrq.md, src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-qzrq.md, src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-qzrq.md, docs/changes/W2-123-evidence.md, src/gov/retrieval/ollama.py, src/gov/retrieval/semantic.py, tests/acceptance/W2-123/README.md, tests/acceptance/W2-123/conftest.py, tests/acceptance/W2-123/test_w2_123_config_invalid.py, tests/acceptance/W2-123/test_w2_123_determinism.py, tests/acceptance/W2-123/test_w2_123_evidence.py, tests/acceptance/W2-123/test_w2_123_probe.py, tests/acceptance/W2-123/test_w2_123_restart.py, tests/acceptance/W2-123/test_w2_123_retry.py, tests/acceptance/W2-123/test_w2_123_start.py, tests/acceptance/W2-123/w2_123_support.py, tests/unit/retrieval/test_w2_123_embedding_cap.py, tests/unit/retrieval/test_w2_123_retry.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 6ed6a5aed047 names no task and changes src/gov/retrieval/ollama.py, src/gov/retrieval/semantic.py: work on DAEO-qzrq that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-qzrq profile=STANDARD ticket_commits=27 range_others=1740 brought=0 recorded=123",
+   "why": ""
+  }
+ ],
+ "DAEO-jpr0": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit c667bc49ca0a names no task and changes .tickets/DAEO-jpr0.md, tests/conftest.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 3f93c137a4b6 names no task and changes tests/conftest.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit befa57695c38 names no task and changes tests/conftest.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-jpr0.md, src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 87cadea156e4 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2b733c4589b8 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2bb3705dbd0f names no task and changes src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit afea87dca49d names no task and changes src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit e3355def9f99 names no task and changes src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-jpr0.md, src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-jpr0.md, src/gov/retrieval/semantic.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-jpr0.md, docs/changes/W2-126-evidence.md, src/gov/retrieval/semantic.py, src/gov/retrieval/vector_cache.py, tests/acceptance/W2-126/README.md, tests/acceptance/W2-126/conftest.py, tests/acceptance/W2-126/test_w2_126_bound.py, tests/acceptance/W2-126/test_w2_126_dev_tiers.py, tests/acceptance/W2-126/test_w2_126_evidence.py, tests/acceptance/W2-126/test_w2_126_hits.py, tests/acceptance/W2-126/test_w2_126_retry.py, tests/acceptance/W2-126/test_w2_126_same_vector.py, tests/acceptance/W2-126/test_w2_126_writers.py, tests/acceptance/W2-126/w2_126_support.py, tests/conftest.py, tests/unit/rebuild/test_w2_122_seed.py, tests/unit/retrieval/test_emg_query_device.py, tests/unit/retrieval/test_semantic_cpu_embedder.py, tests/unit/retrieval/test_semantic_query_vector.py, tests/unit/retrieval/test_w2_108_freshness_once.py, tests/unit/retrieval/test_w2_123_retry.py, tests/unit/retrieval/test_w2_126_retry.py, tests/unit/retrieval/test_w2_126_vector_cache.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 6ed6a5aed047 names no task and changes src/gov/retrieval/semantic.py, tests/unit/retrieval/test_emg_query_device.py, tests/unit/retrieval/test_semantic_cpu_embedder.py, tests/unit/retrieval/test_semantic_query_vector.py: work on DAEO-jpr0 that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-jpr0 profile=STANDARD ticket_commits=28 range_others=1669 brought=0 recorded=95",
+   "why": ""
+  }
+ ],
+ "DAEO-n0wb": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit c667bc49ca0a names no task and changes tests/acceptance/W2-92/README.md, tests/acceptance/W2-92/w2_92_support.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 3f93c137a4b6 names no task and changes src/gov/retrieval/retrieve.py, src/gov/store/loader.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit befa57695c38 names no task and changes docs/research/W2-92-memory-measure.md, src/gov/store/loader.py, tests/acceptance/W2-92/README.md, tests/acceptance/W2-92/test_w2_92_verbless_labels.py, tests/acceptance/W2-92/w2_92_support.py, tests/unit/store/test_w2_92_links.py, tests/unit/store/test_w2_92_s11.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit f67e57deb9dd names no task and changes .tickets/DAEO-n0wb.md: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-n0wb.md, docs/research/W2-92-memory-measure.md, docs/research/W2-92-proto-drift.py, src/gov/retrieval/graph_route.py, src/gov/retrieval/retrieve.py, src/gov/store/loader.py, tests/acceptance/W2-92/README.md, tests/acceptance/W2-92/conftest.py, tests/acceptance/W2-92/test_w2_92_drift.py, tests/acceptance/W2-92/test_w2_92_hop.py, tests/acceptance/W2-92/test_w2_92_speed.py, tests/acceptance/W2-92/test_w2_92_stated_links.py, tests/acceptance/W2-92/test_w2_92_status.py, tests/acceptance/W2-92/test_w2_92_unchanged.py, tests/acceptance/W2-92/w2_92_support.py, tests/unit/retrieval/test_w2_92_follow.py, tests/unit/store/test_w2_92_links.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ff64f14835f6 names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 87cadea156e4 names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2b733c4589b8 names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 2bb3705dbd0f names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit afea87dca49d names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit e3355def9f99 names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-n0wb.md, docs/research/W2-92-memory-measure.md, docs/research/W2-92-proto-drift.py, src/gov/retrieval/graph_route.py, src/gov/retrieval/retrieve.py, src/gov/store/loader.py, tests/acceptance/W2-92/README.md, tests/acceptance/W2-92/conftest.py, tests/acceptance/W2-92/test_w2_92_drift.py, tests/acceptance/W2-92/test_w2_92_hop.py, tests/acceptance/W2-92/test_w2_92_speed.py, tests/acceptance/W2-92/test_w2_92_stated_links.py, tests/acceptance/W2-92/test_w2_92_status.py, tests/acceptance/W2-92/test_w2_92_unchanged.py, tests/acceptance/W2-92/w2_92_support.py, tests/unit/retrieval/test_w2_92_follow.py, tests/unit/store/test_w2_92_links.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-n0wb.md, src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes src/gov/retrieval/retrieve.py: work on DAEO-n0wb that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-n0wb profile=STANDARD ticket_commits=56 range_others=2299 brought=0 recorded=197",
+   "why": ""
+  }
+ ],
+ "DAEO-ouet": [
+  {
+   "gate": "probe:PROBE_INVALID",
+   "what": "commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)",
+   "why": "commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)"
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 08c31e7ffee0 names no task and changes tests/acceptance/W2-96/README.md, tests/acceptance/W2-96/test_w2_96_at_d10a_optin.py, tests/acceptance/W2-96/test_w2_96_at_d10b_cells.py, tests/acceptance/W2-96/test_w2_96_at_premises.py, tests/acceptance/W2-96/w2_96_support.py: work on DAEO-ouet that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit c667bc49ca0a names no task and changes .tickets/DAEO-ouet.md, tests/unit/accept/test_w2_96_accept.py, tests/unit/accept/test_w2_96_review3.py, tests/unit/accept/test_w2_96_review4.py, tests/unit/accept/test_w2_96_run2.py: work on DAEO-ouet that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-ouet.md: work on DAEO-ouet that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-ouet.md: work on DAEO-ouet that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-ouet.md: work on DAEO-ouet that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-ouet profile=FULL ticket_commits=61 range_others=2233 brought=0 recorded=192",
+   "why": ""
+  }
+ ]
+}

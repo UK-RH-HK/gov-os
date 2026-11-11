@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 138
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Ur3uS5vFkQGAHhAukcnXa2", "time": "2026-11-10T11:10:15.809Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96-maps-d10-tests/80cdbcaf-6ee5-458b-98fb-dde003784ab5.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-96-maps-d10-tests", "tool": "Bash", "form": "env HOME=/tmp/gov-launch-o0s_153a/claude-1000/w2-96-rev/home PYTHONUSERBASE=/home/usain/.local TMPDIR=/tmp/gov-launch-o0s_153a/claude-1000/w2-96-rev/tmp bash /home/usain/Dynamic-Agentic-Engineering-OS", "rule": "the call reads files whose names another command gives at run time, from a listing who

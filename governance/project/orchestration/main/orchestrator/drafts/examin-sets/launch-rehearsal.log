@@ -1,0 +1,38 @@
+     copy d19700bc32aa1d17f22771b56c94f1d4d688441b
+     pin d39c86a4d3447b62987d9cd2aa34b8a18baf0188
+     brief examin-writer.md d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f
+     brief proving-ground-writer.md 57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c
+     template settings.json.tmpl 9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b
+     template wall_hook.py 95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3
+     template CLAUDE.md.tmpl aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267
+     template kinds.yaml ddd84ae2591061327e1730517ffbce987be7a272a72311bb3b6e79e4bf2401a7
+     template tree-exclude.txt e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537
+     template README.md 65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49
+--- launch --dry: set examin, brief examin-writer.md
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": "20261111T152247Z-examin-r1", "set": "examin", "round": 1, "commit": "d39c86a4d3447b62987d9cd2aa34b8a18baf0188", "brief_sha256": "d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f", "approved_sha256": "ec9b7ce596565d0b481084d7510ec9f8332b8e5343218c11b29c5ab1a8e7f472", "seed_sha256": "54183f4323f377b737433a1e98229ead0fdc686f93bab0
+ok   L1 [examin] the launch script accepts the brief and builds the wall (exit 0)
+--- launch --dry: set adoption-proving-ground, brief proving-ground-writer.md
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": "20261111T152247Z-adoption-proving-ground-r1", "set": "adoption-proving-ground", "round": 1, "commit": "d39c86a4d3447b62987d9cd2aa34b8a18baf0188", "brief_sha256": "57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c", "approved_sha256": "ec9b7ce596565d0b481084d7510ec9f8332b8e5343218c11b29c5ab1a8e7f472", "seed_sha256": "54183f4323f3
+ok   L1 [adoption-proving-ground] the launch script accepts the brief and builds the wall (exit 0)
+--- the walls the dry runs left (planted sets root only)
+wall 20261111T152247Z-adoption-proving-ground-r1
+ok   W1 [20261111T152247Z-adoption-proving-ground-r1] brief.md is in the wall
+     selection: commit is the pin: True | last_audit: None | changed: 0 | sample: 0
+ok   W2 [20261111T152247Z-adoption-proving-ground-r1] the tree is built (84 files)
+ok   W3 [20261111T152247Z-adoption-proving-ground-r1] COPY-HEAD.txt in the tree holds the copy's own commit
+ok   W4 [20261111T152247Z-adoption-proving-ground-r1] the briefs folder is left out of the tree
+ok   W5 [20261111T152247Z-adoption-proving-ground-r1] the product files are in the tree
+wall 20261111T152247Z-examin-r1
+ok   W1 [20261111T152247Z-examin-r1] brief.md is in the wall
+     selection: commit is the pin: True | last_audit: None | changed: 0 | sample: 84
+ok   W2 [20261111T152247Z-examin-r1] the tree is built (84 files)
+ok   W3 [20261111T152247Z-examin-r1] COPY-HEAD.txt in the tree holds the copy's own commit
+ok   W4 [20261111T152247Z-examin-r1] the briefs folder is left out of the tree
+ok   W5 [20261111T152247Z-examin-r1] the product files are in the tree
+--- a delivery of a visible/ sub-folder and DRAW.txt (the launch script's own copy_set, round 1 move)
+['DRAW.txt', 'q01.yaml', 'q02.yaml', 'visible/q01.yaml', 'visible/q02.yaml']
+ok   D1 copy_set carries the sub-folder and DRAW.txt
+measure reads hidden/*.yaml (not recursive): ['q01.yaml', 'q02.yaml']
+ok   D2 a glob of hidden/*.yaml, as the measure reads it, holds the hidden half only
+
+failures: 0

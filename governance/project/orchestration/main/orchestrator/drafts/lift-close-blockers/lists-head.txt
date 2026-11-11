@@ -1,0 +1,8 @@
+accepted_reds: 0 entries, 0 count, 0 refused
+load_sensitive: 24 entries, 23 count, 1 refused
+   REFUSED: the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, D
+accepted_history: 0 entries, 0 accepted, 0 refused
+acceptance_exemptions: 7 entries, 3 would not clear a commit
+   NOT CLEARING: ('c9a08678644485a7528bc875164e110881b63d93', 'DEC-900', "DEC-900 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-718 item 11, DEC-713, DEC-714, DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-889 item 16 d · **Basis:** lens I's P-IS-8 (`docs/assessment/2026-10/I-SYNTHESIS.md`; I2 F1, I3 F1 and R1). · **Changed by:** DEC-906 item 1 (its form): a retirement is a test designer's commit from now on; `c9a08678` stays in history, exempted by exact sha.)")
+   NOT CLEARING: ('ab169d051b82072f0db4350b2066eabf6919ffa0', 'DEC-1123', 'DEC-1123 does not name the commit ab169d051b82')
+   NOT CLEARING: ('15952bbfa576dcfabb7d36d95912a848077e5c3c', 'DEC-1123', 'DEC-1123 does not name the commit 15952bbfa576')

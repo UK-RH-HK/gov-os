@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(sudo:*)",
+      "Edit(**/*.key)",
+      "Edit(**/*.pem)",
+      "Edit(**/.env*)",
+      "Edit(config/secrets*)",
+      "Read(//home/usain/gov-os-workbench/qualification-oracle/**)"
+    ]
+  }
+}

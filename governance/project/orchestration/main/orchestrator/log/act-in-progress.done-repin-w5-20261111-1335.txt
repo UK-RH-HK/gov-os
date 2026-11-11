@@ -1,0 +1,1 @@
+2026-11-11 02:31:06 CTO 8ddb8b14 holds for ACT-REPIN-W5 (candidate 797495bdfc70, wheel 04b094fbd587): no landing on w2/integrate until the owner says done (DEC-1028 item 6; review F1)

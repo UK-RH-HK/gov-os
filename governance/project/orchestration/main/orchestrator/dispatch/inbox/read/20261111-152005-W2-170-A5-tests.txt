@@ -1,0 +1,9 @@
+log: W2-170-A5-tests.json
+W2: W2-170
+status: PACKAGES
+
+I stopped this tests run before launching the test designer and am returning PACKAGES. The ticket doesn't state its interface, and a pair may not start until it does (DEC-1052). Nothing was launched or committed, and the branch is unchanged at `df30e3dfd3f4`.
+
+task: DAEO-61vm
+status: PACKAGES
+work_completed: Ran the first calls. Identity is orchestrator / DAEO-61vm, the tree is /home/usain/gov-os-worktrees/W2-170 on w2/W2-170, and there was no checkpoint to resume from. Read the ticket, MEMORY-AUDIT-1.md, the writer and checker briefs, the `memory-verdict-2` entry in path-map.yaml and the CLI 

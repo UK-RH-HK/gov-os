@@ -1,0 +1,19 @@
+DAEO-blwa containment: no finding over 22 ticket commits
+DAEO-qzrq containment: no finding over 27 ticket commits
+DAEO-jpr0 containment FINDING: 2 lines
+    containment: commit 15c80ebb72b7: tests/acceptance/W2-123/README.md, tests/acceptance/W2-123/test_w2_123_retry.py, tests/acceptance/W2-126/README.md, tests/acceptance/W2-126/test_w2_126_retry.py: a merge commit's own change to a ticket file or an acceptance test
+    containment: commit b32fdb80f5fc: .tickets/DAEO-03ub.md, .tickets/DAEO-0rfi.md, .tickets/DAEO-jpr0.md, .tickets/DAEO-r30l.md, docs/DECISION_REGISTER.md, docs/changes/W2-126-evidence.md, docs/checkpoints/DAEO-jpr0/CP-DAEO-jpr0-0001.md, governance/project/orchestration/packages/INVENTORY-TESTS-CODE-1.md, governance/project/orchestration/packages/P1-INVENTORY-1.md, src/gov/retrieval/semantic.py, src/gov/retrieval/vector_cache.py, tests/conftest.py, tests/unit/retrieval/test_semantic_query_vector.py, tests/unit/retrieval/test_w2_108_freshness_once.py, tests/unit/retrieval/test_w2_126_vector_cache.py, tests/acceptance/W2-126/README.md, tests/acceptance/W2-54/README.md, tests/acceptance/W2-54/conftest.py, tests/acceptance/W2-54/test_w2_54_cpu_embedder.py, tests/acceptance/W2-54/test_w2_54_query_cache.py, tests/acceptance/W2-54/test_w2_54_query_vector.py, tests/acceptance/W2-54/w2_54_support.py: a merge commit's own change to a ticket file or an acceptance test
+DAEO-n0wb containment FINDING: 7 lines
+    containment: commit 5fc7681a1214: tests/conftest.py: committed path(s) outside allowed paths
+    containment: commit 720a2cbb66e0: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 4e9ba434eb70: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit a01fc5f456cd: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 295d23c5112c: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit e270a5206b60: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 0024c753aaf6: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+DAEO-ouet containment FINDING: 2 lines
+    containment: commit 65fa76dc3cf2: tests/unit/accept/test_w2_96_accept.py, tests/unit/accept/test_w2_96_review3.py, tests/unit/accept/test_w2_96_review4.py, tests/unit/accept/test_w2_96_run2.py, tests/unit/accept/w2_96_reap.py: committed path(s) outside allowed paths
+    containment: commit 6bcbbcdd5511: tests/unit/accept/test_w2_96_run2.py: committed path(s) outside allowed paths
+DAEO-vhad containment: no finding over 1 ticket commits
+DAEO-zuiy containment: no finding over 1 ticket commits
+DAEO-fu3n containment: no finding over 2 ticket commits

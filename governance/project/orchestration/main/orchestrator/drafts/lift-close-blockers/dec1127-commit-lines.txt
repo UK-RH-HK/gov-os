@@ -1,0 +1,18 @@
+    - `6ed6a5aed047` (2026-11-02): Merge emg/query: the DEC-1033 emergency patch (fix b): a question's vector accepted from a
+    - `1296a57bc60b` (2026-11-03): Merge w2/W2-91 into w2/W2-91-tests: the engineer's merge of integrate and its evidence rec
+    - `24b3bf2f67e5` (2026-11-06): Merge w2/integrate into w2/W2-134-tests (the CTO): the W2-134 ticket
+    - `ffbf0392d236` (2026-11-06): Merge w2/integrate into w2/W2-32 (the CTO): S11 re-worded (DEC-1086 A), for its merge befo
+    - `e3355def9f99` (2026-11-06): Merge w2/W2-32 into w2/integrate (the CTO, DEC-1086 A, DEC-1087 (1)): S11 the candidate po
+    - `afea87dca49d` (2026-11-06): Merge w2/integrate into w2/W2-135-tests (the CTO): W2-32 S11 merged; S3's reference blob t
+    - `2bb3705dbd0f` (2026-11-06): Merge w2/integrate into w2/W2-129 (the CTO): TESTS-READY and the settled points
+    - `2b733c4589b8` (2026-11-06): Merge w2/integrate into w2/W2-116 (the CTO): TESTS-READY and the widened paths
+    - `87cadea156e4` (2026-11-06): Merge w2/integrate into w2/W2-129-tests (the CTO): S16 added (DEC-1088 (6))
+    - `75acb0ff22e7` (2026-11-06): Merge w2/W2-116 into w2/integrate (the CTO, DEC-1087 (3)): the integration store in the pr
+    - `419f828a8b51` (2026-11-06): Merge w2/integrate into w2/W2-129 (the CTO)
+    - `ff64f14835f6` (2026-11-06): Merge w2/W2-135 into w2/integrate (the CTO, DEC-1086 B, DEC-1087 (1)): a line over 4,000 c
+    - `5bf20b53224d` (2026-11-06): Merge w2/integrate into w2/W2-112 (the CTO): the memory release for re-pin window 4 brough
+    - `f67e57deb9dd` (2026-11-09): W2-128 tests: integrate merged (the interface's ref and string items, d1f50e2f)
+    - `befa57695c38` (2026-11-09): Merge w2/integrate into W2-56: the ticket's round-2 points (P-S7), before the review
+    - `3f93c137a4b6` (2026-11-10): W2-153-tests: integrate merged (ACT-SETS-GLOBS-1's hook 74f8dbea4761 and path map, 9cce743
+    - `c667bc49ca0a` (2026-11-10): W2-153-tests: integrate merged (round 2b, f3c15908d)
+    - `08c31e7ffee0` (2026-11-10): scratch: the designer's S-D10a/b cases beside the engineer's code, for the review (not for

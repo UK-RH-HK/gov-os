@@ -1,2 +1,10 @@
 2026-10-29 20:47:36 watch started (floor 3 GiB; trip below 2 GiB available or on an OOM kill)
 2026-11-03 11:18:54 watch started (floor 3 GiB; trip below 2 GiB available or on an OOM kill)
+2026-11-11 15:04:38 watch started (floor 3 GiB; trip below 2 GiB available or on an OOM kill)
+2026-11-11 15:20:23 watch started (floor 3 GiB; trip below 2 GiB available or on an OOM kill; rg tripwire at 200)
+2026-11-11 15:23:34 TRIPPED: MemAvailable 16904408 kB, OOM lines 4; floor put back to 6,710,886 kB
+Nov 11 15:23:22 Usain kernel: python3 invoked oom-killer: gfp_mask=0xcc0(GFP_KERNEL), order=0, oom_score_adj=0
+Nov 11 15:23:22 Usain kernel: oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=user.slice,mems_allowed=0,oom_memcg=/user.slice/user-1000.slice/user@1000.service/app.slice/gov-probe-cap-1.scope,task_memcg=/user.slice/user-1000.slice/user@1000.service/app.slice/gov-probe-cap-1.scope,task=python3,pid=15149,uid=1000
+Nov 11 15:23:22 Usain kernel: Memory cgroup out of memory: Killed process 15149 (python3) total-vm:277640kB, anon-rss:261000kB, file-rss:6484kB, shmem-rss:0kB, UID:1000 pgtables:576kB oom_score_adj:0
+Nov 11 15:23:22 Usain kernel: Memory cgroup out of memory: Killed process 15149 (python3) total-vm:277640kB, anon-rss:261000kB, file-rss:6484kB, shmem-rss:0kB, UID:1000 pgtables:576kB oom_score_adj:0
+2026-11-11 15:37:09 watch started (floor 3 GiB; trip below 2 GiB available or on an OOM kill; rg tripwire at 200)

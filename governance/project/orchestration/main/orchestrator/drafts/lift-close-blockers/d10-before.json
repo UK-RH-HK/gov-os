@@ -1,0 +1,98 @@
+{
+ "DAEO-vhad": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-vhad.md: work on DAEO-vhad that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-vhad.md: work on DAEO-vhad that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-vhad.md: work on DAEO-vhad that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-vhad.md: work on DAEO-vhad that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-vhad profile=LITE ticket_commits=1 range_others=1707 brought=0 recorded=97",
+   "why": ""
+  }
+ ],
+ "DAEO-zuiy": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-zuiy.md: work on DAEO-zuiy that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-zuiy.md: work on DAEO-zuiy that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-zuiy.md: work on DAEO-zuiy that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-zuiy.md, tests/acceptance/W2-66/README.md, tests/acceptance/W2-66/test_w2_66_live_test_map.py: work on DAEO-zuiy that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-zuiy profile=LITE ticket_commits=1 range_others=1727 brought=0 recorded=104",
+   "why": ""
+  }
+ ],
+ "DAEO-fu3n": [
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 5bf20b53224d names no task and changes .tickets/DAEO-fu3n.md: work on DAEO-fu3n that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit ffbf0392d236 names no task and changes .tickets/DAEO-fu3n.md: work on DAEO-fu3n that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 24b3bf2f67e5 names no task and changes .tickets/DAEO-fu3n.md: work on DAEO-fu3n that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "unmeasured:WORK_WITHOUT_TASK",
+   "what": "commit 1296a57bc60b names no task and changes .tickets/DAEO-fu3n.md: work on DAEO-fu3n that no ticket measured",
+   "why": ""
+  },
+  {
+   "gate": "ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED",
+   "what": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing",
+   "why": "the load_sensitive entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (DEC-757) is refused: DEC-757 is not accepted (its status: DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) \u00b7 **Under:** DEC-704, DEC-718, DEC-734, DEC-736, DEC-737, DEC-750, DEC-754, DEC-372, DEC-588 \u00b7 **Basis:** P-W2-19; `log/W2-01-close.json`. \u00b7 **Changed by:** DEC-900: its two `accepted_reds` entries (W1-42's RETR-X-02 and governance share) are retired; DEC-899 item 3: the W1-02 and W1-05 p95 `load_sensitive` entries are removed. \u00b7 **Changed by:** DEC-953 (item 1)); it covers nothing"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-fu3n profile=LITE ticket_commits=2 range_others=1803 brought=0 recorded=141",
+   "why": ""
+  }
+ ]
+}

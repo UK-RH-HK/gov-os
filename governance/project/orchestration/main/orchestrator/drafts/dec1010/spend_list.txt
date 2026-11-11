@@ -1,0 +1,270 @@
+2026-11-07 14:52 | agent | None | None | None | K7 home-ticket research (Explore agent)
+2026-11-07 15:03 | agent | None | None | None | PAT agent B (research, worktree 4 commits behind)
+2026-11-07 15:04 | agent | None | None | None | PAT agent A (research, worktree at head at its start)
+2026-11-07 16:05 | agent | None | None | None | E0/E0b runbook research (Explore agent)
+2026-11-07 16:15 | agent | None | None | None | CAP-45.a CIT-P draft (product-spec agent, W2-27)
+2026-11-07 16:03 | worker | None | None | None | W2-137 independent test designer (launched worker)
+2026-11-07 16:03 | worker | None | None | None | W2-138 independent test designer (launched worker)
+2026-11-07 16:33 | experiment | None | None | None | E0: the 138 through pin-bcea09060ebc (measure clone c00d525f)
+2026-11-07 17:05 | agent | None | None | None | CAP-45.a CIT-P review (independent-auditor agent)
+2026-11-07 17:30 | experiment | None | None | None | E1 pilot: 5 visible questions, 7 reader calls (opus 5.5 high), 10 grader calls (opus 5.5 and sonnet 5.5)
+2026-11-07 17:50 | agent | None | None | None | CAP-45.a CIT-P answer round (product-spec agent, resumed; cumulative 268,238 with its first run of 217,949)
+2026-11-07 18:00 | worker | None | None | None | W2-137 engineer (launched worker)
+2026-11-07 18:00 | worker | None | None | None | W2-138 engineer (launched worker)
+2026-11-07 17:40 | experiment | None | None | None | E2: search-again on the 138 + 2 apart; 159 reader calls (opus 5.5 high), 280 grader calls (opus 5.5, sonnet 5.5)
+2026-11-07 17:45 | worker | None | None | None | W2-137 designer second pass (D-2)
+2026-11-07 17:45 | worker | None | None | None | W2-137 engineer second pass
+2026-11-07 17:45 | worker | None | None | None | W2-138 designer second pass (W2-133 guard rows)
+2026-11-07 17:41 | worker | None | None | None | W2-138 engineer second pass (ended before its wider run; CTO verifies)
+2026-11-07 18:10 | worker | None | None | None | W2-138 independent review (launched worker)
+2026-11-07 18:20 | worker | None | None | None | W2-137 independent review (launched worker)
+2026-11-07 18:55 | agent | None | None | None | SEARCH-AGAIN-PRACTICE package draft (product-spec agent)
+2026-11-07 18:50 | worker | None | None | None | W2-136 independent test designer (launched worker)
+2026-11-07 18:47 | experiment | None | None | None | W2-137 S5 GPU window (bursts + the 138 through the clone code)
+2026-11-07 19:20 | worker | None | None | None | W2-136 engineer (launched worker)
+2026-11-07 19:27 | experiment | None | None | None | E3: five conditions on the 138 + 2 apart, 700 reader calls (opus 5.5 high) and their graders
+2026-11-07 19:45 | worker | None | None | None | W2-136 engineer second pass
+2026-11-07 19:55 | worker | None | None | None | W2-136 independent review (launched worker)
+2026-11-07 19:43 | experiment | None | None | None | E3 search-again on top 20 and 40 unranked (280 runs, 50 live searches)
+2026-11-07 20:05 | experiment | None | None | None | E5 live run: the 138 with a page of 40 within 12,000 tokens (GPU searches only)
+2026-11-07 20:20 | experiment | None | None | None | E5 reader run: 140 reader calls on the 12,000-token bundle and their graders
+2026-11-07 21:00 | agent | None | None | None | E0b harness fix (research agent): rx.py depth/top_k, store-keyed cache, live-missing scoring, pool-off
+2026-11-07 21:20 | agent | None | None | None | E0b harness review (independent-auditor agent)
+2026-11-07 21:29 | experiment | None | None | None | E0b: runs A and B through the harness (314 texts scored live on the 0.6B)
+2026-11-07 22:00 | agent | None | None | None | E4 scoring window preparation (research agent)
+2026-11-07 22:10 | agent | None | None | None | glossary prototype (research agent)
+2026-11-07 22:25 | agent | None | None | None | E4 window review round 1 (independent-auditor agent): not READY, F1 blocking
+2026-11-07 22:35 | agent | None | None | None | GLOSSARY-1 package draft (product-spec agent)
+2026-11-07 22:50 | agent | None | None | None | E4 window answer round (research agent, resumed; cumulative 335,033)
+2026-11-07 23:00 | agent | None | None | None | E4 window review round 2 (auditor, resumed; cumulative 264,138 with round 1 205,127)
+2026-11-07 22:31 | experiment | None | None | None | E2G: E2 with the prototype glossary consulted (165 reader calls, 25 consultations, graders)
+2026-11-07 22:38 | experiment | None | None | None | E4 scoring window (gte and zerank, 720 texts) and the M3/M1 replays
+2026-11-07 22:55 | agent | None | None | None | M3-ADOPTION-1 package draft (product-spec agent)
+2026-11-07 23:05 | agent | None | None | None | FRESH-80-1 package draft (product-spec agent)
+2026-11-07 23:25 | experiment | None | None | None | E4 reader runs: 280 calls on M3 and M1 bundles and their graders
+2026-11-08 09:30 | agent | None | None | None | Decided-but-not-done audit, DEC-1047 to DEC-1096 (general-purpose)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 1, the store and hook (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 2, links and marks (independent auditor, 2 rounds)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 3, register ids (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 4, chunking and the cap (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 5, roles and hidden sets (independent auditor, 2 rounds)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 6, search again in briefs (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | Readiness review 7, the fresh 80 (independent auditor, 2 rounds)
+2026-11-08 09:30 | agent | None | None | None | ACT-GUARD-SETS-1 rebuild and two rehearsals (general-purpose)
+2026-11-08 09:30 | agent | None | None | None | The fresh-80 scripts, build and round-1 fixes (general-purpose)
+2026-11-08 09:30 | agent | None | None | None | The fresh-80 scripts' code review, 2 rounds (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | P-SELECT-GRAPH trial (research)
+2026-11-08 09:30 | agent | None | None | None | W2-130 clean-up and sitting list, with audit corrections (general-purpose)
+2026-11-08 09:30 | agent | None | None | None | W2-130 marks audit (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | ADR-0002 refresh, 2 passes (product-spec)
+2026-11-08 09:30 | agent | None | None | None | ADR-0002 review, 2 rounds (independent auditor)
+2026-11-08 09:30 | agent | None | None | None | W2-145 ticket draft (product-spec)
+2026-11-08 18:16 | agent | None | None | None | Fresh-80 pre-flight item 6 delta review (independent auditor, resumed)
+2026-11-08 19:41 | experiment | None | None | None | FRESH-80 judged reader run (A1-A3, opus reader, opus/sonnet graders)
+2026-11-08 20:09 | experiment | None | None | None | FRESH-80 data e3: top 5/10/20, 40 unranked, one call
+2026-11-08 20:28 | experiment | None | None | None | FRESH-80 data e3sa: top 20, 40 unranked, search again
+2026-11-08 20:36 | experiment | None | None | None | FRESH-80 data e2g: the prototype glossary consulted
+2026-11-08 21:00 | experiment | None | None | None | FRESH-80 data e5: 12,000-token bundle, one call (live retrieval: no tokens)
+2026-11-08 21:46 | experiment | None | None | None | FRESH-80 data e4: M3 and M1, one call (window: no tokens)
+2026-11-09 01:06 | worker | None | None | None | W2-145 independent test designer (launched worker)
+2026-11-09 01:06 | worker | None | None | None | W2-20 independent test designer, revision round (launched worker)
+2026-11-09 01:13 | worker | None | None | None | W2-142 independent test designer (launched worker)
+2026-11-09 01:17 | worker | None | None | None | W2-141 independent test designer (launched worker)
+2026-11-09 01:32 | worker | None | None | None | W2-147 independent test designer (launched worker)
+2026-11-09 01:33 | worker | None | None | None | W2-56 independent test designer, first half (launched worker)
+2026-11-09 01:42 | worker | None | None | None | W2-142 independent test designer, round 2 (launched worker)
+2026-11-09 01:44 | worker | None | None | None | W2-147 engineer (launched worker)
+2026-11-09 01:49 | worker | None | None | None | W2-147 independent review (launched worker)
+2026-11-09 01:49 | worker | None | None | None | W2-141 independent test designer, round 2 (launched worker)
+2026-11-09 01:49 | worker | None | None | None | W2-142 product-spec worker (launched worker)
+2026-11-09 01:54 | worker | None | None | None | W2-142 independent review (launched worker)
+2026-11-09 01:55 | worker | None | None | None | W2-20 independent test designer, round 2 (launched worker)
+2026-11-09 01:59 | worker | None | None | None | W2-20 independent test designer, round 3 (launched worker)
+2026-11-09 02:16 | worker | None | None | None | W2-141 engineer (launched worker)
+2026-11-09 02:18 | worker | None | None | None | W2-145 engineer (launched worker)
+2026-11-09 02:26 | worker | None | None | None | W2-141 engineer, round 2 (launched worker)
+2026-11-09 02:32 | worker | None | None | None | W2-145 engineer, round 2 (launched worker)
+2026-11-09 02:36 | worker | None | None | None | W2-141 independent review (launched worker)
+2026-11-09 02:50 | worker | None | None | None | W2-145 independent review (launched worker)
+2026-11-09 02:52 | worker | None | None | None | W2-141 engineer, round 3 (launched worker)
+2026-11-09 03:02 | worker | None | None | None | W2-141 independent review, round 2 (launched worker)
+2026-11-09 03:28 | worker | None | None | None | W2-145 engineer, round 3 (launched worker)
+2026-11-09 03:42 | worker | None | None | None | W2-145 independent review, round 2 (launched worker)
+2026-11-09 04:00 | worker | None | None | None | W2-20 engineer, the rebuild (launched worker)
+2026-11-09 09:30 | agent | None | None | None | Item 8: tickets, six designers, five engineers and reviews (general-purpose, CTO's helper)
+2026-11-09 09:30 | agent | None | None | None | W2-88-STANDARD-1 (product-spec)
+2026-11-09 09:30 | agent | None | None | None | P-SELECT-FIXES-1 and the code route script (research)
+2026-11-09 09:30 | agent | None | None | None | SANDBOX-GUARD-EXP-1 design, two drafts (research)
+2026-11-09 09:30 | agent | None | None | None | Q07/Q14 re-worded (product-spec)
+2026-11-09 09:30 | agent | None | None | None | W2-130 sitting patches (general-purpose, resumed; delta)
+2026-11-09 09:30 | agent | None | None | None | W2-130 final patches audit (independent auditor, resumed; delta)
+2026-11-09 09:30 | agent | None | None | None | FORECAST-W2-1 (general-purpose)
+2026-11-09 09:30 | agent | None | None | None | DEC-1099 ticket edits (product-spec)
+2026-11-09 09:30 | agent | None | None | None | Sandbox experiment preparation: seal and corpus (research)
+2026-11-09 09:30 | agent | None | None | None | Sandbox declaration, briefs, A's runner, scorer (research)
+2026-11-09 09:30 | agent | None | None | None | ACT-SELECT-FIXES-1, W2-66c, ACT-SELECT-HOOK-1 (general-purpose)
+2026-11-09 09:30 | agent | None | None | None | ACT-INDEP-WALLS-1 and LAUNCH-SPEC (research)
+2026-11-09 14:20 | worker | None | None | None | W2-148 independent test designer (launched worker)
+2026-11-09 14:24 | worker | None | None | None | W2-20 engineer, round 2 (launched worker)
+2026-11-09 14:31 | worker | None | None | None | W2-20 independent test designer, round 4 (launched worker)
+2026-11-09 14:33 | worker | None | None | None | W2-20 independent test designer, round 5 (launched worker)
+2026-11-09 14:45 | worker | None | None | None | W2-20 independent review (launched worker)
+2026-11-09 14:49 | worker | None | None | None | W2-20 independent test designer, round 6 (launched worker)
+2026-11-09 15:02 | worker | None | None | None | W2-20 independent test designer, round 7 (launched worker)
+2026-11-09 15:08 | worker | None | None | None | W2-148 engineer (launched worker)
+2026-11-09 15:23 | worker | None | None | None | W2-148 independent review, round 1 (launched worker)
+2026-11-09 15:25 | worker | None | None | None | W2-20 engineer, round 3 (launched worker)
+2026-11-09 15:34 | worker | None | None | None | W2-20 independent review, round 2 (launched worker)
+2026-11-09 15:42 | worker | None | None | None | W2-148 engineer, round 2 (launched worker)
+2026-11-09 15:56 | worker | None | None | None | W2-148 independent review, round 2 (launched worker)
+2026-11-09 16:02 | worker | None | None | None | W2-20 independent test designer, round 8 (launched worker)
+2026-11-09 16:10 | worker | None | None | None | W2-20 engineer, round 4, DEC-1105 (launched worker)
+2026-11-09 16:18 | worker | None | None | None | W2-148 independent test designer, round 2 (DEC-1106) (launched worker)
+2026-11-09 16:22 | worker | None | None | None | W2-20 narrow review, DEC-1105 (launched worker)
+2026-11-09 16:36 | worker | None | None | None | W2-148 engineer, round 3 (DEC-1106) (launched worker)
+2026-11-09 16:47 | worker | None | None | None | W2-148 narrow review of DEC-1106 (launched worker)
+2026-11-09 16:57 | worker | None | None | None | W2-148 independent test designer, F21 round (DEC-1107) (launched worker)
+2026-11-09 17:05 | worker | None | None | None | W2-148 engineer, F21 round (DEC-1107) (launched worker)
+2026-11-09 17:11 | worker | None | None | None | W2-148 narrow review of DEC-1107 (F21) (launched worker)
+2026-11-09 18:30 | agent | None | None | None | ACT-GATE-CONFIG-1 and ACT-D4-RESTORE-1 (general-purpose)
+2026-11-09 18:30 | agent | None | None | None | OPERATOR-AGENT-1 package (product-spec)
+2026-11-09 18:30 | agent | None | None | None | The landing selection's environment fix (general-purpose)
+2026-11-09 18:30 | agent | None | None | None | W2-148: ticket, designers, engineers, reviews, F15, F21 (general-purpose, CTO's helper)
+2026-11-09 18:30 | agent | None | None | None | Item 8 helper since 09:30: W2-20 rounds 2-3, the exception round, ACT-GATE-CONFIG-2 (delta)
+2026-11-09 18:30 | agent | None | None | None | ACT-GUARD-CALLLOG-1 (general-purpose)
+2026-11-09 19:13 | worker | None | None | None | W2-140 independent test designer (launched worker)
+2026-11-09 19:24 | worker | None | None | None | W2-139 product-spec worker (launched worker)
+2026-11-09 19:25 | launched worker | None | None | None | W2-129 S17 test designer (D-6 part 2 item A)
+2026-11-09 19:25 | launched worker | None | None | None | W2-129 S17 engineer (D-6 part 2 item A)
+2026-11-09 19:25 | launched worker | None | None | None | W2-129 S17 review, READY (D-6 part 2 item A)
+2026-11-09 20:10 | launched | None | None | None | W2-128 round 1 test designer (launched, high)
+2026-11-09 20:35 | launched | None | None | None | W2-128 round 1 test designer revision 2 (launched, medium)
+2026-11-09 19:45 | worker | None | None | None | W2-148 replay round (DEC-1108 (2)): independent test designer (w2/W2-148-replay-tests, 841c64944)
+2026-11-09 19:45 | worker | None | None | None | W2-148 replay round (DEC-1108 (2)): engineer (w2/W2-148-replay, fefc3390c, 24abf75a1)
+2026-11-09 19:45 | worker | None | None | None | W2-148 replay round (DEC-1108 (2)): narrow review, READY by verdict.py (F30-F32 in scope not blocking, F33 out)
+2026-11-09 19:45 | agent | None | None | None | DEC-1108 (2): the CTO's replay-set builder (build_replay_calls.py, 11 tests) and the W2-148 round's coordination (general-purpose, CTO's helper)
+2026-11-09 19:45 | worker | None | None | None | W2-149 independent test designer (launched worker, opus, high)
+2026-11-09 19:45 | launched worker | None | None | None | W2-92 S11 test designer (D-6 part 2 item B)
+2026-11-09 20:08 | worker | None | None | None | W2-139 and W2-140 batch independent review, round 1 (launched worker)
+2026-11-09 21:40 | launched | None | None | None | W2-128 round 1 product-spec (launched, high)
+2026-11-09 20:10 | launched worker | None | None | None | W2-92 S11 engineer (D-6 part 2 item B)
+2026-11-09 20:25 | launched worker | None | None | None | W2-92 S11 review, READY (D-6 part 2 item B)
+2026-11-09 21:50 | launched | None | None | None | W2-128 round 1 review (launched, independent-auditor, high)
+2026-11-09 20:20 | launched worker | None | None | None | W2-56 second-half test designer (guard alone) and W1-27 D-2 revision (launched, high)
+2026-11-09 20:45 | worker | None | None | None | W2-149 engineer (launched worker, opus, high)
+2026-11-09 22:15 | launched | None | None | None | W2-128 W1-35 revision test designer (launched, medium)
+2026-11-09 20:31 | launched worker | None | None | None | W2-56 test designer revision (S9 real case, settled points; launched, medium)
+2026-11-09 22:35 | launched | None | None | None | W2-128 round 1 fixes, product-spec (launched, medium)
+2026-11-09 21:00 | launched worker | None | None | None | W2-141 S4 test designer (D-6 part 2 item D)
+2026-11-09 21:10 | worker | None | None | None | W2-149 review round 1 (launched worker, opus, high) + 3 live cases (haiku)
+2026-11-09 21:10 | launched worker | None | None | None | W2-141 S4 review, READY (D-6 part 2 item D)
+2026-11-09 21:35 | worker | None | None | None | W2-149 engineer round 2 (launched worker, opus, high)
+2026-11-09 21:30 | launched worker | None | None | None | W2-150 test designer (D-6 part 2 item E)
+2026-11-09 21:55 | worker | None | None | None | W2-149 review round 2 (launched worker, opus, high) + live re-run (haiku)
+2026-11-09 23:30 | launched | None | None | None | W2-152 test designer (launched, high)
+2026-11-09 23:55 | launched | None | None | None | W2-128 round 2a test designer (launched, medium)
+2026-11-09 21:14 | launched worker | None | None | None | W2-56 engineer round 1 (launched, high)
+2026-11-10 00:20 | launched | None | None | None | W2-128 round 2a product-spec (launched, medium)
+2026-11-10 00:45 | launched | None | None | None | W2-128 round 2a review (launched, independent-auditor, high)
+2026-11-09 22:25 | launched worker | None | None | None | W2-150 engineer (D-6 part 2 item E)
+2026-11-09 21:28 | launched worker | None | None | None | W2-56 test designer revision (S13 real case to P-1 (b); launched, medium)
+2026-11-09 22:40 | launched worker | None | None | None | W2-150 review, READY (D-6 part 2 item E)
+2026-11-10 01:15 | launched | None | None | None | W2-152 engineer (launched, high)
+2026-11-09 22:55 | launched worker | None | None | None | W2-151 product-spec (D-6 part 2 item C)
+2026-11-09 23:00 | launched worker | None | None | None | W2-151 review, READY (D-6 part 2 item C)
+2026-11-10 01:50 | launched | None | None | None | W2-152 review round 1 (launched, independent-auditor, high)
+2026-11-09 23:40 | launched worker | None | None | None | W2-150 follow-up S6 test designer
+2026-11-10 02:05 | launched | None | None | None | W2-152 test designer revision 2 (launched, medium)
+2026-11-09 23:55 | launched worker | None | None | None | W2-150 follow-up S6 engineer
+2026-11-10 02:20 | launched | None | None | None | W2-152 engineer fix round (launched, high)
+2026-11-10 00:15 | launched worker | None | None | None | W2-150 follow-up S6 narrow review, READY
+2026-11-10 02:35 | launched | None | None | None | W2-152 review round 2 (launched, independent-auditor, high)
+2026-11-10 03:00 | launched | None | None | None | W2-153 test designer (launched, high)
+2026-11-09 22:13 | launched worker | None | None | None | W2-56 engineer round 2 (launched, high)
+2026-11-10 00:55 | launched worker | None | None | None | D-6 part 2 item F test designer (link findings in tests)
+2026-11-10 03:30 | launched | None | None | None | W2-153 engineer (launched, high)
+2026-11-10 01:20 | launched worker | None | None | None | D-6 part 2 item F review, READY
+2026-11-10 03:50 | launched | None | None | None | W2-153 test designer revision 2 (launched, medium)
+2026-11-10 04:15 | launched | None | None | None | W2-153 engineer fix round (launched, high; one refused start: the branch launcher wanted the template copy)
+2026-11-09 22:32 | launched worker | None | None | None | W2-56 independent review round 1, READY (launched, high)
+2026-11-09 22:32 | orchestrator probe | None | None | None | W2-56 CTO probes: D-13 socket allow (3 claude -p haiku sessions) and the real cases outside the sandbox (about 16 haiku sessions)
+2026-11-10 02:00 | launched worker | None | None | None | W2-55 S9 test designer (D-6 part 2 item F2)
+2026-11-10 04:50 | launched | None | None | None | W2-153 review (launched, independent-auditor, high)
+2026-11-10 02:20 | launched worker | None | None | None | W2-55 S9 engineer (D-6 part 2 item F2)
+2026-11-10 02:40 | launched worker | None | None | None | W2-55 S9 review (D-6 F2): F1 blocks (Settles unreported)
+2026-11-09 22:57 | note | None | None | None | correction: D-6 part 2 rows dated 2026-11-09 20:10 to 2026-11-10 02:40
+2026-11-09 23:00 | launched worker | None | None | None | W2-129 S18 test designer (D-6 F2 round 2)
+2026-11-09 23:15 | launched worker | None | None | None | W2-129 S18 engineer (D-6 F2 round 2)
+2026-11-09 23:30 | launched worker | None | None | None | D-6 F2 round-2 review (W2-55 S9 + W2-129 S18), READY
+2026-11-09 23:25 | agent | None | None | None | ACT-CLAUDE-COPIES-1 review (in-session independent-auditor subagent, operator reviewer brief)
+2026-11-09 23:44 | launched | None | None | None | W2-128 round 2b test designer (launched, medium)
+2026-11-10 00:29 | launched | None | None | None | W2-128 round 2b product-spec (launched, medium; 13 gate refusals before admission)
+2026-11-10 00:29 | launched | None | None | None | W2-128 round 2b review (launched, independent-auditor, high)
+2026-11-10 01:08 | launched | None | None | None | W2-153 R1 fixtures test designer (launched, high)
+2026-11-10 01:08 | launched | None | None | None | W2-153 R1 unit fixtures engineer (launched, high)
+2026-11-10 01:34 | launched | None | None | None | W2-153 F2-baseline test designer (launched, medium)
+2026-11-10 01:34 | launched | None | None | None | W2-152 comment test designer (launched, low)
+2026-11-10 01:34 | launched | None | None | None | W2-153 W2-56 S6 assertion test designer (launched, medium)
+2026-11-10 01:34 | launched | None | None | None | W2-153 skills-list engineer (launched, medium)
+2026-11-10 01:50 | launched | None | None | None | W2-153 R1 last unit file engineer (launched, medium)
+2026-11-10 02:03 | launched | None | None | None | W2-153 F6-case test designer (launched, low)
+2026-11-10 02:17 | agent | None | None | None | ACT-CLAUDE-COPIES-2 review (in-session independent-auditor subagent, operator reviewer brief)
+2026-11-10 10:19 | launched | None | None | None | W2-153 W1-46 revision test designer (launched, medium)
+2026-11-10 10:19 | launched | None | None | None | W2-153 W1-46 revision review (launched, independent-auditor, high)
+2026-11-10 11:47 | launched | None | None | independent-auditor | DAEO-sdxk wake/helper-watch/brake code review (claude -p, independent-auditor, high)
+2026-11-10 11:51 | launched | DAEO-zqvn | W2-13-d10b | independent-test-designer | W2-13-d10b independent-test-designer (launched, high) D10-serial-only-1a-designer
+2026-11-10 11:58 | launched | DAEO-ouet | W2-96-d10b | independent-test-designer | W2-96-d10b independent-test-designer (launched, high) D10-W2-96-accept-designer
+2026-11-10 12:03 | launched | DAEO-zqvn | W2-13 | independent-auditor | W2-13 independent-auditor (launched, max) D10-serial-only-1a-review
+2026-11-10 12:03 | launched | DAEO-52ku | W2-149 | engineer | W2-149 engineer (launched, high) W2-149-engineer-sgx-f18
+2026-11-10 12:03 | launched | DAEO-8s85 | W2-153 | independent-test-designer | W2-153 independent-test-designer (launched, high) W2-153-designer-r8
+2026-11-10 12:07 | launched | DAEO-r30l | W2-20-d10d | independent-test-designer | W2-20-d10d independent-test-designer (launched, high) D10-pinned-gov-designer
+2026-11-10 12:09 | launched | DAEO-8s85 | W2-153 | engineer | W2-153 engineer (launched, high) W2-153-engineer-r4
+2026-11-10 12:18 | launched | DAEO-ouet | W2-96-d10b | engineer | W2-96-d10b engineer (launched, high) D10-W2-96-accept-engineer
+2026-11-10 12:19 | launched | DAEO-8s85 | W2-153 | independent-auditor | W2-153 independent-auditor (launched, high) W2-153-review-s3a
+2026-11-10 12:21 | launched | None | None | independent-auditor | ACT-DEADMAN-WAKE-1 review round 1 (claude -p, independent-auditor, max)
+2026-11-10 12:23 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, max) ACT-WIN-TOAST-1-review
+2026-11-10 12:24 | launched | DAEO-52ku | W2-149 | independent-auditor | W2-149 independent-auditor (launched, max) W2-149-review-sgx-f18
+2026-11-10 12:29 | launched | None | None | None | W2-153 S3-amended test designer (launched, high)
+2026-11-10 12:29 | launched | None | None | None | W2-153 S3-amended engineer (launched, high)
+2026-11-10 12:29 | launched | None | None | None | W2-153 S3-amended review (launched, independent-auditor, high)
+2026-11-10 12:29 | agent | None | None | None | ACT-CLAUDE-COPIES-3 review (in-session independent-auditor subagent, operator reviewer brief)
+2026-11-10 12:31 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, max) D10-pinned-gov-review
+2026-11-10 12:40 | launched | DAEO-ouet | W2-96 | independent-auditor | W2-96 independent-auditor (launched, max) D10-W2-96-accept-review
+2026-11-10 12:43 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, max) ACT-WIN-TOAST-1-review-r2
+2026-11-10 12:47 | launched | None | None | independent-auditor | ACT-DEADMAN-WAKE-1 review round 2 (claude -p, independent-auditor, max)
+2026-11-10 12:54 | launched | DAEO-52ku | W2-149 | independent-auditor | W2-149 independent-auditor (launched, max) ACT-W2-149-INSTALL-1-review-v3
+2026-11-10 12:55 | launched | DAEO-ouet | W2-96 | independent-test-designer | W2-96 independent-test-designer (launched, high) D10-W2-96-r2-designer
+2026-11-10 13:08 | launched | DAEO-ouet | W2-96 | engineer | W2-96 engineer (launched, high) D10-W2-96-r2-engineer
+2026-11-10 13:11 | launched | DAEO-52ku | W2-149 | independent-test-designer | W2-149 independent-test-designer (launched, high) W2-149-designer-sgx-f36
+2026-11-10 13:12 | launched | DAEO-ouet | W2-96 | independent-test-designer | W2-96 independent-test-designer (launched, high) D10-W2-96-r2-designer-fix
+2026-11-10 13:20 | launched | DAEO-52ku | W2-149 | engineer | W2-149 engineer (launched, high) W2-149-engineer-sgx-f36
+2026-11-10 13:22 | launched | DAEO-ouet | W2-96 | independent-auditor | W2-96 independent-auditor (launched, high) D10-W2-96-r2-review
+2026-11-10 13:39 | launched | DAEO-52ku | W2-149 | independent-auditor | W2-149 independent-auditor (launched, max) W2-149-review-sgx-f36
+2026-11-10 14:00 | launched | DAEO-ouet | W2-96 | independent-auditor | W2-96 independent-auditor (launched, max) D10-W2-96-probe-r3
+2026-11-10 14:04 | launched | DAEO-52ku | W2-149 | independent-auditor | W2-149 independent-auditor (launched, max) ACT-W2-149-INSTALL-1-review-v4
+2026-11-10 14:11 | launched | DAEO-ouet | W2-96 | independent-test-designer | W2-96 independent-test-designer (launched, low) D10-lift-maps-designer
+2026-11-10 14:11 | brake | None | W2-96 | None | runaway brake on W2-96
+2026-11-10 14:12 | brake-clear | None | W2-96 | None | the CTO cleared the brake on W2-96
+2026-11-10 14:13 | launched | DAEO-ouet | W2-96 | independent-test-designer | W2-96 independent-test-designer (launched, low) D10-lift-maps-designer-fix
+2026-11-10 14:15 | launched | DAEO-ouet | W2-96 | independent-auditor | W2-96 independent-auditor (launched, low) D10-lift-maps-review
+2026-11-10 15:37 | launched | DAEO-t8mp | W2-128 | independent-test-designer | W2-128 independent-test-designer (launched, high) D10-W1-08-designer
+2026-11-10 15:42 | launched | DAEO-t8mp | W2-128 | independent-auditor | W2-128 independent-auditor (launched, high) D10-W1-08-review
+2026-11-10 16:06 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, max) ACT-PATHMAP-NS-2-review
+2026-11-10 16:06 | brake | None | W2-20 | None | runaway brake on W2-20
+2026-11-10 16:09 | brake-clear | None | W2-20 | None | the CTO cleared the brake on W2-20
+2026-11-10 16:10 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, max) ACT-EFFORT-HIGH-1-review
+2026-11-10 16:15 | launched | DAEO-t8mp | W2-128 | product-spec | W2-128 product-spec (launched, high) W2-128-tpl101-spec
+2026-11-10 16:21 | launched | DAEO-t8mp | W2-128 | independent-auditor | W2-128 independent-auditor (launched, high) W2-128-tpl101-review
+2026-11-10 16:27 | launched | DAEO-t8mp | W2-128 | product-spec | W2-128 product-spec (launched, high) W2-128-tpl101-spec-r2
+2026-11-10 16:33 | launched | DAEO-t8mp | W2-128 | independent-auditor | W2-128 independent-auditor (launched, high) W2-128-tpl101-review-r2
+2026-11-10 17:00 | launched | DAEO-r30l | W2-20 | independent-auditor | W2-20 independent-auditor (launched, high) ACT-EFFORT-HIGH-2-review
+2026-11-10 17:53 | launched | DAEO-r30l | W2-20 | independent-test-designer | W2-20 independent-test-designer (launched, high) D10-collect-rename
+2026-11-10 17:53 | brake | None | W2-20 | None | runaway brake on W2-20
+2026-11-10 17:53 | brake-clear | None | W2-20 | None | the CTO cleared the brake on W2-20
+2026-11-10 21:14 | launched | DAEO-h2k3 | W2-61h | independent-test-designer | W2-61h independent-test-designer (launched, high) D10R2-G-visible-questions-designer
+2026-11-10 21:14 | launched | DAEO-clon | W2-112 | independent-test-designer | W2-112 independent-test-designer (launched, high) D10R2-A-sockets-designer
+2026-11-10 21:15 | launched | DAEO-rmhj | W2-138 | independent-test-designer | W2-138 independent-test-designer (launched, high) D10R2-E-bundle-fields-designer
+2026-11-10 21:22 | launched | DAEO-wnnz | W2-56 | independent-test-designer | W2-56 independent-test-designer (launched, high) D10R2-C-cbm-suites-designer
+2026-11-10 21:59 | launched | DAEO-h2k3 | W2-61h | independent-test-designer | W2-61h independent-test-designer (launched, high) D10R2-G2-retired-originals-designer
+2026-11-10 22:10 | launched | DAEO-8s85 | W2-153 | independent-test-designer | W2-153 independent-test-designer (launched, high) D10R2-B-launch-template-designer-2
+2026-11-10 22:14 | launched | DAEO-h2k3 | W2-61h | independent-test-designer | W2-61h independent-test-designer (launched, high) D10R2-Q23-reword-designer

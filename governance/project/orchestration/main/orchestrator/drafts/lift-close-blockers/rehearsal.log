@@ -1,0 +1,71 @@
+=== clone at 8c18fa3004a620060b4e26e66a360e1eabfb7332 (main tree HEAD 8c18fa3004a620060b4e26e66a360e1eabfb7332)
+=== BEFORE: pre-measure findings per ticket (lift closes, then D-10's three)
+  DAEO-blwa: 7 findings {'unmeasured:WORK_WITHOUT_TASK': 6, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-qzrq: 11 findings {'unmeasured:WORK_WITHOUT_TASK': 10, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-jpr0: 14 findings {'unmeasured:WORK_WITHOUT_TASK': 13, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-n0wb: 15 findings {'unmeasured:WORK_WITHOUT_TASK': 14, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-ouet: 7 findings {'probe:PROBE_INVALID': 1, 'unmeasured:WORK_WITHOUT_TASK': 5, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+       probe:PROBE_INVALID | commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)
+  DAEO-vhad: 5 findings {'unmeasured:WORK_WITHOUT_TASK': 4, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-zuiy: 5 findings {'unmeasured:WORK_WITHOUT_TASK': 4, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+  DAEO-fu3n: 5 findings {'unmeasured:WORK_WITHOUT_TASK': 4, 'ratchet:load_sensitive:LOAD_SENSITIVE_REFUSED': 1}
+=== BEFORE: containment (counted)
+DAEO-blwa containment: no finding over 22 ticket commits
+DAEO-qzrq containment: no finding over 27 ticket commits
+DAEO-jpr0 containment FINDING: 2 lines
+    containment: commit 15c80ebb72b7: tests/acceptance/W2-123/README.md, tests/acceptance/W2-123/test_w2_123_retry.py, tests/acceptance/W2-126/README.md, tests/acceptance/W2-126/test_w2_126_retry.py: 
+    containment: commit b32fdb80f5fc: .tickets/DAEO-03ub.md, .tickets/DAEO-0rfi.md, .tickets/DAEO-jpr0.md, .tickets/DAEO-r30l.md, docs/DECISION_REGISTER.md, docs/changes/W2-126-evidence.md, docs/check
+DAEO-n0wb containment FINDING: 7 lines
+    containment: commit 5fc7681a1214: tests/conftest.py: committed path(s) outside allowed paths
+    containment: commit 720a2cbb66e0: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 4e9ba434eb70: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit a01fc5f456cd: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 295d23c5112c: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit e270a5206b60: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 0024c753aaf6: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+DAEO-ouet containment FINDING: 2 lines
+    containment: commit 65fa76dc3cf2: tests/unit/accept/test_w2_96_accept.py, tests/unit/accept/test_w2_96_review3.py, tests/unit/accept/test_w2_96_review4.py, tests/unit/accept/test_w2_96_run2.py, te
+    containment: commit 6bcbbcdd5511: tests/unit/accept/test_w2_96_run2.py: committed path(s) outside allowed paths
+DAEO-vhad containment: no finding over 1 ticket commits
+DAEO-zuiy containment: no finding over 1 ticket commits
+DAEO-fu3n containment: no finding over 2 ticket commits
+=== diff:  0 files changed
+=== register commit 7c26a420281e
+yaml-ok accepted_history 18 load_sensitive 24 acceptance_exemptions ['DEC-1127', 'DEC-1031', 'DEC-1123', 'DEC-1123', 'DEC-1123', 'DEC-1127', 'DEC-1127']
+=== owner commit aee0a374875d; tree status: 0 changed
+=== AFTER: pre-measure findings per ticket
+  DAEO-blwa: 0 findings {}
+  DAEO-qzrq: 0 findings {}
+  DAEO-jpr0: 0 findings {}
+  DAEO-n0wb: 0 findings {}
+  DAEO-ouet: 1 findings {'probe:PROBE_INVALID': 1}
+       probe:PROBE_INVALID | commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)
+  DAEO-vhad: 0 findings {}
+  DAEO-zuiy: 0 findings {}
+  DAEO-fu3n: 0 findings {}
+=== AFTER: containment (counted; no edit clears these)
+DAEO-blwa containment: no finding over 22 ticket commits
+DAEO-qzrq containment: no finding over 27 ticket commits
+DAEO-jpr0 containment FINDING: 2 lines
+    containment: commit 15c80ebb72b7: tests/acceptance/W2-123/README.md, tests/acceptance/W2-123/test_w2_123_retry.py, tests/acceptance/W2-126/README.md, tests/acceptance/W2-126/test_w2_126_retry.py: 
+    containment: commit b32fdb80f5fc: .tickets/DAEO-03ub.md, .tickets/DAEO-0rfi.md, .tickets/DAEO-jpr0.md, .tickets/DAEO-r30l.md, docs/DECISION_REGISTER.md, docs/changes/W2-126-evidence.md, docs/check
+DAEO-n0wb containment FINDING: 7 lines
+    containment: commit 5fc7681a1214: tests/conftest.py: committed path(s) outside allowed paths
+    containment: commit 720a2cbb66e0: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 4e9ba434eb70: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit a01fc5f456cd: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 295d23c5112c: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit e270a5206b60: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+    containment: commit 0024c753aaf6: docs/changes/W2-92-evidence.md: committed path(s) outside allowed paths
+DAEO-ouet containment FINDING: 2 lines
+    containment: commit 65fa76dc3cf2: tests/unit/accept/test_w2_96_accept.py, tests/unit/accept/test_w2_96_review3.py, tests/unit/accept/test_w2_96_review4.py, tests/unit/accept/test_w2_96_run2.py, te
+    containment: commit 6bcbbcdd5511: tests/unit/accept/test_w2_96_run2.py: committed path(s) outside allowed paths
+DAEO-vhad containment: no finding over 1 ticket commits
+DAEO-zuiy containment: no finding over 1 ticket commits
+DAEO-fu3n containment: no finding over 2 ticket commits
+=== lists
+accepted_reds: 0 entries, 0 count, 0 refused
+load_sensitive: 24 entries, 24 count, 0 refused
+accepted_history: 18 entries, 18 accepted, 0 refused
+acceptance_exemptions: 7 entries, 0 would not clear a commit
+=== W1-01 acceptance folder after the owner's commit: 54 passed, 12 deselected in 49.79s

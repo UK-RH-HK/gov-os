@@ -1,0 +1,204 @@
+######## DEC-1112 at 14134
+### DEC-1112 — The sandbox experiment narrowed to set-up A (set-up B a Wave 3 row); W2-56 builds on the path-map guard alone; what the CTO brings the owner (standing)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1098 (4), DEC-1099 (1), DEC-936 item 2.5, DEC-1110 (1), DEC-1111 (2) · **Source:** the owner's message (chat, 2026-11-09), after set-up B's fix pass was stopped by a safety check (the third stop on its replay environment) · **Changed by:** DEC-1128 (4): set-up B dropped entirely, not a Wave 3 row; DEC-1128 (2): the tuned guard's changes go live only on set-up A's 100 % on the path map's actions
+- **Decision:**
+  - (1) **The sandbox experiment: (a).** Set-up A (the path-map guard alone) measured fully, as declared, beside D-10;
+    set-up B becomes a Wave 3 row, built by a different route. W2-56 builds on the path-map guard alone, with today's
+    launcher sandbox for workers unchanged. The CTO brings set-up A's result against the bar and, under DEC-1099 (1) Q8,
+    the tuned guard's changes as an ACT if they cut false refusals with no new wrong allow.
+  - (2) **W1-46's research-install case (DEC-1111 (2)) is a P2:** the CTO decides it under DEC-936 item 2.5, records it
+    as a delegated decision and lists it in the digest.
+  - (3) **Standing: the CTO brings the owner only:** P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs;
+    fixed briefs to approve once; anything that changes one of the owner's standing decisions; and steps only the owner
+    can do physically. Every other P2 is the CTO's, recorded and listed in the digest. The line joins the
+    standing-rules list.
+- **Basis:** question 4 (the owner's time kept for what only the owner can decide) and question 2 (the guard measured
+  as it is, without a harness that could not be built safely here).
+
+### DEC-1113 — Set-up A's four fixed briefs approved once with two changes: the guard rules decided since DEC-1099 included, the pinned commit one where they are live; overlap disagreements decided by an independent auditor under its own fixed brief
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1112 (1), DEC-1101 (2), DEC-1099 (1) Q5 · **Source:** the owner's message (chat, 2026-11-09), on the four briefs (labeller, labeller-2, writer-tuning, writer-heldout)
+- **Decision:** the four briefs are approved once, after two changes and before they are hashed:
+  - (1) every brief's list of decisions to read, and the labeller's "what counts as forbidden", include the guard rules
+    decided since DEC-1099: the walls (DEC-1101 (2)-(3)), rule 2c (DEC-1099 (1) Q6, DEC-1101), rule 2d (DEC-1106 (3),
+    DEC-1108 (5)) and the call log; the experiment's pinned commit is one where those rules are live; any judged outside
+    the bar is said so in the declaration instead;
+  - (2) the overlap's disagreements are decided by an independent auditor, under its own fixed brief for the owner's
+    approval once, from the decisions alone, blind to the guard and the results; only a case it cannot settle from the
+    decisions, or one whose outcome changes the experiment's verdict, escalates to the owner; the rest appear as counts
+    in the result.
+  The CTO brings the new hashes and the auditor's brief.
+- **Basis:** question 2 (the labels judged by every rule in force, and their disagreements settled independently).
+
+### DEC-1114 — W2-56's S8 on Linux (DEC-105, against DEC-1035 (2)): (b), S8's reach and S10 deferred to Wave 3 as a ticket; the rest of W2-56 merged now; a re-estimate at today's measured pace
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse)
+- **Decision:**
+######## DEC-1109 at 14091
+### DEC-1109 — The operator agent's briefs: the reviewer's approved, the operator's approved with one change; the rest of the work restarted in parallel; standing: unblocked work keeps moving while an item waits on the owner
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1101 (2), DEC-1104 (2), DEC-1106, DEC-1098 (6) · **Source:** the owner's message (chat, 2026-11-09), after ACT-OPERATOR-1 (`06596e9d`)
+- **Decision:**
+  - (1) **ACT-OPERATOR-1's fixed briefs:** `reviewer-brief.md` approved as written (`e86703304144…`); `brief.md` approved
+    with one change: "unless the program's own output asks for it" becomes "unless the program's final result line asks
+    for it", so text from an ACT's own check output can never prompt the session. The hashes and APPROVED rebuilt, the
+    affected rehearsal cases re-run, a new message for the owner's operator.
+  - (2) **The rest of the work restarted now, in parallel** (none of it waits on the operator agent): W2-139 and W2-140 in
+    one batch before D-10; D-5 (the templates) and D-6 part 2; the sandbox experiment's remaining preparation (set-up
+    B's runner, the fixed briefs for the owner's approval); the launch script for the independent sessions, tests first;
+    the replay set builder (DEC-1108 (2)); D-10's red-fix list made ready (W1-06, test_fusion, the three red-by-design
+    cases).
+  - (3) **Standing:** while an item waits on the owner, every unblocked item keeps moving in parallel, within the
+    machine's limits; never report "nothing is running" while unblocked work remains.
+- **Basis:** question 2 (no session prompted by an ACT's own output) and question 4 (the machine kept working while the
+  owner decides).
+
+### DEC-1110 — The standing operating rules at the top of the CTO's prompt and in START-NEXT-SESSION §2; a stop-hook check against idling while unblocked work remains, by an ACT; a fresh CTO session before D-10; ready lists that cover several of gov plan's batches after the lift
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (3) standing · **Under:** DEC-936 item 2, DEC-942, DEC-1109 (3), DEC-1104 (4), DEC-1007, DEC-1088 · **Source:** the owner's message (chat, 2026-11-09), accepting the CTO's answers on why DEC-1109 (3) restated DEC-936 item 2, a fresh session, and the flow after the lift
+- **Decision:**
+  - (1) **The standing operating rules** as one short list at the top of `governance/project/prompts/w2-orchestrator.md`
+    and in START-NEXT-SESSION §2; and **a stop-hook check as an ACT for the owner's operator, rehearsed:** before the
+    CTO ends a turn, if no agent or job is running while DECIDED-NOT-DONE shows unblocked items, it blocks with a
+    reminder; it lets a legitimate wait through (the machine full, the gate shut, every remaining item waiting on the
+    owner or on a running job), naming which.
+  - (2) **A fresh CTO session at the boundary:** after the seven running helpers report and before D-10, the handover
+    written to the 11-08 standard (START-NEXT-SESSION, RESUME HERE, DECISIONS-IN-FORCE, DECIDED-NOT-DONE, the
+    standing-rules list); the CTO says when it is ready to switch.
+  - (3) **Standing, after the lift:** each ready list the CTO commits covers several of `gov plan`'s batches ahead, so
+    the dispatcher keeps the machine full through a wait.
+- **Basis:** question 4 (the machine kept full while the owner decides) and question 2 (a rule that a long session's
+  compactions cannot erase is enforced by a check, not by memory).
+
+######## DEC-1097 at 13850
+### DEC-1097 — The experiments decided: the fresh 80 judges window 4's configuration (search again once) against K9's end-to-end bar; ACT-GUARD-SETS-1 rebuilt and applied before it; a seven-reviewer readiness review; keep the 0.6B; G3 no change; the overdue items given their fates
+- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) decided (b) by the owner (chat, 2026-11-08, after the 09:00 digest) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE
+- **Decision, the experiments:**
+  - (1) **FRESH-80-1:** (a) the configuration judged is window 4's pin (`pin-bcea09060ebc`), the pool on, today's
+    bundle (6,000 tokens), search again once (A2); (b) at window 4's commit `c00d525f`, with the visible-40 control
+    first (within 2 of E0's 34); (c) every experiment runs on the 80 for data, and only the configuration in (a) is
+    judged (FRESH-80-1 §3.4); (d) **the K9 bar:** right end to end at least 85 % with wrong claims at most 5 %, target
+    95 %, hit@5 reported beside it (on 79: at least 68 right, at most 3 wrong claims, FRESH-80-1 §4.3); (e) the readers
+    and graders read the 80; (f) the owner's checker's staleness pass first, with the CTO's brief
+    (FRESH-80-READINESS §2); (g) the twenty fixes and the fault rule as written (FRESH-80-1 §2, §3.5), including the
+    stricter grade as data, the nonexistent-id rule, and no commit, rebuild or GPU window during the run; the CTO's
+    hold on W2-139 and W2-140 until after the 80 confirmed.
+  - (2) **ACT-GUARD-SETS-1:** rebuilt against today's live files, with the 80's reader-run folder added to the hidden
+    globs, and W2-84's hidden-half test cases deleted with it (DEC-1061 (4)); rehearsed end to end (DEC-1057), then to
+    the owner's operator; applied before the 80's single use; the live worktrees get the merge the same day.
+  - (3) **The readiness review:** approved as proposed (FRESH-80-READINESS §5), seven independent read-only reviewers;
+    fixed before the 80 only what fails open or would make the verdict wrong, in at most two rounds; the rest become
+    rows (DEC-1010). If anything in retrieval changes, E0 and E2 rerun on the 138 before the 80.
+  - (4) **The release:** if retrieval changes after the verdict, the 138 are measured again at the release commit
+    before it is cut (E0's figures and E2's A2, McNemar against the verdict commit's), a fixed step in W2-27's item (a).
+  - (5) **M3-ADOPTION-1:** keep the 0.6B (branch (c)); M3 and M1 measured on the 80 for data only.
+  - (6) **GLOSSARY-1: (b)** (the owner, 2026-11-08, after the 09:00 digest): kept in Wave 2; redesigned beside the
+    agent's own words (never in place of them), ranked toward decisions and ticket titles and definitions, and for
+    asking; retested on the 138 after the 80, declared first, against E2; `gov glossary` (W2-143, W2-144) built only
+    if the retest helps. Not in the fresh-80 configuration; the prototype's figure on the 80 is data only.
+  - (7) **G3 (overlapping slices):** no change before the 80; a ticket after the lift if the review finds it worth it.
+- **Decision, the overdue items (DECIDED-NOT-DONE §2):**
+  - (8) **Before the lift's re-pin:** W2-141 (tests first, built, reviewed); W2-20 rebuilt to its launch line
+    (DEC-1088 (5)(b)) and W2-136's F2 entry criterion, reviewed and merged; ADR-0002 refreshed, reviewed and brought to
+    the owner (DEC-1093 (3)); a new ticket for "no private reranker beside the shared service" (DEC-1048 (5),
+    DEC-1046 (1)), tests first, built before the lift.
+  - (9) **Now, on the CPU, with no commit on integrate during the 80's run:** W2-130's link clean-up and the
+    110-decision list with the CTO's proposal per id, for the owner's sitting (DEC-1074 (7) O2); the P-SELECT-GRAPH
+######## DEC-1088 at 13673
+### DEC-1088 — Dependency mapping decided: `gov plan` (W2-136), the template's `reads:`, `needs:` and `waits_on:`, enforcement at launch; closed tickets are never edited (standing)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; item (6) standing) · **Under:** DEC-1087 (5), DEC-1007 (2), DEC-936 item 3.4, DEC-899, DEC-235, DEC-1052 · **Source:** `governance/project/orchestration/packages/LIFT-1/DEPENDENCY-MAP-1.md` · **Changes:** DEC-936 item 3.4 (the planner's dependency half moves from Wave 3 into Wave 2)
+- **Decision:**
+  - (1) **DEPENDENCY-MAP-1 §2 is approved.** `gov plan` proposes the batches deterministically, and the orchestrator
+    approves them into the ready list, so DEC-1007 (2) holds.
+  - (2) **W2-136's KPI lines, and the lines added to W2-128 and W2-121, are approved,** updated to (3) and (5).
+  - (3) **§5 (b):**
+    - `reads:` stays wide, for information and the `READS_WIDE` warning;
+    - `needs:` lists the paths whose finished state the ticket depends on, and orders tickets together with
+      `waits_on:`;
+    - the template asks for both, and W2-128's ready check refuses a new ticket without them, by name.
+  - (4) **Timing:** W2-136 is built right after re-pin window 4, beside the experiments, tests first, so it is live at
+    the lift's re-pin, before the three layers' streams start.
+  - (5) **Enforcement at launch.** `gov launch` refuses:
+    - (a) a lead for a ticket that is not in the approved batch, or whose waits are not met when checked at launch time
+      against the current tickets;
+    - (b) any session, lead or worker, when the dispatcher's gate is closed or the machine's limits would be passed.
+
+    One recorded override, with a decision id, is shown in the plan and the log (DEC-899). Every refusal names what the
+    ticket waits for: the ticket, the path or the limit. The CTO finds its home and gives its KPI lines. It lands with
+    W2-136.
+  - (6) **Tickets, standing:**
+    - a closed ticket is never edited; any bug fix, new spec or upgrade to its work is a new ticket;
+    - an open ticket may change while it is in flight, and `gov plan` recomputes the plan from the current tickets;
+    - each change to an open ticket is marked on it with the decision that made it, and `gov links` flags any change
+      without one.
+- **Where (5) lives (the CTO, from the code):**
+  - (a) is W2-136's: it holds the plan, and the launcher calls its check;
+  - (b) is W2-20's: the machine-wide gate, built and held, whose lines already refuse a start while the gate is shut.
+    It gains one line covering every session and the override, and lands with W2-136.
+  - (6)'s flag is a line added to W2-129 (open, in flight).
+- **Basis:** question 2 (agents in parallel never collide in ordinary work: an order the tool proves, enforced at launch).
+
+######## DEC-1114 at 14164
+### DEC-1114 — W2-56's S8 on Linux (DEC-105, against DEC-1035 (2)): (b), S8's reach and S10 deferred to Wave 3 as a ticket; the rest of W2-56 merged now; a re-estimate at today's measured pace
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse)
+- **Decision:**
+  - (1) **(b).** S8's reach (a sandboxed session connecting to the shared reranker's one socket) and S10 (its
+    measurement) are deferred to Wave 3, as a ticket to give sandboxed workers ranked search without opening every Unix
+    socket (`docs/plan/WAVE_3_PARKING.md` W3-P28). S8's settings-level form (the one path, nothing wider) stays built,
+    inert on Linux. Until then a sandboxed worker's search is unranked, named and counted (S11). S9 and F4 stand
+    unchanged. The rest of W2-56 merges now; leads and in-session agents, which are not sandboxed, keep ranked search.
+  - (2) **A re-estimate** as a short package (FORECAST-W2-2): for the lift, EXAMIN's copy and Wave 2's end, both (a)
+    elapsed time from today's measured agent pace and (b) FORECAST-W2-1's lead-hour method, with which the CTO trusts
+    and why; the share done by tickets and by what the lift needs; what remains before the lift, item by item, with its
+    critical path; and how much of each date waits on the owner rather than on agents.
+- **Basis:** question 2 (containment kept: S9 forbids opening every socket) and question 4 (the dates told from what
+  is measured now).
+
+
+### DEC-1115 — Yes to ACT-SETS-GLOBS-1 (by hand) and ACT-CLAUDE-COPIES-1 (by the operator agent, its first live run); TPL-6's Appendix A applied now; before the lift, past 80 % of the week's usage only the lift's critical path runs
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5
+- **Decision:**
+  - (1) **ACT-SETS-GLOBS-1: yes** (`yes ACT-SETS-GLOBS-1 1f93d6ef`, class (b)); the owner's operator applies it by
+    hand now (the package's §5).
+  - (2) **ACT-CLAUDE-COPIES-1: yes** at manifest `5d3a18832b9b`, class (b), run by the operator agent from its queue,
+    its first live run. If the agent refuses, the CTO tells the owner why and the owner's operator applies it by hand
+    (§5). The agent reads a yes only in its fixed form, `yes ACT-<id> <manifest sha8>` on a line of its own (G6); the
+    package had given another form, so the owner types `yes ACT-CLAUDE-COPIES-1 5d3a1883` before the CTO queues it.
+  - (3) **TPL-6's Appendix A as proposed, now:** the CTO prompt's Appendix A becomes the 466-character pointer to the
+    kernel templates (TPL6-APPENDIX-A).
+  - (4) **Standing until the lift:** if the week's usage passes 80 % before the lift, the lift's critical path comes
+    first and work outside it waits for the weekly reset. Usage stays recorded, not an alarm (DEC-1089 (3)); this is
+    a priority rule, not a cap. It joins rule 6 of the standing-rules list.
+- **Basis:** question 2 (the hidden sets hidden before the first writer run; the templates one source) and question 4
+  (the lift's date protected if the week's allowance runs short).
+
+######## DEC-1103 at 14003
+### DEC-1103 — W2-20's machine gate file by an ACT; D-4's 3 capped and 7 lifted cases back into the gates by an ACT; ACT-INDEP-WALLS-1's four answers; an operator-agent package requested
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1100, DEC-1101 (3), DEC-1098 (6), DEC-1061, DEC-1088 (5)(b), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after the selection ACTs were applied (`8038e0ee`; the hook 6fbbf312…) and the push (`795d97c7`, `3ce6394f`)
+- **Decision:**
+  - (1) **W2-20's gate file, option (a):** `~/.gov-os/machine/gate.json` created by `gov resources --init-config`
+    from W2-20's code, as an ACT for the owner's operator, rehearsed, with the exact commands.
+  - (2) **D-4's 3 capped and 7 lifted cases go back into the gates** (amending DEC-1061's cut for these ten), rehearsed,
+    as one more ACT.
+  - (3) **ACT-INDEP-WALLS-1, all four as recommended:** the layout and the three layers, the sandbox added once
+    proven; rule 2c for the tuner on W2-56; `~/gov-os-writer` and `~/gov-os-checker` left as they are until the launch
+    script is the default, then retired; the budgets and timeouts decided with the fixed briefs. The CTO says when it is
+    ready for the operator.
+  - (4) **Requested: an operator-agent package** so that ACTs no longer need the owner at the terminal: classes by
+    effect: (a) ACTs that only add checks, tighten a control, or change nothing that governs agents, applied by an
+    independent operator agent in its own walled folder, only after the rehearsal passes, an independent review says
+    READY and the hashes match what was reviewed; logged, undo ready, the owner notified; (b) anything that loosens or
+    alters a control (the guard, permissions, settings, pins, installs) or needs sudo: the owner's one-line "yes" in the
+    chat, then the operator agent runs it, except sudo, which stays the owner's. The CTO never changes an ACT after its
+    review and cannot apply one; P1 issues always come to the owner. The package says who classifies each ACT and how a
+    misclassification is caught. Not decided until the owner approves the package.
+- **Basis:** question 2 (the gates restored where the trial showed misses; the walls' controls as recommended) and
+  question 4 (the owner's time kept for what loosens a control).
+
+### DEC-1104 — D-4's ten cases by option C; the operator agent approved as recommended; the landing selection's environment fixed before its results are relied on; ACTs given as messages for the owner's operator
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing · **Under:** DEC-1103, DEC-1100, DEC-1101, DEC-1061, DEC-1058, DEC-928 (3), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after ACT-INDEP-WALLS-1 (`147706ae`) and ACT-GATE-CONFIG-1 (`d7490945`) were applied by the owner's operator
+- **Decision:**
+  - (1) **ACT-D4-RESTORE-1: option C.** The seven green cases into the gates now (the ACT's form B); D-10 decides each
+    of the three red-by-design cases (W1-33's auditor, W1-05's install, W1-46's research install): rewrite it for
+    today's hook and gate it, or keep it report-only. DEC-1103 (2) is narrowed accordingly.
+  - (2) **OPERATOR-AGENT-1, all seven as recommended:** the classes and the table, tightening-only edits as (a), guard
+    code always (b); the owner's yes typed as `yes ACT-<id> <sha8>`, read from the CTO session's transcript; the shared
+    servers' settings become (a) (amending DEC-1058 (b) for them); re-pins stay the owner's for now (DEC-928 (3)),
+    decided again after one rehearsed re-pin in the agent's form; the dispatcher's cron launches it from a queue, the
+    CTO only queues; a push for every (a) ACT for the first two weeks, then the digest only, failures always pushed;

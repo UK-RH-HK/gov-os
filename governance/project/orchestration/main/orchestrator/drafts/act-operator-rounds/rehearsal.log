@@ -1,0 +1,67 @@
+== the planted HOME: a copy of the live install
+== the planted tree: the repository files as they are now, in a git repository of its own
+ok:   the planted tree committed
+== apply.sh, the cases
+ok:   check on the before state (exit 0)
+ok:     output has: state: before
+ok:     output has: check: ready to apply
+ok:   check refuses while a request waits in queue/ (exit 1)
+ok:     output has: a request waits
+ok:   check refuses while the freeze is held (exit 1)
+ok:     output has: freeze is held
+ok:   apply refuses while the journal exists (exit 1)
+ok:     output has: journal
+ok:   apply refuses while a launch holds log/launch.lock (exit 1)
+ok:     output has: a launch is running
+ok:   check refuses a repository file moved since the build (exit 1)
+ok:     output has: neither as built before
+ok:   check again on the before state (exit 0)
+ok:   check refuses an unlisted file in the install (exit 1)
+ok:     output has: neither as built before
+ok:   apply (exit 0)
+ok:     output has: the install's own APPROVED check: ok
+ok:     output has: state applied
+   APPROVED ece74a7678244ba20232b9fd586cee5d3afa356eebb674ec23ddc69cf598181b
+ok:   a second apply is refused (exit 1)
+ok:     output has: not in the before state
+ok:   check reads already applied (exit 0)
+ok:     output has: already applied
+-- the installed files are byte for byte the repository's
+ok:   install verdict.py = repository verdict.py
+ok:   install operator_run.py = repository operator_run.py
+ok:   every file in the install hashes as APPROVED says
+-- the main tree after apply: what the owner commits
+ M governance/project/operator/operator_run.py
+ M governance/project/operator/verdict.py
+ M tests/acceptance/W2-148/w2_148_support.py
+ M tests/unit/operator/test_w2_148_parts.py
+?? tests/unit/operator/test_dec1131_rounds.py
+ok:   5 paths changed (4 M, 1 new)
+-- the operator's own tests and W2-148's acceptance tests on the applied tree (two deselected by name: each reads the real repository's history, commit 116c2b413 and the packages' ACT files, which a planted tree lacks; neither reads anything this ACT changes)
+........................................................................ [ 69%]
+........................................................................ [ 86%]
+......................................................                   [100%]
+414 passed, 2 deselected in 76.47s (0:01:16)
+ok:   unit and acceptance tests pass on the applied tree
+-- undo
+ok:   undo (exit 0)
+ok:     output has: state before (undone)
+ok:   APPROVED as before
+ok:   every install file byte for byte as before
+ok:   the tree is clean again (git status empty)
+ok:   undo again is refused (exit 1)
+ok:     output has: not as this ACT left it
+ok:   check reads ready to apply again (exit 0)
+ok:     output has: check: ready to apply
+-- a tampered backup stops the undo
+ok:   apply again (exit 0)
+ok:   undo refuses a backup that does not match its SHA256SUMS (exit 1)
+ok:     output has: does not match its SHA256SUMS
+ok:   undo with the backup mended (exit 0)
+ok:   clean again
+== the live files are untouched
+277c8ca9f06c
+fe2e2f424616
+ok:   live APPROVED unchanged
+ok:   live verdict.py unchanged
+failures: 0

@@ -60,7 +60,9 @@ if [ "${LANDING_AS_SLOT:-}" = 1 ]; then
       [ -n "${LANDING_RUN_DIR:-}" ] && : > "$LANDING_RUN_DIR/held"
       exit 75
     fi
-    exec "$@"
+    # The hook starts this run in the background, where SIGINT (and under nohup SIGHUP) begins ignored and is
+    # inherited: W2-96's signal cases then fail (6 false reds on 11-11 13:42, 16 of 16 green from a plain shell).
+    exec env --default-signal=INT,HUP "$@"
   fi
   LANDING_IN_SLOT=1 exec bash "${LANDING_HEAVY:-$TOOLS/heavy_slot.sh}" bash "$SELF" "$@"
 fi

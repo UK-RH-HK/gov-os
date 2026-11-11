@@ -47,7 +47,7 @@
     "After: EXAMIN's copy about 11-15; Wave 2's end about 11-22 (E); usage 59 % at 15:26, the 80 % rule (DEC-1115 (4))"
   ],
   "owner_action": "P2 start the fresh CTO session when ready (DEC-1122 (2)); (B) extra usage, the owner's check; D-10 run 1's figures and triage follow its end",
-  "last_report": "2026-11-10 18:32:37",
+  "last_report": "2026-11-11 09:34:24",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -103,5 +103,5 @@
     ],
     "keystone-7": "done: DEC-1089"
   },
-  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+  "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

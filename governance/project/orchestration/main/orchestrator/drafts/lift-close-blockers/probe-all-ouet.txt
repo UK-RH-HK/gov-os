@@ -1,0 +1,5 @@
+reviewer-role commits in range: ['3f975a3e6ea5', 'efb8acb1b596']
+records: {'PR-DAEO-ouet-d10.md': '9ca161a6fe38b4dbac953841f4f76e5b91654cfa', 'PR-DAEO-ouet-d10b.md': '8b31965edae8a9f173fa5a365922eaae2c3d32a5', 'PR-DAEO-ouet-d10c.md': '8f6e66a17572ff2e192244df7aff19d7c8bd9af9', 'PR-DAEO-ouet.md': '90122df096e7bb40c1890485b64a5638e335922f'}
+final-round records: ['PR-DAEO-ouet-d10c.md']
+-- PR-DAEO-ouet-d10c.md: probed 8f6e66a17572, 97 commits after it
+  ticket commit 1905b29699a7 (Role ['orchestrator']) changes .tickets/DAEO-ouet.md after probed

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 148
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Dw4LsggjWENV5mpxJYb1rU", "time": "2026-11-10T22:15:00.606Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/8ddb8b14-0dce-4faa-9cb0-7150fcce200d.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "run() { d=/home/usain/gov-os-worktrees/$1; shift; ( cd $d && env -u TMPDIR -u PYTEST_ADDOPTS PYTHONPATH=$d/src timeout 2400 python3 -m pytest \"$@\" -q -p no:cacheprovider -o tmp_path_retention_policy=f", "rule": "the call reads files whose names another command gives at run time, from a listing whose start the

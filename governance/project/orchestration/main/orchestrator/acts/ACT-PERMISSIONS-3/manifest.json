@@ -1,0 +1,38 @@
+{
+ "act": "ACT-PERMISSIONS-3",
+ "dec": "DEC-1126",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/settings.local.json",
+   "before": "d715292711a2c38fe7ea3830df3c1000b001c7348876f74902fd683981d98624",
+   "after": "acb46a637d484265579f2aa2ba1009611ae06b8d44dbe5c52601b5fd87f7b070"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/settings.local.json": "d715292711a2c38fe7ea3830df3c1000b001c7348876f74902fd683981d98624",
+  "after/repo/.claude/settings.local.json": "acb46a637d484265579f2aa2ba1009611ae06b8d44dbe5c52601b5fd87f7b070",
+  "apply.sh": "f89091626b4b25765dd9f96f7adb9c0d7a439ab3c2495175a542eed8aa3f7f7a",
+  "list.txt": "d4f8acb6665d985f6c8e98c71d1943595565febc0228bbda55a5e2b30bd0170c",
+  "rehearsal.log": "f55aa9189bb74a4cf0928e28d801c96d98684c2a4a79baaeb2b1d4fa2c5be9be"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -c 'import json,sys; p=json.load(open(\".claude/settings.local.json\"))[\"permissions\"]; a=p[\"allow\"]; sys.exit(0 if a[-2:]==[\"Edit(//tmp/gov-os-emg-*/**)\",\"Read(//tmp/gov-os-emg-*/**)\"] and len(a)==44 and p[\"deny\"][-6:]==[\"Edit(//tmp/gov-os-emg-*/**/*.key)\", \"Edit(//tmp/gov-os-emg-*/**/*.pem)\", \"Edit(//tmp/gov-os-emg-*/**/.env*)\", \"Read(//tmp/gov-os-emg-*/**/*.key)\", \"Read(//tmp/gov-os-emg-*/**/*.pem)\", \"Read(//tmp/gov-os-emg-*/**/.env*)\"] and len(p[\"deny\"])==10 and len(p[\"additionalDirectories\"])==2 and not any(x.startswith(\"Write(\") or \"//tmp/**\" in x for x in a) else 1)'",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -m json.tool .claude/settings.local.json > /dev/null",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "f55aa9189bb74a4cf0928e28d801c96d98684c2a4a79baaeb2b1d4fa2c5be9be"
+ }
+}

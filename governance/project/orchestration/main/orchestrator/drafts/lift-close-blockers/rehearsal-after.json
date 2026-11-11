@@ -1,0 +1,63 @@
+{
+ "DAEO-blwa": [
+  {
+   "gate": "_info",
+   "what": "DAEO-blwa profile=STANDARD ticket_commits=22 range_others=1751 brought=0 recorded=145",
+   "why": ""
+  }
+ ],
+ "DAEO-qzrq": [
+  {
+   "gate": "_info",
+   "what": "DAEO-qzrq profile=STANDARD ticket_commits=27 range_others=1744 brought=0 recorded=145",
+   "why": ""
+  }
+ ],
+ "DAEO-jpr0": [
+  {
+   "gate": "_info",
+   "what": "DAEO-jpr0 profile=STANDARD ticket_commits=28 range_others=1673 brought=0 recorded=117",
+   "why": ""
+  }
+ ],
+ "DAEO-n0wb": [
+  {
+   "gate": "_info",
+   "what": "DAEO-n0wb profile=STANDARD ticket_commits=56 range_others=2303 brought=0 recorded=219",
+   "why": ""
+  }
+ ],
+ "DAEO-ouet": [
+  {
+   "gate": "probe:PROBE_INVALID",
+   "what": "commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)",
+   "why": "commit 3f975a3e6ea5 in the range of the ticket carries the reviewer's role (independent-auditor)"
+  },
+  {
+   "gate": "_info",
+   "what": "DAEO-ouet profile=FULL ticket_commits=61 range_others=2237 brought=0 recorded=214",
+   "why": ""
+  }
+ ],
+ "DAEO-vhad": [
+  {
+   "gate": "_info",
+   "what": "DAEO-vhad profile=LITE ticket_commits=1 range_others=1709 brought=0 recorded=119",
+   "why": ""
+  }
+ ],
+ "DAEO-zuiy": [
+  {
+   "gate": "_info",
+   "what": "DAEO-zuiy profile=LITE ticket_commits=1 range_others=1729 brought=0 recorded=126",
+   "why": ""
+  }
+ ],
+ "DAEO-fu3n": [
+  {
+   "gate": "_info",
+   "what": "DAEO-fu3n profile=LITE ticket_commits=2 range_others=1805 brought=0 recorded=163",
+   "why": ""
+  }
+ ]
+}
