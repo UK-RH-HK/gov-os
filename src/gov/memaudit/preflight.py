@@ -16,8 +16,8 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 
 from gov.memaudit import layout, ledger, tables
-from gov.memaudit.common import (HEX40, blob_at, git, read_json, resolve_commit, set_digest, toplevel, utc_iso,
-                                 write_whole, z_list, UsageError)
+from gov.memaudit.common import (FILES_KEY, HEX40, blob_at, git, read_json, resolve_commit, set_digest, sha256_file,
+                                 toplevel, utc_iso, write_whole, z_list, UsageError)
 
 CODES = ("PF-COUNT", "PF-FORM", "PF-COMMIT", "PF-QUOTA", "PF-SPREAD", "PF-DRAWN", "PF-SOURCE", "PF-EVALNS",
          "PF-DUPPOOL", "PF-IDEXISTS")
@@ -397,6 +397,9 @@ def run(sets_root, audit, *, commit, repo=None, runs_dir=None) -> tuple[str, dic
         "subsystems": subsystems, "domain_min": tables.domain_min(n), "subsystem_max": tables.subsystem_max(n),
         "selection": lists_from, "re_anchored": re_anchored, "no_token": no_token, "pool": len(pool),
         "set_digest": set_digest(p["hidden"]),
+        # every delivered file's sha256 by id, a refused one too: declare's DC-PREFLIGHT declares only these bytes
+        # (Interface section 10 item 9)
+        FILES_KEY: {f.stem: sha256_file(f) for f in files},
     }
     run_dir = layout.make_run(p)
     write_whole(run_dir, "PREFLIGHT.json", counts)

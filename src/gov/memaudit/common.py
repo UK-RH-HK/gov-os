@@ -12,6 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HEX40 = re.compile(r"[0-9a-f]{40}")
+HEX64 = re.compile(r"[0-9a-f]{64}")
+# PREFLIGHT.json's record of each delivered file's sha256 by id (Interface section 10 item 9)
+FILES_KEY = "files_sha256"
 
 
 class UsageError(Exception):

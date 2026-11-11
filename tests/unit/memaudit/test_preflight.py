@@ -243,6 +243,36 @@ def test_with_used_present_preflight_writes_nothing_and_exits_3(plant):
     assert sorted(p.name for p in plant.run_dir.iterdir()) == ["USED"]
 
 
+def _files_sha256(plant) -> dict:
+    return {f.stem: hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(plant.hidden.glob("q*.yaml"))}
+
+
+@pytest.mark.parametrize("defect", ["clean", "commit", "form", "count"])
+def test_preflight_json_records_each_delivered_file_s_sha256_by_id_on_every_run(plant, defect):
+    """Section 10 item 9: ids to lowercase hex digests, every delivered file (a PF-FORM refused one too), ok or not."""
+    if defect == "commit":
+        plant.put({**plant.questions["q03"], "commit": plant.repo["earlier"]})
+    elif defect == "form":
+        (plant.hidden / "q05.yaml").write_text("not: [valid")
+    elif defect == "count":
+        for i in range(36, 41):
+            (plant.hidden / f"q{i:02d}.yaml").unlink()
+    done = plant.cli(*plant.preflight_args())
+    assert done.returncode == (0 if defect == "clean" else 1)
+    doc = json.loads((plant.run_dir / "PREFLIGHT.json").read_text())
+    record = doc[preflight.FILES_KEY]
+    assert record == _files_sha256(plant)
+    assert len(record) == (35 if defect == "count" else 40)
+    assert all(len(v) == 64 and v == v.lower() and not v.startswith("sha256") for v in record.values())
+
+
+def test_a_stray_file_is_not_in_the_record(plant):
+    (plant.hidden / "notes.txt").write_text("x")
+    plant.cli(*plant.preflight_args())
+    record = json.loads((plant.run_dir / "PREFLIGHT.json").read_text())[preflight.FILES_KEY]
+    assert set(record) == {f"q{i:02d}" for i in range(1, 41)}
+
+
 def test_no_question_text_gold_answer_path_or_heading_leaves_the_tool(plant):
     q = plant.questions["q03"]
     plant.put({**q, "question": f"What is the {UNIQUE['question']} rule?", "gold_answer": f"The {UNIQUE['gold']}.",

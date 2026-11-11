@@ -7,8 +7,10 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from gov.memaudit import declare, ledger
-from gov.memaudit.common import set_digest
+from gov.memaudit.common import FILES_KEY, set_digest
 
 from .conftest import AUDIT, SETS_MAP
 
@@ -101,10 +103,124 @@ def test_each_refusal_code_writes_nothing(plant):
     assert not (plant.run_dir / "DECLARATION.json").exists() and not (plant.run_dir / "USED").exists()
 
 
-def test_a_set_changed_after_void_is_dc_drops(plant):
+def test_a_set_changed_after_void_is_dc_preflight_and_dc_drops(plant):
     ready(plant)
     (plant.hidden / "q05.yaml").write_text((plant.hidden / "q05.yaml").read_text() + "\n")
-    assert plant.cli(*plant.declare_args()).stdout == "DC-DROPS\n"
+    assert plant.cli(*plant.declare_args()).stdout == "DC-PREFLIGHT\nDC-DROPS\n"
+
+
+def test_a_digest_new_drops_after_a_byte_change_is_still_dc_preflight(plant):
+    """DROPS.json taken after the change (its digest matches): only the pre-flight record refuses it."""
+    assert plant.cli(*plant.preflight_args()).returncode == 0
+    (plant.hidden / "q05.yaml").write_text((plant.hidden / "q05.yaml").read_text() + "# a comment\n")
+    plant.notes()
+    assert plant.cli(*plant.void_args()).returncode == 0
+    assert_refused_writing_nothing(plant, ["DC-PREFLIGHT"])
+
+
+def snapshot(plant) -> dict:
+    return {"run": {p.name: p.read_bytes() for p in plant.run_dir.iterdir()},
+            "map": (plant.root / "governance/project/path-map.yaml").read_bytes()}
+
+
+def assert_refused_writing_nothing(plant, codes, *extra):
+    before = snapshot(plant)
+    done = plant.cli(*plant.declare_args(None, None, *extra))
+    assert done.returncode == 1 and done.stdout.splitlines() == codes, done.stdout
+    assert snapshot(plant) == before
+    assert not (plant.run_dir / "USED").exists() and not (plant.run_dir / "DECLARATION.json").exists()
+    assert [e["event"] for e in ledger.read(plant.run_dir)][-1] in ("drop", "preflight")
+
+
+def replace_after_preflight(plant, change):
+    """The writer's round 2: ``hidden/`` replaced after a clean pre-flight, then the round-2 notes accept all."""
+    assert plant.cli(*plant.preflight_args()).returncode == 0
+    change()
+    plant.notes()
+    assert plant.cli(*plant.void_args()).returncode == 0
+
+
+def test_files_replaced_after_a_clean_preflight_are_dc_preflight_and_write_nothing(plant):
+    def change():
+        plant.put({**plant.questions["q03"], "commit": plant.repo["earlier"]})
+        plant.put({**plant.questions["q04"], "sources": [{"path": "docs/plan/missing.md"}]})
+        plant.put({**plant.questions["q06"], "sources": [{"path": "fixtures/evaluation/x/hidden/q01.yaml"}]})
+    replace_after_preflight(plant, change)
+    assert_refused_writing_nothing(plant, ["DC-PREFLIGHT"])
+
+
+@pytest.mark.parametrize("how", ["comment", "reworded", "keyword"])
+def test_a_kept_file_rewritten_but_still_valid_is_dc_preflight(plant, how):
+    def change():
+        path = plant.hidden / "q07.yaml"
+        if how == "comment":
+            path.write_bytes(path.read_bytes() + b"# appended\n")
+        elif how == "reworded":
+            plant.put({**plant.questions["q07"], "question": "What, in other words, does part 7 say?"})
+        else:
+            plant.put({**plant.questions["q07"], "keyword": True})
+    replace_after_preflight(plant, change)
+    assert_refused_writing_nothing(plant, ["DC-PREFLIGHT"])
+
+
+def test_a_kept_file_whose_id_was_never_preflighted_is_dc_preflight(plant):
+    (plant.hidden / "q40.yaml").unlink()
+    del plant.questions["q40"]
+    assert plant.cli(*plant.preflight_args()).returncode == 0  # 39 files: at most the quotas
+    plant.put({**plant.questions["q39"], "id": "q41"})  # a file the pre-flight never saw, in form
+    plant.notes({"q39": "reject"})
+    assert plant.cli(*plant.void_args()).returncode == 0
+    assert_refused_writing_nothing(plant, ["DC-PREFLIGHT"])
+
+
+def test_dropped_files_are_not_compared(plant):
+    assert plant.cli(*plant.preflight_args()).returncode == 0
+    plant.notes({"q02": "reject"})
+    assert plant.cli(*plant.void_args()).returncode == 0
+    dropped = plant.hidden / "dropped" / "q02.yaml"
+    dropped.write_bytes(dropped.read_bytes() + b"# changed in dropped\n")
+    (plant.hidden / "dropped" / "q77.yaml").write_text("x: 1\n")
+    assert plant.cli(*plant.declare_args()).returncode == 0
+
+
+def test_a_replaced_set_preflighted_again_is_declared_and_used(plant):
+    def change():
+        plant.put({**plant.questions["q07"], "question": "What, in other words, does part 7 say?"})
+    replace_after_preflight(plant, change)
+    assert plant.cli(*plant.declare_args()).stdout == "DC-PREFLIGHT\n"
+    assert plant.cli(*plant.preflight_args()).returncode == 0
+    done = plant.cli(*plant.declare_args())
+    assert done.returncode == 0 and done.stdout.splitlines()[-1] == "USED written"
+    assert (plant.run_dir / "USED").exists()
+
+
+@pytest.mark.parametrize("record", ["absent", "not_a_map", "upper_hex", "prefixed", "not_ok"])
+def test_a_preflight_json_without_a_good_record_is_dc_preflight(plant, record):
+    ready(plant)
+    path = plant.run_dir / "PREFLIGHT.json"
+    doc = json.loads(path.read_text())
+    if record == "absent":
+        del doc[FILES_KEY]
+    elif record == "not_a_map":
+        doc[FILES_KEY] = list(doc[FILES_KEY])
+    elif record == "upper_hex":
+        doc[FILES_KEY] = {k: v.upper() for k, v in doc[FILES_KEY].items()}
+    elif record == "prefixed":
+        doc[FILES_KEY] = {k: "sha256:" + v for k, v in doc[FILES_KEY].items()}
+    else:
+        doc["ok"] = False
+    path.write_text(json.dumps(doc))
+    assert_refused_writing_nothing(plant, ["DC-PREFLIGHT"])
+
+
+def test_a_symlinked_kept_file_is_dc_preflight(plant):
+    ready(plant)
+    target = plant.tmp / "q08-copy.yaml"
+    target.write_bytes((plant.hidden / "q08.yaml").read_bytes())
+    (plant.hidden / "q08.yaml").unlink()
+    (plant.hidden / "q08.yaml").symlink_to(target)
+    assert plant.cli(*plant.declare_args()).stdout.splitlines()[0] == "DC-PREFLIGHT"
+    assert not (plant.run_dir / "USED").exists()
 
 
 def test_the_sets_root_map_gains_exactly_one_entry_and_the_repository_is_untouched(plant):

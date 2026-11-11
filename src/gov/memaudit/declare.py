@@ -16,8 +16,8 @@ import time
 from pathlib import Path
 
 from gov.memaudit import layout, ledger
-from gov.memaudit.common import (UsageError, blob_at, read_json, resolve_commit, set_digest, sha256_bytes,
-                                 sha256_file, toplevel, utc_iso, write_whole)
+from gov.memaudit.common import (FILES_KEY, HEX64, UsageError, blob_at, read_json, resolve_commit, set_digest,
+                                 sha256_bytes, sha256_file, toplevel, utc_iso, write_whole)
 
 PIN_RE = re.compile(r"pin-[0-9a-f]{12}")
 DECISION_RE = re.compile(r"DEC-[0-9]+")
@@ -192,6 +192,30 @@ def _write_used(p: dict, audit: str, decl_sha: str) -> None:
 
 # ---- the declaration
 
+def preflighted(pre, hidden: Path) -> bool:
+    """Whether the kept set is the set pre-flighted ok (Interface section 10 item 9): ``PREFLIGHT.json`` is ok and
+    records each delivered file's sha256 by id, and every kept file (``hidden/*.yaml``, flat; ``dropped/`` is not
+    compared) has its id in that record with the same sha256. Anything else, a missing or malformed record included,
+    is False (fail closed)."""
+    if not (isinstance(pre, dict) and pre.get("ok") is True):
+        return False
+    record = pre.get(FILES_KEY)
+    if not (isinstance(record, dict) and all(isinstance(k, str) and isinstance(v, str) and HEX64.fullmatch(v)
+                                             for k, v in record.items())):
+        return False
+    hidden = Path(hidden)
+    if not hidden.is_dir():
+        return False
+    for e in os.scandir(hidden):
+        if not e.name.endswith(".yaml"):
+            continue
+        if not e.is_file(follow_symlinks=False):
+            return False
+        if record.get(e.name[:-len(".yaml")]) != sha256_file(hidden / e.name):
+            return False
+    return True
+
+
 def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None) -> tuple[str, dict]:
     """Returns the exit word (``ok``, ``refused`` with its codes, or ``used``) and the counts the subcommand prints. A
     usage fault raises ``UsageError``."""
@@ -211,8 +235,7 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
         return "used", {"used": True}
 
     codes = []
-    pre = read_json(p["preflight"])
-    if not (isinstance(pre, dict) and pre.get("ok") is True):
+    if not preflighted(read_json(p["preflight"]), p["hidden"]):
         codes.append("DC-PREFLIGHT")
     drops = read_json(p["drops"])
     digest = set_digest(p["hidden"])
