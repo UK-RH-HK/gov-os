@@ -53,31 +53,31 @@ this repository's settings.
 
 ### Success 1, failure 1: no deny rule for `npm install*` or `pip install*` in the generated settings
 
-| Test | Measures | On the base |
-|---|---|---|
-| `test_no_rule_of_the_templates_source_binds_the_install[npm install -g ccusage]`, `[pip install requests]` | no `bash` rule of the template's source, whatever its value, binds the install (as `Bash(<pattern>)`) | **red**: `npm install*` / `pip install*` |
-| `test_no_rule_of_the_generated_settings_binds_the_install[<install>-deny]` × 2 | no deny rule of the generated settings binds the install (W1-05's reading of a rule) | **red**: `Bash(npm install*)` / `Bash(pip install*)` |
-| `test_no_rule_of_the_generated_settings_binds_the_install[<install>-ask]`, `[<install>-allow]` × 4 | removed, not moved: no ask or allow rule binds it either (W1-47's reading of DEC-172) | green; must stay green |
+| KPI | Tests | Measures | On the base |
+|---|---|---|---|
+| S1, F1 | `test_w2_105_install_block.py::test_no_rule_of_the_templates_source_binds_the_install[npm install -g ccusage]`, `test_w2_105_install_block.py::test_no_rule_of_the_templates_source_binds_the_install[pip install requests]` | no `bash` rule of the template's source, whatever its value, binds the install (as `Bash(<pattern>)`) | **red**: `npm install*` / `pip install*` |
+| S1, F1 | `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-deny]`, `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-deny]` | no deny rule of the generated settings binds the install (W1-05's reading of a rule) | **red**: `Bash(npm install*)` / `Bash(pip install*)` |
+| S1, F1 | `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-ask]`, `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-allow]`, `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-ask]`, `test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-allow]` | removed, not moved: no ask or allow rule binds it either (W1-47's reading of DEC-172) | green; must stay green |
 
 ### Success 2, failures 1 and 2: the CTO's session is asked by the guard, every other session refused by it
 
-| Test | Measures | On the base |
-|---|---|---|
-| `test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[<install>]` × 2 | the orchestrator on `DAEO-zz91`, in the `default`, `auto` and `acceptEdits` modes: no settings rule decides, the hook is reached, the guard asks | **red**: a settings deny rule refuses first (the guard's own answer is `ask`) |
-| `test_an_install_by_another_role_is_refused_by_the_guard[<role>-<install>]` × 8 (engineer, independent-test-designer, independent-auditor, product-spec) | refused, and by the guard's own program, not by a settings rule; no `ask` | **red**: a settings deny rule refuses first (the guard's own answer is `deny`) |
-| `test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[<install>]` × 2 | a session with no `GOV_ROLE`: the same | **red**: the same |
-| `test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[<install>]` × 2 | research on its ticket, started in the project's root: refused by the guard | **red**: the same |
+| KPI | Tests | Measures | On the base |
+|---|---|---|---|
+| S2, F1, F2 | `test_w2_105_install_block.py::test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[pip install requests]` | the orchestrator on `DAEO-zz91`, in the `default`, `auto` and `acceptEdits` modes: no settings rule decides, the hook is reached, the guard asks | **red**: a settings deny rule refuses first (the guard's own answer is `ask`) |
+| S2, F1, F2 | `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[engineer-npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[engineer-pip install requests]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-pip install requests]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-pip install requests]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[product-spec-npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[product-spec-pip install requests]` | refused, and by the guard's own program, not by a settings rule; no `ask` | **red**: a settings deny rule refuses first (the guard's own answer is `deny`) |
+| S2, F1, F2 | `test_w2_105_install_block.py::test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[npm install -g ccusage]`, `test_w2_105_install_block.py::test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[pip install requests]` | a session with no `GOV_ROLE`: the same | **red**: the same |
+| S2, F1, F2 | `test_w2_105_install_block.py::test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[npm install -g ccusage]`, `test_w2_105_install_block.py::test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[pip install requests]` | research on its ticket, started in the project's root: refused by the guard | **red**: the same |
 
 ### Success 3, failure 3: every other rule unchanged, by name and count
 
-| Test | Measures | On the base |
-|---|---|---|
-| `test_the_comparison_base_gives_the_two_install_rules` | the base source gives the two rules and rulesync generates each once from it: the comparison is with the right base | green; green after too |
-| `test_the_templates_source_is_its_base_less_the_two_install_rules` | the source's rules, as `(category, pattern, value)`, are the base's less the two, and their count is the base's less 2 | **red**: 4 rules, the base's 4 |
-| `test_no_other_rule_of_the_templates_source_is_added_removed_or_changed` | the two install rules aside, the source's rules are the base's | green; must stay green |
-| `test_the_generated_rules_are_the_base_rules_less_the_two_install_rules` | the generated rules, as `(list, rule)` with their counts over every list of `permissions`, are the base's less the two deny rules; total = base − 2 | **red**: 4 deny rules, the base's 4 |
-| `test_no_other_generated_rule_is_added_removed_or_changed` | the two aside, every list's rules by name and count are the base's, and every non-list entry of `permissions` is the base's | green; must stay green |
-| `test_sudo_is_still_denied_by_the_generated_settings` | a deny rule of the generated settings still binds `sudo apt-get install -y jq` | green; must stay green |
+| KPI | Tests | Measures | On the base |
+|---|---|---|---|
+| S3, F3 | `test_w2_105_install_block.py::test_the_comparison_base_gives_the_two_install_rules` | the base source gives the two rules and rulesync generates each once from it: the comparison is with the right base | green; green after too |
+| S3, F3 | `test_w2_105_install_block.py::test_the_templates_source_is_its_base_less_the_two_install_rules` | the source's rules, as `(category, pattern, value)`, are the base's less the two, and their count is the base's less 2 | **red**: 4 rules, the base's 4 |
+| S3, F3 | `test_w2_105_install_block.py::test_no_other_rule_of_the_templates_source_is_added_removed_or_changed` | the two install rules aside, the source's rules are the base's | green; must stay green |
+| S3, F3 | `test_w2_105_install_block.py::test_the_generated_rules_are_the_base_rules_less_the_two_install_rules` | the generated rules, as `(list, rule)` with their counts over every list of `permissions`, are the base's less the two deny rules; total = base − 2 | **red**: 4 deny rules, the base's 4 |
+| S3, F3 | `test_w2_105_install_block.py::test_no_other_generated_rule_is_added_removed_or_changed` | the two aside, every list's rules by name and count are the base's, and every non-list entry of `permissions` is the base's | green; must stay green |
+| S3, F3 | `test_w2_105_install_block.py::test_sudo_is_still_denied_by_the_generated_settings` | a deny rule of the generated settings still binds `sudo apt-get install -y jq` | green; must stay green |
 
 ### Success 4, failure 4: W1-38 and W1-39 pass on the change
 
