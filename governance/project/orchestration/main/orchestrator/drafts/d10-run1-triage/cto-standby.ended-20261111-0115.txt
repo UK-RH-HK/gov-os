@@ -1,0 +1,1 @@
+2026-11-10 23:49:33 CTO 8ddb8b14 waits on the owner: D-10 run 2 reported (nightly red 2, the warm latency); the owner's choice on the latency before the re-pin ACT

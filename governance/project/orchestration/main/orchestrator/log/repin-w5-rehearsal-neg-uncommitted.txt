@@ -1,0 +1,43 @@
+======== rehearsal of re-pin window 5 (neg-uncommitted), 2026-11-11 01:33:56
+======== the live paths before
+gov link: /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov -> /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov
+gov script sha256: 53352b173ba5
+pins: pin-5c401220 pin-6a4696eb pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: 35172e0a411d
+shared reranker pid: 1544290
+store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 7cfddfccb8c3
+store halves: a at 0fd3a54591c7, b at 7cfddfccb8c3
+w2/integrate: 7cfddfccb8c3
+half a: 0fd3a54591c7, store 453M
+half b: 7cfddfccb8c3, store 454M
+registry clone at 7cfddfccb8c3 on w2/integrate
+scratch hook: 099de326c45b (a copy of the live one)
+mirror ready: gov -> /tmp/gov-os-emg-repin5/n2/home/.local/share/gov-os/pin-bcea09060ebc/bin/gov; store -> /tmp/gov-os-emg-repin5/n2/home/gov-os-worktrees/W2-00-store-b
+======== the operator's script, against the mirror
+== 0. preconditions
+
+STOP: the tree has uncommitted changes in src/ or pyproject.toml (at the start)
+Nothing was switched: /tmp/gov-os-emg-repin5/n2/home/.local/bin/gov is still pin-bcea09060ebc. Tell the CTO.
+======== the script ended: exit 1, 0 s
+======== the live paths after
+gov link: /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov -> /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov
+gov script sha256: 53352b173ba5
+pins: pin-5c401220 pin-6a4696eb pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: 35172e0a411d
+shared reranker pid: 1544290
+store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 7cfddfccb8c3
+store halves: a at 0fd3a54591c7, b at 7cfddfccb8c3
+w2/integrate: 7cfddfccb8c3
+the live gov link, script, pins, wheels, hook, registry file and reranker pid: UNCHANGED (every line equal before and after)
+the live store link, its halves and w2/integrate: UNCHANGED
+the scratch hook after: 099de326c45b (the script only reads it)
+NEGATIVE RUN OK (neg-uncommitted): STOP at part 0 before anything was built or switched
+rehearsal exit 0

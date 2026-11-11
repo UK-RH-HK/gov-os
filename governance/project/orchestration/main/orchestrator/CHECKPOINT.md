@@ -1,18 +1,19 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-10 22:25 UTC: session `8ddb8b14`; D-10 RUN 2 RUNNING; next free id DEC-1125
-- **Run 2 since 22:22:34 UTC**, head `078e972d5`, 16 workers, `tools/d10_start.sh run2 16` (clean signals, TMPDIR
-  /tmp/gov-d10), pid `239599` (`log/d10/run2/pid`); nightly then the lifted step (fixed: `rep:` prefix,
-  `d10_lifted_only.py`); ends when `log/d10/run2/exit` exists (~1 h 40 min). **No commits on integrate until then.**
-- **Before it:** every run-1 fix merged (A `2fddb5bf0`, B `ba2ecaacf`, C `c37ec8c76`, D `adeba3758`, E/H `0edfcda88`,
-  G `d831dd35e`, Q23 `9007b8cfa` (DEC-1124, independent session), records `6455c8c40`); ACT-DEADMAN-STANDBY-1 landed
-  `c769396a2` (15 passed); ACT-W1-01-EXEMPT-2 `3428f659f` by the owner's operator (41 passed); ACT-SENTINEL-1 re-done
-  by the owner's operator 22:10 (sentinel up). Machine restart 21:29-21:52: servers restarted from committed configs
-  (11434 OLLAMA-CAP-1, 11435 QUERY-GPU-2 wrapper); watchers and both digests re-armed.
-- **At its end, to the owner:** worker count, nightly and lifted wall, swap figure; the reds by group against run 1
-  (`drafts/d10-run1-triage/NOTES.md`); expected residue: W2-50 lifted guard cases flaky under load (pass alone), the
-  guard's lifted rules (~77, expected), W1-33/W1-05 install wiring, W2-13 latency; product-traceability a warning (DEC-1123 (3)).
-- **Then:** the re-pin ACT (row 88) per START-NEXT-SESSION §5.
+## RESUME HERE — 2026-11-11 01:20 UTC: session `8ddb8b14`; THE NIGHT TO THE RE-PIN (DEC-1125 (3)); next free id DEC-1126
+- **Owner asleep; no pushes to the owner before 07:30 unless P1** (DEC-936 (1)). The 09:30 digest (cron 7355d120,
+  fires ~09:32) carries: the audit's findings and fixes, a ready-for-re-pin verdict, ACT-REPIN-W5 and the owner's
+  steps, the closes' state, anything else for the owner.
+- **Done tonight:** D-10 run 2 reported; DEC-1125 recorded `493d485b6` (latency a named red; memory audit weekly,
+  DEC-1101 (1) changed, DEC-1097 (4) folded; the night); W2-155 filed `DAEO-ar89` (P4); rows 116-118; stand-by ended.
+- **Eight Sonnet helpers running (01:18), briefs `briefs/NIGHT-*.md`, none commits; the CTO commits their paths:**
+  re-pin ACT (`NIGHT-repin-act.md` → `packages/ACT-REPIN-W5.md`, `pin/*W5*`, `pin/*7*`); closes (`LIFT-CLOSES-1.md`);
+  audit (a) decisions (writes DECISIONS-IN-FORCE + DECIDED-NOT-DONE: the CTO keeps off both until it returns), (b)
+  plan (P1-PLAN, FORECAST-W2-3), (c) tickets (`.tickets/*` open/in-progress), (d) tools (EMERGENCY-TOOLS-1, tickets
+  W2-156..169), (e) memory audit tool (`MEMORY-AUDIT-1`, tickets W2-170..179), (f) checks (`AUDIT-NIGHT-1/f-checks.md`).
+  Reports in `packages/AUDIT-NIGHT-1/`. **`src/` frozen tonight** (the candidate's wheel).
+- **Then:** an Opus C3 review of ACT-REPIN-W5 (fixed form, JUDGEMENT.md); `gov plan` ready lists several batches deep
+  (`packages/READY-AFTER-LIFT-1.md`); commit everything; write the digest text; checkpoint; watchers armed.
 
 ## RESUME HERE (history) — 2026-11-10 18:15 UTC: session `412a4e37` hands over during D-10 run 1 (DEC-1122 (2)); next free id DEC-1123
 - **D-10 run 1 RUNNING since 18:10:09 UTC** (the records' "after 18:20" is wrong: correct it in the next commit), head
