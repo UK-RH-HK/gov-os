@@ -6,7 +6,6 @@ ref that does not resolve each end in a refusal that names the thing (DEC-449, D
 
 from __future__ import annotations
 
-import hashlib
 import sqlite3
 import subprocess
 from pathlib import Path
@@ -14,6 +13,9 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
+from gov.util import frontmatter as fm
+from gov.util.digest import sha256
+from gov.util.gitenv import git_env
 
 FOLDER = "governance/adoption"  # the tool's own records: no artefact of the project, so not in its inventory
 STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
@@ -27,10 +29,6 @@ def refuse(code: str, message: str, **details) -> GovError:
     return GovError("ADOPT_" + code, message, details)
 
 
-def sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-
 def record_path(stage: str) -> str:
     return f"{FOLDER}/{stage}-{TITLES[stage].replace(' ', '-')}.md"
 
@@ -38,7 +36,7 @@ def record_path(stage: str) -> str:
 def _run(root: Path, args: tuple, ok: tuple, data: bytes | None = None) -> tuple[int, bytes]:
     try:
         done = subprocess.run(["git", "-C", str(root), "-c", "core.quotePath=false", *args], capture_output=True,
-                              input=data, stdin=None if data is not None else subprocess.DEVNULL)
+                              input=data, stdin=None if data is not None else subprocess.DEVNULL, env=git_env(root))
     except OSError as exc:
         raise refuse("GIT_FAILED", f"git {args[0]} could not be run in {root}: {exc}") from None
     if done.returncode not in ok:
@@ -119,18 +117,14 @@ def commit(root: Path, message: str, files: dict[str, str]) -> None:
 
 def frontmatter(text: str) -> dict | None:
     """The frontmatter of ``text``, None when it has none; ``ValueError`` when it cannot be read."""
-    lines = [line.rstrip() for line in text.split("\n")]
-    if lines[0] != "---":
-        return None
-    if "---" not in lines[1:]:
-        raise ValueError("the frontmatter is not closed")
     try:
-        data = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)]))
-    except yaml.YAMLError as exc:
-        raise ValueError("the frontmatter is not valid YAML: " + " ".join(str(exc).split())) from None
-    if not isinstance(data, dict):
-        raise ValueError("the frontmatter is not a mapping")
-    return data
+        return fm.parse(text, rstrip=True)
+    except fm.FrontmatterError as error:
+        if error.kind == fm.UNCLOSED:
+            raise ValueError("the frontmatter is not closed") from None
+        if error.kind == fm.NOT_YAML:
+            raise ValueError("the frontmatter is not valid YAML: " + " ".join(str(error.error).split())) from None
+        raise ValueError("the frontmatter is not a mapping") from None
 
 
 def read_record(root: Path, tracked: dict, rel: str) -> tuple[dict, bytes]:

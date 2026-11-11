@@ -1,6 +1,6 @@
 ---
 id: DAEO-0mtg
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-31T01:22:30Z

@@ -27,6 +27,8 @@ import tempfile
 import time
 from pathlib import Path
 
+from gov.util.gitenv import git_env
+
 ACT_PATHS = (".gov-runtime/freeze", ".tickets/**")
 OWNER, ORCHESTRATOR = "owner", "orchestrator"
 FIRST_PROCESSES = ("init", "systemd")  # the ``comm`` of a system's first process; a sandbox's own is another
@@ -44,7 +46,7 @@ def add_arguments(parser) -> None:
 
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=git_env(root))
 
 
 def _mirror_path(root: Path) -> Path:
@@ -52,7 +54,7 @@ def _mirror_path(root: Path) -> Path:
     is ``sha256(realpath(git-common-dir))`` (DEC-429)."""
     try:
         raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
-                             capture_output=True, text=True, check=True).stdout.strip()
+                             capture_output=True, text=True, check=True, env=git_env(root)).stdout.strip()
         if not os.path.isabs(raw):
             raw = os.path.join(str(root), raw)
         common = os.path.realpath(raw)

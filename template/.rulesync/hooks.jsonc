@@ -27,6 +27,7 @@
     "sessionStart": [
       {
         "type": "command",
+        "matcher": "compact|clear|resume",
         "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/sessionstart.py\"",
         "timeout": 60
       }

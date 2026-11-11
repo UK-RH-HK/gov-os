@@ -11,6 +11,9 @@ import tempfile
 from pathlib import Path
 
 from gov.guard import runs
+from gov.util.gitenv import GIT_DIRS, git_binary
+from gov.util.patterns import _has_glob, _match_pattern
+from gov.util.tickets import _parse_frontmatter
 
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
@@ -57,49 +60,7 @@ _UNRESOLVABLE = "/<guard-unresolvable>"
 _MOST_LANDED = 10000
 
 
-# -- frontmatter --------------------------------------------------------------
-
-def _parse_frontmatter(text: str) -> dict | None:
-    if not text.startswith("---"):
-        return None
-    end = text.find("\n---", 3)
-    if end < 0:
-        return None
-    result: dict = {}
-    paths: list[str] = []
-    in_paths = False
-    for line in text[4:end].splitlines():
-        s = line.strip()
-        if not s or s.startswith("#"):
-            continue
-        if re.match(r"^[a-zA-Z_][\w-]*:", line) and not line[0].isspace():
-            in_paths = False
-            key, _, val = line.partition(":")
-            if key.strip() == "allowed_paths":
-                in_paths = True
-                continue
-            result[key.strip()] = val.strip()
-        elif in_paths and s.startswith("- "):
-            e = s[2:].strip()
-            if len(e) >= 2 and e[0] == e[-1] and e[0] in ("'", '"'):
-                e = e[1:-1]
-            paths.append(e)
-        elif in_paths and not s.startswith("-"):
-            in_paths = False
-    result["allowed_paths"] = paths
-    return result
-
-
-# -- pattern matching ----------------------------------------------------------
-
-def _match_pattern(relpath: str, pattern: str) -> bool:
-    parts = pattern.split("**")
-    segs = [re.escape(p).replace(r"\*", "[^/]*") for p in parts]
-    rx = "^" + ".*".join(segs)
-    if pattern.endswith("**"):
-        rx += ".*"
-    return bool(re.match(rx + "$", relpath))
-
+# -- frontmatter and pattern matching: gov.util.tickets and gov.util.patterns (W2-150) --
 
 # -- ticket loading ------------------------------------------------------------
 
@@ -285,11 +246,6 @@ def _expand_token(token: str) -> str | None:
             return None
 
     return ''.join(parts)
-
-
-def _has_glob(s: str) -> bool:
-    """True when *s* contains shell glob characters."""
-    return '*' in s or '?' in s or '[' in s
 
 
 # -- Bash write analysis -------------------------------------------------------
@@ -808,27 +764,64 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
 
 # -- the freeze mirror (DEC-429) -----------------------------------------------
 
+# W2-L160: git from the system's own folders, never whatever comes first on
+# the inherited PATH; the helper's folders and resolver, one for the guard.
+_GIT_DIRS = GIT_DIRS
+# DEC-783 item 2: the look-up's own limit, inside the hook's 20 s deadline.
+_LOOKUP_S = 15
+
+
+class FreezeLookupUnavailable(Exception):
+    """The freeze look-up could not be made: no git resolved, or it passed
+    its own limit.  The guard refuses the call (DEC-580)."""
+
+
+def _git_binary() -> str | None:
+    return git_binary(_GIT_DIRS)
+
+
 def _mirror_path(project_root: str) -> Path:
     """The mirror file for this project: ``~/.local/state/gov-os/<key>/freeze``
-    where ``<key>`` is ``sha256(realpath(git-common-dir))``."""
+    where ``<key>`` is ``sha256(realpath(git-common-dir))``.
+
+    Raises ``FreezeLookupUnavailable`` when no git is resolved by absolute
+    path or the look-up passes ``_LOOKUP_S``."""
     import hashlib
     import subprocess as _sp
+    from gov.util.gitenv import git_env
+    git = _git_binary()
+    if git is None:
+        raise FreezeLookupUnavailable("no git resolved by absolute path")
     try:
-        raw = _sp.run(["git", "-C", project_root, "rev-parse", "--git-common-dir"],
-                       capture_output=True, text=True, check=True).stdout.strip()
+        # No inherited GIT_* variable and no system or global configuration
+        # (a trace setting there) reaches it (DEC-710).
+        raw = _sp.run([git, "-C", project_root, "rev-parse", "--git-common-dir"],
+                      capture_output=True, text=True, check=True,
+                      stdin=_sp.DEVNULL, timeout=_LOOKUP_S,
+                      env=git_env(None, pinned=True)).stdout.strip()
         if not os.path.isabs(raw):
             raw = os.path.join(project_root, raw)
         common = os.path.realpath(raw)
+    except _sp.TimeoutExpired:
+        raise FreezeLookupUnavailable(
+            f"git rev-parse gave no answer within {_LOOKUP_S} s") from None
     except Exception:
         common = os.path.realpath(project_root)
     key = hashlib.sha256(common.encode()).hexdigest()
     return Path.home() / ".local" / "state" / "gov-os" / key / "freeze"
 
 
-def _mirror_frozen(project_root: str) -> bool:
-    """True when the mirror says frozen or the mirror folder is unreadable (fail closed, DEC-429)."""
+def _mirror_frozen(project_root: str, *, strict: bool = False) -> bool:
+    """True when the mirror says frozen or the mirror folder is unreadable (fail closed, DEC-429).
+
+    A look-up that could not be made reads as frozen; with ``strict`` it
+    raises ``FreezeLookupUnavailable`` instead, for the guard to refuse."""
     try:
         mirror = _mirror_path(project_root)
+    except FreezeLookupUnavailable:
+        if strict:
+            raise
+        return True
     except Exception:
         return True
     try:
@@ -1066,8 +1059,11 @@ def decide(
     (``freeze_state``); it is read here otherwise.
     """
     frozen = (flag or freeze_state(project_root)) == "frozen"
-    if not frozen and _mirror_frozen(project_root):
-        frozen = True
+    if not frozen:
+        try:
+            frozen = _mirror_frozen(project_root, strict=True)
+        except FreezeLookupUnavailable as exc:
+            return "deny", f"the freeze look-up failed: {exc} (fail closed, DEC-580)"
     erole = (role or "").strip() or ""
 
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.

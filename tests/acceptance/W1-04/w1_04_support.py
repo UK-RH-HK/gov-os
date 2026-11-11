@@ -339,6 +339,7 @@ def hook_environment(project, sandbox, role=None, ticket=None):
         "PYTHONPATH": str(REPO_ROOT / GOV_PACKAGE_PARENT_REL),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
         "CLAUDE_PROJECT_DIR": str(project),
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     if role is not None:
         env[ROLE_ENV] = role

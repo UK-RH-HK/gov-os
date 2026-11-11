@@ -394,31 +394,37 @@ def test_stale_path_in_historical_record_is_not_reported(gov, project, interface
 # --------------------------------------------------------------------------- #
 
 def test_stale_path_in_live_document_is_reported(sandbox, tmp_path):
-    """A reference to a moved path inside a live document IS reported.
+    """References to moved paths in live files ARE reported, each beside an excluded historical file that names the
+    same old path (DEC-448, DEC-456): a live document beside the decision register, a live document beside
+    ``docs/SOURCES.md``, and ``src/gov/cli/`` beside the old ``cli/`` tree. One doctor run on one small committed
+    project; each live reference is named in ``path_compliance.moved_references``.
 
-    DEC-448: the exclusion is narrow — a live document beside an excluded
-    one is still checked.
-
-    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
-    that doctor always emits): ``moved`` is always there (the key
-    ``moved_references``).  The case reads the live document's entry in
-    ``path_compliance.moved_references``, with the decision register (a
-    DEC-448 historical record) naming the same old path beside it, on a
-    small committed project of its own.
-    """
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row M5: the three stale-path cases (this one and
+    ``test_w1_27_path_compliance_r2.py``'s ``test_stale_path_in_live_document_not_sources_is_reported`` and
+    ``test_stale_path_in_src_gov_cli_is_reported``) ran the same doctor on three projects; they are folded into one
+    run with the three planted paths (CAP-06.d unchanged)."""
     project = w2_67_doctor.small_project(tmp_path / "repo")
-    old_rel, new_rel = "src/gov/doctor/old_live_module.py", "src/gov/doctor/new_live_module.py"
-    w2_67b_support.move_committed(project, old_rel, new_rel)
-    w2_67b_support.write_committed(project, "docs/DECISION_REGISTER.md", f"### DEC-999\nMoved {old_rel}.\n")
-    w2_67b_support.write_committed(project, "docs/live-reference.md", f"Reference to the old path: {old_rel}\n")
+    planted = (
+        ("src/gov/doctor/old_live_module.py", "src/gov/doctor/new_live_module.py", "docs/DECISION_REGISTER.md",
+         "### DEC-999\nMoved {old}.\n", "docs/live-reference.md", "Reference to the old path: {old}\n"),
+        ("src/gov/doctor/old_live_src_mod.py", "src/gov/doctor/new_live_src_mod.py", "docs/SOURCES.md",
+         "| {old} | {new} | moved |\n", "docs/live-note.md", "See {old} for the implementation.\n"),
+        ("src/gov/doctor/old_src_cli_mod.py", "src/gov/doctor/new_src_cli_mod.py", "cli/legacy_commands.py",
+         "# old reference: {old}\n", "src/gov/cli/commands_ref.py", "# reference: {old}\n"),
+    )
+    for old, new, excluded, excluded_text, live, live_text in planted:
+        w2_67b_support.move_committed(project, old, new)
+        w2_67b_support.write_committed(project, excluded, excluded_text.format(old=old, new=new))
+        w2_67b_support.write_committed(project, live, live_text.format(old=old, new=new))
 
     run = w2_67_doctor.doctor(project, sandbox)
     references = w2_67b_support.moved_references(run)
 
-    assert w2_67b_support.references_to(references, old_rel, "docs/live-reference.md"), (
-        f"doctor does not report a reference to a moved path inside a "
-        f"live document — the stale-path check should report it\n"
-        f"{run.describe()}"
+    missing = [f"{live} (naming {old}; beside {excluded})" for old, _, excluded, _, live, _ in planted
+               if not w2_67b_support.references_to(references, old, live)]
+    assert not missing, (
+        "doctor does not report a reference to a moved path in a live file — the stale-path check should report "
+        f"it: {missing}\n{run.describe()}"
     )
 
 

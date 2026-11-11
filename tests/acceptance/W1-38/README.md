@@ -70,6 +70,19 @@ editable install's `gov` script at `.local/bin/gov`, its first line naming the t
 --user -e` leaves it (DEC-605): the pinned line starts that interpreter, and the path file gives this worktree's
 package, as before (DEC-732). On lines that run a bare `python3` the script is never read.
 
+**The revision of W2-153 (2026-11-10, ticket `DAEO-8s85`, DEC-1112 (3), DEC-866; `Rewrite-Reason: W2-153 S3
+amended ... and generated projects carry templates/`)** adds no case, removes none and changes no expectation. Only the
+project builder (`w1_38_support.build_project_from_template`) changes. W2-153 composes each rulesync role source from
+its kernel role template and its kernel role file, and the portability check compares a source with that composition
+and requires the eight `.claude/templates/` copies (W2-153 S3, S4). The builder copied no `templates/`, so the check
+fell back to comparing the sources with the role files alone and every generated project was red on the six role
+sources. The builder now also copies `template/governance/kernel/templates/` file by file into
+`governance/kernel/templates/`, as it copies `roles/` and `skills/`. It also writes the eight byte copies under
+`.claude/templates/` that an adopted project holds from the copies ACT (DEC-315; rulesync never writes them). On
+integrate's code (the first composition, the template's body alone) the portability cases turn green with it. The six
+`TestRoleFieldAgreement` cases stay red until the sources carry the role file's body after the template's (S3
+amended): the generated agent then holds the role file's fields.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -86,7 +99,8 @@ rulesync command runs in it.
 | In the project | From | Source |
 |---|---|---|
 | `.rulesync/**` | `template/.rulesync/**` | ADR-0002 §5 |
-| `governance/kernel/hooks/*.py`, `governance/kernel/roles/*.md`, `governance/kernel/skills/**` | `template/governance/kernel/{hooks,roles,skills}` | ADR-0002 §5 |
+| `governance/kernel/hooks/*.py`, `governance/kernel/roles/*.md`, `governance/kernel/skills/**`, `governance/kernel/templates/*` | `template/governance/kernel/{hooks,roles,skills,templates}` | ADR-0002 §5; `templates/` since W2-153 (S3 amended, DEC-1112 (3)): the role sources are composed from the role templates and the role files, so without it the portability check has nothing to compose |
+| `.claude/templates/<stem>.md` for `brief`, `role-research`, `role-product-spec`, `role-test-designer`, `role-engineer`, `role-reviewer`, `role-lead`, `role-cto` | byte copies of `template/governance/kernel/templates/<stem>.md` | W2-153 S4 (DEC-1050): an adopted project holds them from the copies ACT (DEC-315), never from rulesync, and the portability check reports a missing one |
 | `governance/project/tool-registry.yaml`, holding the `rulesync` entry | this repository's own registry entry, unchanged | DEC-127 |
 | `template/governance/kernel/checks/adapter-portability.yaml` | the ticket's declaration | DEC-186 (the path `gov check` reads) |
 | `CLAUDE.md`, `AGENTS.md`, `.claude/**` | `rulesync generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills`, run in the temporary project | KPI success 1 |
@@ -579,6 +593,13 @@ that also stops the test designer").
 line removed; nothing of the template was changed): the generated deny list is the four other rules, `rulesync
 generate --check` ends with 0 and the declared command of the adapter check ends with 0.
 
+**Revised by DEC-966 item 1 (W2-105, `Rewrite-Reason: DEC-966 item 1`, DEC-866).** The two install rules
+(`npm install*`, `pip install*`) are taken out of the template's source too, so an adopted product's CTO session
+reaches the guard's install rule (DEC-172). The two cases of behaviour 2 that listed the other rules now pin the two
+that stay, the ticket-folder edit rule and the sudo rule (`Bash(sudo *)`, `Edit(.tickets/**)` generated), and still
+nothing else. Their ids ("four other") are kept from this round. They are red on the template before W2-105's change
+(the source still gives the two install rules) and green after it.
+
 ### How a case is built
 
 - **The project** is the suite's stand-in project (`generated_project`), as everywhere in the suite; rulesync is
@@ -610,8 +631,8 @@ generate --check` ends with 0 and the declared command of the adapter check ends
 | 1. the rule is gone from the source | `TestTheRuleIsGone::test_the_templates_source_holds_no_edit_rule_on_the_acceptance_test_folder` | no rule under `permission.edit` of the template's source, whatever its value, covers a path of the folder | **red**: the source holds `tests/acceptance/**` as an edit deny rule |
 | 1. and from the generated settings | `…::test_the_generated_settings_hold_no_deny_rule_on_the_acceptance_test_folder` | no `Edit` deny rule of the settings generated from the template covers a path of the folder | **red**: `Edit(tests/acceptance/**)` is generated |
 | | `…::test_the_generated_settings_hold_no_rule_of_a_write_tool_on_the_folder_in_any_list` | no rule of `Edit`, `Write`, `MultiEdit` or `NotebookEdit` in the deny, ask or allow list covers it | **red**: the same rule |
-| 2. the removal takes one rule | `TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else` | the source's rules that are not on the folder are exactly the ticket-folder edit rule and the two install rules and the sudo rule, each `deny` | green before implementation; it must stay green |
-| | `…::test_the_four_other_deny_rules_are_still_generated_and_nothing_else` | the generated permission rules that are not on the folder are exactly the four deny rules, each once; no other list holds a rule | green before implementation; it must stay green |
+| 2. the removal takes one rule | `TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else` | the source's rules that are not on the folder are exactly the ticket-folder edit rule and the sudo rule, each `deny` (since DEC-966 item 1; before it, the two install rules too) | green before DEC-664's implementation; red before W2-105's (the two install rules), green after |
+| | `…::test_the_four_other_deny_rules_are_still_generated_and_nothing_else` | the generated permission rules that are not on the folder are exactly `Bash(sudo *)` and `Edit(.tickets/**)`, each once (since DEC-966 item 1); no other list holds a rule | green before DEC-664's implementation; red before W2-105's (the two install deny rules), green after |
 | | `…::test_the_generated_settings_still_close_the_ticket_folder` | an `Edit` deny rule covers a ticket file that exists and a new one | green before implementation; it must stay green |
 | 3. the guard, the test designer | `TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder` | Write and Edit on an existing and a new file under the folder, and a Bash redirect: every registered command allows | green before implementation; it must stay green |
 | | `…::test_the_test_designer_is_still_refused_outside_the_folder` | Write and Edit on a file of the ticket's own paths, a unit test, the ticket file: the program's own refusal | green before implementation; it must stay green (the allowance is a decision, not a guard that lets everything through) |
@@ -873,3 +894,24 @@ P-1 and P-2 are decided: P-1 by DEC-468 (option a; its cases are `TestOpenSpecSk
   (the role's tools) the project is generated again, so rulesync's own check is clean (asserted).
 - A stand-in rulesync binary is written outside the project; where it only changes one answer (the version), it
   hands every other call to the installed rulesync.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 42 in the full run, 159 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec commands and ve... | `test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_claude_md_is_the_root_rule`, `test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_agents_md_token_limit`, `test_w1_38_rulesync.py::TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships` (1 of 6) | designer |
+| S2: Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI | `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestGenerateCheck::test_check_clean_after_generate` | the ticket's words |
+| S3: Registers the adapter/model-portability family check: generated adapters match their source for Claude Code and AGENTS.md [CAP-38.b] | `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family`, `test_w1_38_rulesync.py::TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read`, `test_w1_38_rulesync.py::TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md` | the ticket's words |
+| F1: generate --delete removes OpenSpec or vendored skills | `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_skills`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_vendored_skills`, `test_w1_38_rulesync.py::TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships` (1 of 6) | the ticket's words |
+| F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md` | the ticket's words |
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the `launched` fixture plants W1-46's open gate (`plant_open_gate`) in the stand-in home and runs the launch through `_run_launch`, W1-07's `run_gov_with_code` with the gate's `GOV_RESOURCES_*` added. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.

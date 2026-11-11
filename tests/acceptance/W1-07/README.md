@@ -219,13 +219,14 @@ failure says:
   `stderr (trimmed):` and the traceback's end (`_check_path_map` → `_git`). W2-57's own case for that cause is in
   `tests/acceptance/W2-57/`.
 
-## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569)
+## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569), with `accept` (DEC-970) and W2-20's `resources` in their form: six recorded
 
 DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer
 line." DEC-546: the lines are written by a test designer in the follow-up, "with the list itself".
 
-**The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`)
-and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
+**The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`,
+`accept` since DEC-970, W2-96, and `resources`, W2-20's command, in DEC-542's form: `173e8e97`, ported for
+DEC-1097 (8)) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
 (CAP-28.b): no existing list, case or invocation of this suite changed, and only those lines were added to the
 support.
 
@@ -244,12 +245,12 @@ orders the subcommand). So `lock` is recorded as that module command, and record
 
 | Case (`test_w1_07_recorded_commands.py`) | Holds | Today |
 |---|---|---|
-| `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` | the lines name exactly the four, apart from the twelve | green |
-| `test_a_recorded_gov_command_is_offered_and_answers_its_help` (3: `ci`, `launch`, `telemetry`; the one case of each) | `gov --help` offers the command and `gov <command> --help` ends with exit code 0 and names it. The command itself is not run: `launch` starts a session, `ci` runs gates | green, all three |
+| `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` | the lines name exactly six, apart from the twelve: DEC-542's four, `accept` (DEC-970) and `resources`, recorded by W2-20 in DEC-542's form (`173e8e97`) | green (it reads the support's lines only) |
+| `test_a_recorded_gov_command_is_offered_and_answers_its_help` (5: `ci`, `launch`, `telemetry`, `accept`, and W2-20's `resources`; the one case of each) | `gov --help` offers the command and `gov <command> --help` ends with exit code 0 and names it. The command itself is not run: `launch` starts a session, `ci` runs gates | green, the four before `resources`; `resources` red until W2-20 builds it (`invalid choice`) |
 | `test_lock_is_recorded_as_the_module_command_and_is_no_gov_command` (the one case of `lock`) | `gov --help` offers no `lock`; `gov lock` is a usage error (exit code 2); `python3 -m gov.lock` in a folder that is no installed project runs, ends with exit code 1, names `framework.lock` and writes nothing | green |
 
-5 cases, all green: the commands exist as found, and the cases hold them so that the list and the command
-line cannot part unseen. The red of this piece is in W1-26's suite. The command set as a whole (nothing beyond
+7 cases (5 with DEC-542's four; 6 with `accept`; 7 with W2-20's `resources`), all green once W2-20 is built: the
+commands exist as found, and the cases hold them so that the list and the command line cannot part unseen. The red of this piece is in W1-26's suite. The command set as a whole (nothing beyond
 the twelve and the three) is W1-32's case, rewritten for DEC-542.
 
 ## Decision package
@@ -285,3 +286,26 @@ the twelve and the three) is W1-32's case, rewritten for DEC-542.
 - **Recommendation.** (a).
 - **Confidence.** Medium-high. The only risk is that the one-line shape differs from what W1-08 will define, and
   DEC-185 already expects W1-08 to replace it.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 138 in the full run, 86 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Every command returns the API-0002 JSON envelope with exit codes 0-4 | `test_w1_07_envelope.py::test_every_command_returns_the_envelope` (13 of 13), `test_w1_07_envelope.py::test_a_governance_error_has_exit_code_1_and_its_code_in_the_json`, `test_w1_07_envelope.py::test_the_exit_code_is_the_same_without_json` (1 of 3) | the ticket's words |
+| S2: Commands are classed read or act; read commands leave git status --porcelain empty [CAP-27.a] | `test_w1_07_read_act.py::test_a_read_command_leaves_git_status_empty` (16 of 16), `test_w1_07_read_act.py::test_a_read_command_leaves_uncommitted_work_as_it_was` (1 of 8), `test_w1_07_read_act.py::test_a_read_command_leaves_a_dev_tier_clone_clean` (1 of 8) | the ticket's words |
+| S3: Overlay and path-map config load with schema validation; gov --help < 300 ms | `test_w1_07_config.py::test_an_invalid_path_map_gives_config_invalid_on_every_command` (1 of 39), `test_w1_07_config.py::test_a_missing_path_map_is_not_an_error` (13 of 13), `test_w1_07_config.py::test_status_succeeds_without_a_path_map` | the ticket's words |
+| S4: The check-declaration format (family, tier, hard-block or warning, command) is defined and loaded by the CLI, so any ticket can register a chec... | `test_w1_07_check_declarations.py::test_a_declared_check_is_listed_with_its_five_fields` (2 of 2), `test_w1_07_check_declarations.py::test_check_list_succeeds`, `test_w1_07_check_declarations.py::test_the_list_follows_the_declaration_files` | the ticket's words |
+| S5: The command registry reserves each Wave 1 governance operation (status, check, readiness, doctor, rebuild, context, closure, retrieve, checkpoi... | `test_w1_07_registry.py::test_a_reserved_command_not_yet_built_returns_not_implemented`, `test_w1_07_registry.py::test_each_wave_1_operation_is_a_gov_command` (12 of 12) | the ticket's words |
+| F1: A command writes outside its declared act paths | `test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths` (14 of 14) | the ticket's words |
+| F2: Envelope fields drift from docs/interfaces/API-0002.yaml | `test_w1_07_envelope.py::test_the_envelope_has_no_field_outside_the_interface` (13 of 13) | the ticket's words |
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** `w1_07_support.py::RECORDED_GOV_COMMANDS` records `brief` (W2-152), `links` (W2-129) and `plan` (W2-136), one line in DEC-542's form; the recorded commands are nine (eight `gov` commands and `lock`). `test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` pins the nine; `test_w1_07_recorded_commands.py::test_a_recorded_gov_command_is_offered_and_answers_its_help` gains `[brief]`, `[links]`, `[plan]`, green on `w2/integrate` (the commands are built). 10 cases in this section.

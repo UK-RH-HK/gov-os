@@ -93,3 +93,22 @@ The red reasons below are what this suite printed at the commit that added it: *
 
 - **P-1:** `tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py::test_a_heading_after_a_closed_fence_records_its_id`. Its entry `### DEC-101 — The parser changes` has no status line under it, and the case expects the entry to record DEC-101. Under W2-L221 that entry is a heading alone, so the case turns red once W2-03 is built.
 - **P-2:** `tests/acceptance/W1-26/test_w1_26_decision_citations.py::test_a_decision_file_records_its_id[no-type-id-in-grammar]`. A file whose frontmatter has only `id: DEC-101` (no type, no state_class) is expected to satisfy a citation. That contradicts W2-M267 and W2-M145.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 30 in the full run, 9 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The store loads each ### DEC-nnn entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share... | `test_w2_03_entry_records.py::test_every_entry_of_this_repositorys_register_has_its_own_hash`, `test_w2_03_entry_records.py::test_a_decision_id_resolves_to_its_entry_not_to_the_register` | the ticket's words |
+| S2: A decision id resolves to its entry, not to the register [AR-1]. | `test_w2_03_entry_records.py::test_a_decision_id_resolves_to_its_entry_not_to_the_register`, `test_w2_03_entry_records.py::test_the_decision_citations_check_resolves_a_cited_id_to_its_entry` | the ticket's words |
+| S3: A register heading alone, or any Markdown file with a decision id in its frontmatter, is not a decision record [W2-L221, W2-M267, W2-M145]. | `test_w2_03_grammar.py::test_a_register_heading_outside_the_id_grammar_is_no_record`, `test_w2_03_not_records.py::test_a_heading_alone_is_no_record_of_the_store` (2 of 2), `test_w2_03_grammar.py::test_an_id_in_lower_case_does_not_record_the_upper_case_id` | the ticket's words |
+| S4: Decision status and id comparisons follow the schema's grammar, case included [W2-M106, W2-L069]. | `test_w2_03_grammar.py::test_a_decision_with_a_non_canonical_status_is_reported` (1 of 2), `test_w2_03_grammar.py::test_a_decision_with_an_empty_id_is_reported_never_followed_as_none_or_empty` (1 of 2) | the ticket's words |
+| F1: An edited entry changes only its own hash; a duplicate DEC id is refused with both locations. | `test_w2_03_failure.py::test_an_edited_entry_changes_only_its_own_hash` (4 of 4) | the ticket's words |

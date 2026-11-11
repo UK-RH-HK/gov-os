@@ -4,6 +4,7 @@ Read only. The lists are judged by the paths they place in this repository's tra
 grammar of a ticket's ``allowed_paths`` (README, "Interface"). README, "Part 2".
 """
 
+import ast
 import json
 import re
 import subprocess
@@ -40,7 +41,7 @@ RECORD_READERS = (
     ("tests/acceptance/W1-08/test_w1_08_path_map.py", True),           # gate (f)
     ("tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py", True), # gate (f): scans the tree
     ("tests/acceptance/W1-07/test_w1_07_envelope.py", True),           # gate (f): every command on the tree
-    ("tests/acceptance/W2-54/test_w2_54_green_here.py", True),         # DEC-889 item 2
+    # DEC-889 item 2: W2-54's green-here file, case by case since DEC-1050 (T-4); see GREEN_HERE below
     ("tests/acceptance/W1-33/test_w1_33_agent_definitions.py", True),  # DEC-889 item 2
     ("tests/acceptance/W1-49/test_w1_49_threshold.py", True),          # DEC-889 item 2: W1-49's window
     ("tests/acceptance/W1-10/test_w1_10_register.py::"
@@ -58,6 +59,27 @@ RECORD_READERS = (
     ("tests/acceptance/W1-26/test_w1_26_probe_records.py", False),     # I2 F6: docs/probes
     ("tests/acceptance/W1-48", False),                                 # I2 F6: the register's approvals
 )
+
+# Rewrite-Reason: DEC-1050 (T-4, with the CTO's correction R1-22). W2-54's green-here file was held whole; T-4 took
+# out of the record-reading set its three cases that start a whole ``gov check`` (they take the ``gov_check_here``
+# fixture; they run in the full suite only). Every other case of the file is still a reader held case by case, and
+# the three are held by no entry (``test_w2_54_s_cases_that_start_a_whole_gov_check_are_not_in_the_record_reading_set``).
+GREEN_HERE = "tests/acceptance/W2-54/test_w2_54_green_here.py"
+WHOLE_GOV_CHECK = ("test_gov_check_gives_context_reproducibility_green_here",
+                   "test_gov_check_gives_core_schema_green_here", "test_the_w1_43_audit_report_is_untouched")
+
+
+def _green_here_cases():
+    """The test functions of W2-54's green-here file, in order, each with the names of its arguments."""
+    path = ROOT / GREEN_HERE
+    if not path.is_file():
+        return {}
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    return {node.name: [arg.arg for arg in node.args.args] for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")}
+
+
+RECORD_READERS += tuple((f"{GREEN_HERE}::{name}", True) for name in _green_here_cases() if name not in WHOLE_GOV_CHECK)
 
 EVERY_CLOSE = ("tests/acceptance/W1-07/test_w1_07_envelope.py", "tests/acceptance/W1-07/test_w1_07_read_act.py",
                "tests/acceptance/W1-07/test_w1_07_registry.py")
@@ -78,12 +100,14 @@ COUPLINGS = (
                                                           "tests/acceptance/W1-38", "tests/unit/telemetry")),
     ("template/governance/kernel/hooks/precompact.py", ("tests/acceptance/W1-31", "tests/acceptance/W1-37",
                                                         "tests/acceptance/W1-38", "tests/unit/telemetry")),
+    # Rewrite-Reason: DEC-1061 item 9, T-6 (D4-LIST-B §4 row 2): W1-19 and W1-21 (the real-model suites) are selected
+    # only by model-path changes, no longer by the fixture-inputs coupling (FIXTURE_INPUTS_NOT_REACHING below).
     (support.PATH_MAP_REL, tuple(f"tests/acceptance/{w}" for w in
-                                 ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                 ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     (".gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                             ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                             ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("template/.gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                                      ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                      ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("src/gov/checkpoint/record.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-31")),
     ("src/gov/decisions/checker.py", ("tests/acceptance/W1-30",)),
     ("src/gov/closure/command.py", ("tests/acceptance/W1-30",)),
@@ -247,11 +271,47 @@ def test_the_record_only_list_hides_no_code_path(test_map, tracked):
     assert not hidden, f"the record-only list hides code paths: {hidden}"
 
 
+def _string_literals(path):
+    """Every string literal of a tracked Python file (none when it cannot be read or parsed: fail closed here,
+    where a file named by no literal stays a record)."""
+    try:
+        tree = ast.parse((ROOT / path).read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
+        return set()
+    return {node.value for node in ast.walk(tree) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
+
+
+def _read_by_code(path, tracked):
+    """Whether a tracked file kept under a ``tools/`` folder is read by the code beside it: a tracked ``.py``
+    directly in that same ``tools/`` folder holds, as a whole string literal, the file's path relative to the folder
+    or one of its leading folders (``indep_launch.py``: ``"indep-schemas"``; ``deadman.py``: ``"win_toast.ps1"``).
+    A document (``.md``) is always a record."""
+    parts = path.split("/")
+    if path.endswith(".md") or "tools" not in parts[:-1]:
+        return False
+    at = len(parts) - 1 - parts[:-1][::-1].index("tools")       # the nearest ``tools/`` folder above the file
+    folder, rel = "/".join(parts[:at]), parts[at:]
+    names = {"/".join(rel[:depth]) for depth in range(1, len(rel) + 1)}
+    readers = [p for p in tracked if p.endswith(".py") and p.rsplit("/", 1)[0] == folder]
+    return any(names & _string_literals(reader) for reader in readers)
+
+
 @pytest.mark.parametrize("place", RECORD_PLACES)
 def test_every_record_of_each_of_dec_891_s_places_is_record_only(test_map, tracked, place):
+    """Every record DEC-891 places in a record place is record-only.
+
+    Rewrite-Reason: DEC-891, DEC-1112 (3), the CTO's option (a): a file under a DEC-891 place that code reads is not
+    a record. W2-149's result schemas (``governance/project/orchestration/tools/indep-schemas/*.schema.json``) are
+    read by ``indep_launch.py`` beside them; listed record-only, a change to them would skip their tests (fails open
+    for the selection). The rule is the narrowest one the tree decides alone: a file under a ``tools/`` folder that
+    a tracked ``.py`` directly in that folder names, by a whole string literal equal to its path relative to the
+    folder or to one of its leading folders. Prose (a docstring, a comment) names nothing; a ``.md`` is always a
+    record; no folder is excluded by name; tickets, probes, close records, checkpoints and the plan's documents are
+    untouched. The test map's own couplings are not used: a coupling could then take a real record out of this case."""
     records = _patterns(test_map, "record_only")
     files = [p for p in tracked if p.startswith(place) and not p.endswith(CODE_SUFFIXES)
-             and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))]
+             and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))
+             and not _read_by_code(p, tracked)]
     assert files, f"the fixture is wrong: no tracked record under {place}"
     unplaced = [p for p in files if not _placed(records, p)]
     assert not unplaced, f"records of {place} the record-only list leaves out: {unplaced[:20]}"
@@ -270,6 +330,20 @@ def test_the_record_reading_set_holds_each_reader_of_a_record_path(test_map, tar
     assert (ROOT / target.split("::")[0]).exists(), f"the fixture is wrong: {target} does not exist"
     assert _held(_targets(test_map, "record_reading"), target, whole), \
         f"the record-reading set does not hold {target}"
+
+
+def test_w2_54_s_cases_that_start_a_whole_gov_check_are_not_in_the_record_reading_set(test_map):
+    """Rewrite-Reason: DEC-1050 (T-4): W2-54's three green-here cases that start a whole ``gov check`` left the
+    record-reading set; no entry holds them (neither the file whole nor the case). The others are held, case by case,
+    above."""
+    cases = _green_here_cases()
+    assert cases, f"the fixture is wrong: {GREEN_HERE} does not exist or holds no case"
+    wrong = [name for name in WHOLE_GOV_CHECK if "gov_check_here" not in cases.get(name, [])]
+    assert not wrong, f"the fixture is wrong: these cases of {GREEN_HERE} do not start a whole gov check: {wrong}"
+    assert set(cases) - set(WHOLE_GOV_CHECK), f"the fixture is wrong: {GREEN_HERE} holds no other case"
+    targets = _targets(test_map, "record_reading")
+    held = [name for name in WHOLE_GOV_CHECK if _held(targets, f"{GREEN_HERE}::{name}")]
+    assert not held, f"the record-reading set still holds W2-54's cases that start a whole gov check: {held}"
 
 
 def test_every_record_reading_target_exists(test_map):
@@ -302,6 +376,21 @@ def test_each_coupling_imports_cannot_see_is_declared(test_map, path, suites):
     reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
     missing = [s for s in suites if not _held(reached, s, whole=False)]
     assert not missing, f"no coupling takes a change of {path} to {missing}"
+
+
+# DEC-1061 item 9, T-6: a change of the live path map or a gitleaks configuration does not reach the real-model suites
+# (their real-model files run only on a model-path change, select_tests.py's rule, and in the nightly).
+FIXTURE_INPUTS_NOT_REACHING = ((support.PATH_MAP_REL, ".gitleaks.toml", "template/.gitleaks.toml"),
+                               ("tests/acceptance/W1-19", "tests/acceptance/W1-21"))
+
+
+@pytest.mark.parametrize("path", FIXTURE_INPUTS_NOT_REACHING[0])
+def test_a_fixture_input_change_does_not_reach_the_real_model_suites(test_map, path):
+    """T-6 (DEC-1061 item 9): the path map's and the gitleaks configurations' coupling leaves out W1-19 and W1-21."""
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    wrong = [t for t in reached for suite in FIXTURE_INPUTS_NOT_REACHING[1]
+             if t.rstrip("/") == suite or t.startswith(suite + "/")]
+    assert not wrong, f"a change of {path} still reaches the real-model suites through a coupling: {wrong}"
 
 
 # W1-27's ``test_w2_67_copies.py`` loads these conftests by file path (``conftest_of``), which no import shows.
@@ -460,13 +549,22 @@ def test_every_module_a_declared_check_runs_reaches_w1_26(test_map):
 
 # -- DEC-896 item 2: test_inputs moved; KPI 8 and 9: the settings -----------------
 
+MOVED_TEST_INPUTS = ("fixtures/**", "template/**", "schemas/**")   # the inputs DEC-896 item 2 moved
+
+
 def test_the_path_map_s_test_inputs_are_in_the_test_map(test_map):
-    inputs = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
-    if inputs is None:
-        pytest.skip("the path map no longer holds test_inputs (the orchestrator's edit is done)")
+    """DEC-896 item 2: ``test_inputs`` moved from the path map to the test map.
+
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R1: the case skipped forever once the move was done
+    (it compared with the path map's copy). It now asserts the move itself: the test map holds the moved inputs as
+    readable patterns, and the path map holds no ``test_inputs`` beside them."""
     moved = _need(test_map).get("test_inputs")
-    assert isinstance(moved, list) and set(inputs) <= set(moved), \
-        f"the test map does not hold the path map's test_inputs {inputs}: {moved!r}"
+    assert isinstance(moved, list) and moved and all(support.readable_pattern(p) for p in moved), \
+        f"the test map's test_inputs is not a list of patterns: {moved!r}"
+    missing = [p for p in MOVED_TEST_INPUTS if p not in moved]
+    assert not missing, f"the test map's test_inputs lacks {missing}: {moved!r}"
+    left = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
+    assert left is None, f"the path map still holds test_inputs beside the test map's: {left!r}"
 
 
 def test_the_per_test_limit_is_above_the_slowest_test_measured(test_map):

@@ -2,7 +2,7 @@
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
-- **Purpose:** implement one ticket until its acceptance tests pass, with builder tests as regression evidence. A
+- **Purpose:** implement one ticket to fulfil the spec and its KPIs, with builder tests as regression evidence. A
   session runs as `GOV_ROLE=engineer`, started with `gov launch engineer <ticket>` on an `in_progress` ticket whose
   `role` is engineer.
 - **Allowed paths:** the `allowed_paths` of its own `in_progress` ticket, plus `.gov-runtime/scratch/**` (DEC-108).

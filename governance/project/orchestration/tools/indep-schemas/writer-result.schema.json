@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "writer-result.schema.json",
+  "title": "The independent writer's out/result.json (first version, W2-149; a brief may revise it with its own approval)",
+  "type": "object",
+  "required": ["questions", "by_kind", "by_area"],
+  "properties": {
+    "questions": {"type": "integer", "minimum": 0},
+    "by_kind": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fact": {"type": "integer", "minimum": 0},
+        "procedure": {"type": "integer", "minimum": 0},
+        "decision": {"type": "integer", "minimum": 0},
+        "location": {"type": "integer", "minimum": 0},
+        "negative": {"type": "integer", "minimum": 0}
+      }
+    },
+    "by_area": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contract": {"type": "integer", "minimum": 0},
+        "decisions": {"type": "integer", "minimum": 0},
+        "kernel": {"type": "integer", "minimum": 0},
+        "code": {"type": "integer", "minimum": 0},
+        "tests": {"type": "integer", "minimum": 0},
+        "operations": {"type": "integer", "minimum": 0},
+        "docs": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

@@ -39,6 +39,7 @@ tests/acceptance/W1-17/test_w1_17_dev_tier.py::test_one_changed_file_is_re_index
 tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline  # serial: latency: the time taken against the deadline's bound
 tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call  # serial: latency: the time taken against the hang limit
 tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # serial: latency: the check on 60 small files and one large SQLite store within 15 s
+tests/acceptance/W2-13/test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget  # serial: latency: warm p95 of the lexical route, no model, over each dev tier's query set at most 0.5 s (W1-19's budget)
 
 # --- race: kept serial in this run
 tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # serial: race: claims raced from separate processes
@@ -81,7 +82,11 @@ tests/acceptance/W1-16/test_w1_16_paths_and_roots.py::test_the_secrets_indexing_
 tests/acceptance/W1-16/test_w1_16_secret_exclusion.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_reaches_the_index  # serial: daemon: it starts or asks the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_stays_out_of_the_index  # serial: daemon: it starts or asks the codebase-memory daemon
-tests/acceptance/W1-16/test_w1_16_ui_off.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
+# D-10 (DEC-1112 (3), the CTO's (a)): out while D-4's cut keeps every case of the file in breadth (DEC-1061;
+# tests/optin-lifted-breadth.txt, `# cap`): a default run collects none of them, and an entry that names no case
+# stops the close's serial phase (exit 4). In a run with --optin=breadth its seven cases run in the parallel phase,
+# not serially, until the plugin fix (b) treats an entry out of the run as not in it and this line returns. Was:
+# tests/acceptance/W1-16/test_w1_16_ui_off.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
 
 # --- live-session: routed to the nightly (DEC-889 item 5; I1 F-1, F-2; I3 F6)
 tests/acceptance/W1-46/test_w1_46_live_sessions.py  # nightly: live-session: launched engineer and research sessions; the host cases need the network
@@ -105,3 +110,4 @@ tests/acceptance/W2-54/test_w2_54_query_vector.py::test_with_the_real_embedder_o
 # Rewrite-Reason: DEC-951 item 3
 tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit  # nightly: real-model: the context check as declared, over this repository's tickets through this machine's embedder and reranker, ends green within its declared limit
 tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here  # nightly: real-model: gov check over this repository's tickets, each context built through this machine's embedder and reranker, gives context-reproducibility green
+tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget  # nightly: real-model: rebuilds the dev tiers with this machine's embedder and asks each question through the fusion with the embedder and the reranker, warm p95 at most 0.5 s (W1-19's budget); red alone on 11-10 (0.543-0.578 s against 0.5 s), a latency filed against W2-13, not excused

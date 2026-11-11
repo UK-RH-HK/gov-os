@@ -51,8 +51,8 @@ def world(hook, tmp_path_factory):
 
 def assert_policy_2(result, command, who, start, what):
     """W2-58 (DEC-821 item 3, DEC-857 item 3): allowed; but an engineer's content search from the root takes in its
-    ticket's acceptance folder (``tests/acceptance/W1-90/``) and is refused for (c) (DEC-821 item 1). A listing
-    from above (``ls``, ``find``) is not aimed inside that folder and stays allowed."""
+    ticket's acceptance folder (``tests/acceptance/<TICKET_WBS_ID>/``) and is refused for (c) (DEC-821 item 1). A
+    listing from above (``ls``, ``find``) is not aimed inside that folder and stays allowed."""
     listing = any(f" {word} " in f" {command} " for word in ("ls", "find"))
     if who == folders.NOT_A_WRITER and start == ROOT and not listing:
         assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
