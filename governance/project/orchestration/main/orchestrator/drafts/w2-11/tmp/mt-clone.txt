@@ -1,0 +1,67 @@
+6f5a56bd61d7d557a11f59fd8dbb2fa85c97b5df
+.claude/skills/orchestration/SKILL.md
+.claude/skills/test-design/SKILL.md
+.rulesync/skills/discovery/SKILL.md
+.rulesync/skills/orchestration/SKILL.md
+.rulesync/skills/retrieval/SKILL.md
+.rulesync/skills/test-design/SKILL.md
+template/.rulesync/skills/discovery/SKILL.md
+template/.rulesync/skills/orchestration/SKILL.md
+template/.rulesync/skills/retrieval/SKILL.md
+template/.rulesync/skills/test-design/SKILL.md
+template/governance/kernel/skills/discovery/SKILL.md
+template/governance/kernel/skills/orchestration/SKILL.md
+template/governance/kernel/skills/retrieval/SKILL.md
+template/governance/kernel/skills/test-design/SKILL.md
+template/governance/kernel/templates/brief-engineer.md
+template/governance/kernel/templates/brief-lead.md
+template/governance/kernel/templates/brief-product-spec.md
+template/governance/kernel/templates/brief-reviewer.md
+template/governance/kernel/templates/brief-test-designer.md
+
+Auto-merging .claude/agents/orchestrator.md
+Auto-merging .claude/skills/discovery/SKILL.md
+Auto-merging .claude/skills/orchestration/SKILL.md
+CONFLICT (content): Merge conflict in .claude/skills/orchestration/SKILL.md
+Auto-merging .claude/skills/retrieval/SKILL.md
+Auto-merging .claude/skills/test-design/SKILL.md
+CONFLICT (content): Merge conflict in .claude/skills/test-design/SKILL.md
+Auto-merging .rulesync/skills/discovery/SKILL.md
+CONFLICT (content): Merge conflict in .rulesync/skills/discovery/SKILL.md
+Auto-merging .rulesync/skills/orchestration/SKILL.md
+CONFLICT (content): Merge conflict in .rulesync/skills/orchestration/SKILL.md
+Auto-merging .rulesync/skills/retrieval/SKILL.md
+CONFLICT (content): Merge conflict in .rulesync/skills/retrieval/SKILL.md
+Auto-merging .rulesync/skills/test-design/SKILL.md
+CONFLICT (content): Merge conflict in .rulesync/skills/test-design/SKILL.md
+Auto-merging .rulesync/subagents/orchestrator.md
+Auto-merging template/.rulesync/skills/discovery/SKILL.md
+CONFLICT (content): Merge conflict in template/.rulesync/skills/discovery/SKILL.md
+Auto-merging template/.rulesync/skills/orchestration/SKILL.md
+CONFLICT (content): Merge conflict in template/.rulesync/skills/orchestration/SKILL.md
+Auto-merging template/.rulesync/skills/retrieval/SKILL.md
+CONFLICT (content): Merge conflict in template/.rulesync/skills/retrieval/SKILL.md
+Auto-merging template/.rulesync/skills/test-design/SKILL.md
+CONFLICT (content): Merge conflict in template/.rulesync/skills/test-design/SKILL.md
+Auto-merging template/.rulesync/subagents/orchestrator.md
+Auto-merging template/governance/kernel/roles/orchestrator.md
+Auto-merging template/governance/kernel/skills/discovery/SKILL.md
+CONFLICT (content): Merge conflict in template/governance/kernel/skills/discovery/SKILL.md
+Auto-merging template/governance/kernel/skills/orchestration/SKILL.md
+CONFLICT (content): Merge conflict in template/governance/kernel/skills/orchestration/SKILL.md
+Auto-merging template/governance/kernel/skills/retrieval/SKILL.md
+CONFLICT (content): Merge conflict in template/governance/kernel/skills/retrieval/SKILL.md
+Auto-merging template/governance/kernel/skills/test-design/SKILL.md
+CONFLICT (content): Merge conflict in template/governance/kernel/skills/test-design/SKILL.md
+Auto-merging template/governance/kernel/templates/brief-engineer.md
+CONFLICT (content): Merge conflict in template/governance/kernel/templates/brief-engineer.md
+Auto-merging template/governance/kernel/templates/brief-lead.md
+CONFLICT (content): Merge conflict in template/governance/kernel/templates/brief-lead.md
+Auto-merging template/governance/kernel/templates/brief-product-spec.md
+CONFLICT (content): Merge conflict in template/governance/kernel/templates/brief-product-spec.md
+Auto-merging template/governance/kernel/templates/brief-reviewer.md
+CONFLICT (content): Merge conflict in template/governance/kernel/templates/brief-reviewer.md
+Auto-merging template/governance/kernel/templates/brief-test-designer.md
+CONFLICT (content): Merge conflict in template/governance/kernel/templates/brief-test-designer.md
+Auto-merging tests/acceptance/W1-35/test_w1_35_orchestration.py
+Auto-merging tests/acceptance/W1-35/w1_35_orchestration_support.py

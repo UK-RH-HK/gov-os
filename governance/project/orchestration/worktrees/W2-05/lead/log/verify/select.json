@@ -3,9 +3,11 @@
  "why_full": [],
  "core_changed": [],
  "unplaced": [],
- "base": "df77a459e9808aa010d1ee67e49733e6eda050e3",
- "head": "dee133da743967afb8a862a8cafabc6510b1c152",
- "governance_left_out": [],
+ "base": "7709021ad6cc26aa24ca00a3285e58afde299f65",
+ "head": "cd03a9d95653444369ea320bbdd3ef96a17d146f",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0040.md"
+ ],
  "changed": [
   "docs/research/AR-2-git-sweep.md",
   "src/gov/util/role_paths.py",
@@ -2061,6 +2063,7 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-72",
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-76",
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-77",
+  "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-81",
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-84",
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-86",
   "--ignore=/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W2-87",
@@ -3203,6 +3206,7 @@
   "tests/acceptance/W2-72/",
   "tests/acceptance/W2-76/",
   "tests/acceptance/W2-77/",
+  "tests/acceptance/W2-81/",
   "tests/acceptance/W2-84/",
   "tests/acceptance/W2-86/",
   "tests/acceptance/W2-87/",

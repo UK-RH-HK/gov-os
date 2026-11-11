@@ -1,0 +1,7 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-105 (DAEO-zpdj, STANDARD) at 19ac51dd9793: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-11 20:25:06 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-11 20:25:06 merged W2-105 onto 7709021ad6cc: e0001d704179
+2026-11-11 20:40:09 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
+2026-11-11 20:40:09 merged W2-105 onto 7a8d5536d664: 4687835e9501

@@ -1,0 +1,7 @@
+W2-05: merge w2/integrate into w2/W2-05 for the land run (r8, P-MEMAUDIT (a))
+
+Brings W2-170 (src/gov/memaudit/common.py) onto the branch so the sweep
+record's row for it is written against the merged code.
+
+Task: DAEO-0z8c
+Role: orchestrator

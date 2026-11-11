@@ -1,0 +1,4 @@
+W2-11: merge w2/integrate (after the pre-merge commits: W1-35 by the test designer, the five brief pointers and twelve skill files by product-spec; the two generated .claude/skills copies taken from integrate, regenerated after; DEC-1137)
+
+Task: DAEO-k7hz
+Role: orchestrator

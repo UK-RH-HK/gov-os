@@ -1,15 +1,9 @@
-STATE: baseline done; engineer round 1 launching | HEAD: eb88077a54fa | NEXT: wait_for engineer-1 exit file, then step 6 checks | WAITING ON: engineer-1
-BASE: eb88077a54fa (merge of w2/integrate 2ef060a65f.. into 7b5c3cb94fd9; DECIDED-NOT-DONE.md only)
-Rebuild: exit 0 (log/rebuild.log); gov.__file__ = /home/usain/gov-os-worktrees/W2-05/src/gov/__init__.py
-Baseline gov accept W2-05 (log/accept-baseline.log): rc 3, outcome fail; totals 65 passed 0 failed 0 skipped (optin breadth); S1 pass 33/0; S2 "fail" 7/0; S3 "fail" 28/0; F1 "fail" 25/0.
-  Cause (missing_items.py): 7 README-map items are bare `test_x[param id]` names; runner.matches() matches a bracketed item only with `::`, WORD=\w+ fails -> "missing" -> line fails with no red case. Items: S2 1, S3 1, F1 5. README last changed d269ed550 (W2-96, 11-10, test designer). Not this run's paths (tests/acceptance = designer; runner.py = W2-96). Package for the CTO; a README fix after the probe would stale it.
-Workers: engineer-1 (Opus 5.5, high, C2) launching
-Rounds: engineer round 1 in progress; review not started
-Decisions taken: none
-Open packages: P-ACCEPT-MAP (above)
+STATE: r8 land run; integrate merged (merge-4); baseline accept S1 32/1 (sweep: memaudit/common.py unnamed), S2 7/0, S3 28/0, F1 25/0; engineer-2 (record only) launching | HEAD: see git log (merge of 7a8d5536d664) | NEXT: wait_for engineer-2.exit, check its commit, accept + lead_verify, checkpoint, rev-2 | WAITING ON: engineer-2
+BASE (r8): 91dcaf9db1f0; A1 readme-map commit ac4fca415e99 (independent-test-designer, CTO's worker)
+Workers: engineer-1 DONE; rev-1 DONE READY; A1 readme-map DONE (1c80f6d5-7e8a-4a52-a2ca-16b1b5068613); engineer-2 launching
+Rounds: review round 1 READY; r8 = review round 2, the last
+Decisions taken: P-MEMAUDIT (a) by the CTO; spend brake W2-05 set 20:42, cleared by the CTO before engineer-2
+Open packages: P-CEILING (CTO's trim; report figure only), open point 4 records
 Paths: briefs .gov-runtime/scratch/lead/briefs/, logs .gov-runtime/scratch/lead/log/
 task: DAEO-0z8c
 decisions_applied: DEC-710, DEC-712, DEC-580
-brief_gaps (running):
-- gov context --role engineer refused CONTEXT_OVER_CEILING (10753/6000); brief hand-built | ticket file/tool | 5 min est
-- brief expected gov accept "65 passed 0 failed" as green; outcome is fail on 3 lines from README map items | this ticket's part | 15 min

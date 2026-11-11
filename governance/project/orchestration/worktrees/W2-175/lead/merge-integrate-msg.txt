@@ -1,0 +1,5 @@
+Merge w2/integrate into w2/W2-175: the ticket file's scope amendment (888442478, P-2 (a) of run 1) for run 2
+
+Task: DAEO-wahn
+Role: orchestrator
+Implements: DEC-1137, DEC-1116

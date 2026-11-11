@@ -1,0 +1,15 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "status line added",
+   "line": " M docs/research/AR-2-git-sweep.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-175",
+   "change": "head",
+   "before": "6dc99e2c1a95",
+   "after": "44d83e22d7e7"
+  }
+ ]
+}

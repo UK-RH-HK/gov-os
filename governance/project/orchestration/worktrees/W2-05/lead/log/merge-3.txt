@@ -1,0 +1,6 @@
+W2-05: merge w2/integrate into w2/W2-05 before the review (r7)
+
+W2-81's landing (its acceptance tests, probe, checkpoint and close records) and records of other tickets; no file this ticket judges.
+
+Task: DAEO-0z8c
+Role: orchestrator

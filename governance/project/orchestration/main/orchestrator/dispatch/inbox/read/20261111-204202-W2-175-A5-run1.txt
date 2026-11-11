@@ -1,0 +1,8 @@
+log: W2-175-A5-run1.json
+W2: W2-175
+status: PACKAGES. The delta and the tests are done, and `gov accept` passes 51/51 with a one-line record fix. But the spend brake now refuses every launch, so the fix is still uncommitted and the review has not run. Also, S6 cannot pass inside this ticket's paths: W2-153 needs the six `template/.rulesync/su
+
+task: W2-175 (DAEO-wahn) run 1: tests first by an independent designer, the template delta by a product-spec worker, verification, one independent review, then DONE so the owner can approve the bytes.
+status: PACKAGES. The delta and the tests are done, and `gov accept` passes 51/51 with a one-line record fix. But the spend brake now refuses every launch, so the fix is still uncommitted and the review has not run. Also, S6 cannot pass inside this ticket's paths: W2-153 needs the six `template/.rulesync/subagents/*.md` files rewritten, and the ticket does not allow it.
+work_completed:
+- Step 1 c

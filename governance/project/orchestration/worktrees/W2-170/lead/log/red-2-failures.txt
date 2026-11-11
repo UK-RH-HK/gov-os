@@ -1,0 +1,66 @@
+FFFFFFFFFF....                                                           [100%]
+=================================== FAILURES ===================================
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest bfaab376d1b4
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest bfaab376d1b4\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest bfaab376d1b4
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 6fbe73f2cdc0
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 6fbe73f2cdc0\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 6fbe73f2cdc0
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest cf76180713ad
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest cf76180713ad\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest cf76180713ad
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest e29e66b3f103
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest e29e66b3f103\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest e29e66b3f103
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 1738810fc827
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 1738810fc827\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 1738810fc827
+E   AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 48dd0fe164c9
+      USED written
+      '; stderr ''>)
+    assert 0 == 1
+     +  where 0 = <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 48dd0fe164c9\nUSED written\n'; stderr ''>.code
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:93: AssertionError: ('declare must refuse a set whose kept files were not all pre-flighted', <exit 0; stdout 'DECLARED: audit commit 15d346ff6d62, n 40, set digest 48dd0fe164c9
+E   AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+    assert False
+     +  where False = _holds_digests_by_id({'at': '2026-11-11T20:01:12.097914Z', 'audit': 'memory-audit-20261111', 'audit_commit': '15d346ff6d62b2592a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...}, {'q01': 'b9f5432e479c58aa91ad4ca4fb06ba4e14eed3c73b0af4fa0b9d2e9b8684bef9', 'q02': 'dbadb58649e7e6fa121c5bb275059eceed...74b42225352d4652d9454d2c838d8bccd293c', 'q04': '20610b9f43570b4706eb34b0d8f81845cc1628e2464b16e76e387dad220187f5', ...})
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:71: AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+E   AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+    assert False
+     +  where False = _holds_digests_by_id({'at': '2026-11-11T20:01:12.347333Z', 'audit': 'memory-audit-20261111', 'audit_commit': '15d346ff6d62b2592a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...}, {'q01': 'b9f5432e479c58aa91ad4ca4fb06ba4e14eed3c73b0af4fa0b9d2e9b8684bef9', 'q02': 'dbadb58649e7e6fa121c5bb275059eceed...74b42225352d4652d9454d2c838d8bccd293c', 'q04': '20610b9f43570b4706eb34b0d8f81845cc1628e2464b16e76e387dad220187f5', ...})
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:71: AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+E   AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+    assert False
+     +  where False = _holds_digests_by_id({'at': '2026-11-11T20:01:12.608195Z', 'audit': 'memory-audit-20261111', 'audit_commit': '15d346ff6d62b2592a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...}, {'q01': 'b9f5432e479c58aa91ad4ca4fb06ba4e14eed3c73b0af4fa0b9d2e9b8684bef9', 'q02': 'dbadb58649e7e6fa121c5bb275059eceed...74b42225352d4652d9454d2c838d8bccd293c', 'q04': '20610b9f43570b4706eb34b0d8f81845cc1628e2464b16e76e387dad220187f5', ...})
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:71: AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 3, 'contract': 4, 'decision': 6, ...}, ...})
+E   AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 0, 'contract': 4, 'decision': 6, ...}, ...})
+    assert False
+     +  where False = _holds_digests_by_id({'at': '2026-11-11T20:01:12.848792Z', 'audit': 'memory-audit-20261111', 'audit_commit': '15d346ff6d62b2592a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 0, 'contract': 4, 'decision': 6, ...}, ...}, {'q01': 'b9f5432e479c58aa91ad4ca4fb06ba4e14eed3c73b0af4fa0b9d2e9b8684bef9', 'q02': 'dbadb58649e7e6fa121c5bb275059eceed...74b42225352d4652d9454d2c838d8bccd293c', 'q04': '20610b9f43570b4706eb34b0d8f81845cc1628e2464b16e76e387dad220187f5', ...})
+/home/usain/gov-os-worktrees/W2-170/tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py:71: AssertionError: ("PREFLIGHT.json does not record each delivered file's sha256 by id (reading 9)", ['q01', 'q02', 'q03'], {'at': '2026-...2a1010fdb52e16b0382dea6e', 'categories': {'callers': 4, 'code-paraphrase': 0, 'contract': 4, 'decision': 6, ...}, ...})
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_rv1_files_replaced_after_a_clean_preflight_are_refused_by_dc_preflight_writing_nothing
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_rewritten_but_still_valid_is_refused_by_dc_preflight[comment-appended]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_rewritten_but_still_valid_is_refused_by_dc_preflight[keyword-marked]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_rewritten_but_still_valid_is_refused_by_dc_preflight[reworded-question]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_whose_id_was_never_preflighted_is_refused_by_dc_preflight
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s3_f2_a_replaced_set_preflighted_again_is_declared_and_marked_used
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s1_preflight_json_records_each_delivered_file_s_sha256_by_id[clean-39]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s1_preflight_json_records_each_delivered_file_s_sha256_by_id[clean-40]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s1_preflight_json_records_each_delivered_file_s_sha256_by_id[refused-pf-commit]
+FAILED tests/acceptance/W2-170/test_w2_170_s1_s3_preflighted_set.py::test_s1_preflight_json_records_each_delivered_file_s_sha256_by_id[refused-pf-count-35]
+10 failed, 4 passed in 5.24s

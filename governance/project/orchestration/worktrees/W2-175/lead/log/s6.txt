@@ -1,0 +1,204 @@
+........................................................................ [ 28%]
+........................................................................ [ 56%]
+........................................................................ [ 85%]
+.............F.F.F.F.F.F.............F                                   [100%]
+=================================== FAILURES ===================================
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[engineer-.rulesync] _
+
+role = 'engineer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/engineer.md: the body is not that of templates/role-engineer.md, one blank line, then that of roles/engineer.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 1089 identical leading characters in diff, use -v to show
+E           it_for}.
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957]....
+E         
+E         ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-auditor-.rulesync] _
+
+role = 'independent-auditor', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/independent-auditor.md: the body is not that of templates/role-reviewer.md, one blank line, then that of roles/independent-auditor.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 897 identical leading characters in diff, use -v to show
+E           C-1014].
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - You read everything, tests and code alike [DEC-820]....
+E         
+E         ...Full output truncated (53 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-test-designer-.rulesync] _
+
+role = 'independent-test-designer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/independent-test-designer.md: the body is not that of templates/role-test-designer.md, one blank line, then that of roles/independent-test-designer.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 1703 identical leading characters in diff, use -v to show
+E           EC-491].
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - Never read this ticket's implementation (what its branch changes other than your own tests); work from the specification, the KPI lines and the existing code [DEC-820, DEC-963]....
+E         
+E         ...Full output truncated (36 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync] _
+
+role = 'orchestrator', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/orchestrator.md: the body is not that of templates/role-lead.md, one blank line, then that of roles/orchestrator.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th... (DEC-420).\n' == '# You are th... (DEC-420).\n'
+E         
+E         Skipping 1812 identical leading characters in diff, use -v to show
+E           EC-927].
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861]....
+E         
+E         ...Full output truncated (111 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[product-spec-.rulesync] _
+
+role = 'product-spec', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/product-spec.md: the body is not that of templates/role-product-spec.md, one blank line, then that of roles/product-spec.md (S3 amended, DEC-1112 (3))
+E       assert '# You are a ...other host.\n' == '# You are a ...other host.\n'
+E         
+E         Skipping 1283 identical leading characters in diff, use -v to show
+E           EC-924].
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861]....
+E         
+E         ...Full output truncated (35 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[research-.rulesync] _
+
+role = 'research', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/research.md: the body is not that of templates/role-research.md, one blank line, then that of roles/research.md (S3 amended, DEC-1112 (3))
+E       assert '# You are a ...the record.\n' == '# You are a ...the record.\n'
+E         
+E         Skipping 1267 identical leading characters in diff, use -v to show
+E           -924].
+E         - 
+E         - Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E         - 
+E         - The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861]....
+E         
+E         ...Full output truncated (24 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+____ test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-175/pytest-of-usain/pytest-16/test_s3_guard_the_check_finds_0')
+
+    def test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository(tmp_path):
+        """``python3 -m gov.adapters.portability`` from this repository's root (no rulesync: the kernel comparison runs
+        alone) names no ``subagents`` source. Green on integrate, where it compares the role files' bodies; it must stay
+        green once the sources hold the templates' bodies and the check compares the composition."""
+        done = subprocess.run([sys.executable, "-m", "gov.adapters.portability"], cwd=str(support.REPO),
+                              capture_output=True, text=True, timeout=support.COMMAND_TIMEOUT_S,
+                              env=support.portability_env(tmp_path, RULESYNC_BIN="/nonexistent/rulesync"),
+                              stdin=subprocess.DEVNULL)
+        findings = json.loads(done.stdout)["findings"]
+        drift = [f for f in findings if "/subagents/" in str(f.get("file", ""))]
+>       assert drift == [], f"role source findings: {drift}"
+E       AssertionError: role source findings: [{'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md', 'file': '.rulesync/subagents/engineer.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-reviewer.md and template/governance/kernel/roles/independent-auditor.md', 'file': '.rulesync/subagents/independent-auditor.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-test-designer.md and template/governance/kernel/roles/independent-test-designer.md', 'file': '.rulesync/subagents/independent-test-designer.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md', 'file': '.rulesync/subagents/orchestrator.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-product-spec.md and template/governance/kernel/roles/product-spec.md', 'file': '.rulesync/subagents/product-spec.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-research.md and template/governance/kernel/roles/research.md', 'file': '.rulesync/subagents/research.md'}]
+E       assert [{'code': 'SO...research.md'}] == []
+E         
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[engineer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-auditor-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-test-designer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[product-spec-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[research-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository
+7 failed, 247 passed in 33.09s

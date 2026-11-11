@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="9" time="282.609" timestamp="2026-11-11T20:15:31.066324+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-56.test_w2_56_endings" name="test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGINT]" time="0.805" /><testcase classname="tests.acceptance.W2-56.test_w2_56_endings" name="test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGINT]" time="0.906" /><testcase classname="tests.unit.accept.test_w2_96_review3" name="test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]" time="60.052"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r14_a_stopped_run_k0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r14_a_stopped_run_k0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x72f4ab3ffba0&gt;, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_review4" name="test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]" time="60.031"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x72f4ab3fef20&gt;, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r16_an_own_session_0/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]" time="2.101" /><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]" time="60.029"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x72f4ab3c6b60&gt;, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_a_signal_dur0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]" time="2.103" /><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it" time="60.064"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x72f4ab46d4e0&gt;
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-13/test_w2_96_r9_r12_ctrl_c_durin0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-01.test_w1_01_integration_merges" name="test_the_integration_merges_of_this_repository_pass" time="36.284"><failure message="AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'f95b82431ec5': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}&#10;assert not {'f95b82431ec5': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}">repo_root = PosixPath('/home/usain/gov-os-worktrees/W2-105')
+
+    def test_the_integration_merges_of_this_repository_pass(repo_root):
+        """Every merge commit on HEAD's history that touches tests/acceptance/** passes the DEC-253 rule.
+    
+        Rewrite (W2-70, DEC-908 item 3): ``merge_offences`` reads the path map's
+        ``acceptance_exemptions`` (DEC-906), so a branch made before the listed
+        ``c9a08678`` may merge the line that holds it back.
+        """
+        merges = [sha for sha in support.commits_touching(ACCEPTANCE, repo_root)
+                  if len(support.commit_parents(sha, repo_root)) &gt; 1
+                  and DESIGNER not in support.commit_roles(sha, repo_root)]
+        assert merges, "no merge commit on HEAD's history touches tests/acceptance/**: 00e3d539 is expected there"
+        failing = {sha[:12]: support.merge_offences(sha, ACCEPTANCE, repo_root) for sha in merges}
+        failing = {sha: why for sha, why in failing.items() if why}
+&gt;       assert not failing, f"integration merges on HEAD's history do not pass the DEC-253 rule: {failing}"
+E       AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'f95b82431ec5': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}
+E       assert not {'f95b82431ec5': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}
+
+tests/acceptance/W1-01/test_w1_01_integration_merges.py:456: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,10 @@
+log: W2-105-A5-r4-tests.json
+W2: W2-105
+status: DONE. The verified head is `19ac51dd9793` (unchanged, no merge needed). The 28 W2-105 cases, W1-38 and W1-39 are green on it. The scoped run had 9 reds, none caused by this change and none on the known-reds list (details below).
+
+task: W2-105 (DAEO-zpdj) run r4 tests: confirm the head and the designer's fix, show the 28 cases green on the merged code, run `gov accept` and the scoped verification, report so the CTO can land.
+
+status: DONE. The verified head is `19ac51dd9793` (unchanged, no merge needed). The 28 W2-105 cases, W1-38 and W1-39 are green on it. The scoped run had 9 reds, none caused by this change and none on the known-reds list (details below).
+
+work_completed:
+- **Step 1 checks all held.** The head is `19ac51dd9793`, the designer's commit (Role `independent-test-designer`, Task `DAEO-zpdj`, Implements `DE

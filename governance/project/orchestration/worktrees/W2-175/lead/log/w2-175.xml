@@ -1,0 +1,1633 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="0" tests="51" time="1.278" timestamp="2026-11-11T20:21:07.311144+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_front_matter_cites_dec_1137_dec_820_and_dec_861[decisions_read]" time="0.004"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">key = 'decisions_read'
+
+    @pytest.mark.parametrize("key", ("decisions_read", "decisions_carried"))
+    def test_s7_record_front_matter_cites_dec_1137_dec_820_and_dec_861(key):
+&gt;       front, _ = t.record()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422b0ea9f0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_front_matter_cites_dec_1137_dec_820_and_dec_861[decisions_carried]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">key = 'decisions_carried'
+
+    @pytest.mark.parametrize("key", ("decisions_read", "decisions_carried"))
+    def test_s7_record_front_matter_cites_dec_1137_dec_820_and_dec_861(key):
+&gt;       front, _ = t.record()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422b29cbf0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_has_an_entry_for_each_cap_33_step" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">def test_s7_record_has_an_entry_for_each_cap_33_step():
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422b02c4a0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_status_is_accepted_only_with_the_owner_s_approval" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">def test_s7_record_status_is_accepted_only_with_the_owner_s_approval():
+&gt;       front, body = t.record()
+                      ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae30980&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-cto]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae31040&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-engineer]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-engineer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae6eb40&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-lead]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aec77a0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-product-spec]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-product-spec'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aec4b90&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-research]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-research'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422adfeba0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-reviewer]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-reviewer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aeb6690&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-test-designer]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-test-designer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aeb4ce0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-cto]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae06060&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-engineer]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-engineer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aebc710&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-lead]" time="0.001"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae06630&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-product-spec]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-product-spec'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae744d0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-research]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-research'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae76fc0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-reviewer]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-reviewer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422ae74e00&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_record" name="test_s7_record_names_each_template_s_base_sha256[role-test-designer]" time="0.002"><failure message="yaml.scanner.ScannerError: mapping values are not allowed here&#10;  in &quot;&lt;unicode string&gt;&quot;, line 12, column 22:&#10;    state: draft (round 1: the text; the review, the appr ... &#10;                         ^">stem = 'role-test-designer'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_names_each_template_s_base_sha256(stem):
+&gt;       _, body = t.record()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-175/test_w2_175_record.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-175/w2_175_support.py:140: in record
+    return s.split(RECORD.read_text(encoding="utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-128/w2_128_support.py:109: in split
+    front = yaml.safe_load("\n".join(lines[1:number]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:125: in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/__init__.py:81: in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/constructor.py:49: in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:84: in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/composer.py:127: in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/parser.py:428: in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/yaml/scanner.py:116: in check_token
+    self.fetch_more_tokens()
+/usr/lib/python3/dist-packages/yaml/scanner.py:223: in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;yaml.loader.SafeLoader object at 0x71422aebf2f0&gt;
+
+    def fetch_value(self):
+    
+        # Do we determine a simple key?
+        if self.flow_level in self.possible_simple_keys:
+    
+            # Add KEY.
+            key = self.possible_simple_keys[self.flow_level]
+            del self.possible_simple_keys[self.flow_level]
+            self.tokens.insert(key.token_number-self.tokens_taken,
+                    KeyToken(key.mark, key.mark))
+    
+            # If this key starts a new block mapping, we need to add
+            # BLOCK-MAPPING-START.
+            if not self.flow_level:
+                if self.add_indent(key.column):
+                    self.tokens.insert(key.token_number-self.tokens_taken,
+                            BlockMappingStartToken(key.mark, key.mark))
+    
+            # There cannot be two simple keys one after another.
+            self.allow_simple_key = False
+    
+        # It must be a part of a complex key.
+        else:
+    
+            # Block context needs additional checks.
+            # (Do we really need them? They will be caught by the parser
+            # anyway.)
+            if not self.flow_level:
+    
+                # We are allowed to start a complex value if and only if
+                # we can start a simple key.
+                if not self.allow_simple_key:
+&gt;                   raise ScannerError(None, None,
+                            "mapping values are not allowed here",
+                            self.get_mark())
+E                   yaml.scanner.ScannerError: mapping values are not allowed here
+E                     in "&lt;unicode string&gt;", line 12, column 22:
+E                       state: draft (round 1: the text; the review, the appr ... 
+E                                            ^
+
+/usr/lib/python3/dist-packages/yaml/scanner.py:577: ScannerError</failure></testcase><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-cto]" time="0.002" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-engineer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-lead]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-product-spec]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-research]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-reviewer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s1_one_statement_says_reads_are_open_and_names_the_four_refusals[role-test-designer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s2_engineer_never_reads_the_acceptance_test_code_and_may_run_the_cases_and_see_results" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s2_test_designer_never_reads_the_implementation_and_works_from_specification_kpis_and_code" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s2_reviewer_reads_everything_tests_and_code_alike" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-engineer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-lead]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-product-spec]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-research]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-reviewer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_one_statement_says_owner_decisions_are_recorded_by_decision_record_commits[role-test-designer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s3_role_cto_keeps_its_decision_record_commit_line_byte_for_byte" time="0.003" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-cto]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-engineer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-lead]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-product-spec]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-research]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-reviewer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_template_holds_the_stop_sentence_word_for_word[role-test-designer]" time="0.001" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s4_the_stop_sentence_is_brief_md_s_own" time="0.000" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_f1_a_stop_sentence_changed_by_one_letter_fails_the_s4_check" time="0.002" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-cto]" time="0.003" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-engineer]" time="0.005" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-lead]" time="0.003" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-product-spec]" time="0.005" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-research]" time="0.003" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-reviewer]" time="0.004" /><testcase classname="tests.acceptance.W2-175.test_w2_175_templates" name="test_s5_front_matter_is_version_1_0_1_and_otherwise_the_base_s[role-test-designer]" time="0.003" /></testsuite></testsuites>

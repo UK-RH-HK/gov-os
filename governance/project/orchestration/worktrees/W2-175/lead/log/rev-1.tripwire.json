@@ -1,0 +1,25 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "1f2a38a712f1",
+   "after": "e71e687bb665"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "status line gone",
+   "line": " M docs/research/AR-2-git-sweep.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-40",
+   "change": "status line added",
+   "line": "?? experiments/EXP-002/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-40",
+   "change": "status line added",
+   "line": "?? experiments/EXP-002/run_hook_limit.py"
+  }
+ ]
+}

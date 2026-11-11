@@ -1,6 +1,35 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 19:50 UTC: session `b40cba91` hands over (rule 11; context far past 200k); next free id DEC-1138
+## RESUME HERE — 2026-11-11 21:00 UTC: session `b40cba91` hands over (rule 11, context far past 200k); next free id DEC-1139
+**Closed tonight:** W2-04, W2-81, W2-170 (records in `closes/`). **Leads live** (cap five, DEC-1138; `max_leads: 5`): W2-05 r8 land,
+W2-175 run 2, W2-40 run 1, W2-90b r2b land (released 21:00: pre-merge `b3ed3f88d`, merge `cb0e69ba5`). Holds RUNNING: mem_hold,
+night_hold (03:00 → the nightly's end), lead_mem_watch. **The order** is in `dispatch/ready.txt` (`#NEXT` lines; release one per
+freed slot after the pre-release check: role-lead.md, brief non-empty, no unfilled slots in hand briefs, unused log name).
+**READY TO ACT ON, in this order (all workers below are DONE; workers post no inbox items: check their `.exit` files):**
+1. **ACT-EXAMIN-SETS-1 r2 READY** (class (a); `drafts/examin-sets/acts-r2/`, `e8020292`) and **ACT-ACCEPTED-REDS-1 r2 READY** (class (O);
+   `drafts/accepted-reds-1/acts-r2/`, `b8df21d8`): reviews in `~/gov-os-worktrees/W2-20/.gov-runtime/scratch/lead/log/ACT-*-review-r2.json`
+   (REVIEW_MD blocks); copy each r2 bundle to `acts/` (keep r1 as `.r1`), write review.md, copy the packages to `packages/`, commit,
+   then the owner's yes lines: `yes ACT-EXAMIN-SETS-1 e8020292` (+ C1-C8; the agent after ~21:17 UTC 11-12 per row 124, or by hand)
+   and `yes ACT-ACCEPTED-REDS-1 b8df21d8` (by hand, after EXAMIN).
+2. **ACT A's companion tests DONE** (W2-153 worktree, commit on w2/W2-153): merge w2/W2-153 into integrate, then ACT A's review
+   (`drafts/act-a/`, manifest `0b40f1bf`; rebuild if check 3 needs the merged head), then the owner's yes (class (b), the agent).
+3. **Probes:** W2-112 (all 10 lines pass) and W2-149 (all 42 pass): each PROBE_MD block → `docs/probes/<id>/PR-<id>.md` (fill the
+   lead's judgement, the full probed commit, sessions), commit, fresh `gov accept`, close by DEC-953 (as `closes/W2-04-DAEO-u4oz.md`).
+   **W2-148: S15 fails, READY false; DEC-1010's rounds used → to the owner once with the review's three options** (its log
+   `~/gov-os-worktrees/W2-148/.gov-runtime/scratch/lead/log/W2-148-A3-probe.json`): a package.
+4. **W2-105:** landing queued (`dispatch/land.txt`: `W2-105=19ac51dd9793`); its README designer DONE (commit on w2/W2-105 after the
+   land head): land that commit too, fresh `gov accept` (exit 0 expected), close.
+5. **W2-11:** merged integrate `4e265aabe`. Next: a product-spec commit restoring W2-11's own skill text (`drafts/w2-11/ROUTE.md`
+   step 5, RESOLUTION.md §5; brief not yet written); the designer retiring the brief cases (`briefs/W2-11-A1-rebaseline.md`);
+   regenerate the two `.claude/skills` copies (class (b): by ACT if needed); then its resume lead (re-filled brief).
+6. **W2-05:** r8 land running (README pass DONE: 4 lines mapped, 3 pass; success-1's red is the sandbox's read-only /tmp).
+   On DONE: land at once (nothing merged between), close: unblocks batch 5.
+7. W2-66c: land and close (its lead's asks: README row, ceiling trim, P2 (b)). Ceiling trims: W2-05, W2-81, W2-175, W2-66c.
+8. Brakes (row 159): six false trips tonight, each cleared with a note; fix spend.py's window per run.
+**Morning digest (DEC-1138 (5)):** lowest available memory, each lead's peak (`log/lead-mem-watch.jsonl`), load, overnight usage;
+the ledger (`tools/lead_ledger.py --md`); the first nightly under the wrapper (04:00).
+
+## RESUME HERE (history) — 2026-11-11 19:50 UTC: session `b40cba91` hands over (rule 11; context far past 200k); next free id DEC-1138
 - **THE ORDER** (the owner, 19:20; in `dispatch/ready.txt` as live lines plus `#NEXT n` lines; the dispatcher does NOT enforce
   `max_leads: 3`, so release one `#NEXT` line per freed slot, never more). Leads now: **W2-05 fix** (19:24, slot 3; est. 2 h;
   then its close: unblocks batch 5), **W2-170 FULL review** (queued 19:35, `W2-170-A5-review`; build DONE 19:27, accept 165/0/0

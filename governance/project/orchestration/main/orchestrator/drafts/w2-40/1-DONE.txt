@@ -1,0 +1,3 @@
+Task 1 done 2026-11-11 about 20:55 UTC: briefs/W2-40-A5-run1.md written (102,972 bytes, 363 lines, no open slot, no @@).
+Built by drafts/w2-40/assemble.py (head.md + JUDGEMENT.md + LEAD-w2-common.md whole). gov brief no longer refuses W2-40 (exit 0, two warnings); its generic build run was replaced by the research run.
+Launch needs three CTO records first: claim (tk start), allowed_paths cut to experiments/EXP-002/** (launcher refuses two folders), worktree from integrate with an empty experiments/EXP-002 directory.

@@ -1,47 +1,31 @@
-# Lead checkpoint, DAEO-zpdj (W2-105), run 2 (resume), at return (~17:58Z, 2026-11-01)
+# Lead checkpoint, DAEO-zpdj (W2-105), run r4 tests (hand-built brief, DEC-1130 (1)), 2026-11-11, at return
 
-## State
-- Branch w2/W2-105, head fa653609cc93 (clean). Verified head = fa653609cc93. Nothing committed in run 2 (no gov
-  checkpoint record committed, to keep the verified head the head returned).
-- KPI 2 re-baselined (DEC-971 item 4); P-W2-105-1 closed by it.
-- Status returned: DONE, with residual R-W2-105-1 (the README map is unreadable to gov accept for 3 lines).
+STATE: verified, returning DONE | HEAD: 19ac51dd9793 | BASE: 19ac51dd9793 | NEXT: the CTO writes land.txt W2-105=19ac51dd9793, lands and closes (tk close + record) | WAITING ON: none
 
-## Results (run 2)
-- ps-3 (product-spec, sandboxed via gov launch, session cf9826ec): sandbox check passed; `gov accept DAEO-zpdj
-  --json` exit 3, outcome fail, totals 28 passed / 0 failed / 0 skipped; success-3 and failure-3 pass (6 each);
-  success-1, success-2, failure-1 fail with 0/0/0 (map items with placeholders such as `test_x[<install>-deny]` and
-  `[<role>-<install>]` do not match in src/gov/accept/runner.py matches(); names_a_test then fails the line);
-  22 cases unmapped. No case asserts the CTO-only rule. Tripwire 4: nothing changed in this worktree; other trees
-  W2-13 (untracked dotfiles) and W2-13-tests (3 modified files): other tickets' work.
-- W1-38: 201 passed (exit 0, 94 s). W1-39: 71 passed (exit 0, 75 s). No conflict after the merge-back.
-- select_tests.py: scoped, core_changed [], unplaced [], 32 targets, 282 options, 0 serial-only entries.
-- Scoped parallel run (close's form): exit 0, 4196 passed, 1 skipped, 591 s (W2-105 28/28, W1-38 201/201 inside it).
-- Collection: exit 0, "19074/19076 tests collected (2 deselected) in 24.75s".
-- Rebuild-2: exit 0 (lock wait 15:34 to ~16:21; semantic 3,700 s on the shared Ollama); ended 17:28:36Z.
-- gov check: exit 3. RED context reproducibility: "DAEO-i89t: mandatory input 'AR-5' not found in the store"
-  (W2-120's ticket, CTO commit 7224a564 on w2/integrate; not this change). YELLOW core-decision-citations
-  (DEC-999, DEC-994, DEC-998, DEC-991, DEC-9003, DEC-9004, DEC-968 ... cited by commits but not recorded in this
-  tree). YELLOW openspec-validate (openspec not on PATH). All others GREEN.
-- trailer_gate: "DAEO-zpdj: 10 commits, 10 judged, 0 lacking, 0 Implements item(s) not a decision or Contract id
-  that resolves". keyword_warn: 0 files.
+Workers: none · Rounds: converged (no build this run) · Decisions taken: no merge of integrate (step 2: integrate 38 ahead, no trigger path in its diff) · Open packages: none (readme_map_gap is a recommendation, not a block) · Paths: log/ (cases-r4, accept-r4, verify/, alone-r4, alone-home-r4, w1-39-r4, w1-38-optin-r4)
+task: DAEO-zpdj · decisions_applied: DEC-966, DEC-1130, DEC-959, DEC-968, DEC-952
 
-## What a resume must do
-- Nothing for verification. If the CTO takes R-W2-105-1 as a test-designer revision: a README-only map revision in
-  tests/acceptance/W2-105/ (Rewrite-Reason naming DEC-959 item 6), then one gov accept run.
+## Results
+- Step 1: head, the designer's fix (19ac51dd9793 over f95b82431ec5), diff of 3 files, BASE_COMMIT dca333e7a55d, template file: all as the brief says.
+- Step 3: tests/acceptance/W2-105: 28 passed, 0 failed (log/cases-r4.xml). TESTS-READY written.
+- Step 5: gov accept --json exit 3: totals 28/0/0, unmapped 22; success-1, success-2, failure-1, failure-2 fail 0/0/0; success-3, failure-3 pass 6/0/0 (as expected; README map gap).
+- Step 6: lead_verify: scoped, core_changed [], unplaced [], 121 targets; parallel 3965 tests, 9 failed, 10 skipped (846 s); serial 0 entries. W2-105 28/28, W1-38 42/42 inside it; W1-39 NOT selected.
+  - 8 reds: SIGINT variants of W2-56 test_s12 (2) and W2-96 signal cases (6): lead_verify starts with `setsid bash ... &` from a non-interactive shell, so SIGINT is ignored in the run; alone (SigIgn 0): W2-56 2 passed; W2-96 6 passed with the session's HOME (with an empty HOME they fail: gov accept's child drops PYTHONUSERBASE).
+  - 1 red: W1-01 test_the_integration_merges_of_this_repository_pass: merge f95b82431ec5 brings owner commit 6fbe73b1adde (ACT-OPERATOR-ROUNDS-1); integrate's path-map exempts it (DEC-1136) after the branch's merge; red alone too; green on the candidate merge.
+- W1-39 run separately: 39 passed, 32 deselected (the common -k form).
+- W1-38 file with GOV_TESTS_OPTIN=lifted,breadth: 19 passed.
+- links: 0 new since 19ac51dd9793; keyword_warn 0; context 4804 of 6000, ok.
 
-## Brief gaps (run 2)
-- The README map form gov accept (W2-96) reads came later than this ticket's tests; nothing said to re-check the map
-  against it | this ticket's part | ~15 min
-- The order "rebuild first, then the scoped run" holds the run for an hour behind the machine's rebuild queue,
-  though no selected case reads this worktree's store | common brief | ~0 (worked in parallel), est.
-- gov check takes over 10 min (gitleaks) and outlives a foreground call | common brief | ~10 min
-- The final gov checkpoint record (step 7) changes the head after verification, against "DONE with the exact head
-  you verified" | common brief | ~3 min
+## Brief gaps
+- integrate 38 ahead (not 11) and touching tests/acceptance/W2-81 | this ticket's part | ~2 min
+- select_tests.py does not select W1-39 (brief expected it) | this ticket's part / tool | ~5 min
+- lead_verify.sh's detached launch ignores SIGINT: 8 signal cases red for the launch form | tool | ~15 min
+- the empty-HOME form breaks gov accept's own child (PYTHONUSERBASE dropped) | common brief | ~5 min
+- the branch lacks integrate's DEC-1136 exemption, so W1-01 is red on the branch | this ticket's part | ~5 min
 
-## Guard refusals (run 2)
+## Guard refusals
 - none
 
 ## Left files
-- .gov-runtime/scratch/lead/briefs/ps-2-head.md (rm refused, run 1)
-- /tmp/gov-os-lead-W2-105: 4.5M, 726 files and folders
-- blob 1ae28402a109 ("sandbox-trial") in the shared object store from ps-3's step 0 (b)
+- /tmp/gov-os-lead-W2-105: 37M, 8411 files and folders (not removed: rm of own temp folder not allowed headless)
+- .gov-runtime/scratch/lead/briefs/ps-2-head.md (run 1)

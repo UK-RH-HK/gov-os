@@ -1,0 +1,8 @@
+log: spend.jsonl
+W2: W2-175
+Brake: runaway (DEC-1091)
+status: W2-175 has spent 3.62 USD since 2026-11-11 20:15, past twice its projection (1.00 USD, brake at 2.00)
+
+New launches for W2-175 stop (launch_worker.sh refuses while /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/brake/W2-175.json exists) until the CTO clears it:
+  python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/spend.py clear W2-175 [--projection-usd <more>] --note '<why>'
+Record only: never an alarm to the owner (DEC-1089 (3)).

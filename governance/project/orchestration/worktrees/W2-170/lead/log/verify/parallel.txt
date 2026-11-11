@@ -12,81 +12,102 @@ bringing up nodes...
 ........................................................................ [ 16%]
 ........................................................................ [ 18%]
 ........................................................................ [ 19%]
-........................................................................ [ 21%]
+.................................................................F...... [ 21%]
 ........................................................................ [ 23%]
 ........................................................................ [ 25%]
 ........................................................................ [ 27%]
-........................................................................ [ 29%]
+........................................................................ [ 28%]
 ........................................................................ [ 30%]
 ........................................................................ [ 32%]
-.................................................F...................... [ 34%]
+........................................................................ [ 34%]
 ........................................................................ [ 36%]
-........................................................................ [ 38%]
+........................................................................ [ 37%]
 ........................................................................ [ 39%]
 ........................................................................ [ 41%]
 ........................................................................ [ 43%]
 ........................................................................ [ 45%]
-........................................................................ [ 47%]
-........................................................................ [ 49%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
 ........................................................................ [ 50%]
-............................sss......................................... [ 52%]
+........................................................................ [ 52%]
 ........................................................................ [ 54%]
-........................................................................ [ 56%]
-........................................................................ [ 58%]
+........................................................................ [ 55%]
+...........................................sss.......................... [ 57%]
 ........................................................................ [ 59%]
 ........................................................................ [ 61%]
 ........................................................................ [ 63%]
-........................................................................ [ 65%]
-........................................................................ [ 67%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
 ........................................................................ [ 68%]
 ........................................................................ [ 70%]
-........................................................................ [ 72%]
-........................................................................ [ 74%]
-...sss.................................................................. [ 76%]
-........................................................................ [ 78%]
+............sss......................................................... [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+.............F.......................................................... [ 77%]
 ........................................................................ [ 79%]
-.....................................F.................................. [ 81%]
-........................................................................ [ 83%]
-........................................................................ [ 85%]
-........................................................................ [ 87%]
-.......................F.................F.............................. [ 88%]
-........................................................................ [ 90%]
-...F......................................................F............. [ 92%]
-........................................................................ [ 94%]
-........................................................................ [ 96%]
-........................................................................ [ 98%]
-...F.................................................................... [ 99%]
-......                                                                   [100%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+..................................................F..................... [ 86%]
+........F............................................................... [ 88%]
+....................F...F............................................... [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.......................................                                  [100%]
 =================================== FAILURES ===================================
-_____________ test_the_integration_merges_of_this_repository_pass ______________
-[gw0] linux -- Python 3.12.3 /usr/bin/python3
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
 
-repo_root = PosixPath('/home/usain/gov-os-worktrees/W2-170')
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x7f122f476b60>
 
-    def test_the_integration_merges_of_this_repository_pass(repo_root):
-        """Every merge commit on HEAD's history that touches tests/acceptance/** passes the DEC-253 rule.
-    
-        Rewrite (W2-70, DEC-908 item 3): ``merge_offences`` reads the path map's
-        ``acceptance_exemptions`` (DEC-906), so a branch made before the listed
-        ``c9a08678`` may merge the line that holds it back.
-        """
-        merges = [sha for sha in support.commits_touching(ACCEPTANCE, repo_root)
-                  if len(support.commit_parents(sha, repo_root)) > 1
-                  and DESIGNER not in support.commit_roles(sha, repo_root)]
-        assert merges, "no merge commit on HEAD's history touches tests/acceptance/**: 00e3d539 is expected there"
-        failing = {sha[:12]: support.merge_offences(sha, ACCEPTANCE, repo_root) for sha in merges}
-        failing = {sha: why for sha, why in failing.items() if why}
->       assert not failing, f"integration merges on HEAD's history do not pass the DEC-253 rule: {failing}"
-E       AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'c07a3a941397': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}
-E       assert not {'c07a3a941397': ['it brings commits without `Role: independent-test-designer`: 6fbe73b1adde']}
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/acceptance/W1-01/test_w1_01_integration_merges.py:456: AssertionError
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-170...>
+endtime = 19196.976406912, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
 ________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
 [gw3] linux -- Python 3.12.3 /usr/bin/python3
 
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0')
-launch = <function planted.<locals>.launch at 0x7ded4c9d0040>, signum = 2
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x78baacafd800>, signum = 2
 vanish = True
 
     @pytest.mark.parametrize("signum", [2, 15, 1])
@@ -115,7 +136,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-170...>
-endtime = 15188.090025283, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+endtime = 19348.692908151, orig_timeout = 60, stdout_seq = [], stderr_seq = None
 skip_check_and_raise = False
 
     def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
@@ -128,15 +149,15 @@ skip_check_and_raise = False
                     self.args, orig_timeout,
                     output=b''.join(stdout_seq) if stdout_seq else None,
                     stderr=b''.join(stderr_seq) if stderr_seq else None)
-E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
 
 /usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
 _ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
 [gw3] linux -- Python 3.12.3 /usr/bin/python3
 
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0')
-launch = <function planted.<locals>.launch at 0x7ded4c9d31a0>, signum = 2
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x78baac3ac040>, signum = 2
 
     @pytest.mark.parametrize("signum", [2, 15, 1])
     def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
@@ -161,7 +182,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-170...>
-endtime = 15253.755387387, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+endtime = 19415.108419805, orig_timeout = 60, stdout_seq = [], stderr_seq = None
 skip_check_and_raise = False
 
     def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
@@ -174,15 +195,15 @@ skip_check_and_raise = False
                     self.args, orig_timeout,
                     output=b''.join(stdout_seq) if stdout_seq else None,
                     stderr=b''.join(stderr_seq) if stderr_seq else None)
-E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
 
 /usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
 ____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
 [gw3] linux -- Python 3.12.3 /usr/bin/python3
 
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0')
-launch = <function planted.<locals>.launch at 0x7ded4ca0a8e0>, signals = (2,)
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x78baaca86a20>, signals = (2,)
 
     @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
     def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
@@ -205,9 +226,9 @@ tests/unit/accept/test_w2_96_run2.py:194: AssertionError
 _ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
 [gw3] linux -- Python 3.12.3 /usr/bin/python3
 
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1')
-launch = <function planted.<locals>.launch at 0x7ded4c94ccc0>, first = 2
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x78baacade2a0>, first = 2
 more = (15, 1)
 
     @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
@@ -224,7 +245,7 @@ more = (15, 1)
 tests/unit/accept/test_w2_96_run2.py:208: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow')
+path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow')
 seconds = 60
 
     def _wait_for(path: Path, seconds: float = 60) -> None:
@@ -234,15 +255,15 @@ seconds = 60
 >       assert path.exists()
 E       AssertionError: assert False
 E        +  where False = exists()
-E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow').exists
 
 tests/unit/accept/test_w2_96_run2.py:179: AssertionError
 ________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
 [gw3] linux -- Python 3.12.3 /usr/bin/python3
 
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0')
-launch = <function planted.<locals>.launch at 0x7ded4c94cf40>, kinds = (2,)
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-16/popen-gw3/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x78baaca872e0>, kinds = (2,)
 
     @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
     def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
@@ -267,50 +288,6 @@ E       AssertionError: assert 0 == (128 + 2)
 E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/py...>.returncode
 
 tests/unit/accept/test_w2_96_run2.py:235: AssertionError
-_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
-[gw3] linux -- Python 3.12.3 /usr/bin/python3
-
-project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
-tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0')
-launch = <function planted.<locals>.launch at 0x7ded4c9d32e0>
-
-    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
-        root, temp = project
-        started = tmp_path / "started"
-        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
-        gov = launch(root, temp)
-        _wait_for(started)
-        child = int(started.read_text())
-        gov.send_signal(signal.SIGINT)
->       out, _ = gov.communicate(timeout=60)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-tests/unit/accept/test_w2_96_run2.py:247: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-/usr/lib/python3.12/subprocess.py:1209: in communicate
-    stdout, stderr = self._communicate(input, endtime, timeout)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/usr/lib/python3.12/subprocess.py:2116: in _communicate
-    self._check_timeout(endtime, orig_timeout, stdout, stderr)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-170...>
-endtime = 15386.775951405, orig_timeout = 60, stdout_seq = [], stderr_seq = None
-skip_check_and_raise = False
-
-    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
-                       skip_check_and_raise=False):
-        """Convenience for checking if a timeout has expired."""
-        if endtime is None:
-            return
-        if skip_check_and_raise or _time() > endtime:
->           raise TimeoutExpired(
-                    self.args, orig_timeout,
-                    output=b''.join(stdout_seq) if stdout_seq else None,
-                    stderr=b''.join(stderr_seq) if stderr_seq else None)
-E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
-
-/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
 =============================== warnings summary ===============================
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
@@ -318,7 +295,7 @@ tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_adm
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
-  /home/usain/gov-os-worktrees/W2-170/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1379541) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  /home/usain/gov-os-worktrees/W2-170/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2404239) is multi-threaded, use of fork() may lead to deadlocks in the child.
     pid = os.fork()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -329,4 +306,4 @@ SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
-7 failed, 3953 passed, 6 skipped, 6 warnings in 650.32s (0:10:50)
+6 failed, 3987 passed, 6 skipped, 6 warnings in 713.42s (0:11:53)

@@ -1,0 +1,1 @@
+launch_worker product-spec DAEO-wahn: session exit 0; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-175/.gov-runtime/scratch/lead/log/ps-3.json; spend recorded (projection 3)

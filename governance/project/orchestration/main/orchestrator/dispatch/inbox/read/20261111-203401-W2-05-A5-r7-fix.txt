@@ -1,0 +1,6 @@
+log: W2-05-A5-r7-fix.json
+W2: W2-05
+status: PACKAGES. The round converged and review round 1 is READY at `cd03a9d95653`, with its probe record committed. But W2-170's landing on `w2/integrate` (`33591562d`, merged while the reviewer ran) added `src/gov/memaudit/common.py`. That file starts git and the sweep record has no row for it, so S1's s
+
+task: W2-05 (DAEO-0z8c), fix run r7: one engineer round on `src/gov/util/role_paths.py`'s four git calls and the sweep record's stale lines, verification, one fresh FULL review of the final head, then the probe record.
+status: PACKAGES. The round converged and review round 1 is READY at `cd03a9d95653`, with its probe record committed. But W2-170's landing on `w2/integrate` (`33591562d`, merged while the reviewer ran) added `src/gov/memaudit/common.py`. That file starts git and the sweep record has no row for it, so S1's sweep case goes red on the merged result and the queue's test of the merge

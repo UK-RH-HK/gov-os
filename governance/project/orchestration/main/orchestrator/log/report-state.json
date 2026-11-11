@@ -29,7 +29,7 @@
     "W2-78",
     "W2-110"
   ],
-  "closes_next": "CLOSED 11-11 evening by DEC-953: W2-04 (b0d313cec), W2-81 (19:56); next: W2-66c (land), W2-112, W2-149, W2-148 (probes running), W2-05 (fix running), W2-170 (fix running)",
+  "closes_next": "CLOSED 11-11 evening by DEC-953: W2-04, W2-81, W2-170 (20:28); next: W2-105 (landing; README pass), W2-66c, W2-112, W2-149, W2-148 (probes running), W2-05 (fix running)",
   "examin": "forecast FORECAST-W2-3 (11-11): EXAMIN's copy about 11-16 now that usage (A) ended at the lift (DEC-1126 (2)); W2-27 now also depends on W2-156 (batch 13) and W2-174; the memory audit's first run Mon 11-23 (W2-170 to W2-173)",
   "emergency": "ENDED: the lift done 11-11 (re-pin pin-797495bdfc70 at 13:31, the closes 15:3x); usage (A) ended; 80 % brake stays; WSL out-of-memory 14:19 (2,161 rg), recovered 15:04; mem_guard.py running (DEC-1133 (5))",
   "countdown": [
@@ -40,7 +40,7 @@
     "After: EXAMIN's copy about 11-16; the first nightly under the new wrapper 11-12 04:00; the first memory audit 11-23; Wave 2's end about 11-24 (FORECAST-W2-3); usage 70 % at 18:09 (reset 11-15 09:00), the 80 % brake"
   ],
   "owner_action": "P2: `yes ACT-EXAMIN-SETS-1 97d45565` (READY; + C1-C8, two writer briefs; by the agent after ~21:17 UTC 11-12); `yes ACT-ACCEPTED-REDS-1 49e11172` (READY, by hand, after EXAMIN-SETS-1); ACT-IDLE-GUARD-1 in review",
-  "last_report": "2026-11-11 19:55:54",
+  "last_report": "2026-11-11 20:27:45",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],

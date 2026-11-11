@@ -1,0 +1,15 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "91dcaf9db1f0",
+   "after": "ac4fca415e99"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "acceptance folder",
+   "folder": "W2-05"
+  }
+ ]
+}

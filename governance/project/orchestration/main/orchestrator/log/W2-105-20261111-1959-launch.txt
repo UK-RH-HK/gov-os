@@ -1,0 +1,2 @@
+2026-11-11 19:59:02 admitted by the dispatcher; launching W2-105
+disk gate open: 818 GiB free, 64887625 inodes free

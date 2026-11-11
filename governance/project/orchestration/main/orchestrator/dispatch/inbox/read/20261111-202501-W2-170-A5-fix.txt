@@ -1,0 +1,9 @@
+log: W2-170-A5-fix.json
+W2: W2-170
+status: DONE. Review round 2 passes: `verdict.ready` gives (True, []), and no finding is in scope, reachable in ordinary work and failing open or losing work.
+
+task: DAEO-61vm (W2-170), FULL, resume run after review round 1's PACKAGES: the test-design batch, the one fix pass, verify and review round 2 (the last) for RV1, under Interface reading 9.
+status: DONE. Review round 2 passes: `verdict.ready` gives (True, []), and no finding is in scope, reachable in ordinary work and failing open or losing work.
+work_completed:
+- Merged w2/integrate into w2/W2-170 at `fcfe85cb1`, so the ticket now carries Interface §10 reading 9.
+- td-2 (independent-test-designer, Opus high) wrote 14 cases for reading 9. 10 of them failed on `fcfe85cb1` for reading 9's reason
