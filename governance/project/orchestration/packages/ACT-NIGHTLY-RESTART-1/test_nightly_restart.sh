@@ -165,13 +165,13 @@ S0=$(servers); ME=$$
 reset; clean_runs; rm -f "$T/sibling.pid"; printf 'MemAvailable: 20000000 kB\n' > "$T/meminfo"
 NR_CAP_MB=200 NR_CAP_MIN_MB=100 NR_MEMINFO=$T/meminfo NR_INNER=$T/hog-inner.sh LATEST_IN=60 wrun; rc=$?
 log=$(ls "$ORCH"/log/nightly/restart/*.log | head -1)
-[ $rc -ne 0 ] && ok "a 600 MB hog in a 200 MB cap: the run ended, exit $rc" || bad "hog exit ($rc)"
+[ $rc -ne 0 ] && ok "a 600 MB hog in a 200 MB cap: the run ended, with a non-zero exit" || bad "hog exit ($rc)"
 contains "$log" "KILLED by its memory cap" && ok "the wrapper says the memory cap killed the run (exit 137, the whole run)" || bad "hog message ($(grep 'RUN ENDED' "$log"))"
 sib=$(cat "$T/sibling.pid" 2>/dev/null); [ -n "$sib" ] && ! kill -0 "$sib" 2>/dev/null && ok "the hog's sibling process died with it (the whole run, not a part)" || bad "sibling alive ($sib)"
 [ ! -e "$ORCH/NIGHTLY-RUNNING" ] && [ ! -e "$ORCH/dispatch/OFF" ] && ok "the marker NIGHTLY-RUNNING and dispatch/OFF are gone after the kill" || bad "marker or OFF left"
-kill -0 "$ME" 2>/dev/null && ok "the test's own session (pid $ME) is alive" || bad "session"
+kill -0 "$ME" 2>/dev/null && ok "the test's own session is alive" || bad "session"
 gone=""; for p in $S0; do kill -0 "$p" 2>/dev/null || gone="$gone $p"; done
-[ -z "$gone" ] && ok "every shared-server process seen before ($(echo $S0 | wc -w) of them) is still alive after" || bad "servers gone:$gone"
+[ -z "$gone" ] && ok "every shared-server process seen before the hog is still alive after it" || bad "servers gone:$gone"
 r=$(lastrun); [ -n "$r" ] && contains "$r" "the run was KILLED by its memory cap" && ok "run.txt's last line says what stopped the run" || bad "run.txt after kill ($r)"
 nf=$(systemctl --user list-units --all --no-legend 'gov-nightly-*' | wc -l); [ "$nf" -eq 0 ] && ok "no gov-nightly unit is left loaded or failed" || bad "$nf gov-nightly unit(s) left"
 
@@ -195,6 +195,50 @@ INNER_SLEEP=4 NR_WATCH_S=1 NR_WATCH_RG=500 NR_INNER=$T/sleep-inner.sh LATEST_IN=
 items=$(ls "$ORCH"/dispatch/inbox/*rg-tripwire.txt 2>/dev/null | wc -l)
 [ $rc -eq 0 ] && [ "$items" -eq 1 ] && ok "500 rg processes during the run: one inbox item, and the run goes on to its end (the tripwire stops nothing)" || bad "rg tripwire ($rc, $items items)"
 grep -q "P1: 500 rg processes" "$ORCH"/dispatch/inbox/*rg-tripwire.txt 2>/dev/null && ok "the item names the count and is a P1" || bad "rg item text"
+
+# ---- review round 1's F8 to F11 (the wrapper's second round)
+printf 'MemAvailable: 20000000 kB\n' > "$T/meminfo"
+# F8: a dispatch/OFF the wrapper left behind (its token names a pid that is not alive) is removed and logged; a live pid's is kept
+true & DEAD=$!; wait "$DEAD"
+reset; clean_runs; rm -f "$NR_MARK"; echo "nightly_restart pid $DEAD 2020-01-01 00:00:00" > "$ORCH/dispatch/OFF"
+NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=60 wrun; rc=$?; log=$(ls "$ORCH"/log/nightly/restart/*.log | head -1)
+[ $rc -eq 0 ] && [ -f "$NR_MARK" ] && contains "$log" "removed a stale dispatch/OFF" && ok "F8: a stale dispatch/OFF (its pid is dead) is removed and logged, and the night runs" || bad "stale OFF ($rc: $(grep -E 'stale|REFUSED' "$log" | tail -1))"
+[ ! -e "$ORCH/dispatch/OFF" ] && ok "F8: no dispatch/OFF is left after that run" || bad "OFF left after the stale-OFF run"
+sleep 60 & LIVE=$!
+reset; clean_runs; rm -f "$NR_MARK"; echo "nightly_restart pid $LIVE 2020-01-01 00:00:00" > "$ORCH/dispatch/OFF"
+NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=4 wrun; rc=$?; log=$(ls "$ORCH"/log/nightly/restart/*.log | head -1)
+[ $rc -eq 2 ] && [ -e "$ORCH/dispatch/OFF" ] && [ ! -e "$NR_MARK" ] && ! contains "$log" "removed a stale" && ok "F8: a dispatch/OFF whose token names a live pid is kept, and the night is refused" || bad "live-pid OFF ($rc)"
+kill "$LIVE" 2>/dev/null; wait "$LIVE" 2>/dev/null; rm -f "$ORCH/dispatch/OFF"
+# F9: a scope that fails after the probe (a real one: an unparseable RuntimeMaxSec) is a NOT STARTED night naming the scope, not a MISSED one
+reset; clean_runs; rm -f "$NR_MARK"
+NR_RT_MAX_S=bogus NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=60 wrun; rc=$?; r=$(lastrun)
+[ $rc -ne 0 ] && [ ! -e "$NR_MARK" ] && [ -f "$r" ] && head -1 "$r" | grep -q "nightly night: NOT STARTED by nightly_restart.sh" && contains "$r" "the scope failed after the probe" && ok "F9: a scope that fails after the probe leaves a NOT STARTED run.txt that names the scope failure" || bad "scope failure ($rc: $(cat "$r" 2>&1 | head -2))"
+[ ! -e "$ORCH/dispatch/OFF" ] && ok "F9: no dispatch/OFF is left after the failed scope" || bad "OFF left after the failed scope"
+cat > "$T/fail-inner.sh" <<'EOF'
+#!/usr/bin/env bash
+# a stand-in for a nightly that ran and came out red: its own run.txt, exit 1
+d="$NR_ORCH/log/nightly/$(date +%Y%m%d-%H%M)"; mkdir -p "$d"; echo "$(date +%F) nightly night: planted red run" > "$d/run.txt"; exit 1
+EOF
+reset; clean_runs
+NR_MEMINFO=$T/meminfo NR_INNER=$T/fail-inner.sh LATEST_IN=60 wrun; rc=$?; r=$(lastrun)
+[ $rc -eq 1 ] && contains "$r" "planted red run" && ! contains "$r" "NOT STARTED" && ok "F9: a run that wrote its own run.txt and exited 1 is left as it wrote it (no NOT STARTED line)" || bad "red run ($rc: $(cat "$r" 2>&1 | head -2))"
+# F10: the probe reads the scope's own memory.max; a scope that applies no limit is refused (a stand-in for systemd-run that drops the limits)
+cat > "$T/uncapped-run" <<'EOF'
+#!/usr/bin/env bash
+# a stand-in for systemd-run that applies no limit: the options are dropped, the command runs where it is
+while [ $# -gt 0 ]; do case "$1" in -p) shift 2 ;; -*) shift ;; *) break ;; esac; done
+exec "$@"
+EOF
+reset; clean_runs; rm -f "$NR_MARK"
+chmod +x "$T/uncapped-run"
+NR_SYSTEMD_RUN="$T/uncapped-run" NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=60 wrun; rc=$?; r=$(lastrun)
+[ $rc -eq 2 ] && [ ! -e "$NR_MARK" ] && contains "$r" "the memory cap is not enforced" && ok "F10: a probe scope whose memory.max is not the 64M it was given: the night is refused, nothing run" || bad "uncapped probe ($rc: $(tail -1 "$r" 2>&1))"
+# F11: the quiet check does not rewrite the main tree's index (a touched tracked file would make a plain git status do so)
+reset; sleep 1.1; touch "$FIX/$REL/nightly_estimate.py"; i0=$(sha1sum < "$FIX/.git/index")
+out=$(qout); rc=$?; i1=$(sha1sum < "$FIX/.git/index")
+[ $rc -eq 0 ] && [ "$i0" = "$i1" ] && ok "F11: quiet_check leaves the main tree's index alone (GIT_OPTIONAL_LOCKS=0), tree touched or not" || bad "index changed or busy ($rc: $out)"
+git -C "$FIX" status --porcelain > /dev/null; i2=$(sha1sum < "$FIX/.git/index")
+[ "$i0" != "$i2" ] && ok "F11, the control: a plain git status does rewrite that index, so the case above shows something" || bad "control: a plain git status did not rewrite the index"
 
 echo "cases: $n"
 echo "failures: $fails"

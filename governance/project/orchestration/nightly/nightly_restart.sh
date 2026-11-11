@@ -25,7 +25,8 @@
 #    removed by pid-owned logic here, run.txt says what stopped the run, and the clone is kept for the diagnosis.
 #
 # Test hooks (never set by cron): NR_REPO NR_ORCH NR_INNER NR_CAP_MB NR_CAP_MIN_MB NR_MEMINFO NR_LATEST_EPOCH NR_POLL_S
-# NR_QUIET_N NR_OOM_FLOOR_KB NR_EST NR_WATCH_RG NR_RT_MAX_S NR_WATCH_S, and the quiet check's own (NR_PROC NR_STATUS ...).
+# NR_QUIET_N NR_OOM_FLOOR_KB NR_EST NR_WATCH_RG NR_RT_MAX_S NR_WATCH_S NR_SYSTEMD_RUN, and the quiet check's own (NR_PROC
+# NR_STATUS ...).
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=${NR_REPO:-/home/usain/Dynamic-Agentic-Engineering-OS}
 ORCH=${NR_ORCH:-$REPO/.gov-runtime/scratch/orchestrator}
@@ -54,18 +55,30 @@ QUIET_N=${NR_QUIET_N:-5}; POLL_S=${NR_POLL_S:-60}; WATCH_S=${NR_WATCH_S:-10}; RG
 MEMINFO=${NR_MEMINFO:-/proc/meminfo}
 avail_kb() { awk '/^MemAvailable:/ {print $2}' "$MEMINFO"; }
 
+SDRUN=${NR_SYSTEMD_RUN:-systemd-run}
+
 # the night's run.txt, when the run does not start: the first line is what nightly_check.sh looks for
-refuse() {
+notstarted() {
   local d f
   d=$ORCH/log/nightly/$(date +%Y%m%d-%H%M); mkdir -p "$d"; f=$d/run.txt
   [ -s "$f" ] || date "+%F %T nightly night: NOT STARTED by nightly_restart.sh: $1" > "$f"
   echo "$(date '+%F %T') NOT STARTED by nightly_restart.sh: $1" >> "$f"
-  say "REFUSED: $1"; exit 2
 }
+refuse() { notstarted "$1"; say "REFUSED: $1"; exit 2; }
 
 # one wrapper at a time (fd 8 is closed for everything it starts)
 exec 8> "$ORCH/log/nightly/.restart.lock"
 flock -n 8 || { say "another nightly_restart.sh holds the lock; nothing done"; exit 0; }
+
+# a dispatch/OFF this wrapper wrote in an earlier run that ended without its EXIT trap (a SIGKILL, or the VM ended) names
+# a pid that is not alive: removed, and logged. The CTO's own OFF has no such token and is never touched.
+if [ -f "$ORCH/dispatch/OFF" ]; then
+  tok=$(cat "$ORCH/dispatch/OFF" 2>/dev/null)
+  opid=$(printf '%s' "$tok" | sed -n 's/^nightly_restart pid \([0-9][0-9]*\) .*/\1/p')
+  if [ -n "$opid" ] && ! kill -0 "$opid" 2>/dev/null; then
+    rm -f "$ORCH/dispatch/OFF" && say "removed a stale dispatch/OFF (its token: $tok; pid $opid is not alive)"
+  fi
+fi
 
 # committed, reviewed code only (the same rule as nightly_cron.sh's, for this wrapper's own files)
 if ! git -C "$REPO" diff --quiet HEAD -- "$REL" || [ -n "$(git -C "$REPO" ls-files --others --exclude-standard -- "$REL")" ]; then
@@ -81,10 +94,13 @@ LATEST=${NR_LATEST_EPOCH:-$(( $(date -d "today 07:30" +%s) - EST * 3 / 2 ))}
 say "estimate ${EST} s; latest start $(date -d "@$LATEST" +%H:%M)"
 [ "$(date +%s)" -lt "$LATEST" ] || refuse "it is past the latest start $(date -d "@$LATEST" +%H:%M): the run (estimate $((EST / 60)) min) would not end inside the quiet hours"
 
-# the memory cap can be applied, or the night is not run
-if [ ! -S "$XDG_RUNTIME_DIR/bus" ] || ! systemd-run --user --scope --quiet --unit="gov-nightly-probe-$$" -p MemoryMax=64M -p MemorySwapMax=0 true 2>/dev/null; then
+# the memory cap can be applied and is enforced, or the night is not run: a probe scope with MemoryMax=64M must read back
+# its own memory.max as 67108864 (the memory controller delegated to the user manager)
+if [ ! -S "$XDG_RUNTIME_DIR/bus" ] || ! pm=$("$SDRUN" --user --scope --quiet --unit="gov-nightly-probe-$$" -p MemoryMax=64M -p MemorySwapMax=0 \
+     bash -c 'cat /sys/fs/cgroup"$(cut -d: -f3 /proc/self/cgroup)"/memory.max' 2>/dev/null); then
   refuse "no systemd user scope (no user manager or bus): the memory cap cannot be applied, so the nightly does not run (loginctl enable-linger)"
 fi
+[ "$pm" = 67108864 ] || refuse "the memory cap is not enforced: a probe scope given MemoryMax=64M reads memory.max '${pm:-nothing}' (is the memory controller delegated to the user manager?), so the nightly does not run"
 
 OFF=$ORCH/dispatch/OFF; OFFTOK="nightly_restart pid $$ $(date '+%F %T')"; HAVE_OFF=0
 WPID=""; UNIT=""; TRIPPED=$LOGDIR/tripped.$$; rm -f "$TRIPPED"
@@ -159,7 +175,7 @@ watch() {
 }
 
 # 3. the run, in its scope. fd 8 (the wrapper's lock) is not passed on; the run's processes are the kernel's first pick.
-systemd-run --user --scope --quiet --unit="$UNIT" -p MemoryMax="$((CAP_KB / 1024))M" -p MemorySwapMax=0 -p OOMPolicy=kill \
+"$SDRUN" --user --scope --quiet --unit="$UNIT" -p MemoryMax="$((CAP_KB / 1024))M" -p MemorySwapMax=0 -p OOMPolicy=kill \
   -p RuntimeMaxSec="$RTMAX" \
   env PYTEST_XDIST_AUTO_NUM_WORKERS="$W" NIGHTLY_RESTART=1 \
   bash -c 'echo 500 > /proc/self/oom_score_adj 2>/dev/null; exec bash "$@"' _ "$INNER" 8>&- &
@@ -168,6 +184,7 @@ watch 8>&- &
 WPID=$!
 wait "$SPID"; rc=$?
 kill "$WPID" 2>/dev/null; wait "$WPID" 2>/dev/null; WPID=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do systemctl --user is-active --quiet "$UNIT.scope" 2>/dev/null || break; sleep 0.5; done   # let the unit settle first
 result=$(systemctl --user show -p Result --value "$UNIT.scope" 2>/dev/null)
 systemctl --user reset-failed "$UNIT.scope" 2>/dev/null
 
@@ -187,5 +204,10 @@ if [ -n "$why" ]; then
   say "RUN ENDED: $why (exit $rc)"
 else
   say "run ended: exit $rc, unit result ${result:-none}"
+  # a scope that failed after the probe never ran the command: no run folder today, so the 08:00 check would say "MISSED"
+  # (cron, WSL or the PC was not up) for a night that did not start for another reason: say which
+  if [ "$rc" -ne 0 ] && ! ls -d "$ORCH/log/nightly/$(date +%Y%m%d)"-*/ > /dev/null 2>&1; then
+    notstarted "the scope failed after the probe: systemd-run exited $rc (unit result ${result:-none}), so the nightly did not run; see log/nightly/restart/$(date +%F).log"
+  fi
 fi
 exit "$rc"

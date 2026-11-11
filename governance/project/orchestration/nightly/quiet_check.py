@@ -177,7 +177,9 @@ def file_reasons():
 
 
 def git(*a):
-    r = subprocess.run(["git", "-C", REPO, *a], capture_output=True, text=True, timeout=60)
+    # GIT_OPTIONAL_LOCKS=0: `git status` must not refresh the main tree's index (a write, and a lock a lead could meet)
+    r = subprocess.run(["git", "-C", REPO, *a], capture_output=True, text=True, timeout=60,
+                       env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"))
     return r.returncode, r.stdout
 
 
