@@ -4,7 +4,12 @@ You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
 the register and the owner's word hold over both. **Next free id: DEC-1135.**
 
-## 0000. NOW (16:10 UTC 11-11, session 8ddb8b14 hands over, rule 11): the lift is done; read CHECKPOINT's RESUME HERE first
+## 00000. NOW (16:55 UTC 11-11, session b40cba91): read CHECKPOINT's RESUME HERE (16:55) first
+- Six ACTs in the owner's queue or in review (EXAMIN-SETS-1 and MEMORY-AUDIT-INSTALL-1 READY with yes lines;
+  ACCEPTED-REDS-1, OPERATOR-ROUNDS-1 r2, NIGHTLY-RESTART-1 rebuild in flight; LOAD-BALANCER-A after its companion tests).
+  The start-check pin in §7 is now `pin-797495bdfc70`. Session crons (the digests) die with the session: re-arm them.
+
+## 0000. (history) NOW (16:10 UTC 11-11, session 8ddb8b14 hands over, rule 11): the lift is done; read CHECKPOINT's RESUME HERE first
 - The re-pin is live (`pin-797495bdfc70`); usage (A) ended; ten closes done by DEC-953 (never `gov close` here); decisions
   DEC-1126 to DEC-1134 (DEC-1127 withdrawn). The full order of work and the owner's queue are in
   `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`, RESUME HERE (16:10). DECIDED-NOT-DONE rows 106-150.
