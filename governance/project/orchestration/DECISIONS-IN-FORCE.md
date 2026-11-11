@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added), and to DEC-1126 on 2026-11-11 (re-pin window 5 done at 13:31: the live pin is `pin-797495bdfc70`, `pin-bcea09060ebc` kept for rollback; register v0.510). Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added), and to DEC-1126 on 2026-11-11 (re-pin window 5 done at 13:31: the live pin is `pin-797495bdfc70`, `pin-bcea09060ebc` kept for rollback; register v0.511, DEC-1128). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -502,3 +502,10 @@ other restart is an ACT.
   before approval); W2-32 and W2-15a open at the lift, W2-32 S9 to be disposed under DEC-1097's end-to-end bar
   (DEC-1083 (2)'s hit@5 bar replaced); D-10's ruled red is the green run for W1-01b, W2-66b, W2-90c; W2-82 to P3; the
   permissions asked for on 11-10/11 to the owner by form with an allow-list ACT. Basis: questions 1 and 2.
+- DEC-1128 (2026-11-11, items (2) (3) (4) standing): **no switched-off control returns and no new guard rule goes
+  live unless set-up A's evidence shows 100 % on the path map's actions** (every covered action right, no false
+  refusal, no wrong allow; actions outside the path map outside the bar); **the lift does not wait for set-up A**: the
+  guard stays as today (W2-141's rule included), live false refusals counted weekly from the call log, the guard's
+  error-path faults (row 123) first after the lift; **set-up B dropped entirely** (not a Wave 3 row), leads not
+  sandboxed, the path map and the guard are the controls, set-up A stays as the guard's measurement, the workers'
+  launcher sandbox unchanged; DEC-1010's one rule for all roles investigated read-only first. Basis: questions 2 and 4.

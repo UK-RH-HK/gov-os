@@ -14132,7 +14132,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no gate that reports a known switch over and over).
 
 ### DEC-1112 — The sandbox experiment narrowed to set-up A (set-up B a Wave 3 row); W2-56 builds on the path-map guard alone; what the CTO brings the owner (standing)
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1098 (4), DEC-1099 (1), DEC-936 item 2.5, DEC-1110 (1), DEC-1111 (2) · **Source:** the owner's message (chat, 2026-11-09), after set-up B's fix pass was stopped by a safety check (the third stop on its replay environment)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1098 (4), DEC-1099 (1), DEC-936 item 2.5, DEC-1110 (1), DEC-1111 (2) · **Source:** the owner's message (chat, 2026-11-09), after set-up B's fix pass was stopped by a safety check (the third stop on its replay environment) · **Changed by:** DEC-1128 (4): set-up B dropped entirely, not a Wave 3 row; DEC-1128 (2): the tuned guard's changes go live only on set-up A's 100 % on the path map's actions
 - **Decision:**
   - (1) **The sandbox experiment: (a).** Set-up A (the path-map guard alone) measured fully, as declared, beside D-10;
     set-up B becomes a Wave 3 row, built by a different route. W2-56 builds on the path-map guard alone, with today's
@@ -14397,6 +14397,36 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the lift closed and the work after it started) and question 1 (one memory bar, measured on
   fresh questions at a fixed rhythm).
 
+### DEC-1128 — No switched-off control returns and no new guard rule goes live without set-up A's 100 % on the path map's actions; the lift does not wait for set-up A; set-up B dropped entirely; DEC-1010's one-rule principle investigated first; the switched-off list and the memory audit's landing to the owner
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC)
+- **Decision:**
+  - (1) **The switched-off controls:** the CTO brings one list of every guard rule, gate and check switched off during
+    the emergency: why each was switched off, its home ticket, what must be true before it returns (for the guard,
+    set-up A's evidence against the 100 % bar of item (2)), and when, after the lift.
+  - (2) **Standing: no switched-off control returns, and no new guard rule goes live, unless set-up A's evidence
+    shows 100 % on the path map's actions:** every action the path map covers judged right, with no false refusal
+    and no wrong allow; actions outside the path map are outside the bar. Until a rule meets it, it stays off.
+  - (3) **The lift does not wait for set-up A:** the guard stays as it is today; its live false refusals are counted
+    weekly from the call log; the guard's own error-path faults (DECIDED-NOT-DONE row 123) are fixed first after the
+    lift.
+  - (4) **No more sandbox work (DEC-1112 (1) changed):** set-up B is dropped entirely, not a Wave 3 row; the leads are
+    not sandboxed; the path map and the guard are the controls. Set-up A (the guard alone) stays: it is the guard's
+    measurement for the 100 % bar. The workers' existing launcher sandbox stays as it is.
+  - (5) **DEC-1010, a read-only investigation and recommendation, no change yet.** The principle the owner wants for
+    every role, not only reviewers: work is judged against the ticket's KPI lines and specification, never
+    open-ended; at most two rounds; if the KPIs and specification are still not met after two, it comes to the owner
+    with the evidence. The CTO reports DEC-1010's exact wording and scope today; whether reviewers, auditors, test
+    designers, engineers and product-spec each work to known KPIs and a specification, and how their findings are
+    bounded (in scope or a row); how many rounds each role took on this week's tickets; and one recommended rule for
+    all roles, with what it would change in the briefs, JUDGEMENT.md and the tickets.
+  - (6) **The memory audit:** the CTO confirms W2-170 to W2-173 and W2-88's lines are planned to land in time for the
+    first weekly audit on 11-23 (DEC-1126 (5)).
+- **Note (the CTO):** the guard "as it is today" is the re-pinned guard of `pin-797495bdfc70` (13:31 UTC 11-11),
+  which carries W2-141's rule (an engineer's wide search into its own acceptance folder refused); item (1)'s list
+  names it with its set-up A evidence so far.
+- **Basis:** question 2 (a control is trusted only on measured evidence, and the lift is not held by a measurement)
+  and question 4 (the owner's time: one list, one rule, one recommendation).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14460,3 +14490,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.508 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1124 (Q23 re-worded by an independent session). Next free id: DEC-1125. |
 | 0.509 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1125 (the latency a named red; the memory audit weekly, DEC-1101 (1) changed, DEC-1097 (4) folded; the night to the re-pin). Next free id: DEC-1126. |
 | 0.510 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1126 (the answers to the 09:30 digest: re-pin done; usage (A) ends; W2-60a RUBRIC-2 now; the runaway brake for adopted products; the memory audit's schedule; W2-32/W2-15a open; D-10 the green run; W2-82 to P3; the permissions ACT). Next free id: DEC-1127. |
+| 0.511 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1128 (the 100 % bar on set-up A for any control returning or new guard rule; the lift does not wait; set-up B dropped; DEC-1010 investigated; the switched-off list; the memory audit's landing); DEC-1112 (1) changed. DEC-1127 held for the owner's answer (the close history, PROPOSED). Next free id: DEC-1129. |
