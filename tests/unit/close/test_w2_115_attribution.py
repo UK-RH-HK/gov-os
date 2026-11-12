@@ -251,3 +251,24 @@ def test_s10_a_clone_that_cannot_be_reset_is_replaced_and_said(tmp_path):
     again = attribution.prepare(repo.root, head)
     assert again["reused"] is False and again["replaced"] and "could not be reset" in again["replaced"]
     assert (clone / "src/pkg/core.py").is_file()
+
+
+def test_s4_a_full_green_night_at_the_head_without_the_change_does_not_replace_its_run(tmp_path, monkeypatch):
+    """reds-6 (S4, F-1): the green base is now the head without the change, and a green night ran the full suite on
+    it. The night does not excuse the red, so it stands for nothing: the red is run once on that head (green there),
+    and it is the change's."""
+    repo = project(tmp_path, extra={"tests/unit/test_x.py": "def test_x():\n    assert True\n"})
+    base = repo.git("rev-parse", "HEAD").strip()
+    change(repo, {"tests/unit/test_x.py": FAILS})
+    from .test_w2_115_support import write
+    write(repo, "docs/close/nightly/NR-20261112T000000Z-cccc.json",
+          json.dumps({"head": base, "scope": "full", "verdict": "green", "failures": []}))
+    repo.commit("the night's record (a record, no task)")
+    tags = []
+    real = attribution.run_alone
+    monkeypatch.setattr(attribution, "run_alone", lambda c, t, o, f, to, tag: tags.append(tag) or real(
+        c, t, o, f, to, tag))
+    reds, read = _attribute(repo)
+    assert read == {"read": True, "record": "docs/close/nightly/NR-20261112T000000Z-cccc.json"}
+    assert [t for t in tags if t.startswith("without")] == ["without-0"]  # one run on the head without the change
+    assert reds[0]["caused"] is True and "nightly record" not in reds[0]["reason"]

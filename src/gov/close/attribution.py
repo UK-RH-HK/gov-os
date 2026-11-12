@@ -358,12 +358,16 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
                    for t in tests}
     without: dict[str, list[str | None]] = {}
     free = night["read"] and night.get("scope") == "full" and _same_commit(clone, night["head"], base)
-    to_run = []
+    to_run, from_night = [], set()
     for t in tests:
         if not any(r is not None for r in with_change[t]):
             continue  # green alone: nothing to compare
-        if free and rounds[t] == 1:  # the night ran the full suite on the head without the change: its result is
-            without[t] = [night["failures"].get(t)]  # that run; a load-sensitive red still gets its rounds run
+        # the night ran the full suite on the head without the change: its result stands for that run, free, only
+        # where it excuses the red (red there with the same failure type); else the red is run there once, as every
+        # other red is; a load-sensitive red still gets its rounds run
+        if free and rounds[t] == 1 and not judge(with_change[t], [night["failures"].get(t)])[0]:
+            without[t] = [night["failures"].get(t)]
+            from_night.add(t)
         else:
             to_run.append(t)
     if to_run:
@@ -386,7 +390,7 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
         caused, kind, reason = judge(with_change[t], without.get(t, []))
         if base is None and any(r is not None for r in with_change[t]):
             reason += "; no head without the change is known (the ticket has no commit of its own)"
-        if free and t in without:
+        if t in from_night:
             reason += f"; the head without the change read from the nightly record {night['record']}"
         if kind == UNKNOWN:
             kind = next((f["failure_type"] for f in failing if f["test"] == t), UNKNOWN)

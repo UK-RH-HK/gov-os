@@ -206,3 +206,25 @@ def test_f1_an_untrailered_slip_after_the_green_base_is_caused_and_never_closes(
     assert not red.get("repair_ticket")
     assert not (repo.root / f"docs/close/{TICKET}").exists()
     assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]
+
+
+def test_f1_a_red_is_run_on_the_green_base_even_where_a_full_green_night_names_it(tmp_path, no_lists, monkeypatch):
+    """reds-6 (S4, F-1): the green base is a full green night's head. The night does not excuse the red, so the red
+    is run once on the green base (green there) before it is judged the change's: RED_CAUSED."""
+    import json
+    repo = project(tmp_path)
+    green = repo.git("rev-parse", "HEAD").strip()
+    repo.commit("night", files={f"docs/close/nightly/NR-20261101T010000Z-{green[:12]}.json": json.dumps(
+        {"verdict": "green", "head": green, "scope": "full", "failures": []}) + "\n"})
+    repo.commit("slip", files={"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return 0\n"})
+    change(repo, {"src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    runs = []
+    real = attribution.run_alone
+    monkeypatch.setattr(attribution, "run_alone", lambda c, t, o, f, to, tag: runs.append(
+        (tag, attribution._git(c, "rev-parse", "HEAD").stdout.strip())) or real(c, t, o, f, to, tag))
+    with pytest.raises(GovError) as raised:
+        command.run(repo.root, _args(), CONFIG)
+    assert raised.value.code == "RED_CAUSED"
+    [red] = raised.value.details["reds"]
+    assert red["caused"] is True and "nightly record" not in red["reason"]
+    assert [(tag, head) for tag, head in runs if tag.startswith("without")] == [("without-0", green)]
