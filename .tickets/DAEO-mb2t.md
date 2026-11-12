@@ -22,6 +22,19 @@ allowed_paths:
 - src/gov/close/rebuild_gate.py
 - tests/unit/rebuild/test_w2_124*
 - tests/unit/adopt/test_w2_124*
+- tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-32/test_w2_32_s10_no_cpu_fallback.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-13/test_w2_13_secrets.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-13/test_w2_13_unavailable.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-13/test_w2_13_latency.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-76/test_w2_76_timings.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-76/test_w2_76_unchanged.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W2-116/test_w2_116_reindex.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/acceptance/W1-41/test_w1_41_embedding_policy.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/unit/rebuild/test_w2_116_integration.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/unit/rebuild/test_no_embeddings.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/unit/rebuild/test_w2_122_seed.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- tests/unit/retrieval/test_w2_32_rebuild_cut.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
 kpis:
   success:
   - '`gov rebuild` exits non-zero, named (`REBUILD_FAILED`, `store: semantic`), when the semantic store was asked for and not recreated (the embedder unavailable, hung or failing part way); only `--no-embeddings` skips it; never an ok answer over a partial store. Verify: a planted project that asks for a semantic store, with a stub embedder that is unavailable, one that hangs and one that fails part way: `gov rebuild` exits non-zero each time and prints `REBUILD_FAILED` and `store: semantic`; the same project with `--no-embeddings` exits 0; no run prints ok over a partial store [DEC-1015 item 4, DEC-1027 C]'
@@ -78,4 +91,8 @@ if the close's own code must change instead, the lead returns a package (W2-115 
 
 - **P2 (b):** S2 and S5 both kept; S5 is read in the result: `gov rebuild` keeps exit 0 and `"ok": true`, and the result carries `complete: false` and `not_built: [{store, reason}]` for every store not built (no path map, no `.gitleaks.toml`, a store the path map calls for not built); adoption reads `not_built`. No earlier suite is rewritten for it. W2-26's finding 2 (`"ok": true` on an unadopted clone) stays, named in the result rather than refused.
 - **P3:** with (b), earlier suites should not change; if any turns red, its files come back to the owner by name before any revision (widening is the owner's, DEC-1142 (8)).
+
+## P1-L decided (the owner, DEC-1150 (3), 2026-11-12)
+
+**(a): the 13 files are revised** by an independent test designer, one revision each, `Rewrite-Reason: DEC-1027 C` (the rebuild refuses an embedded namespace with no embedder): each case gets `--no-embeddings` or a healthy stand-in embedder, or reads `error.details.stores` where it checks a refusal. **Each revised case keeps what it was guarding** (W2-32's fail-closed cases above all: a case that proved a refusal still proves that refusal); nothing else in the files changes. **The reviewer checks, case by case, that no revised case loses its point** (its assertion still fails on the behaviour it guarded against), and names any that does as a blocking finding.
 
