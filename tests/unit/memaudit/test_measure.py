@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import threading
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -17,7 +16,7 @@ from gov.memaudit import declare, ledger, measure, scores
 from gov.memaudit.common import read_json
 
 from .conftest import AUDIT
-from .fakes import audit_ranks, measure_args, prepare
+from .fakes import measure_args, prepare
 
 PROBE = "what decides a close"
 

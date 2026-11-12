@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 
 from gov.memaudit import declare, events, fault, layout, runner, scores, wrapper
-from gov.memaudit.common import read_json, set_digest, sha256_file, toplevel, utc_iso
+from gov.memaudit.common import UsageError, read_json, set_digest, sha256_file, toplevel, utc_iso
 
 CONTROL_SET, CONTROL_PART, CONTROL_N = "memory-retrieval", "visible", 40
 CONTROL_FIRST, CONTROL_SPREAD = 34, 2  # E0's figure on the visible 40, and the spread allowed (DEC-1097 (1)(b))
@@ -180,6 +180,8 @@ def rescore(sets_root, audit, n: int, *, repo=None, emit) -> str:
     line; nothing is written. ``ok``, or ``refused`` with ``MS-KEPT``; never ``used``."""
     p = layout.paths(sets_root, audit)
     repo = Path(repo) if repo is not None else toplevel()
+    if layout.inside(repo, p["root"]):
+        raise UsageError("flag inside the sets root")
     kept = p["run"] / f"attempt-{n}" / "kept"
     if not kept.is_dir():
         emit("MS-KEPT")

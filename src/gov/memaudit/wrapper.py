@@ -65,7 +65,8 @@ def main(real_gov: str, argv=None) -> int:
         os.execv(real_gov, [real_gov, *argv])
     from gov.memaudit import events, fault
     started = time.monotonic()
-    done = subprocess.run([real_gov, *argv], stdout=subprocess.PIPE, stdin=subprocess.DEVNULL)  # stderr passes through
+    with open(Path(run) / "gov.err", "ab") as err:  # the real gov's standard error: a file of the run folder (F1)
+        done = subprocess.run([real_gov, *argv], stdout=subprocess.PIPE, stderr=err, stdin=subprocess.DEVNULL)
     ms = int((time.monotonic() - started) * 1000)
     out = done.stdout
     call = None

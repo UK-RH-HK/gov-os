@@ -5,16 +5,15 @@ from __future__ import annotations
 import hashlib
 import json
 import random
-from pathlib import Path
 
 import pytest
 import yaml
 
-from gov.memaudit import classes, declare, pool
+from gov.memaudit import pool
 from gov.memaudit.common import set_digest
 
 from .conftest import AUDIT, SRC, question
-from .fakes import measure_args, measured
+from .fakes import measured
 from .test_measure import events, snapshot
 
 OLD = "memory-audit-20261001"

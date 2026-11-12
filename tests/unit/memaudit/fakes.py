@@ -80,8 +80,8 @@ class FakeGov:
     def save(self) -> None:
         (self.bin / "plan.json").write_text(json.dumps(self.plan), encoding="utf-8")
 
-    def rank(self, q: dict, rank: int | None, **spec) -> None:
-        self.plan["questions"][q["question"]] = {"evidence": evidence_at(q, rank), **spec}
+    def rank(self, q: dict, rank: int | None, routes=("lexical", "semantic"), **spec) -> None:
+        self.plan["questions"][q["question"]] = {"evidence": evidence_at(q, rank, routes), **spec}
 
     def override(self, text: str, nth: int, **spec) -> None:
         self.plan["overrides"][f"{text}|{nth}"] = spec

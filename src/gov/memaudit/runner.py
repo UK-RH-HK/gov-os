@@ -47,9 +47,12 @@ def measure(set_name: str, part: str, *, repo, root, folder, wrapper, run, phase
     folder = Path(folder)
     cmd = [sys.executable, "-m", "gov.retrieval.measure", set_name, "--part", part, "--root", str(repo),
            "--sets-root", str(root), "--out", str(folder), "--gov", str(wrapper)]
-    with open(folder / "measure.txt", "wb") as out, open(folder / "measure.err", "wb") as err:
-        return subprocess.run(cmd, stdout=out, stderr=err, stdin=subprocess.DEVNULL, cwd=folder,
-                              env=environment(run, phase, attempt, folder), check=False).returncode
+    with open(folder / ".measure.txt.tmp", "wb") as out, open(folder / ".measure.err.tmp", "wb") as err:
+        rc = subprocess.run(cmd, stdout=out, stderr=err, stdin=subprocess.DEVNULL, cwd=folder,
+                            env=environment(run, phase, attempt, folder), check=False).returncode
+    for name in ("measure.txt", "measure.err"):  # whole or absent: a run that died leaves no half output
+        os.replace(folder / f".{name}.tmp", folder / name)
+    return rc
 
 
 def rescore(set_name: str, part: str, *, repo, root, kept) -> tuple[int, str]:

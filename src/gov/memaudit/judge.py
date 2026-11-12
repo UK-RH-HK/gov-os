@@ -186,7 +186,10 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
             emit("USED")
             return "used"
         last = (read_json(reader / "plan.json") or {}).get("projection")
-        if projection is None or not isinstance(last, (int, float)) or not projection > last:
+        if not isinstance(last, (int, float)):  # no figure recorded with the rows: the default the run began on
+            n0 = (read_json(p["declaration"]) or {}).get("n")
+            last = projection_of(n0, None) if isinstance(n0, int) else None
+        if projection is None or last is None or not projection > last:
             raise UsageError("projection")
 
     counting = _counting(p)
@@ -231,9 +234,6 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
                                       "projection": proj, "brake": brake})
     caller = Caller(claude, run_dir, reader)
     job = _Judge(p, repo, gov, caller, brake, emit)
-    before = len(rows_of(reader))
-    emit(f"JUDGE questions {len(qs)}; rows already written {before}; spent so far {caller.total:.2f} USD; "
-         f"projection {proj:.2f}, brake {brake:.2f}")
     with ThreadPoolExecutor(WORKERS) as pool:
         list(pool.map(lambda q: job.work(q, first[q["id"]]), qs))
     if job.stopped:

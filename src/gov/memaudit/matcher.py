@@ -14,7 +14,7 @@ import yaml
 
 from gov.retrieval import measure as M
 
-APART = "nonexistent-id"  # the category scored apart (DEC-1071 (5), DEC-1078 (1)); it still counts in n (ruling 8)
+APART = "nonexistent-id"  # the category scored apart: right when the answer is not found; it still counts in n (ruling 8)
 MeasureError = M.MeasureError
 
 
@@ -33,7 +33,7 @@ def questions(sets_root, set_name: str, part: str, repo) -> list[dict]:
         raise MatcherError("set") from None
     if not isinstance(entry, dict) or M.set_fault(entry):
         raise MatcherError("set")
-    if part == "hidden" and M._measured(entry, root):  # DEC-820 (d): a session the set measures never opens it
+    if part == "hidden" and M._measured(entry, root):  # a session the set measures never opens its hidden part
         raise MatcherError("measured role")
     quoting = M._Part("/q", [*entry.get("visible", []), *entry["hidden"], f"{M.EVALUATION}/**"], "")
     declared = M.families(root, repo)
@@ -68,7 +68,7 @@ def cited(repo, q: dict, citations) -> bool:
 
 
 def names_the_ids(result: dict, question: str) -> bool:
-    """DEC-1071 (5): the product stopped with UNRESOLVED_IDS and its gaps name every id the question names."""
+    """The product stopped with UNRESOLVED_IDS and its gaps name every id the question names."""
     from gov.retrieval import lexical
     if (result or {}).get("stopping_reason") != "UNRESOLVED_IDS":
         return False

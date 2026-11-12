@@ -6,9 +6,6 @@ from __future__ import annotations
 import json
 import re
 
-import pytest
-import yaml
-
 from gov.memaudit import ledger, prompts, tables
 from gov.memaudit.claude import argv_of
 
@@ -43,7 +40,7 @@ def test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar(pla
     done = run_judge(plant, claude)
     assert done.returncode == 0, done.stdout
     out = done.stdout.splitlines()
-    assert out[0].startswith("JUDGE questions 40; rows already written 0")
+    assert out[0].startswith("VERDICT ") and len(out) == 5  # the five lines of item 8, nothing before them
     verdict = [line for line in out if line.startswith(("VERDICT", "BAR", "BESIDE"))]
     assert verdict[0] == ("VERDICT right end to end 34 of 40 (85.0 %; exact 95 % interval 70.2 to 94.3 %); "
                           "wrong claims 2 of 40 (5.0 %)")
@@ -230,6 +227,31 @@ def test_the_second_grader_disagreeing_is_counted_beside_the_verdict(plant):
     assert f["verdict"]["right"] == 40  # the named grader judges; the second is beside it
 
 
+def test_the_misses_are_counted_by_rank_bucket_namespace_category_and_route(plant):
+    q3 = dict(plant.questions["q03"], keyword=True)
+    plant.put(q3)
+    fake, _ = prepare(plant)
+    spec = {"q03": (3, ["lexical"]), "q07": (8, ["semantic"]), "q10": (12, ["lexical", "semantic"]),
+            "q12": (1, ["rerank"]), "q15": (None, ["lexical"]), "q21": (None, ["lexical"])}
+    for qid, (rank, routes) in spec.items():
+        fake.rank(plant.questions[qid], rank, routes=routes)
+    fake.save()
+    assert plant.cli(*measure_args(plant)).returncode == 0
+    claude = FakeClaude(plant)
+    plant_verdicts(claude)
+    assert run_judge(plant, claude).returncode == 0
+    m = json.loads((plant.run_dir / "FIGURES.json").read_text())["misses"]
+    assert m["by_rank"] == {"rank_1_5": 2, "rank_6_20": 2, "not_in_20": 2}
+    assert m["by_namespace"] == {"embedded": 5, "keyword_only": 1}
+    assert m["by_route"] == {"lexical": 1, "semantic": 1, "both": 1, "other": 1, "none": 2}
+    want = {c: 0 for c in tables.QUOTAS}
+    for qid in ("q03", "q07", "q10", "q12", "q15", "q21"):
+        want[plant.questions[qid]["category"]] += 1
+    assert m["by_category"] == want
+    rows = {json.loads(x)["id"]: json.loads(x) for x in (plant.run_dir / "misses.jsonl").read_text().splitlines()}
+    assert [rows[i]["evidence_in_bundle"] for i in ("q03", "q15", "q21")] == [True, False, False]
+
+
 # ---- F1: only ids, counts and digests leave
 
 def test_a_unique_word_in_a_question_gold_answer_answer_and_path_is_found_nowhere_but_misses_and_reader(plant):
@@ -238,8 +260,8 @@ def test_a_unique_word_in_a_question_gold_answer_answer_and_path_is_found_nowher
              sources=[{"path": UNIQUE["path"], "heading": UNIQUE["heading"], "lines": [82, 82]}])
     plant.put(q)
     fake, _ = prepare(plant)
-    done = plant.cli(*measure_args(plant))
-    assert done.returncode == 0, done.stdout
+    measured_out = plant.cli(*measure_args(plant))
+    assert measured_out.returncode == 0, measured_out.stdout
     claude = FakeClaude(plant)
     claude.plan["readers"][q["question"]] = {"steps": [{"verdict": "answer", "answer": "WRONG about zephyrbadger",
                                                        "citations": [], "search": ""}]}
@@ -247,7 +269,8 @@ def test_a_unique_word_in_a_question_gold_answer_answer_and_path_is_found_nowher
     done = run_judge(plant, claude)
     assert done.returncode == 0, done.stdout
     words = [UNIQUE["question"], UNIQUE["gold"], "fjordnarwhal", "zephyrbadger"]
-    texts = {"stdout": done.stdout, "stderr": done.stderr}
+    texts = {"stdout": done.stdout, "stderr": done.stderr, "measure stdout": measured_out.stdout,
+             "measure stderr": measured_out.stderr}
     for p in plant.run_dir.rglob("*"):
         rel = p.relative_to(plant.run_dir)
         # misses.jsonl and the reader's rows are where they belong; the kept outputs are the retriever's own
@@ -370,3 +393,17 @@ def test_a_flag_inside_the_sets_root_is_refused(plant):
     args[args.index("--claude") + 1] = str(plant.root / "claude")
     done = plant.cli(*args)
     assert done.returncode == 4 and done.stdout == "ERROR: UsageError\n"
+
+
+def test_a_planted_ledger_over_the_brake_stops_before_any_call_and_resume_starts_from_its_total(plant):
+    from gov.memaudit import events as ledger_events
+    fake, ranks, claude = measured(plant)
+    ledger_events.append(plant.run_dir, "spend", call="reader-1", qid="q01", usd=20.0, total=20.0)
+    done = run_judge(plant, claude, "--projection", "5")  # the brake is 10, the run's total already 20
+    assert done.returncode == 2 and done.stdout.splitlines()[-1] == "STOPPED brake" and claude.calls() == []
+    assert not (plant.run_dir / "misses.jsonl").exists() and not (plant.run_dir / "FIGURES.json").exists()
+    (plant.run_dir / "reader/plan.json").unlink()  # the figure the stopped run began on is not recorded: the default
+    done = run_judge(plant, claude, "--resume", "--projection", "50")
+    assert done.returncode == 0, done.stdout
+    sp = [e for e in events(plant, "spend") if e["call"] != "reader-1" or e["qid"] != "q01" or e["usd"] != 20.0]
+    assert abs(sp[0]["total"] - 20.01) < 1e-6 and len(claude.calls()) == 120
