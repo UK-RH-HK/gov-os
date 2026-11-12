@@ -644,7 +644,11 @@ def scoped(root: Path, ticket: str) -> dict:
     test_map, why_not = load_map(root)
     if test_map is None:
         raise SelectionRefused(f"the test map {MAP_REL} cannot be read ({why_not}): no selection is made blind")
-    paths, base_commit = ticket_change(root, ticket)
+    own_paths, base_commit = ticket_change(root, ticket)
+    # the change is what the head holds that no green record has tested: everything since the newest green record
+    # (the strict close's base), with the ticket's own commits; a ticket's own commits alone without a green record
+    green = base(root)
+    paths = sorted(set(own_paths) | set(changed(root, green))) if green else own_paths
     tickets = _tickets(root)
     couplings = test_map.get("couplings") or []
     why: dict[str, list[str]] = {}
@@ -718,17 +722,14 @@ def scoped(root: Path, ticket: str) -> dict:
                                + ", ".join(f"{t} ({d})" for t, d in gone))
     suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
-            "changed": paths, "records_only": records_only, "why": {t: why[t] for t in suites}, "base": base_commit,
+            "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only, "why": {t: why[t] for t in suites}, "base": base_commit,
             "head": _git(root, "rev-parse", "HEAD").strip()}
 
 
 def pytest_options(test_map: dict | None) -> list[str]:
     """The options every scoped run takes besides its targets: no cache, the retention policy, JUnit's node
-    files, and the test map's per-test limit (``--timeout``, pytest-timeout's) where the interpreter has the plugin,
-    so a test that hangs fails as a timeout (S4) instead of ending the whole run."""
-    import importlib.util
-
-    options = list(PYTEST_OPTIONS)
-    if importlib.util.find_spec("pytest_timeout") is not None:
-        options.append(f"--timeout={settings(test_map)[0]}")
-    return options
+    files, and the test map's per-test limit (``--timeout``, pytest-timeout's), so a test that hangs fails as a
+    timeout (S4) instead of ending the whole run. The same on every machine whatever the caller's environment: where
+    the runs' interpreter lacks pytest-timeout, pytest refuses the option and the run does not complete (fail closed,
+    as the strict close's ``TIMEOUT_PLUGIN_ABSENT``)."""
+    return list(PYTEST_OPTIONS) + [f"--timeout={settings(test_map)[0]}"]

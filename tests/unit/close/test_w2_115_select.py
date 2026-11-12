@@ -11,7 +11,7 @@ import pytest
 from gov.cli.errors import GovError
 from gov.close import command, select
 
-from .test_w2_115_support import OWN_SUITE, OWN_TEST, TICKET, change, project
+from .test_w2_115_support import OWN_SUITE, OWN_TEST, TICKET, change, green_night, project
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -125,6 +125,47 @@ def test_s2_unmapped_change_refuses_never_widened(tmp_path):
     with pytest.raises(select.SelectionRefused) as raised:
         select.scoped(repo.root, TICKET)
     assert "src/pkg/lonely.py" in raised.value.reason
+
+
+def test_s2_records_committed_since_the_green_base_select_record_reading_only(tmp_path):
+    """The change is everything since the last green record, not only the ticket's own commits: a record commit
+    without the ticket's trailer is still the change, and records alone select record_reading only."""
+    repo = project(tmp_path)
+    green_night(repo)
+    repo.commit("a decision", "Role: orchestrator", files={"docs/notes.md": "# notes, one decision\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert chosen["suites"] == ["tests/unit/test_records.py"]
+    assert chosen["records_only"] is True
+
+
+def test_s2_an_unmapped_path_merged_since_the_green_base_refuses(tmp_path):
+    repo = project(tmp_path)
+    green_night(repo)
+    repo.commit("merged", "Task: T-0009", files={"odd/unplaced.txt": "odd\n"})
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
+    with pytest.raises(select.SelectionRefused) as raised:
+        select.scoped(repo.root, TICKET)
+    assert "odd/unplaced.txt" in raised.value.reason
+    done = _cli(repo.root, "--select", TICKET)
+    assert done.returncode == 2 and select.SELECTION_REFUSED in done.stderr and done.stdout.strip() == ""
+
+
+def test_s2_the_close_records_outputs_only_the_tickets_own_paths(tmp_path):
+    repo = project(tmp_path)
+    green_night(repo)
+    repo.commit("a decision", "Role: orchestrator", files={"docs/notes.md": "# notes, one decision\n"})
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert "docs/notes.md" in chosen["changed"] and chosen["own"] == ["src/pkg/feature.py"]
+
+
+def test_s3_pytest_options_do_not_depend_on_the_environment(monkeypatch):
+    import importlib.util
+
+    with_plugin = select.pytest_options(None)
+    monkeypatch.setattr(importlib.util, "find_spec", lambda name, *a, **k: None)
+    assert select.pytest_options(None) == with_plugin
+    assert any(o.startswith("--timeout=") for o in with_plugin)
 
 
 def test_s2_unreadable_map_refuses(tmp_path):

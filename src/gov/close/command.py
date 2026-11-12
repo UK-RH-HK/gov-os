@@ -1863,7 +1863,7 @@ def _run_scoped(root: Path, args, config: dict):
         "base": base,
         "changed": chosen["changed"],
     }
-    commit_files = list(chosen["changed"])
+    commit_files = list(chosen.get("own", chosen["changed"]))
     close_record_path, checkpoint_path = _record_and_close(root, ticket, record, commit_files)
     return {"ticket": ticket, "close": SCOPED, "close_record": close_record_path, "checkpoint": checkpoint_path,
             **{key: record[key] for key in ("commit", "selection", "runs", "review", "reds", "culprits", "clone",

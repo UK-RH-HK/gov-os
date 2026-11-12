@@ -18,7 +18,7 @@ PASS = "def test_ok():\n    assert True\n"
 
 def map_data(**more) -> dict:
     data = {"version": 1, "shared_core": ["src/pkg/core.py"],
-            "record_only": [".tickets/**.md", "docs/**.md"],
+            "record_only": [".tickets/**.md", "docs/**.md", "docs/close/nightly/*.json"],
             "record_reading": ["tests/unit/test_records.py"], "every_close": [],
             "couplings": [{"paths": ["src/pkg/core.py"], "suites": ["tests/unit/test_core_contract.py"],
                            "why": "the core's contract is read by a test that does not import it"}],
@@ -75,6 +75,16 @@ def project(tmp_path: Path, mode: str | None = "scoped", extra: dict | None = No
 
 def change(repo: Repo, planted: dict, ticket: str = TICKET, message: str = "work") -> str:
     return repo.commit(message, f"Task: {ticket}", "Role: engineer", files=planted)
+
+
+def green_night(repo: Repo, stamp: str = "20261101T010000Z") -> str:
+    """A green nightly record naming the head as it is now, committed as a record (no task): the last green base."""
+    import json
+
+    head = repo.git("rev-parse", "HEAD").strip()
+    record = {"verdict": "green", "head": head, "secrets_full_scan": True}
+    repo.commit("night", files={f"docs/close/nightly/NR-{stamp}-{head[:12]}.json": json.dumps(record) + "\n"})
+    return head
 
 
 def write(repo: Repo, rel: str, text: str) -> None:
