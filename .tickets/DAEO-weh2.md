@@ -1,6 +1,6 @@
 ---
 id: DAEO-weh2
-status: open
+status: in_progress
 deps: []
 links: [DAEO-61vm, DAEO-k1e2, DAEO-c9n8]
 created: 2026-11-12T07:10:00Z
