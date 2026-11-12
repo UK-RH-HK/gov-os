@@ -23,7 +23,6 @@ allowed_paths:
 - template/governance/project/path-map.yaml
 - tests/unit/adopt/**
 - tests/unit/adapters/**
-- tests/acceptance/W1-41/test_w1_41_migration.py
 - fixtures/adopt/**
 - CLAUDE.md
 - AGENTS.md
