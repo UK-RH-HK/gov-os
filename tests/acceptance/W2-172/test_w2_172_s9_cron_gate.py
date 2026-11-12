@@ -12,8 +12,10 @@ open, else busy), polling every ``GOV_MEMAUDIT_GATE_POLL_S`` seconds for at most
 and then stopping ``STOPPED <step> gate busy`` (a stop at that step, exit 2). The busy case runs the real driver without
 ``GOV_MEMAUDIT_NOW`` (the store's commit is planted at the real time) so that the wait can run out by the seam or the real
 clock; the wrapper does not override the 3600 default. Readings: the wrapper's default gate is the product's
-``gov resources --check`` (O2), which is a command with arguments while ``--gate-cmd`` is an executable called with none: the
-cases test the default only by the wrapper's text (``resources --check``).
+``gov resources --check`` (O2). PKG-W2-172-TESTS-1 GATE-1 (a) (DEC-1112 (3)): the driver splits ``--gate-cmd``'s value with
+``shlex.split`` and runs the words as given, so that default works as it is; "called with no arguments" reads "run as its
+words" (a one-word value, as the planted gate is, gets no arguments). The cases give the wrapper a stub gate through
+``GOV_MEMAUDIT_GATE`` and test the default only by the wrapper's text (``resources --check``).
 """
 
 from __future__ import annotations
