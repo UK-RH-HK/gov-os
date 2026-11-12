@@ -81,6 +81,13 @@ The real code-graph tool (`codebase-memory-mcp`) stays on `PATH` for this suite 
 `_CBM_SUITES`), because its adopt stages read the code graph. Inside a sandbox where `/tmp/gov-cbm-<uid>` is read-only
 the stages end in `ADOPT_CODE_GRAPH_UNREADABLE`; the suite is run outside it.
 
+**The query embedder's address (run 6, batch 2, DEC-1065, DEC-1033).** `gov` embeds a question (a search, and so the
+semantic index's canary) with the query embedder at `GOV_QUERY_OLLAMA_HOST` (`OLLAMA_HOST`'s form; default
+`127.0.0.1:11435`) and the chunks that build the index with the shared server at `OLLAMA_HOST`. `w2_52_support.environment`
+gives the one stand-in's address to both settings, so questions and chunks are embedded with the same vectors and the
+model on the GPU; a case that gives no stand-in keeps W1-41's dead address for both. A case never reaches a real server
+at a default address.
+
 ## The interface the cases hold (readings; the engineer may dispute any point through the lead)
 
 The KPI lines leave the interface open. Each point below is this suite's reading, chosen as close to the sources

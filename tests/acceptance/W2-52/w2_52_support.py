@@ -94,6 +94,7 @@ def build_harbour(destination):
 
 EMBED_MODEL = "qwen3-embedding:0.6b"
 DIMENSIONS = 1024
+QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"  # the query embedder's address, in OLLAMA_HOST's form (DEC-1033)
 _STOP = {"the", "and", "for", "with", "that", "this", "each", "does", "when", "who", "what", "into", "from", "its",
          "are", "was", "has", "have", "before", "after", "then", "any", "all", "given", "query", "instruct",
          "retrieve", "relevant", "passages", "search", "web", "answer", "which", "every"}
@@ -187,10 +188,17 @@ def vector_site(destination):
 
 def environment(sandbox, endpoint=None, site=None):
     """W1-41's environment (this worktree's ``src/``, an empty HOME, a git identity, no model), with the stand-in
-    endpoint where ``endpoint`` is given and ``sqlite_vec`` where ``site`` is given."""
+    endpoint where ``endpoint`` is given and ``sqlite_vec`` where ``site`` is given.
+
+    Rewrite-Reason: DEC-1065, DEC-1033. A question (a search, and so the semantic index's canary) is embedded by the
+    query embedder at ``GOV_QUERY_OLLAMA_HOST``, the chunks by the shared server at ``OLLAMA_HOST``. The one stand-in
+    answers at both addresses (the same vectors, the model on the GPU), so questions and chunks are embedded alike.
+    Both settings are always set here (W1-41's base sets both to a dead port): a case never reaches the machine's
+    real servers at the default addresses."""
     env = support.environment(sandbox)
     if endpoint:
         env["OLLAMA_HOST"] = endpoint
+        env[QUERY_HOST_SETTING] = endpoint
     if site:
         env["PYTHONPATH"] = env["PYTHONPATH"] + os.pathsep + str(site)
     return env
