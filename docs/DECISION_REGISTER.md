@@ -14751,6 +14751,20 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) Into the common lead brief beside the two-refusal rule.
 - **Basis:** P1-I; the P1-D reviewer and W2-152's re-probe each stopped after two memory-gate refusals (2026-11-12 14:05-14:28).
 
+### DEC-1147 — W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~15:00, P1-H (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1145, DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"W2-152 CIT-P approved at 09fc68645c0c, after the fact":** `template/governance/kernel/schemas/facts.schema.json`, sha256 before
+    `be3e204355c0dd4c98cc584b72a1cef5eaa4733ca9a7feec8684b728026af7a6`, after `3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c`
+    (15 added, 1 removed: `ready` required, and the `ready.new_since` date property), on w2/integrate since the CTO's merge `b0bbd373f`
+    (2026-11-09 23:07) without approval until now. The missing record `docs/changes/W2-152-CIT-P.md` is written by a product-spec worker
+    as the CTO proposed; then W2-152 closes through the queue.
+  - (2) **To the owner next:** whether the facts file an adoption writes carries `ready.new_since` set to the adoption's own date, before
+    W2-27 (a fix if not); row 173's route (a kernel path needs an approval line before any merge, in the queue and in the CTO's hand-merge
+    check), without a new ticket; a scan of every commit on w2/integrate since 11-02 touching `template/governance/kernel/**`, each with its
+    approval line or none.
+- **Basis:** the owner's message of 2026-11-12 ~15:00 answering P1-H.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14833,3 +14847,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
 | 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
 | 0.528 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1145 (W2-146's kernel path-map schema approved at ebdbabd2e0d3; a non-compiling id form refused at use, the config check a row), DEC-1146 (a resource gate's refusal is a wait, not a two-refusal refusal; standing). Next free id: DEC-1147. |
+| 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |
