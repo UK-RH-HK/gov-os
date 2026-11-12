@@ -9,7 +9,7 @@ head: f1ae5fecbc52 (the skill text; the next commit adds only this record)
 ticket: DAEO-pg6i (W2-88a)
 task: DAEO-pg6i
 author: product-spec (W2-88a worker)
-review: PENDING (independent review not yet made; the ticket lead records it)
+review: PASS, independent-auditor session aa319b73-04df-481c-88eb-c6ee3e11d54f, head ba400b94e738, 4 non-blocking findings (§6)
 decisions_read: [DEC-1150, DEC-996, DEC-995, DEC-1098, DEC-1130, DEC-1072, DEC-1071, DEC-1074, DEC-1083, DEC-1116, DEC-1050]
 decisions_carried: [DEC-1150, DEC-1098, DEC-1130, DEC-1083]
 state_class: EVIDENCE
@@ -120,11 +120,36 @@ approval (DEC-315).
 
 ## 6. Independent review
 
-The independent review of the skill's text, by a fresh read-only independent-auditor session, is pending.
+The independent review of the skill's text was made by a fresh, read-only independent-auditor session (claude-opus-5-5,
+effort high), session `aa319b73-04df-481c-88eb-c6ee3e11d54f`, on head `ba400b94e738` (text `f1ae5fecbc52`), 2026-11-12.
+It checked S1, S2 and S3 against the ticket, its parents (DAEO-2bdu, DAEO-zmo4), ADOPT-VERIFY-1's APPROACH.md and the
+register; recomputed both hashes, the numstat and the copies' byte-equality; ran the acceptance folder (34 passed, 1
+failed: this section's verdict case, then PENDING) and the skills check (`{"findings": []}`, exit 0); and probed the
+tests' strength on a clone outside the tree (four weakenings, each caught by name). The lead recorded the verdict here.
+The reviewer's whole return is in the lead's records (`.gov-runtime/scratch/lead/log/rv-1.json`); the probe record's
+folder `docs/probes/DAEO-pg6i/` is outside this ticket's allowed paths, so no probe record is committed.
 
-verdict: PENDING
+The reviewer's verdict blocks, as returned:
 
-The ticket lead records the reviewer's session id and its result here after the review (CAP-33.d).
+```
+verdict: PASS
+head: ba400b94e738
+findings: 4
+```
+
+```verdict
+{"kpis": [{"kpi": "S1", "verdict": "pass", "findings": [{"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "S2", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F4", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "S3", "verdict": "pass", "findings": []}]}
+```
+
+The four findings, all non-blocking (none fails open or loses work), for the owner at the approval of the bytes. Any fix
+changes the skill's bytes, so it needs a new commit, a new after-hash in §2 and a look from the reviewer again:
+
+| # | Finding (path:line in the kernel skill; the same in both copies) | The reviewer's fix | Lead's triage |
+|---|---|---|---|
+| F1 | The Verify section's four statements cite DEC-1130, which only asks for a ticket and an approach; the rules are in ADOPT-VERIFY-1's APPROACH.md, approved by DEC-1132 (2). DEC-1050 (on "a product-spec session writes") and DEC-1083 (on the three checkers) do not state those points (`SKILL.md:65-68,70`) | Cite DEC-1132 (2) on the four statements; move DEC-1050 to "editing the text only" | Owner's call: DEC-1132 is not in the ticket's `sources:`, so citing it widens the ticket |
+| F2 | Step 4 cites DEC-1071 (1)-(3) and DEC-1074 (4), which govern fixes and the 5-point bound, not writing the sets (`SKILL.md:56`) | Cite DEC-1074 (3) and DEC-1098 (1) on step 4 | In scope; a citation-only fix if the owner asks for it before approving |
+| F3 | Step 4 says both sets are "held outside every worktree"; S13 says it of the verdict set only, and the practice record's step 4 says "the hidden check and the verdict set" (`SKILL.md:56`; `docs/research/W2-88-memory-practice.md:216-217`). The skill's rule is the stricter one, and it is what Gov OS does | One wording in both places | Owner's call: which rule (verdict set only, or both sets as Gov OS keeps them) |
+| F4 | The tool paragraph states W2-174's list and apply options as present; W2-174 is not built (`SKILL.md:70`). It fails closed (unknown option, nothing written) | Order the promotion and the `.claude/` copies ACT after W2-174 merges, or say in the paragraph that the options come with W2-174 | Owner's call at approval: the sequencing |
 
 ## 7. Owner's approval
 
