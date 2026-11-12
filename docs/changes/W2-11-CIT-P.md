@@ -9,7 +9,7 @@ base: 4c064bab
 round2_head: 646850506819
 ticket: DAEO-k7hz (W2-11), rounds 1 and 2 of two declared rounds (DEC-916), round 1 with its resume under DEC-992; round 2 re-baselined by DEC-1137
 author: product-spec (W2-11)
-review: a fresh independent reviewer of the combined K3 CIT-P (DEC-954 Q7), with the judgement rules; round 1's review record `docs/probes/DAEO-k7hz/CITP-REVIEW-r1.md` (pass, F1 to F7); round 2 awaits its own review
+review: a fresh independent reviewer of the combined K3 CIT-P (DEC-954 Q7), with the judgement rules; round 1's review record `docs/changes/W2-11-CITP-REVIEW-r1.md` (pass, F1 to F7); round 2 awaits its own review
 decisions_carried: [DEC-957, DEC-959, DEC-866, DEC-820, DEC-861, DEC-862, DEC-847, DEC-837, DEC-838, DEC-808, DEC-791, DEC-430, DEC-943, DEC-951, DEC-889, DEC-968, DEC-832, DEC-981, DEC-992, DEC-802, DEC-536, DEC-534, DEC-539, DEC-1137, DEC-1083, DEC-995, DEC-996, DEC-991, DEC-994, DEC-974, DEC-979, DEC-983, DEC-982, DEC-952, DEC-953, DEC-851, DEC-315, DEC-1112]
 decisions_read: [DEC-952, DEC-953, DEC-851, DEC-974, DEC-979, DEC-982, DEC-983, DEC-991, DEC-994, DEC-995, DEC-996, DEC-959, DEC-832, DEC-1137, DEC-1083]
 list_rows: [W2-L097, W2-L256, W2-L257, W2-L258, W2-L259, W2-L268, W2-M313, W2-M346, W2-M356]
@@ -37,7 +37,7 @@ CIT-P (DEC-954 Q7): the branch merges only after the owner approves that proposa
 | E7 | The skill template and qa-review; test-design's proportion, kinds and cost; orchestration's three reference files | DEC-959 items 3 and 5; DEC-951 item 5; DEC-889 item 11 c |
 | E8 | The list rows taken in | W2-L097, W2-L256 to W2-L259, W2-L268, W2-M313, W2-M346, W2-M356 |
 | E9 | The opaque acceptance runner has merged: `gov accept` is the engineer's only way to run the acceptance tests, and reads one README-map form | W2-96's KPI lines 3 and 6; DEC-959 items 6 and 7; DEC-820 (c) |
-| E10 | Round 1's review: F1 to F6 ride along in the resume, F7 is a row | `CITP-REVIEW-r1.md`; DEC-802; DEC-992 |
+| E10 | Round 1's review: F1 to F6 ride along in the resume, F7 is a row | `W2-11-CITP-REVIEW-r1.md`; DEC-802; DEC-992 |
 
 Corroboration: the sweep's findings were re-read against the files on this branch's base; each changed rule was
 read in the register before it was cited. The README-map form was read from `gov accept`'s map reader as merged.
