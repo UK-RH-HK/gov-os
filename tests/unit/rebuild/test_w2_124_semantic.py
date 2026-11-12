@@ -16,7 +16,9 @@ def _args(*given):
     return parser.parse_args(list(given))
 
 
-EMBEDDED = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded"}}}}
+EMBEDDED = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded"}},
+                              "capabilities": {"code_intelligence": {"enabled": True}}}}
+NO_CODE_INDEX = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded"}}}}
 NOT_EMBEDDED = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "not embedded"}}}}
 
 
@@ -33,7 +35,8 @@ class Embedder:
 
 
 @pytest.fixture()
-def embedder(monkeypatch):
+def embedder(monkeypatch, tmp_path):
+    (tmp_path / ".gitleaks.toml").write_text("title = 'x'\n", encoding="utf-8")  # the secrets scan's rules are there
     stand_in, remembered = Embedder(), []
     monkeypatch.setattr("gov.store.load", lambda root: {"digest": "d"})
     monkeypatch.setattr("gov.retrieval.lexical.refresh", lambda root: {})
@@ -149,6 +152,48 @@ def test_s5_a_store_the_path_map_calls_for_and_not_built_is_named_with_its_reaso
     result = run(tmp_path, _args(), EMBEDDED)
     assert result["not_built"] == [{"store": "codeintel", "reason": "the code index tool failed (exit code 2)"}]
     assert result["complete"] is False
+
+
+def test_s5_a_code_index_the_path_map_does_not_call_for_is_never_not_built(tmp_path, embedder, monkeypatch):
+    def refused(root):
+        raise FileNotFoundError("codebase-memory-mcp")
+
+    monkeypatch.setattr("gov.codeintel.index", refused)
+    result = run(tmp_path, _args(), NO_CODE_INDEX)
+    assert result["stores"]["codeintel"]["requested"] is False
+    assert result["not_built"] == [] and result["complete"] is True
+
+
+def test_s5_no_gitleaks_file_is_ok_incomplete_and_the_lexical_index_is_named(tmp_path, embedder, monkeypatch):
+    def refused(root):
+        raise RuntimeError(".gitleaks.toml cannot be read: no such file")
+
+    (tmp_path / ".gitleaks.toml").unlink()
+    monkeypatch.setattr("gov.retrieval.lexical.refresh", refused)
+    result = run(tmp_path, _args("--no-embeddings"), NO_CODE_INDEX)
+    assert result["complete"] is False
+    assert [item["store"] for item in result["not_built"]] == ["lexical"]
+    assert ".gitleaks.toml" in result["not_built"][0]["reason"]
+    assert result["stores"]["lexical"]["status"] == "not_recreated"
+
+
+def test_s5_a_lexical_failure_that_is_not_the_missing_rules_still_fails_the_rebuild(tmp_path, embedder, monkeypatch):
+    def broken(root):
+        raise RuntimeError("the lexical store is corrupt")
+
+    monkeypatch.setattr("gov.retrieval.lexical.refresh", broken)
+    with pytest.raises(GovError) as raised:
+        run(tmp_path, _args("--no-embeddings"), NO_CODE_INDEX)
+    assert raised.value.details["store"] == "lexical"
+
+
+def test_s1_a_refused_semantic_store_stops_before_the_code_index_is_built(tmp_path, embedder, monkeypatch):
+    built = []
+    monkeypatch.setattr("gov.codeintel.index", lambda root: built.append(root))
+    embedder.does = _unavailable
+    with pytest.raises(GovError):
+        run(tmp_path, _args(), EMBEDDED)
+    assert built == []
 
 
 def test_s5_a_store_that_was_not_asked_for_is_never_not_built(tmp_path, embedder):
