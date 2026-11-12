@@ -1,6 +1,6 @@
 ---
 id: DAEO-cb2b
-status: in_progress
+status: closed
 deps: [DAEO-r30l]
 links: [DAEO-zkr9, DAEO-r30l, DAEO-ts4y]
 created: 2026-11-01T20:10:00Z

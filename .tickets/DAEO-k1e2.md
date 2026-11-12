@@ -201,3 +201,11 @@ Inside one `measure` call, as `run_measure.sh`: ready check (probe, then `contro
   `notready`, 1 to 39 lines or no `families:` line is `control` (item 5); S2's planted set has 40 questions (W2-170's preflight
   passes 36 to 40; S2's "12" is read as "a planted set"); refusal precedence and `search.ok` for a degraded answer are as built,
   stated in the evidence; eng-1's pool restart after `MS-POOLFAULT` stands. The heavy-slot TMPDIR sits outside `~/gov-os-runs`.
+
+## PKG-W2-171-REV1-1 (the CTO, delegated P2, 2026-11-12 08:04)
+
+(a): the brake cleared at 07:56 (projection 30 USD, counting afresh); round 2 with the test-first form: a test-design batch for F-1
+(the VERDICT line's exact interval computed from the counts, not from FIGURES.json's rounded 4-place values: 32 of 40 prints
+`64.4 to 90.9 %`), an engineer for F-1 and F-2 (a faulted attempt's figures never printed by `measure --kept`), rebuild, verify,
+review round 2 (the last, DEC-1010). F-3 (the --repo tree not checked against audit_commit) is a Wave 3 row; F-4 (an unexpected
+worker error leaves reader/ with no STOPPED) is recorded, the hand ACT of ruling 5 covers it.
