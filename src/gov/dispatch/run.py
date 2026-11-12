@@ -46,11 +46,11 @@ def tick(root: Path, now=None) -> tuple[int, dict | None]:
         data = {"ok": True, "time": states.stamp(moment), "outcome": "OFF", "exit_code": EXIT_OK}
         status.write(state, data)
         return EXIT_OK, data
-    state.make()
     lock = state.lock()
     if lock is None:
         return EXIT_LOCKED, None
     try:
+        state.make()
         try:
             code, data = _pass(Path(root), state, moment)
         except configuration.ConfigError as error:

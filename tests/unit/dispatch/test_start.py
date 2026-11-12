@@ -306,6 +306,22 @@ def test_a_held_lock_exits_4_and_writes_nothing(project):
     assert code == 4 and before == after
 
 
+def test_a_pass_that_loses_the_lock_creates_no_folder_and_no_file(project):
+    project.state.mkdir(parents=True, exist_ok=True)
+    handle = open(project.state / "tick.lock", "a")
+    fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+    def listing():
+        return sorted(str(p.relative_to(project.state)) for p in project.state.rglob("*"))
+
+    before = listing()
+    try:
+        code, _ = project.tick()
+    finally:
+        handle.close()
+    assert code == 4 and listing() == before == ["tick.lock"]
+
+
 def test_two_ticks_started_together_run_one_pass(project):
     project.ticket("W2-1")
     project.ready(project.entry("W2-1"))

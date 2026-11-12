@@ -142,6 +142,9 @@ class State:
 
     def lock(self):
         """The pass's lock, or None when another pass holds it. Released with the file (also when the process dies)."""
+        # The folder is made only when it is not there, and then no other pass can hold a lock in it: a pass that loses
+        # the lock has created nothing. The lock file is opened without a write (append, no data).
+        self.dir.mkdir(parents=True, exist_ok=True)
         handle = open(self.file("tick.lock"), "a")
         try:
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
