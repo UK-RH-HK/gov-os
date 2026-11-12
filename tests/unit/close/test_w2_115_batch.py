@@ -101,3 +101,85 @@ def test_s6_the_without_build_is_a_fresh_merge_never_a_revert(tmp_path, monkeypa
     assert merged[:4] == [["a", "b", "c"], ["b", "c"], ["a", "c"], ["a", "b"]]
     log = attribution._git(repo.root / attribution.CLONE_REL, "log", "--all", "--format=%s").stdout
     assert "Revert" not in log
+
+
+# ---------------------------------------------------------------------------
+# ``run`` in a scoped project: W2-68's entry point, each candidate a ticket whose work is on ``w2/<its wbs_id>``
+# ---------------------------------------------------------------------------
+
+def _tickets_three(tmp_path, b_files=None):
+    from gov.tasks.tickets import frontmatter  # noqa: F401  (the close reads the tickets this way)
+
+    from .test_w2_115_support import ticket_text
+
+    extra = {}
+    for tid, wbs in (("T-0002", "W-2"), ("T-0003", "W-3")):
+        extra[f".tickets/{tid}.md"] = ticket_text(ticket=tid, wbs=wbs)
+        extra[f"tests/acceptance/{wbs}/test_{wbs.lower().replace('-', '_')}.py"] = "def test_ok():\n    assert True\n"
+    repo = project(tmp_path, extra=extra)
+    base = repo.git("rev-parse", "HEAD").strip()
+    for tid, wbs, planted in (("T-0001", "W-1", {"src/pkg/other.py": "def other():\n    return 1  # a\n"}),
+                              ("T-0002", "W-2", b_files or {"src/pkg/feature.py": BROKEN_FEATURE}),
+                              ("T-0003", "W-3", {"docs/c.md": "# c\n"})):
+        repo.git("checkout", "-q", "-b", f"w2/{wbs}", base)
+        repo.commit(f"work of {tid}", f"Task: {tid}", "Role: engineer", files=planted)
+        repo.git("checkout", "-q", "main")
+    return repo, base
+
+
+def test_s6_run_in_a_scoped_project_sends_back_only_the_culprit_and_closes_the_rest_on_one_commit(tmp_path):
+    from gov.tasks.tickets import frontmatter
+
+    repo, base = _tickets_three(tmp_path)
+    result, code = batch.run(repo.root, ["T-0001", "T-0002", "T-0003"])
+    assert code == batch.EXIT_CULPRITS
+    assert result["culprits"] == ["T-0002"] and result["landed"] == ["T-0001", "T-0003"]
+    land = result["land_commit"]
+    assert repo.git("merge-base", "--is-ancestor", land, "main") == ""
+    assert repo.git("show", "main:src/pkg/feature.py") != BROKEN_FEATURE  # the culprit never landed
+    commits = set()
+    for tid in ("T-0001", "T-0003"):
+        record = frontmatter(repo.root / f"docs/close/{tid}/CL-{tid}.md")
+        assert record["close"] == "scoped" and record["culprits"] == ["T-0002"]
+        assert all(record["runs"]) and all(r["failed"] == 0 for r in record["runs"])
+        commits.add(record["commit"])
+        assert frontmatter(repo.root / f".tickets/{tid}.md")["status"] == "closed"
+    assert commits == {land}  # landed on the same run
+    assert not (repo.root / "docs/close/T-0002").exists()
+    assert frontmatter(repo.root / ".tickets/T-0002.md")["status"] != "closed"
+
+
+def test_s6_run_a_ticket_without_its_work_branch_is_not_isolated(tmp_path):
+    repo, base = _tickets_three(tmp_path)
+    repo.git("branch", "-q", "-D", "w2/W-3")
+    with pytest.raises(GovError) as raised:
+        batch.run(repo.root, ["T-0001", "T-0003"])
+    assert raised.value.code == batch.CANDIDATE_NOT_ISOLATED
+    assert repo.git("rev-parse", "main").strip() == base
+
+
+def test_f3_run_a_red_no_candidate_explains_lands_nothing_and_closes_nothing(tmp_path, monkeypatch):
+    from gov.tasks.tickets import frontmatter
+
+    repo, base = _tickets_three(tmp_path, b_files={"docs/b.md": "# b\n"})
+    real = batch._targets
+    monkeypatch.setattr(batch, "_targets", lambda clone, c, g: real(clone, c, g) if g else {
+        "suites": ["tests/unit/test_red.py"], "pytest_options": real(clone, c, [OWN_SUITE])["pytest_options"]})
+    repo.commit("a red on the base", files={"tests/unit/test_red.py": "def test_red():\n    assert 1 == 2\n"})
+    base = repo.git("rev-parse", "HEAD").strip()
+    with pytest.raises(GovError) as raised:
+        batch.run(repo.root, ["T-0001", "T-0002"])
+    assert raised.value.code == batch.BATCH_UNEXPLAINED
+    assert repo.git("rev-parse", "main").strip() == base
+    assert all(frontmatter(repo.root / f".tickets/{t}.md")["status"] != "closed" for t in ("T-0001", "T-0002"))
+
+
+def test_f4_run_in_a_strict_project_is_todays(tmp_path, monkeypatch):
+    repo = project(tmp_path, mode=None)
+    called = []
+    monkeypatch.setattr(batch, "_measure", lambda root, tickets: called.append(tickets) or (_ for _ in ()).throw(
+        GovError("STOP", "today's path")))
+    monkeypatch.setattr(batch, "run_scoped", lambda *a, **k: pytest.fail("the scoped batch ran in a strict project"))
+    with pytest.raises(GovError) as raised:
+        batch.run(repo.root, ["T-0001"])
+    assert raised.value.code == "STOP" and called == [["T-0001"]]

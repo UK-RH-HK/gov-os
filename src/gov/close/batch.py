@@ -408,9 +408,12 @@ def _close(root: Path, ticket: str, check: str) -> dict:
 def run(root: Path, tickets: list[str]) -> tuple[dict, int]:
     """The batch: ``(result, exit code)``; a ``GovError`` where it ends before any close (step 1, the check, step 6,
     a red run)."""
+    from gov.close.command import SCOPED, close_mode
     from gov.tasks.tickets import TICKETS_REL
 
     root = Path(root)
+    if close_mode(root) == SCOPED:  # W2-115 S6: the culprit isolated before anything lands; strict: today's (F4)
+        return run_scoped(root, tickets)
     measured = _measure(root, tickets)
     rel, loads = measured["record"], measured["loads"]
     green = measured["verdict"] == "green"
@@ -600,6 +603,108 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
         result["landed"] = [c["name"] for c in landed]
     _attribution.checkout(clone, base_sha)
     return result, (EXIT_CULPRITS if result["culprits"] else 0)
+
+
+WORK_BRANCH = "w2/{wbs}"
+
+
+def run_scoped(root: Path, tickets: list[str], timeout: float = 3600) -> tuple[dict, int]:
+    """``run`` in a scoped project (S6, F3): each ticket a candidate whose work is on its unmerged ``w2/<wbs_id>``
+    branch, isolated on ``HEAD`` by ``isolate`` before anything lands; the culprits are sent back (not landed, not
+    closed), the rest land and are closed on the same run: each landed ticket's close record names the land commit
+    and the culprits. ``BATCH_UNEXPLAINED`` and ``CANDIDATE_NOT_ISOLATED`` refuse the batch: nothing lands or
+    closes. A ticket whose review is not READY (S11) refuses the batch before anything runs."""
+    from gov.close import attribution as _attribution
+    from gov.close import command as _command
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    root = Path(root)
+    _refuse_unless_ready(root, tickets)
+    base_sha = _git(root, "rev-parse", "HEAD").strip()
+    branch = _git(root, "symbolic-ref", "--quiet", "--short", "HEAD", ok=(0, 1)).strip() or None
+    given = []
+    for ticket in tickets:
+        front = frontmatter(root / TICKETS_REL / f"{ticket}.md") or {}
+        ref = WORK_BRANCH.format(wbs=str(front.get("wbs_id") or front.get("external-ref") or ticket))
+        sha = _git(root, "rev-parse", "--verify", "--quiet", f"refs/heads/{ref}^{{commit}}", ok=(0, 1)).strip()
+        if not sha:
+            raise GovError(CANDIDATE_NOT_ISOLATED, f"{ticket}: its work branch {ref} names no commit, so it cannot be "
+                           "isolated; nothing lands", {"candidate": ticket, "branch": ref}, exit_code=EXIT_RED)
+        if _select.is_ancestor(root, sha, base_sha):
+            raise GovError(CANDIDATE_NOT_ISOLATED, f"{ticket}: its work branch {ref} is already merged, so the build "
+                           "without it cannot be made; nothing lands", {"candidate": ticket, "branch": ref},
+                           exit_code=EXIT_RED)
+        given.append({"name": ticket, "commit": sha, "branch": ref})
+    reviews = _reviews(root, base_sha, given)
+    result, code = isolate(root, base_sha, [f"{c['name']}={c['commit']}" for c in given], None, onto=branch,
+                           timeout=timeout)
+    result["closes"] = []
+    land = result["land_commit"]
+    if land is None:
+        return result, code
+    if branch is None:
+        _git(root, "merge", "--ff-only", "-q", land, pinned=False)
+    # every landed ticket's selection at the land commit, before any close record moves HEAD
+    try:
+        chosen = {t: _select.scoped(root, t) for t in result["landed"]}
+    except _select.SelectionRefused as refused:
+        raise GovError(_select.SELECTION_REFUSED, f"landed at {land[:12]} but nothing closed: {refused.reason}",
+                       result, exit_code=EXIT_RED)
+    runs = result.get("rest_runs") or result.get("runs") or []
+    night = _attribution.nightly_reading(root)
+    clone = result["clone"]
+    for ticket in result["landed"]:
+        record = {
+            "close": _command.SCOPED,
+            "commit": land,
+            "selection": {"suites": chosen[ticket]["suites"], "pytest_options": chosen[ticket]["pytest_options"]},
+            "runs": runs,
+            "review": {"verdict": reviews[ticket]["verdict"], "record": reviews[ticket]["record"]},
+            "reds": [],
+            "culprits": list(result["culprits"]),
+            "clone": {"path": clone["path"], "reused": clone["reused"], "replaced": clone["replaced"]},
+            "nightly": {"read": night["read"], "record": night["record"]},
+            "base": base_sha,
+            "changed": chosen[ticket]["changed"],
+            "batch": {"candidates": result["candidates"], "landed": result["landed"], "land_commit": land},
+        }
+        close_rel, checkpoint = _command._record_and_close(root, ticket, record, list(chosen[ticket]["own"]))
+        outputs = [f"{TICKETS_REL}/{ticket}.md", f"docs/close/{ticket}", f"docs/checkpoints/{ticket}"]
+        commit = _commit(root, f"close: {ticket} (batch landed at {land[:12]})",
+                         [p for p in outputs if (root / p).exists()], task=ticket)
+        result["closes"].append({"ticket": ticket, "close_record": close_rel, "checkpoint": checkpoint,
+                                 "commit": commit, "closed_commit": land})
+    return result, code
+
+
+def _reviews(root: Path, base: str, candidates: list[dict]) -> dict:
+    """Each candidate's review verdict (S11), read in the warm clone at the base with that candidate merged onto
+    it: READY for each, else the batch is refused with the first refusal's code before anything runs."""
+    from gov.close import attribution as _attribution
+    from gov.close import command as _command
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    try:
+        state = _attribution.prepare(root, base)
+    except _attribution.CloneError as e:
+        raise GovError("CLOSE_CLONE_FAILED", f"the batch's clone cannot be made: {e}", {"base": base})
+    clone = root / state["path"]
+    found = {}
+    try:
+        for cand in candidates:
+            if _build(clone, base, [cand]) is None:
+                raise GovError(CANDIDATE_NOT_ISOLATED, f"{cand['name']} does not merge onto the base; nothing lands",
+                               {"candidate": cand["name"]}, exit_code=EXIT_RED)
+            front = frontmatter(clone / TICKETS_REL / f"{cand['name']}.md") or {}
+            review = _command.review_verdict(clone, cand["name"], front)
+            if review["verdict"] != _command.READY:
+                raise GovError(review["verdict"], f"{cand['name']}: " + "; ".join(review["reasons"])
+                               + "; nothing lands", {"candidate": cand["name"], "review": review},
+                               exit_code=EXIT_RED)
+            found[cand["name"]] = review
+    finally:
+        _attribution.checkout(clone, base)
+    return found
 
 
 def refresh(root: Path) -> dict:
