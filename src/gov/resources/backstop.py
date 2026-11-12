@@ -50,10 +50,11 @@ def _names(groups) -> str:
 
 
 def _live(group: int) -> bool:
-    """Signal 0 to the group: it exists (a group we may not signal exists too)."""
+    """Signal 0 to the group: it exists (a group we may not signal exists too); a number beyond what a process group
+    id can be (``os.killpg`` raises OverflowError) names no group, so it counts as ended (L5)."""
     try:
         os.killpg(group, 0)
-    except ProcessLookupError:
+    except (ProcessLookupError, OverflowError):
         return False
     except PermissionError:
         return True
@@ -191,7 +192,7 @@ def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
                     continue
                 try:
                     os.killpg(g, signal.SIGSTOP)
-                except (ProcessLookupError, PermissionError):
+                except (ProcessLookupError, PermissionError, OverflowError):
                     continue
                 paused.append(g)
             seen = f"{reading[0]}/{reading[1]} MiB" if reading else "none"

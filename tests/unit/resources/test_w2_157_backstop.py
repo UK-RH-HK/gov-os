@@ -453,6 +453,25 @@ def test_s4_a_group_that_has_ended_is_skipped_and_named(rig):
     assert f"skipped (already ended): {ended}" in item
 
 
+@pytest.mark.parametrize("huge", [2**31, 2**63, 10**20])
+def test_s4_a_number_no_group_can_have_is_skipped_and_named_not_a_crash(rig, huge):
+    rig.smi("15900, 24000")
+    rig.config()
+    live = rig.job()
+    result = backstop.watch([huge, live], rig.root, rig.env)
+    assert result["tripped"] and result["paused"] == [live] and result["skipped"] == [huge]
+    assert f"skipped (ended) {huge};" in rig.log.read_text()
+    assert f"skipped (already ended): {huge}" in Path(result["inbox_item"]).read_text()
+
+
+def test_s4_only_numbers_no_group_can_have_end_the_watch_at_once(rig):
+    rig.smi("15900, 24000")
+    rig.config()
+    result = backstop.watch([2**40], rig.root, rig.env)
+    assert result["tripped"] is False and result["skipped"] == [2**40] and rig.smi_calls() == 0
+    assert "end: every watched group has ended" in rig.log.read_text()
+
+
 def test_s4_a_job_that_ends_first_ends_the_watch_without_a_trip(rig):
     rig.smi("100, 24000", "100, 24000")
     rig.config()

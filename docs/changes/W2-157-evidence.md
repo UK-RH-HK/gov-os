@@ -58,6 +58,7 @@ Until they are added, `gov resources --backstop` refuses to start, naming each m
 - **R4** A log that shrinks below its offset (rotation or truncation) is read from 0: what is there was written since the start. A partial last line is read once it is complete.
 - **R5** An inbox item written within the same second as another is never overwritten: the second one gets a `-2` suffix. This is the one departure from the item's literal name, and only on a collision.
 - **R6** `watch` also refuses (`RESOURCE_ARGUMENTS_INVALID`) a group that is not an integer above 1, though the command's own type already does.
+- **R7** Fix after the first acceptance run (S4, L1/L5): a decimal integer above 1 beyond what `os.killpg` accepts (2**31 and up) raised `OverflowError` in `_live` and crashed the watch; `_live` now counts it as an ended group (skipped and named), and the SIGSTOP loop also catches it. Unit tests: `test_s4_a_number_no_group_can_have_is_skipped_and_named_not_a_crash` (three sizes) and `test_s4_only_numbers_no_group_can_have_end_the_watch_at_once`.
 
 ## Evidence run
 
