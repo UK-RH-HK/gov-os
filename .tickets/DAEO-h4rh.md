@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-zmo4, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ylsh, DAEO-ozyt]
+deps: [DAEO-pg6i, DAEO-zmo4, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ylsh, DAEO-ozyt]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -62,6 +62,7 @@ depends_on:
 - DAEO-t8mp
 - DAEO-r8vq
 - DAEO-k4wm
+- DAEO-pg6i  # W2-88a: the adopt skill's kernel text, the practice's order (DEC-1150 (1))
 # The six below are on EXAMIN's copy's path (AUDIT-NIGHT-1 d-tools §5): W2-42a, W2-116, W2-145, W2-153, W2-156, W2-157 [added, DEC-1112 (3), the CTO's delegated decision]
 - DAEO-03ub
 - DAEO-f58b
