@@ -230,6 +230,15 @@ def test_a_50_mb_transcript_is_answered_within_100_ms(root, transcripts):
     assert median < 0.100, f"median {median * 1000:.1f} ms"
 
 
+def test_a_null_cwd_without_claude_project_dir_writes_nothing(root, transcripts):
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    event = {**_event(t), "cwd": None}
+    before = _snapshot(root)
+    done = _run(root, event, windows=PLANTED, project_dir=False)
+    assert done.returncode == 0 and done.stdout == ""
+    assert _snapshot(root) == before
+
+
 @pytest.mark.parametrize("case", ["missing_path", "malformed_last_line", "unreadable_usage", "empty_event",
                                   "null_event", "not_json", "other_event", "no_transcript_field", "directory"])
 def test_any_error_gives_exit_0_and_no_stdout(root, transcripts, case):

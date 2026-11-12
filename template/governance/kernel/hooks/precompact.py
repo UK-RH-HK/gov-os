@@ -15,6 +15,12 @@ Never blocks a compaction (DEC-264). Two actions, in order:
    part. A block is the hook's own only when its lines match the
    digest on its ``generated:`` line.
 
+3. W2-176 read-first line (DEC-1140 (1)(b)): for every role, one plain
+   line on stdout, which Claude Code adds to the compaction
+   instructions: the summary begins with "READ FIRST:" and the
+   orchestrator's or lead's checkpoint (its RESUME HERE section), or a
+   worker's brief and record. Written even when 1 or 2 fails.
+
 Always exits 0.
 """
 
@@ -33,6 +39,8 @@ from pathlib import Path
 BEGIN = b"<!-- GENERATED STATE BLOCK BEGIN -->"
 END = b"<!-- GENERATED STATE BLOCK END -->"
 STAMP = "%Y-%m-%dT%H:%M:%SZ"
+BRIEF_REL = ".gov-runtime/scratch/brief"  # launch_worker.sh copies a worker's brief here
+RECORDS_REL = ".gov-runtime/scratch/checkpoints"  # the automatic record (DEC-444)
 
 
 def checkpoint_rel(project_root: str) -> str:
@@ -40,6 +48,37 @@ def checkpoint_rel(project_root: str) -> str:
     there), the orchestrator's in the main tree."""
     linked = os.path.isfile(os.path.join(project_root, ".git"))
     return f".gov-runtime/scratch/{'lead' if linked else 'orchestrator'}/CHECKPOINT.md"
+
+
+def newest(folder: str) -> str:
+    """The newest file in the folder, else the folder."""
+    try:
+        files = [entry for entry in os.scandir(folder) if entry.is_file()]
+    except OSError:
+        return folder
+    return max(files, key=lambda entry: entry.stat().st_mtime_ns).path if files else folder
+
+
+def read_first(project_root: str, ticket: str) -> str:
+    """The line that tells the compaction summary what to read first."""
+    if os.environ.get("GOV_ROLE") == "orchestrator":
+        what = f"{os.path.join(project_root, checkpoint_rel(project_root))}, its RESUME HERE section"
+    else:
+        records = os.path.join(project_root, RECORDS_REL, ticket) if ticket else os.path.join(project_root, RECORDS_REL)
+        what = (f"your brief and your record, {newest(os.path.join(project_root, BRIEF_REL))} "
+                f"and {newest(records)}")
+    return f'Begin the compaction summary with this line: "READ FIRST: {what}, before any other work."\n'
+
+
+def say(line: str, messages: list[str]) -> None:
+    """The read-first line first, then the systemMessage when something failed. Stdout that is not one JSON
+    object is taken as plain text, so the whole of it goes into the compaction instructions with the line at
+    their head; a JSON object first would put the line after it, or lose it to a failed parse. Claude Code
+    discards a PreCompact hook's systemMessage anyway, so the JSON loses nothing by being read as text."""
+    sys.stdout.write(line)
+    if messages:
+        sys.stdout.write(json.dumps({"systemMessage":
+            f"PreCompact: {'; '.join(messages)}. The compaction proceeds."}))
 
 
 def digest(stamp: bytes, rest: bytes) -> bytes:
@@ -112,11 +151,10 @@ def main() -> None:
             _rec_write(Path(project_root), ticket, "compaction", "Resume after compaction", [], dest="automatic")
         except Exception as exc:
             messages.append(f"checkpoint not written ({exc})")
+    line = read_first(project_root, ticket)  # after the write: it names the record just written
 
     if os.environ.get("GOV_ROLE") != "orchestrator":
-        if messages:
-            sys.stdout.write(json.dumps({"systemMessage":
-                f"PreCompact: {'; '.join(messages)}. The compaction proceeds."}))
+        say(line, messages)
         return
 
     rel = checkpoint_rel(project_root)
@@ -138,9 +176,7 @@ def main() -> None:
     except OSError as exc:
         messages.append(f"no state block was appended to {rel} ({exc.strerror})")
 
-    if messages:
-        sys.stdout.write(json.dumps({"systemMessage":
-            f"PreCompact: {'; '.join(messages)}. The compaction proceeds."}))
+    say(line, messages)
 
 
 if __name__ == "__main__":
