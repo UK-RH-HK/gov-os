@@ -56,6 +56,7 @@ Every item is a full node id. "Red on today's code": what fails on w2/integrate 
 |---|---|---|
 | S2 | `test_b_s2_closes.py::test_a_close_with_a_ticket_in_the_landing_blocks_it_while_it_runs_w2_id` | no `land:` reason (no landing) |
 | S2 | `test_b_s2_closes.py::test_a_close_with_a_ticket_in_the_landing_blocks_it_while_it_runs_ticket_id` | no `land:` reason (no landing) |
+| S2 | `test_b_s2_closes.py::test_a_close_under_a_shell_wrapper_blocks_the_landing_of_its_ticket[w2-id-bash-c]` (also `[w2-id-sh-c]`, `[ticket-id-bash-c]`, `[ticket-id-sh-c]`; review round 1 RV1: a close started through `bash -c`/`sh -c`, its child holding the id) | no `land:` reason (the landing goes) |
 | S2 | `test_b_s2_closes.py::test_a_close_with_no_shared_ticket_does_not_block_the_landing[another-ticket]` | no landing: the stub never runs |
 | S2 | `test_b_s2_closes.py::test_a_close_with_no_shared_ticket_does_not_block_the_landing[w2-id-prefix-only]` | no landing: the stub never runs |
 | S2 | `test_b_s2_closes.py::test_a_close_with_no_shared_ticket_does_not_block_the_landing[w2-id-prefix-with-flag]` | no landing: the stub never runs |
