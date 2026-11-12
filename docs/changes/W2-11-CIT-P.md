@@ -6,7 +6,7 @@ date: 2026-10-31
 revised: 2026-11-11
 branch: w2/W2-11
 base: 4c064bab
-round2_head: c96136eb62c8
+round2_head: 646850506819
 ticket: DAEO-k7hz (W2-11), rounds 1 and 2 of two declared rounds (DEC-916), round 1 with its resume under DEC-992; round 2 re-baselined by DEC-1137
 author: product-spec (W2-11)
 review: a fresh independent reviewer of the combined K3 CIT-P (DEC-954 Q7), with the judgement rules; round 1's review record `docs/probes/DAEO-k7hz/CITP-REVIEW-r1.md` (pass, F1 to F7); round 2 awaits its own review
@@ -223,7 +223,7 @@ Beyond its version, `skills/orchestration/SKILL.md` changes only the reads line'
 "Followed by hand" heading back to "Followed by hand (Wave 2)": its body is at its cap, and its first paragraph already
 points to `briefs-and-returns.md` for the detail. Its body stays `OK` (2,496 tokens of 2,500).
 
-**Versions:** orchestration 1.3.0 to 1.4.0 and test-design 1.3.0 to 1.4.0, each a minor raise, in the kernel source,
+**Versions:** orchestration 1.2.0 to 1.4.0 and test-design 1.2.0 to 1.4.0 (1.2.0 is the integration branch's; 1.3.0 never merged), each a minor raise, in the kernel source,
 `.rulesync/skills/` and `template/.rulesync/skills/`, `version` and `metadata.version` alike. `templates/skill.md` is
 a template: its `1.0.0` is the version a new skill starts at and is left as it is.
 
@@ -238,8 +238,8 @@ versions beyond this round; a possible follow-up). The five `brief-*.md` and the
   returned DEC-991 and DEC-952 with the SMART-WORK-1 map, which agree with the register's text.
 - The twelve kernel skills' front matter was checked (the ten native skills and the three vendored superpowers
   skills): no permission field in any `SKILL.md` front matter.
-- `body_tokens.py`: orchestration body 9,976 chars = 2,494 tokens (cap 2,500), `OK`; test-design 5,623 chars =
-  1,406 tokens, `OK`. `cmp`: every changed kernel file is byte-identical to its two `.rulesync` copies.
+- `body_tokens.py`: orchestration body 9,981 chars = 2,496 tokens (cap 2,500), `OK`; test-design 5,671 chars =
+  1,418 tokens, `OK`. `cmp`: every changed kernel file is byte-identical to its two `.rulesync` copies.
 - W1-35's cases: 124 passed (42 deselected); W1-37's: 4 passed.
 - The skill validator on the kernel skills and the template: no finding on the files this round changes.
 
@@ -248,7 +248,8 @@ versions beyond this round; a possible follow-up). The five `brief-*.md` and the
 | # | Row |
 |---|---|
 | a | The restore on the merged head was verified line by line: S1 to S11 are met in the sources. |
-| b | `gov accept` before round 2: 99 passed, 7 failed, 1 skipped. The seven failures are the copy cases, which fail on stale `.claude` copies by design until the copies ACT. |
+| b | `gov accept` before round 2: 99 passed, 7 failed, 1 skipped; at the head `646850506819`: 186 passed, 7 failed, 1 skipped. The seven failures are the copy cases, which fail on stale `.claude` copies by design until the copies ACT. |
+| b2 | The lead's suite at the head `646850506819`: 4,646 tests, 13 failed: the seven copy cases and six W2-96 unit cases on signals and timeouts, in files W2-11 does not touch. |
 | c | S12 has no text by design: its first half was retired by DEC-1137 (1), its second half is Wave 3 (DEC-1083). |
 | d | S16's template half (the orchestrator brief template) has no file in W2-11's paths: it is a package with the CTO. |
 | e | The generated copies to regenerate (the CTO's step, after the lead's DONE; no worker writes `.claude/**`, DEC-315, DEC-1112 (3)): `.claude/skills/orchestration/SKILL.md` and `briefs-and-returns.md`, `.claude/skills/test-design/SKILL.md` and `test-kinds.md`. |
