@@ -95,3 +95,10 @@ for EXAMIN's copy is the owner's to say (09:30 digest of 11-12).
   held; 2 a usage or configuration error.
 - S1's installed host entry and S8's switch-over (P-W2-121-4 (a)): checked at the close of the last part through the
   CTO's ACT after the probe record exists, not inside a build run.
+
+## P-W2-121-5 (the CTO's ruling, delegated P2, 2026-11-12 03:20)
+
+The six W2-96 reds in `tests/unit/accept/test_w2_96_{run2,review3,review4}.py` (signals and timeouts in `gov accept`'s
+clean-up; red in 13 of 14 recent verifies across eight trees, and in the nightly of 11-12) are shared base reds: each return
+names them; they do not block this ticket's verify, review or land (the queue traces an unowned red against the head
+without the batch). They are not added to `skip_known.json` (that list is for skips). Their fix is its own ticket.

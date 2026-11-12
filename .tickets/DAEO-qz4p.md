@@ -20,6 +20,7 @@ allowed_paths:
 - governance/project/orchestration/tools/indep_launch.py
 - governance/project/orchestration/tools/indep-schemas/**
 - tests/unit/orchestration/test_w2_173*
+- tests/unit/orchestration/test_w2_149_indep_launch.py  # W2-149's two unit cases in the fixed form (run 2's unresolved; the CTO, 2026-11-12 05:10)
 - docs/changes/W2-173-evidence.md
 kpis:
   success:
@@ -41,6 +42,8 @@ sources:
 - DEC-1113
 - DEC-1050
 - DEC-1073
+- DEC-866
+- DEC-105
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-173/
