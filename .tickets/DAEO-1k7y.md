@@ -69,3 +69,7 @@ revision of the acceptance folder is a test designer's, not the engineer's.
   (cause (B): a background start ignores SIGINT). Both paths are in allowed_paths for that revision only (dropped after the land).
   No assertion is weakened. Not (b): the verify's and the nightly's start form stay as they are, so the tests own their start state.
 - **P-W2-177-2 (a):** done on w2/integrate (da6ba9c53): `type: task`.
+
+## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact.

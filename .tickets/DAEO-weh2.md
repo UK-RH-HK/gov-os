@@ -56,3 +56,7 @@ and this ticket (b), which must land before W2-171's land. Class C1. A test revi
 W2-173's `test_w2_173_unchanged.py` (failure lines 3-4, `branch_names()`: the merge-base of HEAD with w2/integrate) has the same
 form: W2-178 (DAEO-7oxm, running, in indep_launch.py) would be red on it. S1 applies to it too: judged only on `w2/W2-173`,
 skipped with its reason on any other branch, a candidate merge or w2/integrate. Its paths are added.
+
+## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact. It should have been a fix inside an existing ticket (its paths and KPI lines widened by the owner's decision), not a new ticket.

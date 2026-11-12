@@ -1,6 +1,6 @@
 ---
 id: DAEO-ywb5
-status: in_progress
+status: open
 deps: []
 links: [DAEO-ozyt, DAEO-weh2]
 created: 2026-11-12T08:52:00Z
@@ -8,7 +8,7 @@ type: task
 priority: 2
 assignee: independent-test-designer
 external-ref: W2-181
-tags: [wave-2, test-revision, resources, lite]
+tags: [wave-2, test-revision, resources, lite, wave-3, deferred]
 wbs_id: W2-181
 title: 'W2-157''s F4 path case judges any branch against W2-157''s own paths: judged only on w2/W2-157, as W2-180 did for W2-170 and W2-173 (DECIDED-NOT-DONE row 171)'
 class: test-revision
@@ -47,3 +47,7 @@ DECIDED-NOT-DONE row 171: a per-ticket path case that diffs any branch against i
 result against its own ticket's allowed_paths is red on the next ticket in the same area and on the merge queue's batches (W2-157
 itself was ejected at 07:46 in a batch with W2-121). W2-180 fixed W2-170's and W2-173's; this is the last one found on integrate
 (W2-157 closed 08:33). The next ticket in `src/gov/resources/` (W2-121c) would be red on it. Class C1.
+
+## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Parked in docs/plan/WAVE_3_PARKING.md as W3-P31: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
