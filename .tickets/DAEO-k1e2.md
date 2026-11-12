@@ -20,6 +20,7 @@ allowed_paths:
 - src/gov/memaudit/**
 - tests/unit/memaudit/**
 - docs/changes/W2-171-evidence.md
+- docs/probes/DAEO-k1e2/**  # the probe record, so the branch's path case holds at its head (as W2-157's; the CTO, 2026-11-12 12:50)
 kpis:
   success:
   - 'S1 The control runs first: the standing visible-40 set is measured with the audit''s declared configuration, and its hit@5 must be within 2 of the last audit''s control (the first audit''s control is within 2 of 34, E0''s figure, DEC-1097 (1)(b)). Outside that, nothing is measured, the counts say `control out of range`, and `USED` is left as written by W2-170. Verify: planted fake `gov` returning a control at 34, 33 and 31: the first two proceed, the third stops before the audit set''s first search [DEC-1097 (1), DEC-1101 (1)]'
@@ -191,3 +192,21 @@ Inside one `measure` call, as `run_measure.sh`: ready check (probe, then `contro
    confirm it: a missing set ends the ready check (`STOPPED notready`), and the first live run shows it.
 10. `pool-import`'s exclusions (category `nonexistent-id`, ids `h24`, `m60`) stand; the count guard (79 and 138) refuses a
     mismatch with nothing written.
+
+## PKG-W2-171-F5-1 and run 2's readings (the CTO, delegated P2, 2026-11-12 07:12)
+
+- **(a) now, (b) before the land:** W2-170's F5 path case is a branch-scoped red on this branch (it judges any branch against
+  W2-170's paths): named in the return, it does not block this ticket's review. W2-180 (DAEO-weh2, C1) makes it judge only
+  W2-170's own branch; it must land before this ticket's land, or the queue attributes the red to this batch. Not skip_known.json.
+- **Readings confirmed:** `counts.attempt` holds the attempt's name (Interface item 3); a control with 0 question lines is
+  `notready`, 1 to 39 lines or no `families:` line is `control` (item 5); S2's planted set has 40 questions (W2-170's preflight
+  passes 36 to 40; S2's "12" is read as "a planted set"); refusal precedence and `search.ok` for a degraded answer are as built,
+  stated in the evidence; eng-1's pool restart after `MS-POOLFAULT` stands. The heavy-slot TMPDIR sits outside `~/gov-os-runs`.
+
+## PKG-W2-171-REV1-1 (the CTO, delegated P2, 2026-11-12 08:04)
+
+(a): the brake cleared at 07:56 (projection 30 USD, counting afresh); round 2 with the test-first form: a test-design batch for F-1
+(the VERDICT line's exact interval computed from the counts, not from FIGURES.json's rounded 4-place values: 32 of 40 prints
+`64.4 to 90.9 %`), an engineer for F-1 and F-2 (a faulted attempt's figures never printed by `measure --kept`), rebuild, verify,
+review round 2 (the last, DEC-1010). F-3 (the --repo tree not checked against audit_commit) is a Wave 3 row; F-4 (an unexpected
+worker error leaves reader/ with no STOPPED) is recorded, the hand ACT of ruling 5 covers it.

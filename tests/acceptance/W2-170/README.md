@@ -49,7 +49,12 @@ cases, 8 functions, one file), with a support module (`w2_170_world.py`), a conf
   `sys.addaudithook` for `open`, `os.*` and `subprocess.Popen` events, writes them to a file, then runs `gov.memaudit`
   with `runpy` as `__main__`. The case runs `preflight` (its default runs folder `~/gov-os-runs`, planted in the planted
   home), `void` and `declare` this way and fails on any logged path at or under the true home's `gov-os-eval` or
-  `gov-os-runs`, and unless the log shows the planted questions and the planted home's runs folder opened.
+  `gov-os-runs`, and unless the log shows the planted questions and the planted home's runs folder opened. The
+  repository under test's own root (the checkout this folder sits in, found from `w2_170_world.HERE`) is excluded
+  from that judgement (W2-179, `DAEO-c9n8`): the nightly's clone lives at `~/gov-os-runs/W2-00/nightly/<run>/`, so its
+  own source, tests and stores are not runs-folder opens; the root is compared with each logged path in the
+  `realpath` form, and the case first asserts that it is not the true home, runs folder or sets root, nor an
+  ancestor of one.
 - **S4's measure:** `python3 -m gov.retrieval.measure memory-audit-20261111 --root <repo> --sets-root <root> --part
   hidden --kept <empty folder>` as the orchestrator (`GOV_ROLE=orchestrator`, a role no set measures): before
   `declare` it answers "not declared"; after, it declares the set accepted, covered and every question loaded, and
@@ -57,10 +62,18 @@ cases, 8 functions, one file), with a support module (`w2_170_world.py`), a conf
 - **S6's selection:** a planted repository holding this tree's own `governance/project/test-map.yaml`, a stub for every
   target the map names, a planted `tests/unit/memaudit/` and one change `src/gov/memaudit/core.py`; its green nightly
   record names the base. `gov.close.select.plan` must answer `scoped` and name `tests/unit/memaudit/`.
-- **F5:** `git diff --name-only <merge-base with w2/integrate>...HEAD` of the branch the suite runs on; allowed are the
+- **F5:** judged **only on W2-170's own branch, `w2/W2-170`** (the checked-out branch of the repository this folder sits
+  in, `w2_170_world.TREE`): there, `git diff --name-only <merge-base with w2/integrate>...HEAD`; allowed are the
   ticket's `allowed_paths` (matched by `gov.close.select.match`) and its own acceptance folder
-  (`acceptance_tests.path`). Without the `w2/integrate` reference or the ticket file it is **skipped with the reason
-  named**, never passed.
+  (`acceptance_tests.path`). On any other checkout (another ticket's branch, the merge queue's detached candidate merge,
+  `w2/integrate`, a clone's checkout) it is **skipped with the reason named** (the branch found, or "detached HEAD"), as
+  it is without the `w2/integrate` reference or the ticket file; never red, never passed silently. The judgement is one
+  function, `judge_f5_paths(root)`, which the case calls with `TREE` and the planted cases call with each planted
+  repository: in its own `git init` under `tmp_path`, `w2/integrate` holds a base commit and a copy of W2-170's ticket
+  file, and one commit adds `docs/changes/W2-171-evidence.md` (outside W2-170's paths; W2-171's own file): on a branch
+  `w2/W2-170` the judgement fails naming the path; on `w2/W2-171`, on a detached candidate merge of `w2/W2-171` into
+  `w2/integrate` (`--no-ff`), and on `w2/integrate` itself it skips; a change inside `src/gov/memaudit/**` on
+  `w2/W2-170` passes.
 - No network, no GPU, no model, no store but the planted file. No case is marked `local_only`; no test, class,
   parameter id or file name holds `real`, `green_here` or `time_limit`.
 
@@ -125,9 +138,19 @@ install that the changed `HOME` would hide):
 | S6 | `test_w2_170_s6_wiring.py::test_s6_each_subcommand_prints_its_usage_with_help_and_exits_0`, `test_w2_170_s6_wiring.py::test_s6_argparse_errors_exit_4`, `test_w2_170_s6_wiring.py::test_s6_the_scoped_selection_for_a_change_under_src_gov_memaudit_names_tests_unit_memaudit`, `test_w2_170_s6_wiring.py::test_s6_the_entry_points_for_w2_171_and_w2_172_exist` | `gov.memaudit` absent (`--help` and argparse exit 1; the entry points cannot be imported); today's test map places nothing under `src/gov/memaudit/`, so the selection is `full` with `UNPLACED` |
 | F1 | `test_w2_170_s5_counts_only.py::test_f1_the_unique_words_reach_no_output_file_and_no_printed_line`, `test_w2_170_s5_counts_only.py::test_f1_the_words_of_a_dropped_question_reach_no_output`, `test_w2_170_s5_counts_only.py::test_f1_a_refused_malformed_question_s_text_is_never_quoted`, `test_w2_170_s5_counts_only.py::test_f1_an_unreadable_path_map_at_the_commit_is_never_quoted`, `test_w2_170_s4_map.py::test_s4_dc_map_refuses_and_writes_nothing`, `test_w2_170_s1_s3_preflighted_set.py::test_s1_f1_the_digest_record_and_the_refusal_carry_ids_and_digests_only` | batch 1: `gov.memaudit` absent: no subcommand answers (no `PF-`/`DC-`/`ERROR:` line), so no case reaches its grep. Batch 2: passes |
 | F2 | `test_w2_170_s3_declare.py::test_f2_declaration_then_used_by_file_times_and_ledger_order`, `test_w2_170_s3_declare.py::test_f2_with_used_present_every_subcommand_exits_3_prints_used_and_writes_nothing`, `test_w2_170_s3_declare.py::test_s3_a_planted_used_marker_alone_refuses_the_declaration`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_rv1_files_replaced_after_a_clean_preflight_are_refused_by_dc_preflight_writing_nothing`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_rewritten_but_still_valid_is_refused_by_dc_preflight`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_a_kept_file_whose_id_was_never_preflighted_is_refused_by_dc_preflight`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_f2_a_replaced_set_preflighted_again_is_declared_and_marked_used`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_f2_a_byte_identical_redelivery_after_the_preflight_goes_on`, `test_w2_170_s1_s3_preflighted_set.py::test_s3_f2_files_dropped_after_round_two_need_not_match_the_preflight` | batch 1: `gov.memaudit` absent: no `DECLARATION.json`, `USED` or ledger line is written; nothing exits 3. Batch 2: `USED` is written for a set whose kept files were not the pre-flighted ones (as S3's row) |
-| F3 | `test_w2_170_s4_map.py::test_f3_the_planted_repository_is_unwritten_after_every_subcommand`, `test_w2_170_s4_map.py::test_f3_a_refused_declaration_leaves_the_repository_unwritten`, `test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders` | `gov.memaudit` absent: the subcommands exit 1 and the open-log runner's `runpy` raises `ImportError` (its exit 99) |
+| F3 | `test_w2_170_s4_map.py::test_f3_the_planted_repository_is_unwritten_after_every_subcommand`, `test_w2_170_s4_map.py::test_f3_a_refused_declaration_leaves_the_repository_unwritten`, `test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders` | `gov.memaudit` absent: the subcommands exit 1 and the open-log runner's `runpy` raises `ImportError` (its exit 99). W2-179: the third case excludes the repository's own root (a clone under `~/gov-os-runs`), and any other open at or under the true sets root or runs folder still fails it |
 | F4 | `test_w2_170_s2_void.py::test_f4_five_drops_void_the_audit_with_no_used_and_no_declaration`, `test_w2_170_s2_void.py::test_f4_no_dropped_question_is_deleted` | `gov.memaudit` absent: `void` exits 1, not 0 or 2, and nothing is moved to `hidden/dropped/` |
-| F5 | `test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows` | passes on the tests' branch (it changes only this folder); judges the ticket's branch after the merge; skipped, with the reason, without `w2/integrate` |
+| F5 | `test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows`, `test_w2_170_f5_paths.py::test_f5_the_planted_paths_are_outside_and_inside_the_ticket_s_paths`, `test_w2_170_f5_paths.py::test_f5_planted_w2_170_branch_with_a_change_outside_its_paths_fails`, `test_w2_170_f5_paths.py::test_f5_planted_w2_170_branch_with_a_change_inside_its_paths_passes`, `test_w2_170_f5_paths.py::test_f5_planted_other_ticket_branch_with_the_same_change_is_skipped_with_its_reason`, `test_w2_170_f5_paths.py::test_f5_planted_candidate_merge_on_a_detached_head_is_skipped_with_its_reason`, `test_w2_170_f5_paths.py::test_f5_planted_integrate_branch_itself_is_skipped_with_its_reason` | the case judges only on `w2/W2-170` (there: passes while the branch changes only W2-170's paths and its folder) and is skipped, with the reason named, on any other checkout and without `w2/integrate`; the six planted cases pass today (they assert the judgement's fail or skip) |
+
+## Revision (W2-180, DAEO-weh2)
+
+`test_f5_the_branch_changes_only_paths_the_ticket_allows` diffed whatever branch the suite ran on against W2-170's own
+`allowed_paths`, so it was red on any later ticket's branch (W2-171's, which adds `docs/changes/W2-171-evidence.md` and
+its own acceptance folder) and would have been red on the merge queue's candidate merge of it, attributed to that
+batch (PKG-W2-171-F5-1). A test designer revised it, with a Rewrite-Reason (DEC-866): the case now judges only on
+`w2/W2-170` and skips with its reason elsewhere, and six planted cases (one a sanity check of the planted paths) guard
+the judgement; no other case changed. The folder now holds 185 cases from 107 test functions (179 and 101 above, plus
+these six).
 
 ## Expected red on today's integrated code
 

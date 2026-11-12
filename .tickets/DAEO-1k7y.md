@@ -1,10 +1,10 @@
 ---
 id: DAEO-1k7y
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-ouet, DAEO-cb2b, DAEO-wnnz]
 created: 2026-11-12T05:03:31Z
-type: bug
+type: task
 priority: 1
 assignee: engineer
 external-ref: W2-177
@@ -58,3 +58,16 @@ The CTO's ruling P-W2-121-5 (2026-11-12 03:20, delegated P2): six cases in `test
 with five W2-96 acceptance cases of the same family, among them the premise case R11). They are shared base reds: named
 in every return, not blocking. This ticket fixes them. Class C2. Diagnosis first (S1), then the smallest fix; a test
 revision of the acceptance folder is a test designer's, not the engineer's.
+
+## P-W2-177-1 and P-W2-177-2 (the CTO, delegated P2, 2026-11-12 07:05)
+
+- **P-W2-177-1 (a):** an independent test designer's revision, with a Rewrite-Reason naming this ticket and DEC-866, of
+  `tests/acceptance/W2-96/w2_96_support.py`'s `_popen` and `tests/acceptance/W2-56/w2_56_support.py`'s `start_launch`: each of
+  SIGINT, SIGTERM and SIGHUP set to ignored when the case names it, otherwise to default, as `w2_96_reap.launch_gov` now does
+  (cause (B): a background start ignores SIGINT). Both paths are in allowed_paths for that revision only (dropped after the land).
+  No assertion is weakened. Not (b): the verify's and the nightly's start form stay as they are, so the tests own their start state.
+- **P-W2-177-2 (a):** done on w2/integrate (da6ba9c53): `type: task`.
+
+## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact.

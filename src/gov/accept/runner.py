@@ -537,6 +537,8 @@ def _run(root: Path, folder: Path, timeout: float, optins: list[str] = (),
         report, temp = private / "report.xml", private / "tmp"
         temp.mkdir()
         env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "PYTHON"))}
+        if "PYTHONUSERBASE" in os.environ:  # where pytest is found when HOME holds no user site (W2-177)
+            env["PYTHONUSERBASE"] = os.environ["PYTHONUSERBASE"]
         env.update(PYTHONPATH=str(root / "src"), PYTHONDONTWRITEBYTECODE="1", TMPDIR=str(temp))
         env.pop(OPTIN_ENV, None)  # exactly the suites the map's cases need, none of the caller's (S-D10a)
         if optins:

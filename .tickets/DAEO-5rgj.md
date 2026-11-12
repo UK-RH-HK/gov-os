@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-121c
-tags: [wave-2, dispatch, full]
+tags: [wave-2, dispatch, full, wave-3, deferred]
 wbs_id: W2-121c
 title: "gov dispatch, part c: health: heavy-job slots, the embedding servers health and GPU state, the busy-core band, overnight server errors, heartbeat alerts"
 class: implementation
@@ -24,7 +24,6 @@ allowed_paths:
 est_loc: 600
 kpis:
   success:
-  - 'Every heavy step takes a heavy-job slot (W2-20: test runs, rebuilds, full checks, retrieval measures), so peaks stay capped whenever they come; a heavy step found running outside a slot is named in the status as a finding Verify: a planted heavy step (test run, rebuild, full check, retrieval measure) is shown holding a slot; a planted one running with no slot is named in the status as a finding. [DEC-1008, DEC-979 D1]'
   - 'Nothing holds the machine unseen: each pass checks the shared embedding server''s health (a fixed test request answered within a configured time) and every heavy-job slot holder''s progress (its process tree''s CPU time growing within a configured time); a hung server or an idle holder becomes one inbox item and one alert through the host''s notifier, once per incident, cleared on recovery; the server is restarted only through the project''s configured safe restart (W2-123), rate-limited and recorded; a holder is never killed automatically Verify: a planted hung embedding server (the fixed request unanswered past the configured time) and a planted idle slot holder (its process tree''s CPU time flat past the configured time): each gives one inbox item and one alert on the notifier stub, once per incident, cleared on recovery; the server restarts only through the configured safe restart, rate-limited and recorded; the holder''s process is still running afterwards. [DEC-1015 item 2]'
   - 'While ready work waits, busy cores stay within a configured band for at least 80 % of the hours; time below or above the band is reported daily with its cause Verify: planted history of hours with ready work waiting: the daily report gives the share of hours with busy cores inside the configured band (at least 80 % passes, below it is flagged) and lists the time below and above the band with its cause. [DEC-1014 item 2, SMART-WORK-4 line 13]'
   - 'Each pass reads the GPU state and, for each embedding server, its model''s layers on the GPU (from the server''s own log or API); a crash in a server''s log, or a model loaded with 0 layers on a GPU it is expected to use, writes one inbox item at once and one line for the sentinel, once per incident; the status shows the GPU, its holders and each model''s layers Verify: planted server logs: a crash line, and a model loaded with 0 layers on a GPU it is expected to use, each give one inbox item at once and one sentinel line, once per incident; a healthy log gives none; the status shows the GPU, its holders and each model''s layers. [DEC-1030 items 1 and 4, DEC-1031 item 4]'
@@ -43,3 +42,11 @@ track: A
 # W2-121c gov dispatch, part c
 
 Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W2-121-1 (a) and P-W2-121-3 (a), 2026-11-12: these KPI lines moved word for word; it builds on part a's Interface (in W2-121's ticket) and runs after it. The reference is the CTO's dispatcher (`governance/project/orchestration/tools/dispatch/`), never a target.
+
+## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Parked in docs/plan/WAVE_3_PARKING.md as W3-P33: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
+
+## Its first KPI line moved to W2-121b (the owner, DEC-1144 (5), P1-E option 1, 2026-11-12)
+
+"Every heavy step takes a heavy-job slot ..." moved word for word into W2-121b (DAEO-ifgf), so K9's dispatcher is parts a and b. This part stays parked (W3-P33) with its other lines.

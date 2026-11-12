@@ -1,6 +1,6 @@
 ---
 id: DAEO-7oxm
-status: open
+status: closed
 deps: [DAEO-qz4p]
 links: [DAEO-qz4p, DAEO-61vm, DAEO-k1e2]
 created: 2026-11-12T05:03:31Z
@@ -48,3 +48,7 @@ W2-173 run 1's P-2 (2026-11-12): W2-173's body cites W2-170's Interface (the aud
 `hidden/dropped/`), but no KPI line of W2-173 carries it, and its S5 and F3 forbid it, so it was not built. This ticket
 carries the line. It must land before the first memory audit run (Mon 11-23). It runs after W2-173 (the same file).
 Class C2. The held-out and hidden-half rules hold: tests plant their own sets root; no session opens the real one.
+
+## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact. It should have been a fix inside an existing ticket (its paths and KPI lines widened by the owner's decision), not a new ticket.

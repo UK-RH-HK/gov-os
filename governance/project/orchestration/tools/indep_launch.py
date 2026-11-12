@@ -29,6 +29,16 @@ under the sets root); the inputs are staged and the products delivered by the sc
 labeller's rule script runs confined (bwrap, no network, no process, capped) at its round-1 delivery (else 20, nothing
 lands) and again at its round 2 (else code 18). A result whose `stopped` is not `none` delivers nothing (20).
 
+The memory audit's follow-ups (W2-173; DEC-1120 (2)-(3), DEC-1101 (2)): a brief's front matter may name `effort`
+(low, medium, high, xhigh or max; any other value 10), passed to the canary and the session as --effort and recorded
+in WALL.json and the counts (null when the brief names none). A memory writer's or checker's result whose `stopped` is
+not `none` delivers nothing (21). The checker's notes.md and the auditor's classes.json are checked against their
+briefs' fixed form (section 6) and the result's counts before they are delivered (else 20, nothing lands).
+
+The auditor's copy of a set (W2-178; W2-170's Interface, DEC-1101 (2)): every file of the set's hidden half except
+those under its `hidden/dropped/` folder (any depth below it); the writer's round 2 and the checker's copies are
+unchanged. A link anywhere under `hidden/` still refuses 10, and a set empty after the exclusion refuses 10 as any other.
+
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
 budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
 the counts object (indep-schemas/indep-counts.schema.json), also written as <runs>/indep/<kind>/<run>/counts.json
@@ -107,6 +117,12 @@ SGX_OUT = ("round", "cases", "copies", "near_miss", "not_executable", "rules", "
            "may_change_verdict", "instructions_ignored", "stopped", "labelled", "allow", "refuse")
 STOPPED = ("none", "input-missing", "input-malformed", "decisions-conflict", "forbidden-read-needed",
            "form-not-writable", "not-sealed")
+EFFORTS = ("low", "medium", "high", "xhigh", "max")  # a brief's `effort`, passed as --effort (W2-173 S1)
+# The checker's notes.md and the auditor's classes.json, as the memory audit's briefs fix them (§6; W2-173 S3, S4).
+NOTES_HEAD = "# Cross-check notes"
+NOTES_SET = ("domains:", "categories:", "keyword:", "supersession ", "set codes:")
+VERDICTS = ("accept", "revise", "reject")
+REASON_MOST = 200
 # The confined rule script (S25): its caps; the prelude below sets them inside the sandbox before the script's code runs.
 RULES_WALL_S = 20                 # wall-clock seconds (at most 60)
 RULES_CPU_S = 15
@@ -422,7 +438,7 @@ class State:
         self.log_lines = []
         self.counts = {
             "act": ACT, "kind": None, "run": None, "set": None, "round": None, "commit": None,
-            "brief_sha256": None, "approved_sha256": None, "seed_sha256": None,
+            "brief_sha256": None, "approved_sha256": None, "seed_sha256": None, "effort": None,
             "template_ok": False, "override": False,
             "selection": {"changed": None, "sample": None, "overlap": None},
             "session": {"exit": None, "is_error": None, "turns": None, "cost_usd": None, "duration_s": None,
@@ -761,6 +777,8 @@ def plan_inputs(kind, rnd, root, set_name, audit):
             rels = plain_files(hidden)
         except (ValueError, OSError):
             raise Refuse(10, "input")
+        if kind == "auditor":  # W2-178: the auditor's copy leaves out hidden/dropped/ (a plain file "dropped" stays)
+            rels = [r for r in rels if not r.startswith("dropped" + os.sep)]
         if not rels:
             raise Refuse(10, "input")
         return [(os.path.join(hidden, r), os.path.join("input", "set", r)) for r in rels]
@@ -1085,15 +1103,17 @@ def clean_env(home):
     return env
 
 
-def session_flags(wall, tree, tools, model, budget, session_id, extra_dir=None):
+def session_flags(wall, tree, tools, model, budget, session_id, extra_dir=None, effort=None):
     # --setting-sources project (F11, DEC-1112 (3)): only the wall's own settings load, never the user's or local ones
     flags = ["-p", "--restricted", "--setting-sources", "project",
              "--settings", os.path.join(wall, ".claude", "settings.json"), "--add-dir", tree]
     if extra_dir:
         flags += ["--add-dir", extra_dir]
-    return flags + ["--tools", ",".join(tools), "--no-session-persistence", "--strict-mcp-config",
-                    "--disable-slash-commands", "--permission-prompts", "none", "--model", model,
-                    "--max-budget-usd", num_text(budget), "--output-format", "json",
+    flags += ["--tools", ",".join(tools), "--no-session-persistence", "--strict-mcp-config",
+              "--disable-slash-commands", "--permission-prompts", "none", "--model", model]
+    if effort:  # the brief's effort (W2-173 S1, DEC-1120 (2)); none named: no flag
+        flags += ["--effort", effort]
+    return flags + ["--max-budget-usd", num_text(budget), "--output-format", "json",
                     "--session-id", session_id]  # drawn by the script: the trace check always has its key (F1)
 
 
@@ -1341,7 +1361,8 @@ def run_canary(st, ctx):
         limit = min(CANARY_LIMIT, ctx["timeout"])
         cid = draw_session_id(st)
         argv = (["timeout", f"--kill-after={CANARY_KILL_AFTER}", num_text(limit), "claude"]
-                + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], cid, cdir) + [prompt])
+                + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], cid, cdir,
+                                ctx["effort"]) + [prompt])
         st.log("canary", "start")
         started = True
         proc = subprocess.Popen(argv, cwd=st.wall, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
@@ -1379,7 +1400,8 @@ def run_canary(st, ctx):
 def run_session(st, ctx):
     sid = draw_session_id(st)
     argv = (["timeout", f"--kill-after={KILL_AFTER}", num_text(ctx["timeout"]), "claude"]
-            + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], sid) + [PROMPT])
+            + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], sid,
+                            effort=ctx["effort"]) + [PROMPT])
     st.session_file = st.wall + ".session.json"
     fd = os.open(st.session_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
     with os.fdopen(fd, "wb") as out:
@@ -1546,6 +1568,100 @@ def deliver_file(src, dst):
     return want
 
 
+def staged_set_ids(wall):
+    """(W2-173 S3) The ids of the set staged in the wall: its files' stems (`q01` for `q01.yaml`), sorted; a stem
+    twice: 20."""
+    try:
+        rels = plain_files(os.path.join(wall, "input", "set"))
+    except (ValueError, OSError):
+        raise Refuse(20, "notes")
+    ids = sorted(os.path.splitext(os.path.basename(r))[0] for r in rels)
+    if len(set(ids)) != len(ids):
+        raise Refuse(20, "notes")
+    return ids
+
+
+def staged_miss_ids(wall):
+    """(W2-173 S4) The ids the lines of the wall's staged input/misses.jsonl carry; unreadable or a repeated id: 20."""
+    data = read_plain(os.path.join(wall, "input", "misses.jsonl"), wall)
+    if data is None:
+        raise Refuse(20, "classes")
+    try:
+        return [o["id"] for _raw, o in jsonl_objects(data)]
+    except (ValueError, UnicodeDecodeError):
+        raise Refuse(20, "classes")
+
+
+def check_notes(data, ids, res):
+    """(W2-173 S3) The checker's notes.md in its brief's fixed form (§6): `# Cross-check notes`; `## Questions` and one
+    line per staged id in id order, `<id> | accept|revise|reject | <codes or -> | also: <...> | <sentence>` (split on
+    ` | ` into five fields at most, as the next step reads it); `## The set` and its five lines; nothing else but blank
+    lines beside a heading and one final newline. The result's checked, accepted, revise and rejected equal the lines'
+    counts. Anything else: 20."""
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise Refuse(20, "notes")
+    if text.endswith("\n"):
+        text = text[:-1]
+    raw = text.split("\n")
+    lines = []
+    for i, line in enumerate(raw):
+        if line == "":
+            if not ((i > 0 and raw[i - 1].startswith("#")) or (i + 1 < len(raw) and raw[i + 1].startswith("#"))):
+                raise Refuse(20, "notes")
+            continue
+        lines.append(line)
+    n = len(ids)
+    if (len(lines) != n + 8 or lines[0] != NOTES_HEAD or lines[1] != "## Questions"
+            or lines[n + 2] != "## The set"):
+        raise Refuse(20, "notes")
+    tally = {v: 0 for v in VERDICTS}
+    for want, line in zip(ids, lines[2:n + 2]):
+        f = line.split(" | ", 4)
+        if (len(f) != 5 or f[0] != want or f[1] not in VERDICTS or not f[2].strip() or not f[3].startswith("also:")
+                or not f[4].strip()):
+            raise Refuse(20, "notes")
+        tally[f[1]] += 1
+    if not all(line.startswith(p) for p, line in zip(NOTES_SET, lines[n + 3:])):
+        raise Refuse(20, "notes")
+    if (res.get("checked"), res.get("accepted"), res.get("revise"), res.get("rejected")) != (
+            n, tally["accept"], tally["revise"], tally["reject"]):
+        raise Refuse(20, "notes")
+
+
+def check_classes(data, ids, res):
+    """(W2-173 S4) The auditor's classes.json: a JSON object with one entry for each staged miss id and no other, each
+    `{"class": <one of the five>, "reason": <one line of at most 200 characters>}`; the result's five `misses` counts
+    (an absent one is 0) equal the classes' counts. Anything else: 20."""
+    def no_repeat(pairs):
+        obj = {}
+        for k, v in pairs:
+            if k in obj:
+                raise ValueError("repeat")
+            obj[k] = v
+        return obj
+
+    def no_constant(_x):
+        raise ValueError("constant")
+    try:
+        obj = json.loads(data.decode("utf-8"), object_pairs_hook=no_repeat, parse_constant=no_constant)
+    except (ValueError, UnicodeDecodeError, RecursionError):
+        raise Refuse(20, "classes")
+    if not isinstance(obj, dict) or set(obj) != set(ids):
+        raise Refuse(20, "classes")
+    tally = {c: 0 for c in MISS_CLASSES}
+    for v in obj.values():
+        reason = v.get("reason") if isinstance(v, dict) else None
+        if (not isinstance(v, dict) or not isinstance(v.get("class"), str) or v["class"] not in MISS_CLASSES
+                or not isinstance(reason, str) or "\n" in reason or "\r" in reason or len(reason) > REASON_MOST):
+            raise Refuse(20, "classes")
+        tally[v["class"]] += 1
+    misses = res.get("misses")
+    if not isinstance(misses, dict) or any(misses.get(c, 0) != tally[c] for c in MISS_CLASSES):
+        raise Refuse(20, "classes")
+
+
 def deliver(st, ctx):
     kind, root, out = st.kind, ctx["root"], os.path.join(st.wall, "out")
     setdir = os.path.join(root, "fixtures", "evaluation", ctx["set"])
@@ -1635,6 +1751,13 @@ def deliver(st, ctx):
         raise Refuse(20, "missing")
     if not real_inside(dest_dir, root) or not os.path.isdir(dest_dir) or os.path.islink(dest_dir):
         raise Refuse(20, "destination")
+    data = read_plain(src, out)  # (W2-173 S3, S4) the file's fixed form and the result's counts, before it lands
+    if data is None:
+        raise Refuse(20, "missing")
+    if kind == "checker":
+        check_notes(data, staged_set_ids(st.wall), ctx["result"])
+    else:
+        check_classes(data, staged_miss_ids(st.wall), ctx["result"])
     h = deliver_file(src, dst)
     d.update(files=1, sha256=h, to=DELIVERS[kind])
     if kind == "auditor":
@@ -1909,6 +2032,12 @@ def check_result(st, ctx):
             res = load_json_strict(f.read().decode("utf-8"))
     except (ValueError, UnicodeDecodeError, OSError):
         raise Refuse(20, "unreadable")
+    if (not ctx.get("sgx") and st.kind in ("writer", "checker") and isinstance(res, dict)
+            and res.get("stopped") in STOPPED[1:]):
+        # (W2-173 S2) a result that says it stopped: its word counted, nothing checked further, nothing delivered
+        st.counts["out"]["stopped"] = res["stopped"]
+        st.counts["out"]["schema_ok"] = None
+        raise Refuse(21, "stopped")
     if not isinstance(res, dict) or not schema_ok(res, ctx["result_schema"]):
         raise Refuse(20, "schema")
     if ctx.get("sgx"):
@@ -1923,6 +2052,7 @@ def check_result(st, ctx):
             copy_numbers(st, st.kind, res)
         except (KeyError, AttributeError, TypeError):
             raise Refuse(20, "schema")
+        ctx["result"] = res  # the checker's and the auditor's delivery check their file against its counts (S3, S4)
     st.counts["out"]["schema_ok"] = True
     st.log("result", "schema", "ok")
 
@@ -2137,6 +2267,10 @@ def build_and_run(st, o, root, over, cwd, home):
     if fm is None or fm.get("kind") != kind:
         raise Refuse(10, "front_matter")
     model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs)
+    effort = fm.get("effort")
+    if "effort" in fm and not (isinstance(effort, str) and effort in EFFORTS):
+        raise Refuse(10, "effort")  # (W2-173 S1) one of the five, or no line at all
+    c["effort"] = effort
     flow = entry["flow"] if entry else None
     budget, timeout_s = fm.get("budget_usd", spec["budget_usd"]), fm.get("timeout_s", spec["timeout_s"])
     if not (is_number(budget) and 0 < budget <= spec["budget_usd"]):
@@ -2323,7 +2457,7 @@ def build_and_run(st, o, root, over, cwd, home):
                 "sets_root": root, "brief": brief_path, "brief_sha256": want, "seed_sha256": seed_sha,
                 "settings_sha256": sha_bytes(settings.encode("utf-8")), "hook_sha256": sha_bytes(tmpl["wall_hook.py"]),
                 "template_sha256": {n: sha_bytes(tmpl[n]) for n in TEMPLATE_FILES},
-                "approved_sha256": c["approved_sha256"], "model": model, "tools": list(spec["tools"]),
+                "approved_sha256": c["approved_sha256"], "model": model, "effort": effort, "tools": list(spec["tools"]),
                 "budget_usd": budget, "timeout_s": timeout_s, "prompt_sha256": PROMPT_SHA256,
                 "result_schema": schema_name, "brief_id": brief_id if entry else None, "flow": flow,
                 "selection": dict(sel_counts),
@@ -2340,7 +2474,7 @@ def build_and_run(st, o, root, over, cwd, home):
         return 0
 
     ctx = {"root": root, "trees": trees, "runs": runs, "runs_indep": runs_indep, "repo": repo, "home": home,
-           "tools": list(spec["tools"]), "model": model, "budget": budget, "timeout": timeout_s,
+           "tools": list(spec["tools"]), "model": model, "effort": effort, "budget": budget, "timeout": timeout_s,
            "result_schema": result_schema, "set": set_name, "round": rnd, "audit": o.audit, "commit": commit,
            "sgx": sgx, "brief_id": brief_id}
     # the canary, then the session
@@ -2370,11 +2504,16 @@ def build_and_run(st, o, root, over, cwd, home):
             c["status"] = "delivered"
             st.log("delivered", c["delivered"]["files"])
         except Refuse as r:
-            if r.code != 20:
+            if r.code == 21:  # (W2-173 S2) a memory writer's or checker's result that says it stopped
+                c["status"] = "stopped"
+                code = 21
+                st.log("stopped", r.word)
+            elif r.code != 20:
                 raise
-            c["status"] = "rejected"
-            code = 20
-            st.log("rejected", r.word)
+            else:
+                c["status"] = "rejected"
+                code = 20
+                st.log("rejected", r.word)
     if code == 21:
         c["out"]["files"] = out_files(os.path.join(st.wall, "out"))
     pack(st)
