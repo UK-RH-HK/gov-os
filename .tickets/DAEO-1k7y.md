@@ -46,6 +46,9 @@ track: A
 reads:
 - tests/acceptance/W2-96/test_w2_96_at_run_2.py
 - tests/acceptance/W2-96/test_w2_96_at_no_leak.py
+needs:
+- src/gov/accept/runner.py
+- src/gov/accept/command.py
 ---
 # W2-177 The six W2-96 signal reds
 
