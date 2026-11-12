@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from gov.close import attribution
 
 from .test_w2_115_support import TICKET, change, project
@@ -72,6 +74,51 @@ def test_s4_load_sensitive_is_a_latency_entry_of_the_serial_list(tmp_path):
     assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_b.py::test_b")
     assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_c.py::test_c")  # a marker is not
     assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_a.py::test_ab")
+
+
+@pytest.mark.parametrize("line", [
+    "tests/acceptance/W-2/test_t.py::test_t  # serial: latency: timed",
+    "tests/acceptance/W-2/test_t.py::test_t  # serial: latency",
+    "tests/acceptance/W-2/test_t.py::test_t  # serial: Latency (W-2): timed",
+    "tests/acceptance/W-2/test_t.py::test_t\t# serial: latency, timed",
+    "./tests/acceptance/W-2/test_t.py  # serial: latency: the file",
+    "tests/acceptance/W-2/  # serial: latency: the folder",
+    "tests/acceptance/W-2/test_t.py::test_t[slow]  # serial: latency: one parameter set",
+    "tests/acceptance/W-2/test_t.py::test_t  # latency: the route left out",
+])
+def test_s4_a_latency_entry_is_matched_in_every_form_the_serial_phase_takes(tmp_path, line):
+    """eng-3: the entry names the file, the node id, a parametrised id or the folder, and the comment's kind is read
+    whatever follows it; another kind still is not load-sensitive."""
+    (tmp_path / "tests/acceptance").mkdir(parents=True)
+    (tmp_path / SERIAL_LIST).write_text(f"# the list\n{line}\n", encoding="utf-8")
+    assert attribution.load_sensitive(tmp_path, "tests/acceptance/W-2/test_t.py::test_t[slow]")
+    (tmp_path / SERIAL_LIST).write_text(f"{line.replace('atency', 'ace')}\n", encoding="utf-8")
+    assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-2/test_t.py::test_t[slow]")
+
+
+def test_s4_a_load_sensitive_red_runs_its_rounds_without_the_change_even_with_a_nightly(tmp_path, monkeypatch):
+    """eng-3: the nightly's one result does not stand for a load-sensitive red's 3 rounds on the head without the
+    change: they are run (a red that is not load-sensitive still reads the nightly)."""
+    repo = project(tmp_path, extra={"tests/unit/test_x.py": FAILS, "tests/unit/test_y.py": FAILS.replace("x", "y"),
+                                    SERIAL_LIST: "tests/unit/test_x.py::test_x  # serial: latency: timed\n"})
+    base = repo.git("rev-parse", "HEAD").strip()
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)\n#\n"})
+    head = repo.git("rev-parse", "HEAD").strip()
+    monkeypatch.setattr(attribution, "nightly_reading", lambda root: {
+        "read": True, "record": "docs/close/nightly/NR.json", "head": base, "scope": "full",
+        "failures": {"tests/unit/test_x.py::test_x": "AssertionError", "tests/unit/test_y.py::test_y": "AssertionError"}})
+    calls = []
+    real = attribution.run_alone
+    monkeypatch.setattr(attribution, "run_alone", lambda c, t, o, f, to, tag: calls.append((t, tag)) or real(
+        c, t, o, f, to, tag))
+    tree = repo.root / attribution.prepare(repo.root, head)["path"]
+    failing = [{"test": f"tests/unit/test_{n}.py::test_{n}", "failure_type": "AssertionError", "text": ""}
+               for n in ("x", "y")]
+    reds, _ = attribution.attribute(repo.root, tree, head, base, failing, [], repo.root / ".gov-runtime/a", 60)
+    assert [tag for t, tag in calls if t.endswith("test_x")] == [f"with-{n}" for n in range(3)] + [
+        f"without-{n}" for n in range(3)]
+    assert [tag for t, tag in calls if t.endswith("test_y")] == ["with-0"]  # its other side read from the night
+    assert all(r["caused"] is False for r in reds)
     assert not attribution.load_sensitive(tmp_path / "nowhere", "tests/acceptance/W-1/test_a.py::test_a")
 
 

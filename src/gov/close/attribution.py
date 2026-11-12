@@ -286,13 +286,35 @@ def load_sensitive(clone: Path, test: str) -> bool:
         text = (Path(clone) / LIST_REL).read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return False
-    for line in text.splitlines():
-        entry, _, comment = (" " + line).partition(" #")
-        entry = entry.strip()
-        kind = re.match(r"\s*serial:\s*([\w-]+)\s*:", comment)
-        if entry and kind and kind.group(1) == LATENCY and declares(entry, test):
+    node = _plain(test)
+    for line in text.lstrip("\ufeff").splitlines():
+        entry, _, comment = (" " + line.replace("\t", " ")).partition(" #")
+        entry = _plain(entry.strip())
+        if entry and _kind(comment) == LATENCY and (declares(entry, node) or declares(entry.rstrip("/"), node)):
             return True
     return False
+
+
+def _plain(node: str) -> str:
+    """A node id or list entry in one spelling: ``/`` separators, no leading ``./``."""
+    node = node.replace("\\", "/")
+    while node.startswith("./"):
+        node = node[2:]
+    return node
+
+
+def _kind(comment: str) -> str | None:
+    """The kind of an entry's comment ``<route>: <kind>: <reason>``: the word after the route, lower case, whatever
+    follows it (a reason, a parenthesis, nothing); a comment whose first word is itself a kind of the list's (the
+    route left out, which the serial phase keeps in the close) gives that word. None where there is no comment."""
+    words = [w.strip().lower() for w in comment.split(":")]
+    first = re.match(r"[\w-]+", words[0]) if words else None
+    if first is None:
+        return None
+    if first.group(0) == LATENCY:
+        return LATENCY
+    second = re.match(r"[\w-]+", words[1]) if len(words) > 1 else None
+    return second.group(0) if second else None
 
 
 def nightly_reading(root: Path) -> dict:
@@ -340,8 +362,8 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
     for t in tests:
         if not any(r is not None for r in with_change[t]):
             continue  # green alone: nothing to compare
-        if free:  # the night ran the full suite on the head without the change: its result is that run
-            without[t] = [night["failures"].get(t)] * rounds[t]
+        if free and rounds[t] == 1:  # the night ran the full suite on the head without the change: its result is
+            without[t] = [night["failures"].get(t)]  # that run; a load-sensitive red still gets its rounds run
         else:
             to_run.append(t)
     if to_run:

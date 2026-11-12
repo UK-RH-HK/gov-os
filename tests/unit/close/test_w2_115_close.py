@@ -90,6 +90,22 @@ def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists)
     assert red["test"] in text and "AssertionError" in text
 
 
+@pytest.mark.parametrize("entry", ["test_broken.py::test_broken", "test_broken.py"])
+def test_s4_a_latency_entry_red_gets_three_rounds_each_way_in_the_close(tmp_path, no_lists, runs, entry):
+    """eng-3: end to end, a red that a ``latency`` entry of the serial-only list names (the node id, or its file) is
+    run in the close's phase, then 3 rounds alone on the head and 3 on the head without the change."""
+    test = f"{OWN_SUITE}test_broken.py::test_broken"
+    repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN,
+                                    "tests/acceptance/serial-only.txt": f"# the list\n{OWN_SUITE}{entry}  # serial: "
+                                                                        "latency: timed\n"})
+    change(repo, {"src/pkg/feature.py": FEATURE})
+    command.run(repo.root, _args(), CONFIG)
+    [red] = _record(repo)["reds"]
+    assert red["test"] == test and red["caused"] is False
+    assert runs[1] == [f"{OWN_SUITE}{entry}"]  # the serial phase ran it (its run)
+    assert runs[2:] == [[test]] * 6, runs  # then 3 rounds alone on the head, 3 on the head without the change
+
+
 def test_f1_a_caused_red_never_closes(tmp_path, no_lists):
     repo = project(tmp_path)
     change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x) + 1\n"})
