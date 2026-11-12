@@ -1,5 +1,8 @@
 # ACT-GATE-CONFIG-1: W2-20's machine gate file, written by `gov resources --init-config` from W2-20's code (DEC-1103 (1))
 
+> **Superseded figure (2026-11-12, DEC-1149):** the gate's working size is now 805,306,368 B (0.75 GiB) per live
+> session (ACT-P95-1, applied 16:53). The 2.04 GiB (2,191,601,664 B, DEC-947 item 2) figure below is kept as history.
+
 - **For:** the owner's operator. It writes one file under HOME, outside every repository, and changes no tracked file.
 - **By:** the CTO, 2026-11-09. Built and rehearsed with HOME pointed at a throwaway home. Nothing live is changed until
   the operator runs §3.
