@@ -142,7 +142,7 @@ def test_a_degraded_search_makes_the_attempt_not_whole_one_restart_then_it_passe
     assert not any(line.startswith("RETRIEVAL attempt 1") for line in done.stdout.splitlines())  # a faulted attempt's figures are never printed
     assert [(e["n"], e["state"], e["cause"]) for e in events(plant, "attempt")] == [
         (1, "start", None), (1, "fault", "degraded"), (2, "start", None), (2, "done", None)]
-    assert [e["attempt"] for e in events(plant, "counts")] == [2]
+    assert [e["attempt"] for e in events(plant, "counts")] == ["attempt-2"]
 
 
 def test_two_faults_stop_the_audit_for_the_owner(plant):
@@ -232,6 +232,16 @@ def test_a_missing_control_set_ends_the_ready_check_with_notready(plant):
     plant_audit(plant, fake)  # memory-retrieval is not declared in the sets root's map
     done = plant.cli(*measure_args(plant))
     assert done.returncode == 2 and done.stdout.splitlines()[-1] == "STOPPED notready"
+
+
+def test_a_control_set_folder_removed_after_its_map_entry_is_notready_not_a_control_figure(plant):
+    import shutil
+    prepare(plant)
+    shutil.rmtree(plant.root / "fixtures/evaluation/memory-retrieval/visible")  # mapped, but its questions are gone
+    done = plant.cli(*measure_args(plant))
+    assert done.returncode == 2 and done.stdout.splitlines()[-1] == "STOPPED notready"
+    assert (plant.run_dir / "STOPPED").read_text() == "notready\n"
+    assert not any(e["event"] == "control" for e in events(plant)) and not (plant.run_dir / "attempt-1").exists()
 
 
 def test_a_set_that_changed_since_the_declaration_is_ms_digest_and_nothing_is_searched(plant, monkeypatch):

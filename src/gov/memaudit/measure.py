@@ -90,6 +90,9 @@ class _Run:
             self.emit(f"NOT READY: control-{k} did not run as declared (exit {rc})")
             raise Stop("notready")
         of, hit5 = len(parsed["questions"]), sum(1 for q in parsed["questions"] if q["hit5"])
+        if of == 0:  # ruling 9: the control's set did not load (missing): the ready check ends, not a control figure
+            self.emit(f"NOT READY: control-{k} measured no question (the control's set is missing)")
+            raise Stop("notready")
         last, last_audit = last_control(self.p)
         ok = of == CONTROL_N and parsed["families"] is not None and abs(hit5 - last) <= CONTROL_SPREAD
         events.append(self.run, "control", k=k, hit5=hit5, of=of, last=last, last_audit=last_audit, ok=ok)
@@ -132,7 +135,7 @@ class _Run:
         write_text(folder / "DONE", utc_iso())
         events.append(self.run, "attempt", n=n, state="done", cause=None)
         write_text(self.run / "COUNTS", f"attempt-{n}")
-        events.append(self.run, "counts", attempt=n)
+        events.append(self.run, "counts", attempt=f"attempt-{n}")  # item 3: the counting attempt's name, as COUNTS
         parsed = fault.read_parsed(folder)
         self.emit(scores.retrieval_line(n, scores.retrieval(parsed["questions"], scores.apart_ids(self.p["hidden"]))))
         return True

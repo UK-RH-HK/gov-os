@@ -113,3 +113,26 @@ ownership rule of ruling 3 (`test_only_the_matcher_imports_the_measures_private_
     `miss-classes.json` the five counts are zero.
 13. **A second judge on the same folder at the same moment** (the lock held) is exit 3.
 14. **`not_run`** in `FIGURES.json` is always 0 (`judge` ends only with every row).
+
+## Fix round 1 (engineer, after the lead's verification at 6e4b1f56079a)
+
+Eight acceptance cases were red; two causes, both in `src/gov/memaudit/measure.py`:
+
+1. **The `counts` event's `attempt`** (Interface item 3: `counts {attempt}`, "the counting attempt's name (attempt-1 or
+   attempt-2)", the same word `COUNTS` holds) was written as the number `n`. It is now `f"attempt-{n}"`. Cases:
+   `test_s4_a_fault_in_the_first_attempt_…` (4 parameters), `test_the_ledger_events_have_item_3s_fields`,
+   `test_the_ledger_after_a_whole_measure_ends_with_counts`, `test_s2_the_counting_attempt_prints_…`. Unit test
+   `test_a_degraded_search_in_attempt_1_…` now expects `["attempt-2"]`.
+2. **A control whose set holds no question** (ruling 9: a missing set ends the ready check, `STOPPED notready`). A
+   control that exited 0 with zero question lines was read as hit@5 `0 of 0`, out of range, `STOPPED control`. Zero
+   question lines now ends the ready check as `NOT READY: control-<k> measured no question…`, `STOPPED notready`; the
+   `control` event is not written. A control with some lines but not 40, no `families:` line or a hit@5 off by more than
+   2 stays `STOPPED control` (item 5 as read in gap 3 above). Case: `test_s1_a_missing_control_set_ends_the_ready_check`.
+   New unit test: `test_a_control_set_folder_removed_after_its_map_entry_is_notready_not_a_control_figure`.
+
+Run (heavy slot, `-m "not local_only" -k "not real and not green_here and not time_limit"`): the four acceptance files
+holding the eight cases, 51 passed; `tests/acceptance/W2-171` 125 passed, 1 skipped; `tests/unit/memaudit` 214 passed;
+`tests/acceptance/W2-170` 177 passed, 2 failed: `test_f5_the_branch_changes_only_paths_the_ticket_allows` (expected, whole
+branch against W2-170's paths) and `test_f3_a_run_s_file_access_log_…`, which fails only because the ordered TMPDIR
+(`~/gov-os-runs/tmp/W2-171`) is under `~/gov-os-runs`, the folder that test treats as the true runs folder; it passes
+with the sandbox's own TMPDIR and does not touch `measure.py`.
