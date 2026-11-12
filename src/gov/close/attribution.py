@@ -389,7 +389,7 @@ def attribute(root: Path, clone: Path, commit: str, base: str | None, failing: l
     for t in tests:
         caused, kind, reason = judge(with_change[t], without.get(t, []))
         if base is None and any(r is not None for r in with_change[t]):
-            reason += "; no head without the change is known (the ticket has no commit of its own)"
+            reason += "; no head without the change: no green base on HEAD's line is known, so the red is the change's"
         if t in from_night:
             reason += f"; the head without the change read from the nightly record {night['record']}"
         if kind == UNKNOWN:

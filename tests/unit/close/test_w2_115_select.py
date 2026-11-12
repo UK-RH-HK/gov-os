@@ -267,7 +267,8 @@ def test_f1_the_head_without_the_change_is_the_green_base_when_an_ancestor(tmp_p
     assert "src/pkg/feature.py" in chosen["changed"]
 
 
-def test_f1_a_green_base_not_an_ancestor_falls_back_to_the_oldest_own_commits_parent(tmp_path):
+def test_f1_a_green_base_not_an_ancestor_gives_no_head_without_the_change(tmp_path):
+    # P1-K (a), R2-1: the fallback to the oldest own commit's parent is dropped; an own commit present changes nothing
     repo = project(tmp_path)
     repo.git("checkout", "-q", "-b", "elsewhere")
     elsewhere = repo.commit("elsewhere", files={"docs/notes.md": "# notes, elsewhere\n"})
@@ -275,17 +276,20 @@ def test_f1_a_green_base_not_an_ancestor_falls_back_to_the_oldest_own_commits_pa
     record = {"verdict": "green", "head": elsewhere}
     repo.commit("night", files={"docs/close/nightly/NR-20261101T010000Z-x.json": json.dumps(record) + "\n"})
     change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
+    assert _oldest_own_parent(repo)
     chosen = select.scoped(repo.root, TICKET)
     assert chosen["green_base"] is None
-    assert chosen["base"] == _oldest_own_parent(repo)
-    assert select.head_without_change(repo.root, elsewhere, "abc") == "abc"
+    assert chosen["base"] is None
+    assert select.head_without_change(repo.root, elsewhere) is None
 
 
-def test_f1_no_green_base_falls_back_to_the_oldest_own_commits_parent(tmp_path):
+def test_f1_no_green_base_gives_no_head_without_the_change(tmp_path):
+    # P1-K (a), R2-1: no green record at all, own commits present: no head without the change
     repo = project(tmp_path)
     change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
     change(repo, {"src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    assert _oldest_own_parent(repo)
     chosen = select.scoped(repo.root, TICKET)
     assert chosen["green_base"] is None
-    assert chosen["base"] == _oldest_own_parent(repo)
-    assert select.head_without_change(repo.root, None, None) is None
+    assert chosen["base"] is None
+    assert select.head_without_change(repo.root, None) is None

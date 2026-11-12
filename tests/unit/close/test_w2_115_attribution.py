@@ -124,10 +124,11 @@ def test_s4_a_load_sensitive_red_runs_its_rounds_without_the_change_even_with_a_
 
 # --- the attribution on a planted project ------------------------------------------
 
-def _attribute(repo, failing_test="tests/unit/test_x.py::test_x", kind="AssertionError"):
+def _attribute(repo, failing_test="tests/unit/test_x.py::test_x", kind="AssertionError", no_base=False):
     from gov.close.select import ticket_change
     head = repo.git("rev-parse", "HEAD").strip()
     _, base = ticket_change(repo.root, TICKET)
+    base = None if no_base else base
     clone = attribution.prepare(repo.root, head)
     tree = repo.root / clone["path"]
     failing = [{"test": failing_test, "failure_type": kind, "text": ""}]
@@ -162,6 +163,16 @@ def test_s4_a_test_the_change_added_is_the_changes(tmp_path):
     change(repo, {"tests/unit/test_x.py": FAILS})
     reds, _ = _attribute(repo)
     assert reds[0]["caused"] is True and "absent" in reds[0]["reason"]
+
+
+def test_s4_with_no_head_without_the_change_a_red_the_parent_also_has_is_the_changes(tmp_path):
+    # P1-K (a), R2-1: no green base on HEAD's line, so no head without the change: every red is the change's
+    repo = project(tmp_path, extra={"tests/unit/test_x.py": FAILS})
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)\n#\n"})
+    reds, _ = _attribute(repo, no_base=True)
+    assert reds[0]["caused"] is True
+    assert "no green base on HEAD's line is known" in reds[0]["reason"]
+    assert "commit of its own" not in reds[0]["reason"]
 
 
 def test_s4_load_sensitive_gets_three_rounds_others_one(tmp_path, monkeypatch):

@@ -11,7 +11,7 @@ import yaml
 from gov.cli.errors import GovError
 from gov.close import attribution, command, gates, ratchet, select
 
-from .test_w2_115_support import OTHER, OWN_SUITE, TICKET, change, project, ticket_text
+from .test_w2_115_support import OTHER, OWN_SUITE, TICKET, change, green_night, project, ticket_text
 
 CONFIG = {"path-map.yaml": {"close_workers": 1}}
 FEATURE = "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # changed\n"
@@ -76,6 +76,7 @@ def test_s7_a_clean_scoped_close_writes_every_key(tmp_path, no_lists, runs):
 
 def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists):
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN})
+    green_night(repo)  # P1-K (a): an unowned red needs a green base on HEAD's line to be judged against
     change(repo, {"src/pkg/feature.py": FEATURE})
     command.run(repo.root, _args(), CONFIG)  # F1: not refused
     record = _record(repo)
@@ -90,6 +91,21 @@ def test_s5_an_unowned_red_is_named_opened_and_never_refuses(tmp_path, no_lists)
     assert red["test"] in text and "AssertionError" in text
 
 
+def test_f1_with_no_green_record_a_red_the_oldest_own_parent_has_is_caused_and_never_closes(tmp_path, no_lists):
+    """P1-K (a), R2-1: no green base on HEAD's line, so no head without the change; the red is red on the parent of
+    the ticket's oldest own commit too, yet it is the change's: refused, no record, no repair ticket."""
+    repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN})
+    change(repo, {"src/pkg/feature.py": FEATURE})
+    with pytest.raises(GovError) as raised:
+        command.run(repo.root, _args(), CONFIG)
+    assert raised.value.code == "RED_CAUSED"
+    [red] = raised.value.details["reds"]
+    assert red["caused"] is True and "no green base on HEAD's line" in red["reason"]
+    assert not red.get("repair_ticket")
+    assert not (repo.root / f"docs/close/{TICKET}").exists()
+    assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]
+
+
 @pytest.mark.parametrize("entry", ["test_broken.py::test_broken", "test_broken.py"])
 def test_s4_a_latency_entry_red_gets_three_rounds_each_way_in_the_close(tmp_path, no_lists, runs, entry):
     """eng-3: end to end, a red that a ``latency`` entry of the serial-only list names (the node id, or its file) is
@@ -98,6 +114,7 @@ def test_s4_a_latency_entry_red_gets_three_rounds_each_way_in_the_close(tmp_path
     repo = project(tmp_path, extra={f"{OWN_SUITE}test_broken.py": BROKEN,
                                     "tests/acceptance/serial-only.txt": f"# the list\n{OWN_SUITE}{entry}  # serial: "
                                                                         "latency: timed\n"})
+    green_night(repo)  # P1-K (a): the head without the change is the green base
     change(repo, {"src/pkg/feature.py": FEATURE})
     command.run(repo.root, _args(), CONFIG)
     [red] = _record(repo)["reds"]
@@ -193,7 +210,6 @@ def test_s10_two_closes_in_a_row_reuse_the_clone(tmp_path, no_lists):
 def test_f1_an_untrailered_slip_after_the_green_base_is_caused_and_never_closes(tmp_path, no_lists):
     """F-1: a green test, then an untrailered commit that breaks it, then the ticket's trailered work: the red is
     judged against the green base, so it is the change's: RED_CAUSED, no record, no repair ticket."""
-    from .test_w2_115_support import green_night
     repo = project(tmp_path)
     green_night(repo)
     repo.commit("slip", files={"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return 0\n"})

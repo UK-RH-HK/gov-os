@@ -539,13 +539,14 @@ def ticket_change(root: Path, ticket: str) -> tuple[list[str], str | None]:
     return paths, base_commit
 
 
-def head_without_change(root: Path, green: str | None, own_base: str | None) -> str | None:
+def head_without_change(root: Path, green: str | None) -> str | None:
     """The head a red is judged against (DEC-988 item 3, DEC-989): the green base the change is counted from when
     it is an ancestor of ``HEAD``, so every commit counted in the change (an untrailered one too) is outside it;
-    else the first parent of the ticket's oldest own commit (``own_base``); None when neither is known."""
+    else None, never the parent of the ticket's oldest own commit: with no green base on HEAD's line every red
+    counts as the change's (fails closed)."""
     if green and is_ancestor(Path(root), green):
         return green
-    return own_base
+    return None
 
 
 def _module_of(rel: str) -> str | None:
@@ -672,7 +673,7 @@ def scoped(root: Path, ticket: str) -> dict:
     test_map, why_not = load_map(root)
     if test_map is None:
         raise SelectionRefused(f"the test map {MAP_REL} cannot be read ({why_not}): no selection is made blind")
-    own_paths, base_commit = ticket_change(root, ticket)
+    own_paths, _ = ticket_change(root, ticket)
     # the change is what the head holds that no green record has tested: everything since the newest green record
     # (the strict close's base), with the ticket's own commits; a ticket's own commits alone without a green record
     green = base(root)
@@ -756,7 +757,7 @@ def scoped(root: Path, ticket: str) -> dict:
     suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
             "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only, "why": {t: why[t] for t in suites},
-            "base": head_without_change(root, green, base_commit),
+            "base": head_without_change(root, green),
             "head": _git(root, "rev-parse", "HEAD").strip()}
 
 

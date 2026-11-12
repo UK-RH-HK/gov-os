@@ -125,8 +125,8 @@ def add_arguments(parser) -> None:
                         help="--verify's folder (default .gov-runtime/close/verify/<ticket>/)")
     parser.add_argument("--base", metavar="<commit>", default=None,
                         help="the scoped close's head without the change (default: the green base the change is "
-                             "counted from when it is an ancestor of HEAD, else the parent of the ticket's oldest "
-                             "commit)")
+                             "counted from when it is an ancestor of HEAD, else none, and every red is the "
+                             "change's)")
 
 
 def run(root: Path, args, config: dict):
