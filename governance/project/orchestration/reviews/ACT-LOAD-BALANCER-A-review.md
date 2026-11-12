@@ -32,3 +32,9 @@ Also: real pinned `gov resources --register` from a real git tree under a plante
 
 ## Scratch and trees
 Clone 201M with 9861 inodes, removed. Both trees `git status --porcelain` empty. No model process.
+
+## The reviewer's verdict block (as returned; READY computed by verdict.py)
+
+```verdict
+{"kpis": [{"kpi": "act-load-balancer-a", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "in", "ordinary_work": "no", "consequence": "other"}]}]}
+```
