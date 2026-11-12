@@ -1,6 +1,6 @@
 ---
 id: DAEO-ifgf
-status: open
+status: in_progress
 deps: [DAEO-cb2b]
 links: [DAEO-cb2b]
 created: 2026-11-12T01:50:00Z
@@ -17,6 +17,12 @@ role: engineer
 profile: FULL
 depends_on: [DAEO-cb2b]
 waits_on: []
+reads:
+- src/gov/dispatch/**
+- src/gov/resources/**
+- governance/project/orchestration/tools/dispatch/**  # the CTO's dispatcher, a reference only
+- .tickets/DAEO-cb2b.md  # part a's Interface
+needs: []
 allowed_paths:
 - src/gov/dispatch/**
 - tests/unit/dispatch/test_w2_121b*
