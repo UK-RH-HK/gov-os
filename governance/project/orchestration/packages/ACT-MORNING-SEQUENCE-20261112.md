@@ -16,9 +16,9 @@ queue held) so `git status` stays clean between steps; the CTO lifts it at your 
 | 2 | ACT-CLAUDE-COPIES-4 | 19 files under `.claude/` and `.rulesync/subagents/` | `6ab06e85` | READY | before W2-11's merge |
 | 3 | ACT-DISPATCH-1 | `dispatch/dispatcher.py`, `balancer.py` and their two unit tests | `a20754dd` | READY (F2 for you) | none |
 | 4 | ACT-IDLE-GUARD-2 (round 2) | `tools/stop_idle_check.py` and its unit test | `a3fe076c` | READY | none |
-| 5 | ACT-EXAMIN-SETS-1 (round 2) | `governance/project/path-map.yaml`; step 2 the sets root's own map | `e8020292` | READY | first of the path-map chain |
-| 6 | ACT-ACCEPTED-REDS-1 (round 2) | `governance/project/path-map.yaml` | `b8df21d8` | READY | after 5 |
-| 7 | ACT-PATHMAP-EXP-1 | `governance/project/path-map.yaml` | `9a945c99` | READY | after 6 |
+| 5 | ACT-EXAMIN-SETS-1 (round 3) | `governance/project/path-map.yaml`; step 2 the sets root's own map | `2f814211` | READY | first of the path-map chain |
+| 6 | ACT-ACCEPTED-REDS-1 (round 3) | `governance/project/path-map.yaml` | `9c20e5e3` | READY | after 5 |
+| 7 | ACT-PATHMAP-EXP-1 (round 3) | `governance/project/path-map.yaml` | `b26fe623` | READY | after 6 |
 | 8 | ACT-OPERATOR-HOURS-2 (round 2) | the operator's `opcommon.py` and `APPROVED`; four repository paths; then its own `acceptance_exemptions` line | `7acf0243` | round 2 FAIL on F1 (the undo), fixed as text by the reviewer's option (a); forward path verified | after 7 (its second commit changes the path map) |
 | — | ACT-OPERATOR-HOURS-1 | the crontab (line 7) | `9cbccb82` | READY | the CTO applies it after 8 |
 | 9 | ACT-CLAUDE-COPIES-5 | the six `.claude/skills` copies | `e602d596` | READY | after W2-11's merge (Part 2) |
@@ -35,9 +35,9 @@ yes ACT-LOAD-BALANCER-A 0b40f1bf
 yes ACT-CLAUDE-COPIES-4 6ab06e85
 yes ACT-DISPATCH-1 a20754dd
 yes ACT-IDLE-GUARD-2 a3fe076c
-yes ACT-EXAMIN-SETS-1 e8020292
-yes ACT-ACCEPTED-REDS-1 b8df21d8
-yes ACT-PATHMAP-EXP-1 9a945c99
+yes ACT-EXAMIN-SETS-1 2f814211
+yes ACT-ACCEPTED-REDS-1 9c20e5e3
+yes ACT-PATHMAP-EXP-1 b26fe623
 yes ACT-OPERATOR-HOURS-2 7acf0243
 yes ACT-OPERATOR-HOURS-1 9cbccb82
 yes ACT-CLAUDE-COPIES-5 e602d596
@@ -97,12 +97,12 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > git commit -m "ACT-IDLE-GUARD-2: the idle check leaves out a returned lead's line and merged plan tickets, and cuts a slow plan at 5 s (DEC-1140 (2); ACT-IDLE-GUARD-1 review F1-F3)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1140, DEC-1110" --trailer "Role: owner" -- governance/project/orchestration/tools/stop_idle_check.py tests/unit/orchestration/test_stop_idle_check.py
 > ```
 >
-> **5. ACT-EXAMIN-SETS-1** (the path map declares EXAMIN's set and the proving ground's held-out half; DEC-1130 (3))
+> **5. ACT-EXAMIN-SETS-1** (round 3, rebuilt after HOURS-2's exemption moved the map; the owner's narrow check PASS, DEC-1144 (4); the path map declares EXAMIN's set and the proving ground's held-out half; DEC-1130 (3))
 > ```
 > A=.gov-runtime/scratch/orchestrator/acts/ACT-EXAMIN-SETS-1
-> sha256sum $A/manifest.json     # expect e80202922e72b3e55767efceef315b8ead863de443fb4036aab24cb6f9e8674f
-> bash $A/apply.sh check         # expect: state before (sha256 f4029cfb4942)
-> bash $A/apply.sh apply         # expect: state applied (sha256 0ec1d20da86a)
+> sha256sum $A/manifest.json     # expect 2f814211320cf13edc8cce0eee84bae84a6402cee0b2e6fa6ea8069b52404ba7
+> bash $A/apply.sh check         # expect: state before (sha256 30233a092a4b)
+> bash $A/apply.sh apply         # expect: state applied (sha256 1fe00f43d8ab)
 > bash $A/apply.sh verify        # exit 0
 > PYTHONPATH=src python3 -m gov.check.pathmap; echo $?   # expect: 0, with no output before it
 > git commit -m "ACT-EXAMIN-SETS-1: the path map declares EXAMIN's set and the proving ground's held-out half (DEC-1130 (3))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1130, DEC-1101" --trailer "Role: owner" -- governance/project/path-map.yaml
@@ -113,9 +113,9 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > **6. ACT-ACCEPTED-REDS-1** (`accepted_reds` lists the two warm real-model latency cases until W2-155 closes; DEC-1134)
 > ```
 > A=.gov-runtime/scratch/orchestrator/acts/ACT-ACCEPTED-REDS-1
-> sha256sum $A/manifest.json     # expect b8df21d891600ff4701ff264ff94f32257c4c9150ae4eb4a3254af2662248ea7
-> bash $A/apply.sh check         # expect: state before (sha256 0ec1d20da86a)
-> bash $A/apply.sh apply         # expect: state applied (sha256 5654eca4c139)
+> sha256sum $A/manifest.json     # expect 9c20e5e3c737f422319ebf6286e8f5d2ddaf2cec4c6ab69de9cf9d58775e8b11
+> bash $A/apply.sh check         # expect: state before (sha256 1fe00f43d8ab)
+> bash $A/apply.sh apply         # expect: state applied (sha256 e4281125cf0e)
 > bash $A/apply.sh verify        # silent, exit 0
 > PYTHONPATH=src python3 -m gov.check.pathmap; echo $?   # expect: 0, with no output before it
 > git diff --numstat -- governance/project/path-map.yaml  # expect: 9  1  governance/project/path-map.yaml
@@ -125,9 +125,9 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > **7. ACT-PATHMAP-EXP-1** (the experiments root in exactly one namespace of the path map; frees W2-40)
 > ```
 > A=.gov-runtime/scratch/orchestrator/acts/ACT-PATHMAP-EXP-1
-> sha256sum $A/manifest.json     # expect 9a945c99201d4c2c49cbd522c38b3ebee5b2fa0c09dbb5f9e62f852721b6e93c
-> bash $A/apply.sh check         # expect: state before (sha256 5654eca4c139)
-> bash $A/apply.sh apply         # expect: state applied (sha256 d50884e3633e)
+> sha256sum $A/manifest.json     # expect b26fe623d7a685ec7083a224e5f21af4a51503bae4d836d020df32290b73ff5c
+> bash $A/apply.sh check         # expect: state before (sha256 e4281125cf0e)
+> bash $A/apply.sh apply         # expect: state applied (sha256 805bd918d467)
 > bash $A/apply.sh verify        # exit 0
 > PYTHONPATH=src python3 -m gov.check.pathmap; echo $?   # expect: 0, with no output before it
 > git commit -m "ACT-PATHMAP-EXP-1: the experiments root is in exactly one namespace of the path map (DEC-333, DEC-273)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-333, DEC-273" --trailer "Role: owner" -- governance/project/path-map.yaml

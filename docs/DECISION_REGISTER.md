@@ -14696,6 +14696,75 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (5) **C8:** no checker for W2-94.
 - **Basis:** questions 2 and 4.
 
+### DEC-1144 — P1-A to P1-G: W2-11 merged by hand; W2-157 reopened for the backstop hang with a temporary skip; W2-146's schema lines read first; a narrow third check of the path-map chain; K9 met by W2-121 a and b with part c's slot line; `--sets-root` in W2-93; reviewers' read-only probes in the quiet hours
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-989, DEC-1141 (4), DEC-1010, DEC-1131, DEC-1008 (2)-(3), DEC-974, DEC-1142 (7), DEC-1143 (4), DEC-1112 (3), CAP-33
+- **Decision:**
+  - (1) **P1-A (a): W2-11 merged by hand**, an exception to DEC-989 beside DEC-1141 (4)'s two: its seven copy cases could be green only after
+    ACT-CLAUDE-COPIES-5, which applies only after the merge. Merged `6f2234f40` (W2-11 head `6ba93fc8bf35`; kernel bytes as approved at
+    `dca382f3069f`); the owner's operator applied COPIES-5 at once (`a2a74f22f`); W2-11 closes on a green run.
+  - (2) **P1-B (a)+(b): W2-157 (`DAEO-ozyt`) reopened for one fix** inside its own scope: a group of only zombies counts as ended, `watch()`
+    gets a bound, and `test_w2_157_backstop.py` reaps its own groups (one C2 run). Until that fix lands, **one temporary entry** in
+    `skip_known.json` for `tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log`,
+    naming W2-157 as its fix; the fix's land removes it. An exception for a test that cannot finish, not a hidden red.
+    **Found when recording (the CTO, told to the owner):** `skip_known.json` is the skip guard's list of known skips; it causes
+    no skip, and the queue strips `PYTEST_ADDOPTS` (`merge_queue.py` `env()`), so (b) takes effect only through a change to the
+    queue (a control path, by ACT) or to the test (the fix itself). Not built: the fix runs first, and a hang meanwhile is
+    stopped by pid as before.
+  - (3) **P1-C: W2-146's 15 added lines** of `template/governance/kernel/schemas/path-map.schema.json` (`7a1a1cd8…` -> `d22efa5a…`) were
+    pasted to the owner verbatim first; the CAP-33 approval follows the owner's reading, as its own line. Until then W2-146 is held.
+  - (4) **P1-D (a): a narrow independent check** of the path-map chain's round 3 (EXAMIN-SETS-1 `2f814211`, ACCEPTED-REDS-1 `9c20e5e3`,
+    PATHMAP-EXP-1 `b26fe623`), limited to: the entries byte-identical to round 2's; only befores, afters and offsets moved; the chain
+    and its rehearsal. A third round, the owner's exception to DEC-1010 for this rebuild only. The yes lines follow its PASS.
+  - (5) **P1-E option 1: K9's dispatcher is W2-121 parts a and b**, with part c's first KPI line ("every heavy step takes a heavy-job slot",
+    DEC-1008 (3)) moved into W2-121b (`DAEO-ifgf`), a widening by the owner's decision (DEC-974). Parts c (less that line) and d stay
+    parked in Wave 3 (W3-P33, W3-P34).
+  - (6) **P1-F (a): the W2-81 runner's `--sets-root <root>`** goes inside W2-93 (`DAEO-6y0x`): its paths gain
+    `tests/acceptance/W2-81/w2_81_run.py` and `tests/acceptance/W2-81/test_w2_81_runner.py`, for the independent test designer who writes
+    `validate_hidden.py`, with one KPI line: the runner and the validator take `--sets-root <root>`. Answers DEC-1143 (4)'s open point.
+  - (7) **P1-G (a): a reviewer's read-only probes are allowed in the quiet hours**, in its own TMPDIR (outside the repository and the runs
+    folders), touching neither the repository nor the evaluation sets; the two-refusal stop (DEC-1142 (9)) still holds. Into the briefs.
+  - (8) **Read and accepted (delegated P2s, DEC-1112 (3)):** W2-124's P2 (b) and P3 (`fe7bd01ae`); W2-115's PK-5 (c), deferred with
+    W2-115b (`33b5651eb`).
+- **Basis:** the owner's message of 2026-11-12 ~14:10 answering the CTO's seven P1 packages.
+
+### DEC-1145 — W2-146's kernel path-map schema approved (CAP-33) at ebdbabd2e0d3; a non-compiling id form refused at use, the config check's gap a row
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1144 (3), DEC-1071 (5), DEC-1099 (2)
+- **Decision:**
+  - (1) **"W2-146 CIT-P approved at ebdbabd2e0d3"**, after reading the 15 added lines of
+    `template/governance/kernel/schemas/path-map.schema.json` (sha256 before `7a1a1cd8cbf6fb073e2e1eb6f816d2ba83e2b647e2dc94efb1dfa96f359a8469`,
+    after `d22efa5ada515c8cd0132b8c4960e7aa4d34d4e3fe345b07f576cedfba0fc7be`; record `docs/changes/W2-146-CIT-P.md`). W2-146 lands
+    through the queue at that commit (DEC-989).
+  - (2) **The owner's check, answered by the CTO:** `"format": "regex"` is enforced only by a validator given a format checker. A pattern
+    that does not compile is refused at use: `gov retrieve`'s reader (`gov.retrieval.lexical.id_forms`) stops with `CONFIG_INVALID` naming
+    `id_forms[<i>]` (acceptance: `tests/acceptance/W2-146/test_w2_146_reader.py`, the pattern `(`; the schema cases use
+    `Draft202012Validator(..., format_checker=FormatChecker())`). The project's own path-map check (`gov.config`, hand-written per W1-08)
+    does not read `id_forms`, so a broken form is caught at the first retrieve, not at check time: DECIDED-NOT-DONE row 174.
+- **Basis:** the owner's message of 2026-11-12 ~14:35.
+
+### DEC-1146 — A resource gate's refusal is a wait, not a refusal under the two-refusal rule (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:45, P1-I (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1142 (9), DEC-1088 (5)
+- **Decision:**
+  - (1) **A resource gate's refusal** (memory, CPU, disk, a heavy slot) is a wait, not a refusal under the two-refusal rule: the session
+    relaunches when the gate opens, without asking the owner. The two-refusal rule (DEC-1142 (9)) covers permission refusals: the guard,
+    the sandbox, a hook.
+  - (2) The P1-D check (DEC-1144 (4)) is relaunched once the CTO's merge checks free the gate.
+  - (3) Into the common lead brief beside the two-refusal rule.
+- **Basis:** P1-I; the P1-D reviewer and W2-152's re-probe each stopped after two memory-gate refusals (2026-11-12 14:05-14:28).
+
+### DEC-1147 — W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~15:00, P1-H (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1145, DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"W2-152 CIT-P approved at 09fc68645c0c, after the fact":** `template/governance/kernel/schemas/facts.schema.json`, sha256 before
+    `be3e204355c0dd4c98cc584b72a1cef5eaa4733ca9a7feec8684b728026af7a6`, after `3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c`
+    (15 added, 1 removed: `ready` required, and the `ready.new_since` date property), on w2/integrate since the CTO's merge `b0bbd373f`
+    (2026-11-09 23:07) without approval until now. The missing record `docs/changes/W2-152-CIT-P.md` is written by a product-spec worker
+    as the CTO proposed; then W2-152 closes through the queue.
+  - (2) **To the owner next:** whether the facts file an adoption writes carries `ready.new_since` set to the adoption's own date, before
+    W2-27 (a fix if not); row 173's route (a kernel path needs an approval line before any merge, in the queue and in the CTO's hand-merge
+    check), without a new ticket; a scan of every commit on w2/integrate since 11-02 touching `template/governance/kernel/**`, each with its
+    approval line or none.
+- **Basis:** the owner's message of 2026-11-12 ~15:00 answering P1-H.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14776,3 +14845,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 
 | 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
 | 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
+| 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
+| 0.528 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1145 (W2-146's kernel path-map schema approved at ebdbabd2e0d3; a non-compiling id form refused at use, the config check a row), DEC-1146 (a resource gate's refusal is a wait, not a two-refusal refusal; standing). Next free id: DEC-1147. |
+| 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |

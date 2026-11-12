@@ -9,6 +9,7 @@ The file-access log: ``w2_170_open_log.py`` installs ``sys.addaudithook`` for ``
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -148,7 +149,28 @@ def _logged_run(world, home, log, sub, flags, env=None):
     return done, entries
 
 
+def _true_root_opens(paths, repo_root):
+    """The logged paths at or under the true sets root or runs folder that are not of the repository under test.
+
+    W2-179: the nightly's clone lives under ``~/gov-os-runs``, so the repository's own source, tests and stores are
+    not a runs-folder open. Both sides are compared in one normal form, ``os.path.realpath`` (symlinks resolved, ``..``
+    collapsed), so a symlinked or ``..`` spelling can neither carry a true-root path past the filter nor keep a
+    repository path in it; a path that does not exist is normalised by its spelling, and nothing is opened.
+    """
+    own = os.path.realpath(str(repo_root))
+    return [p for p in paths if (W.at_or_under(p, W.TRUE_SETS) or W.at_or_under(p, W.TRUE_RUNS))
+            and not W.at_or_under(os.path.realpath(p), own)]
+
+
 def test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders(world, tmp_path):
+    # W2-179 (F1): the repository's root, derived from this file's location (W.HERE, not the current directory, which
+    # is the planted repository, and not an environment variable), must be narrower than every true root: an
+    # exclusion that covered the true home, the runs folder or the sets root (or an ancestor of one) passes everything
+    repo_root = W.HERE.parents[2]
+    for true_root in (W.TRUE_HOME, W.TRUE_RUNS, W.TRUE_SETS):
+        for form in (str(true_root), os.path.realpath(str(true_root))):
+            assert not W.at_or_under(form, repo_root) and not W.at_or_under(form, os.path.realpath(str(repo_root))), (
+                "the repository root covers a true root", str(repo_root), form)
     # the default runs folder is ~/gov-os-runs: a planted home holds one, so the run needs it and finds it there
     home = tmp_path / "home-with-runs"
     shutil.copytree(world.launch, home / "gov-os-runs")
@@ -161,7 +183,7 @@ def test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_
     done3, entries3 = _logged_run(world, home, tmp_path / "declare.log", "declare", world.dc_flags())
     assert done3.returncode == 0, (done3.stdout, done3.stderr)
     every = entries + entries2 + entries3
-    reached = [p for _, p in every if W.at_or_under(p, W.TRUE_SETS) or W.at_or_under(p, W.TRUE_RUNS)]
+    reached = _true_root_opens([p for _, p in every], repo_root)
     assert reached == [], reached
     assert any(W.at_or_under(p, world.hidden) for _, p in entries), "the log saw no planted question opened"
     assert any(W.at_or_under(p, home / "gov-os-runs") for _, p in entries), "~ was not the planted home"
