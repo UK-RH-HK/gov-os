@@ -245,7 +245,7 @@ def stand_in_vector(text):
 
 
 class OllamaStandIn:
-    """A healthy Ollama endpoint on a free loopback port, reporting the model wholly on the CPU (DEC-798)."""
+    """A healthy Ollama endpoint on a free loopback port, reporting the model wholly on the GPU (DEC-1033)."""
 
     def __init__(self):
         self.requests = []

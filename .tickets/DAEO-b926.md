@@ -23,8 +23,8 @@ allowed_paths:
 - docs/plan/wave-2/examin-real/**
 kpis:
   success:
-  - The same steps as W2-27, on the real repository, on an adoption branch the owner merges after green CI. The first real ticket closes with gov close at exit 0. Only the pinned, hash-verified release
-    is used.
+  - 'The same steps as W2-27, on the real repository, on an adoption branch the owner merges after green CI. The first real ticket closes with gov close at exit 0. Only the pinned, hash-verified release
+    is used. Verify: the adoption run''s stage records on the real repository list the same steps as W2-27''s, all on the adoption branch (the main branch is unchanged until the owner''s merge, which is after a green CI run); `gov close` on the first real ticket exits 0; the install record names the pinned release and its hash, and the hash check passes; a planted unpinned or hash-mismatched release is refused.'
   failure: []
 profile: FULL
 sources:

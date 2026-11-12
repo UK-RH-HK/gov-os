@@ -130,7 +130,32 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_waits_on_as_a_string_or_ref_and_reason` | red | `waits_on` not declared: a bare string passes, and an object without `ref` passes |
 | S10 | `test_w2_128_schemas.py::test_s10_every_existing_ticket_stays_valid` | green (guard) | all 213 tickets validate today; they must after the change (see N-2: `DAEO-2bdu`) |
 | S10 | `test_w2_128_schemas.py::test_s10_t1_is_the_ticket_template_with_its_skeleton_in_one_yaml_block` | red | today's `ticket.md` is front matter, with no `name: ticket` and no yaml block |
-| S11 | round 2: not mapped | none | TPL-6, after TPL-4 and the owner's row decisions |
+| S11 | `test_w2_128_round2a.py::test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation` | red (2a); green (2b, strengthened) | 2a: no `w2/integrate`, "any path under src/" barred outright; 2b (F3) adds a permitting sentence naming `w2/integrate` or the integrated code, and no clause barring source code or implementation without "ticket" |
+| S11 | `test_w2_128_round2a.py::test_s11_orchestration_briefs_points_to_the_kernel_templates` | red (2a) | Briefs names the five `brief-*.md` texts and no kernel template |
+| S11 | `test_w2_128_round2a.py::test_s11_orchestration_skill_no_longer_says_a_brief_states_each_step_in_full` | red (2a) | "The ticket loop" says `brief-lead.md` "states each step in full" |
+| S11 | `test_w2_128_round2a.py::test_s11_k4_no_bar_on_globbing_the_governance_folder` | red (2a) | "No glob, search or listing runs over the project's governance folder" (DEC-508) |
+| S11 | `test_w2_128_round2a.py::test_s11_k4_no_bar_on_reading_the_settings_file` | red (2a) | "The settings file and the held-out file are never read" (DEC-525) |
+| S11 | `test_w2_128_round2a.py::test_s11_k4_guard_still_bars_the_held_out_contents` | green (guard) | the held-out file is barred today; the restated lines must keep it barred |
+| S11 | `test_w2_128_round2a.py::test_s11_k4_lines_are_restated_citing_dec_820` | red (2a); green (2b, strengthened) | 2a: no DEC-820 in the section; 2b (F3) adds that one line citing DEC-820 names all four refusals (secrets, held-out, counterpart/same ticket, hidden half) |
+| S11 | `test_w2_128_round2a.py::test_review_f6_orchestration_skill_names_no_retired_brief_text_as_content` | red (2a) | lines 14, 29 and 61 name `brief-*.md` texts as the content |
+| S11 | `test_w2_128_round2a.py::test_review_f6_orchestrator_role_names_no_retired_brief_text_as_content[kernel]` | red (2a); green (2b) | `roles/orchestrator.md:39` started a lead "from the kernel template `brief-lead.md`"; round 2a fixed it |
+| S11 | `test_w2_128_round2a.py::test_review_f6_orchestrator_role_names_no_retired_brief_text_as_content[rulesync]` | red (2b) | `template/.rulesync/subagents/orchestrator.md:47` still starts a lead "from the kernel template `brief-lead.md`" (review F1) |
+| S11 | `test_w2_128_round2a.py::test_s11_judgement_rules_are_in_t6_and_in_no_other_kernel_template` | green (guard) | only `role-reviewer.md` holds `Ordinary work:` and `Consequence:` today |
+| S11 | `test_w2_128_round2a.py::test_s11_checkpoint_example_holds_no_daeo_0000` | red (2a) | `checkpoint.md` names `DAEO-0000` in `task:` and `inputs` |
+| S11 | `test_w2_128_round2a.py::test_s11_checkpoint_planted_from_its_example_gives_gov_links_no_unknown_id` | red (2a) | `gov links` gives `UNKNOWN_ID` on `DAEO-0000` (line 7, `task:`) |
+| S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[discovery]` | red (2a) | the copy differs from the kernel skill (version and a line) |
+| S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[retrieval]` | red (2a) | the copy differs from the kernel skill |
+| S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[orchestration]` | green (guard) | equal today; must stay equal after the skill changes |
+| S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[test-design]` | green (guard) | as above |
+| S11 | `test_w2_128_round2a.py::test_s11_skill_version_is_one_minor_above_integrates[orchestration]` | red (2b) | `1.1.0` (round 2a's), not `1.2.0`; baseline `a2576c6f` (revised in 2b) |
+| S11 | `test_w2_128_round2a.py::test_s11_skill_version_is_one_minor_above_integrates[test-design]` | red (2b) | as above |
+| S11 | `test_w2_128_round2a.py::test_s11_skills_validator_passes_on_both_skills` | green (guard) | `{"findings": []}` today |
+| S11 | `test_w2_128_round2a.py::test_s11_guard_test_design_skill_changes_only_its_read_rule` | green (guard) | only the read rule changed in 2a; 2b also lets a unit elsewhere differ by CAP-38.b re-cited as CAP-38.c |
+| S11 | `test_w2_128_round2a.py::test_s11_guard_orchestration_skill_changes_only_the_named_parts` | green (guard) | only 2a's named lines changed; 2b also frees F2's three lines (DEC-511, DEC-254, DEC-386) |
+| S11 | `test_w2_128_round2b.py::test_s11_f2_orchestration_requires_no_gov_checkpoint_record_per_round_on_dec_511` | red (2b) | `SKILL.md:76` "A lead writes a real checkpoint with `gov checkpoint` at each round boundary" on DEC-511 alone (lifted by DEC-1057, R-6) |
+| S11 | `test_w2_128_round2b.py::test_s11_f2_one_writer_per_tree_cites_dec_963_not_dec_254` | red (2b) | `SKILL.md:55` cites DEC-254 for "never two writing sessions in one tree" |
+| S11 | `test_w2_128_round2b.py::test_s11_f2_no_bar_on_reading_another_sessions_folders` | red (2b) | `SKILL.md:83` "nothing is left in or read from another session's folders", a read bar beyond DEC-820's four |
+| S11 | `test_w2_128_round2b.py::test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136` | red (2b) | the read rule cites "(CAP-38.b, DEC-136)" and no CAP-38.c |
 | S12 | round 2: not mapped | none | TPL-7, the measures |
 | S13 | round 2: not mapped | none | TPL-8, the pilot |
 | S14 | `test_w2_128_links.py::test_s14_template_carries_its_link_lines[brief]` | red | `brief.md` does not exist |
@@ -153,6 +178,9 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S14 | `test_w2_128_links.py::test_s14_gov_links_finds_nothing_on_a_record_planted_from_the_template[lesson]` | green (guard) | as above |
 | S14 | `test_w2_128_links.py::test_s14_gov_links_finds_nothing_on_a_record_planted_from_the_template[research]` | green (guard) | as above |
 | S14 | `test_w2_128_links.py::test_s14_gov_links_finds_nothing_on_a_record_planted_from_the_template[ticket]` | red | `ticket.md` has no yaml skeleton to plant |
+| S14 | `test_w2_128_round2b.py::test_s14_checkpoint_template_task_is_empty_with_a_comment_to_fill_it` | red (2b) | `checkpoint.md:7` holds `task: '{ID}'` |
+| S14 | `test_w2_128_round2b.py::test_s14_gov_links_on_a_tree_holding_the_checkpoint_template_gives_no_unknown_id[template]` | red (2b) | `gov links` gives `UNKNOWN_ID` `{ID}` (line 7) on the unfilled template at its own path (review F5) |
+| S14 | `test_w2_128_round2b.py::test_s14_gov_links_on_a_tree_holding_the_checkpoint_template_gives_no_unknown_id[adopted]` | red (2b) | as above, at an adopted project's `governance/kernel/templates/checkpoint.md` |
 | S15 | `test_w2_128_facts.py::test_s15_links_command_and_its_check_and_t7_quotes_its_first_line` | red | `facts.yaml` does not exist |
 | S16 | `test_w2_128_schemas.py::test_s16_schema_declares_optional_sources_as_a_list_of_ids[lesson.schema.json]` | red | `sources` not declared: a bare string passes |
 | S16 | `test_w2_128_schemas.py::test_s16_schema_declares_optional_sources_as_a_list_of_ids[failure.schema.json]` | red | as above |
@@ -186,7 +214,9 @@ does not declare the field, or a record template without its link lines. The 8 g
 | F6 | round 2: not mapped | none | a measure blocking a launch, close or landing (TPL-7 F1) |
 | F7 | `test_w2_128_templates.py::test_f7_every_bracketed_decision_id_in_a_template_is_accepted` | red | the nine templates do not exist |
 
-**Round 2, not mapped here:** S7, S9, S11, S12, S13 and F2-F6 whole; and these halves of round-1 lines:
+**Round 2, not mapped here:** S7, S9, S12, S13 and F2-F6 whole; S11's TPL-6 S1 and S2 (Appendix A's pointer,
+`LEAD-w2-common.md` and `build_lead_brief.py`: the CTO's lane) and S4's project half (`JUDGEMENT.md` itself); and
+these halves of round-1 lines:
 - S6's TPL-2 S3 (a `steps` switch flipped in a filled brief removes its one line and nothing else): needs
   `gov brief`.
 - S10's TPL-5 S3 (the ready check inside `gov brief`: refusals per required field, warnings per advisory item).
@@ -204,6 +234,91 @@ memory first" or off T-8's Start line; the reversal line removed; a row line wit
 `W2-56`; a record template citing `DEC-999999` (the planted `gov links` case); a check that exits 1, sleeps 6 s or
 runs `gov retrieve "x"`; seven dod items; a dod line copied into T-7; the links command changed; the ticket
 schema losing the `{line, verify}` form, `non_goals` or `waits_on`; the lesson schema losing `sources`.
+
+## Round 2a (2026-11-09, a fresh designer; S11's text part)
+
+From the ticket's body "Round 2a", S11 (TPL-6 S1-S4) and the round-1 review's F6 and F7, reading integrate's text
+(`w2/integrate` at `61231e618`, DEC-963). Nothing of this ticket's implementation was read. 21 cases in
+`test_w2_128_round2a.py`, mapped to S11 above: **14 red, 7 green guards** on integrate (the whole folder: 113 collected, 14 failed, 99 passed, 9.0 s). Round 1's 92 cases are
+unchanged.
+
+- **The baseline is pinned.** The versions and the guards compare with integrate's text read by
+  `git show 61231e61839e…:<path>` at test time, not with the moving `w2/integrate`: once this ticket is merged,
+  `w2/integrate` holds the change, and "one minor above integrate" would turn red at the close. "One minor above" is
+  `major.(minor+1).0`.
+- **Sentences** are a unit (README above) split after `.`, `;`, `:`, `?`, `!` or at a spaced dash. A *bar* is a
+  sentence with a negation (`no`, `never`, `not`, `forbid…`, `refus…`, `without`, `n't`).
+  - The read rule (the `## ` section whose heading holds "read") must name `w2/integrate`, cite DEC-963, and hold a
+    bar naming "implementation" and "ticket". No sentence of the skill may bar `src/` without naming "ticket".
+  - K-4: no sentence may name `glob`/`listing`/`search` and "governance", or "settings" and "read", in a bar unless
+    it also holds a permitting word (`open`, `may`, `allowed`, `permitted`, `readable`, `free`, `no longer`, `lifted`).
+    A sentence naming "held-out" with a bar (`never`, `not`, `no`, `but for`, `except`, `only`, `refus…`) must remain.
+    The "protected files" section must cite DEC-820.
+- **Briefs and F6.** A retired text (`brief-engineer.md`, `brief-test-designer.md`, `brief-reviewer.md`,
+  `brief-product-spec.md`, `brief-lead.md`) may stand in a unit only beside the template that replaces it
+  (`role-*.md`). Briefs must name `template/governance/kernel/templates` or a `role-*.md`. "word for word" may not
+  stand in Briefs, and neither "each step in full" nor "standing sentences word for word" anywhere in the skill.
+  `roles/orchestrator.md` must name a role template, the templates folder or `gov brief`.
+- **The guards.** The front matter is unchanged except `version`, and the `## ` headings are the same, in order.
+  - test-design: every section other than the read rule is unchanged, unit for unit, white space folded.
+  - orchestration: Briefs may change whole. In "Temp hygiene and protected files" the units citing DEC-508 or DEC-525
+    may change, and every other unit stays, in order. Elsewhere the unit count is kept, and only a unit that names a
+    retired brief text may change (F6: lines 14 and 29).
+- **The checkpoint.** It holds no `DAEO-0000`. It is planted as round 1 plants it, with `{ID}` filled with
+  `DAEO-t8mp` and any other `{KEY…}` with a plain word, and no other substitution. No `UNKNOWN_ID` may name it.
+  `gov links` reads `task:`, not `inputs`, so the string case covers the `inputs` id.
+- **The skills validator** runs as `python3 -m gov.check.skill_validator --both-layouts
+  template/governance/kernel/skills/{orchestration,test-design}` from the tree root and must exit 0. It refuses an
+  unknown `gov` subcommand in code. `gov brief` is not one of its commands on integrate (W2-152 is not merged), so a
+  skill naming `` `gov brief` `` in code fails it today.
+- **A check of the cases** (a scratch worktree, removed): a stand-in 2a passed all 113 (92 + 21). Each of 19 wrong
+  changes then failed the case meant for it, among them:
+  - `src/` barred outright; the ticket bar dropped;
+  - "word for word" kept; no template named; "each step in full" kept;
+  - the glob or the settings bar kept; the held-out bar dropped;
+  - `brief-engineer.md` named in the role file; JUDGEMENT copied into T-7; `task: DAEO-9999` in the checkpoint;
+  - a stale rulesync copy; version `1.0.1`; an unknown `gov` command;
+  - a test-design Inputs line or description changed; an orchestration line added, a temp-hygiene line changed or a
+    section renamed.
+
+## Round 2b (2026-11-09, a fresh designer; round 2a's review F1-F4 and its F5 link notice)
+
+From the ticket's body "Round 2b", `reviews/w2-128-r2a.md` (F1-F5), DEC-511/DEC-1057 (R-6), DEC-254, DEC-963,
+DEC-820, DEC-1052 and `contract.yaml` CAP-38.b/CAP-38.c, reading integrate's text (`w2/integrate` at `a2576c6f6`,
+merged into this branch by the CTO; DEC-963). Nothing of this ticket's implementation was read. Run in the launch
+sandbox: **121 collected, 10 failed, 111 passed** (15 s); the exclusion left nothing out.
+
+- **New cases** (`test_w2_128_round2b.py`, 7 node ids; 7 red):
+  - F2, per-round checkpoint: no clause naming `gov checkpoint`, "round" and "checkpoint" without a negation or a
+    permitting word; no unit cites DEC-511 without DEC-1057.
+  - F2, one writer: no DEC-254 in the skill; a unit naming writing sessions (or one writer) and a tree exists and
+    cites DEC-963.
+  - F2, other sessions: no clause naming another session and "read" in a bar, unless it holds a permitting word or
+    names the counterpart / same ticket (DEC-820 (c)). The temp-hygiene line may also be dropped.
+  - F4: the read rule cites CAP-38.c and neither CAP-38.b nor DEC-136.
+  - The link notice: `checkpoint.md`'s `task:` is empty (`''` or null) and its line carries a `#` comment naming the
+    id or ticket; the unfilled template, planted at `template/governance/kernel/templates/checkpoint.md` and at
+    `governance/kernel/templates/checkpoint.md` (one tree each, with round 1's `_judge`), gives no `UNKNOWN_ID`.
+- **Revised cases** (`test_w2_128_round2a.py`; DEC-866, `Rewrite-Reason:`):
+  - F1: the F6 role case is parametrised over the kernel role (`[kernel]`, green) and
+    `template/.rulesync/subagents/orchestrator.md` (`[rulesync]`, red). Root `.rulesync/` is the ACT's, not read.
+  - F3: the read rule also needs a sentence with a permitting word, "read", no negation, and `w2/integrate` or "the
+    integrated code"; no *clause* (a sentence cut again at each comma) may bar `src/`, "source code",
+    "implementation" or "production director…" without "ticket". K-4: one unit of "protected files" citing DEC-820
+    names secrets, held-out, counterpart or same ticket, and hidden half. Both green on integrate (2a holds them).
+  - Versions: baseline `a2576c6f66ae…` (integrate as merged for these cases, 1.1.0); expected `1.2.0`. Red.
+  - Guards (still against `61231e618`, so 2a's and 2b's changes together): orchestration frees, in addition, the
+    units citing DEC-511 or DEC-254 anywhere and DEC-386 in "protected files"; in every section other than Briefs
+    the other units stay in order, and new units may not outnumber the freed ones (a freed unit is restated one for
+    one or dropped). Test-design: outside the read rule a unit may differ only by CAP-38.b re-cited as CAP-38.c.
+    Both green.
+- **A check of the cases** (a scratch worktree, removed): a stand-in 2b passed all 121. Each of 19 wrong changes
+  failed only the case(s) meant for it (`task: '{ID}'` kept fails the three checkpoint cases): the rulesync role keeping `brief-lead.md`; a per-round `gov
+  checkpoint` kept after ", and none …"; DEC-511 alone; DEC-254 kept; the one-writer line dropped; the other-session
+  read bar kept, or joined by a comma; CAP-38.b or DEC-136 kept beside CAP-38.c; "it does not read source code"
+  inside the ticket sentence; the permitting sentence removed; refusal (c) or (d) dropped; `task: '{ID}'` kept; the
+  comment removed; version 1.2.1; an unrelated orchestration line changed or one added; a test-design Inputs line
+  changed. Two allowed changes stayed green: an Inputs line re-cited to CAP-38.c, the temp-hygiene line dropped.
 
 ## Notes and limits
 
@@ -230,4 +345,6 @@ schema losing the `{line, verify}` form, `non_goals` or `waits_on`; the lesson s
   `facts.yaml`, the check runner, the register's statuses, the schema validator, the record finder.
 - `conftest.py`: puts this folder on the import path.
 - `test_w2_128_templates.py` (S1-S5, S18, S20, F1, F7), `test_w2_128_facts.py` (S6, S8, S15),
-  `test_w2_128_schemas.py` (S10, S16), `test_w2_128_links.py` (S14, S17, S19), `test_w2_128_rows.py` (S21).
+  `test_w2_128_schemas.py` (S10, S16), `test_w2_128_links.py` (S14, S17, S19), `test_w2_128_rows.py` (S21),
+  `test_w2_128_round2a.py` (S11, round 2a, revised in 2b; it reuses `test_w2_128_links.py`'s planting),
+  `test_w2_128_round2b.py` (S11 and S14, round 2b; it reuses round 2a's helpers and round 1's planting).

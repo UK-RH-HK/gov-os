@@ -237,3 +237,20 @@ The engineer's reading with `--from-head` at the ticket's head (`5a9e36c07571` p
 against 67, visible 33 and hidden 34 on both (the halves' gap −4.7 on both), MRR over the 79 0.6306 against 0.6242:
 **adopted by the rule** (the 79 not lower, the gap not wider, MRR higher). Beside it, the 138 (with the spent 59): 106
 against 105, the spread between the three sets 21.1 against 22.8. Records `~/gov-os-runs/D4B/w4-i-rx`, `w4-92-rx`.
+
+## 11. S11 (D-6 part 2, DEC-1109 (2)): the register's verbless change labels
+
+- **The change:** in `loader.register_statements`, a **Changed by:**, **Amended by:**, **Lifted by:**, **Superseded by:** or **Amended:** value with no "<verb> ... by" now names as changers only the ids at the head of its clauses (`_clause_heads`): the value ends at " · " and at a line break that starts a list item at any indentation; it splits into clauses at each ";" outside parentheses; a head is the text before its first ":" outside parentheses (the whole clause when it has none); the changers are the head's ids outside parentheses. Before, every id in the value (to its first unindented list item) was a changer.
+- **Unchanged:** labels with a verb, the out-labels (**Changes:**, **Supersedes:**, ...), **Superseded:**, the free text and the change log. The list-item cut is the verbless branch's alone; the others keep their own cut.
+- **The CTO's probe on this repository's register** (`decf83278` before, `6bc41bbca` after; read-only, no store):
+
+| | Before | After |
+|---|---:|---:|
+| Statements, all forms | 3,559 | 3,549 |
+| Verbless in-label statements | 339 | 329 |
+| Other statements, identical and in order | 3,220 | 3,220 |
+| The wrong pairs present (DEC-208, DEC-237, DEC-838 → DEC-281; DEC-880, DEC-913 → DEC-608; DEC-843 → DEC-880; DEC-891 → DEC-896; DEC-866 → DEC-492; DEC-723 → DEC-728; DEC-775 → DEC-780) | 10 of 10 | 0 of 10 |
+| The head pairs present (DEC-900, DEC-899 → DEC-757; DEC-882, DEC-884, DEC-889 → DEC-880; DEC-868, DEC-908 → DEC-455; DEC-1057, DEC-522 → DEC-511) | 9 of 9 | 9 of 9 |
+| `gov links --all` UNMARKED_CHANGE | 9 | 8 (DEC-780 ← DEC-775 left) |
+
+The ten statements removed are exactly the probe's ten; none was added. Where they sat: DEC-281, DEC-492, DEC-608, DEC-880 and DEC-896 in the prose after a clause's colon; DEC-728 (**Changed by:**) and DEC-780 (**Lifted by:**) on indented sub-items below the label. The census (`docs/research/D4B-link-census.py`) keeps its own reading, so §10's "one for one" now holds for every statement but the verbless labels', which are the census's minus these ten (`tests/unit/store/test_w2_92_links.py`). §10's figures of record were measured before S11; up to ten of its changer pairs came from these labels.

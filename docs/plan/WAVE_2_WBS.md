@@ -1460,7 +1460,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are filed on 2026-10-29.
 
-#### W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
+#### Split: W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
 - **Why:** a launched session loads none of its role's text (lens E F2); no launch sets effort, and the compaction threshold was a user-level value (lens F F1); the model a subagent runs on is not the one recorded (lens E F14); the loaded skill copy has no version (lens E F15). The accepted plan (§4.3, §2 rows 5, CAP-35.c lite and CAP-36.a lite) adds W2-60 under the admission rule (iii): exit criterion 5. Until it lands, the prompt's launch forms carry the values by hand (prompt v3, §6; DEC-839 item 5).
 - **Split** so that each part fits one lead run: **W2-60a** (the role at launch and the launch record; FULL, engineer) and **W2-60b** (the per-session record; STANDARD, engineer, after W2-60a).
 - **Starts** as soon as filed, beside the memory work (DEC-941), stacked on `w2/integrate` (DEC-786): W2-58's launcher is merged there (`af5d1a25`). W2-60a runs beside W2-56 on `launcher.py`, each in modules of its own. W2-60b starts after W2-60a merges and after W2-07 (`DAEO-r9ss`) closes, since W2-07 holds `src/gov/telemetry/**`. W2-21 follows both on the launcher, and builds on W2-60a's launch record.
@@ -1759,6 +1759,85 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
   - EXAMIN's copy (W2-27) is its live trial.
 - **Depends on:** W2-03, W2-52 (`stages.py`, the adopt skill), W2-76 (`src/gov/rebuild/**`), W2-81 (its builders). W2-27 depends on it.
 - **Contract:** A9 lite comes into Wave 2 by a CIT-P note under DEC-105 option (a) (the owner's decision is DEC-954 Q9f).
+
+### Cards for tickets filed without one (2026-11-09; D-10's red-fix list, the plan validator's `wave2-tickets`)
+
+W2-60 above is a split parent with no ticket of its own: its heading says so, so it is not read as a ticket. The tickets below were filed straight from a decision with no card (W2-63 and W2-66c, then W2-128 onwards, the three-digit ids the validator now reads, W2-139's D-10 review F1); each card points at its ticket file, which holds the KPIs.
+
+#### W2-63 W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window (LITE, independent-test-designer; DEC-838, DEC-665, DEC-865)
+- **Ticket file:** `DAEO-pl6k` (closed).
+
+#### W2-66c W2-66's live-map suite pins ACT-SELECT-FIXES-1's lines (LITE, independent-test-designer; DEC-1100, DEC-1098, DEC-889, DEC-891)
+- **Ticket file:** `DAEO-btcs` (open); its KPIs and paths are there.
+
+#### W2-128 The templates: one per role, the ticket and the brief envelope, filled from the ticket and one facts file, delivered at launch, their use measured (P1-7, R3 TPL-1 to TPL-8, DEC-1050 TEMPLATES) (STANDARD, product-spec)
+- **Ticket file:** `DAEO-t8mp` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-129 gov links: one cheap, incremental link-integrity check that finds every unlinked or contradicted record across the repository and its memory, and names the role that fixes it; a notice, never a gate (DEC-1073 (5)(b)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-q7lk` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-130 The link clean-up: every drifting decision marked in its own entry (the 87 with no hint first), tickets linked to the decisions they rest on, commit trailers' residuals listed, and one status-reconciliation list for the owner (DEC-1073 (5)(a)) (STANDARD, orchestrator)
+- **Ticket file:** `DAEO-q8cl` (open); its KPIs, paths and sources are there.
+
+#### W2-131 A register chunk in a bundle carries its own entry's id, not DEC-999 (DEC-1082 (2), a priority fix in re-pin window 4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-r8vq` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-133 A narrowed or gap-starting register item carries its own entry's id (W2-131's follow-up, DEC-1083, re-pin window 4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-k4wm` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-134 The memory measure re-anchors line-cited gold in memory for the commit it measures, and never writes the sets root (W2-61h S8's code, DEC-1085 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-m4rq` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-135 A line over 4,000 characters in a bundle item is sent as its first 4,000, the item marked cut, its lines cited unchanged: a guard against one-line files only (BUNDLE-BUDGET-1 (a), DEC-1086 B) (STANDARD, engineer)
+- **Ticket file:** `DAEO-c4pb` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-136 gov plan: the dependency map from each ticket's writes, needs and waits, the launch batches it proposes, and gov launch's check against them (DEC-1088, DEPENDENCY-MAP-1) (STANDARD, engineer)
+- **Ticket file:** `DAEO-p3ln` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-137 The shared reranker's request cap raised, now that memory is released after each request: fewer requests a search, 20 and 10 searches at once measured with the GPU peak under budget (DEC-1090 (2), PAT-1 G1) (STANDARD, engineer)
+- **Ticket file:** `DAEO-5emz` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-138 The store's commit in every search result, and the worker's check of each item's line hash against its own file (DEC-1090 (3), PAT-1 G2 and G4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-rmhj` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-139 CAP-45.a to Wave 3: the approved CIT-P note applied to the Contract as version 4.3, with its CIT-E, merged in one batch with W2-140 (DEC-1093 (1)) (STANDARD, product-spec)
+- **Ticket file:** `DAEO-ongl` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-140 W2-49's acceptance suite revised for Contract 4.3 (CAP-45 and CAP-45.a to Wave 3), written against the approved CIT-P note before the edit, merged in one batch with W2-139 (DEC-1093 (1)) (STANDARD, independent-test-designer)
+- **Ticket file:** `DAEO-5ce2` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-141 The guard refuses an engineer's search that can reach its own ticket's acceptance folder (Grep, Glob, and Bash recursive searches) unless the call excludes it, saying how (DEC-1093 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-xwro` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-142 Search again once in the kernel skills: the retrieval skill's step 7 and the discovery skill's line, after the practice is proven in use (DEC-1094 (2), SEARCH-AGAIN-PRACTICE §3.1-3.2) (LITE, product-spec)
+- **Ticket file:** `DAEO-qskx` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-145 No private reranker beside the shared service: a search the shared reranker cannot answer stays unranked and named, never a private reranker on the GPU or the CPU; the service holds every reranker GPU slot (DEC-1048 (5), DEC-1046 (1), DEC-1097 (8)) (FULL, engineer)
+- **Ticket file:** `DAEO-2tfd` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-146 The id reader reads every id form a repository declares: a question that names a nonexistent id in any declared form stops with UNRESOLVED_IDS, so DEC-1071 (5)'s stop can fire in any adopted repository (DEC-1099 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-f6x3` (open); its KPIs, paths and sources are there.
+
+#### W2-147 gov plan breaks a cycle only at a ticket inside it: a ticket outside every cycle keeps all its waits (DEC-1102) (STANDARD, engineer)
+- **Ticket file:** `DAEO-zi7s` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-148 The operator agent: ACTs applied by class from a queue, in a walled session (DEC-1104 (2)) (FULL, engineer)
+- **Ticket file:** `DAEO-xafn` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-149 The independent sessions' launch script: a walled headless session per job from an approved brief (DEC-1101 (2)-(3) step 2) (FULL, engineer)
+- **Ticket file:** `DAEO-52ku` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-150 Memory's import closure free of the gates: E-2's four coupling edges untangled (P1-6 item 1, D-6 part 2; DEC-1039 (2), DEC-1109 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-ijf5` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-151 MR-1 to MR-6 regenerated from contract.yaml: the master-rule records say what the Contract says (D-6 part 2; DEC-1074 (8), DEC-1109 (2)) (LITE, product-spec)
+- **Ticket file:** `DAEO-qzca` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-152 gov brief: a filled brief from the ticket and the facts file, refused when the ticket is not READY by code (W2-128 TPL-3, TPL-2 S3, TPL-5 S3 and the dependency fields; the CTO's split, DEC-1112 (3)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-o5x1` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-153 The role template delivered at launch: gov launch and the dispatcher pass it as the appended system prompt, refusing without it; the subagent bodies and the template copies generated and checked byte for byte (W2-128 TPL-4; the CTO's split, DEC-1112 (3)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-8s85` (in_progress); its KPIs, paths and sources are there.
 
 ## 3. Order, layers and critical path
 

@@ -62,6 +62,11 @@ Two forms, both valid once the implementation lands:
    `436a7520`) gives every bundle that field. None of these questions expands a parent, so it is `[]` in each, and
    it is pinned so, as part of the baseline, not a W2-92 change. Every other field is as before, and any other
    change still fails `test_u1`.
+   **Revised under DEC-1109 (2) for D-10's red-fix list** (DEC-1106 (3), DEC-1108 (5): the live path map's
+   `write_refused` block, `~/.gov-os/guard-calls` and its `why`, made the planted copy match "who calls
+   w92_nowhere"): `support.path_map()` now writes the kernel schema's required keys only, with the live map's closed
+   values (`state_class`, `capabilities`, the `policies` strengths, each system's `status`) and none of its paths or
+   prose, so only the planted corpus answers; no pinned bundle changes.
 2. **Live** (`test_u2`): the plain question's evidence is the plain fused order of the lexical route, the only route
    of today that answers in these projects (`gov.retrieval.lexical.search` then `gov.retrieval.fusion.rrf`, as W2-87
    does), and the pinned answer is that order. Since W2-13's S2 the route's list for the fusion is its `ranked`
@@ -120,7 +125,7 @@ its two title cases (it sees the change).
 | KPI line | Tests | Red on the integrated code because |
 |---|---|---|
 | **Success 6.** A plain question costs about one second: the record route no longer parses every record's front matter in each process (the titles kept in the store at rebuild) | `test_w2_92_speed.py::test_s6a_a_plain_question_does_not_read_every_records_front_matter` (cases: plain, unknown id) · `test_w2_92_speed.py::test_s6a_premise_the_counter_sees_a_record_read` · `test_w2_92_speed.py::test_s6b_a_title_is_the_one_the_store_was_built_with` · `test_w2_92_speed.py::test_s6b_after_a_rebuild_the_new_title_is_the_stores` | `test_s6a` (both cases): "one plain question opened 240 of the 240 planted records' files (at most 12 allowed)": `graph_route.start_ids` reads every record's title from its file and parses its front matter in each process. `test_s6b_a_title_is_the_one_the_store_was_built_with`: the bundle is empty (`[]`): the title is read from the working tree's file, which the edit after the load changed, not from the store (the store holds titles of register entries only). Its premises hold there: after the edit the lexical index is refreshed and fresh, and the lexical route alone finds nothing for the old title, so only the record route can bring the record (revised under the CTO's decision P2, DEC-342: before, the edit left the index stale, and a stale index cites nothing whatever the title's source). Checked in a scratch copy, never committed: the integrated record route made to read titles as committed (`git show HEAD:<path>`) passes both `s6b` cases. **The premise and `test_s6b_after_a_rebuild_the_new_title_is_the_stores` pass** (guards: the counter counts one open and one parse for one record read; a committed title change and a rebuild move the title). |
-| **Success 6 with success 4.** Nothing else in the bundle changes; S1's record route answers as before | `test_w2_92_speed.py::test_s6c_the_record_route_answers_as_the_integrated_code_does` (cases: plain, unknown id, decision id, contract id at radius 1, ticket id, W2 id, record title, a many-records title, ticket, batched) | **Passes on the integrated code** (a guard, by construction): any change to an item, its order, or a field outside the evidence fails it. |
+| **Success 6 with success 4.** Nothing else in the bundle changes; the record route answers as before | `test_w2_92_speed.py::test_s6c_the_record_route_answers_as_the_integrated_code_does` (cases: plain, unknown id, decision id, contract id at radius 1, ticket id, W2 id, record title, a many-records title, ticket, batched) | **Passes on the integrated code** (a guard, by construction): any change to an item, its order, or a field outside the evidence fails it. |
 
 - **S6-P1. Where the titles come from.** The KPI line allows "the titles kept in the store at rebuild, or read only
   when a question names a record"; the CTO's brief for this round says the titles come from the store after a
@@ -222,6 +227,55 @@ marked. The planted texts hold none of these words.
 - **S9-P1. The form of the mark.** A per-item field is recommended: a new top-level key of every bundle would change
   `test_w2_92_unchanged.py`'s pinned bundles (`test_u1`, `test_u3`), which include register chunks. Confidence medium.
 
+## KPI line S11 (D-6 part 2; DEC-1109 (2)), tests and red reasons on the integrated code `2a64626532cb`
+
+Added under DEC-1109 (2) by the test designer (`DAEO-n0wb`, D-6 part 2, plan item B of
+`governance/project/orchestration/packages/LIFT-1/D6-PART2.md`), from S11, its failure line ("a verbless change
+label's prose id counted as a changer, or a clause-head changer lost"), the brief and the register's text, never
+from the implementation. The row is DECIDED-NOT-DONE row 24, "the loader's 8 wrong pairs" (DEC-1098 (3)). "Today" is
+`w2/integrate` `2a64626532cb` (`support.D6_BASE`), the head of `w2/W2-92-d6-tests` when the cases were written.
+
+- **The public function** is `gov.store.loader.register_statements(text, entries=None)`, whose statements are
+  `{source, target, cls, form, whole, where}`. Each case reads it two ways, each in a new process with this
+  worktree's `src/`: the planted register's text whole, and each entry of `register_entries(text)` alone, as
+  `gov links` (W2-129) reads it.
+- **S11's register** (`test_w2_92_verbless_labels.py::s11_register`) holds the shapes the W2-130 sitting found in
+  this repository's register, renumbered: prose after a clause's colon (DEC-901 → DEC-281), a `;` in that prose
+  (DEC-917 → DEC-608), several heads with prose in one clause (DEC-882, DEC-884, DEC-889 → DEC-880), an id in
+  parentheses after a `;` inside quotes (DEC-868, DEC-899 → DEC-492), sub-items directly below the status line
+  (DEC-953 → DEC-728), the four heads that stay, each other verbless label (`**Amended by:**`, `**Lifted by:**`,
+  `**Superseded by:**`, `**Amended:**`), a label on its own line, and a value ending at ` · `. One plain entry
+  stands for every other id named, so each is a known entry.
+- **The guard's register** (`others_register`): labels with a verb (`amended by`, `superseded by`, `superseded in
+  part by`, `amended in its item 2 by`, one with prose after a colon), `**Changes:**` with prose after a colon,
+  `**Amends:**`, `**Supersedes:**` on the status line and on a later line, `**Replaces:**`, free text and a change
+  log, then the marina's register (`support.links_register`). Its one verbless label, the marina's `**Changed by:**
+  DEC-433 (item 3's wording)`, gives the same under S11 (its head is its one id).
+- **`gov links --all --json`** runs on a planted git repository holding S11's register and the path map.
+- No store, index, vector, code-graph tool or `gitleaks`: runs inside a worker's sandbox, about 1 s.
+
+Red run on `2a64626532cb` (this branch's `src/`), in the sandbox through the heavy slot, with the exclusions of
+`EMG-d4b-launched.md` (they leave none of these out): **28 tests, 14 failed, 14 passed** (about 1 s). Every red
+fails on its own assertion, none on a premise.
+
+| KPI line | Tests | Red on the integrated code because |
+|---|---|---|
+| **S11 and failure 6.** A verbless change label names as changers only the ids at the head of its clauses: an id in the prose after a clause's colon, inside parentheses, or on a sub-item below the label is not a changer | `test_w2_92_verbless_labels.py::test_s11_a_verbless_labels_prose_parenthesis_or_sub_item_id_is_no_changer` (cases: prose after a colon; prose after a colon, a ';' inside it; prose after one of several heads' colons; an id inside parentheses; an id inside parentheses, after a ';' inside quotes; a sub-item below the label, indented 2; indented 3; sub-items indented 4 and 2; a label on its own line: prose and a parenthesis; Amended by, Lifted by, Superseded by and Amended prose; guard: the value ends at the middle dot) · `test_w2_92_verbless_labels.py::test_s11_gov_links_reports_no_unmarked_change_made_only_by_a_sub_item_or_prose_id` | Today every id in a verbless value is a changer, read either way: e.g. "prose after a colon: ['DEC-513', 'DEC-514', 'DEC-515'] counted as changers of DEC-511 (its changers: ['DEC-512', 'DEC-513', 'DEC-514', 'DEC-515'])"; the sub-items' ids too ("['DEC-563'] counted as changers of DEC-561"). `gov links` reports UNMARKED_CHANGE for the six pairs only a sub-item or prose id makes (DEC-561 ← DEC-563, DEC-571 ← DEC-573, DEC-576 ← DEC-578 and DEC-579, DEC-581 ← DEC-583 and DEC-584); its premise holds (DEC-581 ← DEC-582, a head on a label's own line, and DEC-682 ← DEC-681, a `**Changes:**`, are reported). **The middle-dot guard passes** (DEC-673 after ` · **Basis of the rule:**` is no changer today). |
+| **S11 and failure 6**, "a clause-head changer lost"; each head an amend, a supersede for `**Superseded by:**` | `test_w2_92_verbless_labels.py::test_s11_each_clause_head_of_a_verbless_label_stays_a_changer` (cases: heads split by ';', one clause's prose naming an id; heads joined by 'and', a parenthesis before the colon; a head above its sub-items; a head on a label's own line; heads joined by ',', a colon inside a parenthesis; heads split by ';', each before its colon; heads joined by 'and' before a colon; heads split by ';', no colon, W2 ids in parentheses; each other label's head) | **Passes on the integrated code** (guards: today every id is a changer, the heads among them, each of the class named). |
+| **S11**, "labels with a verb, and every other statement form, give what they give today" | `test_w2_92_verbless_labels.py::test_s11_a_verb_label_and_every_other_form_give_what_they_give_today` | **Passes on the integrated code** (a guard, by construction: this worktree's statements are `D6_BASE`'s). |
+| S11, "on this repository's register no longer gives the wrong pairs the sitting found, and every head pair stays" | none: the CTO's probe on this repository's register, **verified by the evidence file** | n/a |
+
+- **S11-P1. Where it shows in `gov links`.** `gov links` counts a change as marked when the changed entry's status
+  line names the changer anywhere, so a prose id on the status line itself is never reported, today or after. The
+  case uses the pairs that do show: an id on a sub-item below the status line (the DEC-728 ← DEC-723 shape) and a
+  prose or parenthesised id on a label's own line. Confidence high.
+- **S11-P2. "What they give today".** The guard compares the six keys of each statement as a multiset, read both
+  ways; a key the implementation adds is not compared. A change to the guard's register outside the verbless labels
+  (a statement gained, lost or re-classed) fails it. Today the change-log lines give no statement; the guard keeps
+  them so. Confidence medium-high.
+- **S11-P3. Not tested:** `whole` of a `**Superseded by:**` head (today `false`; S11 does not say), and the order of
+  the statements. Confidence medium.
+
 ## Packages (the KPI lines were not clear; the tests follow the recommendation)
 
 - **P-1. A missing record store and a question that names no record.** Today such a project refuses every question
@@ -259,3 +313,8 @@ marked. The planted texts hold none of these words.
   and by the integrated code; the store's tables read with sqlite; the readers of register chunks.
 - `test_w2_92_stated_links.py` (S7), `test_w2_92_hop.py` (S8), `test_w2_92_status.py` (S9), `test_w2_92_drift.py`
   (S10).
+- `test_w2_92_verbless_labels.py` (S11, DEC-1109 (2)): its two planted registers, the planted repository for
+  `gov links`, and its fixtures; `w2_92_support.D6_BASE` and `base_src(place, commit)` name its base.
+- **The base trees by a named path (D-10, DEC-385).** `base_src`, also behind `test_w2_92_speed.py`'s `base`, takes
+  `src/` only: `git -C <root>/src archive --prefix=src/ <commit>`, so W1-28's reading route sees a named folder, not
+  a whole-tree copy (W1-28's and W1-50's checks flagged the old `git -C <root> archive <commit> src`); same tree, same cases.

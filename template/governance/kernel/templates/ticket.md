@@ -1,6 +1,6 @@
 ---
 name: ticket
-version: 1.0.0
+version: 1.0.1
 role: any
 id: PROJ-0000
 type: task
@@ -17,6 +17,9 @@ id: DAEO-xxxx
 wbs_id: W2-00
 title: <the outcome, in one line, imperative>
 type: task
+class: implementation              # the default; or specification (the close checks its readiness record);
+                                   # research, audit, integration, coordination (the close judges their evidence; coordination has no tests of its own);
+                                   # also in use: test-revision, skill, config, test-design, ops, template, schema, tool, role-definition, documentation
 role: engineer                     # or product-spec, research, independent-test-designer
 profile: STANDARD                  # LITE, STANDARD or FULL; FULL only for memory, the five guard rules, launch/close, the queue, data loss
 status: open

@@ -266,6 +266,16 @@ failing service cases, and the service-naming bundle case) would also fail insid
 alone. The four memory-release cases (DEC-1068's note) are the exception: they carry the box's Unix sockets over
 loopback TCP there, and run red or green for the release itself.
 
+## Revised for D-10 run 1 (DAEO-clon): the socket base found no folder where `TMPDIR` is unset
+
+Rewrite-Reason: D-10 run 1: the socket base refused /tmp itself; red wherever TMPDIR is unset (DEC-1122). `short_base()`
+in `w2_112_support.py` (used by W2-112's bundle case, W2-145's `conftest.py` and, through the box, W2-145's cases) skipped
+every folder of fewer than three path parts, so with `TMPDIR` unset (`/tmp` itself) no base was left and 101 cases
+errored at setup. When no folder qualifies it now makes one fresh private folder (`mkdtemp`, mode 0700, prefix
+`gov-sock-`) directly under `/tmp`, takes its run folders there and removes it when the process ends; the old rule stands
+(nothing loose in `/` or `/tmp`, never inside the repository, a socket path of at most 108 bytes). No other expectation
+changed.
+
 ## Revised by W2-145 (DAEO-2tfd): no private reranker beside the shared service
 
 Rewrite-Reason: DEC-1048 (5) (with DEC-1046 (1), DEC-1097 (8)), by W2-145's independent test designer, before its

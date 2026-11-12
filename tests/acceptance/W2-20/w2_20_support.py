@@ -55,6 +55,21 @@ MEASURED_KEYS = ("verification_peak_bytes", "working_size_bytes")
 REBUILD_PEAK_KEY = "rebuild_peak_bytes"  # P-5 (a): the re-measure's third figure, from rebuild slot holders' samples
 
 
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; every
+# repository a launch runs in here holds the eight copies (any bytes), so the template check is never what refuses.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+
+
+def plant_templates(root: Path) -> None:
+    """Write the eight ``.claude/templates/<stem>.md`` copies into the repository at ``root``."""
+    folder = Path(root) / ".claude" / "templates"
+    folder.mkdir(parents=True, exist_ok=True)
+    for stem in TEMPLATE_STEMS:
+        (folder / f"{stem}.md").write_text(f"---\nname: {stem}\n---\n# W2-20 fixture template copy {stem}\n",
+                                           encoding="utf-8")
+
+
 def today() -> str:
     return datetime.date.today().isoformat()
 
@@ -298,7 +313,8 @@ class Machine:
         path.mkdir()
         self._git(path, "init", "-q")
         (path / "README.md").write_text(f"{name}: a W2-20 test repository\n")
-        self._git(path, "add", "README.md")
+        plant_templates(path)
+        self._git(path, "add", "README.md", ".claude")
         self._git(path, "commit", "-q", "-m", "initial")
         return path.resolve()
 

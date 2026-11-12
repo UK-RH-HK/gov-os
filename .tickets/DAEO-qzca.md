@@ -1,6 +1,6 @@
 ---
 id: DAEO-qzca
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-11-09T21:30:00Z
@@ -27,7 +27,7 @@ kpis:
   - 'Any file changed outside the six records and the evidence note; contract.yaml or CONTRACT_v4.md touched (W2-139''s).'
 profile: LITE
 sources:
-- W2-129
+- DAEO-q7lk
 - DEC-1074
 - DEC-1109
 - DEC-623

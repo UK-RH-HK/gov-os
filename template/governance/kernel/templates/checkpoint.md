@@ -4,14 +4,14 @@ type: checkpoint
 status: ACTIVE
 state_class: NARRATIVE
 title: Short title of the checkpoint
-task: DAEO-0000         # the ticket's DAEO-… id (DEC-1073)
+task: ''                # fill with the ticket's DAEO-… id, {ID} (DEC-1073)
 decisions_applied: []   # the ids the work applied (DEC-1073)
 task_status: in_progress
 trigger: stop
 next_action: The next step, for the session that resumes
 created: '2026-01-01T00:00:00Z'
 inputs:
-- id: DAEO-0000
+- id: '{ID}'
   version: '0000000'
   hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
 ---

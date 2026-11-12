@@ -72,8 +72,16 @@ def _reported(outcome):
 
 
 def _short_home(box):
-    """A scratch ``HOME`` short enough for the service's socket path under it (108 bytes), for this case alone."""
-    starts = [Path(start) for start in (os.environ.get("TMPDIR"), tempfile.gettempdir()) if start]
+    """A scratch ``HOME`` short enough for the service's socket path under it (108 bytes), for this case alone.
+
+    With ``TMPDIR`` unset no folder qualifies (the temporary folder is ``/tmp`` itself, which takes no loose
+    entries): the home is then made in a fresh private folder (mode 0700) directly under ``/tmp``, which
+    ``_drop_home`` removes with it (D-10 run 1: the socket base refused ``/tmp`` itself)."""
+    try:
+        system_temp = tempfile.gettempdir()
+    except OSError:  # no writable temporary folder at all: only the private folder is left to try
+        system_temp = None
+    starts = [Path(start) for start in (os.environ.get("TMPDIR"), system_temp) if start]
     for start in [folder for path in starts for folder in (path, *path.parents) if len(folder.parts) >= 3]:
         if len(str(start)) + 60 > 104 or start == s.ROOT or s.ROOT in start.parents:
             continue
@@ -83,8 +91,20 @@ def _short_home(box):
             continue
         box.home = home
         return home
-    pytest.fail("no temporary folder is short enough for a Unix socket's path under it: set TMPDIR shorter",
-                pytrace=False)
+    try:  # no folder qualifies: a private one of our own, directly under /tmp
+        private = Path(tempfile.mkdtemp(prefix="w32p-", dir="/tmp")).resolve()
+        box.private_base = private
+        box.home = Path(tempfile.mkdtemp(prefix="w32h-", dir=private))
+    except OSError:
+        pytest.fail("no temporary folder is short enough for a Unix socket's path under it, and no private folder "
+                    "can be made under /tmp: set TMPDIR to a writable, shorter folder", pytrace=False)
+    return box.home
+
+
+def _drop_home(box):
+    """Remove the scratch ``HOME`` and, when it had to be made in a private folder under ``/tmp``, that folder."""
+    shutil.rmtree(box.home, ignore_errors=True)
+    shutil.rmtree(getattr(box, "private_base", box.home), ignore_errors=True)
 
 
 def _fake_reranker_environment(box):
@@ -141,7 +161,7 @@ def test_the_default_reranker_whose_shared_service_dies_after_accepting_is_repor
             assert "private" not in str(answer["outcome"].get("by")), answer["outcome"]
         _no_private_and_the_service_died_after_accepting(record)
     finally:
-        shutil.rmtree(box.home, ignore_errors=True)
+        _drop_home(box)
 
 
 @pytest.mark.parametrize("dying", ["dies-process", "dies:EOFError"])
@@ -172,4 +192,4 @@ def test_retrieve_with_a_dying_reranker_cites_its_evidence_and_reports_the_reran
             _no_private_and_the_service_died_after_accepting(record)
     finally:
         if record is not None:
-            shutil.rmtree(box.home, ignore_errors=True)
+            _drop_home(box)

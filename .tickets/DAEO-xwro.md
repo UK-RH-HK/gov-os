@@ -20,7 +20,7 @@ allowed_paths:
 - src/gov/guard/role_paths.py
 - tests/unit/guard/test_w2_141*
 - docs/changes/W2-141-evidence.md
-- .claude/hooks/role_reads.py  # the live hook's side [changed, DEC-1093 (2); DEC-1102]
+# .claude/hooks/role_reads.py out of the paths: a launched session cannot edit it (DEC-315); the hook as built stays staged in docs/changes/W2-141-hook/** below, applied to the live file by the operator's ACT; the CTO's delegated decision (DEC-1112 (3))
 - docs/changes/W2-141-hook/**  # the hook as built, staged for the operator's ACT (a launched worker cannot edit .claude/, DEC-315) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/hooks/test_live_hook.py  # its one G14_PASSED case that S1 now refuses (the designer's round-2 P-2) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/guard/test_reads.py  # its rows that expect the old refusal of a search into the own acceptance folder (the engineer's round-1 report) [changed, DEC-1093 (2); DEC-1102]
@@ -38,6 +38,9 @@ kpis:
   - 'A test run that appends to, creates or reads the real ~/.gov-os/guard-calls (S4) [DEC-1108 (5)]'
 profile: STANDARD
 sources:
+- DEC-820
+- DEC-826
+- DEC-877
 - DEC-1109
 - DEC-1108
 - DEC-1093
@@ -46,6 +49,8 @@ sources:
 - DEC-963
 - DEC-1052
 - DEC-1102
+- DEC-315
+- DEC-1112
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-141/
@@ -90,3 +95,10 @@ copy), applied in the same operator ACT. P-2: `tests/unit/hooks/test_live_hook.p
 [DEC-1093]
 
 **D-6 part 2 placed here (CTO, 2026-11-09; DEC-1108 (5), DEC-1109 (2)):** S4, its failure line and the `tests/conftest.py` path are DECIDED-NOT-DONE row 60 ("the live-hook suites' temporary folder ... W2-141's acceptance file by its designer"). Tests only: W2-141's test designer on `w2/W2-141-d6-tests`, one review; plan item D in `governance/project/orchestration/packages/LIFT-1/D6-PART2.md`. No product code changes (the hook already reads GOV_GUARD_CALLS_DIR, ACT-GUARD-CALLLOG-1).
+
+**The staged hook rebuilt on ACT-SETS-GLOBS-1's hook (CTO's helper, 2026-11-10; DECIDED-NOT-DONE row 78, DEC-1112 (3)):** `beec1f2f8`, review READY by verdict.py (`.gov-runtime/scratch/orchestrator/reviews/W2-141-rebase-review.md`). Rows:
+- F1 (in, other): the README's rebuild note names rules 2b, 2c and 2d but not the call log or `Narrow`.
+- F2 (in, other): the rehearsal's "failures: 0" does not count the suites or the replay compare's exit; the README's "Before the ACT" omits `drafts/g14/test_g14.py`'s four engineer near-miss cases (searches from above), which S1/S2 now refuse: the re-pin ACT revises them or expects them red.
+- F3 (out, other): the README's rollback does not say to commit it and merge it into the worktrees.
+- F4 (out, other): the pair was rehearsed with today's pin, not the re-pin's: re-run `drafts/w2-141-rebase/rehearse.sh` with the candidate pin when preparing the ACT.
+- D1 (the guard, other): the live guard refuses a git diff of two blob references (`<rev>:<path>`), since `reads.py`'s `patched()` resolves each revision word as a commit; a false refusal (it also refused a Bash line that only carried that text in a heredoc). `git show` into scratch and `git diff --no-index` work.

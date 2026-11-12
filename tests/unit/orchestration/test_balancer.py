@@ -220,3 +220,46 @@ def test_an_event_target_opens_at_its_first_event_and_once():
 def test_not_measured_changes_nothing():
     st = {"breach_since": 5.0}
     assert lb.breach_step(st, None, 1e9) is None and st == {"breach_since": 5.0}
+
+
+# ---- DEC-1140 (2), ACT-DISPATCH-1: a job measured for minutes counts at its measured load, not at its phase's whole peak ----
+
+def slot_job(cpu, recent=None):
+    j = {"kind": "slot", "name": "pid 1", "phase": "test", "cpu": cpu, "rss_kb": GB, "rr": 0}
+    if recent is not None:
+        j["recent_cpu"] = recent
+    return j
+
+
+def test_a_held_slot_measured_low_counts_at_the_floor_not_at_its_peak():
+    pk = lb.phase_peaks([])  # a slot's test phase: 5.9 cores at the floor
+    jobs = [slot_job(0.1, 0.1), slot_job(0.8, 0.8), slot_job(0.0, 0.0)]
+    old = lb.forecast(state(jobs=jobs), pk, "lead")
+    assert old["resources"]["cpu"]["need"] == pytest.approx(2.0 + (5.8 + 5.1 + 5.9) + 2.0) and not old["ok"]
+    new = lb.forecast(state(jobs=jobs, held_floor=1.0), pk, "lead")
+    assert new["resources"]["cpu"]["need"] == pytest.approx(2.0 + (0.9 + 0.2 + 1.0) + 2.0) and new["ok"]
+    assert "3 of them at their measured load" in new["resources"]["cpu"]["text"]
+
+
+def test_a_job_measured_busy_counts_at_its_measured_peak_and_never_above_its_phase_peak():
+    pk = lb.phase_peaks([])
+    f = lb.forecast(state(jobs=[slot_job(0.5, 4.0)], held_floor=1.0), pk, "lead")
+    assert f["resources"]["cpu"]["need"] == pytest.approx(2.0 + 3.5 + 2.0)  # 4.0 measured in the window, 0.5 now
+    f = lb.forecast(state(jobs=[slot_job(0.5, 9.0)], held_floor=1.0), pk, "lead")
+    assert f["resources"]["cpu"]["need"] == pytest.approx(2.0 + 5.4 + 2.0)  # capped at the 5.9 peak
+    assert "measured load" not in f["resources"]["cpu"]["text"]
+
+
+def test_a_job_with_no_measure_or_with_the_switch_off_keeps_its_whole_peak():
+    pk = lb.phase_peaks([])
+    base = lb.forecast(state(jobs=[slot_job(0.1)]), pk, "lead")["resources"]["cpu"]["need"]
+    assert base == pytest.approx(2.0 + 5.8 + 2.0)
+    assert lb.forecast(state(jobs=[slot_job(0.1)], held_floor=1.0), pk, "lead")["resources"]["cpu"]["need"] == pytest.approx(base)
+    assert lb.forecast(state(jobs=[slot_job(0.1, 0.1)], held_floor=None), pk, "lead")["resources"]["cpu"]["need"] == pytest.approx(base)
+
+
+def test_the_measured_load_never_touches_memory_or_the_gpu():
+    pk = lb.phase_peaks([])
+    jobs = [slot_job(0.1, 0.1)]
+    a, b = lb.forecast(state(jobs=jobs), pk, "lead"), lb.forecast(state(jobs=jobs, held_floor=1.0), pk, "lead")
+    assert a["resources"]["ram"] == b["resources"]["ram"] and a["resources"]["gpu"] == b["resources"]["gpu"]

@@ -8,9 +8,19 @@ through ``retrieve`` alone and, on the register's repository, through ``gov retr
 question followed through its continuations. The comparison takes off only the cut lines' text and the cut key: an
 item's text is today's line for line, each line either today's whole or, where today's line is over 4,000 characters,
 its first 4,000 and its newline. Every other field and bundle key must be today's.
+
+The continuation token is compared decoded (base64 of a JSON object), without its ``s`` key: W2-138 S3 (``dcda27011``,
+DEC-1090 (3)) puts the store's commit there, so a token the code before the change made has none. The running tree's
+token must carry ``s`` as a full commit (the same on every page of a question: one store), today's must carry none (the
+premise of "today"), and every other key of the two tokens, and whether a token is given at all, is compared as before.
 """
 
 from __future__ import annotations
+
+import base64
+import binascii
+import json
+import re
 
 import pytest
 
@@ -19,6 +29,40 @@ import w2_135_support as support
 CAP = support.CAP
 CASES = [pytest.param(*case, id=case[0]) for case in support.SCENARIOS]
 APART = ("text", "cut")
+
+
+STORE_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
+
+
+def _payload(token):
+    """A continuation token decoded: base64 of a JSON object."""
+    try:
+        payload = json.loads(base64.urlsafe_b64decode(token))
+    except (TypeError, ValueError, binascii.Error) as error:
+        raise AssertionError(f"the continuation token {token!r} is not base64 of JSON: {error}") from error
+    assert isinstance(payload, dict), f"the continuation token decodes to {payload!r}, not an object"
+    return payload
+
+
+def _without_store(bundle):
+    """The bundle with its token decoded, without ``s`` (a bundle without a token stays as it is)."""
+    if not bundle.get("continuation"):
+        return bundle
+    return {**bundle, "continuation": {key: value for key, value in _payload(bundle["continuation"]).items()
+                                       if key != STORE_KEY}}
+
+
+def _commit_of(bundle):
+    return _payload(bundle["continuation"]).get(STORE_KEY) if bundle.get("continuation") else None
+
+
+def _account_for_the_store_key(old, new, where):
+    """W2-138 S3: today's token names no store; the running tree's names a full commit."""
+    if old.get("continuation"):
+        assert STORE_KEY not in _payload(old["continuation"]), f"{where}: premise: today's token holds a store commit"
+    if new.get("continuation"):
+        assert re.fullmatch(r"[0-9a-f]{40}", str(_commit_of(new))), \
+            f"{where}: the token names no full store commit: {_commit_of(new)!r}"
 
 
 def _cited(bundle):
@@ -38,6 +82,8 @@ def _lines_today_s_but_cut(was: str, now: str, span: str) -> None:
 
 
 def _same(old, new, where):
+    _account_for_the_store_key(old, new, where)
+    old, new = _without_store(old), _without_store(new)
     assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
     for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
                 "stopping_reason", "rerank", "left_out"):
@@ -64,6 +110,8 @@ def _both(ask, today, query, kwargs):
 def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
     olds, news, *_ = _both(ask, today, query, kwargs)
     assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
+    assert len({_commit_of(page) for page in news if page.get("continuation")}) <= 1, \
+        f"{name}: the pages of one question name more than one store commit"
     for number, (old, new) in enumerate(zip(olds, news), 1):
         _same(old, new, f"{name}, page {number}")
 

@@ -29,6 +29,7 @@
         "operations": {"type": "integer", "minimum": 0},
         "docs": {"type": "integer", "minimum": 0}
       }
-    }
+    },
+    "stopped": {"type": "string", "enum": ["none", "input-missing", "input-malformed", "decisions-conflict", "forbidden-read-needed", "form-not-writable", "not-sealed"]}
   }
 }

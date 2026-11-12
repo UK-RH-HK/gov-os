@@ -1,0 +1,67 @@
+# The visible half of the question set: python-app-clean, the Python shape with nothing planted (W2-81).
+# Nothing is planted here, so no question has a forbidden citation: the controls must still be answered from.
+form: w2-81-questions/1
+repository: python-app-clean
+questions:
+  - id: python-app-clean-v01
+    category: which-spec-governs
+    question: Which spec governs the upstream timeout of the {topic} service?
+    gold_answer: "{governing}, which states {spec_line}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+  - id: python-app-clean-v02
+    category: what-value
+    question: What value does the {topic} service use for {const}?
+    gold_answer: "{value_line}, in {topic_code}"
+    sources:
+      - {path: "{topic_code}", holds: "{value_line}"}
+  - id: python-app-clean-v03
+    category: where-specified
+    question: Where are the timeout of the {topic} service specified and implemented?
+    gold_answer: "specified in {governing}, implemented in {topic_code}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+      - {path: "{topic_code}", holds: "{value_line}"}
+  - id: python-app-clean-v04
+    category: which-plan-current
+    question: Which plan is current for the {plan_title}?
+    gold_answer: "{plan}"
+    sources:
+      - {path: "{plan}", holds: "1. Ship the {topic} service."}
+  - id: python-app-clean-v05
+    category: what-module-does
+    question: What does the upstream {adapter} module of {product} do?
+    gold_answer: "{adapter_module} opens the upstream connection with a timeout (connect)"
+    sources:
+      - {path: "{adapter_module}", holds: "def connect(timeout):"}
+  - id: python-app-clean-v06
+    category: which-test-covers
+    question: Which test covers the settlement of {topic} amounts?
+    gold_answer: "{topic_test}, test_settle_rounds"
+    sources:
+      - {path: "{topic_test}", holds: "def test_settle_rounds():"}
+  - id: python-app-clean-v07
+    category: where-config
+    question: Where is the package configuration of {product}?
+    gold_answer: pyproject.toml
+    sources:
+      - {path: pyproject.toml, holds: 'name = "{product}"'}
+  - id: python-app-clean-v08
+    category: how-to-run
+    question: How is the {product} service started?
+    gold_answer: "{run_line}"
+    sources:
+      - {path: README.md, holds: "{run_line}"}
+  - id: python-app-clean-v09
+    category: which-spec-governs
+    question: What is the length of the {other} codes, and which spec states it?
+    gold_answer: "{code_len_line}, in {control_spec}; {codes_module} holds {code_len_code}"
+    sources:
+      - {path: "{control_spec}", holds: "{code_len_line}"}
+      - {path: "{codes_module}", holds: "{code_len_code}"}
+  - id: python-app-clean-v10
+    category: entry-point
+    question: Which module is the entry point of {product}, and what does it wire together?
+    gold_answer: "{app}: the {topic} timeout, the upstream {adapter} and the {other} codes"
+    sources:
+      - {path: "{app}", holds: "def main():"}

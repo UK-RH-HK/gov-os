@@ -8,7 +8,11 @@ exist, else the live hook.
 | Staged copy | Goes to | Made from (sha256 of the live file) |
 |---|---|---|
 | `role_reads.py` | `.claude/hooks/role_reads.py` | `5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07` |
-| `pretooluse.py` | `.claude/hooks/pretooluse.py` | `bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449` |
+| `pretooluse.py` | `.claude/hooks/pretooluse.py` | `74f8dbea4761de37628305e5d58125641ae39a409a7ed0a2babb379b1ceca5b8` |
+
+`pretooluse.py` was rebuilt on 2026-11-10 on the live hook at `9cce7430d` (ACT-SETS-GLOBS-1; it carries rule 2b's
+glob line, rule 2c and rule 2d, which the first copy, made from `bd545af8…` at `15952bbfa`, lacked). W2-141's one
+change was re-applied and nothing else (DECIDED-NOT-DONE row 78).
 
 If a live file's hash no longer matches when the ACT is prepared, the live file changed after these copies were
 made: merge that change into the copy first. Never overwrite it.
@@ -82,14 +86,15 @@ Unchanged:
 ## Rollback
 
 Both live files are tracked; the hashes above are their contents at commit
-`15952bbfa576dcfabb7d36d95912a848077e5c3c`, the last that changed them. In the tree the ACT applies to:
+`9cce7430d8f617eccabc48a7f7df7346c40a7602`, the last that changed `pretooluse.py` (`role_reads.py` last changed
+before it, at `e02d55e40`). In the tree the ACT applies to:
 
 1. **Before copying**, keep the live files outside the hook folder (a `.py` left in `.claude/hooks/` could be loaded):
    `cp .claude/hooks/role_reads.py .claude/hooks/pretooluse.py <a folder outside .claude/>/`, and check that
    `sha256sum` of the two copies gives the hashes in the table.
 2. **To roll back**, copy the kept files back over `.claude/hooks/role_reads.py` and `.claude/hooks/pretooluse.py`.
    If the copies are lost, restore the tracked versions:
-   `git checkout 15952bbfa576dcfabb7d36d95912a848077e5c3c -- .claude/hooks/role_reads.py .claude/hooks/pretooluse.py`
+   `git checkout 9cce7430d8f617eccabc48a7f7df7346c40a7602 -- .claude/hooks/role_reads.py .claude/hooks/pretooluse.py`
    (this holds only while the live files matched the hashes above when the ACT was applied).
 3. **Check** that `sha256sum .claude/hooks/role_reads.py .claude/hooks/pretooluse.py` gives the two hashes in the table
    again. No other file changes in the ACT, so nothing else needs restoring.

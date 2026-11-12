@@ -513,3 +513,7 @@ designer's.
 - **Tests.** `test_rollback_of_a_ticket_with_no_commit_succeeds_with_an_empty_list` asserts success, the empty
   `reverted`, and that no file outside `.tickets/` and no other ticket's file changes; it does not assert whether a
   commit is made.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the launches through W1-46's `launch` get W1-46's open gate (`plant_open_gate`); `interrupted_launch` plants it before building W1-46's environment. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
+
+**D-10 run 2's fix (2026-11-10, W2-153 `DAEO-8s85`, DEC-1050, DEC-866):** `test_the_extra_cli_arguments_reach_the_product_spec_session` asks for the caller's four arguments as one ordered run followed by nothing or by the one `--append-system-prompt-file <...>/.claude/templates/<stem>.md` pair W2-153 appends (W1-46's `caller_args_then_template_pair`, W2-56's revised S6); an extra, dropped or reordered argument still fails.

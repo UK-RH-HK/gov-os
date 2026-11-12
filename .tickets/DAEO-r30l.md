@@ -1,6 +1,6 @@
 ---
 id: DAEO-r30l
-status: in_progress
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -59,6 +59,7 @@ kpis:
   - 'Enforcement at launch (DEC-1088 (5)(b)): gov launch refuses any session, lead or worker, while the gate is shut on any of its readings (load, CPU, memory, disk, inodes, a heavy-job slot, the GPU for a start that declares a need) or when the new session''s working size would pass a limit, naming the limit and its reading; one recorded override (gate_override: <DEC-id> on the launch) starts it anyway, and the override is written in the launch log and the plan''s output. Verify: unit tests with each reading planted shut, and with the override [DEC-1088 (5), DEC-899] [added, DEC-1088]'
   - 'The query-wrapper removal (DEC-1037): the product''s automatic start of the query embedding server (ensure_query_available with start, in gov.retrieval.ollama) carries everything the interim wrapper ~/.local/bin/ollama adds, so that a small ACT can remove the wrapper: its CPUs and priority from the gate''s configuration file (as today); its device from that file (the GPU visible by default, or the CPU with the GPU hidden), a malformed value shutting the start, named; none of a heavy slot''s thread-budget variables inherited by the server; its output appended to its own log; and one line per start in a start log naming the time, the device and the caller (pid, working folder, command). The evidence names the ACT''s steps (the wrapper removed, the real binary found on PATH, a restart seen capped), not applied by this ticket. Verify: unit tests with a stand-in executable that records its environment, CPU affinity and niceness, started through ensure_query_available(start=True) with no wrapper on PATH, one case per device and a planted thread budget [DEC-1037 (a), DEC-1037 (4), DEC-1038 (1)] [added, DEC-1037; DEC-1097 (8)]'
   - 'W2-136''s F2 entry criterion: before leads are routed through gov launch, the plan check (src/gov/launch/plan_check.py) reads the current tickets and the approved ready list from the main tree (or a named path the dispatcher keeps), never a lead worktree''s own copies, which can be stale; and a plan override is written to a launch log, not only to standard error (W2-136 F4). Verify: unit tests with a planted main tree and a lead worktree whose tickets and ready list differ from it: the check follows the main tree''s, a lead its stale copy would admit is refused; a planted override: one line in the launch log and the line on standard error [DEC-1088 (5)(b), DEC-803] [added, DEC-1088 (5)(b); DEC-1097 (8)]'
+  - 'The secrets scan has one switch: `governance/project/secrets.yaml` (`scan: on` or `scan: off`; the file or the key absent means on). When it is off, no content goes to the scanner; the rebuild''s report, `gov doctor` and `gov ci` name it; and the secrets-indexing check reads not applicable (YELLOW). Verify: `tests/unit/secrets_check/test_dec1045_switch.py` [DEC-1045] [added, DEC-1045 (3); the switch was built in `ddcec657c` under the CTO''s own task id, so no ticket held a line for it]'
   failure:
   - 'A heavy job whose child programs together use more CPUs than its slot''s share, because they start their own thread pools or size their pools to the whole machine.'
   - A session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
@@ -68,6 +69,9 @@ kpis:
   - 'A worker''s memory charged twice (in its lead''s tree and as its own session).'
 profile: STANDARD
 sources:
+- DEC-866
+- DEC-753
+- DEC-1109
 - DEC-729
 - DEC-742
 - DEC-747
@@ -86,6 +90,8 @@ sources:
 - DEC-1031
 - DEC-1038
 - DEC-1039
+- DEC-1041
+- DEC-1045
 - DEC-1088
 - DEC-1037
 - DEC-1097
@@ -93,9 +99,6 @@ sources:
 - DEC-961
 - DEC-979
 - DEC-982
-- W2-M188
-- W2-M244
-- W2-M262
 - DEC-803
 est_loc: 320
 acceptance_tests:

@@ -206,3 +206,5 @@ map: S1 17 passed and 16 failed, S2 11 passed, S3 39 passed, none unmapped (outc
   reranker, the oracle, S3's scenarios and the page walker.
 - `conftest.py`: the session's planted repositories, today's modules, the stand-ins (autouse), `ask`.
 - `test_w2_135_cut.py` (S1), `test_w2_135_under.py` (S2), `test_w2_135_unchanged.py` (S3).
+
+- **D-10 run 2 (W2-138 `dcda27011`, DEC-1090 (3); DEC-1122 (3)):** `test_w2_135_unchanged.py` compares the continuation token decoded without its `s` key (the store's commit); the running tree's token must name a full commit, the same on every page, today's none, and every other key is still compared.

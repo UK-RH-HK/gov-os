@@ -23,17 +23,16 @@ allowed_paths:
 - tests/unit/update/**
 kpis:
   success:
-  - gov update --check reports the installed and target versions, the migrations and their impact.
+  - 'gov update --check reports the installed and target versions, the migrations and their impact. Verify: in a planted project installed at release A with a target release B holding two migrations, `gov update --check` exits 0 and prints "A", "B", the two migrations by id and an impact line for each, and changes no file (`git status` clean).'
   - 'The update [CAP-45.a, W2-M176]: verifies the target release''s manifest and file hashes; applies the migrations with copier update, keeping the overlay files unchanged; regenerates the adapters and
-    rebuilds the affected indexes; runs gov doctor and writes a ledger entry'
-  - A failed update rolls back to the recorded point.
+    rebuilds the affected indexes; runs gov doctor and writes a ledger entry. Verify: a planted update A to B prints the manifest and hash check passed, the migrations applied, the overlay files byte-identical to before (sha256 equal), the adapters regenerated, the indexes rebuilt, `gov doctor` run with exit 0, and the ledger holds one new entry naming A, B and the migrations'
+  - 'A failed update rolls back to the recorded point. Verify: a planted update whose second migration fails leaves the project at the recorded point (every tracked and untracked file byte-identical to the record, the installed version still A), exits non-zero and names the failed migration.'
   failure:
-  - An update to a release that fails hash verification refuses.
-  - An overlay file changed by the update is a failure and triggers the rollback.
+  - 'An update to a release that fails hash verification refuses. Verify: a planted target release with one file whose hash differs from the manifest: `gov update` exits non-zero naming the file and the hash mismatch, and nothing is applied (no migration run, no file changed). It must never print that the update was applied.'
+  - 'An overlay file changed by the update is a failure and triggers the rollback. Verify: a planted migration that edits one overlay file: the update reports a failure naming the overlay file, then the rollback runs and restores it byte for byte; the project is never left updated with the changed overlay file.'
 profile: FULL
 sources:
 - CAP-45.a
-- W2-M176
 est_loc: 260
 acceptance_tests:
   path: tests/acceptance/W2-17/

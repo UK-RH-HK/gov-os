@@ -201,7 +201,7 @@ The case removes one table from the project's store file (`records`, then
 ### 4. The launcher's exit code when stderr cannot be written (DEC-392)
 
 The removal fails as in `test_w1_32_launch.py` (a folder the session left
-read-only). The launcher's stderr is closed before `gov` starts, or is a pipe
+read-only, and since D-10 the temp folder's parent too). The launcher's stderr is closed before `gov` starts, or is a pipe
 whose reading end is closed.
 
 | Case | Holds the launcher to | Then |
@@ -250,3 +250,9 @@ Cases: 52 in the full run, 29 in `breadth`, 0 in `lifted`.
 | S5: The command set stays at the Wave 1 list (no command without a contract item) [CAP-28.a] | `test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones` | the ticket's words |
 | F1: status mutates the repository | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged` (2 of 2), `test_w1_32_status_read_only.py::test_status_writes_nothing_anywhere` (2 of 2) | designer |
 | F2: An open gate is missing from the output | `test_w1_32_status_not_read.py::test_every_open_package_is_listed_however_many`, `test_w1_32_status_not_read.py::test_an_open_specification_shows_every_open_row_linked_or_not` | the ticket's words |
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the launches through W1-46's `launch` get W1-46's open gate (`plant_open_gate`); `signalled_launch` and `_launch_without_stderr` plant it before building W1-46's environment. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
+
+**D-10's red fix, the failed removal (2026-11-10, W2-116 `DAEO-f58b`, DEC-1112 (3); Rewrite-Reason DEC-902, W2-M405):** W2-56 removes the whole temp folder on every ending and restores 0700 on it first, so the session's sealed folder no longer made the removal fail and the seven failed-removal cases (`test_w1_32_launch.py::test_a_failed_removal_keeps_the_sessions_exit_code[0]`, `[7]`, `test_w1_32_launch.py::test_a_failed_removal_writes_one_line_to_stderr_that_names_the_folder[0]`, `[7]`, `test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written[stderr-closed-7]`, `[stderr-reader-gone-0]`, `[stderr-reader-gone-7]`) failed on their premise. The stand-in session now also leaves the folder its temp folder is in read-only as its last act (`w1_32_launch_support.stuck_plan`, `sealed_parent`): the launcher may empty its temp folder but cannot unlink it, and it does not change that folder's mode (shown: the premise holds on integrate `9ca161a6f`). The premise checked is that the temp folder stays (`removal_failed`), not that the sealed file inside it stays; the exit code, the one stderr line naming the folder and the stderr-closed and reader-gone cases are asserted as before. `unseal` restores the parent too.
+
+**D-10's red fix, the command set (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** `test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones` failed on "gov has commands the command list does not record: ['brief', 'links', 'plan']". W1-07's lines now record the three; the pinned set is `accept`, `brief`, `ci`, `launch`, `links`, `plan`, `resources`, `telemetry`, still exact. Unchanged: any other unrecorded command fails, a recorded command gone from `gov --help` fails, `lock` is none of `gov`'s, `release` alone is excused until recorded (DEC-753). Green on this branch alone.

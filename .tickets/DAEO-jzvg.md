@@ -26,14 +26,14 @@ allowed_paths:
 - fixtures/lang/**
 kpis:
   success:
-  - A project declares its test commands (for example cargo test, npm test or vitest run, pytest), each with its own parallel option, its own result reader, and the input globs W2-66's selection keys on (W2-48's cache was withdrawn, DEC-880). gov
-    close and the regression run the declared commands [AR-10, W2-H042, W2-L119].
-  - A Rust fixture and a TypeScript fixture each close a ticket with their own command [AR-10].
-  - A run that collects or passes nothing counts as unmeasured or failed, never passed [W2-H026, W2-M162].
-  - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
-  - A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed [DEC-736, W2-H026].
+  - 'A project declares its test commands (for example cargo test, npm test or vitest run, pytest), each with its own parallel option, its own result reader, and the input globs W2-66''s selection keys on (W2-48''s cache was withdrawn, DEC-880). gov
+    close and the regression run the declared commands. Verify: a planted project declaring three commands (cargo test, vitest run, pytest) each with a parallel option, a result reader and input globs: `gov close` and the regression run print each declared command with its parallel option and result reader, and W2-66''s selection reads the declared globs (a change to a file matching only the vitest globs selects only the vitest command) [AR-10, W2-H042, W2-L119]'
+  - 'A Rust fixture and a TypeScript fixture each close a ticket with their own command. Verify: the Rust fixture''s ticket closes with exit 0 and the close record names `cargo test`; the TypeScript fixture''s ticket closes with exit 0 and the record names its declared command (no pytest run in either) [AR-10]'
+  - 'A run that collects or passes nothing counts as unmeasured or failed, never passed. Verify: a planted suite that collects 0 tests and one that runs 0 passes: the close prints UNMEASURED or FAILED for each and refuses; it must never print passed [W2-H026, W2-M162]'
+  - 'Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run. Verify: a planted project with an ignored file and a compiled artifact in the working tree: the run''s checkout lists neither, `git status` of the working tree is unchanged after the run, and a test that reads the ignored file fails in the run [W2-M253, W2-M159, W2-M160]'
+  - 'A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed. Verify: a planted suite declared "needs environment" with the environment absent: the close output names the suite and prints UNMEASURED; it must never print the suite as passed [DEC-736, W2-H026]'
   failure:
-  - An undeclared language in a project with no test command is a named refusal, not a silent pytest run.
+  - 'An undeclared language in a project with no test command is a named refusal, not a silent pytest run. Verify: a planted project with Rust sources and no declared test command: `gov close` exits non-zero with a refusal naming the undeclared language; no pytest process is started (the run record holds no pytest command).'
   lifted:
   - 'A ratchet baseline of known reds. Each red test at adoption is listed by its exact id, with an owner, a cause class and how it shrinks. A new red refuses the close. A listed test that turns green leaves the list, and the output says so. The list never grows without the project owner''s decision [DEC-736]. [lifted (was S5), DEC-1083: the ratchet lists are lifted (INVESTIGATION-1 §5)]'
   - 'The ratchet''s field rule, tested: one acceptance case per list (accepted_reds, load_sensitive): an entry that names no fix is refused by the ratchet''s check, naming the entry [lens H finding 19; DEC-890] [lifted (was S7), DEC-1083: the ratchet lists are lifted (INVESTIGATION-1 §5)]'
@@ -48,13 +48,6 @@ sources:
 - DEC-762
 - DEC-1083
 - DEC-890
-- W2-H026
-- W2-H042
-- W2-L119
-- W2-M159
-- W2-M160
-- W2-M162
-- W2-M253
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-19/

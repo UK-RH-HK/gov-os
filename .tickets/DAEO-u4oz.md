@@ -1,6 +1,6 @@
 ---
 id: DAEO-u4oz
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -41,12 +41,6 @@ sources:
 - CAP-15.b
 - DEC-1025
 - DEC-1052
-- W2-H034
-- W2-M126
-- W2-M215
-- W2-M239
-- W2-M294
-- W2-M330
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-04/

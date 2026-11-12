@@ -48,7 +48,7 @@ import json, os, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 cfg = json.load(open(os.path.join(HERE, "stub.json")))
 argv = sys.argv[1:]
-VALUED = ("--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
+VALUED = ("--setting-sources", "--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
           "--session-id")
 flags, adds, i = {}, [], 0
 while i < len(argv) - 1:
@@ -133,6 +133,12 @@ for rel, text in cfg.get("out", {}).items():
     p = os.path.join(os.getcwd(), rel)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w").write(text)
+for rel, spec in cfg.get("per_id", {}).items():  # one line per id of an input file (set-up A's labeller 2)
+    ids = [json.loads(x)["id"] for x in open(os.path.join(os.getcwd(), spec["src"])) if x.strip()]
+    ids = ids[spec.get("drop", 0):] + spec.get("extra", []) + ids[:1] * spec.get("repeat", 0)
+    p = os.path.join(os.getcwd(), rel)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w").write("".join(json.dumps(dict(spec["line"], id=i)) + "\n" for i in ids))
 if cfg.get("trace_drawn"):
     trace_drawn("session-env")
 if mode == "child":
@@ -371,7 +377,14 @@ def test_no_name_matched_stop_in_the_script():
 
 def test_documented_lines_name_only_the_sets_root():
     lines = [x.strip() for x in indep_launch.__doc__.splitlines() if x.strip().startswith("python3 ")]
-    assert len(lines) == 6
+    # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; --counts-only
+    assert len(lines) == 10
+    briefs = [ln.split("--brief ")[1].split()[0] for ln in lines if "--brief " in ln]
+    # the five set-up A briefs at their real paths (ACT-W2-149-INSTALL-1): governance/project/indep-briefs/sgx1/<name>.md
+    sgx = sorted(b for b in briefs if b.startswith("governance/project/indep-briefs/sgx1/"))
+    assert sgx == sorted(f"governance/project/indep-briefs/sgx1/{n}.md"
+                         for n in ("labeller", "labeller-2", "overlap-auditor", "writer-heldout", "writer-tuning"))
+    assert not any("/sgx1-" in b for b in briefs)
     for ln in lines:
         assert WALLS + "/" not in ln and "$" not in ln and not any(c in ln for c in "*?[{<>|;&`")
 
@@ -740,6 +753,11 @@ def test_canary_runs_with_the_session_flags_plus_its_folder(w):
     drop = "--session-id"
     assert {k: v for k, v in canary["flags"].items() if k != drop} == {
         k: v for k, v in session["flags"].items() if k != drop}
+    # F11 (DEC-1112 (3)): both lines carry --setting-sources project, exactly once, beside --restricted
+    for c in (canary, session):
+        assert c["flags"]["--setting-sources"] == "project"
+        assert c["argv"].count("--setting-sources") == 1 and c["argv"][1:4] == [
+            "--restricted", "--setting-sources", "project"]
     # each draws its own id (F1, F6)
     assert canary["flags"][drop] != session["flags"][drop]
     assert all(uuid.UUID(c["flags"][drop]).version == 4 for c in (canary, session))
@@ -763,8 +781,10 @@ def test_writer_session_is_closed_and_delivers_counts_only(w):
     session = w.calls()[1]
     wall, tree = w.wall(counts), w.tree(counts)
     a = session["argv"]
-    assert a[:6] == ["-p", "--restricted", "--settings", f"{wall}/.claude/settings.json", "--add-dir", str(tree)]
-    assert a[6:-3] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
+    assert a[:8] == ["-p", "--restricted", "--setting-sources", "project",  # F11 (DEC-1112 (3))
+                     "--settings", f"{wall}/.claude/settings.json", "--add-dir", str(tree)]
+    assert a.count("--setting-sources") == 1
+    assert a[8:-3] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
                        "--strict-mcp-config", "--disable-slash-commands", "--permission-prompts", "none", "--model",
                        "claude-haiku-5-5", "--max-budget-usd", "25", "--output-format", "json"]
     assert a[-3] == "--session-id" and uuid.UUID(a[-2]).version == 4  # the closing flag: the id the script drew
@@ -933,14 +953,17 @@ def test_f3_the_test_hook_is_recorded(w):
     assert m["test_hook"] is True and "test_hook set" in log
 
 
-def test_f5_a_rejected_labeller_leaves_no_labels_folder(w):
+def test_a_labeller_brief_without_an_entry_is_refused_10_nothing_built(w):
+    # the labeller kind runs set-up A's flows only (DEC-1112 (3)): the old sealed-folder flow is gone
     seal = w.plant_seal()
     before = tree_hash(w.sets / "fixtures")
     w.stub({"session": "write", "out": {"out/result.json": json.dumps({"labelled": 3, "allow": 2, "refuse": 1})}})
-    rc, counts, _ = w.launch("labeller")
-    assert rc == 20 and counts["status"] == "rejected"
-    assert not (seal / "labels").exists()
+    for kw in ({}, {"rnd": 2, "seed": 4242, "dry": True}):
+        rc, counts, _ = w.launch("labeller", **kw)
+        assert rc == 10 and counts["status"] == "refused"
+    assert not (seal / "labels").exists() and w.calls() == []
     assert tree_hash(w.sets / "fixtures") == before
+    nothing_built(w)
 
 
 def test_f5_a_rejected_writer_round_one_leaves_no_set_folder(w):
@@ -969,57 +992,47 @@ def test_f8_the_schemas_hashes_are_in_the_wall(w):
 # -- the other kinds -----------------------------------------------------------------------------------------------
 def test_checker_delivers_its_notes(w):
     w.plant_set()
+    notes_text = (  # W2-173 S3: §6's fixed form
+        "# Cross-check notes\n"
+        "## Questions\n"
+        "q01 | accept | - | also: none | the label and its anchor hold\n"
+        "q02 | revise | R6-SPAN-MISSES | also: none | the anchor ends before the deciding line\n"
+        "## The set\n"
+        "domains: code 0, decisions 2, tickets 0, plan 0, contract 0, none 0\n"
+        "categories: decision 2, contract 0, plan 0, ticket 0, exact-string 0, callers 0, code-paraphrase 0, "
+        "kernel-template 0, multi-file 0, failure-memory 0, history 0, nonexistent-id 0\n"
+        "keyword: any 2, all 0\n"
+        "supersession 0, kernel roles or skills 0, failure or lesson 0, drawn changed 0, drawn sample or none 2\n"
+        "set codes: none\n")
     w.stub({"session": "write", "out": {"out/result.json": json.dumps(
-        {"checked": 2, "accepted": 1, "revise": 1, "rejected": 0}), "out/notes.md": "notes\n"}})
+        {"checked": 2, "accepted": 1, "revise": 1, "rejected": 0}), "out/notes.md": notes_text}})
     rc, counts, _ = w.launch("checker")
     assert rc == 0, counts
     assert w.calls()[1]["input"] == ["selection.json", "set"]
     notes = w.sets / "fixtures" / "evaluation" / SET / "XCHECK-r1.md"
-    assert notes.read_text() == "notes\n"
-    assert counts["delivered"] == {"files": 1, "sha256": sha(b"notes\n"), "to": "notes"}
+    assert notes.read_text() == notes_text
+    assert counts["delivered"] == {"files": 1, "sha256": sha(notes_text.encode()), "to": "notes"}
     assert counts["out"]["checked"] == 2 and counts["out"]["questions"] is None
 
 
 def test_auditor_delivers_its_classes_and_the_audit_is_logged(w):
     w.plant_set()
     (w.sets / "runs" / "e0").mkdir(parents=True)
-    (w.sets / "runs" / "e0" / "misses.jsonl").write_text('{"q": 1}\n')
+    (w.sets / "runs" / "e0" / "misses.jsonl").write_text("".join(  # W2-173 S4: classes keyed by the misses' ids
+        json.dumps({"id": i, "question": "q", "gold_answer": "g", "gold_sources": ["s"], "answer": "a",
+                    "outcome": "wrong", "evidence_in_bundle": False}) + "\n" for i in ("m1", "m2")))
+    classes_text = json.dumps({  # W2-173 S4: classes keyed by the misses' ids
+        "m1": {"class": "retrieval_miss", "reason": "no gold place reached the agent"},
+        "m2": {"class": "retrieval_miss", "reason": "the gold span was not in the bundle"}}) + "\n"
     w.stub({"session": "write", "out": {"out/result.json": json.dumps({"misses": {"retrieval_miss": 2}}),
-                                        "out/classes.json": "{}\n"}})
+                                        "out/classes.json": classes_text}})
     rc, counts, _ = w.launch("auditor", audit="e0")
     assert rc == 0, counts
     assert w.calls()[1]["input"] == ["misses.jsonl", "selection.json", "set"]
-    assert (w.sets / "runs" / "e0" / "miss-classes.json").read_text() == "{}\n"
+    assert (w.sets / "runs" / "e0" / "miss-classes.json").read_text() == classes_text
     line = json.loads((w.runs / "AUDITS.log").read_text().splitlines()[-1])
     assert line["commit"] == w.commit and line["run"] == counts["run"] and line["audit"] == "e0"
     assert counts["out"]["misses"] == {"retrieval_miss": 2}
-
-
-def test_labeller_delivers_into_the_sealed_folder(w):
-    seal = w.plant_seal()
-    w.stub({"session": "write", "out": {"out/result.json": json.dumps({"labelled": 3, "allow": 2, "refuse": 1}),
-                                        "out/labels.jsonl": '{"id": "a000"}\n'}})
-    rc, counts, _ = w.launch("labeller")
-    assert rc == 0, counts
-    assert (seal / "labels" / f"{counts['run']}.jsonl").read_text() == '{"id": "a000"}\n'
-    assert counts["delivered"]["to"] == "labels" and counts["out"]["agree"] is None
-
-
-def test_second_labeller_overlap_is_ten_percent_by_the_seed(w):
-    seal = w.plant_seal(n1=23, n2=5)
-    rc1, a, _ = w.launch("labeller", rnd=2, seed=4242, dry=True)
-    rc2, b, _ = w.launch("labeller", rnd=2, seed=4242, dry=True)
-    assert rc1 == rc2 == 0
-    sa = json.loads((w.wall(a) / "input" / "selection.json").read_text())
-    sb = json.loads((w.wall(b) / "input" / "selection.json").read_text())
-    ids1 = [f"a{i:03d}" for i in range(23)]
-    assert sa["overlap"] == sb["overlap"] == random.Random(4242).sample(ids1, math.ceil(23 / 10))
-    assert a["selection"]["overlap"] == 3
-    acts = (w.wall(a) / "input" / "actions.jsonl").read_text().splitlines()
-    assert [json.loads(x)["id"] for x in acts] == [f"b{i:03d}" for i in range(5)] + sa["overlap"]
-    assert (w.wall(a) / "input" / "rulebook.md").read_text() == (seal / "rulebook.md").read_text()
-    rc, one, _ = w.launch("labeller", seed=4242, dry=True, set_name="labels-one")
-    assert (w.wall(one) / "input" / "actions.jsonl").read_bytes() == (seal / "corpus" / "actions-r1.jsonl").read_bytes()
 
 
 def test_writer_round_two_replaces_its_set_inside_hidden(w):
@@ -1075,7 +1088,12 @@ def test_schema_checker_is_strict():
 def test_counts_schema_closes_every_object_and_string():
     whole = schema()
     out = whole["properties"]["out"]["properties"]
-    as_given = [out["by_kind"], out["by_area"], out["misses"]]  # the result's own counts, copied as given
+    # the result's own counts, copied as given (set-up A's objects keyed "1".."14" too)
+    as_given = [out[k] for k in ("by_kind", "by_area", "misses", "cases", "copies", "near_miss", "by_class")]
+    as_given.append(whole["properties"]["delivered"]["properties"]["files_sha256"])
+    # set-up A's numbers are optional keys of `out` (and files_sha256 of `delivered`): present only when given
+    optional = {id(whole["properties"]["out"]): set(indep_launch.SGX_OUT) - {"labelled", "allow", "refuse"},
+                id(whole["properties"]["delivered"]): {"files_sha256"}}
 
     def walk(node):
         if isinstance(node, dict):
@@ -1084,7 +1102,8 @@ def test_counts_schema_closes_every_object_and_string():
             if "object" in types:
                 assert node.get("additionalProperties") is False, node
                 if not any(node is x for x in as_given):
-                    assert set(node.get("required", [])) == set(node.get("properties", {})), node
+                    want = set(node.get("properties", {})) - optional.get(id(node), set())
+                    assert set(node.get("required", [])) == want, node
             if "string" in types:
                 assert "enum" in node or "const" in node or node.get("pattern", "").startswith("^"), node
                 if "pattern" in node:

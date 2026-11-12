@@ -19,11 +19,19 @@ template's sources, the kernel, the tool registry, the real ``rulesync generate`
 it: ``support.RULESYNC_BIN``, skipped when it is not installed). No tool call is ever made: the guard is
 asked, and ``gov launch`` starts a stand-in program that records what a session would be started with
 (W1-46's stand-in). Nothing of this repository but the template's files and the named tool registry is read.
+
+Rewrite-Reason: DEC-966 item 1 (W2-105, DEC-866). The template's ``npm install*`` and ``pip install*`` deny rules
+are taken out of its permission source, so an adopted product's CTO session reaches the guard's install rule
+(DEC-172). The cases of behaviour 2 pinned them among the other rules; they now pin the ticket-folder edit rule and
+the sudo rule, and nothing else. The two cases keep their ids ("four other") from DEC-664's round.
 """
 
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -53,15 +61,16 @@ FOLDER_PATHS = (FOLDER, EXISTING_TEST, NEW_TEST, f"{FOLDER}/conftest.py", f"{FOL
 WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
 RULE_LISTS = ("deny", "ask", "allow")
 
-# What the template's source gives beside the rule DEC-664 takes out, and what rulesync makes of each.
+# What the template's source gives beside the rule DEC-664 takes out, and what rulesync makes of each. The two
+# install rules (``npm install*``, ``pip install*``) are taken out too, by DEC-966 item 1.
 OTHER_SOURCE_RULES = {
     ("edit", ".tickets/**", "deny"),
-    ("bash", "npm install*", "deny"),
-    ("bash", "pip install*", "deny"),
     ("bash", "sudo *", "deny"),
+    ("bash", "gov launch:*", "allow"),
 }
 OTHER_GENERATED_RULES = {
-    "deny": ["Bash(npm install*)", "Bash(pip install*)", "Bash(sudo *)", "Edit(.tickets/**)"],
+    "allow": ["Bash(gov launch:*)"],
+    "deny": ["Bash(sudo *)", "Edit(.tickets/**)"],
 }
 
 ENGINEER = hooks.ENGINEER
@@ -217,16 +226,46 @@ def _describe(results):
 # ``gov launch`` in the stand-in project
 # ---------------------------------------------------------------------------
 
+def _run_launch(product, sandbox, gate, role, ticket):
+    """``gov launch <role> <ticket>`` in ``product`` with this worktree's ``gov``: W1-07's ``run_gov_with_code``
+    (its environment, its timeout, its ``Run``), with the open gate's ``GOV_RESOURCES_*`` variables added."""
+    cli = support.cli_support
+    launcher = cli.write_launcher(support.REPO_ROOT, sandbox)
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(Path(support.REPO_ROOT) / "src"),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},
+        **gate,
+    }
+    args = ("launch", role, ticket)
+    started = time.perf_counter()
+    try:
+        done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(product), env=env, capture_output=True,
+                              text=True, timeout=cli.COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired as exc:
+        raise AssertionError(f"gov {' '.join(args)} did not end within {cli.COMMAND_TIMEOUT_S:.0f} s; what it "
+                             f"printed before then:\n{cli.output_excerpt(exc.stdout, exc.stderr)}") from None
+    return cli.Run(args, done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
+
+
 @pytest.fixture()
 def launched(product, sandbox):
     """``launched(role)``: ``gov launch <role> <its ticket>`` run in the stand-in project with this worktree's
-    code and a stand-in home whose CLI is W1-46's recording stand-in. No session is started."""
+    code and a stand-in home whose CLI is W1-46's recording stand-in. No session is started.
+
+    The resource gate is planted open in the stand-in home (W1-46's ``plant_open_gate``; W2-20 S19, DEC-1088 (5)(b)
+    runs it on every launch) and its readings carried into the launch's environment, which W1-07's
+    ``run_gov_with_code`` builds from scratch: ``_run_launch`` is that runner with them added."""
     cli = launch_support.install_stand_in_cli(sandbox)
+    gate = launch_support.plant_open_gate(sandbox)
 
     def _launch(role):
         before = len(launch_support.calls(cli))
-        run = support.cli_support.run_gov_with_code(support.REPO_ROOT, product, sandbox, "launch", role,
-                                                    TICKET_OF[role])
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
         result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
         assert run.returncode == 0, (
             f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
@@ -285,15 +324,19 @@ class TestEveryOtherRuleStays:
     """Green before implementation; it must stay green."""
 
     def test_the_templates_source_gives_the_four_other_rules_and_nothing_else(self, tmp_path):
+        """Since DEC-966 item 1 the other rules are two: the ticket-folder edit rule and the sudo rule (the id is
+        DEC-664's round's)."""
         others = {rule for rule in _source_rules() if not _on_the_folder(rule, tmp_path)}
         assert others == OTHER_SOURCE_RULES, (
-            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the install "
-            f"and sudo rules, and no other; missing: {sorted(OTHER_SOURCE_RULES - others)}, "
+            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the sudo rule, "
+            f"and no other (DEC-966 item 1: no install rule); missing: {sorted(OTHER_SOURCE_RULES - others)}, "
             f"not expected: {sorted(others - OTHER_SOURCE_RULES)}"
         )
 
     @needs_rulesync
     def test_the_four_other_deny_rules_are_still_generated_and_nothing_else(self, generated_project, tmp_path):
+        """Since DEC-966 item 1 the other deny rules are two: ``Bash(sudo *)`` and ``Edit(.tickets/**)`` (the id is
+        DEC-664's round's)."""
         settings = support.load_settings(generated_project)
         permissions = settings.get("permissions")
         assert isinstance(permissions, dict), f"{GENERATED_REL} holds no `permissions` map"
@@ -304,8 +347,8 @@ class TestEveryOtherRuleStays:
         others = {kind: rules for kind, rules in others.items() if rules}
         assert others == OTHER_GENERATED_RULES, (
             f"beside a rule on the acceptance-test folder, {GENERATED_REL} generated from the template's sources "
-            f"must hold the ticket-folder Edit rule and the install and sudo rules as deny rules, each once, and "
-            f"no other permission rule; it holds {others}"
+            f"must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other "
+            f"permission rule (DEC-966 item 1: no install rule); it holds {others}"
         )
 
     @needs_rulesync

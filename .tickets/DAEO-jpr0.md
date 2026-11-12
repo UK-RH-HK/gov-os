@@ -1,6 +1,6 @@
 ---
 id: DAEO-jpr0
-status: in_progress
+status: closed
 deps: [DAEO-qzrq]
 links: [DAEO-blwa, DAEO-qzrq]
 created: 2026-11-02T12:41:50Z
@@ -44,6 +44,7 @@ kpis:
   - 'A rebuild or search that fails because of the cache.'
 profile: STANDARD
 sources:
+- DEC-1109
 - DEC-1032
 - DEC-1031
 - DEC-1015
@@ -54,7 +55,7 @@ sources:
 - DEC-1042
 - DEC-1046
 - DEC-1052
-- W2-123
+- DAEO-qzrq
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-126/

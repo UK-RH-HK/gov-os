@@ -25,20 +25,20 @@ allowed_paths:
 - experiments/EXP-003/**
 kpis:
   success:
-  - The same metric, corpora and modes as W2-15a, re-run after W2-32's bounded improvements. Each figure is shown beside its baseline [AR-10].
-  - The corpus mean per corpus and mode against the owner's 99 % goal, with every miss classified (labelling, chunking, ranking, coverage).
-  - 'The stacking test, final: complete and no duplicates, or each gap named [AR-10].'
-  - 'The scale probe: EXAMIN''s clone and ~/workspace against DEC-078''s envelope (≈ 80k nodes, 270k edges, ≈ 2.2 GB peak RSS), including the brute-force vector scan and the graph cache [W2-M351, W2-L317,
-    W2-L320, W2-M089].'
-  - CAP-10's hit@5 against 85, per class beside the single-class figure, for the owner's CAP-10 package (Q-10) [W2-M017, F-m2].
+  - 'The same metric, corpora and modes as W2-15a, re-run after W2-32''s bounded improvements. Each figure is shown beside its baseline. Verify: the evidence record''s table lists the same metric name, corpora and modes as W2-15a''s record (a diff of the three name lists is empty), and each figure has a baseline figure beside it; a row without a baseline fails the record check [AR-10]'
+  - 'The corpus mean per corpus and mode against the owner''s 99 % goal, with every miss classified (labelling, chunking, ranking, coverage). Verify: the record holds, for each corpus and mode, the mean as a percentage beside 99 %, and every question below the goal carries one class from labelling, chunking, ranking or coverage (a count of unclassified misses is 0).'
+  - 'The stacking test, final: complete and no duplicates, or each gap named. Verify: the record''s stacking result for each corpus says complete with a duplicate count of 0, or lists each gap by question id; a planted stack with one duplicate and one missing item is reported with both named [AR-10]'
+  - 'The scale probe: EXAMIN''s clone and ~/workspace against DEC-078''s envelope (≈ 80k nodes, 270k edges, ≈ 2.2 GB peak RSS), including the brute-force vector scan and the graph cache. Verify: the record holds, for each of the two corpora, the node count, edge count and peak RSS in GB beside the envelope''s figures, with the brute-force vector scan''s time and the graph cache''s size and load time [W2-M351, W2-L317,
+    W2-L320, W2-M089]'
+  - 'CAP-10''s hit@5 against 85, per class beside the single-class figure, for the owner''s CAP-10 package (Q-10). Verify: the record holds hit@5 per class and the single-class figure as percentages beside 85, and the package for Q-10 names them and is in the owner''s inbox [W2-M017, F-m2]'
   - 'Batched, ranked, stacked retrieval: a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent''s budget, never by one giant query or context; the
-    measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner''s target of 99 % [DEC-860]'
-  - 'Memory is judged on the combined memory spec (semantic and lexical search, full indexing, full embeddings, the knowledge and code graph, the SQLite and vector-store structure); EXAMIN''s clone and ~/workspace are indexed with W2-88''s tools [DEC-954 Q9c, Q9f]'
-  - 'hit@5 is judged against the owner''s target of 95 %, CAP-10''s 85 the floor; at 85 or above with room for improvement found, memory is not closed: an escalation to the owner [DEC-957]'
-  - 'The query embedder, GPU against CPU, re-investigated on the full combined measure (DEC-798 kept the CPU on a measure of the embedding model alone): whether the final answers stay the same (the retrieved and stacked evidence per question, over repeated runs on each device and between the devices), the retrieval quality (both figures per device), the speed (query latency and the whole measure''s time), and the CPU a GPU query embedder would free; recorded in the evidence record and brought to the owner as a package to decide; the CPU embedder stays until then [DEC-975, DEC-798]'
-  - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone. [moved from W2-15a S2, DEC-1083]'
-  - 'Indexing time, peak RSS and incremental update per corpus, against DEC-078''s envelope [W2-L102, W2-L321]. [moved from W2-15a S4, DEC-1083]'
-  - 'Decision-level retrieval after W2-03 [AR-10]. The thin-margin cases and the two dev queries without gold paths are fixed or named [W2-M342, W2-L322, W2-M340]. [moved from W2-15a S6, DEC-1083]'
+    measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner''s target of 99 %. Verify: a planted question whose evidence needs three batches is answered by three batched searches (the search log shows three calls, no single giant query) with the stacked context holding all its evidence in relevance order; the record prints the share as a percentage beside 99 % [DEC-860]'
+  - 'Memory is judged on the combined memory spec (semantic and lexical search, full indexing, full embeddings, the knowledge and code graph, the SQLite and vector-store structure); EXAMIN''s clone and ~/workspace are indexed with W2-88''s tools. Verify: the record names the index each corpus was built with and it is the one W2-88''s tools write (the index manifest names the tool and version); it lists the combined spec''s parts (semantic and lexical search, full indexing, full embeddings, the knowledge and code graph, the SQLite and vector-store structure) each as present for EXAMIN''s clone and ~/workspace [DEC-954 Q9c, Q9f]'
+  - 'hit@5 is judged against the owner''s target of 95 %, CAP-10''s 85 the floor; at 85 or above with room for improvement found, memory is not closed: an escalation to the owner. Verify: planted results at hit@5 of 90 % with an improvement found leave the memory ticket open and put one escalation in the owner''s inbox; at 96 % memory is judged met; at 84 % it fails the floor; each prints the figure beside 95 % and 85 % [DEC-957]'
+  - 'The query embedder, GPU against CPU, re-investigated on the full combined measure (DEC-798 kept the CPU on a measure of the embedding model alone): whether the final answers stay the same (the retrieved and stacked evidence per question, over repeated runs on each device and between the devices), the retrieval quality (both figures per device), the speed (query latency and the whole measure''s time), and the CPU a GPU query embedder would free; recorded in the evidence record and brought to the owner as a package to decide; the CPU embedder stays until then. Verify: the record holds, per device, the retrieved and stacked evidence per question over at least two repeated runs and between the two devices (the share of questions with identical evidence is printed), both quality figures, query latency and the whole measure''s time in seconds, and the CPU a GPU query embedder would free; the owner''s inbox holds one package naming these; the configured query embedder is still the CPU one [DEC-975, DEC-798]'
+  - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone. Verify: the run''s corpus list names the dev tiers, ~/workspace and a clone of the owner''s EXAMIN copy made by this ticket (its path is not W2-26''s); the ~/workspace file listing before and after the run is identical (read-only) [moved from W2-15a S2, DEC-1083]'
+  - 'Indexing time, peak RSS and incremental update per corpus, against DEC-078''s envelope. Verify: the record holds, per corpus, the full indexing time in seconds, peak RSS in GB and the incremental update time after a planted one-file change, each beside DEC-078''s envelope [W2-L102, W2-L321] [moved from W2-15a S4, DEC-1083]'
+  - 'Decision-level retrieval after W2-03 [AR-10]. The thin-margin cases and the two dev queries without gold paths are fixed or named. Verify: the record holds decision-level retrieval results run after W2-03 merged (its commit is before the run''s start); each thin-margin case and each of the two dev queries without gold paths is either given a gold path and passes, or is named in the record with its reason [W2-M342, W2-L322, W2-M340] [moved from W2-15a S6, DEC-1083]'
   failure: []
   lifted:
   - 'Both figures in every report: hit@5 against CAP-10''s floor of 85, and the complete-stacked-evidence share against 99 % [DEC-833] [lifted (was S7), DEC-1083: "both figures" is one rule in W2-61''s measure (W-3)]'
@@ -55,19 +55,8 @@ sources:
 - DEC-954
 - DEC-957
 - DEC-1083
-- DEC-798
-- W2-15a
-- W2-61
-- W2-L102
-- W2-L317
-- W2-L320
-- W2-L321
-- W2-L322
-- W2-M017
-- W2-M089
-- W2-M340
-- W2-M342
-- W2-M351
+- DAEO-rd0g
+- DAEO-iw1f
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
@@ -81,6 +70,11 @@ list_rows:
 - W2-M017
 - W2-M089
 - W2-M351
+- W2-L102
+- W2-L321
+- W2-L322
+- W2-M340
+- W2-M342
 ---
 # W2-15b EXP-003, pass 2: the final measurement against 99 %
 

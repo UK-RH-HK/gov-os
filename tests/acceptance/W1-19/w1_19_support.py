@@ -70,6 +70,8 @@ UNAVAILABLE = "FACET_UNAVAILABLE"
 CALL_TIMEOUT_S = 300.0
 MEASURE_TIMEOUT_S = 3600.0
 MISSING_EXIT = 3
+# The machine-wide vector cache's folder (W2-126); each test has its own (tests/conftest.py, DEC-1042).
+VECTOR_CACHE_SETTING = "GOV_VECTOR_CACHE_DIR"
 
 # The pins of ADR-0002 §2 (DEC-074 R1).
 EMBED_MODEL = "qwen3-embedding:0.6b"
@@ -323,8 +325,17 @@ class Api:
 
         ``PYTHONPATH`` is this worktree's ``src`` and, when this machine has ``sqlite_vec``, the folder that links
         that one package: the empty HOME has no user site folder to find it in. ``PATH`` hides ``ollama`` alone; every
-        other program of this machine's ``PATH`` stays (``_path_without_ollama``, DEC-1046)."""
+        other program of this machine's ``PATH`` stays (``_path_without_ollama``, DEC-1046).
+
+        ``GOV_VECTOR_CACHE_DIR`` (the machine-wide vector cache's folder, W2-126) is carried from the running test's
+        own environment, read here at each call, not at import: ``tests/conftest.py`` gives each test a folder of its
+        own (DEC-1042). Unset there, it is left out, and the cache falls back to its default under the empty HOME;
+        ``extra`` may set it. Rewrite-Reason: DEC-1042: W1-19's scratch environment dropped the test's own vector
+        cache folder (W2-126), so a test was served another's cached vectors (the ``api`` fixture is session-scoped,
+        so every test of one process shared one HOME, and so one cache)."""
+        cache = os.environ.get(VECTOR_CACHE_SETTING)
         return {
+            **({VECTOR_CACHE_SETTING: cache} if cache else {}),
             "PATH": self._path_without_ollama(),
             "HOME": str(self.workdir / "home"),
             "TMPDIR": str(self.workdir / "tmp"),
@@ -333,7 +344,7 @@ class Api:
             "PYTHONPATH": os.pathsep.join([str(SRC), *([str(self.site)] if self.site else [])]),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "OLLAMA_HOST": ollama_host or self.dead_host,
-            # W2-54, DEC-798: the CPU-only embedder's address; the same stand-in (or the same dead port).
+            # W2-54, DEC-1033: the query embedder's address; the same stand-in (or the same dead port).
             "GOV_QUERY_OLLAMA_HOST": ollama_host or self.dead_host,
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",

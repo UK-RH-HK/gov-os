@@ -73,9 +73,16 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
 
     Revised for W2-20 (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20's KPI adds ``resources`` to the
     recorded ``gov`` commands; the set is still exact, and ``release`` is still excused until recorded (DEC-753).
+
+    Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite by a fresh test designer, DEC-491):
+    ``gov --help`` offers ``brief`` (W2-152, DEC-1088 (3)), ``links`` (W2-129, DEC-1074 (7)) and ``plan``
+    (W2-136, DEC-1088), approved commands the lists did not record, so the case failed on them. W1-07's lines
+    record them; the pinned set is still exact, any other unrecorded command still fails, a recorded command
+    gone from ``gov --help`` still fails, the module command is still none of ``gov``'s, and ``release`` alone
+    is still excused until recorded (DEC-753).
     """
-    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "resources", "telemetry"}, (
-        RECORDED)
+    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "brief", "ci", "launch", "links", "plan",
+                                                            "resources", "telemetry"}, RECORDED
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)

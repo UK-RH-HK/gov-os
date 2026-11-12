@@ -53,7 +53,7 @@ SEALED = "fixtures/evaluation/sandbox-guard-exp-1/hidden"
 ACT = "ACT-INDEP-WALLS-1"
 STATUSES = ("delivered", "rejected", "refused", "stopped", "dry")
 REASONS = {10: "brief", 11: "template", 12: "wall_exists", 13: "seed_order", 14: "commit", 15: "file_budget",
-           16: "canary", 17: "argument", 20: "result", 21: "stopped", 22: "trace"}
+           16: "canary", 17: "argument", 18: "rules", 20: "result", 21: "stopped", 22: "trace"}
 WRITER_KINDS = ("fact", "procedure", "decision", "location", "negative")
 WRITER_AREAS = ("contract", "decisions", "kernel", "code", "tests", "operations", "docs")
 AUDIT_CLASSES = ("gold_wrong", "question_ambiguous", "retrieval_miss", "answer_wrong", "out_of_scope")
@@ -61,7 +61,10 @@ TOOLS_COUNTED = ("Read", "Grep", "Glob", "Write", "Edit", "MultiEdit", "TodoWrit
                  "Task", "Agent", "NotebookEdit", "Skill", "other")
 COUNTS_KEYS = {"act", "kind", "run", "set", "round", "commit", "brief_sha256", "approved_sha256", "template_ok",
                "seed_sha256", "override", "selection", "session", "out", "delivered", "traces", "status", "code",
-               "reason"}
+               "reason",
+               # Revised for W2-173 S1 (DEC-1120 (2)-(3), DEC-866): every counts object carries the brief's `effort`,
+               # a string or null.
+               "effort"}
 NESTED_KEYS = {"selection": {"changed", "sample", "overlap"},
                "session": {"exit", "is_error", "turns", "cost_usd", "duration_s", "refusals"},
                "refusals": set(TOOLS_COUNTED),
@@ -79,14 +82,212 @@ SET_NAME = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 HIDDEN_GLOBS = ("fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
                 "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**",
                 "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**")
-PATH_MAP = """# Planted path map (W2-149 acceptance tests): only the block the launch script counts the hidden part by.
-sets_root_hidden:
+SGX_SET_BLOCK = """evaluation_sets:
+  sandbox-guard-exp-1:
+    visible: []
+    hidden: ["fixtures/evaluation/sandbox-guard-exp-1/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+"""
+SGX_HIDDEN_GLOB = '"fixtures/evaluation/sandbox-guard-exp-1/hidden/**", '
+PATH_MAP = """# Planted path map (W2-149 acceptance tests): the block the launch script counts the hidden part by, and the
+# evaluation set writer 2's seal is read from (S24).
+""" + SGX_SET_BLOCK + """sets_root_hidden:
   root: "~/gov-os-eval"
   hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
            "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**",
            "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**"]
   refused_roles: [orchestrator, engineer, research, product-spec, independent-test-designer, independent-auditor]
 """
+
+# -- set-up A's wiring (DEC-1112 (3), DEC-1113): the planted template's kinds.yaml and the five approved briefs' front
+# matter, byte for byte (their bodies are never planted: each planted brief carries a short body of the tests' own).
+SGX1_TREE_EXCLUDE = (".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**")
+# S23 (F38; DEC-1113 (2): the overlap auditor decides from the decisions alone): its entry also leaves out every file
+# that states which dispute side is which labeller's. The other four set-up A entries keep SGX1_TREE_EXCLUDE.
+AUDITOR_TREE_EXCLUDE = (".tickets/**", "governance/project/orchestration/packages/**",
+                        "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/**",
+                        "tests/unit/orchestration/test_w2_149*", "docs/changes/W2-149-evidence.md")
+SGX1_IDS = ("sgx1-writer-tuning", "sgx1-writer-heldout", "sgx1-labeller", "sgx1-labeller-2", "sgx1-overlap-auditor")
+
+
+def _flow_list(globs) -> str:
+    return "[" + ", ".join(json.dumps(g) for g in globs) + "]"
+
+
+def template_entry_excludes() -> dict:
+    """Set-up A's five entries' ``tree_exclude`` as this tree's own template (``kinds.yaml``) states them (S23, F38):
+    the planted ``kinds.yaml`` carries them, so a dry build exercises the template's entries as the engineer leaves
+    them. An entry missing or malformed falls back to the four globs (S22's and S23's template cases catch it)."""
+    try:
+        import yaml
+        briefs = (yaml.safe_load((TEMPLATE_SRC / "kinds.yaml").read_text()) or {}).get("briefs") or {}
+    except Exception:  # noqa: BLE001 - a template that does not parse is the template cases' finding
+        briefs = {}
+    out = {}
+    for bid in SGX1_IDS:
+        tx = (briefs.get(bid) or {}).get("tree_exclude") if isinstance(briefs, dict) else None
+        ok = isinstance(tx, list) and tx and all(isinstance(g, str) for g in tx)
+        out[bid] = tuple(tx) if ok else SGX1_TREE_EXCLUDE
+    return out
+
+
+_TX = _flow_list(SGX1_TREE_EXCLUDE)
+_TXE = {bid: _flow_list(g) for bid, g in template_entry_excludes().items()}
+KINDS_YAML = f"""# Planted kinds.yaml (W2-149 acceptance tests, set-up A's wiring): the template's four kinds as they stand, each
+# with a model, and the briefs: map a brief's missing model, result_schema and sample are taken from (DEC-1112 (3)).
+kinds:
+  writer:
+    tools: [Read, Grep, Glob, Write, Edit, TodoWrite]
+    input: [selection]
+    input_round2: [set, notes]
+    delivers: set
+    budget_usd: 25
+    timeout_s: 7200
+    model: claude-kind-writer
+  checker:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set]
+    delivers: notes
+    budget_usd: 15
+    timeout_s: 5400
+    model: claude-kind-checker
+  auditor:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set, misses]
+    delivers: classes
+    budget_usd: 15
+    timeout_s: 5400
+    model: claude-kind-auditor
+  labeller:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [rulebook, actions]
+    delivers: labels
+    budget_usd: 30
+    timeout_s: 10800
+    model: claude-kind-labeller
+briefs:
+  sgx1-writer-tuning:
+    kind: writer
+    flow: sgx1-writer-1
+    model: claude-entry-writer-tuning
+    result_schema: sgx1-writer-tuning-result.schema.json
+    tree_exclude: {_TXE['sgx1-writer-tuning']}
+  sgx1-writer-heldout:
+    kind: writer
+    flow: sgx1-writer-2
+    result_schema: sgx1-writer-heldout-result.schema.json
+    tree_exclude: {_TXE['sgx1-writer-heldout']}
+  sgx1-labeller:
+    kind: labeller
+    flow: sgx1-labeller-1
+    model: claude-entry-labeller
+    result_schema: sgx1-labeller-result.schema.json
+    sample: 0
+    tree_exclude: {_TXE['sgx1-labeller']}
+  sgx1-labeller-2:
+    kind: labeller
+    flow: sgx1-labeller-2
+    model: claude-entry-labeller-2
+    result_schema: sgx1-labeller-2-result.schema.json
+    sample: 0
+    tree_exclude: {_TXE['sgx1-labeller-2']}
+  sgx1-overlap-auditor:
+    kind: auditor
+    flow: sgx1-overlap-auditor
+    model: claude-entry-overlap-auditor
+    result_schema: sgx1-overlap-auditor-result.schema.json
+    sample: 0
+    tree_exclude: {_TXE['sgx1-overlap-auditor']}
+  w2-149-no-schema:
+    kind: writer
+    flow: sgx1-writer-1
+    sample: 5
+    tree_exclude: {_TX}
+  w2-149-no-sample:
+    kind: auditor
+    flow: sgx1-overlap-auditor
+    result_schema: sgx1-overlap-auditor-result.schema.json
+    tree_exclude: {_TX}
+"""
+_TOOLS5 = "tools: [Read, Grep, Glob, Write, TodoWrite]\n"
+_TOOLS6 = "tools: [Read, Grep, Glob, Write, Edit, TodoWrite]\n"
+_EXP = "experiment: SANDBOX-GUARD-EXP-1\n"
+SGX1_FRONT = {
+    "labeller": ("---\nbrief: sgx1-labeller\nkind: labeller\nversion: 3\n" + _EXP + "rounds: 2\n" + _TOOLS5
+                 + "budget_usd: 30\ntimeout_s: 10800\n---\n"),
+    "labeller-2": ("---\nbrief: sgx1-labeller-2\nkind: labeller\nversion: 3\n" + _EXP + "rounds: 2\n" + _TOOLS5
+                   + "budget_usd: 30\ntimeout_s: 10800\n---\n"),
+    "writer-tuning": ("---\nbrief: sgx1-writer-tuning\nkind: writer\nversion: 3\n" + _EXP + "rounds: 1\n" + _TOOLS6
+                      + "sample: 400\nbudget_usd: 25\ntimeout_s: 7200\n---\n"),
+    "writer-heldout": ("---\nbrief: sgx1-writer-heldout\nkind: writer\nversion: 3\n" + _EXP + "rounds: 1\n" + _TOOLS6
+                       + "sample: 400\nbudget_usd: 25\ntimeout_s: 7200\n---\n"),
+    "overlap-auditor": ("---\nbrief: sgx1-overlap-auditor\nkind: auditor\nversion: 1\n" + _EXP + "rounds: 1\n"
+                        + _TOOLS5 + "budget_usd: 10\ntimeout_s: 3600\n"
+                        + 'budget_basis: "the labellers\' figures (30 USD, 10800 s per half: a rulebook, then several '
+                        "hundred actions by hand) scaled to the overlap's disputes, about 40 cases (10 % of 400), one "
+                        "round, no rulebook or script; the declaration's brake at twice the projection applies\"\n"
+                        + "---\n"),
+}
+# The sha256 of each approved brief's front matter alone (the .fm files beside the approved briefs, 2026-11-10).
+SGX1_FRONT_SHA256 = {
+    "labeller": "8d8ec2c78dc7190d252f1a7094e3ec497de4d4e6161d0287e3be77fc44c74723",
+    "labeller-2": "ea75f95d0562a71b8976dfc0dc67e7266c8497cf52bdf7e4ae7883d3f4a7541e",
+    "writer-tuning": "75558111cac1e00e96c971dd80f176739a12d058b3bc084ec5de975d749f7f65",
+    "writer-heldout": "d91987a40a4cb239d205f6815f6eac2ec4ee04e2e994c83f7c4def4dea33c4c9",
+    "overlap-auditor": "058e22f90fc205569df7824de4574d06ea58a4af7cb81ebea350308d243b0362",
+}
+SGX1_BODY = ("# The planted body of a set-up A brief (W2-149 acceptance tests)\n\nNot the approved text: only the front "
+             "matter above is the approved brief's, byte for byte.\n")
+_FM_EXTRA = "model: claude-front-model\nresult_schema: labeller-result.schema.json\n"
+SGX1_VARIANTS = {
+    # S22: a front-matter value beats the entry's
+    "sgx1x/labeller-front": SGX1_FRONT["labeller"][:-4] + _FM_EXTRA + "---\n",
+    # S22: an entry of another kind (every value present in the front matter, so only the entry's kind refuses)
+    "sgx1x/writer-as-labeller": ("---\nbrief: sgx1-writer-tuning\nkind: labeller\n" + _FM_EXTRA + "sample: 3\n---\n"),
+    "sgx1x/labeller-as-auditor": ("---\nbrief: sgx1-labeller\nkind: auditor\nmodel: claude-front-model\n"
+                                  "result_schema: auditor-result.schema.json\nsample: 3\n---\n"),
+    # S22: a labeller brief naming no entry, or an id the map does not hold (every value present otherwise)
+    "sgx1x/labeller-unknown": ("---\nbrief: sgx1-labeller-9\nkind: labeller\n" + _FM_EXTRA + "sample: 3\n---\n"),
+    # S22: a value found nowhere (the entry lacks it and so does the front matter)
+    "sgx1x/no-schema": "---\nbrief: w2-149-no-schema\nkind: writer\n---\n",
+    "sgx1x/no-sample": "---\nbrief: w2-149-no-sample\nkind: auditor\n---\n",
+}
+PLANTED_TICKETS = {
+    "DAEO-aaa1": ("engineer", "W2-901", ["src/pkg/**", "docs/d01.md"]),
+    "DAEO-aaa2": ("independent-test-designer", "W2-902", ["tests/acceptance/W2-902/**"]),
+    "DAEO-aaa3": ("orchestrator", "W2-903", ["governance/**", ".tickets/**"]),
+}
+TICKET_MARK = "MARK-W2149-TICKET-BODY"
+
+
+def ticket_text(tid, role, wbs, paths):
+    lines = ["---", f"id: {tid}", "status: open", "deps: []", f"title: 'Planted ticket {tid} (W2-149 acceptance tests)'",
+             f"role: {role}", f"wbs_id: {wbs}", "allowed_paths:"] + [f"- {p}" for p in paths]
+    lines += ["kpis:", "  success:", f"  - 'S1 planted KPI line ({TICKET_MARK})'", "profile: LIGHT", "---",
+              f"# Planted ticket {tid}", "", f"Its body ({TICKET_MARK}) never reaches a wall.", ""]
+    return "\n".join(lines)
+
+
+SETUP_A_FILES = {
+    # S23: one file under each of the set-up A entries' tree_exclude globs (the template's and the briefs' are there)
+    ".claude/settings.json": '{"permissions": {"deny": []}}\n',
+    ".claude/hooks/pretooluse.py": "# planted guard hook (W2-149 S23)\n",
+    "src/gov/guard/core.py": "# planted guard code (W2-149 S23)\n",
+    "src/gov/launch/run.py": "# planted launcher code (W2-149 S23)\n",
+}
+SETUP_A_FILES.update({f".tickets/{t}.md": ticket_text(t, *v) for t, v in PLANTED_TICKETS.items()})
+# S23 (F38): one file under each of the overlap auditor's further globs but .tickets/** (the tickets above), each
+# holding TELL_MARK; tree-exclude.txt leaves none of them out, so every tree but the overlap auditor's holds them.
+TELL_MARK = "TELL-W2149-WHICH-SIDE"
+TELL_FILES = {
+    "governance/project/orchestration/packages/ACT-W2-149-PLANTED.md": f"# planted package (W2-149 S23, {TELL_MARK})\n",
+    "governance/project/orchestration/tools/indep_launch.py": f"# planted launcher (W2-149 S23, {TELL_MARK})\n",
+    "tests/acceptance/W2-149/planted.md": f"# planted acceptance notes (W2-149 S23, {TELL_MARK})\n",
+    "tests/unit/orchestration/test_w2_149_planted.py": f"# planted unit test (W2-149 S23, {TELL_MARK})\n",
+    "docs/changes/W2-149-evidence.md": f"# planted evidence (W2-149 S23, {TELL_MARK})\n",
+}
+SETUP_A_FILES.update(TELL_FILES)
 GIT_ENV = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "W2-149 tests",
            "GIT_AUTHOR_EMAIL": "w2-149@example.invalid", "GIT_COMMITTER_NAME": "W2-149 tests",
            "GIT_COMMITTER_EMAIL": "w2-149@example.invalid", "PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"}
@@ -160,6 +361,10 @@ BRIEFS = {"writer": brief_text("writer", 5, budget=0.5, timeout=30),
           "labeller": brief_text("labeller", 3, budget=0.5, timeout=30),
           "writer-short": brief_text("writer", 5, budget=0.5, timeout=2),
           "writer-overbudget": brief_text("writer", 5, budget=99, timeout=30)}
+# Set-up A (DEC-1112 (3)): the five approved briefs' front matter byte for byte, each with a planted body, at the
+# approved briefs' own paths (governance/project/indep-briefs/sgx1/<name>.md); and S22's variants.
+BRIEFS.update({f"sgx1/{name}": fm + SGX1_BODY for name, fm in SGX1_FRONT.items()})
+BRIEFS.update({name: fm + SGX1_BODY for name, fm in SGX1_VARIANTS.items()})
 
 
 def flip_last_letter(data: bytes) -> bytes:
@@ -185,6 +390,21 @@ def corrupt_settings(data: bytes) -> bytes:
     return (json.dumps(doc, indent=2) + "\n").encode()
 
 
+def path_map_without_the_set(data: bytes) -> bytes:
+    """PU (S24): the path map holds no sandbox-guard-exp-1 evaluation set (sets_root_hidden still names its glob)."""
+    text = data.decode()
+    assert SGX_SET_BLOCK in text
+    return text.replace(SGX_SET_BLOCK, "evaluation_sets: {}\n", 1).encode()
+
+
+def path_map_without_the_cover(data: bytes) -> bytes:
+    """PC (S24): the set's entry stays; sets_root_hidden no longer covers its hidden glob."""
+    text = data.decode()
+    head, sep, tail = text.partition("sets_root_hidden:")
+    assert sep and SGX_HIDDEN_GLOB in tail
+    return (head + sep + tail.replace(SGX_HIDDEN_GLOB, "", 1)).encode()
+
+
 def base_files(extra_briefs=None):
     files = {"README.md": "# The planted repository (W2-149 acceptance tests)\n",
              "CLAUDE.md": "Planted CLAUDE.md of the planted repository.\n",
@@ -202,6 +422,9 @@ def base_files(extra_briefs=None):
         files[f"src/pkg/m{n:02d}.py"] = f"VALUE = {n}\n"
     for name in TEMPLATE_FILES:
         files[f"{TEMPLATE_REL}/{name}"] = (TEMPLATE_SRC / name).read_bytes()
+    # set-up A's wiring: the planted kinds.yaml (a model per kind, the briefs: map); tree-exclude.txt stays the tree's
+    files[f"{TEMPLATE_REL}/kinds.yaml"] = KINDS_YAML
+    files.update(SETUP_A_FILES)
     for name, text in dict(BRIEFS, **(extra_briefs or {})).items():
         files[f"{BRIEFS_REL}/{name}.md"] = text
     return files
@@ -249,7 +472,9 @@ def build_repo(root: Path, extra_briefs=None) -> dict:
     variants = [("TB", f"{BRIEFS_REL}/writer.md", flip_last_letter)]
     variants += [(f"T-{name}", f"{TEMPLATE_REL}/{name}", flip_last_letter) for name in TEMPLATE_FILES]
     variants += [("TK", f"{TEMPLATE_REL}/kinds.yaml", bash_in_kinds),
-                 ("TS", f"{TEMPLATE_REL}/settings.json.tmpl", corrupt_settings)]
+                 ("TS", f"{TEMPLATE_REL}/settings.json.tmpl", corrupt_settings),
+                 ("PU", "governance/project/path-map.yaml", path_map_without_the_set),
+                 ("PC", "governance/project/path-map.yaml", path_map_without_the_cover)]
     previous = None
     for key, rel, change in variants:
         if previous:
@@ -279,7 +504,11 @@ stdin, its parent's command line) and plays Claude Code:
   - a --settings file it cannot read, parse or validate is ignored without a word;
   - with the settings loaded, the Read is refused only when a PreToolUse hook in them refuses it (run as Claude Code
     runs a command hook: sh -c, the event on stdin, exit 2 or a "deny" decision refuses);
-  - the real session plays the case's script (out/ files, a sleep, a child, the budget's end, a trace file)."""
+  - the real session plays the case's script (out/ files, a sleep, a child, the budget's end, a trace file);
+  - the user's settings source (S10, DEC-1112 (3)): with no --setting-sources, or a list naming "user", it loads
+    $HOME/.claude/settings.json when that file is valid: its SessionStart hooks run at every call's start and its
+    PreToolUse hooks run beside the --settings file's on the canary's Read (allow lines never lift a refusal: Claude
+    Code's deny-over-allow); a list that leaves "user" out loads nothing from it. Each call records which."""
 import hashlib, json, os, re, subprocess, sys, time, uuid
 
 CFG = __CFG__
@@ -409,9 +638,140 @@ def hook_denies(settings, tool, tin, cwd, sid):
     return False
 
 
+def user_source(flags):
+    """The user's settings source: on with no --setting-sources or a list naming "user"; its file loaded when valid."""
+    src = flags.get("--setting-sources")
+    on = src is None or "user" in [x.strip() for x in str(src).split(",")]
+    path = os.path.join(os.environ.get("HOME", "/nonexistent"), ".claude", "settings.json")
+    present = os.path.isfile(path)
+    loaded = settings_ok(path) if (on and present) else None
+    return {"sources": src, "user_on": on, "path": path, "present": present, "loaded": loaded is not None}, loaded
+
+
+def run_hooks(settings, event_name, cwd, sid, **extra):
+    for e in settings.get("hooks", {}).get(event_name, []):
+        for x in e["hooks"]:
+            event = dict({"session_id": sid, "transcript_path": "", "cwd": cwd, "hook_event_name": event_name}, **extra)
+            try:
+                subprocess.run(["/bin/sh", "-c", x["command"]], input=json.dumps(event), capture_output=True,
+                               text=True, cwd=cwd, timeout=x.get("timeout", 60))
+            except Exception:
+                pass
+
+
 def record(name, data):
     with open(os.path.join(REC, name), "a") as f:
         f.write(json.dumps(data) + "\n")
+
+
+# Set-up A's sessions (DEC-1112 (3)): a program reads the wall's own input/ and writes what the brief asks, so a real
+# run (whose seed the script draws) still answers its own staged ids. Each returns {out/ file: text}.
+LABELS = ("allow", "refuse", "ask")
+
+
+def _jsonl(path):
+    with open(path) as f:
+        return [json.loads(x) for x in f if x.strip()]
+
+
+def _by_class(lines):
+    return {str(k): sum(1 for x in lines if str(x["rule_class"]) == str(k)) for k in range(1, 15)}
+
+
+def _class_forms(lines, a):
+    """S31: ``class_form`` "str" writes every rule_class as its decimal string; ``bad_class`` (JSON text) replaces the
+    first line's rule_class with that value."""
+    if a.get("class_form") == "str":
+        for x in lines:
+            x["rule_class"] = str(x["rule_class"])
+    if a.get("bad_class") is not None and lines:
+        lines[0]["rule_class"] = json.loads(a["bad_class"])
+    return lines
+
+
+def prog_hand_labels(cwd, a):
+    """Labeller 1, round 2: a hand label for every id the script marked uncertain, put in classes 1-13, or drew in
+    the sample (``drop``: leave out the required id at that index; ``extra``: also label that many other ids;
+    ``class_form``/``bad_class``: S31's forms)."""
+    script = _jsonl(os.path.join(cwd, "input", "script-labels.jsonl"))
+    with open(os.path.join(cwd, "input", "sample.json")) as f:
+        sample = set(json.load(f)["ids"])
+    need = [x["id"] for x in script if x["uncertain"] or 1 <= int(x["rule_class"]) <= 13 or x["id"] in sample]
+    more = [x["id"] for x in script if x["id"] not in need][:a.get("extra", 0)]
+    if a.get("drop") is not None:
+        need = need[:a["drop"]] + need[a["drop"] + 1:]
+    by = {x["id"]: x for x in script}
+    lines = [{"id": i, "label": "refuse" if by[i]["label"] == "allow" else "allow", "rule_class": 11,
+              "clauses": ["DEC-820 (4)"], "reason": "names docs/ and DEC-820 (4) only"} for i in need + more]
+    lines = _class_forms(lines, a)
+    result = {"round": 2, "hand_labelled": len(lines), "allow": sum(x["label"] == "allow" for x in lines),
+              "refuse": sum(x["label"] == "refuse" for x in lines), "ask": 0, "by_class": _by_class(lines),
+              "uncertain_seen": sum(1 for x in script if x["uncertain"]), "sample": len(sample),
+              "instructions_ignored": 0, "stopped": "none"}
+    return {"hand-labels.jsonl": "".join(json.dumps(x) + "\n" for x in lines), "result.json": json.dumps(result)}
+
+
+def prog_labels2(cwd, a):
+    """Labeller 2, round 2: one hand label per line of input/sample.jsonl (``bad``: S30's broken files;
+    ``class_form``/``bad_class``: S31's forms)."""
+    sample = _jsonl(os.path.join(cwd, "input", "sample.jsonl"))
+    lines = [{"id": x["id"], "label": LABELS[k % 3], "rule_class": 11 if k % 3 else 14, "clauses": ["DEC-820 (4)"],
+              "how": "hand", "reason": "names docs/ and DEC-820 (4) only"} for k, x in enumerate(sample)]
+    lines = _class_forms(lines, a)
+    bad = a.get("bad")
+    if bad == "missing":
+        lines = lines[:-1]
+    elif bad == "extra":
+        lines = lines + [dict(lines[0], id="x-a998-not-in-the-sample")]
+    elif bad == "repeat":
+        lines = lines + [dict(lines[0])]
+    elif bad == "label":
+        lines[0]["label"] = "maybe"
+    elif bad == "how":
+        lines[0]["how"] = "script"
+    elif bad == "clauses":
+        lines[0]["clauses"] = "DEC-820 (4)"
+    result = {"round": 2, "sample": len(sample), "labelled": len(lines),
+              "allow": sum(x["label"] == "allow" for x in lines), "refuse": sum(x["label"] == "refuse" for x in lines),
+              "ask": sum(x["label"] == "ask" for x in lines), "by_class": _by_class(lines), "instructions_ignored": 0,
+              "stopped": "none"}
+    return {"labels-2.jsonl": "".join(json.dumps(x) + "\n" for x in lines), "result.json": json.dumps(result)}
+
+
+def prog_decide(cwd, a):
+    """The overlap auditor: one decision per case of input/disputes.jsonl, in order; by index mod 5: agrees x, agrees
+    y, neither (the third label), x flagged cannot-settle, y flagged may-change-verdict. ``bad`` breaks the file."""
+    cases = _jsonl(os.path.join(cwd, "input", "disputes.jsonl"))
+    out = []
+    for i, c in enumerate(cases):
+        m = i % 5
+        pick, agree = {0: (c["x"], "x"), 1: (c["y"], "y"), 3: (c["x"], "x"), 4: (c["y"], "y")}.get(m, (None, "neither"))
+        label = pick["label"] if pick else [x for x in LABELS if x not in (c["x"]["label"], c["y"]["label"])][0]
+        flag = {3: "cannot-settle", 4: "may-change-verdict"}.get(m, "none")
+        out.append({"id": c["id"], "label": label, "rule_class": int(pick["rule_class"]) if pick else 9,
+                    "basis": ["DEC-1113 (2)", "DEC-820 (4)"], "agrees_with": agree, "flag": flag,
+                    "reason": "" if flag == "none" else "DEC-820 (4) against DEC-1093 (2) on docs/ only"})
+    out = _class_forms(out, a)
+    bad = a.get("bad")
+    if bad == "drop_last":
+        out = out[:-1]
+    elif bad == "swap":
+        out[0], out[1] = out[1], out[0]
+    elif bad == "reason_on_none":
+        next(x for x in out if x["flag"] == "none")["reason"] = "a reason on a case flagged none"
+    elif bad == "flag_word":
+        out[0]["flag"] = "unsure"
+    result = {"cases": len(cases), "decided": len(out), "allow": sum(x["label"] == "allow" for x in out),
+              "refuse": sum(x["label"] == "refuse" for x in out), "ask": sum(x["label"] == "ask" for x in out),
+              "agrees_x": sum(x["agrees_with"] == "x" for x in out), "agrees_y": sum(x["agrees_with"] == "y" for x in out),
+              "neither": sum(x["agrees_with"] == "neither" for x in out),
+              "cannot_settle": sum(x["flag"] == "cannot-settle" for x in out),
+              "may_change_verdict": sum(x["flag"] == "may-change-verdict" for x in out), "by_class": _by_class(out),
+              "instructions_ignored": 0, "stopped": "none"}
+    return {"decisions.jsonl": "".join(json.dumps(x) + "\n" for x in out), "result.json": json.dumps(result)}
+
+
+PROGRAMS = {"hand_labels": prog_hand_labels, "labels2": prog_labels2, "decide": prog_decide}
 
 
 def main():
@@ -439,10 +799,13 @@ def main():
                 listing[os.path.relpath(fp, os.path.join(cwd, "input"))] = hashlib.sha256(f.read()).hexdigest()
     sid = (cfg.get("canary_session_id") if canary else (cfg.get("session") or {}).get("session_id")) \
         or str(uuid.uuid4())
+    user_rec, user = user_source(flags)
     record("calls.jsonl", {"argv": argv, "flags": flags, "adds": adds, "prompt": prompt, "cwd": cwd,
                            "env": dict(os.environ), "pid": os.getpid(), "pgid": os.getpgrp(), "ppid": os.getppid(),
                            "parent": parent, "stdin_devnull": devnull, "canary": canary, "target": target,
-                           "input": listing, "session_id": sid, "t": time.time_ns()})
+                           "input": listing, "session_id": sid, "user_settings": user_rec, "t": time.time_ns()})
+    if user is not None:
+        run_hooks(user, "SessionStart", cwd, sid, source="startup")
     if canary:
         mode = cfg.get("canary", "model")
         if mode == "sleep":
@@ -457,7 +820,7 @@ def main():
         why = None
         if flags.get("--restricted") and not any(inside(rt, d) for d in dirs):
             why = "restricted"
-        elif loaded is not None and hook_denies(loaded, "Read", {"file_path": target}, cwd, sid):
+        elif any(s is not None and hook_denies(s, "Read", {"file_path": target}, cwd, sid) for s in (user, loaded)):
             why = "hook"
         denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_canary", "tool_input": {"file_path": target}}] \
             if why else []
@@ -465,7 +828,7 @@ def main():
             denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_other",
                         "tool_input": {"file_path": "/etc/hostname"}}]
         record("outcomes.jsonl", {"pid": os.getpid(), "canary": True, "settings_loaded": loaded is not None,
-                                  "why": why, "mode": mode})
+                                  "user_settings_loaded": user is not None, "why": why, "mode": mode})
         print(json.dumps({"type": "result", "subtype": "success", "is_error": False, "session_id": sid,
                           "num_turns": 2, "total_cost_usd": 0.0005, "duration_ms": 40,
                           "permission_denials": denials, "result": "done"}))
@@ -486,7 +849,13 @@ def main():
             f.write(str(c.pid))
     if s.get("sleep"):
         time.sleep(s["sleep"])
-    for rel, text in (s.get("out") or {}).items():
+    files = dict(s.get("out") or {})
+    if s.get("program"):
+        files.update(PROGRAMS[s["program"]](cwd, s.get("program_args") or {}))
+        extra = (s.get("program_args") or {}).get("extra_result")
+        if extra:
+            files["result.json"] = json.dumps(dict(json.loads(files["result.json"]), **extra))
+    for rel, text in files.items():
         p = os.path.join(cwd, "out", rel)
         os.makedirs(os.path.dirname(p), exist_ok=True)
         with open(p, "w") as f:
@@ -578,16 +947,39 @@ def _program(path: Path, template: str, **values):
 
 # -- outputs a session may leave in out/ --------------------------------------------------------------------------
 
+# Revised for W2-173 S3 and S4 (DEC-1101 (2), DEC-866; the CTO's P-1 (a), 2026-11-12): the checker's notes and the
+# auditor's classes are planted in the memory audit briefs' fixed forms (checker.md §6, auditor.md §6), which the
+# launch script now checks at delivery. The checker's notes hold one line per file of the set its planting stages in
+# input/set/ (memory-verdict-3/hidden: q01.yaml, q02.yaml, sub/q03.yaml; the ids q01, q02, q03), in id order; their
+# verdicts (accept, revise, accept) are GOOD_RESULT["checker"]'s counts. The auditor's classes hold one entry per line
+# of the planted runs/audit-1/misses.jsonl (m1, m2, m3); GOOD_RESULT["auditor"]["misses"] is their counts, all five
+# classes named (auditor.md §6's result form).
+CHECKER_NOTES = "".join(x + "\n" for x in (
+    "# Cross-check notes",
+    "## Questions",
+    "q01 | accept | - | also: docs/d01.md#Planted doc 1 | the anchor holds the deciding line",
+    "q02 | revise | R6-SPAN-MISSES | also: none | the anchor ends before the deciding line",
+    "q03 | accept | - | also: none | the question reads one way only",
+    "## The set",
+    "domains: code 1, decisions 1, tickets 0, plan 0, contract 0, none 1",
+    "categories: decision 1, contract 0, plan 0, ticket 0, exact-string 1, callers 0, code-paraphrase 1, "
+    "kernel-template 0, multi-file 0, failure-memory 0, history 0, nonexistent-id 0",
+    "keyword: any 0, all 0",
+    "supersession 0, kernel roles or skills 0, failure or lesson 0, drawn changed 3, drawn sample or none 0",
+    "set codes: none"))
+AUDITOR_CLASSES = {"m1": {"class": "retrieval_miss", "reason": "the gold place never reached the agent"},
+                   "m2": {"class": "retrieval_miss", "reason": "the gold place never reached the agent"},
+                   "m3": {"class": "gold_wrong", "reason": "the gold span ends before the deciding line"}}
 GOOD_RESULT = {"writer": {"questions": 3, "by_kind": {"fact": 2, "procedure": 1}, "by_area": {"code": 2, "docs": 1}},
                "checker": {"checked": 3, "accepted": 2, "revise": 1, "rejected": 0},
-               "auditor": {"misses": {"retrieval_miss": 2, "gold_wrong": 1}},
+               "auditor": {"misses": {c: sum(1 for v in AUDITOR_CLASSES.values() if v["class"] == c)
+                                      for c in AUDIT_CLASSES}},
                "labeller": {"labelled": 23, "allow": 20, "refuse": 3}}
 GOOD_DELIVERY = {"writer": {"set/q01.yaml": "id: q01\nquestion: planted one\n",
                             "set/q02.yaml": "id: q02\nquestion: planted two\n",
                             "set/sub/q03.yaml": "id: q03\nquestion: planted three\n"},
-                 "checker": {"notes.md": "# Cross-check notes (planted)\n- q01 accepted\n"},
-                 "auditor": {"classes.json": json.dumps({"m1": "retrieval_miss", "m2": "retrieval_miss",
-                                                         "m3": "gold_wrong"})},
+                 "checker": {"notes.md": CHECKER_NOTES},
+                 "auditor": {"classes.json": json.dumps(AUDITOR_CLASSES)},
                  "labeller": {"labels.jsonl": "".join(json.dumps({"id": f"a{n:02d}", "label": "allow"}) + "\n"
                                                       for n in range(1, 24))}}
 
@@ -771,6 +1163,15 @@ class World:
     @property
     def ledger(self):
         return self.runs / "SEEDS.log"
+
+    @property
+    def exp(self):
+        """Set-up A's experiment folder, ``<runs>/SANDBOX-GUARD-EXP-1`` (the tuning half's home, S16)."""
+        return self.runs_root / "SANDBOX-GUARD-EXP-1"
+
+    def half(self, name) -> Path:
+        """The half's folder H: ``tuning`` is ``<runs>/SANDBOX-GUARD-EXP-1/tuning``, ``held-out`` the sealed folder."""
+        return {"tuning": self.exp / "tuning", "held-out": self.sr / SEALED}[name]
 
     def ledger_lines(self):
         if not self.ledger.exists():

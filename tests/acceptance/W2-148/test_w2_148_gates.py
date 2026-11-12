@@ -194,9 +194,19 @@ def test_s12_g8_the_dry_run_refuses(world, case):
 
 # --- S13 G9 Holds ---------------------------------------------------------------------------------------------------
 
+def _night_hold(w, holding):
+    """The CTO's night hold state file (log/night-hold.state.json), fresh, with `holding` as given."""
+    p = w.scratch / "log/night-hold.state.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"pid": 1, "at": "2026-11-10 05:30:00", "holding": holding, "in_window": True, "nightly": "n"}))
+
+
 HOLDS = {
-    "quiet-hours": (lambda w: w.set_clock("2026-11-10T02:00:00+00:00"),
-                    lambda w: w.set_clock("2026-11-10T07:30:00+00:00")),
+    # DEC-1141 (6), ACT-OPERATOR-HOURS-2: 02:10 to 03:09 always holds; from 03:10 to 07:59 the night hold's state file decides
+    "before-the-night-hold": (lambda w: w.set_clock("2026-11-10T02:30:00+00:00"),
+                              lambda w: w.set_clock("2026-11-10T08:00:00+00:00")),
+    "night-hold-on": (lambda w: (w.set_clock("2026-11-10T05:30:00+00:00"), _night_hold(w, True)),
+                      lambda w: _night_hold(w, False)),
     "nightly-window": (lambda w: w.set_clock("2026-11-10T21:30:00+00:00"),
                        lambda w: w.set_clock("2026-11-10T22:30:00+00:00")),
     "close-queue-running": (lambda w: w.close_flag.write_text("running\n"), lambda w: w.close_flag.unlink()),

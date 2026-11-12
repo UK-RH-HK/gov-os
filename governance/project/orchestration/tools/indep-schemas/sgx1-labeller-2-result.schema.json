@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sgx1-labeller-2-result.schema.json",
+  "title": "SANDBOX-GUARD-EXP-1's second labeller: out/result.json, round 1 or round 2 (its brief's section 6: numbers and fixed words only; W2-149, DEC-1112 (3))",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "round"
+  ],
+  "properties": {
+    "round": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "rules": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "instructions_ignored": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stopped": {
+      "type": "string",
+      "enum": [
+        "none",
+        "input-missing",
+        "input-malformed",
+        "decisions-conflict",
+        "forbidden-read-needed"
+      ]
+    },
+    "sample": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "labelled": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "allow": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "refuse": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ask": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "by_class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "properties": {
+        "1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "round",
+        "rules",
+        "instructions_ignored",
+        "stopped"
+      ],
+      "properties": {
+        "round": {
+          "type": "integer",
+          "const": 1
+        },
+        "rules": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "instructions_ignored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stopped": {
+          "type": "string",
+          "enum": [
+            "none",
+            "input-missing",
+            "input-malformed",
+            "decisions-conflict",
+            "forbidden-read-needed"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "round",
+        "sample",
+        "labelled",
+        "allow",
+        "refuse",
+        "ask",
+        "by_class",
+        "instructions_ignored",
+        "stopped"
+      ],
+      "properties": {
+        "round": {
+          "type": "integer",
+          "const": 2
+        },
+        "sample": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "labelled": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "allow": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "refuse": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ask": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_class": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14"
+          ],
+          "properties": {
+            "1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "3": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "4": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "5": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "6": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "7": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "8": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "9": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "10": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "11": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "12": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "13": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "14": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "instructions_ignored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stopped": {
+          "type": "string",
+          "enum": [
+            "none",
+            "input-missing",
+            "input-malformed",
+            "decisions-conflict",
+            "forbidden-read-needed"
+          ]
+        }
+      }
+    }
+  ]
+}

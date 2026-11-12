@@ -1,6 +1,6 @@
 ---
 id: DAEO-n0wb
-status: in_progress
+status: closed
 deps: [DAEO-s9qc, DAEO-ym8a]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -46,6 +46,7 @@ kpis:
   - 'A verbless change label''s prose id counted as a changer, or a clause-head changer lost (S11) [DEC-1109 (2)]'
 profile: STANDARD
 sources:
+- DEC-385
 - DEC-1098
 - DEC-1109
 - DEC-957

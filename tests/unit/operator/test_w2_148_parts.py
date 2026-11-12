@@ -184,7 +184,7 @@ def test_a_list_file_not_held_as_hashed_is_never_a(tmp_path):
 
 
 def test_the_pinned_verdict_is_the_ctos_byte_for_byte():
-    assert sha((OPDIR / "verdict.py").read_bytes()) == "277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378"
+    assert sha((OPDIR / "verdict.py").read_bytes()) == "30214f3de29dacdf9bb443371c05a4392e8da3c305aeb9b7845b9a433d5cf4a5"
 
 
 def test_no_wait_or_stop_by_a_name_match():

@@ -1,7 +1,7 @@
 """KPI success 4: a question about an id that exists nowhere stops with a named reason and no unrelated items: the
 stated gap (RETR-X-02, DEC-900, AR-9) [W2-M296].
 
-``DEC-9999`` is held by no file of the fixture and no record. Asked through ``gov retrieve --json`` as the question
+The planted ``support.MISSING_ID`` is held by no file of the fixture and no record. Asked through ``gov retrieve --json`` as the question
 alone (no ``--id``), and with ``--id`` as W1-21 asks it, the bundle:
 
 - names the id among its gaps;

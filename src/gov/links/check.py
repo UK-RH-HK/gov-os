@@ -10,8 +10,8 @@ The eight kinds (``CODES``), each finding carrying its code, ids, path and line,
 commit's finding: its ``Role:``, and once landed the lead, ``commit_role_field``) and a one-line fix, ``text`` when
 a free-text pattern found it:
 
-- UNMARKED_CHANGE: a register entry another entry, the register's change log or ARCHIVE-SUPERSEDED §A supersedes or
-  amends, whose status line does not name that changer. The statements are the loader's ``register_statements``
+- UNMARKED_CHANGE: a register entry another entry, the register's change log or ARCHIVE-SUPERSEDED §A supersedes,
+  amends or settles (S18), whose status line does not name that changer. The statements are the loader's ``register_statements``
   (one pattern set); §A is read with the loader's own ``_BY`` pattern, as W2-92's drift script reads it.
 - UNKNOWN_ID: an id or path in a typed place that names nothing that exists.
 - UNLINKED_ID: an id a ticket's KPI brackets name, or a worker commit's ``Implements:`` names, missing from the
@@ -32,7 +32,10 @@ counted by code and role, and listed with ``--all``.
 
 from __future__ import annotations
 
+import ast
+import io
 import re
+import tokenize
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -69,7 +72,11 @@ OPEN = ("open", "in_progress")  # a ticket whose sources and KPI brackets bear a
 ACCEPTANCE_JUDGED = ("in_progress", "closed")  # a ticket whose acceptance_tests.path must exist
 CLOSE_NOT_DONE = ("SUPERSEDED", "WITHDRAWN", "REJECTED", "REVOKED", "REFUSED")  # a close record that closed nothing
 EXEMPT_TASKS = ("decision-record",)  # DEC-861
-CHANGE_CLASSES = ("supersede", "amend")
+# A settlement (``**Settles:** DEC-x`` in DEC-y's status line) is a change, DEC-866 (1); S18, DEC-1109 (2). It is
+# never whole: its mark is a ``**Changed by:**``, as an amendment's. Only the label counts (``SETTLES_FORM``): a free
+# "settled by" names a package item or a residual far more often than the entry ("P-4 is settled by DEC-762").
+CHANGE_CLASSES = ("supersede", "amend", "settle")
+SETTLES_FORM = "**Settles:**"
 RECORD_KEYS = loader.CITE_KEYS + ("constrains",)  # a record's id keys; ``task`` apart
 TICKET_KEYS = ("sources", "closes", "links", "parent")  # depends_on is core-graph's (LINK-INTEGRITY §4.1)
 
@@ -80,6 +87,9 @@ _ID = re.compile(r"(?<![A-Za-z0-9_])(?:(?:DEC|ADR)-[0-9]{3,}|CAP-[0-9]{2,}(?:\.[
 # A test file's ids, by the census's two patterns (D4B-link-census.py §5): a decision and a wave-1-to-3 ticket; the
 # other grammars in a test file are planted stand-ins far more often than citations.
 _TEST_ID = re.compile(r"\bDEC-[0-9]{3,}\b|\bW[123]-[0-9]+[a-z]?(?![A-Za-z0-9])(?!-)")
+_DEC_WORD = re.compile(r"(?<![A-Za-z0-9_])DEC-[0-9]+(?![A-Za-z0-9_])")  # gov.decisions.register's decision id
+_FAR = 1 << 30  # a literal that runs on past the line's end
+_LONE_CR = re.compile(r"\r(?!\n)")
 _LEAD = re.compile(r"\s*([A-Za-z][A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)*)")  # the loader's: "DEC-954 Q9c" names DEC-954
 _BRACKETS = re.compile(r"\[([^\[\]]*)\]")
 _BRACKETS_OR_PARENS = re.compile(r"\[([^\[\]]*)\]|\(([^()]*)\)")
@@ -212,6 +222,18 @@ class _Repo:
                     self.alias.setdefault(front[key].strip(), str(front["id"]))
         self.known = set(self.entry) | {str(front["id"]) for _, front in self.fronts} | set(self.alias)
         self.known |= self.contract_ids | self._list_rows()
+        self._planted: dict[str, dict[int, list[tuple[int, int]]] | None] = {}
+
+    def planted(self, path: str, line: int, column: int) -> bool:
+        """S17: whether column ``column`` of line ``line`` of ``path`` stands inside a planted literal; False for
+        any file but a ``tests/**/*.py`` file that parses. Each file is parsed once per run, when first asked."""
+        if not (path.startswith(TESTS) and path.endswith(".py")):
+            return False
+        if path not in self._planted:
+            text = self.files.get(path)
+            self._planted[path] = planted_spans(text) if text is not None else None
+        spans = self._planted[path]
+        return spans is not None and any(start <= column < end for start, end in spans.get(line, ()))
 
     def _contract(self) -> dict | None:
         import yaml
@@ -270,6 +292,55 @@ class _Repo:
         """The line of the register that holds the entry's status line."""
         lines = entry["span"].split("\n")
         return entry["line"] + next((n for n, line in enumerate(lines[1:], 1) if line.strip()), 0)
+
+
+def planted_spans(text: str) -> dict[int, list[tuple[int, int]]] | None:
+    """S17 (DEC-1109 (2)): ``line -> [(start, end), ...]``, the character columns of each line of a Python file
+    that stand inside a string literal that is not a docstring (plain, triple-quoted, bytes or f-string, assigned or
+    not: a fixture's planted id); None when the file does not parse, so it is judged as before. A docstring is the
+    first statement's string of a module, class or function. An f-string is one span, its ``{...}`` parts within."""
+    if _LONE_CR.search(text):  # ast counts a lone CR as a line end, ``str.split("\n")`` does not: judged as before
+        return None
+    try:
+        tree = ast.parse(text)
+        tokens = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (SyntaxError, ValueError, tokenize.TokenError, RecursionError, MemoryError):
+        return None
+    lines = text.split("\n")
+
+    def column(row: int, offset: int) -> int:  # ast's columns are UTF-8 bytes, tokenize's characters
+        return len(lines[row - 1].encode("utf-8")[:offset].decode("utf-8", errors="ignore"))
+
+    docstrings = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and node.body:
+            first = node.body[0]
+            if (isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant)
+                    and isinstance(first.value.value, str)):
+                string = first.value
+                docstrings.append(((string.lineno, column(string.lineno, string.col_offset)),
+                                   (string.end_lineno, column(string.end_lineno, string.end_col_offset))))
+    spans: dict[int, list[tuple[int, int]]] = {}
+
+    def span(start: tuple[int, int], end: tuple[int, int]) -> None:
+        for row in range(start[0], end[0] + 1):
+            spans.setdefault(row, []).append((start[1] if row == start[0] else 0, end[1] if row == end[0] else _FAR))
+
+    fstring_start, fstring_end = getattr(tokenize, "FSTRING_START", None), getattr(tokenize, "FSTRING_END", None)
+    depth, opened = 0, (0, 0)
+    for token in tokens:
+        if fstring_start is not None and token.type == fstring_start:
+            if depth == 0:
+                opened = token.start
+            depth += 1
+        elif fstring_end is not None and token.type == fstring_end and depth:
+            depth -= 1
+            if depth == 0:
+                span(opened, token.end)
+        elif token.type == tokenize.STRING and depth == 0:
+            if not any(start <= token.start < end for start, end in docstrings):
+                span(token.start, token.end)
+    return spans
 
 
 def _blobs(root: Path, ids: list[str]) -> dict[str, str]:
@@ -392,6 +463,8 @@ def unmarked(repo: _Repo, statements: list[dict]) -> list[dict]:
     for statement in statements:
         target, source = statement["target"], statement["source"]
         if statement["cls"] not in CHANGE_CLASSES or target not in repo.entry or source == target:
+            continue
+        if statement["cls"] == "settle" and statement["form"] != SETTLES_FORM:
             continue
         if repo.status.get(source) in NOT_A_CHANGER:
             continue
@@ -567,7 +640,7 @@ def texts(repo: _Repo) -> list[dict]:
         elif path.startswith(TESTS) and path.endswith(".py"):
             for number, line in enumerate(text.split("\n"), 1):
                 for match in _TEST_ID.finditer(line):
-                    if not repo.resolves(match.group(0)):
+                    if not repo.resolves(match.group(0)) and not repo.planted(path, number, match.start()):  # S17
                         found.append(_finding(UNKNOWN_ID, [match.group(0)], path, number,
                                               f"correct {match.group(0)} or name the planted id as a stand-in",
                                               f"{match.group(0)} in a test file"))
@@ -826,8 +899,21 @@ def ticket_changes(repo: _Repo) -> list[dict]:
 
 # ---------------------------------------------------------------- ENFORCES_SUPERSEDED
 
+def _planted_cite(repo: _Repo, finding: dict, path: str, number: int, said: str) -> bool:
+    """S17 (DEC-1109 (2)): a finding that only cites its old id on a line of a ``tests/**/*.py`` file that parses,
+    where the old id stands only inside planted literals (a fixture's register or record). A value it holds
+    (``holds '...'``) is no id and is carried as before."""
+    old = finding["ids"][0] if finding["ids"] else ""
+    if said.split(": it still ", 1)[0] != f"cites {old}":
+        return False
+    line = (repo.files.get(path) or "").split("\n")[number - 1:number]
+    places = [match.start() for match in _DEC_WORD.finditer(line[0] if line else "") if match.group(0) == old]
+    return bool(places) and all(repo.planted(path, number, place) for place in places)
+
+
 def enforces(repo: _Repo) -> list[dict]:
-    """W2-55's ``check_propagation`` findings, as that module gives them, each at its path and line."""
+    """W2-55's ``check_propagation`` findings, as that module gives them, each at its path and line; a test file's
+    finding is carried only where the old id stands outside a planted literal (S17, ``_planted_cite``)."""
     from gov.decisions.propagation import check_propagation
 
     if not repo.register_path:
@@ -836,9 +922,12 @@ def enforces(repo: _Repo) -> list[dict]:
     for finding in check_propagation(repo.root):
         path = finding["paths"][0] if finding["paths"] else ""
         at = re.match(rf"{re.escape(path)}:(\d+) ", finding["message"])
-        found.append(_finding(ENFORCES_SUPERSEDED, finding["ids"], path, int(at.group(1)) if at else 1,
-                              "cite the decision in force, or record a **Kept:** reason in the register",
-                              finding["message"].split(" ", 1)[-1] if at else finding["message"]))
+        number = int(at.group(1)) if at else 1
+        said = finding["message"].split(" ", 1)[-1] if at else finding["message"]
+        if at and _planted_cite(repo, finding, path, number, said):
+            continue
+        found.append(_finding(ENFORCES_SUPERSEDED, finding["ids"], path, number,
+                              "cite the decision in force, or record a **Kept:** reason in the register", said))
     return found
 
 

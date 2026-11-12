@@ -6,7 +6,7 @@ Profile: STANDARD.
 
 ## KPI-to-test mapping
 
-### Success KPI 1 — doctor reports installation health [CAP-02.a, CAP-06.a, CAP-25.a]
+### Success 1 — doctor reports installation health [CAP-02.a, CAP-06.a, CAP-25.a]
 
 > doctor reports pinned vs found tool versions, hooks wired, path map with zero
 > unclassified paths, index freshness, canaries, framework.lock MATCH/DRIFT,
@@ -25,7 +25,7 @@ Profile: STANDARD.
 | `test_doctor_report_mentions_isolation` | test_w1_27_doctor.py | `gov doctor` not implemented |
 | `test_doctor_exit_nonzero_on_any_failure` | test_w1_27_doctor.py | `gov doctor` not implemented |
 
-### Success KPI 2 — rebuild guarantees [CAP-07.a, CAP-20.a, CAP-46.a]
+### Success 2 — rebuild guarantees [CAP-07.a, CAP-20.a, CAP-46.a]
 
 > rebuild recreates every derived store; two rebuilds give the same digest; a
 > fresh clone plus doctor plus rebuild works
@@ -39,7 +39,7 @@ Profile: STANDARD.
 | `test_rebuild_needs_only_git` | test_w1_27_rebuild.py | `gov rebuild` not implemented |
 | `test_rebuild_digest_matches_store_loader` | test_w1_27_rebuild.py | `gov rebuild` not implemented |
 
-### Success KPI 3 — path-map compliance [CAP-06.d]
+### Success 3 — path-map compliance [CAP-06.d]
 
 > Path-map compliance is checked by doctor: every tracked path matches a
 > path-map entry, and a recorded reference to a moved path is reported
@@ -50,7 +50,7 @@ Profile: STANDARD.
 | `test_unclassified_path_is_reported` | test_w1_27_path_compliance.py | `gov doctor` not implemented |
 | `test_moved_path_reference_is_reported` | test_w1_27_path_compliance.py | `gov doctor` not implemented |
 
-### Success KPI 4 — recovery/rebuild family check [CAP-38.b]
+### Success 4 — recovery/rebuild family check [CAP-38.b]
 
 > Registers the recovery/rebuild family check: derived state deleted and rebuilt
 > gives the same digest
@@ -63,7 +63,7 @@ Profile: STANDARD.
 | `test_recovery_rebuild_check_is_listed` | test_w1_27_recovery_check.py | `gov check --list` does not yet include it |
 | `test_derived_state_deleted_and_rebuilt_gives_same_digest` | test_w1_27_recovery_check.py | `gov rebuild` not implemented |
 
-### Success KPI 5 — adoption level [CAP-54.a]
+### Success 5 — adoption level [CAP-54.a]
 
 > doctor reports an adoption level: a repository with only the kernel installed
 > passes at the minimal level, and each completed adoption stage raises it
@@ -75,7 +75,7 @@ Profile: STANDARD.
 | `test_minimal_kernel_passes_at_minimal_level` | test_w1_27_adoption.py | `gov doctor` not implemented |
 | `test_completed_stages_raise_adoption_level` | test_w1_27_adoption.py | `gov doctor` not implemented |
 
-### Success KPI 6 — Claude Code drift [DEC-210, DEC-214]
+### Success 6 — Claude Code drift [DEC-210, DEC-214]
 
 > doctor reports Claude Code drift; the CLI and extension differing, either
 > being newer than the registry, or the extension's bundled binary at the
@@ -91,7 +91,7 @@ Profile: STANDARD.
 | `test_extension_below_minimum_is_failure` | test_w1_27_drift.py | `gov doctor` not implemented |
 | `test_cli_at_recorded_version_different_sha256_is_failure` | test_w1_27_drift.py | `gov doctor` not implemented |
 
-### Success KPI 7 — held-out.yaml missing [DEC-223]
+### Success 7 — held-out.yaml missing [DEC-223]
 
 > doctor reports a missing governance/project/held-out.yaml in this repository,
 > because the guard treats a missing file as no held-out rule
@@ -101,7 +101,7 @@ Profile: STANDARD.
 | `test_missing_held_out_yaml_is_reported` | test_w1_27_held_out.py | `gov doctor` not implemented |
 | `test_present_held_out_yaml_is_not_reported` | test_w1_27_held_out.py | `gov doctor` not implemented |
 
-### Success KPI 8 — path-map schema replacement [DEC-185, DEC-189, DEC-228]
+### Success 8 — path-map schema replacement [DEC-185, DEC-189, DEC-228]
 
 > gov validates governance/project/path-map.yaml against the kernel's path-map
 > schema of W1-08, which replaces the minimal schema of W1-07 in
@@ -127,13 +127,13 @@ Profile: STANDARD.
 | `test_absent_system_without_reason_is_invalid` | test_w1_27_schema.py | Schema not yet replaced |
 | `test_repairing_the_key_clears_the_error` | test_w1_27_schema.py | Schema not yet replaced |
 
-### Failure KPI 1 — doctor passes with a wrong tool version
+### Failure 1 — doctor passes with a wrong tool version
 
 | Test | File | Red reason |
 |------|------|------------|
 | `test_doctor_does_not_pass_with_wrong_tool_version` | test_w1_27_doctor.py | `gov doctor` not implemented |
 
-### Failure KPI 2 — rebuild needs anything not in git
+### Failure 2 — rebuild needs anything not in git
 
 | Test | File | Red reason |
 |------|------|------------|
@@ -700,3 +700,5 @@ Inventory row M5 (DEC-1040 (1), applied at the cut): `test_w1_27_path_compliance
 `test_stale_path_in_live_document_not_sources_is_reported` and `test_stale_path_in_src_gov_cli_is_reported`
 are folded into `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` (one doctor run, the
 three planted paths); the older tables above that name them read as that case.
+
+**Citations (DEC-1109 (2), 2026-11-09):** `test_w1_27_rebuild_r8_no_embeddings.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

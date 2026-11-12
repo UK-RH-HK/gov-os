@@ -11,10 +11,10 @@ folder of the worktree that holds this file.
 **The planted project** (``make_project``), in pytest's temporary folder, under a temporary ``HOME``::
 
     <base>/home/proj/
-      .tickets/DAEO-zz41.md               the engineer's ticket, WBS id W2-941 (the session's ticket)
-      .tickets/DAEO-zz42.md               another ticket, WBS id W2-942
-      tests/acceptance/W2-941/            the session ticket's acceptance folder: test_feature.py, README.md
-      tests/acceptance/W2-942/            another ticket's tests: test_other.py (readable, DEC-963)
+      .tickets/DAEO-zz41.md               the engineer's ticket, WBS id <WBS> (the session's ticket)
+      .tickets/DAEO-zz42.md               another ticket, WBS id <OTHER_WBS>
+      tests/acceptance/<WBS>/             the session ticket's acceptance folder: test_feature.py, README.md
+      tests/acceptance/<OTHER_WBS>/       another ticket's tests: test_other.py (readable, DEC-963)
       tests/unit/test_unit.py  src/app/main.py  docs/notes.md  README.md
       governance/project/path-map.yaml    namespaces and the role_paths: block as the main tree holds it (G-14)
       governance/project/held-out.yaml    one held-out path, outside the project
@@ -50,7 +50,7 @@ OTHER = f"tests/acceptance/{OTHER_WBS}"  # another ticket's
 # The exclusion the Grep tool's refusal names (the ticket's S1 wording), and the Grep glob that carries it.
 GREP_EXCLUSION = f"!{OWN}/**"
 # GNU grep's --exclude-dir matches a folder's base name when it recurses: only this form keeps the folder out
-# (grep 3.11: --exclude-dir=tests/acceptance/W2-941 does not; README, discovery D-1).
+# (grep 3.11: --exclude-dir=<OWN>, the full path, does not; README, discovery D-1).
 GREP_DIR_EXCLUSION = f"--exclude-dir={WBS}"
 
 WORD = "zqxw141"

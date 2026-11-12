@@ -16,12 +16,12 @@ plan check and W2-20's gate (open on planted readings), the session itself repla
 
 The planted tickets (README, "S21"):
 
-| Ticket | Lead worktree (stale) | Main tree (current) |
+| Ticket (its planted WBS id in) | Lead worktree (stale) | Main tree (current) |
 |---|---|---|
-| ``PLN-f001`` (W2-911) | in the ready list | taken out of the ready list |
-| ``PLN-f002`` (W2-912) | in the list, no waits | in the list, ``depends_on: PLN-f003`` (open) |
-| ``PLN-f004`` (W2-914) | no such ticket, not in the list | a new ticket, in the list |
-| ``PLN-f005`` (W2-915) | ``plan_override: DEC-1234``, not in the list | the same |
+| ``PLN-f001`` (``STALE_ADMITS``) | in the ready list | taken out of the ready list |
+| ``PLN-f002`` (``STALE_WAIT``) | in the list, no waits | in the list, ``depends_on: PLN-f003`` (open) |
+| ``PLN-f004`` (``NEW_IN_MAIN``) | no such ticket, not in the list | a new ticket, in the list |
+| ``PLN-f005`` (``OVERRIDDEN``) | ``plan_override:`` a planted decision id, not in the list | the same |
 """
 
 from __future__ import annotations
@@ -206,7 +206,9 @@ def launch_lead(machine, trees, monkeypatch):
     start. The real launcher, the real plan check and W2-20's gate (planted readings, open); the repository's
     settings check and the session itself replaced."""
     from gov.launch import launcher
+    import w2_20_support as support
 
+    support.plant_templates(trees.lead)  # W2-153: the role's template copy, so the plan check is what decides
     for key, value in machine.env().items():
         monkeypatch.setenv(key, value)
     for key in ("GOV_PLAN_READY", "GOV_ROLE", "GOV_TICKET"):
@@ -263,7 +265,7 @@ def test_s21_the_launcher_starts_a_lead_the_main_tree_admits(launch_lead):
 
 def test_s21_a_plan_override_is_one_line_in_the_launch_log_and_the_line_on_standard_error(
         machine, launch_lead, capfd):
-    """PLN-f005 is in no list and admitted by ``plan_override: DEC-1234``: the launch log
+    """PLN-f005 is in no list and admitted by its ``plan_override`` (the planted decision id): the launch log
     (``$HOME/.gov-os/machine/launch.log``, P-1's log) gets one line naming the override, its decision and the
     ticket, and standard error keeps W2-136's line."""
     assert launch_lead(OVERRIDDEN[0]) == 0

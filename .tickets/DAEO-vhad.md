@@ -1,6 +1,6 @@
 ---
 id: DAEO-vhad
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-dtv3]
 created: 2026-11-02T12:06:59Z

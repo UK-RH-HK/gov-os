@@ -95,7 +95,7 @@ and is run again).
 - **Source (committed):** the scripts in `.gov-runtime/scratch/orchestrator/tools/`, each matching its last copy on
   `record/w2` (`governance/project/orchestration/main/orchestrator/tools/<name>`), started as
   `MORNING-RESTART-2026-11-03.md` step 4 says: `mem_sampler.sh`, `kind_sampler.py --every 60`, `oom_watch.sh`,
-  `rerank_service_slot_hold.py --watch`.
+  `rerank_service_slot_hold.py --watch`, and `mem_guard.py` (DEC-1133 (5)).
 - **Before:** `git -C /home/usain/Dynamic-Agentic-Engineering-OS show record/w2:governance/project/orchestration/main/orchestrator/tools/<name> | cmp - .gov-runtime/scratch/orchestrator/tools/<name>`
   is silent. If it is not, sync first (`sync_context.py --commit`), or say why the two copies differ.
 - **Commands:** the matching line of step 4, for the one that stopped:
@@ -105,8 +105,9 @@ and is run again).
   cd $O && setsid -f python3 tools/kind_sampler.py --every 60 > /dev/null 2>&1 < /dev/null
   cd $O/tools && setsid -f bash oom_watch.sh > /dev/null 2>&1 < /dev/null
   cd $O && setsid -f python3 tools/rerank_service_slot_hold.py --watch >> log/rerank-slot-hold.log 2>&1 < /dev/null
+  cd $O && MG_STOP=1 setsid -f python3 -I tools/mem_guard.py >> log/mem-guard.out 2>&1 < /dev/null   # DEC-1133 (5): D1, D2
   ```
-- **Check:** exactly one process of each (`ps -eo pid,args | grep -E 'mem_sampler|kind_sampler|oom_watch|rerank_service_slot_hold' | grep -v grep`);
+- **Check:** exactly one process of each (`ps -eo pid,args | grep -E 'mem_sampler|kind_sampler|oom_watch|rerank_service_slot_hold|mem_guard' | grep -v grep`);
   a second copy is stopped, the older one first. While a service runs, the slot watcher holds the other GPU slot
   (`dispatch/status.txt`'s rerankers line).
 - **Not needed:** your session's own background waits (`tools/inbox_wait_quiet.sh`, `tools/wake_at.sh`). They are

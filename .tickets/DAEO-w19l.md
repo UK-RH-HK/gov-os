@@ -22,14 +22,13 @@ allowed_paths:
 - tests/unit/discover/**
 kpis:
   success:
-  - gov discover <question or feature> opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records back the answer.
-    The same request in plain language works the same way [CAP-32.d, DEC-166, W2-M284].
+  - 'gov discover <question or feature> opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records back the answer.
+    The same request in plain language works the same way [CAP-32.d, DEC-166, W2-M284]. Verify: in a planted project, `gov discover "<a feature>"` exits 0 and the project holds one new discovery ticket, a discovery-skill record listing readiness gaps and owner questions, and at least one research or experiment task whose evidence record is named by the ticket; the same request given in plain language yields the same set of artifacts.'
   failure: []
 profile: STANDARD
 sources:
 - CAP-32.d
 - DEC-166
-- W2-M284
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-36/

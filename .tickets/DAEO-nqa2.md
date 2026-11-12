@@ -1,6 +1,6 @@
 ---
 id: DAEO-nqa2
-status: in_progress
+status: closed
 deps: [DAEO-0mtg]
 links: [DAEO-8lmb]
 created: 2026-10-31T13:15:13Z
@@ -54,7 +54,7 @@ sources:
 - DEC-1016
 - DEC-999
 - MR-3
-- W2-106
+- DAEO-0mtg
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-90b/

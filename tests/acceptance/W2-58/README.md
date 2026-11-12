@@ -236,9 +236,16 @@ Readings these cases take:
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
 credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script,
-`.gov-runtime/scratch/w2-58/probe.sh`, which writes the commands' output there. The test reads those files from
-outside. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
+(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script by one call,
+`bash .gov-runtime/scratch/w2-58/probe.sh`, the form W1-46's, W1-50's and W2-54's live sessions run and one the
+session's permissions allow (`--allowedTools Bash`; the fixture's settings carry no permission rules). A long
+compound line in its place (`;`, redirections, several programs) was refused by the CLI's permission layer before
+any of it ran (D-10, round 1). Each step writes its output to `.gov-runtime/scratch/w2-58/` and its exit status to
+`results.txt` there. The test reads those files from outside. `gov launch` hands the session no `PYTHONPATH`
+(W2-56 S5, DEC-826 Q5), so the fixture's hook names its interpreter and the product code (`live_guard_command`), as
+this repository's hook names the pinned interpreter. A bare `python3` hook cannot import `gov` there and refuses
+every call with exit 2 and no reason; that was D-10's red. As the repository's hook does, the fixture's hook refuses
+a call with a reason (exit 2) when it cannot start or crashes, never leaves it unguarded. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
 fails with "did not run the probe to its end" when the session could not run (no network to the model's API).
 Each session runs once per module, and its sandbox, HOME and project are temporary.
 
@@ -259,3 +266,7 @@ Run from this worktree with `PYTHONPATH` set per command:
 Every child process (the guard, `gov launch`, the helper) gets `PYTHONPATH` from `w2_58_support.python_path()`: the
 runner's own value, else the `src/` of the worktree that holds this suite (DEC-732). The guard file run is the
 kernel template's, copied from this worktree. `test_w2_58_code_under_test.py` shows which `gov` a child imports.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_58_support.base_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w2_58_support.launch` and the review case's launch run with `launch_environment` (`base_environment` and the readings of `plant_open_gate`, W2-136's form; `run_gov` takes an `env`); the live sessions keep the real HOME's `gate.json` and take the planted readings. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.

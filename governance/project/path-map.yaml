@@ -131,6 +131,8 @@ namespaces:
       - "governance/project/prompts/**"
       # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1) and the operator agent's install (W2-148)
       - "governance/project/indep-walls/**"
+      # ACT-PATHMAP-NS-2 (DEC-1101, DEC-1113): the walled sessions' fixed briefs (ACT-W2-149-INSTALL-1)
+      - "governance/project/indep-briefs/**"
       - "governance/project/operator/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
@@ -395,6 +397,20 @@ acceptance_exemptions:
     decision: DEC-900
   - commit: "0568d91baf566b4d8f3ccb448e51af41cbb46d03"
     decision: DEC-1031
+  - commit: "cade65dfe0454bb1b34c6a44bd475a9d67c5e45e"
+    decision: DEC-1123  # item (3); the merge settled a README conflict as the test designer had (DEC-253)
+  - commit: "04460404ea8a07bfb3f3f0019d3384e30c7f9466"
+    decision: DEC-1123  # item (3); the merge settled a README conflict as the test designer had (DEC-253)
+  - commit: "8c512d7e7921bfd7b5c3dd50a79bb1fc145f869a"
+    decision: DEC-1123  # item (3); the merge settled a README conflict as the test designer had (DEC-253)
+  - commit: "ab169d051b82072f0db4350b2066eabf6919ffa0"
+    decision: DEC-1123  # item (3); the merge settled a README conflict as the test designer had (DEC-253)
+  - commit: "15952bbfa576dcfabb7d36d95912a848077e5c3c"
+    decision: DEC-1123  # item (3); the owner's ACT-GUARD-SETS-1 commit deleted W2-84's hidden-half cases (DEC-1061, DEC-1097)
+  - commit: "6fbe73b1adde40571f00d490b4b478cf86b70a52"
+    decision: DEC-1136  # the owner's ACT-OPERATOR-ROUNDS-1 commit changed the acceptance support file tests/acceptance/W2-148/w2_148_support.py (DEC-1136 (1)); not a test designer's commit
+  - commit: "8ed7561b68a32feaa6114f8f11c22182d5ead2c3"
+    decision: DEC-1141  # ACT-OPERATOR-HOURS-2's commit (DEC-1136 (2))
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
@@ -573,11 +589,19 @@ role_paths:
 # the root, their own code opens the files, and the sets root's own map does not change. The writer, checker and
 # operator sessions run outside this guard (ACT-MSET-3, ACT-MSET-4, ACT-HLABEL-2, ACT-HNEW-1). The sandbox experiment's
 # held-out halves (DEC-1099 (1) Q6, ACT-SANDBOX-SEAL-1) are refused here too, so the CTO and leads never see them.
+# ACT-SETS-GLOBS-1 (W2-149's review F2; DEC-1101, DEC-1112): the launch script's destinations, before its first real
+# run: every set's hidden/ folder (a writer's new set), the checker's XCHECK-r<round>.md notes beside a set, an
+# audit's runs/<audit>/miss-classes.json, and the audit's runs/<audit>/misses.jsonl (its misses name the questions
+# missed). Each * is one folder or file name. A set's other files (visible/, README, the manual XCHECK.md notes) and
+# every other file under runs/ stay open. For these four the guard's line rule takes the hidden folder or file itself
+# as its key, never the folder above it (fixtures/evaluation, runs).
 sets_root_hidden:
   root: "~/gov-os-eval"
   hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
            "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**",
-           "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**"]
+           "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**",
+           "fixtures/evaluation/*/hidden/**", "fixtures/evaluation/*/XCHECK-r*.md", "runs/*/miss-classes.json",
+           "runs/*/misses.jsonl"]
   refused_roles: [orchestrator, engineer, research, product-spec, independent-test-designer, independent-auditor]
 # ACT-INDEP-WALLS-1 (DEC-1101 (2)): indep-walls/** above holds the independent sessions' walled folders (writer, checker,
 # auditor, labeller; one folder per job kind and run, indep-walls/<kind>/<run>/) and the owner's approved list

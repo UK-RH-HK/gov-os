@@ -1,6 +1,6 @@
 ---
 id: DAEO-0z8c
-status: in_progress
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 allowed_paths:
+- tests/conftest.py  # the suites' own git calls never reach a repository the caller's environment names (D-10's red-fix list item 1, the core.bare tests' half) [DEC-1074 (8), DEC-1083, DEC-1109 (2)]
 - src/gov/**/*.py
 - src/gov/util/gitenv.py
 - lefthook.yml
@@ -49,10 +50,6 @@ sources:
 - DEC-953
 - DEC-970
 - DEC-980
-- W2-L160
-- W2-M105
-- W2-M113
-- W2-M161
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-05/

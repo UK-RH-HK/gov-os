@@ -9,6 +9,9 @@ harness's ``permission_mode`` and must answer ``ask`` whatever it says. A
 PreToolUse ``ask`` is what makes the harness show the prompt in a mode that
 would otherwise let the call through. The live attempt is the switch-over's
 (W1-05) and is not a pytest case.
+
+DEC-957, DEC-971 item 4 (DEC-980): "the orchestrator" is the CTO, the
+orchestrator on the coordination ticket the fixture project's roster names.
 """
 
 from __future__ import annotations
@@ -42,9 +45,19 @@ def test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts(pro
 
 
 @pytest.mark.parametrize("mode", ("auto", "bypassPermissions"))
-def test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too(project, bash, mode):
+def test_an_orchestrator_subagent_in_a_worker_s_session_is_refused_in_auto_mode_too(project, bash, mode):
+    """Was ``test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too`` (DEC-117's ask).
+
+    DEC-957, DEC-971 item 4 (DEC-980): an orchestrator subagent in an engineer's session is not the CTO, so its
+    install is refused and it is told to raise a P1 escalation to the CTO, in the modes that skip prompts too.
+    """
     command = "npm install -g ccusage"
     result = bash(project, command, support.ENGINEER, ORCHESTRATOR_TICKET, subagent=ORCHESTRATOR, mode=mode)
-    assert result.decision == "ask", (
-        f"`{command}` by an orchestrator subagent in {mode} mode did not ask: {result.describe()}"
+    assert result.decision == "deny", (
+        f"`{command}` by an orchestrator subagent in an engineer's session in {mode} mode was not denied: "
+        f"{result.describe()}"
+    )
+    assert support.tells_to_escalate(result), (
+        f"`{command}` by an orchestrator subagent in an engineer's session in {mode} mode: the refusal does not "
+        f"tell the session to raise a P1 escalation to the CTO: {result.describe()}"
     )

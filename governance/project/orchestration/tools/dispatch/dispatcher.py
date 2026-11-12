@@ -305,6 +305,12 @@ def truth():
         cores = job_cores(facts, dry)
         t["_proc_cores"] = cores
         t["jobs"] = find_jobs(facts, c or {}, rr_pids, shared.get("state") in ("BUSY", "WAITING"), cores)
+        try:  # DEC-1140 (2), ACT-DISPATCH-1: each job's measured cores over the last minutes (the forecast's CPU term)
+            measured_load(t["jobs"], c or {}, dry)
+        except Exception as exc:  # noqa: BLE001 - fail to the old reading: every job at its phase peak
+            for j in t["jobs"]:
+                j.pop("recent_cpu", None)
+            t["measured_load_error"] = f"measured load: {exc!r}"[:160]
         pk2 = phase_peaks_current(c or {}, dry)
         hist = {"lead_outside_kb": ((pk or {}).get("lead_outside") or {}).get("rss_kb_p95"),
                 "lead_inside_kb": ((pk or {}).get("lead_inside") or {}).get("rss_kb_p95"),
@@ -943,6 +949,41 @@ def job_cores(facts, dry):
     return out
 
 
+HELD_WINDOW_S = 600  # a job's measured cores are looked at over this long (config.json held_load_window_s)
+HELD_MIN_S = 300     # a job (in one phase) measured for less than this counts its phase peak, as before (held_load_min_s)
+HELD_FLOOR = 1.0     # the least a measured job is counted at: a held slot or a quiet lead may still start a test (held_load_floor)
+
+
+def measured_load(jobs, c, dry):
+    """DEC-1140 (2), ACT-DISPATCH-1: the forecast counted every running job at its phase's whole peak above what it
+    uses now, so a heavy slot held by a lead's short scoped runs was priced at its 6-worker peak while the machine was
+    5 of 20 busy. Each job's measured cores of the last `held_load_window_s` (jobs-load.json: one sample a pass, per
+    pid and phase, so a job that enters another phase starts again) set `recent_cpu` on the job: the highest sample
+    of the window, once the job has been measured for `held_load_min_s` (before that, and with no usable sample,
+    `recent_cpu` is None and the forecast keeps the phase's peak). balancer.forecast then counts the job at the
+    larger of that, what it uses now and `held_load_floor`, never above the phase's peak. config.json
+    `held_load: false` switches it off. A dry pass reads the file and writes nothing."""
+    window = float(c.get("held_load_window_s", HELD_WINDOW_S))
+    min_s = float(c.get("held_load_min_s", HELD_MIN_S))
+    t_now = now()
+    prev = load_json("jobs-load.json", {})
+    keep = {}
+    for j in jobs:
+        key = f"{j['pid']}:{j['phase']}"
+        rec = prev.get(key) if isinstance(prev.get(key), dict) else {}
+        first = float(rec.get("first") or t_now)
+        samples = [(float(a), float(b)) for a, b in (rec.get("s") or []) if t_now - float(a) <= window]
+        if j.get("cpu") is not None:
+            samples.append((t_now, float(j["cpu"])))
+        keep[key] = {"first": first, "s": [[a, round(b, 2)] for a, b in samples]}
+        j["recent_cpu"] = max(b for _, b in samples) if len(samples) >= 3 and t_now - first >= min_s else None
+    if not dry:
+        D.mkdir(parents=True, exist_ok=True)
+        tmp = D / "jobs-load.json.tmp"
+        tmp.write_text(json.dumps(keep))
+        os.replace(tmp, D / "jobs-load.json")
+
+
 def phase_peaks_current(c, dry):
     """phase-peaks.json, refreshed at most every `phase_refresh_s` from log/capacity/balance.jsonl's rows of the last
     `phase_window_h` (the rolling window); the floors (today's figures) when there are none."""
@@ -983,7 +1024,8 @@ def forecast_state(t, c, jobs=None):
     return {"busy_cores": t.get("busy_cores"), "band_hi": (c.get("cpu_band") or [14, 18])[1],
             "mem_available_kb": None if avail is None else avail * 1024, "floor_kb": floor, "gpu": t.get("gpu_last"),
             "headroom_mib": int(c.get("gpu_headroom_mib", 2048)), "rr_held": rr.get("gpu_held"),
-            "rr_slots": rr.get("gpu_slots"), "jobs": t.get("jobs", []) if jobs is None else jobs}
+            "rr_slots": rr.get("gpu_slots"), "jobs": t.get("jobs", []) if jobs is None else jobs,
+            "held_floor": float(c.get("held_load_floor", HELD_FLOOR)) if c.get("held_load", True) else None}
 
 
 def pct(values, q):
@@ -2436,6 +2478,11 @@ def why_not(entry, t, inbox_w2s, started_logs):
         return f"no brief {brief}"
     if "@@" in bp.read_text():
         return "the brief holds an @@ placeholder"
+    cap = max_leads(t.get("_c"))  # ACT-DISPATCH-1: the lead cap the owner set (config.json max_leads), enforced here
+    if cap is not None:
+        running = t.get("lead_count", 0) + len(t.get("pending_launches") or [])
+        if running >= cap:
+            return f"lead cap: {running} of {cap} running"
     ok, why = admit_safely(t, tid, (first,) if first else None)
     if not ok:
         return "not admitted: " + why[:200]
@@ -2525,6 +2572,91 @@ def start_one(t, dry):
         log(f"started {w2} ({tid}) {brief} -> {logf} (launcher exit {rc})")
         return w2, waits
     return None, waits
+
+
+# ---- 3b. idle with headroom (ACT-IDLE-GUARD-1: DEC-1110 (1), DEC-1109 (3), DEC-936 item 2) -----------------------------
+IDLE_REMIND_S = 6 * 3600  # DEC-1118 H: one inbox item per new cause, and a reminder after 6 hours of the same cause
+USED_LOG = ("already started for", "already holds a return")  # why_not()'s answers for a used or a returned log
+
+
+def max_leads(c):
+    """The cap on running leads the owner set, from config.json `max_leads` (a whole number of 1 or more); None when
+    it is not set (the forecast alone admits each start, DEC-1052 O-A1). The idle item below is sent only with a cap
+    set: the cap is the owner's word that there is work to push; the Stop hook's check does not need it."""
+    v = (c or {}).get("max_leads")
+    return v if isinstance(v, int) and not isinstance(v, bool) and v >= 1 else None
+
+
+def idle_headroom(t, started_w2, waits, c):
+    """None, or (cause key, the item's text) when the dispatcher is idle with room to start: nothing started this pass,
+    the gates open, the machine not full, fewer leads running or launching than the cap, and no ready line startable
+    (an empty list, or every line waiting). Lines skipped for a used or a returned log are named first: the CTO's
+    cheapest cure is a new line with a new log name. A hold the dispatcher keeps itself is not idle: the stagger after
+    a start, a hung embedding server."""
+    if started_w2 or not t.get("gate_open") or not t.get("disk_open") or t.get("admit") is False:
+        return None
+    if ((t.get("forecast") or {}).get("lead") or {}).get("ok") is False:
+        return None
+    cap = max_leads(c)
+    running = t.get("lead_count", 0) + len(t.get("pending_launches") or [])
+    if cap is None or running >= cap:
+        return None
+    if "stagger" in waits or any(str(v).startswith("embedding server hung") for v in waits.values()):
+        return None
+    used = sorted(k for k, v in waits.items() if any(m in str(v) for m in USED_LOG))
+    others = sorted(k for k in waits if k not in used)
+    lines = len(read_list(D / "ready.txt"))
+    text = (f"log: dispatch.log\nIdle: headroom\nstatus: the gate is open and {running} of {cap} leads run, but no "
+            f"ready line is startable ({lines} line(s) in ready.txt)")
+    if used:
+        text += ("; skipped for a used or returned log: " +
+                 ", ".join(f"{k} ({waits[k][:70]})" for k in used[:6]) +
+                 ". Write the line again with a new log name (<W2>-A5-<run>.json) to start it, or comment the line "
+                 "out of ready.txt if its ticket needs no new run (a lead that returned packages waits for the owner)")
+    if others:
+        text += "; waiting for other reasons: " + ", ".join(f"{k} ({str(waits[k])[:50]})" for k in others[:6])
+    text += ("\nThe standing rule: never idle while unblocked work remains (DEC-1110 (1), DEC-1109 (3)); "
+             "ready.txt is the CTO's list.\n")
+    # DEC-1118 H: the cause is the waiting set itself (the sorted names of the used lines and of the other waiting
+    # lines), so the same waiting set is one cause however its reasons are worded; "empty" for an empty list
+    parts = (["used:" + ",".join(used)] if used else []) + (["waiting:" + ",".join(others)] if others else [])
+    key = "|".join(parts) if parts else ("empty" if not lines else "waiting")
+    return key, text
+
+
+def watch_headroom(t, started_w2, waits, c, dry):
+    """DEC-1118 H (ACT-DISPATCH-1): an inbox item when idle_headroom() holds and its cause is new, or the same cause
+    has stood for IDLE_REMIND_S (a reminder); otherwise the pass is only logged. The last cause is kept in
+    idle-headroom-reported.json ({cause, sent}) until a real start (a start clears it) or a changed cause: a pass in
+    which idle does not hold forgets nothing, so a cause that returns unchanged is not sent again."""
+    f = D / "idle-headroom-reported.json"
+    try:
+        seen = json.loads(f.read_text())
+        seen = seen if isinstance(seen, dict) and isinstance(seen.get("cause"), str) else {}
+    except (OSError, ValueError):
+        seen = {}
+    got = idle_headroom(t, started_w2, waits, c)
+    if dry:
+        return got
+    state = {} if started_w2 else dict(seen)
+    if got and not started_w2:
+        cause, text = got
+        try:
+            age = now() - float(state.get("sent") or 0)
+        except (TypeError, ValueError):
+            age = IDLE_REMIND_S
+        new = state.get("cause") != cause
+        if new or age >= IDLE_REMIND_S:
+            if not new:
+                text = text.replace("status: ", f"status: (reminder: the same cause for {int(age // 3600)} h) ", 1)
+            inbox_item("idle-headroom", text)
+            state = {"cause": cause, "sent": now()}
+            log(f"idle with headroom: inbox item written ({cause})" + ("" if new else f" as a reminder after {int(age // 3600)} h"))
+        else:
+            log(f"idle with headroom: {cause}; the same cause, last item {int(age // 60)} min ago: logged only")
+    if state != seen:
+        f.write_text(json.dumps(state))
+    return got
 
 
 # ---- 4. land ------------------------------------------------------------------------------------------------------
@@ -3014,6 +3146,7 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     age = int(now() - oldest_item.stat().st_mtime) if oldest_item else None
     s = {k: v for k, v in t.items() if not k.startswith("_")}
     s.update(inbox_unread=len(items), inbox_oldest_age_s=age, started_this_tick=started_w2, ready_waits=waits,
+             ready_count=len(read_list(D / "ready.txt")), max_leads=max_leads(t.get("_c")),
              land=land_state, land_pending=[" ".join(e) for e in read_list(D / "land.txt")], new_returns=new_returns,
              last_start=(" ".join(started()[-1][:3]) if started() else None), failures=failures)
     (D / "status.json").write_text(json.dumps(s, indent=1))
@@ -3159,6 +3292,11 @@ def tick(dry):
     except Exception as exc:
         failures.append(f"start: {exc!r}"[:200])
         log(f"start failed: {exc!r}")
+    try:  # ACT-IDLE-GUARD-1: idle with headroom wakes the CTO through the inbox
+        watch_headroom(t, started_w2, waits, t.get("_c") or {}, dry)
+    except Exception as exc:
+        failures.append(f"headroom watch: {exc!r}"[:200])
+        log(f"headroom watch failed: {exc!r}")
     try:
         land_state = land_step(t, dry)
     except Exception as exc:

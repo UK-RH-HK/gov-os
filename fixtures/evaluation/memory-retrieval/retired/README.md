@@ -180,3 +180,23 @@ the old questions'.
 - **q14-pre-reword-2026-11-09.yaml** (the DEC-1069 label, cc9c94d42a54): it asked for W2-03's dependents, a list
   that grows with every ticket filed against it. It now asks what W2-03 had to show about decision hashes (its
   KPIs, in the closed ticket and the WBS card). Category `ticket`, ticket and radius kept.
+
+## The question re-worded 2026-11-10 under DEC-1124 (`<id>-pre-reword-2026-11-10.yaml`)
+
+The owner's DEC-1124 (2026-11-10) re-words Q23 by the process of DEC-1070 (13) used for Q07 and Q14 on 2026-11-09: a
+session independent of the retrieval work (the independent test designer) wrote it blind at 0edfcda88845, from the
+rubric, the retired files and the repository, with no search and no result read. The file here is the label as it
+stood before, byte for byte; its replacement is `visible/q23.yaml`, whose header comment gives the detail. Figures
+for Q23 before 2026-11-10 are the old question's.
+
+- **q23-pre-reword-2026-11-10.yaml** (W2-61h's q23, the DEC-1069 label, f46b96537d74): it asked which constant in the
+  close's test selection holds the test map's path, and its exact value (`MAP_REL = "governance/project/test-map.yaml"`,
+  `src/gov/close/select.py`). The line moved: W2-150 put the name behind an import from `gov.store.loader`, so its
+  heading was no longer a line of the file and three cases were red (W2-61's every-source-found case and two of
+  W2-61h's, the cited lines and the source holding its answer). A question tied to a line that moves is volatile
+  (the rubric's R11). It now asks a decided rule with a defined name: what the close's test selection does when a
+  selected test-map target is no longer in the tree (it widens to the full regression), and the reason code under
+  which it names the target (`UNRESOLVED_TARGET`; DEC-912 item 3, W2-66's P1). `id: Q23` and the category
+  `exact-string` kept. Two entries of alternatives: the rule (DEC-912's entry, found by its `###` heading, and W2-66's
+  KPI line in `.tickets/DAEO-c1uz.md`) and the code name (the docstring of `src/gov/close/select.py`, and the line
+  that records it). W2-61h's anchor for q23 (`ANCHORS` in `test_w2_61h_visible_new.py`) follows the new question.

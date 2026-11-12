@@ -13,6 +13,11 @@ and ``deny`` for every other role, and for no role.
 gets an install command through the guard without ``ask`` or ``deny``. That the
 owner then approves in chat is a fact of the session; W1-06's KPI carries it.
 
+DEC-957 and DEC-971 item 4 (DEC-980) narrow "the orchestrator" to the CTO: the
+orchestrator on the project's coordination ticket, which the fixture project's
+roster names (``DAEO-zz91``). An orchestrator subagent in a worker's session is
+refused and told to raise a P1 escalation to the CTO.
+
 CAP-25.c makes automated install classification a non-goal, so the commands
 are plain examples of the KPI's three classes and no evasive spelling.
 """
@@ -101,8 +106,9 @@ def test_an_install_by_a_role_without_a_ticket_is_denied(project, bash, role):
 # name: (GOV_ROLE, agent_type, expected decision)
 SUBAGENTS = {
     "orchestrator-subagent-in-orchestrator-session": (ORCHESTRATOR, ORCHESTRATOR, "ask"),
-    "orchestrator-subagent-in-engineer-session": (ENGINEER, ORCHESTRATOR, "ask"),
-    "orchestrator-subagent-in-designer-session": (DESIGNER, ORCHESTRATOR, "ask"),
+    # DEC-957, DEC-971 item 4 (DEC-980): an orchestrator subagent in a worker's session is not the CTO.
+    "orchestrator-subagent-in-engineer-session": (ENGINEER, ORCHESTRATOR, "deny"),
+    "orchestrator-subagent-in-designer-session": (DESIGNER, ORCHESTRATOR, "deny"),
     "engineer-subagent-in-orchestrator-session": (ORCHESTRATOR, ENGINEER, "deny"),
     "designer-subagent-in-orchestrator-session": (ORCHESTRATOR, DESIGNER, "deny"),
     "product-spec-subagent-in-orchestrator-session": (ORCHESTRATOR, support.PRODUCT_SPEC, "deny"),
@@ -112,6 +118,11 @@ SUBAGENTS = {
     "orchestrator-subagent-in-a-session-without-a-role": (None, ORCHESTRATOR, "deny"),
     "orchestrator-subagent-in-a-session-with-an-unknown-role": ("developer", ORCHESTRATOR, "deny"),
 }
+# The two cases DEC-980 flipped from ask to deny: their refusal also tells the session to escalate.
+WORKER_SESSION_ORCHESTRATOR_SUBAGENTS = (
+    "orchestrator-subagent-in-engineer-session",
+    "orchestrator-subagent-in-designer-session",
+)
 
 
 @pytest.mark.parametrize("case", sorted(SUBAGENTS), ids=sorted(SUBAGENTS))
@@ -127,3 +138,8 @@ def test_inside_a_subagent_the_acting_role_decides(project, bash, case):
             f"`{command}` by subagent {agent_type} in a session with GOV_ROLE={session_role!r}: "
             f"expected {expected}: {result.describe()}"
         )
+        if case in WORKER_SESSION_ORCHESTRATOR_SUBAGENTS:
+            assert support.tells_to_escalate(result), (
+                f"`{command}` by subagent {agent_type} in a session with GOV_ROLE={session_role!r}: the refusal "
+                f"does not tell the session to raise a P1 escalation to the CTO: {result.describe()}"
+            )

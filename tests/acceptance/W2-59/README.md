@@ -362,3 +362,5 @@ this README's; the lead numbers its packages.)
   `error.details.checks`), and from `gov doctor --json`'s `canaries` section.
 - The probe declaration is a `python3 -c` command: a declared `python3` command that is not a governance module must
   still run, with the judge's interpreter (W1-26 runs declared commands as written).
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_59_support.session_env` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

@@ -155,10 +155,23 @@ def git(project, *args):
 
 
 def path_map():
-    """This repository's path map with one namespace that classes everything as governance memory without vectors
-    and the planted register named; no authority block (W2-87's order is not under test here)."""
-    document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
-    document.pop("retrieval_authority", None)
+    """The planted project's path map: the kernel schema's required keys only, with one namespace that classes
+    everything as governance memory without vectors and the planted register named; no authority block (W2-87's
+    order is not under test here).
+
+    Only the planted corpus may answer a question, so no free text of this repository's live map reaches the planted
+    index (revised for DEC-1106 (3), DEC-1108 (5): the live map's ``write_refused`` block, ``root:
+    ~/.gov-os/guard-calls`` and its ``why``, made the copy match "who calls w92_nowhere"). From the live map come
+    its closed values alone, so the map stays valid as the kernel schema and its floors move: ``state_class``,
+    ``capabilities``, the ``policies`` strengths and each system's ``status``. A system's ``where`` and ``reason``
+    (paths and prose) become a fixed word, and every optional block (``write_refused``, ``session_hidden``,
+    ``evaluation_sets``, ``load_sensitive``, the others) is left out."""
+    live = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    systems = {name: ({"status": "absent", "reason": "absent"} if system["status"] == "absent"
+                      else {"status": system["status"], "where": ["**"]})
+               for name, system in live["systems"].items()}
+    document = {"state_class": live["state_class"], "capabilities": live["capabilities"],
+                "policies": live["policies"], "systems": systems}
     document["decision_register"] = REGISTER
     document["namespaces"] = {"everything": {
         "paths": ["**"], "memory_class": "governance", "sensitivity": "internal",
@@ -619,6 +632,9 @@ def projection(bundle):
 # The integrated code the S7 to S10 cases are compared with: w2/integrate 8c28aa70fb3f, the tree merged into this
 # branch at 436a7520 (DEC-1074 (5), re-pin window 4).
 LINKS_BASE = "8c28aa70fb3f88187984f3f9b39479696a41a38a"
+# The integrated code S11's "what they give today" is compared with: w2/integrate 2a64626532cb, the head of
+# w2/W2-92-d6-tests when its cases were written (D-6 part 2, DEC-1109 (2)); register_statements as S7 left it.
+D6_BASE = "2a64626532cbbfb89be7de504f4bb8d7efc96181"
 
 # Link types (S7's words)
 CITES, OF_TASK, UNDER, SUPERSEDES, AMENDS = "CITES", "OF_TASK", "UNDER", "SUPERSEDES", "AMENDS"
@@ -822,12 +838,17 @@ class AtSrc(Api):
         return self.retrieve(root, query, tool=ABSENT, **kwargs)[0]
 
 
-def base_src(place):
-    """``LINKS_BASE``'s ``src/``, taken from this repository's git into ``place``; its path."""
-    archive = subprocess.run(["git", "-C", str(REPO_ROOT), "archive", "--format=tar", LINKS_BASE, "src"],
-                             capture_output=True)
+def base_src(place, commit=LINKS_BASE):
+    """``commit``'s ``src/`` (``LINKS_BASE`` unless named), taken from this repository's git into ``place``; its
+    path. S11 names its own base, ``D6_BASE``.
+
+    Limited to the named path ``src/`` in the call itself (DEC-385, W1-28's reading route): git runs in the root's
+    ``src`` folder, where ``git archive <commit>`` takes ``<commit>:src`` only, put back under ``src/`` by
+    ``--prefix``. Nothing outside ``src/`` is taken, the held-out file included."""
+    archive = subprocess.run(["git", "-C", str(REPO_ROOT / "src"), "archive", "--format=tar", "--prefix=src/",
+                              commit], capture_output=True)
     if archive.returncode != 0:
-        raise AssertionError(f"the integrated code {LINKS_BASE[:12]} is not in this repository's git: "
+        raise AssertionError(f"the integrated code {commit[:12]} is not in this repository's git: "
                              f"{archive.stderr[-500:]!r}")
     subprocess.run(["tar", "-x", "-C", str(place)], input=archive.stdout, check=True)
     return Path(place) / "src"

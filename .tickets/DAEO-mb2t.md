@@ -1,6 +1,6 @@
 ---
 id: DAEO-mb2t
-status: open
+status: in_progress
 deps: [DAEO-blwa]
 links: [DAEO-blwa, DAEO-qzrq]
 created: 2026-11-02T10:37:58Z
@@ -24,14 +24,14 @@ allowed_paths:
 - tests/unit/adopt/test_w2_124*
 kpis:
   success:
-  - '`gov rebuild` exits non-zero, named (`REBUILD_FAILED`, `store: semantic`), when the semantic store was asked for and not recreated (the embedder unavailable, hung or failing part way); only `--no-embeddings` skips it; never an ok answer over a partial store [DEC-1015 item 4, DEC-1027 C]'
-  - 'A project with nothing to embed (no path map, or no embedded namespace) is not asked for a semantic store, so its rebuild answers ok [DEC-1027 C]'
-  - 'Adoption never fails for a missing embedder: stage A6 finishes, and its record and the adoption report carry a named finding (the semantic store not recreated, with the reason) and the command to rebuild it later [DEC-1027 C]'
-  - 'The close (and the merge queue''s prepare) treats a rebuild without its semantic store as failed, as the CTO''s `rebuild_slot.sh` does today (exit 75) [DEC-1015 item 4, DEC-1027 C]'
-  - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved from W2-88 S5, DEC-1083]'
+  - '`gov rebuild` exits non-zero, named (`REBUILD_FAILED`, `store: semantic`), when the semantic store was asked for and not recreated (the embedder unavailable, hung or failing part way); only `--no-embeddings` skips it; never an ok answer over a partial store. Verify: a planted project that asks for a semantic store, with a stub embedder that is unavailable, one that hangs and one that fails part way: `gov rebuild` exits non-zero each time and prints `REBUILD_FAILED` and `store: semantic`; the same project with `--no-embeddings` exits 0; no run prints ok over a partial store [DEC-1015 item 4, DEC-1027 C]'
+  - 'A project with nothing to embed (no path map, or no embedded namespace) is not asked for a semantic store, so its rebuild answers ok. Verify: two planted projects, one with no path map and one whose path map names no embedded namespace, with the embedder stub unavailable: `gov rebuild` exits 0 and prints ok for each, and names no semantic store [DEC-1027 C]'
+  - 'Adoption never fails for a missing embedder: stage A6 finishes, and its record and the adoption report carry a named finding (the semantic store not recreated, with the reason) and the command to rebuild it later. Verify: a planted adoption run with the embedder stub unavailable: stage A6''s record shows it finished, and both that record and the adoption report hold one finding that names the semantic store, the reason and the rebuild command; the run does not exit with an error [DEC-1027 C]'
+  - 'The close (and the merge queue''s prepare) treats a rebuild without its semantic store as failed, as the CTO''s `rebuild_slot.sh` does today (exit 75). Verify: a planted rebuild result with no semantic store: the close''s rebuild check and the merge queue''s prepare each report failed, and `rebuild_slot.sh` on the same planted result exits 75 [DEC-1015 item 4, DEC-1027 C]'
+  - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case. Verify: planted repositories, one without the path map, one without .gitleaks.toml and one whose path map calls for a store that was not built: `gov rebuild` names each store not built with its reason and its result is not ok; a planted rebuild with `--no-embeddings` is ok and says it skipped the vectors; W2-26''s finding 2 planted case gives the not-ok result [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved from W2-88 S5, DEC-1083]'
   failure:
-  - 'An ok answer, or a close, over a partial semantic store.'
-  - 'An adoption that fails, or reports success without the finding, when the embedder is unavailable.'
+  - 'An ok answer, or a close, over a partial semantic store. Verify: the planted partial-store cases of S1 and S4: no `gov rebuild` run prints ok and no close or prepare check passes; any ok or pass there is this failure'
+  - 'An adoption that fails, or reports success without the finding, when the embedder is unavailable. Verify: the planted adoption run of S3 with the embedder stub unavailable: the run exits without error and the A6 record and the report each hold the named finding; an error exit, or a record or report without the finding, is this failure'
 profile: STANDARD
 sources:
 - DEC-1027
@@ -40,8 +40,8 @@ sources:
 - DEC-1083
 - DEC-530
 - DEC-954
-- W2-26
-- W2-88
+- DAEO-2ds6
+- DAEO-2bdu
 est_loc: 80
 acceptance_tests:
   path: tests/acceptance/W2-124/

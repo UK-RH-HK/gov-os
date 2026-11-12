@@ -159,6 +159,13 @@ def launcher_with(planted, tmp_path, monkeypatch):
     # the repository's settings are not what these cases are about (the check comes at the argument checks)
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
     store = planted(STORE, ("src/ka/core.py",))
+    # W2-153 (DEC-1050, DEC-866): gov launch refuses without the role's .claude/templates/<stem>.md; the eight copies
+    # are planted (any bytes), so the plan check stays what decides these launches.
+    for stem in ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                 "role-reviewer", "role-lead", "role-cto"):
+        copy = store.root / ".claude" / "templates" / f"{stem}.md"
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        copy.write_text(f"---\nname: {stem}\n---\n# W2-136 fixture template copy {stem}\n", encoding="utf-8")
 
     def _with(answer):
         calls, started = [], []

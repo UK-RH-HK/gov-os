@@ -150,13 +150,24 @@ def gov_src() -> Path:
 # ---------------------------------------------------------------- a short temporary base
 
 
+PRIVATE_ROOT = "/tmp"  # where the fallback makes its own private folder (a test may name another)
+
+
 def short_base() -> Path:
     """A new folder in the temporary folder, or in its nearest writable parent when the path is too long for a
-    Unix socket under it (108 bytes in all); never inside the repository, never ``/`` or ``/tmp`` itself."""
+    Unix socket under it (108 bytes in all); never inside the repository, never ``/`` or ``/tmp`` itself.
+
+    When no such folder qualifies (``TMPDIR`` unset: the temporary folder is ``/tmp`` itself, which takes no loose
+    entries), the base is made in a fresh private folder (mode 0700) directly under ``/tmp``, removed when the
+    process ends: the folder is ours alone, so nothing loose is written into ``/tmp``."""
     import tempfile
 
+    try:
+        system_temp = tempfile.gettempdir()
+    except OSError:  # no writable temporary folder at all: only the private folder is left to try
+        system_temp = None
     seen, candidates = set(), []
-    for start in (os.environ.get("TMPDIR"), tempfile.gettempdir()):
+    for start in (os.environ.get("TMPDIR"), system_temp):
         if not start:
             continue
         path = Path(start).resolve()
@@ -168,20 +179,55 @@ def short_base() -> Path:
                 continue
             candidates.append(folder)
     for folder in candidates:
-        if len(str(folder)) + len("/r0000/h/") + len(SOCKET_REL) > 104:
-            continue
-        for number in range(100_000):
-            made = folder / f"r{number}"
-            try:
-                made.mkdir(mode=0o700)
-                return made
-            except FileExistsError:
-                continue
-            except OSError:
-                break
+        made = _new_run_folder(folder)
+        if made is not None:
+            return made
+    private = _private_folder()
+    made = _new_run_folder(private) if private is not None else None
+    if made is not None:
+        return made
     raise Missing(f"no temporary folder ({os.environ.get('TMPDIR')!r} or a parent of it, outside the repository) is "
-                  "both writable here and short enough for a Unix socket's path under it (108 bytes): set TMPDIR to "
-                  "a writable, shorter folder")
+                  f"both writable here and short enough for a Unix socket's path under it (108 bytes), and no "
+                  f"private folder can be made under {PRIVATE_ROOT}: set TMPDIR to a writable, shorter folder")
+
+
+def _new_run_folder(folder: Path) -> Path | None:
+    """``folder/r<n>``, new and mode 0700, or None when ``folder`` is too long for a socket path or not writable."""
+    if len(str(folder)) + len("/r0000/h/") + len(SOCKET_REL) > 104:
+        return None
+    for number in range(100_000):
+        made = folder / f"r{number}"
+        try:
+            made.mkdir(mode=0o700)
+            return made
+        except FileExistsError:
+            continue
+        except OSError:
+            return None
+    return None
+
+
+_PRIVATE: list[Path] = []  # the fallback's private folder: one per process, made at the first need
+
+
+def _private_folder() -> Path | None:
+    """A fresh folder (mode 0700, ``mkdtemp``) directly under ``PRIVATE_ROOT``, never the repository; or None."""
+    import atexit
+    import shutil
+    import tempfile
+
+    if _PRIVATE and _PRIVATE[0].is_dir():
+        return _PRIVATE[0]
+    try:
+        made = Path(tempfile.mkdtemp(dir=PRIVATE_ROOT, prefix="gov-sock-")).resolve()
+    except OSError:
+        return None
+    if made == REPO_ROOT or REPO_ROOT in made.parents:
+        shutil.rmtree(made, ignore_errors=True)
+        return None
+    _PRIVATE[:] = [made]
+    atexit.register(shutil.rmtree, made, True)
+    return made
 
 
 # ---------------------------------------------------------------- processes

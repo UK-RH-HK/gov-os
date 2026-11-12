@@ -177,6 +177,7 @@ def run_line(line: Line, box: Box, timeout: int = 60) -> Run:
         "HOME": str(box.home), "PATH": box.path, "LANG": "C.UTF-8",
         "TMPDIR": os.environ.get("TMPDIR", "/tmp"), "CLAUDE_PROJECT_DIR": str(box.project),
         "GOV_ROLE": "engineer", "GOV_TICKET": "DAEO-w265", "PYTHONDONTWRITEBYTECODE": "1",
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     try:
         done = subprocess.run(["sh", "-c", line.command], cwd=str(box.project), env=env,

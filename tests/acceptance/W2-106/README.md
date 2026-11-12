@@ -222,3 +222,5 @@ entries' `timeout`).
 None. The one reading stated rather than asked: "takes this repository's pinned form" is held exactly, the program's
 path aside (`test_the_line_takes_this_repository_s_pinned_form`), as the register holds forms (DEC-608, DEC-917); a
 line that behaves alike in other words passes every other case and fails that one alone.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_106_support.line_env` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

@@ -45,6 +45,7 @@ sources:
 - DEC-1027
 - DEC-958
 - DEC-953
+- DEC-1044
 est_loc: 600
 acceptance_tests:
   path: tests/acceptance/W2-42a/

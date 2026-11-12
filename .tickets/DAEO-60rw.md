@@ -21,7 +21,7 @@ allowed_paths:
 - docs/audit/wave-2/W2-30/**
 kpis:
   success:
-  - A fresh auditor gives the real repository's verdict. Track B ends with ADOPTED_HEALTHY (exit criterion 6).
+  - 'A fresh auditor gives the real repository''s verdict. Track B ends with ADOPTED_HEALTHY (exit criterion 6). Verify: the auditor''s result record, written by a session that wrote none of the adoption''s files, holds one verdict for the real repository; Track B is recorded as ended only when that verdict reads ADOPTED_HEALTHY (a planted record with any other verdict leaves Track B open).'
   failure: []
 profile: FULL
 sources:

@@ -37,7 +37,7 @@ def _plain_refused(done) -> None:
 
 # --- S5: "until <ticket>" in the role's own template ----------------------------------------------------------------
 # W2-153 delivers the whole role template as the system prompt, so a stale line there reaches the session too.
-# W2-909 (DAEO-fx09) is closed and W2-908 (DAEO-fx08) open; W2-901 is the briefed ticket itself, so it is not used.
+# The closed planted ticket and the open one; the briefed ticket itself is not used.
 
 def _closed_and_open(repo):
     repo.ticket(s.closed_ticket("DAEO-fx09", "W2-909", status="closed"))

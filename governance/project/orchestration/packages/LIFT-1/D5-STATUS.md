@@ -152,3 +152,132 @@ marked on W2-128.
 - **W2-153** (`DAEO-8s85`, open): its tests after W2-152's engineer. It goes live with the copies ACT.
 - **Review F8** (the scripts' syntax-only checks): no change. The KPI allows a no-op check; dry-run modes for the
   three scripts are an item for the CTO's tools.
+- 2026-11-10: **W2-128 round 2a READY, not merged:** `w2/W2-128` **`5c494e255960`** (tests `f3e2a55accd4`, 21 new
+  cases; the designer pinned the comparisons to `61231e61`, accepted by the CTO).
+  - Changes: the test-design read rule per DEC-963; the orchestration skill's "Briefs" points to the templates and
+    K-4's two lines follow DEC-820; the orchestrator role line; `checkpoint.md`'s example `{ID}`;
+    `template/.rulesync/skills` copies; both skills at 1.1.0; CIT-P rows.
+  - Runs: `gov accept` 113/113; W1-35 27/27; validator clean. Review READY (`reviews/w2-128-r2a.md`).
+  - Its five findings are all `other`:
+    - F1 (in): `template/.rulesync/subagents/orchestrator.md` still names `brief-lead.md`. A ticket path; the
+      `.rulesync/` copy is the ACT builder's.
+    - F3 (in): two cases prove a line only by a name being present.
+    - F2 and F4 (out): lifted or miscited rules left in the two skills, beside the lines round 2a changed.
+    - F5 (out): `gov links` reads the templates' example front matter (a `gov links` row).
+  - F1 to F4 go to a small round 2b (a designer and a product-spec), after W2-152's engineer.
+- 2026-11-10: **the ACT builder v2** finds drifted sources from the portability check; on round 2a's head it carries
+  19 files, rehearsal `failures: 0`. The bundle to queue is rebuilt once the CTO merges round 2a.
+- 2026-11-10: **W2-152's engineer launched** in `w2/W2-152` (integrate `61231e61` plus the cases `b08ede68`).
+- 2026-11-10: **W2-152's engineer done**: `w2/W2-152` `16d052d2fda7`. The CTO's runs: `gov accept W2-152` 56/56,
+  W2-128 92/92, unit tests 12/12. **Review round 1 NOT READY** (`reviews/w2-152-r1.md`):
+  - F1 (S5, blocks): the role templates' "until <ticket>" lines are not checked (T-7's "until W2-56").
+  - Also F3 (no `ready` key turns the dependency check off), F4 (a ticket with no readable KPI lines is READY) and F6
+    (unreadable front matter misnamed). These fail open but are not reachable in ordinary work, so they do not block.
+  - Fix round, tests first: the designer adds F1, F3, F4 and F6 as cases; then the engineer; then review round 2, the
+    last.
+- **Delegated decision (the CTO, DEC-1112 (3)), on the review's F2:** today `gov brief` refuses all 87 open and
+  in-progress tickets for KPI lines without a verify; 15 of them only for their failure lines. Option (a), applying
+  DEC-1083 as written: each in-flight ticket gets its `Verify:` lines, marked with the decision, before its first
+  `gov brief`. A failure line may take `Verify: S<n>`. W2-153's were added today. Options (b) (date-gate the verify
+  rule) and (c) (failure lines exempt) would change DEC-1052 and DEC-1083, so they are the owner's, and are not
+  taken.
+- 2026-11-10: **W2-152 READY, not merged:** `w2/W2-152` **`09fc68645`** (tests `b08ede6890c6` and `50902d8a422f`).
+  - The fix closed F1 (every role's whole template checked for "until"), F3, F4, F5 and F6.
+  - The CTO's runs: `gov accept W2-152` 67/67, W2-128 92/92, unit tests 25/25, schema ok.
+  - Review round 2 READY (`reviews/w2-152-r1.md`, round 2 appended).
+  - Rows kept: F7 (unfilled ticket keys in a brief), F8 (§C's size measure), F9 (tk's `deps:`), F10 (`waits_on` ids
+    beyond tickets), F11 (other "until" spellings).
+- 2026-11-10: **W2-153 in progress**, its test designer launched (`w2/W2-153-tests`).
+- 2026-11-10: **W2-153 built**: `w2/W2-153` **`96e600d65`** (tests `0c73fd5a2cbe` and `2737423ba017`).
+  - The CTO's runs: `gov accept W2-153` 51/51, W2-128 92/92; `tests/unit/launch` and `tests/unit/adapters` 207
+    passed, 0 failed.
+  - Two delegated decisions (in the ticket): `skills` under `claudecode:`, because rulesync 24.0.0 drops a top-level
+    list; and the launcher unit tests' fixtures write the template copy.
+  - The branch's own launcher refused its fix worker for want of `.claude/templates/role-engineer.md`. That is S1
+    working, and the landing risk in one line. The CTO placed eight untracked byte copies in that worker tree only.
+  - Review launched.
+- **The landing order (the CTO's plan, for the merges):**
+  1. Merge W2-128 round 2a and W2-152.
+  2. Rebuild `ACT-CLAUDE-COPIES-1` on that integrate (about 19 files, `.claude/templates/` included), review it, get
+     the owner's yes, and the operator applies it. The copies are then committed, so every new worktree has them.
+  3. Then merge W2-153.
+  4. Then `ACT-CLAUDE-COPIES-2`, the same builder: the agents regenerated from W2-153's composed sources. Until then
+     the agents keep their old bodies, which is harmless.
+
+  Merging W2-153 before step 2 would refuse every `gov launch` until the ACT lands.
+- 2026-11-10: **W2-153 review READY by code** (`reviews/w2-153-r1.md`), **with three merge preconditions, not yet
+  met:**
+  - **R1:** about 110 cases in other suites start a launch in a fixture without the template copy: W2-20's unit
+    tests (36), and the acceptance cases of W2-20, W2-54, W2-136, W1-28, W1-32, W1-46, W2-58 and W1-50 (75). Their
+    fixtures must plant `.claude/templates/<stem>.md`. The unit files go to W2-153's engineer (paths widened); the
+    acceptance support files go to a test designer under DEC-866 (`Rewrite-Reason:`).
+  - **R2:** the ACT builder must accept `TEMPLATE_COPY_MISSING` and the composed roles' findings before the
+    post-W2-153 run (the CTO's tool).
+  - **R3:** at the merge, every live worktree merges integrate before leads resume or `gov` is re-pinned. W2-153's
+    own tree first drops the CTO's untracked copies.
+  The landing order above stands: ACT-1, then W2-153 with R1 done, then ACT-2.
+
+## State at 2026-11-10 04:50 (for the CTO)
+| item | state | head |
+|---|---|---|
+| W2-128 round 2a (TPL-6 S3, S4's kernel half, F6/F7, the checkpoint example) | READY, not merged | `w2/W2-128` `5c494e255960` |
+| W2-152 `gov brief`, the ready check (TPL-3, TPL-2 S3, TPL-5 S3, DEC-1088 (3)) | READY, not merged (review round 2) | `w2/W2-152` `09fc68645` |
+| W2-153 delivery (TPL-4) | READY by code; merge after R1 to R3 and ACT-1 | `w2/W2-153` `96e600d65` |
+| W2-128 round 2b (round 2a's F1 to F4) | not started | — |
+| TPL-7 measures, TPL-8 pilot | not started (TPL-8 after W2-153 lands) | — |
+| Owner: templates' approval, ACT-CLAUDE-COPIES-1, Appendix A | prepared, not applied; ACT rebuilt after round 2a merges, then its G4 review | — |
+- 2026-11-09 23:20 UTC (git time; the earlier log lines dated 11-10 ran 2-3 h ahead): **ACT-CLAUDE-COPIES-1 ready for the
+  owner's yes.**
+  - Rebuilt on integrate `b0bbd373` (rounds 1 and 2a and W2-152 merged), with the builder fixed for review R2:
+    composed-role findings, the template-copy codes, and a clear stop on anything else.
+  - 19 files, manifest `5d3a18832b9b`, class (b).
+  - Rehearsed twice with a planted HOME, 0 failures each: the bundle's own run, and §5 literally with its commits and
+    undo.
+  - The operator's `validate_manifest`, `act_class` (b) and `path_rule` pass.
+  - The independent review under the operator's fixed reviewer brief: all six checks pass, READY by the pinned
+    `verdict.py` (`acts/ACT-CLAUDE-COPIES-1/review.md`).
+  - The message is in `../ACT-CLAUDE-COPIES-1.md` §5.
+  - Next, unchanged: W2-153's R1 (the fixtures), W2-128 round 2b, the link notices (item 4); W2-153 unmerged until
+    ACT-1 is applied, then the worktrees merge integrate (R3).
+- 2026-11-10 00:29 UTC: **ACT-CLAUDE-COPIES-1 applied** by the operator agent (`eb48fe2fd`). **R3:** integrate merged into W2-153,
+  W2-153-tests, W2-128, W2-128-tests and W2-152-tests. W2-153's two conflicts were resolved by the CTO:
+  - `launch()`: kept both sides, the template flag and W2-56's `TEMP_PREFIX`;
+  - `.rulesync/subagents/orchestrator.md`: kept W2-153's composition.
+  The CTO's untracked template copies were removed first. Portability on W2-153 now reports only the six generated
+  agents, which is ACT-2's job. ACT-SETS-GLOBS-1's hook is in each of those trees.
+- 2026-11-10 00:29 UTC: **W2-128 round 2b READY, not merged:** `w2/W2-128` **`5cfa4b28f`** (round 2b `9d95279c9`, tests
+  `aeee55f658f6`); `gov accept` 121/121; review READY (`reviews/w2-128-r2b.md`). One finding, out of scope: five more
+  test-design lines still cite CAP-38.b (a row). Merge before ACT-2 is built, so ACT-2 carries the 1.2.0 skills.
+- 2026-11-10 00:29 UTC: **W2-153 R1, widened:** after W2-56 merged, its acceptance folder goes 136 of 256 red on W2-153, and
+  W2-153's own harness loses its stub's environment variable to W2-56's cleaned environment. The designer (fixtures,
+  nine folders, the harness) goes next, then the engineer (three unit files).
+- 2026-11-10 01:50 UTC: **W2-153 READY to merge: `w2/W2-153` `d77d702c3`**, integrate merged in (`e242a66b`, three launcher
+  conflicts resolved by the CTO over the night, each keeping both sides).
+  - R1 done:
+    - the fixtures of W2-56, W2-20, W2-136, W1-46, W1-28, W1-32, W2-58, W1-50 and W2-54 (a test designer,
+      `1e896245ee93`, `Rewrite-Reason:`);
+    - W2-153's own stub record past W2-56's cleaned environment;
+    - F2's baseline moved to the merge base after W2-56 (`ac0409a40`);
+    - W2-56 S6's argv-tail assertion allows the one pair (`896190341226`);
+    - four unit files' fixtures (the engineer, `d86ca7f4b`, `d77d702c3`);
+    - the test designer's skills switched to `[test-design]` (`49b990521`).
+  - The CTO's runs on the merge result, outside the sandbox: `gov accept W2-153` 51/51; acceptance W2-128 113,
+    W2-152 67, W2-56 284, W2-20 170, W2-136 76 and W2-54 67, all passed, no new failure against integrate. W1-46's
+    80 reds are on integrate too (the fixture HOMEs' missing gate file, another item). Unit launch, resources and
+    adapters: 486 passed, 0 failed.
+  - Structural pass: portability NOTICE (the six agents, ACT-2's), links ok.
+- 2026-11-10 01:50 UTC: **also READY, not merged:** W2-128 round 2b `5cfa4b28f` (121/121, review READY) and W2-152-tests
+  `32b89d25a` (the link-notice comment). **Next, the CTO's order:** merge round 2b, W2-152-tests and W2-153; then
+  ACT-CLAUDE-COPIES-2 (the same builder, on that integrate: the six agents from W2-153's composed sources and round
+  2b's 1.2.0 skills), rehearsed, reviewed, and §6 with the line `yes ACT-CLAUDE-COPIES-2 <manifest sha8>`.
+- 2026-11-10 02:03 UTC: **W2-153 READY to merge at `c82ff5c18`.** Integrate merged in after round 2b (`f3c15908d`) and
+  W2-152-tests (`dea78270a`).
+  - The conflict in `template/.rulesync/subagents/orchestrator.md`: kept W2-153's composition. Round 2b's one-line
+    fix lived in the old body, which the composition replaces; the composed `role-lead.md` body names no retired
+    brief text.
+  - Round 2a's F6 `[rulesync]` case now also accepts the composed body (a test designer, `a3a0eb7a76b8`,
+    `Rewrite-Reason:`).
+  - On the merge result: `gov accept` W2-153 51/51, W2-128 121/121, W2-152 67/67; W2-56 284, W2-20 170, W2-136 76
+    and W2-54 67, all passed; unit tests 486/0; no new failure against integrate (W1-46's 80 gate-file reds are on
+    integrate too). Links ok.
+  - Portability NOTICE: 8 findings, ACT-2's (round 2b's two skill sources and the six agents).

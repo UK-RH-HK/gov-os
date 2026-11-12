@@ -52,8 +52,8 @@ def world(hook, tmp_path_factory):
 def _policy_2(world, forms, form, start=ROOT, who=fix.WIDEST, f=""):
     """Rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3): each search below was refused before W2-58; it is still
     judged as the search it is, and under Policy 2 that search is allowed. The engineer's content search from the root
-    takes in its ticket's acceptance folder (``tests/acceptance/W1-90/``) and stays refused, for (c) (DEC-821 item 1);
-    a listing from above (``ls``) is not aimed inside that folder and is allowed."""
+    takes in its ticket's acceptance folder (``tests/acceptance/<TICKET_WBS_ID>/``, the planted ticket's) and stays
+    refused, for (c) (DEC-821 item 1); a listing from above (``ls``) is not aimed inside that folder and is allowed."""
     command = forms[form]
     result = fix.ask_command(world, command, start, who, f)
     what = f"'{form}' from '{start}' by '{who}'"

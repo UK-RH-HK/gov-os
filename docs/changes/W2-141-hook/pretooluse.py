@@ -13,6 +13,20 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
      set's hidden globs too; under the sets root and in every tree. No block, no check. For those roles a Bash line
      that names the sets root is refused when it also names a hidden folder, or builds a path after it (a variable,
      a substitution, a glob, a cd; DEC-1097 (2), readiness review 5 F1): a plain --sets-root <root> stays allowed;
+     a glob with a wildcard before its end names the hidden folder or file itself (ACT-SETS-GLOBS-1);
+  2c (ACT-INDEP-WALLS-1). no reads, and no writes, of a folder outside every tree that the main tree's path-map.yaml
+     session_hidden: refuses to named sessions only (a role, and the tickets it runs on): SANDBOX-GUARD-EXP-1's tuner
+     (an engineer on W2-56) is refused ~/.claude/projects, the raw transcripts. File tools by the path they name (a
+     search that starts at or above the folder too); a Bash line that names the folder, or names its parent with the
+     folder's name, a substitution, or a variable, glob or cd after it (the line rule of 2b). Every other session,
+     the CTO's tools included, is untouched. No block, no check;
+  2d (ACT-OPERATOR-1, DEC-1106 (3), DEC-1108 (5)). no writes, by any session this guard judges, into a folder
+     outside every tree that the main tree's path-map.yaml write_refused: names, but for the folders directly under
+     it that its entry keeps open: the operator agent's folder ~/gov-os-operator (its install and commit freeze, its
+     frozen ACTs, log and wall; the CTO writes only queue/) and the guard's call log ~/.gov-os/guard-calls. A file
+     tool by the path it names, links followed; a Bash line by the writes the guard resolves (one it cannot work out
+     is let through, as for rules 1 and 5; deletions there are already the catastrophic rule's). The operator agent's
+     walled session runs outside this guard. No block, no check;
   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
      docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
      own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
@@ -36,11 +50,25 @@ ACT-GUARD-FIX-4 (DEC-1050 (12), G-1 and G-2), judge only the writes it resolves:
 cannot work out is let through, never guessed at from the words the command holds. The backstops are the landing's
 check that every commit touching tests/acceptance/ carries Role: independent-test-designer (G-1, in the merge queue
 first) and the reviewed tree's git status after a review (G-2).
+
+The call log (ACT-GUARD-CALLLOG-1, DEC-1106 (2)): after each decision the hook appends one JSON line to
+~/.gov-os/guard-calls/<UTC day>.jsonl (folder 0700, file 0600; outside every tree, the run clones and the sets root):
+the time, the session id, the role, the subagent type, the ticket, the tool, the decision, the rule that decided, the
+kind of tree, the time taken, the sha256 of the normalised action (the tool name and its input as canonical JSON) and
+an HMAC of it under salt.key in that folder (a key file: rule 3 refuses it by name). Never the command, a path or a
+file's text. A line at most 1 KiB, one write; a day's file stops at 32 MiB (a <day>.jsonl.capped marker says so);
+files older than 92 days are removed when a new day's file starts. A failure to log never changes the decision and
+never blocks the call: it is noted once on stderr and the decision stands. GOV_GUARD_CALLS_DIR (an absolute path)
+moves the log, for the rehearsals and the suites only.
 """
+import hashlib
+import hmac
 import json
 import os
 import signal
+import stat
 import sys
+import time
 
 import glob
 import re
@@ -65,6 +93,149 @@ MOST_GLOB = 20000  # the paths one rm glob may name that the guard checks
 # rm in a command the scan cannot read (ACT-GUARD-FIX-4): its words up to the next ; & | ) or newline.
 CRUDE_RM = re.compile(r"(?:^|[;&|(\n`]|\$\(|\b(?:do|then|else|nohup|command|exec|xargs)\s)\s*"
                       r"(?:[\w./-]*/)?\\?rm\s+([^;&|)\n`]*)")
+
+
+# -- the call log (ACT-GUARD-CALLLOG-1, DEC-1106 (2)) -------------------------------------------------------------
+
+CALLS_DIR = os.path.join(HOME, ".gov-os", "guard-calls")
+CALLS_ENV = "GOV_GUARD_CALLS_DIR"  # the rehearsals' and suites' folder; an absolute path or ignored
+CALLS_SALT = "salt.key"  # 64 hex characters, written by apply.sh; *.key: refused by name to every role (rule 3)
+CALLS_CAP = 32 * 1024 * 1024  # a day's file at most
+CALLS_KEEP_DAYS = 92
+CALLS_SECONDS = 2  # the log's own deadline; the decision is made before it starts
+CALLS_DAY = re.compile(r"^(\d{4}-\d{2}-\d{2})\.jsonl(?:\.capped)?$")
+_FIELD = re.compile(r"[^A-Za-z0-9._:-]")
+_CALL = {"t0": time.monotonic(), "event": None, "root": None, "done": False, "warned": False}
+
+
+class _LogTimeout(Exception):
+    pass
+
+
+def _log_timeout(signum, frame):
+    raise _LogTimeout("the call log took more than %d seconds" % CALLS_SECONDS)
+
+
+def _field(value):
+    """A name the log may hold: letters, digits and . _ : - only, at most 64; anything else is dropped."""
+    return _FIELD.sub("", value)[:64] if isinstance(value, str) else ""
+
+
+def action_bytes(tool, tin):
+    """The normalised action: the tool name and its input as canonical JSON (keys sorted, no spaces, UTF-8). A
+    reader recomputes it from a transcript's tool_use (name, input) to match a line by its sha256."""
+    return json.dumps({"tool": tool, "input": tin}, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=False).encode("utf-8", "surrogatepass")
+
+
+def _tree_kind(root):
+    """The kind of tree the session runs in, never its path: worktree, run, scratch, main (a git tree elsewhere) or
+    other. Readers keep the live work (main, worktree) apart from rehearsals, replays and suites."""
+    full = os.path.realpath(root) if isinstance(root, str) and root else ""
+    if not full:
+        return "other"
+    if inside(full, WORKTREES):
+        return "worktree"
+    if inside(full, os.path.realpath(RUNS)):
+        return "run"
+    if inside(full, SCRATCH) or inside(full, SHM):
+        return "scratch"
+    return "main" if os.path.exists(os.path.join(full, ".git")) else "other"
+
+
+def _calls_warn(exc):
+    if _CALL["warned"]:
+        return
+    _CALL["warned"] = True
+    try:
+        sys.stderr.write(f"guard (ACT-GUARD-CALLLOG-1): the call log was not written ({type(exc).__name__}: "
+                         f"{str(exc)[:120]}); the decision stands\n")
+    except Exception:
+        pass
+
+
+def _calls_prune(where, now):
+    """On a new day's file: the day files older than CALLS_KEEP_DAYS, by their names only."""
+    cut = time.strftime("%Y-%m-%d", time.gmtime(now - CALLS_KEEP_DAYS * 86400))
+    for name in os.listdir(where):
+        m = CALLS_DAY.match(name)
+        if m and m.group(1) < cut:
+            os.unlink(os.path.join(where, name))
+
+
+def _calls_write(decision, rule):
+    now = time.time()
+    ev = _CALL["event"] if isinstance(_CALL["event"], dict) else None
+    tool = ev.get("tool_name") if ev is not None else None
+    where = os.environ.get(CALLS_ENV) or ""
+    where = where if os.path.isabs(where) else CALLS_DIR
+    os.makedirs(where, mode=0o700, exist_ok=True)
+    st = os.lstat(where)
+    if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.getuid():
+        raise RuntimeError("the log folder is a link, not a folder, or not this user's")
+    digest = keyed = None
+    if ev is not None:
+        raw = action_bytes(tool if isinstance(tool, str) else None, ev.get("tool_input"))
+        digest = hashlib.sha256(raw).hexdigest()
+        try:
+            with open(os.path.join(where, CALLS_SALT), "rb") as f:
+                salt = f.read(256).strip()
+            if re.fullmatch(rb"[0-9a-f]{64}", salt):
+                keyed = hmac.new(bytes.fromhex(salt.decode()), raw, hashlib.sha256).hexdigest()
+        except OSError:
+            pass
+    row = {"v": 1, "time": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(now)) + ".%03dZ" % (now % 1 * 1000),
+           "session": _field(ev.get("session_id")) if ev is not None else "",
+           "role": _field(os.environ.get("GOV_ROLE") or ""),
+           "agent": _field(ev.get("agent_type")) if ev is not None else "",
+           "ticket": _field(os.environ.get("GOV_TICKET") or ""),
+           "tool": _field(tool), "decision": decision, "rule": rule,
+           "tree": _tree_kind(_CALL["root"] or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()),
+           "ms": int((time.monotonic() - _CALL["t0"]) * 1000), "sha256": digest, "keyed": keyed}
+    line = (json.dumps(row, separators=(",", ":")) + "\n").encode("ascii")
+    day = os.path.join(where, time.strftime("%Y-%m-%d", time.gmtime(now)) + ".jsonl")
+    fd = os.open(day, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+    try:
+        size = os.fstat(fd).st_size
+        if size >= CALLS_CAP:
+            try:
+                os.close(os.open(day + ".capped", os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600))
+            except FileExistsError:
+                pass
+            raise RuntimeError("today's file has reached its cap")
+        os.write(fd, line)  # one write of at most 1 KiB to a file opened for appending: lines never interleave
+    finally:
+        os.close(fd)
+    if size == 0:
+        _calls_prune(where, now)
+
+
+def record(decision, rule):
+    """ACT-GUARD-CALLLOG-1: one line for this call's decision, once. Never raises, never changes the decision: the
+    20-second deadline is stopped first (the decision is made), and the log has CALLS_SECONDS of its own."""
+    if _CALL["done"]:
+        return
+    try:
+        signal.alarm(0)
+        _CALL["done"] = True
+        signal.signal(signal.SIGALRM, _log_timeout)
+        signal.alarm(CALLS_SECONDS)
+        _calls_write(decision, rule)
+    except Exception as exc:
+        _CALL["done"] = True
+        _calls_warn(exc)
+    finally:
+        try:
+            signal.alarm(0)
+        except Exception:
+            pass
+
+
+def judge_rule(why):
+    """The rule id of a refusal by the read judge (rules 2 and 3)."""
+    from gov.guard import reads
+    return {reads.HIDDEN_REFUSAL: "2-hidden", reads.SECRET_REFUSAL: "3-secret",
+            reads.RUNTIME_REFUSAL: "2-listing"}.get(why, "2-judge")
 
 
 def parse_both(parse, command, cwd):
@@ -251,12 +422,53 @@ def sets_root_spellings(top):
     return out
 
 
+_KEY_NAME = r"[^/\s'\"\x00]"  # one character of a folder or file name on a command line
+
+
+def sets_line_keys(globs):
+    """The line rule's keys, (the path's regex, the quoted name's regex) for each hidden glob, in order, each once.
+    A glob whose only wildcard is a trailing /** keeps its literal head (fixtures/evaluation/ dropped: runs/fresh-80,
+    memory-verdict-2, ...) with a / beside it, or its last name quoted, as before. ACT-SETS-GLOBS-1: a glob with a
+    wildcard before its end (fixtures/evaluation/*/hidden/**, fixtures/evaluation/*/XCHECK-r*.md,
+    runs/*/miss-classes.json) has no literal head that is hidden: its key is its own parts (a trailing /** and
+    fixtures/evaluation/ dropped), each * one name, so a line naming the root is refused for the hidden folder or file
+    itself (zz/hidden/, zz/XCHECK-r1.md, runs/zz/miss-classes.json) or its last name quoted, and never for the open
+    folder above it (fixtures/evaluation/zz/visible, runs/e0/counts.txt)."""
+    out = []
+    for g in globs:
+        parts = g.split("/")
+        n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
+        if n >= len(parts) - 1 and (n == len(parts) or parts[n] == "**"):
+            head = "/".join(parts[:n])
+            head = head[len("fixtures/evaluation/"):] if head.startswith("fixtures/evaluation/") else head
+            if head:
+                e = re.escape(head)
+                out.append((r"(?<=/)%s(?![\w.-])|(?<![\w.-])%s(?=/)" % (e, e),
+                            r"(['\"])%s\1" % re.escape(head.rsplit("/", 1)[-1])))
+            continue
+        if parts[-1] == "**":
+            parts = parts[:-1]
+        if parts[:2] == ["fixtures", "evaluation"] and len(parts) > 2:
+            parts = parts[2:]
+        rx = []
+        for p in parts:
+            if p == "**":
+                rx.append(r"[^\s'\"\x00]*?")
+            elif p == "*" or "[" in p or "{" in p:
+                rx.append(_KEY_NAME + "+")
+            else:
+                rx.append("".join(_KEY_NAME + "*" if c == "*" else _KEY_NAME if c == "?" else re.escape(c) for c in p))
+        out.append((r"(?<![\w.-])%s(?![\w.-])" % "/".join(rx), r"(['\"])%s\1" % rx[-1]))
+    return list(dict.fromkeys(out))
+
+
 def sets_line_refusal(text, top, globs):
     """DEC-1097 (2), readiness review 5 F1: the judge cannot place a path the shell builds at run time (a variable set
     on the line stays literal, decide._expand_token reads only the hook's own environment). So a Bash line that names
     the sets root (any spelling, an assignment's value included) is refused when it also
       (a) names a hidden folder as a path (a block glob's literal head, fixtures/evaluation/ dropped: runs/fresh-80,
-          memory-verdict-2, ... with a / beside it), or that folder's last name as a quoted string ('fresh-80');
+          memory-verdict-2, ... with a / beside it), or that folder's last name as a quoted string ('fresh-80'); a
+          glob with a wildcard before its end by its own parts (sets_line_keys, ACT-SETS-GLOBS-1);
       (b) holds a command substitution ($(...), `...`, <(...), >(...), $'...'), a change of folder aimed at the root
           (cd or pushd to it, -C, --chdir, --directory, chdir), or, from the word that names the root on, a shell
           variable ($!, $?, $$, $#, $-, $0 and an unassigned $HOME aside), a glob or brace (* ? [ {), or a cd or pushd.
@@ -267,19 +479,10 @@ def sets_line_refusal(text, top, globs):
     if at < 0:
         return ""
     mark = re.escape(_ROOT_MARK)
-    keys = []
-    for g in globs:
-        parts = g.split("/")
-        n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
-        head = "/".join(parts[:n])
-        head = head[len("fixtures/evaluation/"):] if head.startswith("fixtures/evaluation/") else head
-        if head:
-            keys.append(head)
-    for k in dict.fromkeys(keys):
-        e = re.escape(k)
-        if re.search(r"(?<=/)%s(?![\w.-])|(?<![\w.-])%s(?=/)" % (e, e), marked):
+    for path_rx, name_rx in sets_line_keys(globs):
+        if re.search(path_rx, marked):
             return SETS_LINE_REFUSAL.format(what="a hidden folder")
-        if re.search(r"(['\"])%s\1" % re.escape(k.rsplit("/", 1)[-1]), marked):
+        if re.search(name_rx, marked):
             return SETS_LINE_REFUSAL.format(what="a hidden folder's name")
     if re.search(r"\$\(|`|[<>]\(|\$'", marked):
         return SETS_LINE_REFUSAL.format(what="a command substitution")
@@ -300,16 +503,302 @@ def sets_line_refusal(text, top, globs):
     return ""
 
 
+SESSION_BLOCK = "session_hidden"  # ACT-INDEP-WALLS-1
+SESSION_REFUSAL = ("the call reaches {root}, which is refused to this session (ACT-INDEP-WALLS-1, path-map.yaml "
+                   "session_hidden: {why})")
+PATH_KEYS = ("file_path", "notebook_path", "path")
+
+
+def session_rules(main):
+    """ACT-INDEP-WALLS-1: the main tree's session_hidden block (a branch cannot weaken it): a list of entries, each a
+    root outside every tree (a real path; not / or HOME), the roles refused it and the tickets (any name a ticket goes
+    by; an empty list is every ticket), and why. [] with no block. A block not of that shape raises (fail closed)."""
+    try:
+        with open(os.path.join(main, PATH_MAP), encoding="utf-8") as f:
+            lines = f.read().splitlines(keepends=True)
+    except FileNotFoundError:
+        return []
+    at = [i for i, line in enumerate(lines) if re.match(SESSION_BLOCK + r"\s*:", line)]
+    if not at:
+        return []
+    if len(at) > 1:
+        raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK} is written more than once")
+    end = next((j for j in range(at[0] + 1, len(lines))
+                if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
+    from gov.guard.heldout import load_yaml_unique
+    data = load_yaml_unique("".join(lines[at[0]:end]))
+    block = data.get(SESSION_BLOCK) if isinstance(data, dict) else None
+    if not isinstance(block, list) or not block:
+        raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK} is not a list of entries")
+    out = []
+    for e in block:
+        top = os.path.expanduser(e.get("root")) if isinstance(e, dict) and isinstance(e.get("root"), str) else ""
+        roles, tickets = (e.get("roles"), e.get("tickets")) if isinstance(e, dict) else (None, None)
+        why = e.get("why") if isinstance(e, dict) else None
+        if (not os.path.isabs(top) or os.path.realpath(top) in ("/", HOME)
+                or not isinstance(roles, list) or not roles or not all(isinstance(r, str) and r for r in roles)
+                or not isinstance(tickets, list) or not all(isinstance(t, str) and t for t in tickets)
+                or not isinstance(why, str) or not why):
+            raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK}: an entry is not a root, roles, tickets and why")
+        out.append((os.path.realpath(top), list(roles), list(tickets), why))
+    return out
+
+
+def session_applies(entry, mine, root, main, ticket):
+    """Whether the entry names this session: one of its roles (the session's or the acting role), and, when the
+    entry lists tickets, a name the session's ticket goes by (its id, file name or WBS id, in this tree or the main
+    tree's .tickets). A ticket the guard cannot read raises (fail closed)."""
+    _top, roles, tickets, _why = entry
+    if not any(r in roles for r in mine if r):
+        return False
+    if not tickets:
+        return True
+    if not ticket:
+        return False
+    from gov.guard import reads
+    names = set(reads._ticket(root, ticket)[0]) | set(reads._ticket(main, ticket)[0]) | {ticket}
+    return bool(names & set(tickets))
+
+
+def session_refusal(entry, tool, tin, seen_command, cwd):
+    """Why this call reaches the entry's root, or "". File tools: a path they name (file_path, notebook_path, path,
+    and a Glob pattern's literal head), real, at or under the root, or a Grep or Glob whose start is at or above it.
+    Bash: the line rule of 2b with the root's parent as the root and the root's name as the hidden folder (a root
+    whose parent is HOME: the root itself, no folder name), so a line naming the root, or its parent with the root's
+    name, a substitution, a cd to it, or a variable, glob or cd after it, is refused; and the writes the guard
+    resolves into it. A recursive search from HOME or /, and a script that opens the root in its own code, are let
+    through (the limits of 2b; the sandbox's job)."""
+    top, _roles, _tickets, why = entry
+    msg = SESSION_REFUSAL.format(root=top, why=why)
+
+    def real(p):
+        return os.path.realpath(os.path.join(cwd or "/", os.path.expanduser(p)))
+
+    if seen_command is not None:
+        parent, name = os.path.dirname(top), os.path.basename(top)
+        line = (sets_line_refusal(seen_command, parent, [name + "/**"]) if parent != HOME
+                else sets_line_refusal(seen_command, top, ["**"]))
+        if line:
+            return msg
+        shell, code = bash_writes_of(tin.get("command") or "", cwd)
+        if any(isinstance(t, str) and t and inside(real(t), top) for t in shell + code):
+            return msg
+        return ""
+    for k in PATH_KEYS:
+        v = tin.get(k)
+        if isinstance(v, str) and v:
+            full = real(v)
+            if inside(full, top):
+                return msg
+            if tool in ("Grep", "Glob") and k == "path" and inside(top, full):
+                return msg
+    if tool == "Glob":
+        pat = tin.get("pattern")
+        if isinstance(pat, str) and pat:
+            parts = pat.split("/")
+            n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
+            head = "/".join(parts[:n]) or "."
+            base = tin.get("path") if isinstance(tin.get("path"), str) and tin.get("path") else cwd
+            full = os.path.realpath(os.path.join(real(base or "/"), os.path.expanduser(head)))
+            if inside(full, top) or inside(top, full):
+                return msg
+    return ""
+
+
+WRITE_BLOCK = "write_refused"  # ACT-OPERATOR-1 (2d)
+WRITE_REFUSAL = ("the call writes into {root}, which no session writes (ACT-OPERATOR-1, path-map.yaml write_refused: "
+                 "{why})")
+
+
+def write_rules(main):
+    """ACT-OPERATOR-1 (2d): the main tree's write_refused block (a branch cannot weaken it): a list of entries, each a
+    root outside every tree (a real path; not / or HOME), the names directly under it that stay writable (except),
+    and why. [] with no block. A block not of that shape raises (fail closed)."""
+    try:
+        with open(os.path.join(main, PATH_MAP), encoding="utf-8") as f:
+            lines = f.read().splitlines(keepends=True)
+    except FileNotFoundError:
+        return []
+    at = [i for i, line in enumerate(lines) if re.match(WRITE_BLOCK + r"\s*:", line)]
+    if not at:
+        return []
+    if len(at) > 1:
+        raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK} is written more than once")
+    end = next((j for j in range(at[0] + 1, len(lines))
+                if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
+    from gov.guard.heldout import load_yaml_unique
+    data = load_yaml_unique("".join(lines[at[0]:end]))
+    block = data.get(WRITE_BLOCK) if isinstance(data, dict) else None
+    if not isinstance(block, list) or not block:
+        raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK} is not a list of entries")
+    out = []
+    for e in block:
+        top = os.path.expanduser(e.get("root")) if isinstance(e, dict) and isinstance(e.get("root"), str) else ""
+        keep = e.get("except") if isinstance(e, dict) else None
+        why = e.get("why") if isinstance(e, dict) else None
+        if (not os.path.isabs(top) or os.path.realpath(top) in ("/", HOME)
+                or not isinstance(keep, list)
+                or not all(isinstance(k, str) and k and "/" not in k and k not in (".", "..") for k in keep)
+                or not isinstance(why, str) or not why):
+            raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK}: an entry is not a root, its open folders and why")
+        real = os.path.realpath(top)
+        # an open folder by its own name under the real root, never followed: a link there to the rest of the
+        # root resolves outside it and stays refused
+        out.append((real, [os.path.join(real, k) for k in keep], why))
+    return out
+
+
+def write_refusal(entries, tool, tin, command, cwd):
+    """Why this call writes into an entry's root outside its open folders, or "". A file tool by the path it names,
+    real (links followed); a Bash line by the writes the guard resolves, the shell's own and its inline code's."""
+    targets = []
+    if tool in WRITE_TOOLS:
+        targets = [tin.get("file_path") or tin.get("notebook_path")]
+    elif command is not None:
+        shell, code = bash_writes_of(command, cwd)
+        targets = shell + code
+    for t in targets:
+        if not isinstance(t, str) or not t:
+            continue
+        full = os.path.realpath(os.path.join(cwd or "/", os.path.expanduser(t)))
+        for top, keep, why in entries:
+            if inside(full, top) and not any(inside(full, k) for k in keep):
+                return WRITE_REFUSAL.format(root=top, why=why)
+    return ""
+
+
 _CLASSES = []
 
 
 def classes():
-    """SetsRoot and Judge (DEC-1082 (3)), made once the pinned judge is imported (inside main's fail-closed try)."""
+    """SetsRoot, Judge (DEC-1082 (3)) and Narrow (ACT-SETS-GLOBS-1), made once the pinned judge is imported (inside
+    main's fail-closed try)."""
     if _CLASSES:
         return _CLASSES[0]
+    import fnmatch
     from gov.guard import reads
+    matched = {}  # Narrow.match's answers, per tuple of globs, then per path (one hook run judges one call)
+    listed = {}  # Narrow's folder listings, per folder (one hook run judges one call)
 
-    class SetsRoot(reads._Part):
+    class Narrow(reads._Part):
+        """ACT-SETS-GLOBS-1: a part of sets_root_hidden's globs, under the sets root or in a tree. The judge walks each
+        glob from its literal head, so fixtures/evaluation/*/hidden/** would walk the whole fixtures/evaluation folder,
+        and runs/*/miss-classes.json the whole runs folder, in the sets root and in each of the trees (135 on
+        2026-11-09: about 0.8 s on every call that asks whether a part holds files; 3.2 s on the real sets root under
+        load). Here nothing is walked recursively but what the glob's ** covers: a wildcard part is one listing of the
+        folders reached (fixtures/evaluation/*, runs/*), a literal part after it is joined and stat'ed (hidden,
+        miss-classes.json, misses.jsonl), and only the folders a ** covers are walked, by the judge's own _walk (.git
+        left out, the same file cap, strict as the judge's), each once. The files found are the judge's, link for link.
+        A glob whose only wildcard is a trailing /** is walked exactly as before. Which paths are in the part (match, inside) is the judge's own, asked once per
+        path for all the parts with the same globs: a revision's listing (git grep ... HEAD) asks each tree's part
+        about the same names, and a glob with a wildcard is a pattern match, not a prefix (11.7 s for one such call
+        in the rehearsal without this, 0.6 s before the ACT)."""
+
+        caches = (matched, listed)  # per hook run; a check that times several walks in one process clears them
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._seen = matched.setdefault(tuple(self.globs), {})
+            heads = ["/".join(g.split("/")[:next((i for i, p in enumerate(g.split("/")) if any(c in p for c in "*?[{")),
+                                                  len(g.split("/")))]).rstrip("/") for g in self.globs]
+            self._heads = None if any(not h for h in heads) else heads
+
+        def match(self, rel):
+            if rel in self._seen:
+                return self._seen[rel]
+            hit = bool(rel) and (self._heads is None or any(rel == h or rel.startswith(h + "/") for h in self._heads)) \
+                and super().match(rel)
+            self._seen[rel] = hit
+            return hit
+
+        def _listed(self, folder):
+            """The entries of one folder as (name, a real folder), once per hook run for every part (the trees' parts
+            and the sets root's ask for the same folders); a folder that cannot be listed, but for its absence, refuses
+            when the part is strict (as the judge's _walk_fault)."""
+            if folder not in listed:
+                try:
+                    with os.scandir(folder) as it:
+                        listed[folder] = [(e.name, e.is_dir(follow_symlinks=False)) for e in it]
+                except (FileNotFoundError, NotADirectoryError):
+                    listed[folder] = []
+                except OSError:
+                    if self.strict:
+                        raise reads.PolicyError(reads._WALK_FAULT) from None
+                    listed[folder] = []
+            return listed[folder]
+
+        def _kind(self, path):
+            """'dir' (a real folder), 'other' (a file, a link, anything else) or None (absent); strict as the judge."""
+            try:
+                st = os.lstat(path)
+            except (FileNotFoundError, NotADirectoryError):
+                return None
+            except OSError:
+                if self.strict:
+                    raise reads.PolicyError(reads._WALK_FAULT) from None
+                return None
+            return "dir" if stat.S_ISDIR(st.st_mode) else "other"
+
+        def _starts(self, g):
+            """Where glob g's files can be, never by a recursive walk: its literal head as the judge takes it (links
+            followed); each wildcard part by one listing of each folder reached (real folders only past it, .git left
+            out, as os.walk goes); each literal part after a wildcard joined and stat'ed, never listed. Returns the
+            paths, whether the rest of the glob is ** (walk each path) and whether a wildcard was crossed."""
+            parts = g.split("/")
+            n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
+            here = [os.path.join(self.root, *parts[:n])]
+            for i in range(n, len(parts)):
+                p = parts[i]
+                if p == "**" or "{" in p:
+                    return here, True, i > n
+                last = i == len(parts) - 1
+                nxt = []
+                for c in here:
+                    if any(ch in p for ch in "*?["):
+                        nxt += [os.path.join(c, x) for x, is_dir in self._listed(c)
+                                if x != ".git" and (last or is_dir) and fnmatch.fnmatchcase(x, p)]
+                    elif p != ".git":
+                        x = os.path.join(c, p)
+                        if (self._kind(x) is not None) if last else (self._kind(x) == "dir"):
+                            nxt.append(x)
+                here = nxt
+            return here, False, len(parts) > n
+
+        @property
+        def files(self):
+            if self._files is None:
+                found, walked = set(), set()
+
+                def walk(start):
+                    if start in walked:
+                        return
+                    walked.add(start)
+                    for folder, dirs, names in reads._walk(start, self.strict):
+                        dirs[:] = [d for d in dirs if d != ".git"]
+                        found.update(f for f in (os.path.join(folder, x) for x in names) if self.inside(f))
+                        if len(found) > reads._MOST_FILES:
+                            raise reads.PolicyError(reads._LONG_PART)
+
+                for g in self.globs:
+                    starts, deep, crossed = self._starts(g)
+                    for start in starts:
+                        if deep and not crossed:
+                            walk(start)  # the literal head, as the judge walks it (a link at the top followed)
+                            continue
+                        kind = self._kind(start)
+                        if kind == "dir":
+                            walk(start)  # a set's hidden/, or a folder with the glob's own name: all below it
+                        elif kind == "other" and not deep:
+                            if not crossed and os.path.isdir(start):
+                                walk(start)  # a literal glob naming a link to a folder: followed, as the judge
+                            elif not (crossed and os.path.isdir(start)) and self.inside(start):
+                                found.add(start)  # a file (or a link to one, or a broken link): os.walk names it
+                        if len(found) > reads._MOST_FILES:
+                            raise reads.PolicyError(reads._LONG_PART)
+                self._files = sorted(found)
+            return self._files
+
+    class SetsRoot(Narrow):
         """The sets root's hidden part. The guard walks it for file names only, never their text."""
 
     class Judge(reads._Judge):
@@ -336,7 +825,7 @@ def classes():
                         return why
             return ""
 
-    _CLASSES.append((SetsRoot, Judge))
+    _CLASSES.append((SetsRoot, Judge, Narrow))
     return _CLASSES[0]
 
 
@@ -455,7 +944,8 @@ def rm_refusal(command, cwd, root):
     return None
 
 
-def answer(decision, reason):
+def answer(decision, reason, rule):
+    record(decision, rule)  # ACT-GUARD-CALLLOG-1: never raises, never changes the decision
     out = {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": decision,
                                   "permissionDecisionReason": reason + " (DEC-953 item 2)"}}
     sys.stdout.write(json.dumps(out))
@@ -463,7 +953,7 @@ def answer(decision, reason):
 
 
 def deadline(signum, frame):
-    answer("deny", "the guard could not decide in 20 seconds, so the call is refused")
+    answer("deny", "the guard could not decide in 20 seconds, so the call is refused", "deadline")
 
 
 def under_acceptance(path, root, cwd):
@@ -491,9 +981,11 @@ def main():
     signal.signal(signal.SIGALRM, deadline)
     signal.alarm(20)
     data = json.loads(sys.stdin.read() or "{}")
+    _CALL["event"] = data  # ACT-GUARD-CALLLOG-1: hashed, never written
     tool = data.get("tool_name") or ""
     tin = data.get("tool_input") if isinstance(data.get("tool_input"), dict) else {}
     root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    _CALL["root"] = root
     cwd = data.get("cwd") or root
     role = (os.environ.get("GOV_ROLE") or "").strip()
     ticket = os.environ.get("GOV_TICKET")
@@ -504,10 +996,10 @@ def main():
 
     # Rule 2, the held-out material: every role, any tool that names or reaches it.
     if names_held_out(tool, tin, root, cwd, load_held_out(root)):
-        answer("deny", "the call names or reaches the held-out material")
+        answer("deny", "the call names or reaches the held-out material", "2-heldout")
 
     # Rules 2 and 3, the hidden half and secrets: the product's read judge with only these parts.
-    SetsRoot, Judge = classes()
+    SetsRoot, Judge, Narrow = classes()
     mine = list(dict.fromkeys((role, acting)))
     hidden = []
     for r in mine:
@@ -527,7 +1019,7 @@ def main():
         outside = list(dict.fromkeys(outside))
         if outside:
             sets_parts = [SetsRoot(top, outside, reads.HIDDEN_REFUSAL)] + \
-                         [reads._Part(t, outside, reads.HIDDEN_REFUSAL) for t in tree_roots(root)]
+                         [Narrow(t, outside, reads.HIDDEN_REFUSAL) for t in tree_roots(root)]
     parts += sets_parts
     seen = tin
     if command is not None:
@@ -536,7 +1028,7 @@ def main():
         seen = dict(tin, command=bash_writes.reads_view(command))
     why = Judge(root, parts).tool(tool, seen, cwd)
     if why:
-        answer("deny", why)
+        answer("deny", why, judge_rule(why))
 
     # DEC-1097 (2), readiness review 5 F1: for the roles the block refuses, a Bash line that names the sets root and
     # also names a hidden folder, or builds a path after it (a variable, a substitution, a glob, a cd), is refused: the
@@ -544,7 +1036,7 @@ def main():
     if rule and command is not None and any(r in refused for r in mine if r):
         why = sets_line_refusal(seen["command"], top, outside)
         if why:
-            answer("deny", why)
+            answer("deny", why, "2b-line")
 
     # DEC-1082 (3): no write into those hidden folders by the roles refused them. Only a write whose target the guard
     # works out is judged; one it cannot work out is let through, as for rules 1 and 5 (G-1, G-2).
@@ -559,7 +1051,24 @@ def main():
             if isinstance(t, str) and t:
                 full = os.path.realpath(os.path.join(cwd, os.path.expanduser(t)))
                 if any(p.inside(full) for p in sets_parts):
-                    answer("deny", SETS_WRITE_REFUSAL)
+                    answer("deny", SETS_WRITE_REFUSAL, "2b-write")
+
+    # ACT-INDEP-WALLS-1 (2c): a folder outside every tree refused to named sessions only (SANDBOX-GUARD-EXP-1's tuner:
+    # ~/.claude/projects). The ticket is read only when a role matches, so no other session pays for it.
+    for entry in session_rules(main):
+        if session_applies(entry, mine, root, main, ticket):
+            why = session_refusal(entry, tool, tin, seen["command"] if command is not None else None, cwd)
+            if why:
+                answer("deny", why, "2c")
+
+    # ACT-OPERATOR-1 (2d): folders outside every tree that no session writes (the operator agent's folder but its
+    # queue/, the guard's call log), every role, by the writes the guard resolves. Read only for a write tool or Bash.
+    if tool in WRITE_TOOLS or command is not None:
+        rules_w = write_rules(main)
+        if rules_w:
+            why = write_refusal(rules_w, tool, tin, command, cwd)
+            if why:
+                answer("deny", why, "2d")
 
     # G-14 (DEC-1052), role separation: what the main tree's path map's role_paths: denies the session's role and
     # the acting role to read, by simple path checks (role_reads.py beside this file). No section, no check.
@@ -570,13 +1079,13 @@ def main():
                                  [r for r in dict.fromkeys((role, acting)) if r], ticket,
                                  lambda: tree_roots(root), _expand_token)
         if why:
-            answer("deny", why)
+            answer("deny", why, "g14")
 
     # rm, every role: free but for the catastrophic (ACT-GUARD-FIX-4, DEC-1050 (8)).
     if command is not None:
         why = rm_refusal(command, cwd, root)
         if why:
-            answer("deny", "a catastrophic delete: " + why)
+            answer("deny", "a catastrophic delete: " + why, "rm")
 
     # Rule 5, reviewers and auditors write only their own outcomes. A Bash write whose target the guard cannot work
     # out is let through (ACT-GUARD-FIX-4, G-2): a stray write shows in the reviewed tree's git status.
@@ -590,7 +1099,7 @@ def main():
         if targets and not all(review_may_write(t, root, cwd, made) for t in targets):
             answer("deny", "a reviewer or auditor writes only its own review or audit record (docs/probes/, "
                            "docs/audit/, docs/assessment/, .gov-runtime/scratch/orchestrator/reviews/), its own "
-                           "scratch, or /tmp")
+                           "scratch, or /tmp", "5")
 
     # Rule 1, acceptance tests: written only by the independent test designer. A Bash write whose target the guard
     # cannot work out is let through (ACT-GUARD-FIX-4, G-1): the landing refuses a commit touching the tests
@@ -606,22 +1115,23 @@ def main():
         # scratch repository in /tmp).
         if any(under_acceptance(t, root, cwd) for t in targets + code) or \
                 any(in_a_trees_tests(t, root, cwd) for t in code):
-            answer("deny", "only the independent test designer writes the acceptance tests (MR-3)")
+            answer("deny", "only the independent test designer writes the acceptance tests (MR-3)", "1")
 
     # Rule 4, installs.
     if tool == "Bash":
         from gov.guard.install import has_install, has_sudo
         command = tin.get("command") or ""
         if has_sudo(command):
-            answer("deny", "sudo is refused to every session")
+            answer("deny", "sudo is refused to every session", "4-sudo")
         if has_install(command):
             # Only the CTO's own session asks the owner: the orchestrator role on the coordination ticket (W2-00).
             # Every other session, leads (orchestrator on a ticket of their own) included, is refused (DEC-957).
             cto = role == "orchestrator" and acting == "orchestrator" and reads._ticket(root, ticket)[1] == CTO_WBS
             if cto:
-                answer("ask", "an install needs the owner's approval")
+                answer("ask", "an install needs the owner's approval", "4-ask")
             answer("deny", "installs are refused here: raise the install as a P1 escalation to the CTO, who asks "
-                           "the owner")
+                           "the owner", "4-install")
+    record("allow", "none")  # ACT-GUARD-CALLLOG-1
     sys.exit(0)
 
 
@@ -631,5 +1141,6 @@ if __name__ == "__main__":
     except SystemExit:
         raise
     except Exception as exc:  # fail closed
+        record("deny", "error")  # ACT-GUARD-CALLLOG-1: never raises
         sys.stderr.write(f"guard (DEC-953): could not decide: {exc}; refused\n")
         sys.exit(2)

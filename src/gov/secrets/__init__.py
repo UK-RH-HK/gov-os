@@ -45,7 +45,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from gov.config.loader import load_config, secrets_scan_on
-from gov.guard.runs import root as runs_root
+from gov.util.runs_root import root as runs_root
 from gov.secrets import cache
 
 # The switch (DEC-1045): ``scan: off`` in ``governance/project/secrets.yaml`` gives no content to gitleaks; every place

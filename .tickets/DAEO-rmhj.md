@@ -40,6 +40,7 @@ kpis:
   - 'An evidence item whose sha256 is not the hash of its own lines at the named commit.'
 profile: STANDARD
 sources:
+- DEC-1109
 - DEC-1090
 - DEC-1087
 - DEC-1072

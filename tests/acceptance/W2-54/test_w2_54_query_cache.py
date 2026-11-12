@@ -68,6 +68,16 @@ def _machine_files(folder):
     return sorted(path for path in folder.rglob("*") if path.is_file()) if folder.is_dir() else []
 
 
+def _beside_its_folder(result):
+    """``gov retrieve --json``'s ``result`` without ``result.store.root``, the one field that names the folder the
+    store sits in (W2-138 S1, DEC-1090 (3)): two projects built alike in two folders give answers that differ there by
+    design. Everything else, ``result.store.commit`` included, stays in the comparison (Rewrite-Reason: DEC-1090 (3))."""
+    store = result.get("store") if isinstance(result, dict) else None
+    if not isinstance(store, dict) or "root" not in store:
+        return result
+    return {**result, "store": {key: value for key, value in store.items() if key != "root"}}
+
+
 def _first_answer(box, tmp_path, question, files=None, name="reference"):
     """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike (with a
     cache of its own: ``_reference_cache``)."""
@@ -378,7 +388,14 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
 
     Merged (D-1, DEC-1052): W2-04's revision (the states made by ``gov retrieve``; its answer and the packet both
     held; the context sends nothing) and W2-126's (both caches) together: the reads that make each state are W2-04's,
-    the caches they act on are W2-126's."""
+    the caches they act on are W2-126's.
+
+    Rewrite-Reason: DEC-1090 (3): W2-138 S1 puts the store's folder in every gov retrieve result
+    (``result.store = {"commit", "root"}``), so the reference's answer (``tmp_path / "reference"``) and the case's
+    (``tmp_path / "p"``) differ by ``result.store.root`` by design. The two answers are compared without that one field
+    (``_beside_its_folder``); ``result.store.commit`` stays in the comparison, equal by construction (both projects
+    are committed with the same files, author, committer and dates, ``S.git``). The packet-hash assertions and every
+    other assertion are unchanged."""
     files = S.ticket_files()
     question = S.QUESTION_TICKETS[TICKET]
     others = iter([S.QUESTION_TICKETS["TK-W254-BAKERY"], S.QUESTION_TICKETS["TK-W254-ORCHARD"]] * 3)
@@ -427,7 +444,7 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
 
     def same(what, **kwargs):
         answer = retrieve(what, question, **kwargs)
-        assert S.canonical(answer) == S.canonical(answer_reference), (
+        assert S.canonical(_beside_its_folder(answer)) == S.canonical(_beside_its_folder(answer_reference)), (
             f"{what}: one question, two answers (the first in a new store):\n"
             f"{[item.get('path') for item in answer.get('evidence') or []]}\n"
             f"{[item.get('path') for item in answer_reference.get('evidence') or []]}")

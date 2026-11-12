@@ -33,12 +33,15 @@ kpis:
   - '`gov launch independent-test-designer` points the session''s retrieval at it; a designer''s retrieval never reads a ticket worktree''s store [DEC-963, DEC-983, DEC-982]'
   - 'The store is also refreshed after every landing on the integration branch, and it is the warm base `gov rebuild --seed` (W2-122) reads; a seed taken from a store behind the integration head is named, and only what changed since is re-embedded [DEC-1014 items 4 and 6, SMART-WORK-5 D, DEC-1015 item 3] (folds W2-06 S1, S2)'
   - 'A re-index never empties the semantic index; a model-less re-index reports the semantic facet unavailable instead [DEC-719]. [moved from W2-06 S5, DEC-1083]'
+  - '`gov launch` points every worker session''s retrieval at the integration store (the `GOV_STORE` of a launched session), not only a designer''s; a designer''s retrieval never reads a ticket worktree''s store. Verify: a launcher unit test per worker role: the session environment names the integration store; a designer''s never names a worktree''s store [DEC-1087 (3), DEC-963] [added, the CTO''s note of 2026-11-06 in the body (S3 widened), DEC-1087 (3)]'
   failure:
   - 'A designer''s retrieval answered from a ticket worktree''s store.'
   - 'The link switched to a store whose build failed, or a search answered from a half-built store.'
   - 'A re-index that fails leaves the previous index and reports the failure; it never leaves no index [W2-M088]. [moved from W2-06 F1, DEC-1083]'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-983
 - DEC-982
 - DEC-963
@@ -48,14 +51,14 @@ sources:
 - DEC-1083
 - DEC-1087
 - DEC-719
-- W2-06
-- W2-M088
+- DAEO-kia7
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-116/
   author: independent-test-designer (MR-3); from the spec and KPIs, in parallel with the implementer (DEC-963); a planted branch, a build killed half-way, a search during a build
 track: B
-list_rows: []
+list_rows:
+- W2-M088
 ---
 # W2-116 The designers' store in the product
 
