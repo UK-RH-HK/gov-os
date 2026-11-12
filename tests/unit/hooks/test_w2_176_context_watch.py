@@ -1,14 +1,16 @@
-"""W2-176 (DAEO-ktiw) S2, S3 and F1 for context_watch.py: a once-per-session reminder near the window's end.
+"""W2-176 (DAEO-ktiw) S2, S3 and F1 for context_watch.py: a once-per-context-window reminder near the window's end.
 
 The hook runs as a subprocess fed planted PostToolUse events and planted transcripts. A planted window is set by
 running the hook through ``python3 -c`` with its module-level table replaced, so no case needs a huge transcript
-[DEC-1140 (1)(b), DEC-445, DEC-838, DEC-901].
+[DEC-1140 (1)(b), DEC-445, DEC-838, DEC-901]. No session has a token cap (the owner, 2026-11-12): every session,
+the CTO, a lead or a worker, is reminded at 85 % of its own model's window, and no session is treated apart.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
 import statistics
 import subprocess
 import sys
@@ -87,19 +89,31 @@ def _snapshot(root):
             for p in root.rglob("*") if p.is_file()}
 
 
-CTO_TICKET = "DAEO-sdxk"
+COORDINATION_TICKET = "DAEO-sdxk"
+MODELS_1M = ["claude-opus-5-5", "claude-opus-5-5[1m]", "claude-opus-5-5-20261001", "claude-sonnet-5-5",
+             "claude-haiku-5-5", "claude-fable-5-2"]
 
 
-def _ticket(root, ticket=CTO_TICKET, front="class: coordination\n", body=""):
-    """A planted .tickets/<ticket>.md; the CTO's session is the orchestrator on a coordination ticket (DEC-1140 (4))."""
+def _ticket(root, ticket=COORDINATION_TICKET, front="class: coordination\n", body=""):
+    """A planted .tickets/<ticket>.md; the CTO's own session is the orchestrator on a coordination ticket."""
     path = root / ".tickets" / f"{ticket}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"---\nid: {ticket}\n{front}status: in_progress\n---\n# planted\n{body}")
     return ticket
 
 
-def _cto(root, stdin, **kwargs):
-    return _run(root, stdin, role="orchestrator", ticket=_ticket(root), **kwargs)
+def _as(who, root, stdin, **kwargs):
+    """Runs the hook as one kind of session: the CTO, a lead (a linked worktree), a worker or a test designer."""
+    if who == "cto":
+        return _run(root, stdin, role="orchestrator", ticket=_ticket(root), **kwargs)
+    if who == "lead":
+        if not (root / ".git").exists():
+            (root / ".git").write_text("gitdir: /nowhere\n")
+        return _run(root, stdin, role="orchestrator", ticket=_ticket(root, "DAEO-lead", ""), **kwargs)
+    return _run(root, stdin, role=who, ticket="DAEO-ktiw", **kwargs)
+
+
+SESSIONS = ["cto", "lead", "engineer", "independent-test-designer"]
 
 
 @pytest.fixture()
@@ -148,21 +162,6 @@ def test_the_wording_holds_the_three_duties_and_the_not_a_stop_sentence(root, tr
     assert "handover aid" in lowered and "not a stop" in lowered and "not an early compaction" in lowered, text
 
 
-def test_the_cto_is_given_resume_here_decided_not_done_and_report_state(root, transcripts):
-    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
-    text = _context(_cto(root, _event(t), windows=PLANTED))
-    assert "RESUME HERE" in text and "DECIDED-NOT-DONE" in text and "report-state" in text, text
-    assert str(root / ".gov-runtime/scratch/orchestrator/CHECKPOINT.md") in text, text
-
-
-def test_the_ctos_report_state_is_the_one_under_its_scratch_log(root, transcripts):
-    """P2 (a): the CTO's file is <root>/.gov-runtime/scratch/orchestrator/log/report-state.json."""
-    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
-    text = _context(_cto(root, _event(t), windows=PLANTED))
-    assert str(root / ".gov-runtime/scratch/orchestrator/log/report-state.json") in text, text
-    assert str(root / "log/report-state.json") not in text, text
-
-
 def test_a_lead_is_given_its_checkpoint(root, transcripts):
     (root / ".git").write_text("gitdir: /nowhere\n")
     t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
@@ -171,14 +170,41 @@ def test_a_lead_is_given_its_checkpoint(root, transcripts):
     assert "DECIDED-NOT-DONE" not in text and "report-state" not in text, text
 
 
-@pytest.mark.parametrize("front", ["class: implementation\n", None])
-def test_an_orchestrator_on_another_ticket_is_a_lead_given_its_checkpoint(root, transcripts, front):
-    """Not the coordination ticket, or no such ticket file: its CHECKPOINT via checkpoint_rel (main tree here)."""
+@pytest.mark.parametrize("front", ["class: coordination\n", "class: implementation\n", None])
+def test_an_orchestrator_on_any_ticket_is_given_its_checkpoint(root, transcripts, front):
+    """The coordination ticket is not told apart: its CHECKPOINT via checkpoint_rel (main tree here), as any other."""
     ticket = _ticket(root, "DAEO-lead", front) if front else "DAEO-none"
     t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
     text = _context(_run(root, _event(t), role="orchestrator", ticket=ticket, windows=PLANTED))
     assert str(root / ".gov-runtime/scratch/orchestrator/CHECKPOINT.md") in text, text
+    assert "RESUME HERE" in text, text
     assert "DECIDED-NOT-DONE" not in text and "report-state" not in text, text
+
+
+def test_the_coordination_ticket_changes_nothing_in_the_reminder(tmp_path, transcripts):
+    """The same text, word for word, for the orchestrator on the coordination ticket and on another ticket."""
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    texts = []
+    for front in ("class: coordination\n", "class: implementation\n"):
+        folder = tmp_path / front.split()[1]
+        folder.mkdir()
+        ticket = _ticket(folder, COORDINATION_TICKET, front)
+        text = _context(_run(folder, _event(t), role="orchestrator", ticket=ticket, windows=PLANTED))
+        texts.append(text.replace(str(folder), "<root>"))
+    assert texts[0] == texts[1], texts
+
+
+@pytest.mark.parametrize("who", SESSIONS)
+def test_the_wording_names_no_cap_and_no_handover_limit(root, transcripts, who):
+    """A handover aid, not a stop: no 200k, no token limit, no cap, for any session."""
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    text = _context(_as(who, root, _event(t), windows=PLANTED)).replace(str(root), "<root>")
+    lowered = text.lower()
+    for word in ("200k", "200,000", "200 000", "200000", "limit", "cap", "capped", "1m", "1,000,000"):
+        assert re.search(rf"(?<![\w,]){re.escape(word)}(?![\w,])", lowered) is None, (word, text)
+    assert "write your checkpoint now" in lowered and "update every file" in lowered, text
+    assert "begin your compaction summary with" in lowered and "READ FIRST:" in text, text
+    assert "handover aid" in lowered and "not a stop" in lowered, text
 
 
 def test_a_worker_is_given_its_record(root, transcripts):
@@ -187,64 +213,51 @@ def test_a_worker_is_given_its_record(root, transcripts):
     assert "record" in text.lower() and "DECIDED-NOT-DONE" not in text and "RESUME HERE" not in text, text
 
 
-# S2: the real table
+# S2: the real table; no cap for any session (the owner, 2026-11-12)
 
 
-@pytest.mark.parametrize("model", ["claude-opus-5-5", "claude-opus-5-5[1m]", "claude-opus-5-5-20261001",
-                                   "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-2"])
-def test_a_1m_model_uses_1_000_000_for_the_ctos_session(root, transcripts, model):
-    """DEC-1140 (4): the CTO's own session is reminded against its model's window."""
-    low = _transcript(transcripts / "low.jsonl", _assistant(model, 840_000))
-    assert _cto(root, _event(low, session="low")).stdout == ""
-    high = _transcript(transcripts / "high.jsonl", _assistant(model, 850_000))
-    assert "READ FIRST:" in _context(_cto(root, _event(high, session="high")))
-
-
-@pytest.mark.parametrize("who", ["cto", "engineer"])
-def test_an_unknown_model_uses_200_000(root, transcripts, who):
-    run = _cto if who == "cto" else _run
-    low = _transcript(transcripts / "low.jsonl", _assistant("some-other-model", 169_000))
-    assert run(root, _event(low, session="low")).stdout == ""
-    high = _transcript(transcripts / "high.jsonl", _assistant("some-other-model", 170_000))
-    assert "READ FIRST:" in _context(run(root, _event(high, session="high")))
-
-
-# P4: leads and workers against min(model window, 200,000) (DEC-1118 (A)); the CTO against the model's (DEC-1140 (4))
-
-
-def test_an_opus_transcript_at_180k_is_silent_for_the_cto_and_reminds_a_lead_and_an_engineer(tmp_path, transcripts):
-    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 180_000))
-    cto, lead, engineer = (tmp_path / name for name in ("cto", "lead", "engineer"))
-    for folder in (cto, lead, engineer):
+@pytest.mark.parametrize("model", MODELS_1M)
+@pytest.mark.parametrize("who", ["lead", "engineer", "independent-test-designer"])
+def test_a_lead_or_worker_on_a_1m_model_is_reminded_at_850k_not_at_170k(tmp_path, transcripts, who, model):
+    for used in (170_000, 180_000, 200_000, 849_999):
+        folder = tmp_path / f"silent-{used}"
         folder.mkdir()
-    (lead / ".git").write_text("gitdir: /nowhere\n")
-    done = _cto(cto, _event(t))
+        t = _transcript(transcripts / f"t-{used}.jsonl", _assistant(model, used))
+        done = _as(who, folder, _event(t, session=f"s-{used}"))
+        assert done.returncode == 0 and done.stdout == "", (used, done.stdout)
+        assert not (folder / STATE).exists(), used
+    folder = tmp_path / "at-850k"
+    folder.mkdir()
+    t = _transcript(transcripts / "t-850k.jsonl", _assistant(model, 850_000))
+    assert "READ FIRST:" in _context(_as(who, folder, _event(t, session="s-850k")))
+
+
+@pytest.mark.parametrize(("model", "window"), [("claude-opus-5-5", 1_000_000), ("claude-sonnet-5-5[1m]", 1_000_000),
+                                               ("claude-haiku-5-5", 1_000_000), ("claude-fable-5-2", 1_000_000),
+                                               ("some-other-model", 200_000)])
+@pytest.mark.parametrize("who", SESSIONS)
+def test_no_session_is_reminded_below_85_percent_of_its_own_window(tmp_path, transcripts, who, model, window):
+    """Every session against its own model's window; an unknown model's window is 200,000 (a model size, not a cap)."""
+    edge = window * 85 // 100
+    low_root, high_root = tmp_path / "low", tmp_path / "high"
+    low_root.mkdir()
+    high_root.mkdir()
+    low = _transcript(transcripts / "low.jsonl", _assistant(model, edge - 1))
+    done = _as(who, low_root, _event(low, session="low"))
     assert done.returncode == 0 and done.stdout == "", done.stdout
-    assert not (cto / STATE).exists()
-    lead_text = _context(_run(lead, _event(t), role="orchestrator", ticket=_ticket(lead, "DAEO-lead", "")))
-    assert str(lead / ".gov-runtime/scratch/lead/CHECKPOINT.md") in lead_text, lead_text
-    assert "your record" in _context(_run(engineer, _event(t), role="engineer", ticket="DAEO-ktiw"))
+    assert not (low_root / STATE).exists()
+    high = _transcript(transcripts / "high.jsonl", _assistant(model, edge))
+    assert "READ FIRST:" in _context(_as(who, high_root, _event(high, session="high")))
 
 
-@pytest.mark.parametrize("case", ["other_class", "class_in_the_body", "past_4_kib", "bad_ticket_name", "engineer"])
-def test_only_the_orchestrator_on_a_coordination_ticket_is_the_cto(root, transcripts, case):
-    """Everything else is capped at 200,000: an Opus 5.5 transcript at 180k reminds it."""
-    role, ticket = "orchestrator", CTO_TICKET
-    if case == "other_class":
-        _ticket(root, front="class: implementation\n")
-    elif case == "class_in_the_body":
-        _ticket(root, front="", body="class: coordination\n")
-    elif case == "past_4_kib":
-        _ticket(root, front=f"notes: {'x' * 4200}\nclass: coordination\n")
-    elif case == "bad_ticket_name":
-        _ticket(root)
-        ticket = f"../.tickets/{CTO_TICKET}"
-    else:
-        _ticket(root)
-        role = "engineer"
+def test_an_opus_transcript_at_180k_is_silent_for_every_session(tmp_path, transcripts):
     t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 180_000))
-    text = _context(_run(root, _event(t), role=role, ticket=ticket))
-    assert "DECIDED-NOT-DONE" not in text, text
+    for who in SESSIONS:
+        folder = tmp_path / who
+        folder.mkdir()
+        done = _as(who, folder, _event(t))
+        assert done.returncode == 0 and done.stdout == "", (who, done.stdout)
+        assert not (folder / STATE).exists(), who
 
 
 # P3: subagent events skipped (R2); re-armed below 50 % (R1)
@@ -393,7 +406,7 @@ def test_a_leads_reminder_leaves_no_bytecode_beside_the_hooks(tmp_path, transcri
     root = tmp_path / "lead"
     root.mkdir()
     (root / ".git").write_text("gitdir: /nowhere\n")
-    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 190_000))
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 900_000))
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(tmp_path / "home"),
            "CLAUDE_PROJECT_DIR": str(root), "GOV_ROLE": "orchestrator", "GOV_TICKET": "DAEO-lead"}
     done = subprocess.run([sys.executable, str(hooks / "context_watch.py")], input=json.dumps(_event(t)),
@@ -411,7 +424,7 @@ def test_a_failed_text_build_leaves_no_marker_and_the_next_call_reminds_once(tmp
     root = tmp_path / "lead"
     root.mkdir()
     (root / ".git").write_text("gitdir: /nowhere\n")
-    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 190_000))
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 900_000))
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "PYTHONDONTWRITEBYTECODE": "1",
            "HOME": str(tmp_path / "home"), "CLAUDE_PROJECT_DIR": str(root), "GOV_ROLE": "orchestrator",
            "GOV_TICKET": "DAEO-lead"}
