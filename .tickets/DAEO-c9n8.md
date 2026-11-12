@@ -1,6 +1,6 @@
 ---
 id: DAEO-c9n8
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-61vm]
 created: 2026-11-12T05:40:00Z
