@@ -1,8 +1,8 @@
 """S10: the close's clean clone is a warm one kept between closes (reset, stores kept), replaced by a fresh one when
 it cannot be reset; the record says so.
 
-Two planted closes in a row: PROJ-aaaa, then PROJ-ffff (both change the widget; W2-bb's known red, red on the base,
-needs the head without the change, so the clone is used). Between them the clone is dirtied (a tracked file changed)
+Two planted closes in a row: PROJ-aaaa, then PROJ-ffff (both change the widget; W2-bb's known red, red on the green
+base, needs the head without the change, so the clone is used). Between them the clone is dirtied (a tracked file changed)
 and a file is put in its stores folder (``.gov-runtime/``, which git ignores); or its ``.git`` is broken.
 
 Red on today's code: today's close keeps no clone at ``.gov-runtime/close/clone`` and its record has no ``clone``;
@@ -17,10 +17,16 @@ STORE_MARK = ".gov-runtime/w2-115-store-mark.txt"
 
 
 def _first_close(base):
+    """The first close. The green base is the initial commit (one green nightly record names it; the known red is
+    red there already), an ancestor of HEAD in both closes.
+
+    Rewrite-Reason: DEC-1150 (2): the planted project needs a green base on HEAD's line under the owner's P1-K (a).
+    Before, the project had no nightly record, so the known red was judged against the parent of the ticket's oldest
+    own commit, the fallback the owner dropped (R2-1)."""
     sandbox = support.cli_support.make_sandbox(base / "sandbox")
     told = base / "told"
     known = support.node_of("W2-bb", "bb_known", "test_bb_known")
-    project = support.Smart(base / "project", told, nightly=None,
+    project = support.Smart(base / "project", told, nightly="green",
                             reds={known.split("::")[0]: support.telling("test_bb_known", told, support.KNOWN_RED)})
     project.work({support.WIDGET: "# the widget, CHANGED\n"})
     project.ready(sandbox)

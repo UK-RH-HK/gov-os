@@ -19,8 +19,16 @@ def sandbox(tmp_path):
 
 class Unowned:
     """A scoped close with two reds its change did not cause (both red on the base, the same failure type):
-    a known red, and a load-sensitive one (an entry of the serial-only list with the kind ``latency``). The nightly's
-    record on the base is red with both. The path map's bytes and time are taken before the close."""
+    a known red, and a load-sensitive one (an entry of the serial-only list with the kind ``latency``). The path
+    map's bytes and time are taken before the close.
+
+    The green base is the initial commit G (both reds already red there): one green nightly record names it, so
+    the head without the change is G, an ancestor of HEAD. The nightly's newest record, red with both failures,
+    names the commit after G (the green record's own, the same code), so it does not stand in for the run on G.
+
+    Rewrite-Reason: DEC-1150 (2): the planted project needs a green base on HEAD's line under the owner's P1-K (a).
+    Before, the only record was red, so no green base existed and the reds were judged against the parent of the
+    ticket's oldest own commit, the fallback the owner dropped (R2-1)."""
 
     def __init__(self, base):
         self.sandbox = support.cli_support.make_sandbox(base / "sandbox")
@@ -31,8 +39,10 @@ class Unowned:
                 self.load_sensitive.split("::")[0]: support.telling("test_bb_timing", told, support.KNOWN_RED)}
         failures = [{"test": node, "failure_type": "AssertionError", "text": "AssertionError: a known red"}
                     for node in (self.known, self.load_sensitive)]
-        self.project = project = support.Smart(base / "project", told, reds=reds, nightly=failures,
+        self.project = project = support.Smart(base / "project", told, reds=reds, nightly="green",
                                                serial=[self.load_sensitive])
+        self.green_base = project.initial
+        project.nightly_record = project.plant_night(project.head(), failures)
         self.known_tickets = {p.stem for p in (project.root / ".tickets").glob("*.md")}
         project.work({support.WIDGET: "# the widget, CHANGED\n"})
         project.ready(self.sandbox)

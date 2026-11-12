@@ -240,8 +240,9 @@ def test_a_failing_test_the_ticket_added_has_no_record_and_never_matches(make_pr
 
 
 # --------------------------------------------------------------------------
-# The base a red is judged against: the green base when it is an ancestor of HEAD, else the parent of the
-# ticket's oldest own commit (review round 1's F-1; PK-3 (a); DEC-988 item 3, DEC-989)
+# The base a red is judged against: the green base, only when it is an ancestor of HEAD; with no green base on
+# HEAD's line there is no head without the change and every red is the change's (review round 1's F-1, PK-3 (a);
+# review round 2's R2-1, the owner's P1-K (a), DEC-1150 (2); DEC-988 item 3, DEC-989)
 # --------------------------------------------------------------------------
 
 RED_CAUSED = "RED_CAUSED"  # the brief's code for a caused red (td-4; review round 1's F-1)
@@ -267,10 +268,14 @@ def _green_base_then_slip(make_project, sandbox, tmp_path, slip, work):
     return project, before, project.close(sandbox)
 
 
-def _assert_red_caused(project, before, run, node):
+def _assert_red_caused(project, before, run, node, green_base=True):
     """Refused with RED_CAUSED naming ``node``; the ticket stays open; a close record, when the refused close writes
-    one, marks ``node`` caused (today's refused close writes none; README, reading 7); no repair ticket names it;
-    on the head without the change it ran and passed (the base it was judged against)."""
+    one, marks ``node`` caused (today's refused close writes none; README, reading 7); no repair ticket names it.
+    With a green base on HEAD's line (``green_base``): on it, the head without the change, ``node`` ran and passed.
+    Without one there is no head without the change, and nothing is asserted about a run off the change.
+
+    Rewrite-Reason: DEC-1150 (2), the owner's P1-K (a): with no green base every red is the change's (the
+    ``green_base`` switch; before, every caller expected a run on a base)."""
     said = support.assert_refused(run, RED_CAUSED)
     assert node in said, f"the refusal does not name the caused red {node}\n{run.describe()}"
     assert project.ticket_status() == "in_progress", "the ticket closed with a red its change caused"
@@ -280,9 +285,10 @@ def _assert_red_caused(project, before, run, node):
     repairs = [p.name for p in (project.root / ".tickets").glob("*.md")
                if p.stem not in before and node in p.read_text(encoding="utf-8")]
     assert not repairs, f"a repair ticket was opened for a red the change caused: {repairs}"
-    base = support.base_side(project.told_runs(node.split("::")[1]))
-    assert base and all(r["ok"] for r in base), \
-        f"the red was not judged against a base where it passes (runs without the change: {base})"
+    if green_base:
+        base = support.base_side(project.told_runs(node.split("::")[1]))
+        assert base and all(r["ok"] for r in base), \
+            f"the red was not judged against a base where it passes (runs without the change: {base})"
 
 
 def test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused(make_project, sandbox, tmp_path):
@@ -319,37 +325,35 @@ def _green_base_elsewhere(make_project, sandbox, tmp_path, elsewhere, reds_on_ma
     return project, before, project.close(sandbox)
 
 
-def test_with_the_green_base_not_an_ancestor_a_red_the_parent_has_is_not_the_change_s(make_project, sandbox,
-                                                                                      tmp_path):
-    """F-1 (S4, S5, F1): the green base is not an ancestor of HEAD, so reds are judged against the parent of the
-    ticket's oldest own commit. W2-bb's known red is red there with the same failure type (AssertionError); the
-    green base's branch does not hold the test at all. The red is not the change's: the close does not refuse on it,
-    the close record names it (not caused) with a repair ticket for the orchestrator, and it ran red on the parent."""
+def test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s(make_project, sandbox,
+                                                                                            tmp_path):
+    """R2-1, DEC-1150 (2) (S4, F1): the only green record names a commit on another branch, not an ancestor of
+    HEAD, so there is no green base on HEAD's line and no head without the change: every red is the change's. W2-bb's
+    known red is already red, with the same failure type (AssertionError), on the parent of the ticket's oldest own
+    commit; that no longer excuses it (the fallback to that parent is dropped, the owner's P1-K (a)). Refused with
+    RED_CAUSED, marked caused when a record is written, no repair ticket, the ticket stays open. Nothing is asserted
+    about a run on the parent.
+
+    Rewrite-Reason: DEC-1150 (2), the owner's P1-K (a): with no green base every red is the change's. Was
+    ``test_with_the_green_base_not_an_ancestor_a_red_the_parent_has_is_not_the_change_s`` (PK-3 (a)'s fallback:
+    the close passed, the red not caused, a repair ticket opened)."""
     told = tmp_path / "project-told"
     project, before, run = _green_base_elsewhere(
         make_project, sandbox, tmp_path, {support.GIZMO: "# a gizmo, on another branch\n"},
         {BB_KNOWN.split("::")[0]: support.telling("test_bb_known", told, support.KNOWN_RED)})
-    support.passed(run)
-    assert project.ticket_status() == "closed", f"the ticket did not close\n{run.describe()}"
-    entry = support.red_entry(project.record(), BB_KNOWN)
-    assert entry.get("caused") is False, f"the red the parent already has is recorded as caused: {entry}"
-    repair = entry.get("repair_ticket")
-    found = [p for p in (project.root / ".tickets").glob("*.md") if p.stem not in before
-             and (p.stem == repair or support.close_support.frontmatter_of(p).get("id") == repair)]
-    assert repair and len(found) == 1, f"no repair ticket {repair!r} was opened in .tickets/"
-    text = found[0].read_text(encoding="utf-8")
-    assert support.close_support.frontmatter_of(found[0]).get("assignee") == "orchestrator" and BB_KNOWN in text, \
-        f"the repair ticket is not the orchestrator's or does not name the red:\n{text}"
-    base = support.base_side(project.told_runs("test_bb_known"))
-    assert base and not any(r["ok"] for r in base), f"the red was not run on the parent of the oldest own commit: {base}"
+    _assert_red_caused(project, before, run, BB_KNOWN, green_base=False)
 
 
 def test_with_the_green_base_not_an_ancestor_a_red_the_parent_does_not_have_is_the_change_s(make_project, sandbox,
                                                                                             tmp_path):
-    """F-1 (S4, F1): the green base is not an ancestor of HEAD; W2-bb's widget test passes on the parent of the
-    ticket's oldest own commit, and the ticket's work breaks it (the green base's branch has the widget broken
-    too, so a close judging against that branch would wrongly excuse it). Refused with RED_CAUSED, marked caused,
-    no repair ticket; the test ran and passed on the parent."""
+    """F-1, R2-1 (S4, F1): the only green record names a commit on another branch, not an ancestor of HEAD, so
+    there is no green base on HEAD's line and every red is the change's. W2-bb's widget test passes before the
+    ticket's work, and the work breaks it (the other branch has the widget broken too, so a close judging against
+    that branch would wrongly excuse it). Refused with RED_CAUSED, marked caused, no repair ticket.
+
+    Rewrite-Reason: DEC-1150 (2), the owner's P1-K (a): with no green base every red is the change's. The run on
+    the parent of the ticket's oldest own commit is no longer asserted (the fallback is dropped; there is no head
+    without the change)."""
     told = tmp_path / "project-told"
     project = make_project(reds=_widget_test(told), nightly=None)
     green = project.elsewhere({support.WIDGET: "# the widget, BROKEN on another branch\n"})
@@ -359,4 +363,25 @@ def test_with_the_green_base_not_an_ancestor_a_red_the_parent_does_not_have_is_t
     assert not support.is_ancestor(project, green, "HEAD"), "the planted green base is an ancestor of HEAD"
     before = project.tickets()
     run = project.close(sandbox)
-    _assert_red_caused(project, before, run, BB_WIDGET)
+    _assert_red_caused(project, before, run, BB_WIDGET, green_base=False)
+
+
+def test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s(make_project, sandbox,
+                                                                                       tmp_path):
+    """R2-1 (the reviewer's P1), DEC-1150 (2) (S4, F1): no green record at all, so no head without the change.
+    The engineer's first commit has no ``Task:`` trailer (an honest slip) and breaks W2-bb's widget test; the
+    ticket's trailered work follows. Judged against the parent of the oldest trailered commit (the slip, where the
+    test is already red with the same failure type) the red would be excused; with no green base it is the
+    change's: refused with RED_CAUSED, marked caused when a record is written, no repair ticket, the ticket stays
+    open. Nothing is asserted about a run off the change."""
+    told = tmp_path / "project-told"
+    project = make_project(reds=_widget_test(told), nightly=None)
+    records = list((project.root / support.NIGHTLY_DIR_REL).glob("*.json")) \
+        if (project.root / support.NIGHTLY_DIR_REL).is_dir() else []
+    assert not records, f"the planted project holds a nightly record: {records}"
+    project.slip({support.WIDGET: "# the widget, BROKEN by an untrailered commit\n"})
+    project.work({support.WIDGET: "# the widget, CHANGED BROKEN\n"})
+    project.ready(sandbox)
+    before = project.tickets()
+    run = project.close(sandbox)
+    _assert_red_caused(project, before, run, BB_WIDGET, green_base=False)
