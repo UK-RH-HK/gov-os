@@ -1,6 +1,6 @@
 ---
 id: DAEO-ozyt
-status: closed
+status: in_progress
 deps: [DAEO-r30l]
 links: [DAEO-r30l, DAEO-5emz]
 created: 2026-11-11T01:20:16Z
@@ -19,7 +19,7 @@ depends_on:
 allowed_paths:
 - src/gov/resources/backstop.py
 - src/gov/resources/command.py  # the one option, --backstop
-- src/gov/resources/config.py  # the one new value, gpu_backstop_limit_mib
+- src/gov/resources/config.py  # the one new value, gpu_backstop_limit_mib; and the template default working_size_bytes 805306368 (DEC-1149 (2))
 - tests/unit/resources/test_w2_157*
 - docs/changes/W2-157-evidence.md
 - docs/probes/DAEO-ozyt/**  # the probe record, so F4 holds at the branch head (run 1's F4 note; the CTO, 2026-11-12 07:20)
@@ -39,6 +39,7 @@ kpis:
   - 'S3 An embedder not wholly on the GPU trips it: a model of an embedding server (the ports from the gate''s configuration) whose `size_vram` is below its `size`, or a line "offloaded N/M layers to GPU" with N below M in the server''s log written since the watch started. Verify: a stand-in server answering both forms, each tripping it once, and a line with N equal to M not tripping it [DEC-1067 (GPU safety), DEC-1068 (4), DEC-1030]'
   - 'S4 Only the named groups are touched: nothing is matched by name, a name that is not a process group id above 1 refuses to start (exit 2), and a group already ended is skipped and named. A trip writes one inbox item naming the reason, the groups paused and how to resume (`kill -CONT -- -<pgid>`) or stop them, then the watch ends; when every named group has ended on its own, the watch logs it and ends. Verify: a stand-in with an unrelated process of the same name left running after a trip; a refused argument "abc"; a job that ends first [DEC-1067 (GPU safety), DEC-1068 (4), DEC-1073]'
   - 'S5 It changes nothing else: it only reads the GPU, the servers'' answers and their logs, and writes its own log and the one inbox item. Verify: a filesystem-spy test over a run with no trip: only its log is written [DEC-1068 (4)]'
+  - 'The template''s default `working_size_bytes` (a new machine''s `gate.json`, `src/gov/resources/config.py`) is 805,306,368 B (0.75 GiB per live session), dated 2026-11-12 with its source DEC-1149, as this machine''s gate now holds (ACT-P95-1) Verify: a unit case reads `config.template()` and finds working_size_bytes 805306368 with the date and the source naming DEC-1149 [DEC-1149 (2)]'
   failure:
   - 'A process outside the named groups paused or signalled. Verify: S4''s planted unrelated process of the same name, left running after a trip: its state is still running and it received no signal; any stop of it is this failure'
   - 'A trip on a reading under every limit, or a spill, an embedder partly on the CPU or a partial offload not tripping it. Verify: S1''s stand-in readings (15,800 MiB no trip), S2''s (total minus 65 MiB no trip, total minus 63 MiB trip) and S3''s stand-in server (N equal to M no trip; `size_vram` below `size` and N below M each trip): each reading gives the stated outcome'
@@ -79,3 +80,19 @@ F4: the probe record's folder is in allowed_paths (no test change after the revi
 the three backstop keys outside `template()` (W2-20's frozen key set) stand. Rows: FR-11 (a try/finally so the own group's pause
 happens whatever the item write does), FR-12, FR-13, FR-3 (an owner question: a GPU that cannot be read), FR-4, FR-6 to FR-10.
 After the land the owner's operator adds the three gate.json entries (docs/changes/W2-157-evidence.md).
+
+## Reopened for one fix (the owner, DEC-1144 (2), P1-B (a), 2026-11-12)
+
+`tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log` hung two
+merge-queue runs (1 h 45 min, then 77 min). The cause: the test replaces the backstop's sleep, then calls `watch()` on planted process
+groups; a call that does not trip polls forever, because a group whose members are all zombies (unreaped) or paused still passes
+`os.killpg(g, 0)`. The fix, inside S4 as written ("when every named group has ended on its own, the watch logs it and ends") and this
+ticket's paths: (1) a group whose live members are all zombies counts as ended; (2) `watch()` takes a bound (a maximum number of polls
+or seconds, a keyword argument whose default keeps the command's behaviour), and every test that calls it passes one; (3) each test reaps
+the process groups it plants. No KPI line changes. One C2 run; it lands through the queue (DEC-989). The owner's temporary skip (P1-B (b))
+cannot take effect without a control-path change (DEC-1144 (2)'s note), so until this lands a hang is stopped by pid.
+
+## Widened by the owner (DEC-1149 (2), 2026-11-12)
+
+One KPI line: the template's default working size becomes 805,306,368 B (0.75 GiB per session), as ACT-P95-1 set on this machine. `config.py` is already in this ticket's paths; the change rides the resume after the backstop fix run returns, with one unit case.
+

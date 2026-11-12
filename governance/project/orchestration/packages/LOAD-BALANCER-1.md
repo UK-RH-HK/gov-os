@@ -1,5 +1,8 @@
 # LOAD-BALANCER-1: W2-20's resource gate after the re-pin, what bypasses it, how to close the gaps, and the sample day
 
+> **Superseded figure (2026-11-12, DEC-1149):** the gate's working size is now 805,306,368 B (0.75 GiB) per live
+> session (ACT-P95-1, applied 16:53). The 2.04 GiB (2,191,601,664 B, DEC-947 item 2) figure below is kept as history.
+
 Helper for the CTO (DAEO-sdxk), 11-11, read at about 15:25 to 15:40 UTC. Read-only: no config changed, no measurement run,
 no lead started. The only live call was `gov resources --json` (the plain reading; it also removes dead registry entries,
 and there were none). Code read: the main tree's `src/gov/` (w2/integrate head) and the pin's copy. The nine files that

@@ -16,7 +16,7 @@ import pytest
 
 import w2_128_support as s
 from test_w2_128_links import _judge
-from test_w2_128_round2a import NEG, ORCHESTRATION, PERMIT, TEST_DESIGN, clauses, now, section
+from test_w2_128_round2a import NEG, ORCHESTRATION, PERMIT, TEST_DESIGN, clauses, now, read_rule
 
 CHECKPOINT_TEMPLATE = "template/governance/kernel/templates/checkpoint.md"
 
@@ -59,7 +59,8 @@ def test_s11_f2_no_bar_on_reading_another_sessions_folders():
 # --- F4: the test-design read rule's citation --------------------------------------------------------------------------
 
 def test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136():
-    rule = section(now(TEST_DESIGN), "read")
+    # Revised for W2-11 (DEC-866, DEC-981, DEC-1137): the read rule is found where it now stands (``read_rule``)
+    rule = read_rule(now(TEST_DESIGN))
     assert re.search(r"CAP-38\.c\b", rule), "the read rule does not cite CAP-38.c (independent test authorship)"
     wrong = [cited for cited in ("CAP-38.b", "DEC-136") if re.search(re.escape(cited) + r"(?![\w.])", rule)]
     assert not wrong, f"the read rule still cites {wrong} for working from the spec and its KPIs"

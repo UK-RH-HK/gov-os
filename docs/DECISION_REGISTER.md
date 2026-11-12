@@ -11720,7 +11720,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-947 — The memory gate: one verification run's peak reserved once, a working size per lead; re-measured weekly (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead) · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product · **Changed by:** DEC-960 (while a verification run holds the lock, its peak is not reserved again) · **Changed by:** DEC-961 (the verification peak is no longer reserved; the floor, the trip-wire and the working size stay)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead) · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product · **Changed by:** DEC-960 (while a verification run holds the lock, its peak is not reserved again) · **Changed by:** DEC-961 (the verification peak is no longer reserved; the floor, the trip-wire and the working size stay) · **Changed:** item 2's working size changed by DEC-1149 (1) (805,306,368 B per session, ACT-P95-1, 2026-11-12)
 - **Decision:**
   1. The verification lock lets only one full test run happen at a time, so its peak (7.4 GiB measured on 2026-10-29) is reserved once, not per lead.
   2. **The reserve:** the floor, plus one verification run's measured peak, plus each running lead's measured working size outside verification (about 2.1 GiB, measured on 2026-10-29).
@@ -14178,7 +14178,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 
 
 ### DEC-1115 — Yes to ACT-SETS-GLOBS-1 (by hand) and ACT-CLAUDE-COPIES-1 (by the operator agent, its first live run); TPL-6's Appendix A applied now; before the lift, past 80 % of the week's usage only the lift's critical path runs
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5 · **Changed:** item (4) changed by DEC-1149 (3) (usage never stops a lead; report only)
 - **Decision:**
   - (1) **ACT-SETS-GLOBS-1: yes** (`yes ACT-SETS-GLOBS-1 1f93d6ef`, class (b)); the owner's operator applies it by
     hand now (the package's §5).
@@ -14575,7 +14575,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** questions 1 and 4 (the ticket judged on what exists; the live rules carried where agents read them).
 
 ### DEC-1138 — The lead cap raised to five tonight and through 11-12's working day, measured; the safety nets kept; no new lead run after 03:00 before the nightly; the p95 ACT rewrites the working size and both peak figures
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); until the end of 11-12's working day for (1) · **Under:** DEC-1133 (3), (5), DEC-947, DEC-1132 (4), DEC-942 · **Source:** the owner's message (chat, 2026-11-11 ~19:55 UTC): "the risk is mine"
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); until the end of 11-12's working day for (1) · **Under:** DEC-1133 (3), (5), DEC-947, DEC-1132 (4), DEC-942 · **Source:** the owner's message (chat, 2026-11-11 ~19:55 UTC): "the risk is mine" · **Changed:** item (4)'s working-size half done by DEC-1149 (1) (ACT-P95-1); the peaks by DEC-1149 (4)
 - **Decision:**
   - (1) **The lead cap is five** (from three, DEC-1133 (3)'s interim), tonight and through 11-12's working day; up to five
     live lines released from the order, unblockers first; what happens is measured (the lead ledger, the memory sampler).
@@ -14603,7 +14603,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the templates one approved source for every launched session, carrying the owner's three rules).
 
 ### DEC-1140 — Tonight's priorities: usage first (RUBRIC-2 at every launch, quiet notices), context awareness back for every session, then the load balancer, the dispatcher and W2-115; the CTO session to about a million tokens; the free reset: the 80 % brake lifted this week, five leads, 97 % and 99 % lines
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); (5) and (6) for the week to the reset of 11-15, (4) standing · **Under:** DEC-1120, DEC-1118, DEC-1115 (4), DEC-1126, DEC-1089 (3), DEC-1133 (3), DEC-1138 · **Changes:** DEC-1118 (A) for the CTO's own session (see (4)); DEC-1126's 80 % brake lifted for the week (see (5)); DEC-1089 (3) excepted once (see (6)) · **Source:** the owner's messages (chat, 2026-11-11 ~23:05 and ~23:10 UTC) · **Corrected by:** DEC-1141 (3) (item (4)'s last sentence)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); (5) and (6) for the week to the reset of 11-15, (4) standing · **Under:** DEC-1120, DEC-1118, DEC-1115 (4), DEC-1126, DEC-1089 (3), DEC-1133 (3), DEC-1138 · **Changes:** DEC-1118 (A) for the CTO's own session (see (4)); DEC-1126's 80 % brake lifted for the week (see (5)); DEC-1089 (3) excepted once (see (6)) · **Source:** the owner's messages (chat, 2026-11-11 ~23:05 and ~23:10 UTC) · **Corrected by:** DEC-1141 (3) (item (4)'s last sentence) · **Changed:** item (6)'s 97 % line changed by DEC-1149 (3) (report only; the 99 % push stays, report only)
 - **Decision:**
   - (1) **First, usage.** (a) Finish the work that reduces usage; every agent launched by RUBRIC-2 (DEC-1120): workers on C2
     and C1 tickets on Sonnet, high; Opus for C3 and reviews; tonight's lead briefs that say Opus corrected; every new brief
@@ -14696,6 +14696,119 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (5) **C8:** no checker for W2-94.
 - **Basis:** questions 2 and 4.
 
+### DEC-1144 — P1-A to P1-G: W2-11 merged by hand; W2-157 reopened for the backstop hang with a temporary skip; W2-146's schema lines read first; a narrow third check of the path-map chain; K9 met by W2-121 a and b with part c's slot line; `--sets-root` in W2-93; reviewers' read-only probes in the quiet hours
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-989, DEC-1141 (4), DEC-1010, DEC-1131, DEC-1008 (2)-(3), DEC-974, DEC-1142 (7), DEC-1143 (4), DEC-1112 (3), CAP-33
+- **Decision:**
+  - (1) **P1-A (a): W2-11 merged by hand**, an exception to DEC-989 beside DEC-1141 (4)'s two: its seven copy cases could be green only after
+    ACT-CLAUDE-COPIES-5, which applies only after the merge. Merged `6f2234f40` (W2-11 head `6ba93fc8bf35`; kernel bytes as approved at
+    `dca382f3069f`); the owner's operator applied COPIES-5 at once (`a2a74f22f`); W2-11 closes on a green run.
+  - (2) **P1-B (a)+(b): W2-157 (`DAEO-ozyt`) reopened for one fix** inside its own scope: a group of only zombies counts as ended, `watch()`
+    gets a bound, and `test_w2_157_backstop.py` reaps its own groups (one C2 run). Until that fix lands, **one temporary entry** in
+    `skip_known.json` for `tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log`,
+    naming W2-157 as its fix; the fix's land removes it. An exception for a test that cannot finish, not a hidden red.
+    **Found when recording (the CTO, told to the owner):** `skip_known.json` is the skip guard's list of known skips; it causes
+    no skip, and the queue strips `PYTEST_ADDOPTS` (`merge_queue.py` `env()`), so (b) takes effect only through a change to the
+    queue (a control path, by ACT) or to the test (the fix itself). Not built: the fix runs first, and a hang meanwhile is
+    stopped by pid as before.
+  - (3) **P1-C: W2-146's 15 added lines** of `template/governance/kernel/schemas/path-map.schema.json` (`7a1a1cd8…` -> `d22efa5a…`) were
+    pasted to the owner verbatim first; the CAP-33 approval follows the owner's reading, as its own line. Until then W2-146 is held.
+  - (4) **P1-D (a): a narrow independent check** of the path-map chain's round 3 (EXAMIN-SETS-1 `2f814211`, ACCEPTED-REDS-1 `9c20e5e3`,
+    PATHMAP-EXP-1 `b26fe623`), limited to: the entries byte-identical to round 2's; only befores, afters and offsets moved; the chain
+    and its rehearsal. A third round, the owner's exception to DEC-1010 for this rebuild only. The yes lines follow its PASS.
+  - (5) **P1-E option 1: K9's dispatcher is W2-121 parts a and b**, with part c's first KPI line ("every heavy step takes a heavy-job slot",
+    DEC-1008 (3)) moved into W2-121b (`DAEO-ifgf`), a widening by the owner's decision (DEC-974). Parts c (less that line) and d stay
+    parked in Wave 3 (W3-P33, W3-P34).
+  - (6) **P1-F (a): the W2-81 runner's `--sets-root <root>`** goes inside W2-93 (`DAEO-6y0x`): its paths gain
+    `tests/acceptance/W2-81/w2_81_run.py` and `tests/acceptance/W2-81/test_w2_81_runner.py`, for the independent test designer who writes
+    `validate_hidden.py`, with one KPI line: the runner and the validator take `--sets-root <root>`. Answers DEC-1143 (4)'s open point.
+  - (7) **P1-G (a): a reviewer's read-only probes are allowed in the quiet hours**, in its own TMPDIR (outside the repository and the runs
+    folders), touching neither the repository nor the evaluation sets; the two-refusal stop (DEC-1142 (9)) still holds. Into the briefs.
+  - (8) **Read and accepted (delegated P2s, DEC-1112 (3)):** W2-124's P2 (b) and P3 (`fe7bd01ae`); W2-115's PK-5 (c), deferred with
+    W2-115b (`33b5651eb`).
+- **Basis:** the owner's message of 2026-11-12 ~14:10 answering the CTO's seven P1 packages.
+
+### DEC-1145 — W2-146's kernel path-map schema approved (CAP-33) at ebdbabd2e0d3; a non-compiling id form refused at use, the config check's gap a row
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1144 (3), DEC-1071 (5), DEC-1099 (2)
+- **Decision:**
+  - (1) **"W2-146 CIT-P approved at ebdbabd2e0d3"**, after reading the 15 added lines of
+    `template/governance/kernel/schemas/path-map.schema.json` (sha256 before `7a1a1cd8cbf6fb073e2e1eb6f816d2ba83e2b647e2dc94efb1dfa96f359a8469`,
+    after `d22efa5ada515c8cd0132b8c4960e7aa4d34d4e3fe345b07f576cedfba0fc7be`; record `docs/changes/W2-146-CIT-P.md`). W2-146 lands
+    through the queue at that commit (DEC-989).
+  - (2) **The owner's check, answered by the CTO:** `"format": "regex"` is enforced only by a validator given a format checker. A pattern
+    that does not compile is refused at use: `gov retrieve`'s reader (`gov.retrieval.lexical.id_forms`) stops with `CONFIG_INVALID` naming
+    `id_forms[<i>]` (acceptance: `tests/acceptance/W2-146/test_w2_146_reader.py`, the pattern `(`; the schema cases use
+    `Draft202012Validator(..., format_checker=FormatChecker())`). The project's own path-map check (`gov.config`, hand-written per W1-08)
+    does not read `id_forms`, so a broken form is caught at the first retrieve, not at check time: DECIDED-NOT-DONE row 174.
+- **Basis:** the owner's message of 2026-11-12 ~14:35.
+
+### DEC-1146 — A resource gate's refusal is a wait, not a refusal under the two-refusal rule (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:45, P1-I (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1142 (9), DEC-1088 (5)
+- **Decision:**
+  - (1) **A resource gate's refusal** (memory, CPU, disk, a heavy slot) is a wait, not a refusal under the two-refusal rule: the session
+    relaunches when the gate opens, without asking the owner. The two-refusal rule (DEC-1142 (9)) covers permission refusals: the guard,
+    the sandbox, a hook.
+  - (2) The P1-D check (DEC-1144 (4)) is relaunched once the CTO's merge checks free the gate.
+  - (3) Into the common lead brief beside the two-refusal rule.
+- **Basis:** P1-I; the P1-D reviewer and W2-152's re-probe each stopped after two memory-gate refusals (2026-11-12 14:05-14:28).
+
+### DEC-1147 — W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~15:00, P1-H (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1145, DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"W2-152 CIT-P approved at 09fc68645c0c, after the fact":** `template/governance/kernel/schemas/facts.schema.json`, sha256 before
+    `be3e204355c0dd4c98cc584b72a1cef5eaa4733ca9a7feec8684b728026af7a6`, after `3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c`
+    (15 added, 1 removed: `ready` required, and the `ready.new_since` date property), on w2/integrate since the CTO's merge `b0bbd373f`
+    (2026-11-09 23:07). The missing record `docs/changes/W2-152-CIT-P.md` is written; then W2-152 closes through the queue.
+    **Corrected the same day (the CTO, DEC-861):** the CTO reported these bytes as unapproved since 11-09; in fact DEC-1116 (1) approved
+    them on 2026-11-10 within W2-128's set (TEMPLATES-APPROVAL-1's table lists `facts.schema.json` at `3141d5da...`), so they were
+    unapproved on w2/integrate for about a day, not three; DEC-1147 (1) is a second, explicit approval. The record was written by the
+    CTO (orchestrator), as W2-146's lead wrote W2-146's: the launcher refused a product-spec worker on an engineer ticket (DEC-995).
+  - (2) **To the owner next:** whether the facts file an adoption writes carries `ready.new_since` set to the adoption's own date, before
+    W2-27 (a fix if not); row 173's route (a kernel path needs an approval line before any merge, in the queue and in the CTO's hand-merge
+    check), without a new ticket; a scan of every commit on w2/integrate since 11-02 touching `template/governance/kernel/**`, each with its
+    approval line or none.
+- **Basis:** the owner's message of 2026-11-12 ~15:00 answering P1-H.
+
+### DEC-1148 — Five kernel files approved by their bytes; the adoption's facts file by W2-174 with the CTO filling a project's commands (a1); the kernel gate in the CTO's tools; W2-45 widened for two revisions
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~16:00-16:30; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1147 (2), DEC-974, DEC-105, DEC-1045, DEC-715, DEC-996 (2), DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"kernel bytes approved: adopt/SKILL.md 641a347b, pretooluse.py c2c8f0af, settings.json 3aaa82e5, secrets-indexing.yaml 8dae63e8,
+    test-map.schema.json 0e4105ef"** (full sha256: `641a347b9b14101dde711f3550f087e714e404575f780be2a3cd91ff2925102d`,
+    `c2c8f0af783a7e605113e0154dcf143eca63a34221293a325e5553904aa9e3a6`, `3aaa82e5b53aa4809fdfd38d442f4f00320bde2d133b022849c35c30a14ddf9a`,
+    `8dae63e8188b6b5498c1ce7fe36e2565dc38129ad0ff551ee16820ddb5567f83`, `0e4105ef08727a8598feabcb929627d598cac4e2e74bcde0e0e81355b9bdf384`),
+    after reading the diffs: W2-52's adopt-skill text (landed 11-12 03:07 without approval, against DEC-996 (2); `d71113b6` before it was
+    W1-41's text, W2-83a never built its clause, nothing lost); W2-110's guard hook; W2-56's settings rule (the `Bash(gov launch:*)` allow
+    approved knowingly, DEC-715); the scan switch's check line (DEC-1045 (4)); the test map's description (DEC-1050 (2)). The scan stays
+    off on this repository only (`governance/project/secrets.yaml`, DEC-1045); EXAMIN's adoption keeps it on (W2-27's line, (2)).
+  - (2) **Item 4 (a1):** W2-174 gains the facts-file KPI line and `src/gov/adopt/facts.py` (product defaults, named placeholders for a
+    command with no product form), its S3 fixture carries its own filled facts file; W2-27 gains one line (the copy's facts file holds
+    EXAMIN's commands, every role's brief builds there, the secrets scan stays on); W2-160 (`gov wait`) moves onto EXAMIN's path after
+    W2-159 lands; a row for the three commands (`lead_verify`, `launch_worker`, `wait_for`) the kernel facts schema requires.
+  - (3) **Item 5 (a):** the kernel gate in the CTO's own tools (`kernel_gate.py`, the approved list `kernel-approved.txt`, called by
+    `land.py` before any enqueue and by `hand_merge_check.sh` before any merge) today, with its one review; the product queue
+    (`merge_queue.py`) by ACT later.
+  - (4) **Item 6 (a), P1-J:** W2-45 widened by `tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py` and
+    `tests/unit/ci/test_ci_command.py` for one revision each, each with its Rewrite-Reason (P-W2-45-1 items 2 and 5).
+- **Basis:** the owner's messages of 2026-11-12 ~16:00 and ~16:30.
+
+### DEC-1149 — The working size 0.75 GiB per session (ACT-P95-1), the new figure everywhere; usage never stops a lead or a worker; the two peaks re-measured within the week (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~16:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (3) standing · **Under:** DEC-947, DEC-1088 (5), DEC-1133 (5), DEC-1138 (2), (4), DEC-1140 (6), DEC-1115 (4), DEC-1091, DEC-1089 (3), DEC-1146
+- **Context:** the machine gate (`gov launch`, `src/gov/resources/gate.py`) opens when available memory plus the live sessions' memory is at least the 3 GiB floor plus `working_size_bytes` for each live registered session and the newcomer. Every session, lead or worker, was counted at DEC-947 item 2's 2,191,601,664 B (2,140,236 kB, 2026-10-29), while each uses 0.25-0.40 GB (the CTO's lead-memory ledger since 2026-11-11 18:00: a lead's process tree p50 0.29 GB, p95 0.41 GB, p99 0.65 GB, max 1.87 GB; available never below 12.75 GB). The gate refused workers on that accounting with 15-16 GB available (W2-124, W2-157, W2-45, the CTO's reviewer); the sample day and ACT-P95-1 (DEC-1138 (4)) had not run.
+- **Decision:**
+  - (1) **`working_size_bytes` = 805,306,368 B (0.75 GiB) per live session,** from the ledger, by ACT-P95-1 (class (b): one quick review, the owner's yes, the CTO applies it at once). The floor (3 GiB), the hold below 5 GB available (DEC-1138 (2)), `mem_guard` and the OOM trip (2 GiB) stay and handle any peak. DEC-947 item 2 and DEC-1138 (4)'s working-size half are changed by this item.
+  - (2) **The new figure everywhere:** every decision, ACT and file that states or relies on the old working size is amended by its own route: the register by this record and its marks; the gate's file by ACT-P95-1; the CTO's prompt, the decisions-in-force list and the packages by recorded edits; the product's default for a new machine (`src/gov/resources/config.py:220`) changes to the same 805,306,368 B by widening W2-157 (open, `config.py` already in its paths; the owner, ~16:50: no new ticket).
+  - (3) **Usage never stops leads:** usage is tracked and reported in every report and digest; no lead or worker is held, refused or stopped because of usage or spend. DEC-1140 (6)'s 97 % line and DEC-1115 (4)'s priority rule are changed by this item: the 99 % push to the owner stays, as a report only. **The runaway brake (DEC-1091) stays a stop** (the owner, ~16:50): it guards against a ticket looping, not against usage. The usage stop is removed from the CTO's tools (`usage_lines.sh`'s 97 line is a report; the usage-97 brake files cleared).
+  - (4) **The ledger keeps running;** the two peak figures (`verification_peak_bytes`, `rebuild_peak_bytes`) are re-measured from it and brought to the owner within the week (by 2026-11-19). Once ACT-P95-1 is in, the CTO reports how many leads the gate admits at the day's readings and what binds first after it (the cap of five, the CPU, the heavy slots, or ready work).
+  - (5) **Applied:** the owner's `yes ACT-P95-1 4169b2f9` (16:53); the CTO applied it at once (verified: working_size_bytes 805306368; the gate open at 15.36 GB available with 6 sessions). The review's rows: R1 the 5 GB hold (`mem_hold`) now does the gate's old job, so it becomes part of the launch check or gets a liveness check; R3 a re-measure at the new density (row 177).
+- **Basis:** the owner's messages of 2026-11-12 ~16:40, ~16:50 and 16:53.
+
+### DEC-1150 — W2-88 split into W2-88a and W2-88b, with W2-174's skill line; P1-K (a) the fallback dropped; P1-L (a) the 13 files revised, each case keeping its guard
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~17:00; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-996 (1), DEC-995, DEC-974, DEC-1010, DEC-802, DEC-1027, DEC-1142 (8)
+- **Decision:**
+  - (1) **Package 1 (a):** W2-88a (DAEO-pg6i, product-spec: S17 and W2-174's S5, moved word for word, the three adopt-skill paths, its CIT-P and the practice record) and W2-88b (DAEO-aks1, research: proofs (b) and (c), their scale and measure lines, the proof record in `experiments/W2-88/`, the clone failure line) filed under DEC-996 (1)'s split list; W2-88 keeps the code, proof (a)'s record moving to `docs/changes/W2-88-evidence.md`; W2-174 loses S5 and the skill paths; W2-27 depends on W2-88a too. **Proof (c) works on copies only:** nothing is written in ~/workspace or in any of the owner's own repositories (a failure line of W2-88b).
+  - (2) **P1-K (a):** W2-115's `select.head_without_change` returns the green base or nothing (the fallback dropped; fails closed); the fix rides a resume, no review round 3. Before it lands, the CTO brings how EXAMIN's copy gets its first green base or a recorded list of its standing reds, so W2-27's first closes do not refuse for ever.
+  - (3) **P1-L (a):** W2-124 widened by the 13 files for one test-designer revision each (Rewrite-Reason DEC-1027 C); each revised case keeps what it was guarding (W2-32's fail-closed cases above all); the reviewer checks, case by case, that no case loses its point.
+- **Basis:** the owner's message of 2026-11-12 ~17:00.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14776,3 +14889,8 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 
 | 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
 | 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
+| 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
+| 0.528 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1145 (W2-146's kernel path-map schema approved at ebdbabd2e0d3; a non-compiling id form refused at use, the config check a row), DEC-1146 (a resource gate's refusal is a wait, not a two-refusal refusal; standing). Next free id: DEC-1147. |
+| 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |
+| 0.530 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1148 (five kernel files approved by their bytes; the adoption's facts file (a1), W2-27's line, W2-160 onto the path; the kernel gate in the CTO's tools; W2-45 widened for two revisions). Next free id: DEC-1149. |
+| 0.531 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1149 (the working size 0.75 GiB by ACT-P95-1, applied; the figure everywhere; usage never stops a lead, the runaway brake kept; the peaks by 11-19), DEC-1150 (W2-88 split into W2-88a and W2-88b; P1-K (a); P1-L (a)); DEC-947 item 2, DEC-1138 (4), DEC-1140 (6) and DEC-1115 (4) changed. Next free id: DEC-1151. |

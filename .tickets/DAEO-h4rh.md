@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-zmo4, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ylsh, DAEO-ozyt]
+deps: [DAEO-pg6i, DAEO-zmo4, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ylsh, DAEO-ozyt]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -62,6 +62,7 @@ depends_on:
 - DAEO-t8mp
 - DAEO-r8vq
 - DAEO-k4wm
+- DAEO-pg6i  # W2-88a: the adopt skill's kernel text, the practice's order (DEC-1150 (1))
 # The six below are on EXAMIN's copy's path (AUDIT-NIGHT-1 d-tools §5): W2-42a, W2-116, W2-145, W2-153, W2-156, W2-157 [added, DEC-1112 (3), the CTO's delegated decision]
 - DAEO-03ub
 - DAEO-f58b
@@ -94,6 +95,7 @@ kpis:
   - 'W2-88''s tools run on the copy at adoption (the assessment, the refactoring plan as proposals, the full index and embeddings), and EXAMIN''s question set (W2-94) is measured with both figures, hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % [DEC-954 Q9f, DEC-957]'
   - 'The first numbered, frozen release is cut by the owner and hash-checked (two builds give the same bytes; the wheel and every file match the manifest), recorded in docs/plan/wave-2/examin-copy/release-check.md, before W2-81''s proving-ground run and this ticket''s adoption [DEC-1089, DEC-954 Q8c, DEC-772]'
   - 'Exit criterion 7: CAP-45.a moved to Wave 3 by an approved CIT-P note (docs/changes/W2-27-CIT-P.md), or named as an exception the owner accepts [DEC-1089]'
+  - 'The copy''s `governance/project/facts.yaml` holds EXAMIN''s own commands (`launch_worker` = `gov launch`, `wait_for` = `gov wait`, `lead_verify` = EXAMIN''s own verify command, the rest from the adoption''s defaults), and every role''s brief (the five worker roles and the lead''s run kinds) builds with `gov brief` in the copy; the copy carries no `governance/project/secrets.yaml` or one with `scan: on`, so the secrets scan stays on there Verify: `gov brief <role> <ticket>` exits 0 in the copy for each worker role and each lead run kind on one of its tickets; `gov check` there shows the secrets-indexing check measured (not "off by configuration") [DEC-1148 (2), DEC-1045]'
   failure: []
 profile: FULL
 sources:
@@ -158,3 +160,7 @@ these two items). [DEC-1089]
 **DEC-1090 (5) (owner, 2026-11-07):** (b) takes option A, the CIT-P note moving CAP-45.a to Wave 3 (drafted by a
 product-spec agent, one independent review, then the owner). (a) The release is cut after the lift's re-pin and before
 W2-81's proving-ground run. [DEC-1090]
+
+## A line added by the owner (DEC-1148 (2), item 4 (a1), 2026-11-12)
+
+The copy's facts file holds EXAMIN's commands and every role's brief builds there; the secrets scan stays on in the copy (DEC-1045 lifted it on this repository only). Depends on W2-174's facts step and W2-160 (`gov wait`).

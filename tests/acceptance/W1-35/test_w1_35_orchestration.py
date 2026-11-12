@@ -9,7 +9,7 @@ Covers the ticket's two last success lines:
   orchestration skill states the route.
 
 The cases read delivered text and say what a reader must be able to find in it. They fix no heading and no
-sentence but the three standing sentences of a brief. See the README for the reading rules and the red reasons.
+sentence but the standing sentences of a brief. See the README for the reading rules and the red reasons.
 """
 
 from __future__ import annotations
@@ -237,7 +237,8 @@ class TestTicketLeadSection:
 
     def test_the_section_says_what_a_lead_returns(self):
         section = self._section()
-        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION", "LEAD_CHECKPOINT")
+        # DEC-838 item 2: LEAD_CHECKPOINT is no longer a lead's status (W2-11, DEC-866).
+        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION")
                    if not re.search(rf"\b{form}\b", section)]
         assert not missing, f"the ticket lead section does not name the return forms {missing}"
 
@@ -327,11 +328,16 @@ class TestBriefTemplates:
         taken = {name: [word for word in support.RECORD_TEMPLATE_WORDS if word in name.lower()]
                  for name in support.BRIEFS.values()}
         assert not any(taken.values()), f"brief names that W1-08 reads as record templates: {taken}"
+        # W2-L258 (DEC-729, DEC-866): a brief carries record frontmatter of its own type; it never declares itself
+        # one of the record kinds W1-08 validates.
         for kind in support.BRIEFS:
             front, _ = support.split_frontmatter(support.read(support.brief_rel(kind)))
-            assert not (front or {}).get("type"), (
-                f"{support.brief_rel(kind)} has a record frontmatter (type: {front.get('type')}); a brief is "
-                f"not a record"
+            declared = str((front or {}).get("type") or "")
+            words = set(re.split(r"[^a-z0-9]+", declared.lower()))
+            kinds = [word for word in support.RECORD_TEMPLATE_WORDS if word in words]
+            assert not kinds, (
+                f"{support.brief_rel(kind)} declares itself a record kind W1-08 validates (type: {declared}); a "
+                f"brief has a record type of its own"
             )
 
 

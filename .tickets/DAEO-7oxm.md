@@ -1,6 +1,6 @@
 ---
 id: DAEO-7oxm
-status: in_progress
+status: closed
 deps: [DAEO-qz4p]
 links: [DAEO-qz4p, DAEO-61vm, DAEO-k1e2]
 created: 2026-11-12T05:03:31Z
