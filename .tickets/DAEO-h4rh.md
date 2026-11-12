@@ -169,3 +169,8 @@ The copy's facts file holds EXAMIN's commands and every role's brief builds ther
 ## The copy's first green base (the owner, DEC-1151, 2026-11-12)
 
 W2-115's close takes as its green base only a full close's record or a green night (P1-K (a): no fallback), so the copy runs one full close at adoption, its standing reds listed by the owner's decision in `accepted_reds`; the line above.
+
+## The copy's commit (the owner's C1, DEC-1143 (2); confirmed 2026-11-12, DEC-1151 (2))
+
+W2-27's adoption runs on EXAMIN's copy `~/gov-os-workbench/examin` at `0a82082495f52df068c3c6b518969b419f02fe95` (the one commit of its 46 uncommitted entries, made on the owner's word at 10:45; the copy is clean at it), through a launch clone under `~/gov-os-runs/` as W2-94's was; the same commit EXAMIN's question set was written on (W2-94's run `20261112T185806Z-examin-r1`, scaffold commit `48459935c435` whose only parent it is, `COPY-HEAD.txt` holding it). A different commit of the copy needs the owner's word and a new question set.
+

@@ -14817,6 +14817,14 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) **W2-27's green-base line, (a), as the CTO wrote it:** before any scoped close in the copy, a full close at the adoption commit; every red fixed or listed in the copy's `accepted_reds` by an ACT the owner approves; that record is the copy's first green base.
 - **Basis:** the owner's message of 2026-11-12 ~18:55.
 
+### DEC-1152 — EXAMIN's visible half released and final; the commit's pin kept in the run record, the decisions and W2-27's ticket; P1-M (a) a narrow check of W2-115's fix
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~19:20-19:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-1143 (2)-(4), DEC-1151, DEC-1150 (2), DEC-1010
+- **Decision:**
+  - (1) **Step 7 done:** EXAMIN's development half released by the owner's operator (`release_visible.sh`, 10 files, exit 0, `.release-visible.record` written). **The ten questions stand:** the owner's operator checked each against EXAMIN's files at `0a82082495f5`, read only, each confirmed with file and lines. The released half is final.
+  - (2) **The pin:** EXAMIN's set and W2-27's adoption are at `0a82082495f52df068c3c6b518969b419f02fe95` (C1); recorded in the writer's run record, DEC-1143 (2), DEC-1151 (2) and W2-27's ticket; **no ACT pins it in the path map.**
+  - (3) **P1-M (a):** W2-115's fix (P1-K (a)) gets one narrow independent check of the fix only, so the queue has a passing record (a third look, the owner's exception, limited to the fix).
+- **Basis:** the owner's messages of 2026-11-12 ~19:20 and ~19:35.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14903,3 +14911,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.530 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1148 (five kernel files approved by their bytes; the adoption's facts file (a1), W2-27's line, W2-160 onto the path; the kernel gate in the CTO's tools; W2-45 widened for two revisions). Next free id: DEC-1149. |
 | 0.531 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1149 (the working size 0.75 GiB by ACT-P95-1, applied; the figure everywhere; usage never stops a lead, the runaway brake kept; the peaks by 11-19), DEC-1150 (W2-88 split into W2-88a and W2-88b; P1-K (a); P1-L (a)); DEC-947 item 2, DEC-1138 (4), DEC-1140 (6) and DEC-1115 (4) changed. Next free id: DEC-1151. |
 | 0.532 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1151 (ACT-EXAMIN-WRITERS-INSTALL-1 applied; the two walled writers delivered; W2-27's green-base line). Next free id: DEC-1152. |
+| 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
