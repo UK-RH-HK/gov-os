@@ -599,6 +599,22 @@ NESTED_UNRELATED = (".rulesync/rules/cite-nested-nothing.md",
                     "# Votes\n\nA vote is held in the hall on the first Monday of the month.\n")
 
 
+# P-W2-23-8 (a), R2-1: a folder citation that ends a question (``?`` then the end of the line) cites the store; and a
+# ``?`` inside a glob token is a glob character (it matches one character of a store file name), so the glob reading
+# must stay. id -> (the planted file, its text, the store it cites: "flat" is STORE, "nested" is NESTED_STORE).
+QUESTION_FINAL = {
+    "flat-no-slash": (".rulesync/rules/cite-question-folder.md", "# Votes\n\nDid you search legacy/memory?\n", "flat"),
+    "flat-slash": (".rulesync/rules/cite-question-folder-slash.md",
+                   "# Votes\n\nIs it still in legacy/memory/?\n", "flat"),
+    "nested-no-slash": (".rulesync/rules/cite-question-nested.md",
+                        "# Votes\n\nShould we keep notes/memory?\n", "nested"),
+    # the control: ``?`` inside the token, the glob of ``leg-001.md`` (a store file) and ``leg-002.md``
+    "glob-question-inside": (".rulesync/rules/cite-question-glob.md",
+                             "# Votes\n\nThe quorum rules are in legacy/memory/decisions/leg-00?.md as written.\n",
+                             "flat"),
+}
+
+
 def proof_said(error):
     """What the proof says it found: the refusal's message and its list of citers (never its list of what it read)."""
     details = error.get("details") or {}
