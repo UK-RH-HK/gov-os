@@ -555,6 +555,25 @@ evaluation_sets:
     hidden: ["fixtures/evaluation/sandbox-guard-exp-1/hidden/**"]
     measures:
       roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+  # examin, EXAMIN's question set (W2-94; DEC-957, DEC-828 items 3-4, DEC-1130 (3)): 20 questions about the owner's copy,
+  # written blind by the walled writer (DEC-1101 (3); brief EXAMIN-writer), kept under the sets root (the measure's
+  # --sets-root), never in a tree. The ten visible-half questions are delivered with the hidden half and released to
+  # visible/ by the owner's one copy step; the ten measured ones stay in hidden/. Every role but the orchestrator is
+  # refused the hidden half (as memory-verdict-2); the CTO and leads by sets_root_hidden's fixtures/evaluation/*/hidden/**.
+  examin:
+    visible: ["fixtures/evaluation/examin/visible/**"]
+    hidden: ["fixtures/evaluation/examin/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+  # adoption-proving-ground, W2-81's held-out half (W2-93; DEC-957, DEC-941, DEC-1130 (3)): hidden questions and
+  # planted-problem variants per synthetic repository, written blind by the walled writer (brief PROVING-GROUND-writer),
+  # kept under the sets root. The visible half is W2-81's own questions folder; the runner reads the hidden half from
+  # its --hidden folder. Every role but the orchestrator is refused the hidden half.
+  adoption-proving-ground:
+    visible: ["tests/acceptance/W2-81/questions/**"]
+    hidden: ["fixtures/evaluation/adoption-proving-ground/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
 # The source families (DEC-1078 (4), DEC-1079; W2-61h S7): a gold source and its official copies, each family a list
 # of member path globs. The memory measure (gov.retrieval.measure) counts an evidence item in another member of a gold
 # source's family as a hit on that source only when the item's text holds the gold span's text (whitespace and
