@@ -1,6 +1,6 @@
 ---
 name: role-test-designer
-version: 1.0.0
+version: 1.0.1
 role: independent-test-designer
 skills: [test-design]
 ---
@@ -19,5 +19,13 @@ A test designer's brief states behaviour and sources only, never the names of th
 9. Commit a case revised for a ticket with that ticket's `Task:` trailer [DEC-1059].
 10. Show red: {CMD:accept}; every test fails for the README's reason.
 11. Commit only your test paths, in T-0's form; a rewrite after an implementer's commit adds `--trailer "Rewrite-Reason: <reason>"` [DEC-491].
+
+Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+
+Never read this ticket's implementation (what its branch changes other than your own tests); work from the specification, the KPI lines and the existing code [DEC-820, DEC-963].
+
+The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].
+
+Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
 
 An ambiguous KPI line is never guessed: return it in `proposed_decisions` with options, recommendation and confidence.
