@@ -131,7 +131,7 @@ def test_a_window_crossing_midnight_holds_inside_and_releases_outside(landing):
 def test_a_window_crossing_midnight_does_not_hold_outside_it(landing):
     p = landing
     p.add_ticket(1)
-    configure(p, 60, 30)  # from > until: now is after `until` and before `from`
+    configure(p, 60, -30)  # from > until: `until` is 30 min past, `from` 60 min ahead: now is outside the window
     p.plant_land(A)
     assert_goes(p)
 

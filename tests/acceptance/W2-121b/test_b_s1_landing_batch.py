@@ -51,7 +51,10 @@ def test_approved_tickets_go_as_one_batch_claimed_before_the_launch(landing):
 
     p.release()
     assert p.wait_exit_file(land_id) == "0", "logs/<land id>.exit holds the batch's exit code"
-    assert "landing stub ran with 2 approval" in (p.state / "logs" / land_id).read_text(encoding="utf-8")
+    # the log is the batch's own output: the stub counts all of its arguments (the two flags and the two approvals)
+    expected_log = f"landing stub ran with {len(batch['argv'])} approval argument(s)"
+    assert len(batch["argv"]) == 4, batch["argv"]
+    assert expected_log in (p.state / "logs" / land_id).read_text(encoding="utf-8")
     p.tick_until(p.finalised(A), what="the landing to be finalised")
 
     for pair in (A, B):
