@@ -185,3 +185,22 @@ S12 (the trailers switch) is not built in this run (P4: its CIT-P, review and th
   `test_w2_115_batch.py::test_f3_a_culprits_own_new_red_test_is_blamed_once_confirmed_alone`,
   `test_w2_115_batch.py::test_f3_an_absent_red_not_red_with_its_candidate_alone_refuses_and_nothing_lands`.
 - **F-7 (S9):** the method above, stated exactly; the script inline and re-run at `ce6a2addf362`.
+
+## Fix round 1, red iteration 1 (eng-6): five acceptance reds at `b5ae48b88654`
+
+- **S4 / F-1: the night no longer stands for a run it does not settle.** With F-1 the head without the change is the
+  green base, which is often a full green night's head; `attribution.attribute` then took the night's result for the
+  run there, so a red the night had green was judged caused with no run on that head. Now the night stands for that
+  run (free, no run) only where it excuses the red: red there with the same failure type (`judge` on the night's
+  result). Otherwise the red is run once on the head without the change (3 rounds if load-sensitive), as without a
+  night; only that run can excuse it. The reason says "read from the nightly record" only when the night stood for
+  the run. Unit tests:
+  `test_w2_115_attribution.py::test_s4_a_full_green_night_at_the_head_without_the_change_does_not_replace_its_run`,
+  `test_w2_115_close.py::test_f1_a_red_is_run_on_the_green_base_even_where_a_full_green_night_names_it` (both red
+  before the fix).
+- **S6 / F3: the run on the rest leaves out a culprit's own new test file.** The batch's selection can name a
+  culprit's new test file by itself; the merged result without the culprit does not hold it, so pytest exited 4 and
+  the batch refused `RUN_INCOMPLETE`. `batch.isolate` now runs the rest on the selection less the targets the rest's
+  commit does not hold (`git cat-file -e <land>:<path>`), and refuses `RUN_INCOMPLETE` if none is left (never a run on
+  nothing). The batch's recorded selection is unchanged. Unit test:
+  `test_w2_115_batch.py::test_f3_the_run_on_the_rest_leaves_out_a_culprits_own_new_test_file` (red before the fix).

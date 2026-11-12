@@ -254,3 +254,25 @@ def test_f3_an_absent_red_not_red_with_its_candidate_alone_refuses_and_nothing_l
     assert raised.value.details["unexplained"] == [f"{NEW_RED}::test_new"]
     assert raised.value.details["explains"] == {f"{NEW_RED}::test_new": []}
     assert repo.git("rev-parse", "main").strip() == base
+
+
+ADDED_RED = "tests/unit/test_a_added.py"
+
+
+def test_f3_the_run_on_the_rest_leaves_out_a_culprits_own_new_test_file(tmp_path):
+    """reds-6 (S6, F3): the selection names a's own new red test file by itself (not inside a suite folder). The
+    rest (b and c) does not hold that file, so its run must not name it (pytest exits 4 on a missing path, and the
+    batch refused RUN_INCOMPLETE): a goes back, b and c land on the same run, and the rest's run is green."""
+    repo = project(tmp_path)
+    base = repo.git("rev-parse", "HEAD").strip()
+    _branch(repo, "a", {ADDED_RED: "def test_added():\n    assert 1 == 2\n"})
+    _branch(repo, "b", {"src/pkg/other.py": "def other():\n    return 1  # b\n"})
+    _branch(repo, "c", {"docs/c.md": "# c\n"})
+    result, code = batch.isolate(repo.root, base, ["a", "b", "c"], targets=[OWN_SUITE, ADDED_RED], onto="main",
+                                 timeout=120)
+    assert code == batch.EXIT_CULPRITS
+    assert result["culprits"] == ["a"] and result["landed"] == ["b", "c"]
+    assert repo.git("rev-parse", "main").strip() == result["land_commit"] != base
+    rest = {r["name"]: r for r in result["rest_runs"]}
+    assert rest["parallel"]["passed"] >= 1 and rest["parallel"]["failed"] == 0
+    assert result["selection"]["suites"] == sorted([OWN_SUITE, ADDED_RED])  # the batch's selection is unchanged

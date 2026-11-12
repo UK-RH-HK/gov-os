@@ -619,7 +619,14 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
             land = _build(clone, base_sha, landed)
             if land is None:
                 refuse(CANDIDATE_NOT_ISOLATED, "the candidates left after the culprits cannot be merged together")
-            rest = run_on(land, chosen, "rest")
+            # the rest is run on the batch's selection less the targets it does not hold (a culprit's own new test
+            # file is not in the merged result without it; naming it makes pytest exit 4); never on nothing
+            held = [s for s in chosen["suites"] if _attribution._git(
+                clone, "cat-file", "-e", f"{land}:{s.split('::')[0].rstrip('/')}").returncode == 0]
+            if not held:
+                refuse("RUN_INCOMPLETE", "the merged result without the culprits holds none of the selection's "
+                       "targets, so it cannot be run")
+            rest = run_on(land, {**chosen, "suites": held}, "rest")
             result["rest_runs"] = rest["runs"]
             if rest["failing"]:
                 refuse(BATCH_UNEXPLAINED, "the merged result without the culprits is not green: "
