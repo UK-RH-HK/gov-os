@@ -479,3 +479,245 @@ def runs(entry: str, ignore: list[str], deselect: list[str]) -> bool:
     if any(file == _norm(i) or file.startswith(_norm(i) + "/") for i in ignore):
         return False
     return not any(entry == d or entry.startswith(d + "::") or entry.startswith(d + "[") for d in deselect)
+
+
+# ---------------------------------------------------------------------------
+# The scoped selection (W2-115 S2, S3; DEC-953 item 4, DEC-968, DEC-1001 (a))
+# ---------------------------------------------------------------------------
+#
+# The scoped close's one selection, also printed by ``gov close --select``: the ticket's own suite and every suite
+# its change can reach, never the full suite. The change is the ticket's own: the paths of HEAD's commits whose
+# trailers hold ``Task: <ticket>`` (merges bring no path of their own). For each changed path:
+#   - a coupling that names it selects its suites (the map's explicit word, for any path);
+#   - a record place (``record_only``) or a governance-overlay path (``governance/project/``, ``.gov-runtime/``)
+#     selects nothing else by itself; records in the change select ``record_reading``;
+#   - a test file selects itself; another file of a test folder (a helper, a conftest) selects its folder;
+#   - a path a ticket with a suite holds in its ``allowed_paths`` selects that suite;
+#   - a Python module selects every test file that imports it, directly or through other modules, or names it
+#     (``python -m <module>``): the import graph; a shared-core path is read the same way, never as "everything".
+# A code path that none of these reaches is unmapped: the selection is refused (``SelectionRefused``), never
+# widened. So is an unreadable test map, a selected target the head does not hold, and a target that would be the
+# whole of ``tests/``.
+
+GOVERNANCE_OVERLAY = ("governance/project/", ".gov-runtime/")
+SELECTION_REFUSED = "SELECTION_REFUSED"
+PYTEST_OPTIONS = ["-p", "no:cacheprovider", "-o", f"tmp_path_retention_policy={RETENTION_POLICY}",
+                  "-o", "junit_family=xunit1"]
+_SKIP_DIRS = {".git", ".gov-runtime", "node_modules", "__pycache__", ".venv", "venv", ".tox", ".mypy_cache"}
+
+
+class SelectionRefused(Exception):
+    """A selection that cannot be made; ``reason`` says why (S2: never widened)."""
+
+    def __init__(self, reason: str):
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _is_test_file(rel: str) -> bool:
+    name = rel.rsplit("/", 1)[-1]
+    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+
+
+def ticket_change(root: Path, ticket: str) -> tuple[list[str], str | None]:
+    """``(paths, base)``: every path the ticket's own commits change, and the head without them: the first parent
+    of the oldest of its non-merge commits (None when it has none)."""
+    from gov.close.repo import ticket_commits
+
+    commits = ticket_commits(Path(root), ticket)
+    own = [c for c in commits if len(c["parents"]) <= 1]
+    paths = sorted({p for c in own for p in c["paths"]})
+    oldest = own[-1] if own else None
+    base_commit = oldest["parents"][0] if oldest and oldest["parents"] else None
+    return paths, base_commit
+
+
+def _module_of(rel: str) -> str | None:
+    """The dotted module a Python file is: under ``src/`` relative to it, else relative to the project."""
+    if not rel.endswith(".py"):
+        return None
+    parts = rel[:-3].split("/")
+    if parts[0] == "src" and len(parts) > 1:
+        parts = parts[1:]
+    if parts[-1] == "__init__":
+        parts = parts[:-1]
+    return ".".join(parts) if parts and all(p.isidentifier() for p in parts) else None
+
+
+def _python_files(root: Path) -> list[str]:
+    found = []
+    for path in sorted(Path(root).rglob("*.py")):
+        rel = path.relative_to(root)
+        if any(part in _SKIP_DIRS for part in rel.parts[:-1]):
+            continue
+        found.append(rel.as_posix())
+    return found
+
+
+def _imported(rel: str, tree: ast.Module) -> set[str]:
+    """Every dotted name a file's imports may mean: ``a.b.c`` and each of its beginnings, ``from a import b`` as
+    ``a.b`` and ``a``; relative imports resolved against the file's own package."""
+    package = (_module_of(rel) or "").split(".")
+    if not rel.endswith("__init__.py"):
+        package = package[:-1]
+    names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                names.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                anchor = package[:len(package) - (node.level - 1)] if node.level - 1 <= len(package) else []
+                module = ".".join(anchor + ([node.module] if node.module else []))
+            else:
+                module = node.module or ""
+            if module:
+                names.add(module)
+                names.update(f"{module}.{alias.name}" for alias in node.names if alias.name != "*")
+    out = set()
+    for name in names:
+        parts = name.split(".")
+        out.update(".".join(parts[:i]) for i in range(1, len(parts) + 1))
+    return out
+
+
+def import_reach(root: Path, changed_modules: list[str]) -> dict[str, set[str]]:
+    """For each changed module, the test files (relative paths) that import it, directly or through other files,
+    or name it as text (a ``python -m`` call). Test helpers are reached by their bare name as well."""
+    root = Path(root)
+    files = _python_files(root)
+    modules: dict[str, str] = {}
+    for rel in files:
+        name = _module_of(rel)
+        if name:
+            modules.setdefault(name, rel)
+        if rel.startswith("tests/"):  # a helper beside its tests is imported by its bare name
+            modules.setdefault(rel.rsplit("/", 1)[-1][:-3], rel)
+    importers: dict[str, set[str]] = {}
+    texts: dict[str, str] = {}
+    for rel in files:
+        try:
+            text = (root / rel).read_text(encoding="utf-8")
+            tree = ast.parse(text)
+        except (OSError, UnicodeDecodeError, SyntaxError, ValueError):
+            continue
+        if _is_test_file(rel):
+            texts[rel] = text
+        for name in _imported(rel, tree):
+            target = modules.get(name)
+            if target and target != rel:
+                importers.setdefault(target, set()).add(rel)
+    found = {}
+    for module in changed_modules:
+        start = modules.get(module)
+        seen, todo = set(), [start] if start else []
+        while todo:
+            current = todo.pop()
+            for importer in importers.get(current, ()):
+                if importer not in seen:
+                    seen.add(importer)
+                    todo.append(importer)
+        hits = {rel for rel in seen if _is_test_file(rel)}
+        hits |= {rel for rel, text in texts.items() if "." in module and module in text}
+        found[module] = hits
+    return found
+
+
+def _within(target: str, other: str) -> bool:
+    """Whether ``target`` lies inside the folder or file ``other`` names (and is not it)."""
+    t, o = _norm(target.partition("::")[0]), _norm(other.partition("::")[0])
+    if t == o:
+        return "::" in target and "::" not in other
+    return t.startswith(o + "/")
+
+
+def scoped(root: Path, ticket: str) -> dict:
+    """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
+    "head"}``; ``SelectionRefused`` with its reason where it cannot be made."""
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    root = Path(root)
+    front = frontmatter(root / TICKETS_REL / f"{ticket}.md")
+    if front is None:
+        raise SelectionRefused(f"{ticket} is not a ticket of this project")
+    wbs = str(front.get("wbs_id") or front.get("external-ref") or ticket)
+    test_map, why_not = load_map(root)
+    if test_map is None:
+        raise SelectionRefused(f"the test map {MAP_REL} cannot be read ({why_not}): no selection is made blind")
+    paths, base_commit = ticket_change(root, ticket)
+    tickets = _tickets(root)
+    couplings = test_map.get("couplings") or []
+    why: dict[str, list[str]] = {}
+
+    def select(target: str, reason: str) -> None:
+        why.setdefault(target, [])
+        if reason not in why[target]:
+            why[target].append(reason)
+
+    own = suite_folder(root, front, wbs)
+    if has_suite(root, own):
+        select(own, "OWN")
+    records, code, placed, modules = [], [], {}, {}
+    for p in paths:
+        hit = False
+        for c in couplings:
+            if _any(p, c.get("paths")):
+                for suite in c.get("suites") or []:
+                    select(suite, f"COUPLING {p}")
+                hit = True
+        if _any(p, test_map.get("record_only")):
+            records.append(p)
+            continue
+        if p.startswith(GOVERNANCE_OVERLAY):
+            continue
+        code.append(p)
+        if suite_of(p) is not None or p.startswith(FULL_TARGET + "/"):
+            if _is_test_file(p):
+                select(p, "TEST_CHANGED")
+                hit = True
+            elif p.rsplit("/", 1)[0] not in (FULL_TARGET, ACCEPTANCE):
+                select(p.rsplit("/", 1)[0] + "/", f"TEST_FOLDER {p}")
+                hit = True
+        for tid, _, patterns, folder, held in tickets:
+            if held and _any(p, patterns):
+                select(folder, f"OVERLAP {tid} {p}")
+                hit = True
+        stem = p.rsplit("/", 1)[-1][:-3] if p.endswith(".py") else ""
+        module = _module_of(p) or (stem if p.startswith(FULL_TARGET + "/") and stem.isidentifier() else None)
+        if module:
+            modules[module] = p
+        placed[p] = hit
+    if modules:
+        reach = import_reach(root, list(modules))
+        for module, p in modules.items():
+            for rel in reach.get(module, ()):
+                select(rel, f"IMPORTS {p}")
+                placed[p] = True
+    unplaced = [p for p, hit in placed.items() if not hit]
+    if unplaced:
+        raise SelectionRefused(f"{len(unplaced)} changed path(s) nothing maps to a suite (no coupling, no ticket "
+                               f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}")
+    if records:
+        for target in test_map.get("record_reading") or []:
+            select(target, "RECORD_READING")
+        if code:
+            for target in test_map.get("every_close") or []:
+                select(target, "EVERY_CLOSE")
+    whole = [t for t in why if _norm(t) in (FULL_TARGET, ACCEPTANCE, "", ".")]
+    if whole:
+        raise SelectionRefused(f"the selection would run the whole of {', '.join(whole)}: the full suite runs only "
+                               "in the nightly; name the reached suites in the test map's couplings")
+    gone = unresolved(root, list(why))
+    if gone:
+        raise SelectionRefused("the head does not hold a selected target: "
+                               + ", ".join(f"{t} ({d})" for t, d in gone))
+    suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
+    return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
+            "changed": paths, "why": {t: why[t] for t in suites}, "base": base_commit,
+            "head": _git(root, "rev-parse", "HEAD").strip()}
+
+
+def pytest_options(test_map: dict | None) -> list[str]:
+    """The options every scoped run takes besides its targets: no cache, the retention policy, JUnit's node
+    files. The same on every machine (no plugin's option): a run's time limit is the close's own, around it."""
+    return list(PYTEST_OPTIONS)

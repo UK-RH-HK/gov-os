@@ -319,6 +319,24 @@ def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:
 # The night
 # ---------------------------------------------------------------------------
 
+SECRETS_FULL_SCAN = "GOV_SECRETS_FULL_SCAN"  # W2-115 S8 (DEC-966 item 4): the night's rebuild scans every text
+
+
+def rebuild_stores(tree: Path) -> dict:
+    """The worktree's stores rebuilt before the night's run with the full secrets scan (W2-115 S8):
+    ``GOV_SECRETS_FULL_SCAN=1`` in the rebuild's environment, whatever the caller's. Without the semantic vectors
+    (``--no-embeddings``: no model runs for a worktree that is removed after the night). ``{"ok", "exit",
+    "secrets_full_scan", "error"}``."""
+    env = {**_pytest_env(tree), SECRETS_FULL_SCAN: "1"}
+    cmd = [sys.executable, "-m", "gov.cli.main", "rebuild", "--json", "--no-embeddings", "--root", str(tree)]
+    try:
+        done = subprocess.run(cmd, cwd=str(tree), env=env, capture_output=True, text=True)
+    except OSError as e:
+        return {"ok": False, "exit": None, SECRETS_FULL_SCAN: "1", "error": str(e)}
+    error = None if done.returncode == 0 else " ".join((done.stderr or done.stdout).split())[-400:]
+    return {"ok": done.returncode == 0, "exit": done.returncode, SECRETS_FULL_SCAN: "1", "error": error}
+
+
 def night(root: Path, branch: str, coverage: bool = False) -> dict:
     """Run the night on ``branch``'s head; its record, written to the working tree."""
     root = Path(root)
@@ -337,6 +355,7 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
     _git(root, "worktree", "add", "--detach", "--force", str(tree), head, pinned=False)
     entry = _entry_of(tree)
     try:
+        rebuilt = rebuild_stores(tree)  # S8: before the run, the full secrets scan
         test_map, _ = _select.load_map(tree)
         per_test, distribution = _select.settings(test_map)
         scope = {"ignore": [], "deselect": [], "per_test_timeout": per_test, "distribution": distribution,
@@ -387,8 +406,11 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
         if not full.exists():
             full.write_text("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<testsuites/>\n", encoding="utf-8")
         junit.append(full.relative_to(root).as_posix())
+    # S8: the record says whether the full secrets scan ran (a failed rebuild: false, with its error); the tests'
+    # verdict stays the tests' own, as the strict close's batch reads it (F4)
     verdict = GREEN if not findings and not listed else RED
     record = {"branch": branch, "head": head, "tree": tree_id, "base": since, "scope": "full", "verdict": verdict,
+              "secrets_full_scan": bool(rebuilt["ok"]), "rebuild": rebuilt,
               "junit_xml": junit, "failures": listed, "packages": packages, "tests_run": counts,
               "findings": findings, "per_test_timeout": per_test, "distribution": distribution,
               "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}

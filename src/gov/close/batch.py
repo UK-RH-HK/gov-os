@@ -443,6 +443,165 @@ def run(root: Path, tickets: list[str]) -> tuple[dict, int]:
     return result, 0
 
 
+# ---------------------------------------------------------------------------
+# The scoped close's batch: the culprit isolated before anything lands (W2-115 S6, F3; DEC-979 item 3, DEC-988,
+# DEC-1002)
+# ---------------------------------------------------------------------------
+#
+# ``isolate --base <commit> <candidate> ... [--test <target> ...] [--onto <branch>]``: the merged result of every
+# candidate (a branch, or ``<name>=<commit>``) built on the base in the warm clone, and its selection run. On a red,
+# each red is run again alone; for each candidate in turn the merged result without it is built afresh (the others
+# merged onto the base: never merged code taken out) and each red run alone there; a candidate explains a red that
+# is green without it. A red no single candidate explains is ``BATCH_UNEXPLAINED``; a candidate whose build without
+# it cannot be made is ``CANDIDATE_NOT_ISOLATED``: both refuse the batch and nothing lands. Otherwise the culprits go
+# back and the merged result of the rest, run green again, lands on the same run (``--onto``: that branch moved to
+# it, only from the base). Nothing lands before every candidate is judged.
+
+BATCH_UNEXPLAINED, CANDIDATE_NOT_ISOLATED = "BATCH_UNEXPLAINED", "CANDIDATE_NOT_ISOLATED"
+EXIT_CULPRITS = 5  # landed but for the culprits sent back
+_MERGE_IDENTITY = ["-c", "user.name=gov", "-c", "user.email=gov@localhost"]
+LAND_REF = "refs/gov-close/land"
+
+
+def _candidate(root: Path, given: str) -> dict:
+    name, sep, rev = given.partition("=")
+    rev = rev if sep else name
+    sha = _git(root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}", ok=(0, 1)).strip()
+    if not sha:
+        raise GovError(CANDIDATE_NOT_ISOLATED, f"the candidate {given} names no commit", {"candidate": given})
+    return {"name": name, "commit": sha}
+
+
+def _build(clone: Path, base: str, merged: list[dict]) -> str | None:
+    """The base with ``merged`` merged onto it in turn, in the clone (fresh merges); its commit, or None where a
+    merge cannot be made."""
+    from gov.close import attribution as _attribution
+
+    _attribution.checkout(clone, base)
+    for cand in merged:
+        done = _attribution._git(clone, *_MERGE_IDENTITY, "merge", "--no-ff", "--no-edit", "-q",
+                                 "-m", f"batch: merge {cand['name']}", cand["commit"])
+        if done.returncode != 0:
+            _attribution._git(clone, "merge", "--abort")
+            return None
+    return _attribution._git(clone, "rev-parse", "HEAD").stdout.strip()
+
+
+def _targets(clone: Path, candidates: list[dict], given: list[str] | None) -> dict:
+    """The run's selection: the targets given, else the union of the candidates' scoped selections (each a ticket
+    of the project) at the merged result."""
+    if given:
+        return {"suites": sorted(dict.fromkeys(given)), "pytest_options": _select.pytest_options(
+            _select.load_map(clone)[0])}
+    suites, options = [], None
+    for cand in candidates:
+        try:
+            chosen = _select.scoped(clone, cand["name"])
+        except _select.SelectionRefused as refused:
+            raise GovError(_select.SELECTION_REFUSED, f"{cand['name']}: {refused.reason}",
+                           {"candidate": cand["name"]}, exit_code=EXIT_RED)
+        suites += chosen["suites"]
+        options = chosen["pytest_options"]
+    return {"suites": sorted(dict.fromkeys(suites)), "pytest_options": options or list(_select.PYTEST_OPTIONS)}
+
+
+def isolate(root: Path, base: str, given: list[str], targets: list[str] | None = None, onto: str | None = None,
+            timeout: float = 3600) -> tuple[dict, int]:
+    """The batch (S6): ``(result, exit code)``; a ``GovError`` for a refusal (nothing landed)."""
+    from gov.close import attribution as _attribution
+    from gov.close.command import _phases
+
+    root = Path(root)
+    base_sha = _git(root, "rev-parse", "--verify", "--quiet", f"{base}^{{commit}}", ok=(0, 1)).strip()
+    if not base_sha:
+        raise GovError("BASE_UNKNOWN", f"--base {base} names no commit", {"base": base})
+    if not given:
+        raise GovError(CANDIDATE_NOT_ISOLATED, "the batch names no candidate", {"candidates": []})
+    candidates = [_candidate(root, g) for g in given]
+    stamp = _stamp()
+    folder = root / BATCH_DIR / stamp
+    try:
+        clone_state = _attribution.prepare(root, base_sha)
+    except _attribution.CloneError as e:
+        raise GovError("CLOSE_CLONE_FAILED", f"the batch's clone cannot be made: {e}", {"base": base_sha})
+    clone = root / clone_state["path"]
+    result = {"base": base_sha, "candidates": [c["name"] for c in candidates], "culprits": [], "landed": [],
+              "land_commit": None, "reds": [], "flaky": [], "clone": clone_state, "folder": str(folder)}
+
+    def refuse(code: str, message: str, **more):
+        raise GovError(code, message + "; nothing lands", {**result, **more}, exit_code=EXIT_RED)
+
+    def run_on(commit: str, chosen: dict, name: str) -> dict:
+        _attribution.checkout(clone, commit)
+        phases = _phases(clone, chosen, folder / name, timeout, 1)
+        if not phases["complete"]:
+            refuse("RUN_INCOMPLETE", f"the run on {name} did not complete: {'; '.join(phases['incomplete'])}")
+        return phases
+
+    whole = _build(clone, base_sha, candidates)
+    if whole is None:
+        bad = next((c["name"] for n, c in enumerate(candidates) if _build(clone, base_sha, candidates[:n + 1]) is None),
+                   candidates[-1]["name"])
+        refuse(CANDIDATE_NOT_ISOLATED, f"the candidates cannot be merged together on the base: {bad} does not merge",
+               candidate=bad)
+    chosen = _targets(clone, candidates, targets)
+    result["selection"] = chosen
+    phases = run_on(whole, chosen, "batch")
+    result["runs"] = phases["runs"]
+    options = chosen["pytest_options"]
+    reds = []
+    for test in dict.fromkeys(f["test"] for f in phases["failing"]):
+        alone = _attribution.run_alone(clone, test, options, folder / "alone", timeout, "batch")
+        (reds if alone is not None else result["flaky"]).append(test)
+    result["reds"] = reds
+    land, landed = whole, candidates
+    if reds:
+        explains: dict[str, list[str]] = {r: [] for r in reds}
+        for cand in candidates:
+            others = [c for c in candidates if c is not cand]
+            without = _build(clone, base_sha, others)
+            if without is None:
+                refuse(CANDIDATE_NOT_ISOLATED, f"the merged result without {cand['name']} cannot be built (the "
+                       "others do not merge without it)", candidate=cand["name"])
+            for red in reds:
+                if _attribution.run_alone(clone, red, options, folder / "alone", timeout,
+                                          f"without-{cand['name']}") is None:
+                    explains[red].append(cand["name"])
+        result["explains"] = explains
+        unexplained = [r for r, names in explains.items() if not names]
+        if unexplained:
+            refuse(BATCH_UNEXPLAINED, f"{len(unexplained)} red(s) no single candidate explains: "
+                   f"{', '.join(unexplained)}", unexplained=unexplained)
+        culprits = sorted({n for names in explains.values() for n in names},
+                          key=[c["name"] for c in candidates].index)
+        result["culprits"] = culprits
+        landed = [c for c in candidates if c["name"] not in culprits]
+        if landed:
+            land = _build(clone, base_sha, landed)
+            if land is None:
+                refuse(CANDIDATE_NOT_ISOLATED, "the candidates left after the culprits cannot be merged together")
+            rest = run_on(land, chosen, "rest")
+            result["rest_runs"] = rest["runs"]
+            if rest["failing"]:
+                refuse(BATCH_UNEXPLAINED, "the merged result without the culprits is not green: "
+                       + ", ".join(dict.fromkeys(f["test"] for f in rest["failing"])))
+        else:
+            land = None
+    if land is not None:
+        _attribution._git(clone, "update-ref", LAND_REF, land)
+        _git(root, "fetch", "--quiet", "--no-tags", str(clone.resolve()), f"+{LAND_REF}:{LAND_REF}", pinned=False)
+        if onto:
+            current = _git(root, "symbolic-ref", "--quiet", "--short", "HEAD", ok=(0, 1)).strip()
+            if current == onto:
+                _git(root, "merge", "--ff-only", "-q", land, pinned=False)
+            else:
+                _git(root, "update-ref", f"refs/heads/{onto}", land, base_sha, pinned=False)
+        result["land_commit"] = land
+        result["landed"] = [c["name"] for c in landed]
+    _attribution.checkout(clone, base_sha)
+    return result, (EXIT_CULPRITS if result["culprits"] else 0)
+
+
 def refresh(root: Path) -> dict:
     """The incremental record load at ``HEAD``; ``STORE_STALE`` where the store is not fresh at ``HEAD`` after it."""
     from gov.store import load_records
@@ -461,13 +620,25 @@ def main(argv: list[str] | None = None) -> int:
     batch = commands.add_parser("run", help="the batch: one run at HEAD, then each ticket's close")
     batch.add_argument("tickets", nargs="+")
     action = commands.add_parser("refresh", help="the incremental record load at HEAD")
-    for sub in (batch, action):
+    scoped = commands.add_parser("isolate", help="the scoped close's batch: the culprit isolated before anything "
+                                 "lands (W2-115)")
+    scoped.add_argument("candidates", nargs="+", help="a branch, or <name>=<commit>")
+    scoped.add_argument("--base", required=True, help="the commit the candidates merge onto")
+    scoped.add_argument("--test", action="append", default=None, help="a target to run (default: the candidates' "
+                        "scoped selections)")
+    scoped.add_argument("--onto", default=None, help="the branch the rest lands on (moved only from the base)")
+    scoped.add_argument("--timeout", type=float, default=3600)
+    for sub in (batch, action, scoped):
         sub.add_argument("--root", default=".")
         sub.add_argument("--json", action="store_true")
         sub.add_argument("--session", default="")
     args = parser.parse_args(argv)
     try:
-        result, code = run(Path(args.root), args.tickets) if args.action == "run" else (refresh(Path(args.root)), 0)
+        if args.action == "isolate":
+            result, code = isolate(Path(args.root), args.base, args.candidates, args.test, args.onto, args.timeout)
+        else:
+            result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+                else (refresh(Path(args.root)), 0)
     except GovError as error:
         envelope = {"ok": False, "command": COMMAND, "result": {}, "session": args.session,
                     "error": {"code": error.code, "message": error.message, "details": error.details}}
