@@ -409,6 +409,8 @@ acceptance_exemptions:
     decision: DEC-1123  # item (3); the owner's ACT-GUARD-SETS-1 commit deleted W2-84's hidden-half cases (DEC-1061, DEC-1097)
   - commit: "6fbe73b1adde40571f00d490b4b478cf86b70a52"
     decision: DEC-1136  # the owner's ACT-OPERATOR-ROUNDS-1 commit changed the acceptance support file tests/acceptance/W2-148/w2_148_support.py (DEC-1136 (1)); not a test designer's commit
+  - commit: "8ed7561b68a32feaa6114f8f11c22182d5ead2c3"
+    decision: DEC-1141  # ACT-OPERATOR-HOURS-2's commit (DEC-1136 (2))
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
