@@ -17,6 +17,12 @@ role: engineer
 depends_on:
 - DAEO-arrl
 allowed_paths:
+- tests/acceptance/W1-39/test_w1_39_copy.py  # PK-1 (a), the owner DEC-1142 (3): the overlay case names close.yaml; a test designer's revision only (dropped after the land)
+- tests/acceptance/W1-39/README.md  # the same
+- tests/acceptance/W2-77/w2_77_support.py  # PK-2 (a), the CTO: the nightly record's key set allows secrets_full_scan; a test designer's revision only (dropped after the land)
+- tests/acceptance/W2-77/test_w2_77_unchanged.py  # the same
+- tests/acceptance/W2-77/test_w2_77_failed_removal.py  # the same
+- tests/acceptance/W2-77/README.md  # the same
 - src/gov/close/command.py
 - governance/project/close.yaml
 - template/governance/project/close.yaml
@@ -110,3 +116,9 @@ The owner's SMART-WORK-1 decision 1 (DEC-983): the smart close becomes the produ
   trailers switch (S17, a kernel check file) waits for its CIT-P (`docs/changes/W2-115-CIT-P.md`), its independent review
   and the owner's approval (CAP-33), as a later round; this run builds every other line; P5 (a): S18 builds on today's
   serial phase (`serial.py`, W2-57's); W2-154 extends it later in the command.py chain.
+
+## PK-1 and PK-2 (2026-11-12 ~09:55)
+
+- **PK-1 (a) and (c), the owner (DEC-1142 (3)):** W1-39's `test_copy_creates_the_overlay` revised by the test designer (Rewrite-Reason: DEC-1142 (3), DEC-866) to accept the template's `governance/project/close.yaml` in the overlay; DEC-903's overlay list names it (changed by DEC-1142 (3)).
+- **PK-2 (a), the CTO (delegated P2):** W2-77's four key-set cases revised by the test designer to allow the nightly record's `secrets_full_scan` (Rewrite-Reason: DEC-966 item 4, S8).
+- One test-design batch for both, then verify, the FULL review and the probe record. The acceptance paths above are for that revision only and are dropped after the land.
