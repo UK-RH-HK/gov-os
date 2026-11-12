@@ -559,6 +559,46 @@ def retire_store_proposal():
     return [entry(rel, "RETIRE", kind="memory-store") for rel in STORE]
 
 
+# P-W2-23-7 (a), sentence-final citations: each file ends a sentence with the citation and a full stop. Each cites the
+# store of STORE alone. (iii) uses the tail of ``legacy/memory/index.md``, a file whose name is not a record id, so no id
+# match can stand in for the tail form.
+SENTENCE_FINAL = {
+    "folder_then_dot": (".rulesync/rules/cite-final-folder.md", "# Votes\n\nThe old store is legacy/memory.\n"),
+    "folder_slash_then_dot": (".rulesync/rules/cite-final-folder-slash.md",
+                              "# Votes\n\nFor the old notes, see legacy/memory/.\n"),
+    "dotdot_tail_then_dot": (".rulesync/rules/cite-final-tail.md",
+                             "# Votes\n\nThe index of the store is ../memory/index.md.\n"),
+}
+
+# P-W2-23-7 (a), a store whose files all sit in subfolders: no file directly in ``notes/memory/``. Its folder (the
+# deepest folder holding all its files) is ``notes/memory``; ``notes/memory/2025/`` is a folder between it and a file.
+NESTED_STORE = ("notes/memory/2025/q1/a.md", "notes/memory/2026/b.md")
+NESTED_STORE_IDS = ("NST-001", "NST-002")
+NESTED_PATTERNS = NAMESPACE_PATHS + ("notes/**",)   # the path map holds ``notes/`` too, so A3 accepts the proposal
+
+
+def nested_store_files():
+    return {NESTED_STORE[0]: record_text("NST-001", "decision", "ACTIVE", "The cobalt tally is read aloud."),
+            NESTED_STORE[1]: record_text("NST-002", "decision", "ACTIVE", "The ash ballot box stays sealed.")}
+
+
+def retire_nested_store_proposal():
+    return [entry(rel, "RETIRE", kind="memory-store") for rel in NESTED_STORE]
+
+
+NESTED_CITATIONS = {
+    "own_folder_slash": (".rulesync/rules/cite-nested-folder-slash.md",
+                         "# Votes\n\nKeep reading the notes in notes/memory/ before a vote.\n"),
+    "own_folder_mid_sentence": (".rulesync/rules/cite-nested-folder.md",
+                                "# Votes\n\nThe old notes/memory and its tallies are kept for a year.\n"),
+    "folder_between": (".rulesync/rules/cite-nested-between.md",
+                       "# Votes\n\nThe older tallies are in notes/memory/2025/ for now.\n"),
+}
+# The control: a rule that cites nothing of the nested store (no folder of it, no file, no id).
+NESTED_UNRELATED = (".rulesync/rules/cite-nested-nothing.md",
+                    "# Votes\n\nA vote is held in the hall on the first Monday of the month.\n")
+
+
 def proof_said(error):
     """What the proof says it found: the refusal's message and its list of citers (never its list of what it read)."""
     details = error.get("details") or {}
