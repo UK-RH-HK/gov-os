@@ -24,6 +24,7 @@ allowed_paths:
 - governance/project/orchestration/tools/memaudit_cron.sh
 - docs/changes/W2-172-evidence.md
 - docs/probes/DAEO-p8tv/**  # the probe record (PKG-W2-172-IFACE-1, the CTO, 2026-11-12)
+- tests/acceptance/W2-171/test_w2_171_f5_paths.py  # one test-designer revision: F5 judges only on branch w2/W2-171 (the owner's P1-N (a), DEC-1155)
 kpis:
   success:
   - 'S1 One command, `python3 -m gov.memaudit run --sets-root <root>`, runs one audit in this order and no other: the writer''s round 1; the pre-flight (W2-170); the checker''s round 1; the writer''s round 2; the checker''s round 2; the drop and void rule; the declaration, the control and the measure (W2-171); the auditor, also with an empty misses file when there is no miss (the launch script writes the audits'' log line only when an auditor delivers, and that line is what the next audit''s "changed since the last audit" list starts from); the pool''s re-run. Each launch is the launch script''s command line with only `--sets-root <root>` named, the brief''s path under `governance/project/indep-briefs/memory-audit/` and its sha256 taken from `git show` at the audit commit (the script checks it against the owner''s approved list itself); the driver never opens a wall, a set or the approved list. The writer''s round 2 and the checker''s second pass run only when the first checker''s notes hold a `revise` or `reject`; a clean first pass goes straight to the measure. Verify: a planted sets root, repository and stub `claude` (W2-149''s): the call ledger shows the steps in that order for a set with revisions, and without the two second-round steps for a clean set; the printed command lines hold no `fixtures/`, `runs/` or `indep-walls/` [DEC-1101 (2)-(3), DEC-1125 (2)]'
@@ -228,3 +229,8 @@ Nothing `run` writes lies outside `<R>`. The children write what their own Inter
 - **GATE-1 (a):** the driver splits `--gate-cmd`'s value with `shlex.split` and runs the words as given, so the default `gov resources --check` works; the Interface's "called with no arguments" reads "run as its words".
 - **TD-1 (b):** the 12-line digest does not record `--force`; item 1's "and the digest" is corrected to the counts only.
 - **TD-2 (b):** RN-NAME is judged by `STARTS.log` (an audit started), not by a refusal's `COUNTS.json`, so a refused run can be retried the same day.
+
+## P1-N (a) (the owner, DEC-1155, 2026-11-12 ~21:35)
+
+The queue ejected W2-172 at 21:19 on (1) its conftest's path hygiene against the queue clone's `runs/` path (fixed within this ticket's paths) and (2) W2-171's F5 path case judging any branch. Widened by `tests/acceptance/W2-171/test_w2_171_f5_paths.py` for one test-designer revision: F5 judges only on branch w2/W2-171 and skips elsewhere naming why, as W2-180 did for W2-170.
+

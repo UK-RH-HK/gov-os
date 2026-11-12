@@ -14839,6 +14839,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **W2-121b now:** the narrow check of the template default (DEC-1149 (2)) that rode after its review; if it passes, it lands tonight.
 - **Basis:** the owner's message of 2026-11-12 ~20:10, after the queue refused W2-115 and W2-121b for want of a passing record at their heads.
 
+### DEC-1155 — P1-N (a): W2-172 widened by W2-171's F5 case for one revision; a sweep of every acceptance test for the two ejection defects
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~21:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-974, DEC-1154, DECIDED-NOT-DONE row 171
+- **Decision:**
+  - (1) **P1-N (a):** W2-172's allowed_paths gain `tests/acceptance/W2-171/test_w2_171_f5_paths.py` for one test-designer revision (F5 judges only on branch w2/W2-171, as W2-180 did for W2-170), riding with W2-172's own conftest fix (its path hygiene refused the queue clone's `runs/` path); a narrow independent check of both changes (DEC-1154's practice), then the land.
+  - (2) **A sweep:** every acceptance test is searched for the same two defects (a path case that judges any branch instead of its own; a hygiene check tripped by the queue's own folder path); one package with each case found and its fix in the 09:00 digest, so no further land is ejected for them.
+- **Basis:** the owner's message of 2026-11-12 ~21:35.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14928,3 +14935,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
 | 0.534 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1153 (W2-45 widened by W1-40's case; W2-160 by the session-watch command file). Next free id: DEC-1154. |
 | 0.535 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1154 (a change decided after a review gets a narrow independent check; the ticket lands on it; standing). Next free id: DEC-1155. |
+| 0.536 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1155 (P1-N (a): W2-172 widened by W2-171's F5 case; the sweep for the two ejection defects). Next free id: DEC-1156. |
