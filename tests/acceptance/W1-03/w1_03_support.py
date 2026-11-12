@@ -266,8 +266,14 @@ def default_tickets():
     }
 
 
+# The project's coordination ticket (DEC-957, DEC-971 item 4): the orchestrator on it is the CTO, the one session
+# whose install the kernel guard asks the owner about; every other session's install is refused (DEC-980).
+ROSTER_REL = "governance/project/roster.yaml"
+ROSTER_TEXT = f"coordination_ticket: {ORCHESTRATOR_TICKET_ID}\n"
+
 PROJECT_FILES = {
     "README.md": "# Fixture project\n",
+    ROSTER_REL: ROSTER_TEXT,
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
     "pyproject.toml": "[project]\nname = \"fixture\"\n",
     "docs/notes.md": "notes\n",
