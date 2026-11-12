@@ -16,6 +16,8 @@ when it gives them (never its list of what it read).
 
 from __future__ import annotations
 
+import pytest
+
 import w2_23_support as support
 
 
@@ -109,6 +111,22 @@ def test_s3_a_store_with_all_files_in_subfolders_is_found_cited_by_a_folder_betw
         tmp_path, box):
     """P-W2-23-7 (a): ``notes/memory/2025/`` is a folder between the store's folder and a file (``.../2025/q1/a.md``)."""
     _nested(tmp_path, box, "folder_between")
+
+
+@pytest.mark.parametrize("form", list(support.QUESTION_FINAL))
+def test_s3_a_folder_citation_ending_a_question_is_found(tmp_path, box, form):
+    """P-W2-23-8 (a), review finding R2-1: a citation of the store's folder that ends a question is found, as it is
+    with ``.`` or ``!``: ``legacy/memory?``, ``legacy/memory/?`` (the flat store) and ``notes/memory?`` (the nested
+    store). The fourth parameter, ``glob-question-inside``, keeps the glob reading: a ``?`` inside the token
+    (``legacy/memory/decisions/leg-00?.md``) is a glob character and the citation is still found."""
+    rel, text, which = support.QUESTION_FINAL[form]
+    nested = which == "nested"
+    project = _refused_with_found(tmp_path, box,
+                                  {**(support.nested_store_files() if nested else support.store_files()), rel: text},
+                                  support.retire_nested_store_proposal() if nested else support.retire_store_proposal(),
+                                  [rel], patterns=support.NESTED_PATTERNS if nested else support.NAMESPACE_PATHS)
+    store = support.NESTED_STORE if nested else support.STORE
+    assert support.at_head(project, store[0]) is not None, "the store left HEAD although it is cited"
 
 
 def test_s3_with_only_a_rule_citing_nothing_of_a_nested_store_planted_the_store_is_retired(tmp_path, box):
