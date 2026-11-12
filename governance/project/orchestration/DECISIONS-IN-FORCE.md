@@ -459,7 +459,7 @@ other restart is an ACT.
   is report-only fails (stricter; the six whole-suite lifted tickets wait for their features to return); a possessive
   or other further line name refuses the cell; a line whose only case is listed in lifted but defined nowhere fails
   (a row, tests first, after the lift). W2-92's map row 128 fixed before the lift (it closes there).
-- DEC-1118 (2026-11-10): **standing (rule 11):** fresh sessions at ~200k context; the CTO clears at ~200k and before
+- DEC-1118 (2026-11-10): **standing (rule 11):** fresh sessions at ~200k context; the CTO clears at ~200k and before **[(A) replaced by DEC-1141 (3): no token cap for any session.]**
   idles over an hour; ACT-preparation helpers on Sonnet, reviews, test design and engineering on Opus; every session's
   list-price cost logged. D (5-minute worker cache) once verified on this CLI; E and F trials after the lift. A
   model-tier investigation for the fresh session to finish (MODEL-TIERS-1). Basis: 4.
@@ -554,6 +554,10 @@ other restart is an ACT.
   launch (C2/C1 workers Sonnet high; Opus for C3 and reviews), briefs checked before release, no-action notices logged not
   sent; **context awareness before compaction back for every session**; then ACT A, the dispatcher's own lead cap, the idle
   guard's F1-F3, the brake's false trips (row 159), W2-115; usage, spend and speed measured from 11-02, in the digests;
-  **the CTO session to about 1M tokens, a fresh one each morning after the 09:30 digest** (changes DEC-1118 (A) for the
+  **the CTO session to about 1M tokens, a fresh one each morning after the 09:30 digest** (corrected by DEC-1141: no session has a token cap; changes DEC-1118 for the
   CTO); **the 80 % brake lifted this week, five leads, EXAMIN's path first**; **at 97 % no new start, at 99 % push the
   owner at any hour** (an exception to DEC-1089 (3)); the night hold stays. Basis: questions 2 and 4.
+- DEC-1141 (2026-11-12; (3) and (6) standing): W2-11's K3 CIT-P approved at `dca382f3069f`; W2-176's approval withdrawn (its cap);
+  **no token cap for any session** (CTO, leads, workers, helpers): full window and compaction, the hook writing the checkpoint and the
+  read-first line (DEC-1118 (A) replaced entirely; DEC-1140 (4) corrected); hand merges of W2-175 and W2-176 tonight; **the operator
+  agent asleep only during the nightly** (by ACT at 08:00). Basis: questions 2 and 4.
