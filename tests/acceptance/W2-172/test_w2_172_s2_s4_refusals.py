@@ -3,7 +3,8 @@ what refuses it before anything starts (Interface item 3).
 
 The audit commit is the store link's HEAD (``git -C <link> rev-parse HEAD``); the audit's name is
 ``memory-audit-<yyyymmdd>`` of ``GOV_MEMAUDIT_NOW``'s UTC date. The checks, in order: ``RN-LOCK``, ``RN-NOBASE``,
-``RN-RECENT``, ``RN-REBUILD``, ``RN-SIDE``, ``RN-STALE``, ``RN-NAME``. A refusal prints ``REFUSED <code>``, exits 1, starts no
+``RN-RECENT``, ``RN-REBUILD``, ``RN-SIDE``, ``RN-STALE``, ``RN-NAME`` (the last judged by a ``STARTS.log`` line naming the audit, not by the
+folder: PKG-W2-172-TESTS-1 TD-2 (b)). A refusal prints ``REFUSED <code>``, exits 1, starts no
 child, adds nothing to ``STARTS.log`` and writes ``COUNTS.json`` with ``refused`` only where the audit's folder is new.
 
 A start is shown by the planted launch script stopping at its first call (exit 10): the driver printed ``STEP writer-1``,
@@ -40,9 +41,13 @@ def started(world, run, *, audit=None, commit=None, force=False):
 
 
 def forget(world):
-    """Remove the folder a refusal's ``COUNTS.json`` made, so that the same date can start again. (Interface item 3 does
-    not say whether that folder makes a retry on the same date ``RN-NAME``; see the README's ``unresolved``: no case
-    depends on either answer.)"""
+    """Remove the folder a refusal's ``COUNTS.json`` made. Under PKG-W2-172-TESTS-1 TD-2 (b) (DEC-1112 (3)) ``RN-NAME`` is
+    judged by a ``STARTS.log`` line naming the audit (an audit started), never by the folder or by a refusal's
+    ``COUNTS.json``, so a refused run can be retried on the same date with or without this call; the cases that call it
+    keep their steps as they were, and ``test_s4_a_refused_run_is_not_a_start_and_the_same_date_can_be_retried`` shows
+    the retry without it.
+
+    Rewrite-Reason: PKG-W2-172-TESTS-1 TD-2 (b)"""
     shutil.rmtree(world.audit_dir, ignore_errors=True)
 
 
@@ -205,20 +210,61 @@ def test_s4_force_lifts_only_the_5_day_refusal(make_world):
 
 
 def test_s4_a_second_start_on_the_same_date_is_refused_rn_name_and_writes_nothing_there(make_world):
+    """``RN-NAME`` is judged by ``STARTS.log`` (an audit of that name started), so the first audit is planted as it leaves
+    itself: its ``STARTS.log`` line and its folder with a digest and counts. ``--force`` lifts ``RN-RECENT`` only, so the
+    refusal is ``RN-NAME``; the folder existed, so nothing is written into it.
+
+    Rewrite-Reason: PKG-W2-172-TESTS-1 TD-2 (b)"""
     world = make_world()
+    first = world.start_line(world.now, audit=world.audit)
+    world.plant_starts(first)
     world.audit_dir.mkdir(parents=True)
     (world.audit_dir / "DIGEST.txt").write_text("the first audit's digest\n")
     (world.audit_dir / "COUNTS.json").write_text('{"audit": "first"}\n')
     before = W.W171.snapshot(world.audit_dir)
     run = world.go(force=True)
-    C.refused_without_a_start(world, run, "RN-NAME", had_folder=True)
+    C.refused_without_a_start(world, run, "RN-NAME", had_folder=True, starts_before=[first])
     assert W.W171.snapshot(world.audit_dir) == before, "the first audit's folder is left as it was"
+
+
+@pytest.mark.parametrize("cause", ["RN-NOBASE", "RN-REBUILD"])
+def test_s4_a_refused_run_is_not_a_start_and_the_same_date_can_be_retried(make_world, cause):
+    """A refusal that wrote ``<R>/<A>/COUNTS.json`` (the folder was new) is no started audit: ``STARTS.log`` has no line
+    naming ``<A>``, so once the cause is removed a retry on the same date starts (it reaches ``writer-1``) and is not
+    ``RN-NAME``. The folder is not removed in between.
+
+    Added: PKG-W2-172-TESTS-1 TD-2 (b)"""
+    world = make_world()
+    if cause == "RN-NOBASE":
+        world.audits_log.unlink()
+        refused = world.go()
+    else:
+        with W.held_flock(world.link.with_name(world.link.name + ".lock")):
+            refused = world.go()
+    C.refused_without_a_start(world, refused, cause)
+    assert world.audit_dir.is_dir() and world.counts()["refused"] == cause, "the refusal wrote its counts there"
+    if cause == "RN-NOBASE":
+        world.plant_audits({"time": "2026-11-02T00:00:00Z", "commit": world.base_commit, "run": "baseline",
+                            "audit": "baseline"})
+    world.plan_launch(STOP_AT_WRITER)
+    run = world.go()  # the same date, the folder as the refusal left it
+    assert "REFUSED RN-NAME" not in run.lines, run.out
+    line = started(world, run)
+    assert world.starts() == [line], "only the start is a line of STARTS.log"
+    assert world.counts().get("refused") in (None, False), world.counts()
 
 
 @pytest.mark.parametrize("first,second", list(zip(CODES, CODES[1:])))
 def test_s2_the_first_check_that_fails_refuses(make_world, first, second):
     """Each check wins over its successor when both would refuse: the order of item 3. RN-STALE holds from the start (the
-    commit is 30 hours old)."""
+    commit is 30 hours old).
+
+    ``RN-NAME`` is judged by ``STARTS.log`` (a line naming the audit), with the first audit's folder as it leaves it. A
+    line less than 5 days old is itself ``RN-RECENT``, which comes before ``RN-NAME``; so the line planted for
+    ``RN-NAME`` is 6 days before now (older than 5 x 24 h) and ``RN-RECENT`` does not hold from it. Only the
+    ``(RN-STALE, RN-NAME)`` pair holds ``RN-NAME`` and shows the order the case means to show: ``RN-STALE`` first.
+
+    Rewrite-Reason: PKG-W2-172-TESTS-1 TD-2 (b)"""
     world = make_world(now=W.iso(W.AUDIT_TIME + timedelta(hours=30)))
     held = []
 
@@ -234,6 +280,7 @@ def test_s2_the_first_check_that_fails_refuses(make_world, first, second):
         elif code == "RN-SIDE":
             world.commit_in_link(branch="side", date="2026-11-09T00:00:00+00:00")
         elif code == "RN-NAME":
+            world.plant_starts(*world.starts(), world.start_line(hours_before(world, 6 * 24), audit=world.audit))
             world.audit_dir.mkdir(parents=True, exist_ok=True)
 
     for code in (first, second):

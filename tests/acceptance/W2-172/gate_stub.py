@@ -1,4 +1,4 @@
-"""The planted gate (``--gate-cmd <exe>``; Interface item 8): called with no arguments, exit 0 is open, anything else busy.
+"""The planted gate (``--gate-cmd <exe>``; Interface item 8): run as its words (a one-word value: no arguments; PKG-W2-172-TESTS-1 GATE-1 (a)), exit 0 is open, anything else busy.
 
 Answers from ``gate_plan.json`` in ``W172_STATE``: ``{"codes": [1, 1, 0]}``, the n-th call takes the n-th code (the last
 repeats; default 0). Logs each call to ``gate_calls.jsonl``: the time, the argv, and what the highest ``memory-audit-*``
