@@ -3,12 +3,13 @@
 PostToolUse hook (W2-176, DEC-1140 (1)(b), DEC-445): a once-per-context-window reminder near the window's end.
 
 Reads only the transcript's last 256 KiB, takes the last main-session assistant line's usage (input plus cache
-tokens) and divides it by the session's window: the model's window for the CTO's own session (the orchestrator on
-the coordination ticket, DEC-1140 (4)), at most 200,000 for every lead and worker (DEC-1118 (A)). At 85 % or more,
+tokens) and divides it by the window of the session's own model; no session has a token cap (the owner,
+2026-11-12): the CTO, a lead, a worker or a helper each use their model's full window and compact. At 85 % or more,
 once per context window (a state file under .gov-runtime/scratch/context_watch/, removed when usage falls below
-50 %, as after a compaction), it adds context telling the session to write its handover now and to begin its
-compaction summary with the read-first line. A subagent's event (agent_id) is skipped. A handover aid only: it sets
-no threshold, stops nothing and never decides on the tool call (DEC-838, DEC-901's precedent).
+50 %, as after a compaction), it adds context telling the session to write its checkpoint now, to update the files
+that need it and to begin its compaction summary with the read-first line. A subagent's event (agent_id) is
+skipped. A handover aid only: it sets no threshold, stops nothing and never decides on the tool call (DEC-838,
+DEC-901's precedent).
 
 Any error: nothing printed. Always exits 0.
 """
@@ -24,8 +25,7 @@ import sys
 TAIL_BYTES = 256 * 1024
 SHARE = 0.85
 REARM = 0.50
-DEFAULT_LIMIT = 200_000
-HANDOVER_CAP = 200_000  # leads and workers hand over by 200k (DEC-1118 (A)); a constant of the reminder only
+DEFAULT_LIMIT = 200_000  # the window of a model not in the table: a model size, not a cap
 CONTEXT_LIMITS = {  # tokens; a "[1m]" or date suffix matches its base (code.claude.com/docs/en/model-config)
     "claude-opus-5-5": 1_000_000,
     "claude-sonnet-5-5": 1_000_000,
@@ -64,31 +64,12 @@ def last_usage(path: str) -> tuple[int, str] | None:
     return None
 
 
-def is_cto(project_root: str) -> bool:
-    """The orchestrator on a coordination ticket (front matter `class: coordination`, first 4 KiB only)."""
-    ticket = os.environ.get("GOV_TICKET", "")
-    if os.environ.get("GOV_ROLE") != "orchestrator" or not re.fullmatch(r"[A-Za-z0-9_-]+", ticket):
-        return False
-    try:
-        with open(os.path.join(project_root, ".tickets", ticket + ".md"), "rb") as f:
-            head = f.read(4096)
-    except OSError:
-        return False
-    front = head.split(b"\n---", 1)[0] if head.startswith(b"---\n") else b""
-    return re.search(rb"^class:[ \t]*coordination[ \t]*\r?$", front, re.M) is not None
-
-
-def text(project_root: str, cto: bool) -> str:
+def text(project_root: str) -> str:
     def at(rel: str) -> str:
         return os.path.join(project_root, rel)
 
     role = os.environ.get("GOV_ROLE", "")
-    if cto:
-        files = (f"the RESUME HERE section of {at('.gov-runtime/scratch/orchestrator/CHECKPOINT.md')}, "
-                 f"{at('governance/project/orchestration/packages/DECIDED-NOT-DONE.md')} and "
-                 f"{at('.gov-runtime/scratch/orchestrator/log/report-state.json')}")
-        first = f"{at('.gov-runtime/scratch/orchestrator/CHECKPOINT.md')}, its RESUME HERE section"
-    elif role == "orchestrator":
+    if role == "orchestrator":
         sys.dont_write_bytecode = True  # no __pycache__ beside the hooks (F1), as sessionstart.py does
         from precompact import checkpoint_rel  # the same CHECKPOINT the PreCompact hook names
         files = f"your CHECKPOINT, {at(checkpoint_rel(project_root))}"
@@ -113,8 +94,7 @@ def main() -> None:
         project_root = os.environ.get("CLAUDE_PROJECT_DIR") or str(event["cwd"])
         if not os.path.isabs(project_root):
             return  # a null or relative cwd would put the state file outside the project
-        cto = is_cto(project_root)
-        size = limit(found[1]) if cto else min(limit(found[1]), HANDOVER_CAP)
+        size = limit(found[1])
         state = os.path.join(project_root, STATE_REL)
         mark = os.path.join(state, re.sub(r"[^A-Za-z0-9_-]", "_", str(event["session_id"]))[:128] or "_")
         if found[0] < REARM * size:
@@ -126,7 +106,7 @@ def main() -> None:
         if os.path.exists(mark):
             return  # already reminded in this window: the text is not built again
         reply = json.dumps({"hookSpecificOutput": {
-            "hookEventName": "PostToolUse", "additionalContext": text(project_root, cto)}})
+            "hookEventName": "PostToolUse", "additionalContext": text(project_root)}})
         os.makedirs(state, exist_ok=True)  # the marker only once the text is built (R8): a failed build re-tries
         os.close(os.open(mark, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644))
         sys.stdout.write(reply)
