@@ -49,3 +49,7 @@ The nightly of 11-12 (run 20261112-0404, head 9bbef27f1d05) is red on
 clone lives at `~/gov-os-runs/W2-00/nightly/<run>/`, inside the runs folder the case watches. The code is not at fault (W2-170
 closed with the case green in its worktree). A test revision: exclude the repository's own root from "the runs folders".
 Class C1. The hidden-half rule holds: the revised case plants its own sets root and runs folder.
+
+## Approved after the fact (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Filed by the CTO without the owner's P1 (DEC-974; the prompt's §3); the owner approved it after the fact. It should have been a fix inside an existing ticket (its paths and KPI lines widened by the owner's decision), not a new ticket.

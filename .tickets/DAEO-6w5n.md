@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-121d
-tags: [wave-2, dispatch, full]
+tags: [wave-2, dispatch, full, wave-3, deferred]
 wbs_id: W2-121d
 title: "gov dispatch, part d: watch and launch lead: gov watch wakes on key results, merges from integration never wake, gov launch lead builds the invocation"
 class: implementation
@@ -42,3 +42,7 @@ track: A
 # W2-121d gov dispatch, part d
 
 Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W2-121-1 (a) and P-W2-121-3 (a), 2026-11-12: these KPI lines moved word for word; it builds on part a's Interface (in W2-121's ticket) and runs after it. The reference is the CTO's dispatcher (`governance/project/orchestration/tools/dispatch/`), never a target.
+
+## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Parked in docs/plan/WAVE_3_PARKING.md as W3-P34: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.

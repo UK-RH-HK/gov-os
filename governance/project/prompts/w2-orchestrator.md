@@ -35,12 +35,14 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
 10. **What goes to the owner:** only P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs; fixed briefs to
     approve once; anything that changes one of the owner's standing decisions; steps only the owner can do physically.
     Every other P2 is the CTO's, recorded and listed in the digest (DEC-1112 (3)).
-11. **Context and models (DEC-1118):** (A) a helper or lead hands over through its record and a fresh one continues
-    once its context passes about 200k tokens; the CTO checkpoints and clears at the same limit; (B) the CTO
+11. **Context and models (DEC-1118, DEC-1141):** (A) there is no token cap for any session (the CTO, leads, workers
+    and helpers): each uses its model's full window and compacts; before compaction the hook writes the checkpoint
+    and handover, and the summary opens with the read-first line; the CTO starts a fresh session each morning after
+    the digest and its handover (DEC-1140 (4)); (B) the CTO
     checkpoints and clears before any planned idle of more than an hour; (C) every launch's and helper's model and
     effort follow **RUBRIC-2 (DEC-1120)**, by role and criticality class (C3/C2/C1/C0): every spawn names its model and
     effort; ACT preparers, product-spec, research and helpers on Sonnet, high; C3 work, leads, auditors and checkers on
-    Opus, high; through D-10 engineers on C2/C1 tickets stay on Opus, high; promotion to Opus after two failed reviews
+    Opus, high; promotion to Opus after two failed reviews
     or a fail-open finding; max only with a recorded reason. Every session's cost is logged at list price in
     `log/spend.jsonl`, with its tier, class and any promotion.
 

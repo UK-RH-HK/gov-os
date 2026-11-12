@@ -10467,7 +10467,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 288. Delegated decisions of 2026-10-23 from W2-66's and W2-07's first runs (register v0.288, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-903 — W1-39's overlay case named for W2-66's test designer; `src/gov/cli/errors.py` in W2-66's shared core; W2-07's six interface readings (delegated)
-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible, the proposer's recommendation and mine agree, confidence high or medium-high; it changes nothing in the Charter, the master rules or the Contract's scope, and does not weaken the guard; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-896 item 2, DEC-899 items 1 and 2, DEC-889 item 16 d, DEC-866, MR-3 · **Basis:** W2-66's return of run 1 (P-W2-66-T1, its record edits) and W2-07's return of run 1 (P-W2-07-C), `governance/project/orchestration/packages/P-W2-07-A-B.md`.
+- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible, the proposer's recommendation and mine agree, confidence high or medium-high; it changes nothing in the Charter, the master rules or the Contract's scope, and does not weaken the guard; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-896 item 2, DEC-899 items 1 and 2, DEC-889 item 16 d, DEC-866, MR-3 · **Basis:** W2-66's return of run 1 (P-W2-66-T1, its record edits) and W2-07's return of run 1 (P-W2-07-C), `governance/project/orchestration/packages/P-W2-07-A-B.md`. · **Changed by:** DEC-1142 (3) (the overlay list names the template's `close.yaml`)
 - **Decision:**
   1. **P-W2-66-T1 (a).** `tests/acceptance/W1-39/test_w1_39_copy.py::test_copy_creates_the_overlay` asserts that `copier copy` makes an overlay holding exactly the path map (DEC-493). DEC-896 item 2 and W2-66's paths ship the test map's template copy too, so the case is outdated, not wrong.
      - W2-66's ticket file names `tests/acceptance/W1-39/test_w1_39_copy.py` among its test designer's files.
@@ -14650,6 +14650,52 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     08:00; every other hour it runs; the change (its crontab line and a skip while the night hold is on) comes as the first item at 08:00.
 - **Basis:** questions 2 and 4.
 
+### DEC-1142 — The morning of 11-12: W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c); W2-148 S15 option 2; the operator hours as built; the ticket table (kept after the fact, four parked); no new ticket or split without the owner; the two-refusal stop covers another form of the same effect
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~09:50; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (8) and (9) standing · **Under:** CAP-33, DEC-974, DEC-1010, DEC-1052, DEC-903, DEC-1104, DEC-1136, DEC-1140, DEC-1141 · **Changes:** DEC-903 (its overlay list names the template's `close.yaml`)
+- **Decision:**
+  - (1) **W2-176's CIT-P approved at `3b6c5cb79d39`** (`template/governance/kernel/hooks/context_watch.py` sha256
+    `213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242`: no token cap, every session reminded at 85 % of its own
+    model's window; R8 fixed); its delta review's F1 (a): S2 amended to drop the two file names, no new bytes; F2 rides the approval edit.
+    ACT-CONTEXT-WATCH-1: (a), the matcher `Bash`.
+  - (2) **P-W2-23-8 (a):** W2-23's R2-1 fixed (one test case, about 3 lines) with the lead's verification in place of a third review round.
+  - (3) **W2-115 PK-1 (a) and (c):** W1-39's overlay case revised by the test designer (a Rewrite-Reason), and DEC-903's overlay list
+    names the template's `governance/project/close.yaml`.
+  - (4) **W2-148 S15: option 2:** the home `~/.claude/settings*.json` a fixed class (b) in `class-rules.yaml` (an owner ACT); S15 then
+    passes as written.
+  - (5) **ACT-OPERATOR-HOURS-2 (a)** as the CTO fixed its undo (resets by id, checked before and after; the CTO holds integrate);
+    **ACT-OPERATOR-HOURS-1 (a)**, keep `0210`.
+  - (6) **ACT-DISPATCH-1's F2:** keep the 6-hour reminder of an unchanged idle cause.
+  - (7) **ACT-IDLE-GUARD-2's F3:** a row; the CTO keeps the parked-ticket list.
+  - (8) **The ticket table** (filed or split since 11-11 13:31): keep W2-174, W2-175, W2-176 (the owner's), and W2-177, W2-178, W2-179,
+    W2-180 (filed by the CTO without the owner's P1; approved after the fact; W2-178 to W2-180 should have been fixes inside existing
+    tickets); park W2-181, W2-115b, W2-121c, W2-121d in WAVE_3_PARKING; W2-121b waits on the owner's K9 decision. **Standing:** no
+    new ticket and no split is filed without the owner's decision (DEC-974; the prompt's §3).
+  - (9) **The two-refusal stop covers the same effect in another form** (standing): a session refused twice for an action stops and
+    says so; it does not reach the same effect by another command, form or file.
+  - (10) **The owner's operator's Part 1** gains rule 11's edit of the prompt (and line 43's Opus phrase deleted), the stale
+    `.git/config.lock` removed, and W2-157's three `gate.json` keys. The free weekly reset was pressed at about 09:50 (DEC-1140 (6)).
+- **Basis:** questions 2 and 4.
+
+### DEC-1143 — EXAMIN-SETS-1's owner answers: the two writer briefs approved; C1 the workbench copy at one new commit; C2 the launch clone; C3 20; C4 the release step kept; C5 10 per repository and 13 variants; C6 the writer writes data only; C7 by roles; C8 no checker
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~10:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-1130 (3), DEC-1101 (2)-(3), DEC-1082 (3), DEC-723 (3), DEC-736, DEC-757 (6), DEC-1136, DEC-1142 (8)
+- **Decision:**
+  - (1) **The two fixed writer briefs approved as they stand:** `EXAMIN-writer.md` (W2-94) sha256
+    `d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f` and `PROVING-GROUND-writer.md` (W2-93) sha256
+    `57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c`; both name `effort: high`, now passed to the session (W2-173 S1).
+  - (2) **C1:** EXAMIN's copy is `~/gov-os-workbench/examin`, after one new commit there of its uncommitted files, made on the owner's
+    word: `0a82082495f52df068c3c6b518969b419f02fe95` (2026-11-12 10:45 UTC; 42 files: `.gitignore` and `CLAUDE.md` modified, the 40
+    untracked added; the other four "modified" files differed from HEAD only in CRLF line endings, which the copy's `core.autocrlf=input`
+    normalises, so they match the commit and are unchanged on disk). The original `~/EXAMIN APP` stays untouched (`a7cf346c28d7`, its
+    46 uncommitted files as they were). That commit is the one the set pins and the one W2-27 (the adoption on the copy) uses.
+  - (3) **C2:** the launch clone of the copy at that commit with one scaffold commit (no code). **C3:** 20 questions. **C4:** the release
+    step kept; the owner reads the visible half before releasing it. **C5:** 10 per repository and 13 variants. **C7:** `measures` by roles.
+  - (4) **C6:** the writer writes the data only; the validator (`validate_hidden.py`, already in W2-93's paths) is written by an
+    independent test designer under W2-93. W2-81 closed: where the runner's `--sets-root <root>` option goes, without a new ticket,
+    comes to the owner before anything is built (the CTO's recommendation: W2-93's paths gain `tests/acceptance/W2-81/w2_81_run.py` and
+    `tests/acceptance/W2-81/test_w2_81_runner.py` for that test designer's revision, with one KPI line).
+  - (5) **C8:** no checker for W2-94.
+- **Basis:** questions 2 and 4.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14727,3 +14773,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.522 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1139 (W2-175's role templates approved at 4c0c73472fd8 and promoted as 1.0.1; three fixes for the next template delta, (c) to W2-33). Next free id: DEC-1140. |
 | 0.523 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1140 (usage first: RUBRIC-2 at every launch, quiet notices; context awareness back; the load balancer, dispatcher and W2-115; the CTO session to about 1M tokens; the 80 % brake lifted this week, five leads, the 97 % and 99 % lines). Next free id: DEC-1141. |
 | 0.524 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1141 (W2-11 approved; W2-176 withdrawn for its cap; no token cap for any session, DEC-1118 (A) replaced; DEC-1140 (4) corrected; hand merges of W2-175 and W2-176; the operator asleep only during the nightly). Next free id: DEC-1142. |
+
+| 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
+| 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
