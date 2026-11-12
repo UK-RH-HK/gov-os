@@ -99,6 +99,7 @@ def test_s1_the_counts_schema_takes_the_five_or_null_and_nothing_else():
     s = schema()
     e = s["properties"]["effort"]
     assert e["type"] == ["string", "null"] and e["enum"] == ["low", "medium", "high", "xhigh", "max", None]
+    assert "effort" in s["required"]  # every counts object carries it: State builds it in one place
     base = dict(indep_launch.State().counts, code=17, reason="argument")  # a refusal's line, as finish() writes it
     assert indep_launch.schema_ok(base, s)
     for v in indep_launch.EFFORTS + (None,):
