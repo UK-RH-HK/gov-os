@@ -1,6 +1,6 @@
 ---
 id: DAEO-f6x3
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-11-09T01:04:00Z
