@@ -14825,6 +14825,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) **P1-M (a):** W2-115's fix (P1-K (a)) gets one narrow independent check of the fix only, so the queue has a passing record (a third look, the owner's exception, limited to the fix).
 - **Basis:** the owner's messages of 2026-11-12 ~19:20 and ~19:35.
 
+### DEC-1153 — Two widenings: W2-45 by W1-40's one case (P-W2-45-4 (a)); W2-160 by the session-watch command file (P-W2-160-1 (a))
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~19:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-974, DEC-1148 (4), DEC-1144, DEC-1052
+- **Decision:**
+  - (1) **P-W2-45-4 (a):** W2-45's allowed_paths gain `tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py` for one test-designer revision (line 49 expects a non-zero exit and RED, its docstring likewise; `Rewrite-Reason: P-W2-45-1 item 5`), as P1-J's two.
+  - (2) **P-W2-160-1 (a):** W2-160's allowed_paths gain `src/gov/session_watch/command.py` for the `helper-watch` action its S3 names (about 20 lines); W2-159, which built the file, is closed.
+- **Basis:** the owner's message of 2026-11-12 ~19:40, after the CTO's two lines each.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14912,3 +14919,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.531 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1149 (the working size 0.75 GiB by ACT-P95-1, applied; the figure everywhere; usage never stops a lead, the runaway brake kept; the peaks by 11-19), DEC-1150 (W2-88 split into W2-88a and W2-88b; P1-K (a); P1-L (a)); DEC-947 item 2, DEC-1138 (4), DEC-1140 (6) and DEC-1115 (4) changed. Next free id: DEC-1151. |
 | 0.532 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1151 (ACT-EXAMIN-WRITERS-INSTALL-1 applied; the two walled writers delivered; W2-27's green-base line). Next free id: DEC-1152. |
 | 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
+| 0.534 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1153 (W2-45 widened by W1-40's case; W2-160 by the session-watch command file). Next free id: DEC-1154. |
