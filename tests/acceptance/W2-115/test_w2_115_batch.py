@@ -28,7 +28,7 @@ BOTH_NOT_BROKEN = (f"    ok = 'BROKEN' not in (seen[{support.WIDGET!r}] or '') +
                    "    _tell(ok)\n    assert ok, 'the widget or the gadget is broken'\n")
 
 
-def _project(base, reds, bb_paths=None):
+def _project(base, reds, bb_paths=None, test_map=support.DEFAULT_TEST_MAP):
     told = base / "told"
     files = {**support.candidate_ticket(B, "W2-b1", ["src/gov/bolt/**"], told),
              **support.candidate_ticket(C, "W2-c1", ["src/gov/gadget/**"], told),
@@ -38,13 +38,13 @@ def _project(base, reds, bb_paths=None):
             "PROJ-bbbb", "W2-bb", allowed_paths=bb_paths, status="closed")
     files.update({node.split("::")[0]: support.telling(node.split("::")[1], told, body)
                   for node, body in reds.items()})
-    return support.Smart(base / "project", told, files=files)
+    return support.Smart(base / "project", told, files=files, test_map=test_map)
 
 
 class Batch:
-    def __init__(self, base, reds, candidates, bb_paths=None):
+    def __init__(self, base, reds, candidates, bb_paths=None, test_map=support.DEFAULT_TEST_MAP):
         self.sandbox = support.cli_support.make_sandbox(base / "sandbox")
-        self.project = _project(base, reds, bb_paths)
+        self.project = _project(base, reds, bb_paths, test_map)
         self.base = self.project.head()
         self.commits = support.plant_candidates(self.project, self.sandbox, candidates)
         self.run = support.run_module(self.project, self.sandbox, support.BATCH_MODULE, "run", A, B, C)
@@ -130,12 +130,12 @@ class OwnNewTest(Batch):
     """A adds a new test (``tests/unit/widget/test_w2_115_added.py``) with ``body`` beside its widget change; B
     changes the bolt, C the gadget; no planted red. Built without A, the test does not exist."""
 
-    def __init__(self, base, body):
+    def __init__(self, base, body, test_map=support.DEFAULT_TEST_MAP):
         added = support.telling("test_w2_115_added", base / "told", body)
         super().__init__(base, {}, [
             (A, "W2-aa", {support.WIDGET: "# the widget, CHANGED\n", support.ADDED_TEST: added}, None),
             (B, "W2-b1", {BOLT: "# a bolt, CHANGED\n"}, None),
-            (C, "W2-c1", {support.GADGET: "# the gadget, CHANGED\n"}, None)])
+            (C, "W2-c1", {support.GADGET: "# the gadget, CHANGED\n"}, None)], test_map=test_map)
 
 
 @pytest.fixture(scope="module")
@@ -197,3 +197,81 @@ def test_a_candidate_that_cannot_be_isolated_refuses_the_batch(tmp_path_factory)
         (C, "W2-c1", {"src/gov/gadget/__init__.py": "# the gadget's package\n"}, None)])
     support.assert_refused(batch.run, support.CANDIDATE_NOT_ISOLATED)
     batch.nothing_landed()
+
+
+# --------------------------------------------------------------------------
+# Review round 2's R2-4: two guards of the culprit search (S6, F3). Today's code is right on both; each case guards
+# against a mutant that would land work it must not.
+# --------------------------------------------------------------------------
+
+# A's new test: red at once beside the bolt's or the gadget's change; with A alone it runs past the per-test limit.
+NEW_RED_BESIDE_OTHERS_TIMES_OUT_ALONE = _SEES_THE_BOLT + (
+    f"    now = _seen()\n    beside = 'CHANGED' in (now[{BOLT!r}] or '') + (now[{support.GADGET!r}] or '')\n"
+    "    _tell(False)\n    assert not beside, 'the bolt or the gadget changed'\n    time.sleep(120)\n")
+SHORT_LIMIT = dict(support.DEFAULT_TEST_MAP, per_test_timeout=3)
+
+
+def test_a_culprit_s_own_new_test_that_times_out_alone_is_not_confirmed_and_nothing_lands(tmp_path_factory):
+    """R2-4 part 1, the reviewer's B3 (S4, S6, F3): A's new test fails in the batch (beside B's or C's change) and,
+    with A alone on the base, runs past the per-test limit instead of failing. A timeout is an unknown failure and
+    never confirms (S4), so no single candidate explains the red: refused with BATCH_UNEXPLAINED, nothing lands (not
+    B, not C; ``main`` does not move). The run with A alone is observed, so the timeout is what was judged."""
+    batch = OwnNewTest(tmp_path_factory.mktemp("w2_115_batch_timeout_alone"), NEW_RED_BESIDE_OTHERS_TIMES_OUT_ALONE,
+                       test_map=SHORT_LIMIT)
+    support.assert_refused(batch.run, support.BATCH_UNEXPLAINED)
+    batch.nothing_landed()
+    runs = batch.project.told_runs("test_w2_115_added")
+    alone = [r for r in runs if "CHANGED" in (r["seen"].get(support.WIDGET) or "")
+             and "CHANGED" not in (r["seen"].get(BOLT) or "") + (r["seen"].get(support.GADGET) or "")]
+    assert alone, f"the new test was never run with A alone (no timeout was judged)\n{batch.run.describe()}"
+
+
+RUN_INCOMPLETE = "RUN_INCOMPLETE"  # the brief's code (R2-4, the reviewer's B1); the Interface's list does not name it
+A7, B7, C7 = "PROJ-a7a7", "PROJ-b7b7", "PROJ-c7c7"
+NOTES, MORE_NOTES = support.GOVERNANCE_FILE, "governance/project/more-notes.yaml"
+A7_TEST = "tests/unit/a7/test_w2_115_a7.py"  # a folder no ticket's allowed paths cover (no suite reached by overlap)
+# Records select the record-reading suites (S2), and each candidate's checkpoint is a record: none is named here,
+# so the checkpoints select nothing.
+NO_RECORD_READERS = dict(support.DEFAULT_TEST_MAP, record_reading=[])
+
+
+class ZeroRest(Batch):
+    """A7 adds only a new failing test (``tests/unit/a7/test_w2_115_a7.py``, a folder only A7's allowed paths
+    cover); B7 and C7 each change only a governance file, which selects nothing by itself (S2). No candidate has an
+    acceptance folder and the test map names no record-reading suite, so the batch's selection holds A7's new test
+    file alone; without A7 the rest holds none of its targets."""
+
+    def __init__(self, base):
+        cs = support.close_support
+        self.sandbox = support.cli_support.make_sandbox(base / "sandbox")
+        told = base / "told"
+        files = {cs.ticket_path(A7): cs.ticket_text(A7, "W2-a7", allowed_paths=["tests/unit/a7/**"],
+                                                    status="in_progress"),
+                 cs.ticket_path(B7): cs.ticket_text(B7, "W2-b7", allowed_paths=[NOTES], status="in_progress"),
+                 cs.ticket_path(C7): cs.ticket_text(C7, "W2-c7", allowed_paths=[MORE_NOTES], status="in_progress"),
+                 NOTES: "notes: none\n", MORE_NOTES: "notes: none\n"}
+        self.project = support.Smart(base / "project", told, files=files, test_map=NO_RECORD_READERS)
+        self.base = self.project.head()
+        self.commits = support.plant_candidates(self.project, self.sandbox, [
+            (A7, "W2-a7", {A7_TEST: support.telling("test_w2_115_a7", told, NEW_RED)}, None),
+            (B7, "W2-b7", {NOTES: "notes: changed\n"}, None),
+            (C7, "W2-c7", {MORE_NOTES: "notes: changed\n"}, None)])
+        self.run = support.run_module(self.project, self.sandbox, support.BATCH_MODULE, "run", A7, B7, C7)
+
+    def nothing_landed(self):
+        assert self.project.head() == self.base, f"main moved: something landed\n{self.run.describe()}"
+        for ticket in (A7, B7, C7):
+            assert not self.landed(ticket), f"{ticket} landed"
+            assert self.project.ticket_status(ticket) != "closed", f"{ticket} closed"
+
+
+def test_the_rest_never_lands_on_a_run_of_zero_tests(tmp_path_factory):
+    """R2-4 part 2, the reviewer's B1 (S6, F3): the batch's only target is A7's own new test file, red, and A7 is
+    confirmed alone as the culprit. Without A7 the rest (B7, C7) holds none of the selection's targets, so its run
+    would be a run of 0 tests: it must not land on that. Refused with RUN_INCOMPLETE; nothing lands."""
+    batch = ZeroRest(tmp_path_factory.mktemp("w2_115_batch_zero_rest"))
+    support.assert_refused(batch.run, RUN_INCOMPLETE)
+    batch.nothing_landed()
+    runs = batch.project.told_runs("test_w2_115_a7")
+    assert len(runs) >= 2 and not any(r["ok"] for r in runs), \
+        f"A7's new test did not run red in the batch and again alone: {len(runs)} run(s)\n{batch.run.describe()}"
