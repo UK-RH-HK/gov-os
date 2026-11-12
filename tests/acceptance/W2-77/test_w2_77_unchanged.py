@@ -31,6 +31,11 @@ def nights(tmp_path_factory):
 
 
 def test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+    """The green envelope's result is exactly the record's keys (``support.RECORD_KEYS``, which names
+    ``secrets_full_scan``) and its path.
+
+    Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+    """
     result = support.green(nights.green_run)
     data = nights.green_run.envelope()
     assert data.get("command") == support.COMMAND, f"the envelope's command is not {support.COMMAND!r}: {data}"
@@ -43,6 +48,10 @@ def test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
 
 
 def test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key(nights):
+    """Exactly today's keys (``support.RECORD_KEYS``, which names ``secrets_full_scan``) and no ``cleanup`` key.
+
+    Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+    """
     support.green(nights.green_run)
     record, rel = support.record_of(nights.green_project, nights.green_run)
     assert support.CLEANUP_KEY not in record, f"a night whose clone was removed has a cleanup key in {rel}: {record}"
@@ -64,6 +73,11 @@ def test_a_green_night_selects_and_runs_the_full_suite(nights):
 
 
 def test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+    """The red envelope's details are exactly the record's keys (``support.RECORD_KEYS``, which names
+    ``secrets_full_scan``) and its path; the red record's keys are exactly those.
+
+    Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+    """
     error = support.red(nights.red_run)
     details = error.get("details") or {}
     assert set(details) == support.RECORD_KEYS | {"record"}, \

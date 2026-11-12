@@ -319,12 +319,45 @@ def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:
 # The night
 # ---------------------------------------------------------------------------
 
-def night(root: Path, branch: str, coverage: bool = False) -> dict:
-    """Run the night on ``branch``'s head; its record, written to the working tree."""
+SECRETS_FULL_SCAN = "GOV_SECRETS_FULL_SCAN"  # W2-115 S8 (DEC-966 item 4): the night's rebuild scans every text
+
+
+def rebuild_stores(tree: Path) -> dict:
+    """The project worktree's stores rebuilt before the night's run with the full secrets scan (W2-115 S8):
+    ``GOV_SECRETS_FULL_SCAN=1`` in the rebuild's environment, whatever the caller's, and the caller's value put back
+    after it. ``gov rebuild`` by its own code, in this process, as the batch rebuilds (never ``--no-embeddings``:
+    the stores stay the project's). ``{"ok", "error", "GOV_SECRETS_FULL_SCAN"}``."""
+    from gov.config.loader import load_config
+    from gov.rebuild.command import run as rebuild
+
+    before = os.environ.get(SECRETS_FULL_SCAN)
+    os.environ[SECRETS_FULL_SCAN] = "1"
+    try:
+        rebuild(Path(tree), argparse.Namespace(no_embeddings=False, seed=None, integration=None, json=True),
+                load_config(Path(tree)))
+        outcome = {"ok": True, "error": None}
+    except (GovError, OSError, ValueError) as e:
+        outcome = {"ok": False, "error": f"{getattr(e, 'code', type(e).__name__)}: {getattr(e, 'message', e)}"[:400]}
+    finally:
+        if before is None:
+            os.environ.pop(SECRETS_FULL_SCAN, None)
+        else:
+            os.environ[SECRETS_FULL_SCAN] = before
+    return {**outcome, SECRETS_FULL_SCAN: "1"}
+
+
+def night(root: Path, branch: str, coverage: bool = False, rebuild: bool = True) -> dict:
+    """Run the night on ``branch``'s head; its record, written to the working tree. ``rebuild``: the project
+    worktree's stores rebuilt first with the full secrets scan (S8); the strict close's batch, which rebuilds before
+    it, passes False (today's, F4)."""
     root = Path(root)
     head = _git(root, "rev-parse", "--verify", "--quiet", f"{branch}^{{commit}}", ok=(0, 1)).strip()
     if not head:
         raise GovError("BRANCH_UNKNOWN", f"{branch} names no commit of {root}", {"branch": branch})
+    rebuilt = rebuild_stores(root) if rebuild else {"ok": False, "error": None}  # S8: before the run
+    if rebuilt["error"]:
+        print(f"nightly: the stores' rebuild with the full secrets scan failed: {rebuilt['error']}",
+              file=sys.stderr, flush=True)
     tree_id = _git(root, "rev-parse", f"{head}^{{tree}}").strip()
     since = _last_green(root, head)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -387,8 +420,11 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
         if not full.exists():
             full.write_text("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<testsuites/>\n", encoding="utf-8")
         junit.append(full.relative_to(root).as_posix())
+    # S8: the record says whether the full secrets scan ran (one key, true or false, nothing time-varying; a failed
+    # rebuild's error goes to stderr); the tests' verdict stays the tests' own, as the strict close's batch reads it
     verdict = GREEN if not findings and not listed else RED
     record = {"branch": branch, "head": head, "tree": tree_id, "base": since, "scope": "full", "verdict": verdict,
+              "secrets_full_scan": bool(rebuilt["ok"]),
               "junit_xml": junit, "failures": listed, "packages": packages, "tests_run": counts,
               "findings": findings, "per_test_timeout": per_test, "distribution": distribution,
               "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}

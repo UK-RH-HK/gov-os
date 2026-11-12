@@ -83,6 +83,23 @@ R8) and the lead's design note, before the implementation. No implementation was
 - `test_the_fixture_the_other_worktree_holds_the_entry_name_tree_and_the_clone_another` (the fixture's premise: the
   clone gets another entry name than `tree`) and `test_a_failed_clean_up_does_not_change_the_verdict`.
 
+## Revision for W2-115 (DAEO-emq1, td-3): the record's key set names `secrets_full_scan`
+
+Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+`RECORD_KEYS` in `w2_77_support.py` ("the night's record as it is today") now names `secrets_full_scan` among the
+record's keys. The sets stay exact (no subset check), and `cleanup` still appears only on a failed removal. The four
+cases that compare against it:
+
+| Case | What it checks, with the revised key set |
+|---|---|
+| `test_w2_77_failed_removal.py::test_a_failed_clean_up_does_not_change_the_verdict` | the verdict stays green; the record's keys other than `cleanup` are exactly `RECORD_KEYS` |
+| `test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today` | the green envelope's result is exactly `RECORD_KEYS` and `record` |
+| `test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key` | the green record's keys are exactly `RECORD_KEYS`; no `cleanup` |
+| `test_w2_77_unchanged.py::test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today` | the red envelope's details are exactly `RECORD_KEYS` and `record`; the red record's keys are exactly `RECORD_KEYS` |
+
+Red reason on a nightly without W2-115's S8: the record and the envelope lack `secrets_full_scan` (the key sets
+differ by it; the record cases say "lost ['secrets_full_scan']").
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

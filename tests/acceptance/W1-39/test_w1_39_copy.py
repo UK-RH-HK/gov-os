@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import shutil
 
+import yaml
+
 import w1_39_support as support
 
 
@@ -55,20 +57,31 @@ def test_copy_installs_the_rulesync_sources(installed, pristine_source):
 
 
 def test_copy_creates_the_overlay(installed):
-    """The created project has its overlay, ``governance/project/``: a path map and a test map, and nothing else
-    (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are in their own file).
+    """The created project has its overlay, ``governance/project/``: a path map, a test map and the close's
+    configuration, and nothing else (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are
+    in their own file; DEC-903's list changed by DEC-1142 (3): it names ``close.yaml``).
 
     The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``; the test
-    map beside it: ``governance/project/test-map.yaml``.
+    map beside it: ``governance/project/test-map.yaml``; and ``governance/project/close.yaml``, which chooses the
+    scoped close for a new project (``close: scoped``, W2-115's S1).
+
+    Rewrite-Reason: DEC-1142 (3) (DEC-903's overlay list names close.yaml), DEC-866.
     """
     test_map_rel = f"{support.OVERLAY_REL}/test-map.yaml"
+    close_rel = f"{support.OVERLAY_REL}/close.yaml"
     files = support.files_under(installed, support.OVERLAY_REL) if (installed / support.OVERLAY_REL).is_dir() else []
     assert support.PATH_MAP_REL in files, \
         f"`copier copy` created no {support.PATH_MAP_REL} (the overlay of KPI success 1; DEC-493). It created: {files}"
     assert test_map_rel in files, \
         f"`copier copy` created no {test_map_rel} (DEC-896 item 2, DEC-903). It created: {files}"
-    assert files == sorted([support.PATH_MAP_REL, test_map_rel]), \
-        f"`copier copy` created more in the overlay than the path map and the test map DEC-903 names: {files}"
+    assert close_rel in files, \
+        f"`copier copy` created no {close_rel} (DEC-1142 (3), W2-115's S1). It created: {files}"
+    assert files == sorted([support.PATH_MAP_REL, test_map_rel, close_rel]), \
+        (f"`copier copy` created more in the overlay than the path map, the test map and close.yaml DEC-903 names "
+         f"(DEC-1142 (3)): {files}")
+    close = yaml.safe_load((installed / close_rel).read_text(encoding="utf-8"))
+    assert isinstance(close, dict) and close.get("close") == "scoped", \
+        f"the created {close_rel} does not choose the scoped close (`close: scoped`, W2-115's S1): {close!r}"
 
 
 def test_the_path_map_of_a_fresh_project_is_one_doctors_path_map_part_accepts(project, sandbox):
