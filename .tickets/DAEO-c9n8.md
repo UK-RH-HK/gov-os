@@ -4,7 +4,7 @@ status: open
 deps: []
 links: [DAEO-61vm]
 created: 2026-11-12T05:40:00Z
-type: bug
+type: task
 priority: 2
 assignee: independent-test-designer
 external-ref: W2-179
