@@ -1800,6 +1800,12 @@ def _run_scoped(root: Path, args, config: dict):
     commit = _git(root, "rev-parse", "HEAD").strip()
 
     chosen = _selection(root, ticket)
+    own = _select.suite_folder(root, front, str(front.get("wbs_id") or front.get("external-ref") or ticket))
+    if _gates.ticket_class(front) not in _gates.EVIDENCE_CLASSES and not _select.has_suite(root, own):
+        # independent tests first (DEC-953 item 1): a ticket judged on its tests is never closed without them
+        raise GovError("NO_ACCEPTANCE_TESTS", f"{ticket}'s own acceptance suite {own} holds no test: the scoped "
+                       "close runs it, and nothing closes without it", {"ticket": ticket, "suite": own},
+                       exit_code=EXIT_CHECK_FAILED)
     review = review_verdict(root, ticket, front)
     if review["verdict"] != READY:
         raise GovError(review["verdict"], "; ".join(review["reasons"]),

@@ -112,6 +112,17 @@ def test_s2_an_unmapped_change_refuses_the_close_and_runs_nothing(tmp_path, no_l
     assert runs == []
 
 
+def test_a_ticket_without_its_acceptance_tests_is_never_closed(tmp_path, no_lists, runs):
+    repo = project(tmp_path, extra={"tests/unit/test_feature.py": (
+        "from pkg.feature import twice\n\n\ndef test_t():\n    assert twice(1) == 2\n")})
+    repo.git("rm", "-q", "-r", OWN_SUITE)
+    repo.commit("no acceptance tests yet")
+    change(repo, {"src/pkg/feature.py": FEATURE})
+    with pytest.raises(GovError) as raised:
+        command.run(repo.root, _args(), CONFIG)
+    assert raised.value.code == "NO_ACCEPTANCE_TESTS" and runs == []
+
+
 def test_s2_full_is_refused_in_the_scoped_close(tmp_path, no_lists, runs):
     repo = project(tmp_path)
     change(repo, {"src/pkg/feature.py": FEATURE})
