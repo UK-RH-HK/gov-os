@@ -13,6 +13,10 @@ Red on today's code: today's close refuses every red (``CHECK_FAILED``), re-runs
 ``reds`` or ``nightly`` in a close record.
 """
 
+import json
+import os
+from pathlib import Path
+
 import pytest
 
 import w2_115_support as support
@@ -83,13 +87,71 @@ def test_the_nightly_s_recorded_result_is_read_first(unowned):
         f"the record names another nightly record: {nightly.get('record')!r} != {unowned.project.nightly_record!r}"
 
 
+CLONE_REL = ".gov-runtime/close/clone"
+
+
+def _repos_under(root):
+    """Every folder under ``root`` that holds a ``.git`` (a folder or a worktree's file); none is walked into."""
+    found = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        if ".git" in dirnames or ".git" in filenames:
+            found.append(Path(dirpath).resolve())
+            dirnames[:] = []
+    return found
+
+
+def _worktrees(repo):
+    """``(path, head)`` of every entry ``git worktree list`` names for ``repo``."""
+    entries, path = [], None
+    for line in support.close_support.git(repo, "worktree", "list", "--porcelain").splitlines():
+        if line.startswith("worktree "):
+            path = Path(line[len("worktree "):]).resolve()
+        elif line.startswith("HEAD ") and path is not None:
+            entries.append((path, line[len("HEAD "):].strip()))
+    return entries
+
+
 def test_no_clone_is_built_for_the_nightly_baseline(unowned):
-    """S4: no folder for a nightly baseline exists after the run, in the project or in the close's temporary
-    folder."""
+    """S4: no clone is built for the nightly baseline. After the run: no checkout (the project's worktrees, the warm
+    clone's, any repository left in ``.gov-runtime/`` or the close's temporary folder) stands at the commit the
+    nightly record names; no clone or worktree exists other than the project and S10's warm clone
+    (``.gov-runtime/close/clone/``); and no folder named for a baseline or a nightly exists in ``.gov-runtime/`` or
+    the temporary folder, the warm clone's committed folders (its checkout's ``docs/close/nightly/``) aside.
+
+    Rewrite-Reason: S10's warm clone is the Interface's (DEC-1001 (b), DEC-1112 (3)); S4 forbids only a
+    nightly-baseline clone (DEC-1083). The td-1 check failed on the warm clone's committed ``docs/close/nightly/``.
+    """
     support.passed(unowned.run)
+    project = unowned.project
+    root = project.root.resolve()
+    clone = (project.root / CLONE_REL).resolve()
+    night = json.loads((project.root / project.nightly_record).read_text(encoding="utf-8"))["head"]
+    clone_is_repo = (clone / ".git").exists()
+
+    checkouts = _worktrees(project.root)
+    if clone_is_repo:
+        checkouts += _worktrees(clone)
+    at_night = sorted({str(p) for p, head in checkouts if head == night})
+    assert not at_night, f"a checkout stands at the nightly's recorded commit {night[:12]}: {at_night}"
+
+    others = sorted({str(p) for p, _ in checkouts if p not in (root, clone)})
+    assert not others, f"a worktree other than the project and the warm clone was built: {others}"
+
+    repos = (_repos_under(project.root / ".gov-runtime") + _repos_under(unowned.sandbox.tmpdir))
+    for repo in repos:
+        head = support.close_support.git(repo, "rev-parse", "HEAD", check=False).strip()
+        assert head != night, f"a repository stands at the nightly's recorded commit {night[:12]}: {repo}"
+    extra = sorted(str(r) for r in repos if r != clone)
+    assert not extra, f"a clone other than the warm clone ({CLONE_REL}) was built: {extra}"
+
+    tracked = set()
+    if clone_is_repo:
+        listed = support.close_support.git(clone, "ls-tree", "-r", "-d", "--name-only", "HEAD", check=False)
+        tracked = {(clone / rel).resolve() for rel in listed.splitlines() if rel.strip()}
     words = ("baseline", "nightly")
-    found = (support.paths_named(unowned.project.root / ".gov-runtime", words)
+    named = (support.paths_named(project.root / ".gov-runtime", words)
              + support.paths_named(unowned.sandbox.tmpdir, words))
+    found = sorted(p for p in named if Path(p).resolve() not in tracked)
     assert not found, f"a nightly-baseline clone was built: {found}"
 
 
