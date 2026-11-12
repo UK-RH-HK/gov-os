@@ -274,6 +274,50 @@ def test_s3_a_glob_with_no_literal_first_folder_stays_not_found_before_punctuati
         assert safety.citations(text, ["legacy/memory/decisions/leg-001.md"], []) == [], text
 
 
+def _seen(text, paths):
+    return {(item["form"], item["found"]) for item in safety.citations(text, paths, [])}
+
+
+def test_s3_a_folder_or_tail_ending_a_sentence_is_found_without_the_stop():
+    deep = ["legacy/memory/decisions/leg-001.md", "legacy/memory/index.md"]
+    assert ("folder", "legacy/memory") in _seen("The old store is legacy/memory.", deep)
+    assert ("folder", "legacy/memory/decisions") in _seen("The old store is legacy/memory/decisions.", deep)
+    assert ("folder", "legacy/memory/") in _seen("See legacy/memory/.", ["legacy/memory/index.md"])
+    assert ("relative tail", "../memory/index.md") in _seen("See ../memory/index.md.", ["legacy/memory/index.md"])
+    for text in ("See legacy/memory. Then vote.", "See (legacy/memory.)", "See “legacy/memory.” now.",
+                 "See legacy/memory.\n"):
+        assert ("folder", "legacy/memory") in _seen(text, deep) or ("folder", "legacy/memory/") in _seen(text, deep), text
+
+
+def test_s3_a_dot_followed_by_more_path_is_no_stop_for_a_folder_or_tail():
+    store = ["legacy/memory/index.md"]
+    for text in ("See legacy/memory.db now.", "See legacy/memory/.hidden now.", "See legacy/memory..x now."):
+        assert [form for form, _ in _seen(text, store) if form == "folder"] == [], text
+    assert [form for form, _ in _seen("See ../memory/index.md.bak now.", store) if form == "relative tail"] == []
+
+
+def test_s3_a_store_in_subfolders_is_cited_by_the_deepest_folder_holding_all_its_files():
+    store = [".claude/memory/2025/a.md", ".claude/memory/2026/b.md"]
+    assert ("folder", ".claude/memory/") in _seen("Read .claude/memory/ first.", store)
+    nested = ["notes/memory/2025/q1/a.md", "notes/memory/2026/b.md"]
+    for text, shown in (("Read notes/memory/ first.", "notes/memory/"), ("The notes/memory store holds it.", "notes/memory"),
+                        ("Read notes/memory/2025/ first.", "notes/memory/2025/"),
+                        ("Read notes/memory/2025/q1 first.", "notes/memory/2025/q1"),
+                        ("Read notes/memory/2026 first.", "notes/memory/2026"), ("It is in notes/memory.", "notes/memory")):
+        assert ("folder", shown) in _seen(text, nested), text
+    cited = {item["cites"] for item in safety.citations("Read notes/memory/ first.", nested, [])}
+    assert cited == set(nested)
+    for text in ("Read notes/ first.", "Read notes first.", "Read notes/memory.db first."):
+        assert [form for form, _ in _seen(text, nested) if form == "folder"] == [], text
+
+
+def test_s3_a_store_with_no_shared_folder_keeps_each_files_own_parent_folder():
+    store = ["a/x.md", "b/c/y.md", "z.md"]
+    assert [(i["cites"], i["found"]) for i in safety.citations("Read a/ and b/c/ first.", store, [])
+            if i["form"] == "folder"] == [("a/x.md", "a/"), ("b/c/y.md", "b/c/")]
+    assert [i for i in safety.citations("Read b/ first.", store, []) if i["form"] == "folder"] == []
+
+
 def test_s3_the_a8_proof_prints_a_rule_files_url_encoded_citation(root):
     write(root, STORE, "# Legacy memory\n")
     write(root, ".windsurfrules", "Before a vote, read legacy%2Fmemory%2Findex.md.\n")

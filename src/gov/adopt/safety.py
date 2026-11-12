@@ -275,25 +275,52 @@ def _glob(pattern: str) -> re.Pattern:
     return re.compile(body.replace(".*/", "(?:.*/)?"))
 
 
+# A ``.`` (or a run of them) that ends a citation is a sentence's stop, no part of the path and no bar to the match; a
+# ``.`` followed by more path characters is part of a longer name and blocks it (``memory.db``, ``index.md.bak``).
+_NOT_MORE_PATH = r"(?!\.*[\w-])"
+_NOT_MORE_PATH_DIR = r"(?!\.*[\w/*?\[-])"
+
+
+def _folders(paths: list[str]) -> dict[str, tuple[str, ...]]:
+    """The store's folders, each with the store files it names. The store's folder is the deepest folder holding all
+    its files, with each folder between it and a file (a folder above it is not the store's); the files of a folder
+    are those at or below it. A store whose files share no folder keeps each file's own parent folder, with the files
+    directly in it."""
+    parents = [rel.lower().split("/")[:-1] for rel in paths]
+    common = list(parents[0]) if parents else []
+    for parent in parents[1:]:
+        while common and parent[:len(common)] != common:
+            common.pop()
+    folders: dict[str, list[str]] = {}
+    for rel, parent in zip(paths, parents):
+        if common:  # the common folder and each one down to this file's own
+            for depth in range(len(common), len(parent) + 1):
+                folders.setdefault("/".join(parent[:depth]), []).append(rel)
+        elif parent:
+            folders.setdefault("/".join(parent), []).append(rel)
+    return {folder: tuple(names) for folder, names in folders.items()}
+
+
 def citations(text: str, paths: list[str], ids: list[str]) -> list[dict]:
     """Every citation of ``paths`` (the store) or ``ids`` (its records) in ``text``, each with its form and the text
     as found. The forms: the path or id with anything directly before it, backslashes, URL-encoding, another letter
-    case, split across lines; the store's folder alone or a glob that holds the store; ``../`` and only the tail of
-    the path. Nothing else is a citation here."""
-    wanted = []  # (form, cited name, regex)
+    case, split across lines; the store's folder alone (the deepest folder holding all its files, or any folder
+    between that and a file) or a glob that holds the store; ``../`` and only the tail of the path. A full stop that
+    ends a folder or a tail is not part of it. Nothing else is a citation here."""
+    wanted = []  # (form, cited names, regex)
     for rel in paths:
         low, parts = rel.lower(), rel.lower().split("/")
-        wanted.append(("path", rel, re.escape(low)))
-        wanted += [("relative tail", rel, r"(?:\.\./)+" + re.escape("/".join(parts[k:])) + r"(?![\w.-])")
+        wanted.append(("path", (rel,), re.escape(low)))
+        wanted += [("relative tail", (rel,), r"(?:\.\./)+" + re.escape("/".join(parts[k:])) + _NOT_MORE_PATH)
                    for k in range(1, len(parts))]
-        folder = "/".join(parts[:-1])
-        if folder:
-            wanted.append(("folder", rel, re.escape(folder) + ("/?" if "/" in folder else "/") + r"(?![\w./*?\[-])"))
-    wanted += [("id", ident, re.escape(ident.lower()) + r"(?![\w-])") for ident in ids]
+    for folder, names in _folders(paths).items():
+        wanted.append(("folder", names, re.escape(folder) + ("/?" if "/" in folder else "/") + _NOT_MORE_PATH_DIR))
+    wanted += [("id", (ident,), re.escape(ident.lower()) + r"(?![\w-])") for ident in ids]
     found, seen = [], set()
     for join in (True, False):  # joined first: a path split across lines is printed whole, not as its folder
         normal, starts, ends = _normal(text, join)
-        hits = [(form, name, m.start(), m.end()) for form, name, rx in wanted for m in re.finditer(rx, normal)]
+        hits = [(form, name, m.start(), m.end()) for form, names, rx in wanted for m in re.finditer(rx, normal)
+                for name in names]
         for m in _GLOB_TOKEN.finditer(normal):
             lead = len(m.group()) - len(m.group().lstrip(_BEFORE_GLOB))
             bare = m.group()[lead:].rstrip(_AFTER_GLOB)  # a sentence's stop or colon, or a quote, is no part of it
