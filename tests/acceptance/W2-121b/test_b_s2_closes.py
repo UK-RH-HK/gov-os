@@ -59,6 +59,26 @@ def test_a_close_with_a_ticket_in_the_landing_blocks_it_while_it_runs_ticket_id(
     assert p.claim_and_run(1)["argv"] == [W7]
 
 
+@pytest.mark.parametrize("shell", ["/bin/bash", "/bin/sh"], ids=["bash-c", "sh-c"])
+@pytest.mark.parametrize("ticket_arg", ["W2-7", "DAEO-a7"], ids=["w2-id", "ticket-id"])
+def test_a_close_under_a_shell_wrapper_blocks_the_landing_of_its_ticket(landing, shell, ticket_arg):
+    # An agent's Bash tool (`/bin/bash -c "..."`) or cron (`sh -c "..."`) starts the close through a shell: the wrapper
+    # holds the whole command in ONE argument (no argument equals the id); its child, the close itself, holds the id.
+    p = landing
+    setup_tickets(p)
+    stub = f"/opt/gov/{p.CLOSE_MARKER}"
+    wrapper = p.plant_proc([shell, "-c", f"cd /x && {p.CLOSE_MARKER} {ticket_arg} ; echo done"])
+    child = p.plant_proc([sys.executable, stub, ticket_arg], ppid=wrapper)
+    p.plant_land(W7)
+    assert_blocked(p)
+    p.remove_process(child)
+    p.remove_process(wrapper)
+    # the same wrapper shape for a ticket outside the landing does not hold it
+    other = p.plant_proc([shell, "-c", f"cd /x && {p.CLOSE_MARKER} W2-8 ; echo done"])
+    p.plant_proc([sys.executable, stub, "W2-8"], ppid=other)
+    assert p.claim_and_run(1)["argv"] == [W7], "the landing goes once the close of its ticket is gone"
+
+
 @pytest.mark.parametrize("arguments", [["W2-8", "DAEO-a8"], ["W2-70"], ["W2-77", "--verbose"], []],
                          ids=["another-ticket", "w2-id-prefix-only", "w2-id-prefix-with-flag", "no-ticket-argument"])
 def test_a_close_with_no_shared_ticket_does_not_block_the_landing(landing, arguments):
