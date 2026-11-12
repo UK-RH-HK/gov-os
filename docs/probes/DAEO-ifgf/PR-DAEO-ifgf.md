@@ -51,6 +51,18 @@ decisions_applied: [DEC-801, DEC-802, DEC-808, DEC-809, DEC-1010, DEC-136, DEC-8
   - Round 2 found no new finding.
 - **Judgement: pass.** S1 to S4 pass at `dae1c10e0392`. This was the last round.
 
+## Notes: S5, an accepted change in a resume (DEC-802), no new review round
+
+- **What.** The owner widened the ticket by one KPI line, S5 (DEC-1149 (2)). The CTO added `src/gov/resources/config.py` to `allowed_paths` (P-W2-121b-2 (a), `48ef8cf66`). The lead merged `w2/integrate` into the branch (`fa608e568`).
+- **The change.** A fresh engineer (Sonnet 5.5, effort high, class C2, session `7bc7078a-e520-45aa-b394-808c67d74475`) made commit `889233218`. It changes only the `working_size_bytes` entry of `config.template()`: 805,306,368 B, dated 2026-11-12, with the source "DEC-1149 (1), (2): 0.75 GiB per live session, from the lead-memory ledger (ACT-P95-1)". It also adds one unit case, `tests/unit/dispatch/test_w2_121b_config_default.py`, which was red first (`assert 2191601664 == 805306368`) and is green now.
+- **The engineer's runs.** `tests/unit/dispatch` 113 passed, `tests/unit/resources` 319 passed, and `tests/acceptance/W2-20` 170 passed (1 deselected).
+- **The lead's own results at `889233218`.**
+  - The store was rebuilt (exit 0).
+  - `gov accept W2-121b`: pass, 52 passed, 0 failed (success-1 10, success-2 12, success-3 13, success-4 14).
+  - `lead_verify`: 5,089 tests, 2 failed, 7 skipped. Neither red is this ticket's:
+    - (1) `tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths` judges every branch against W2-157's paths, so it is red by construction on any branch other than `w2/W2-157`. Open ticket W2-181 (DAEO-ywb5) fixes it.
+    - (2) `tests/acceptance/W2-157/test_w2_157_limit.py::test_s1_the_period_is_the_files_value` is timing-sensitive. Re-run alone once, it gave 1 passed.
+
 ## The reviewer's record, round 2 (as returned)
 
 ````
