@@ -123,10 +123,13 @@ def main() -> None:
             return
         if found[0] < SHARE * size:
             return
-        os.makedirs(state, exist_ok=True)
+        if os.path.exists(mark):
+            return  # already reminded in this window: the text is not built again
+        reply = json.dumps({"hookSpecificOutput": {
+            "hookEventName": "PostToolUse", "additionalContext": text(project_root, cto)}})
+        os.makedirs(state, exist_ok=True)  # the marker only once the text is built (R8): a failed build re-tries
         os.close(os.open(mark, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644))
-        sys.stdout.write(json.dumps({"hookSpecificOutput": {
-            "hookEventName": "PostToolUse", "additionalContext": text(project_root, cto)}}))
+        sys.stdout.write(reply)
     except Exception:
         return  # already reminded, or any error: say nothing
 
