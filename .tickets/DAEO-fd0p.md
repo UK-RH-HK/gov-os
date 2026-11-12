@@ -5,7 +5,7 @@ deps: []
 links: [DAEO-wnnz, DAEO-t8mp, DAEO-6lid]
 created: 2026-11-11T01:20:19Z
 type: task
-priority: 3
+priority: 1
 assignee: engineer
 external-ref: W2-160
 tags: [wave-2, implementation, standard, after-the-lift, orchestration, launch]
@@ -68,3 +68,7 @@ Filed by the product-spec helper of the night audit (DAEO-sdxk's anti-drift audi
 - **Rabbit holes.** Waiting on a process name (never; DEC-1073 (4)); a wait longer than the tool's own limit.
 
 [DEC-1079, DEC-1112 (3), DEC-1073 (4), DEC-1119 (5)]
+
+## Onto EXAMIN's path (the owner, DEC-1148 (2), item 4 (a1), 2026-11-12)
+
+`gov wait` is the product command an adopted project's facts file names for `wait_for`; every brief's envelope names it (`brief.md:35`), so EXAMIN's copy builds no brief until this lands. Starts after W2-159 lands (the Stop checks it builds on); priority raised for the path.

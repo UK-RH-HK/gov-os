@@ -94,6 +94,7 @@ kpis:
   - 'W2-88''s tools run on the copy at adoption (the assessment, the refactoring plan as proposals, the full index and embeddings), and EXAMIN''s question set (W2-94) is measured with both figures, hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % [DEC-954 Q9f, DEC-957]'
   - 'The first numbered, frozen release is cut by the owner and hash-checked (two builds give the same bytes; the wheel and every file match the manifest), recorded in docs/plan/wave-2/examin-copy/release-check.md, before W2-81''s proving-ground run and this ticket''s adoption [DEC-1089, DEC-954 Q8c, DEC-772]'
   - 'Exit criterion 7: CAP-45.a moved to Wave 3 by an approved CIT-P note (docs/changes/W2-27-CIT-P.md), or named as an exception the owner accepts [DEC-1089]'
+  - 'The copy''s `governance/project/facts.yaml` holds EXAMIN''s own commands (`launch_worker` = `gov launch`, `wait_for` = `gov wait`, `lead_verify` = EXAMIN''s own verify command, the rest from the adoption''s defaults), and every role''s brief (the five worker roles and the lead''s run kinds) builds with `gov brief` in the copy; the copy carries no `governance/project/secrets.yaml` or one with `scan: on`, so the secrets scan stays on there Verify: `gov brief <role> <ticket>` exits 0 in the copy for each worker role and each lead run kind on one of its tickets; `gov check` there shows the secrets-indexing check measured (not "off by configuration") [DEC-1148 (2), DEC-1045]'
   failure: []
 profile: FULL
 sources:
@@ -158,3 +159,7 @@ these two items). [DEC-1089]
 **DEC-1090 (5) (owner, 2026-11-07):** (b) takes option A, the CIT-P note moving CAP-45.a to Wave 3 (drafted by a
 product-spec agent, one independent review, then the owner). (a) The release is cut after the lift's re-pin and before
 W2-81's proving-ground run. [DEC-1090]
+
+## A line added by the owner (DEC-1148 (2), item 4 (a1), 2026-11-12)
+
+The copy's facts file holds EXAMIN's commands and every role's brief builds there; the secrets scan stays on in the copy (DEC-1045 lifted it on this repository only). Depends on W2-174's facts step and W2-160 (`gov wait`).

@@ -17,6 +17,7 @@ depends_on:
 allowed_paths:
 - src/gov/adopt/verify_pass.py
 - src/gov/adopt/command.py
+- src/gov/adopt/facts.py  # the adoption's facts file (DEC-1148 (2), item 4 (a1))
 - template/governance/kernel/skills/adopt/SKILL.md
 - template/.rulesync/skills/adopt/SKILL.md
 - .rulesync/skills/adopt/SKILL.md
@@ -45,11 +46,13 @@ kpis:
   - line: "`gov adopt --verify-apply <answers-file> --root <repo>` appends ` Verify: <clause>` to each named KPI line of each named ticket, the form `gov brief` already reads, and adds one front-matter line `verify_pass: <date> <session>`; every other byte of the ticket file is unchanged, comments and key order included [DEC-1130, DEC-1050]"
     verify: "tests/unit/adopt/test_w2_174_apply.py: a fixture ticket with YAML comments and a block of five lines; after apply, a byte diff shows only the appended clauses and the one added line"
   - line: "After an apply, `ready_check` of that ticket returns no `KPI_NO_VERIFY` finding, and `gov brief engineer <ticket>` builds its brief on the fixture repository [DEC-1083, DEC-1130]"
-    verify: "tests/unit/adopt/test_w2_174_ready.py: calls `gov.brief.build.ready_check` on the applied fixture and finds none; runs `gov brief engineer` on the fixture and gets exit 0"
+    verify: "tests/unit/adopt/test_w2_174_ready.py: calls `gov.brief.build.ready_check` on the applied fixture and finds none; runs `gov brief engineer` on the fixture and gets exit 0 (the fixture carries its own `governance/project/facts.yaml` with every command filled, as an adopted project's CTO fills it after the defaults; DEC-1148 (2))"
   - line: "The answers file is checked by code before anything is written: every named ticket exists and is not closed, every named label exists on it, every line still lacking a verify is answered, and each clause is text of its own (not empty, not only TBD, TODO, n/a or none) [DEC-1130, DEC-1083]"
     verify: "tests/unit/adopt/test_w2_174_checks.py: one case per refusal (unknown ticket, closed ticket, unknown label, an unanswered line, an empty clause, a `TBD` clause), each refused with a named code and nothing written"
   - line: "The adopt skill, in the kernel copy and the two generated-source copies, states the pass: when it runs (for a ticket about to launch, not for the whole tracker), who writes the clauses (a product-spec session), what checks them (the tool, the ticket's test designer, the auditor's sample), and that the owner approves the rule once [DEC-1130, DEC-1083]"
     verify: "tests/unit/adopt/test_w2_174_skill.py: the three files carry the section `Verify clauses for adopted tickets` with the four statements, and the three copies are equal in that section"
+  - line: "`gov adopt` writes `governance/project/facts.yaml` when the repository has none: it validates against `template/governance/kernel/schemas/facts.schema.json`, `ready.new_since` is the adoption's UTC date as a quoted ISO string, and every other key holds a product default (gov commands only, nothing of this repository); a command with no product equivalent (`lead_verify`, and `wait_for` until `gov wait` lands) is written as a named placeholder that `gov brief` refuses by name; an existing facts file is left byte for byte [DEC-1148 (2), DEC-1147, DEC-1088 (3)]"
+    verify: "tests/unit/adopt/test_w2_174_facts.py: a fixture repository without a facts file has, after the adoption step, a file that validates against the kernel schema and carries ready.new_since equal to the step's date, and `gov brief` there no longer answers BRIEF_FACTS_MISSING (it names the placeholder commands instead); a fixture with its own facts file keeps it byte-identical"
   failure:
   - line: "The apply never writes anything if one entry is refused (all or nothing), never edits a ticket the answers file does not name, never edits a closed ticket, and never marks a ticket `verify_pass` while one of its lines still has no verify [DEC-1130]"
     verify: "tests/unit/adopt/test_w2_174_checks.py: a file with nine good entries and one bad one leaves the whole tree byte-identical; a ticket with one line unanswered is refused and unmarked"
@@ -96,3 +99,7 @@ there is nothing to read for that role, and a folder-level check is coarser than
 - Do not rewrite a ticket with a YAML dump; edit the text of the lines.
 - Do not decide what a clause means (a weak clause is the designer's and auditor's to catch); check only that it is text of its own.
 - Do not touch `gov brief`, the template or the schema; do not add an adoption stage (A0 to A8 stay as W2-88 leaves them).
+
+## Widened by the owner (DEC-1148 (2), item 4 (a1), 2026-11-12)
+
+One KPI line (the last success line) and `src/gov/adopt/facts.py`: the adoption writes the facts file `gov brief` needs (`BRIEF_FACTS_MISSING` otherwise), with product defaults and named placeholders; the project's CTO fills its own commands afterwards (for EXAMIN's copy, W2-27's line). S3's fixture carries its own filled facts file. The failure line "the tool never reads or writes outside `<repo>/.tickets/`" concerns the verify pass, not this facts step.
