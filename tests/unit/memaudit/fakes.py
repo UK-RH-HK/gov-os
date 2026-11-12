@@ -155,27 +155,33 @@ def measure_args(plant, *extra) -> list[str]:
             "--commit", plant.repo["head"], "--store", str(plant.store), "--gov", str(plant.gov), *extra]
 
 
+
+
 # ---- the fake claude: one JSON on standard output, driven by a plan file next to it
 
 FAKE_CLAUDE = '''#!%(python)s
-import json, os, sys
+import json, os, sys, time
 here = os.path.dirname(os.path.realpath(__file__))
 plan = json.load(open(os.path.join(here, "claude-plan.json")))
 args = sys.argv[1:]
 model = args[args.index("--model") + 1]
 system = args[args.index("--system-prompt") + 1]
 prompt = sys.stdin.read()
+grader = system.startswith("You grade")
 with open(os.path.join(here, "claude-calls.jsonl"), "a") as f:
-    f.write(json.dumps({"model": model, "grader": system.startswith("You grade"), "argv": args[:3]}) + "\\n")
-cost = plan.get("cost", 0.01)
-if system.startswith("You grade"):
+    f.write(json.dumps({"model": model, "grader": grader, "first": args[:2], "budget": args[args.index("--max-budget-usd") + 1],
+                        "tools": args[args.index("--tools") + 1]}) + "\\n")
+if plan.get("sleep"):
+    time.sleep(plan["sleep"])
+if grader:
+    question = prompt.split("\\n\\nGold answer:")[0]
     said = prompt.split("Answer to grade: ", 1)[1]
     grade = "correct"
-    for mark, g in plan["grades"].items():
-        if mark in said:
-            grade = g
-    if "disagree" in plan and plan["disagree"] in said and model == "claude-sonnet-5-5":
-        grade = "wrong"
+    for rule in plan["rules"]:
+        if all(w in question for w in rule.get("q", [])) and all(w in said for w in rule.get("said", [])) \\
+                and rule.get("model", model) == model:
+            grade = rule["grade"]
+            break
     out = {"grade": grade, "reason": "r"}
 else:
     question = prompt.split("\\n", 1)[0][len("Question: "):]
@@ -183,9 +189,68 @@ else:
     spec = plan["readers"].get(question, plan["default"])
     step = spec["steps"][min(bundles, len(spec["steps"])) - 1]
     if step == "none":
-        print("")
         sys.exit(0)
     out = step
 print(json.dumps({"structured_output": out, "usage": {"input_tokens": 1, "output_tokens": 1},
-                  "total_cost_usd": cost, "is_error": False}))
+                  "total_cost_usd": plan.get("cost", 0.01), "is_error": False}))
 '''
+
+NOT_FOUND = {"verdict": "not_found", "answer": "", "citations": [], "search": ""}
+
+
+class FakeClaude:
+    """A fake ``claude`` executable and its plan: the reader's steps by question, the grader's rules."""
+
+    def __init__(self, plant):
+        self.plant = plant
+        self.bin = plant.tmp / "claude-bin"
+        self.bin.mkdir()
+        self.exe = self.bin / "claude"
+        self.exe.write_text(FAKE_CLAUDE % {"python": sys.executable}, encoding="utf-8")
+        os.chmod(self.exe, 0o755)
+        self.plan = {"cost": 0.01, "readers": {}, "default": {"steps": [NOT_FOUND]},
+                     "rules": [{"q": ["ZZQ"], "grade": "correct"}, {"said": ["Not found."], "grade": "not_found"},
+                               {"said": ["WRONG"], "grade": "wrong"}]}
+        for qid, q in plant.questions.items():
+            self.script(qid, "notfound" if q["category"] == "nonexistent-id" else "right")
+        self.save()
+
+    def save(self) -> None:
+        (self.bin / "claude-plan.json").write_text(json.dumps(self.plan), encoding="utf-8")
+
+    def cite(self, qid, gold=True) -> list:
+        src = self.plant.questions[qid]["sources"][0]
+        if gold:
+            return [{"path": src["path"], "start_line": src["lines"][0], "end_line": src["lines"][1]}]
+        return [{"path": "docs/filler/f1.md", "start_line": 1, "end_line": 2}]
+
+    def answer(self, qid, text, gold=True) -> dict:
+        return {"verdict": "answer", "answer": text, "citations": self.cite(qid, gold), "search": ""}
+
+    def script(self, qid, kind: str) -> None:
+        """``right``, ``wrong`` (a wrong claim), ``uncited`` (correct, the citation not a gold place), ``notfound``,
+        ``again`` (search again once, then right), ``late`` (searches twice, answers at the third attempt)."""
+        again = {"verdict": "search_again", "answer": "", "citations": [], "search": "again words"}
+        steps = {"right": [self.answer(qid, "RIGHT answer")], "wrong": [self.answer(qid, "WRONG answer")],
+                 "uncited": [self.answer(qid, "RIGHT answer", gold=False)], "notfound": [NOT_FOUND],
+                 "again": [again, self.answer(qid, "RIGHT answer")],
+                 "late": [again, again, self.answer(qid, "RIGHT answer")],
+                 "nothing": ["none"]}[kind]
+        self.plan["readers"][self.plant.questions[qid]["question"]] = {"steps": steps}
+
+    def calls(self) -> list[dict]:
+        log = self.bin / "claude-calls.jsonl"
+        return [json.loads(x) for x in log.read_text().splitlines()] if log.exists() else []
+
+
+def judge_args(plant, claude, *extra) -> list[str]:
+    return ["judge", "--sets-root", str(plant.root), "--audit", AUDIT, "--repo", str(plant.repo["path"]),
+            "--gov", str(plant.gov), "--claude", str(claude.exe), *extra]
+
+
+def measured(plant, **kw) -> tuple[FakeGov, dict, FakeClaude]:
+    """``prepare`` and a ``measure`` that counts: the state ``judge`` starts from."""
+    fake, ranks = prepare(plant, **kw)
+    done = plant.cli(*measure_args(plant))
+    assert done.returncode == 0, done.stdout
+    return fake, ranks, FakeClaude(plant)
