@@ -417,7 +417,15 @@ close_timeout: 7200
 # gov close's owner-accepted known reds, a ratchet (DEC-757): each red by exact test id, the owner's decision
 # that accepts it, its reason and the ticket that fixes it. Only an owner's commit adds an entry; a listed test
 # that passes leaves the list in the same close.
-accepted_reds: []
+accepted_reds:
+  - test: "tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95"
+    decision: DEC-1134
+    reason: "the warm real-model query latency, p95 0.54-0.59 s against the 0.5 s budget: the named red of DEC-1125 (1)"
+    fixed_by: W2-155
+  - test: "tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget"
+    decision: DEC-1134
+    reason: "the warm real-model query latency, p95 0.54-0.59 s against the 0.5 s budget: the named red of DEC-1125 (1)"
+    fixed_by: W2-155
 # gov close's named load-sensitive tests (DEC-757): a listed test that fails counts only if it passes in an
 # isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
 # names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
