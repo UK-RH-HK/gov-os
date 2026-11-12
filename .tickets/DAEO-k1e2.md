@@ -1,6 +1,6 @@
 ---
 id: DAEO-k1e2
-status: open
+status: in_progress
 deps: [DAEO-61vm]
 links: [DAEO-52ku, DAEO-2bdu, DAEO-p8tv, DAEO-qz4p]
 created: 2026-11-11T01:20:40Z
