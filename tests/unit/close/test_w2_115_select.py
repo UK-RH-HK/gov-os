@@ -11,7 +11,7 @@ import pytest
 from gov.cli.errors import GovError
 from gov.close import command, select
 
-from .test_w2_115_support import OWN_SUITE, OWN_TEST, TICKET, change, green_night, project
+from .test_w2_115_support import OWN_SUITE, OWN_TEST, TICKET, change, green_night, project, ticket_text
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -110,6 +110,27 @@ def test_s2_governance_alone_selects_nothing_by_itself(tmp_path):
     repo = project(tmp_path)
     change(repo, {"governance/project/briefs/a.md": "a brief\n"})
     assert select.scoped(repo.root, TICKET)["suites"] == []
+
+
+def test_s2_governance_alone_beside_the_tickets_bookkeeping_selects_nothing(tmp_path):
+    """eng-3: on the wider change (since the newest green record, with the ticket's own commits), the green record's
+    own file and the ticket's own ticket file and close record are bookkeeping: a governance file beside them alone
+    selects nothing; another record beside it selects record_reading alone; the bookkeeping alone still does."""
+    from gov.tasks.tickets import TICKETS_REL
+
+    repo = project(tmp_path)
+    green_night(repo)
+    change(repo, {"governance/project/briefs/a.md": "a brief\n",
+                  f"{TICKETS_REL}/{TICKET}.md": ticket_text() + "claimed\n",
+                  f"docs/close/{TICKET}/notes.md": "# a note of the ticket's own close\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert chosen["suites"] == [] and chosen["records_only"] is True
+    assert any(p.startswith("docs/close/nightly/") for p in chosen["changed"])  # the green record is in the change
+    change(repo, {"docs/notes.md": "# notes, a record\n"})
+    assert select.scoped(repo.root, TICKET)["suites"] == ["tests/unit/test_records.py"]
+    other = project(tmp_path / "other")
+    change(other, {f"{TICKETS_REL}/{TICKET}.md": ticket_text() + "claimed\n"})
+    assert select.scoped(other.root, TICKET)["suites"] == ["tests/unit/test_records.py"]  # records alone
 
 
 def test_s2_records_and_code_together_run_the_own_suite_and_record_reading(tmp_path):

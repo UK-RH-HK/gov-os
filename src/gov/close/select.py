@@ -98,23 +98,30 @@ def settings(test_map: dict | None) -> tuple[float, str]:
 # The base and the change
 # ---------------------------------------------------------------------------
 
-def _green_heads(root: Path) -> list[str]:
-    """The commits the green records of the tree name: full closes' ``evidence.head``, green nights' ``head``."""
+def _green_records(root: Path) -> list[tuple[str, str]]:
+    """``(record path, head)`` of each green record of the tree: full closes' ``evidence.head``, green nights'
+    ``head``."""
     from gov.tasks.tickets import frontmatter
 
+    root = Path(root)
     named = []
-    for path in sorted((Path(root) / "docs" / "close").glob("*/CL-*.md")):
+    for path in sorted((root / "docs" / "close").glob("*/CL-*.md")):
         evidence = (frontmatter(path) or {}).get("evidence")
         if isinstance(evidence, dict) and evidence.get("scope") == "full" and isinstance(evidence.get("head"), str):
-            named.append(evidence["head"])
-    for path in sorted((Path(root) / NIGHTLY_REL).glob("*.json")):
+            named.append((path.relative_to(root).as_posix(), evidence["head"]))
+    for path in sorted((root / NIGHTLY_REL).glob("*.json")):
         try:
             night = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
         if isinstance(night, dict) and night.get("verdict") == "green" and isinstance(night.get("head"), str):
-            named.append(night["head"])
-    return list(dict.fromkeys(named))
+            named.append((path.relative_to(root).as_posix(), night["head"]))
+    return named
+
+
+def _green_heads(root: Path) -> list[str]:
+    """The commits the green records of the tree name: full closes' ``evidence.head``, green nights' ``head``."""
+    return list(dict.fromkeys(head for _, head in _green_records(root)))
 
 
 def is_ancestor(root: Path, commit: str, of: str = "HEAD") -> bool:
@@ -631,6 +638,18 @@ def _within(target: str, other: str) -> bool:
     return t.startswith(o + "/")
 
 
+def _bookkeeping(root: Path, ticket: str, paths: list[str]) -> bool:
+    """Whether every record place of ``paths`` is only bookkeeping (S2, the governance-alone rule): the ticket's own
+    ticket file, its own close record or checkpoint, or a green record (written after the head it names, so always
+    in the change counted from that head). Read narrowly: another ticket's file or record, and any other record
+    place, is a record change."""
+    from gov.tasks.tickets import TICKETS_REL
+
+    green = {rec for rec, _ in _green_records(root)}
+    own = (f"docs/close/{ticket}/", f"docs/checkpoints/{ticket}/")
+    return all(p == f"{TICKETS_REL}/{ticket}.md" or p.startswith(own) or p in green for p in paths)
+
+
 def scoped(root: Path, ticket: str) -> dict:
     """The scoped selection of ``ticket``: ``{"ticket", "suites", "pytest_options", "changed", "why", "base",
     "head"}``; ``SelectionRefused`` with its reason where it cannot be made."""
@@ -706,6 +725,11 @@ def scoped(root: Path, ticket: str) -> dict:
     if unplaced:
         raise SelectionRefused(f"{len(unplaced)} changed path(s) nothing maps to a suite (no coupling, no ticket "
                                f"with a suite holds them, no test imports them): {', '.join(sorted(unplaced))}")
+    governance = [p for p in paths if p.startswith(GOVERNANCE_OVERLAY) and not _any(p, test_map.get("record_only"))]
+    if records and not code and governance and _bookkeeping(root, ticket, records):
+        # S2: governance files select nothing by themselves; the ticket's own bookkeeping beside them (its ticket
+        # file, its close record and checkpoint, the green records the change is counted from) is no record change
+        records = []
     if records:
         for target in test_map.get("record_reading") or []:
             select(target, "RECORD_READING")
