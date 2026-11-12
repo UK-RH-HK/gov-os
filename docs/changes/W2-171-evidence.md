@@ -136,3 +136,19 @@ holding the eight cases, 51 passed; `tests/acceptance/W2-171` 125 passed, 1 skip
 branch against W2-170's paths) and `test_f3_a_run_s_file_access_log_…`, which fails only because the ordered TMPDIR
 (`~/gov-os-runs/tmp/W2-171`) is under `~/gov-os-runs`, the folder that test treats as the true runs folder; it passes
 with the sandbox's own TMPDIR and does not touch `measure.py`.
+
+## Round 2 (review round 1's findings F-1 and F-2; PKG-W2-171-REV1-1 (a), test-first)
+
+- **F-1 (S3, Interface item 8):** the VERDICT line printed its exact interval from `FIGURES.json`'s 4-place fractions, so
+  the bounds were rounded twice (32 of 40 printed `64.3 to 91.0 %`; 78 of 79 printed `93.2`). `figures.verdict_lines` now
+  computes `scores.exact_interval(right, n)` from the counts and rounds once to one decimal: 32 of 40 prints
+  `64.4 to 90.9 %`, 78 of 79 `93.1 to 100.0 %`. `verdict.interval_exact` in `FIGURES.json` is unchanged (`[lo, hi]`, fractions to
+  4 places, item 10). Unit cases (test_judge.py): the two figures above, a sweep of every r at n = 40 against
+  `f"{100*x:.1f}"` of the unrounded bounds, and `interval_exact` staying at 4 places.
+- **F-2 (S2, Interface items 1, 2, 8):** `measure --kept <n>` re-scored and printed `RETRIEVAL attempt <n>` for an attempt
+  holding `FAULT`. `measure.rescore` now refuses an attempt folder holding `FAULT` like one with no kept outputs: exit 1,
+  `MS-KEPT`, no `RETRIEVAL` line, nothing written, no search (the measure child is not started). A whole attempt's
+  `--kept` is unchanged. Unit cases (test_measure.py): a degraded attempt-1 with 40 kept files, then attempt-2 counted:
+  `--kept 1` is `MS-KEPT` with the run folder and the fake `gov`'s call log unchanged; `--kept 2` still prints its line.
+- Before the fix three of the five new cases fail (the two interval cases, the faulted `--kept`); the other two describe
+  behaviour that did not change. Not touched: F-3 (a Wave 3 row), F-4 (recorded).

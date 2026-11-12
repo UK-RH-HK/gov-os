@@ -73,6 +73,31 @@ def test_the_kept_flag_of_an_attempt_that_does_not_exist_is_ms_kept_exit_1_never
     assert done.returncode == 1 and done.stdout == "MS-KEPT\n"
 
 
+def test_the_kept_flag_of_a_faulted_attempt_is_ms_kept_exit_1_with_no_retrieval_line_and_nothing_written(plant):
+    # round 2, F-2 (Interface items 1 and 8): attempt-1 degraded (its kept count whole), attempt-2 counted
+    fake, ranks = prepare(plant)
+    fake.override(q_text(plant, "q05"), 1, rerank_by="private")
+    fake.save()
+    assert plant.cli(*measure_args(plant)).returncode == 0
+    assert (plant.run_dir / "attempt-1/FAULT").read_text() == "degraded\n"
+    assert len(list((plant.run_dir / "attempt-1/kept").glob("*.json"))) == 40  # whole by count, so only FAULT refuses it
+    before, searched = snapshot(plant.run_dir), len(fake.calls())
+    done = plant.cli("measure", "--sets-root", str(plant.root), "--audit", AUDIT, "--repo", str(plant.repo["path"]),
+                     "--kept", "1")
+    assert done.returncode == 1 and done.stdout == "MS-KEPT\n" and "RETRIEVAL" not in done.stdout + done.stderr
+    assert snapshot(plant.run_dir) == before and len(fake.calls()) == searched  # nothing written, nothing searched
+
+
+def test_the_kept_flag_of_a_whole_attempt_still_re_scores_after_a_faulted_one(plant):
+    fake, ranks = prepare(plant)
+    fake.override(q_text(plant, "q05"), 1, rerank_by="private")
+    fake.save()
+    assert plant.cli(*measure_args(plant)).returncode == 0
+    done = plant.cli("measure", "--sets-root", str(plant.root), "--audit", AUDIT, "--repo", str(plant.repo["path"]),
+                     "--kept", "2")
+    assert done.returncode == 0 and done.stdout.splitlines() == [expected_line(2, ranks)]
+
+
 def test_a_control_at_33_proceeds(plant):
     prepare(plant, control_hits=33)
     done = plant.cli(*measure_args(plant))

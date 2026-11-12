@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 import re
 
-from gov.memaudit import ledger, prompts, tables
+from gov.memaudit import figures, ledger, prompts, scores, tables
 from gov.memaudit.claude import argv_of
 
 from .conftest import AUDIT, UNIQUE
@@ -55,6 +55,42 @@ def test_the_verdict_lines_show_the_planted_right_wrong_interval_and_the_bar(pla
     assert re.fullmatch(r"BESIDE grader agreement \d+ of \d+; search failures 0; calls run once more 0; "
                         r"spent \d+\.\d\d USD \(projection 6\.28, brake 12\.56\)", verdict[4])
     assert len(verdict) == 5
+
+
+def _figures_of(r: int, n: int) -> dict:
+    """A FIGURES-shaped dict whose ``interval_exact`` is the 4-place rounding the file carries (the old print's source)."""
+    lo, hi = scores.exact_interval(r, n)
+    return {"n": n, "n_gold": n, "bar": {"need_right": 34, "max_wrong": 2, "target_right": 38},
+            "verdict": {"right": r, "wrong": 0, "passes": True, "right_ok": True, "wrong_ok": True, "target_ok": True,
+                        "interval_exact": [round(lo, 4), round(hi, 4)], "not_run": 0},
+            "beside": {"hit5": 0, "in_bundle": 0, "full_evidence": 0, "correct_citation_aside": 0, "not_found": 0,
+                       "a1_right": 0, "mcnemar_a1_a2": {"gains": 0, "losses": 0, "p": 1.0}, "grader_agree": 0,
+                       "graded": 0, "search_failures": 0},
+            "spend": {"usd": 0.0, "projection": 6.28, "brake": 12.56}}
+
+
+def _printed_interval(r: int, n: int) -> str:
+    line = figures.verdict_lines(_figures_of(r, n), 0)[0]
+    return re.search(r"exact 95 % interval (.*?) %\)", line).group(1)
+
+
+def test_the_printed_interval_is_the_exact_bounds_rounded_once_not_figures_jsons_four_places():
+    # round 2, F-1 (Interface items 8 and 10): 32 of 40 is 64.352 to 90.948, which prints 64.4 to 90.9 (not 64.3 to 91.0)
+    assert _printed_interval(32, 40) == "64.4 to 90.9"
+    assert _printed_interval(78, 79) == "93.1 to 100.0"  # exact 93.148 and 99.968
+    assert figures.verdict_lines(_figures_of(32, 40), 0)[0].startswith(
+        "VERDICT right end to end 32 of 40 (80.0 %; exact 95 % interval 64.4 to 90.9 %)")
+
+
+def test_the_printed_interval_equals_one_decimal_of_the_unrounded_bounds_for_every_r_at_n_40():
+    for r in range(0, 41):
+        lo, hi = scores.exact_interval(r, 40)
+        assert _printed_interval(r, 40) == f"{100 * lo:.1f} to {100 * hi:.1f}", r
+
+
+def test_the_interval_kept_in_figures_json_stays_fractions_to_4_places():
+    f = _figures_of(32, 40)
+    assert f["verdict"]["interval_exact"] == [0.6435, 0.9095]
 
 
 def test_figures_json_holds_exactly_item_10s_keys_and_counts(plant):

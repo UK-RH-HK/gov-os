@@ -151,7 +151,7 @@ def write_figures(run, figures: dict) -> None:
 def verdict_lines(f: dict, retried: int) -> list[str]:
     """The five printed lines of item 8."""
     n, v, b, be, sp = f["n"], f["verdict"], f["bar"], f["beside"], f["spend"]
-    lo, hi = f["verdict"]["interval_exact"]
+    lo, hi = scores.exact_interval(v["right"], n)  # from the counts, rounded once: FIGURES.json's 4 places are not reused
     mc = be["mcnemar_a1_a2"]
     word = {True: "met", False: "NOT met"}
     return [

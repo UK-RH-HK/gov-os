@@ -186,7 +186,7 @@ def rescore(sets_root, audit, n: int, *, repo=None, emit) -> str:
     if layout.inside(repo, p["root"]):
         raise UsageError("flag inside the sets root")
     kept = p["run"] / f"attempt-{n}" / "kept"
-    if not kept.is_dir():
+    if (p["run"] / f"attempt-{n}" / "FAULT").exists() or not kept.is_dir():  # a faulted attempt's figures are never printed
         emit("MS-KEPT")
         return "refused"
     rc, text = runner.rescore(p["set"].name, "hidden", repo=repo, root=p["root"], kept=kept)
