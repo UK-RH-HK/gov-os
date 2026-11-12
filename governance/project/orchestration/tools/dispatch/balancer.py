@@ -243,15 +243,25 @@ def forecast(state, peaks, newcomer_kind, newcomer_phases=None):
     band's top), RAM above the floor (available - each job's peak above its RSS now - the newcomer >= the floor), GPU
     memory at most total minus headroom (used + each job's GPU peak above what it holds + the newcomer, the rerankers'
     part at most the free GPU reranker slots' share). `state`: busy_cores, band_hi, mem_available_kb, floor_kb,
-    gpu {used_mib, total_mib} or None, headroom_mib, rr_held, rr_slots, jobs [{kind, phase, cpu, rss_kb, rr}].
+    gpu {used_mib, total_mib} or None, headroom_mib, rr_held, rr_slots, jobs [{kind, phase, cpu, rss_kb, rr}],
+    and optionally held_floor with each job's recent_cpu (DEC-1140 (2): a job measured for minutes counts at the larger
+    of its measured cores of the window, what it uses now and the floor, never above its phase's peak).
     Returns {ok, binding, resources: {cpu|ram|gpu: {need, cap, ok, frac, text}}, newcomer, reason}."""
     phases = newcomer_phases or NEWCOMERS.get(newcomer_kind, UNGATED)
     new = worst(peaks, newcomer_kind, phases)
     rr_share = (peaks.get("_shares") or {}).get("reranker_gpu_mib") or FLOOR_RERANKER_GPU_MIB
     cpu_up = ram_up = gpu_up = 0.0
+    floor, measured = state.get("held_floor"), 0
     for j in state.get("jobs") or []:
         p = peak_of(peaks, j["kind"], j["phase"])
-        cpu_up += max(0.0, p["cpu"] - (j.get("cpu") or 0.0))
+        peak_cpu, now_cpu = p["cpu"], j.get("cpu") or 0.0
+        if floor is not None and j.get("recent_cpu") is not None:
+            # DEC-1140 (2): a job measured for minutes counts at the larger of its measured cores of the window, what
+            # it uses now and a small floor (never above the phase's peak), not at the phase's whole peak
+            held = min(peak_cpu, max(float(j["recent_cpu"]), now_cpu, floor))
+            measured += held < peak_cpu
+            peak_cpu = held
+        cpu_up += max(0.0, peak_cpu - now_cpu)
         ram_up += max(0, p["ram_kb"] - (j.get("rss_kb") or 0))
         gpu_up += max(0, p["gpu"] - (j.get("rr") or 0) * rr_share)
     res = {}
@@ -260,8 +270,9 @@ def forecast(state, peaks, newcomer_kind, newcomer_phases=None):
     if busy is not None:
         need = busy + cpu_up + new["cpu"]
         res["cpu"] = {"need": round(need, 1), "cap": hi, "ok": need <= hi, "frac": need / hi if hi else 9,
-                      "text": f"CPU {need:.1f} of {hi} cores (busy {busy} + running jobs' peaks {cpu_up:.1f} + the "
-                              f"newcomer's {new['cpu']})"}
+                      "text": f"CPU {need:.1f} of {hi} cores (busy {busy} + running jobs' peaks {cpu_up:.1f}"
+                              + (f", {measured} of them at their measured load" if measured else "")
+                              + f" + the newcomer's {new['cpu']})"}
     avail, floor = state.get("mem_available_kb"), state.get("floor_kb")
     if avail is not None and floor is not None:
         need, cap = ram_up + new["ram_kb"], avail - floor
