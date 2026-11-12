@@ -85,3 +85,27 @@ findings: 6
 ## Judgement
 
 **Fail** (the reviewer's): R2-1 is in scope, reachable in ordinary work and fails open (S4, F1). It follows PK-3 (a)'s written fallback, so it goes to the CTO as a package in the lead's return, with R2-2 (F-2 made worse, fails closed) and the minor R2-3 to R2-6. No round 3 (DEC-1010).
+
+## Notes: run 5, the accepted fix riding a resume (DEC-802; no review round 3, DEC-1010)
+
+The owner decided R2-1 as P1-K (a) (DEC-1150 (2), 2026-11-12): drop the fallback. This record's round-2 verdict
+stands as written; the fix below was accepted without a new review round (DEC-802) and is recorded here, not judged.
+
+- w2/integrate `486bc0fb6992` merged (`8e66a9bd7`; no overlapping files).
+- Test design (independent test designer, session `52989e19-3afc-4b72-81e8-e57cb5c9ac8c`; `374cc59e9`, `4f8897e00`,
+  merged `93d722a38`): the not-an-ancestor case revised to the new rule (Rewrite-Reason: DEC-1150 (2)), R2-1's planted
+  case (no green record, an untrailered slip) added, both red before the fix; the `unowned` fixture and the clone's
+  first close re-planted with a green base on HEAD's line (Rewrite-Reason: DEC-1150 (2)); R2-4's two guards added
+  (a culprit timing out alone is not confirmed: `BATCH_UNEXPLAINED`; the rest never lands on zero tests:
+  `RUN_INCOMPLETE`), green on the code as the reviewer found it right. R2-5 went to the engineer (the guard denies the
+  test designer reads of `docs/research/`).
+- Engineer (session `49da35c0-2dce-4290-9c26-dcd87d1649f5`; `1b400c263`, `34601a7ba`): `select.head_without_change`
+  returns the green base when it is an ancestor of HEAD, and None otherwise; with None every red is the change's
+  (`RED_CAUSED`); the reason says so. R2-5's `-I` dropped. The lead brought the research doc's two stale passages to
+  the rule (`b08fae150`).
+- The lead's check at `b08fae150258`: lead_verify parallel 4793 tests, 1 failed
+  (`tests/unit/resources/test_w2_157_backstop.py::test_l5b_..._item[middle]`, another ticket's, outside this change,
+  green alone on re-run: load-sensitive); serial 1 entry green; `gov accept` 88 passed, 0 failed (S12 has no tests,
+  P4). Round 2's shared base reds (W2-96, W2-153) are gone after the merge.
+- Rows, not fixed here: R2-2 (PK-7, deferred with PK-5, the CTO), R2-3, R2-6. Before the land, the CTO brings the
+  owner how EXAMIN's copy gets its first green base (the ticket's "P1-K decided").
