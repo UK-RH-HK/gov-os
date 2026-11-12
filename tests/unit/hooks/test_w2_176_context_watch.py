@@ -402,6 +402,36 @@ def test_a_leads_reminder_leaves_no_bytecode_beside_the_hooks(tmp_path, transcri
     assert sorted(p.name for p in hooks.iterdir()) == ["context_watch.py", "precompact.py"]
 
 
+def test_a_failed_text_build_leaves_no_marker_and_the_next_call_reminds_once(tmp_path, transcripts):
+    """R8: a lead whose precompact import fails gets nothing and no marker; once the import works, one reminder."""
+    hooks = tmp_path / "hooks"
+    hooks.mkdir()
+    (hooks / "context_watch.py").write_bytes((HOOKS / "context_watch.py").read_bytes())
+    (hooks / "precompact.py").write_text("raise RuntimeError('planted: precompact cannot be imported')\n")
+    root = tmp_path / "lead"
+    root.mkdir()
+    (root / ".git").write_text("gitdir: /nowhere\n")
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 190_000))
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "PYTHONDONTWRITEBYTECODE": "1",
+           "HOME": str(tmp_path / "home"), "CLAUDE_PROJECT_DIR": str(root), "GOV_ROLE": "orchestrator",
+           "GOV_TICKET": "DAEO-lead"}
+
+    def call():
+        done = subprocess.run([sys.executable, str(hooks / "context_watch.py")], input=json.dumps(_event(t)),
+                              capture_output=True, text=True, cwd=str(root), env=env, timeout=30, check=False)
+        assert done.returncode == 0, done.stderr
+        return done
+
+    failed = call()
+    assert failed.stdout == "", failed.stdout
+    state = root / STATE
+    assert not state.exists() or not list(state.iterdir()), "the failed build spent the window's reminder"
+    (hooks / "precompact.py").write_bytes((HOOKS / "precompact.py").read_bytes())
+    assert str(root / ".gov-runtime/scratch/lead/CHECKPOINT.md") in _context(call())
+    assert len(list(state.iterdir())) == 1
+    assert call().stdout == "", "reminded twice in one window"
+
+
 @pytest.mark.parametrize("name", ["context_watch.py", "precompact.py"])
 def test_neither_source_sets_or_reads_a_compaction_threshold(name):
     text = (HOOKS / name).read_text().lower()
