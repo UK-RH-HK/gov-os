@@ -21,6 +21,10 @@ this repository's settings.
   `DAEO-zz90`, which the test designer works on, product-spec's, the auditor's and research's with its experiment
   folder `experiments/spikes/exp-901/`), and is committed. Built once per session in pytest's temporary folder; the
   cases that run the hook work on a copy of it.
+- **Its roster** (P-W2-110-5 (a), DEC-980, DEC-971 item 4; `Rewrite-Reason: DEC-971 item 4, DEC-980`): since W2-110 the
+  guard asks only the orchestrator on the ticket named by `coordination_ticket` in `governance/project/roster.yaml`, and
+  refuses every session when the key is missing (fail closed). The fixture writes that roster with
+  `coordination_ticket: DAEO-zz91`, so the CTO's case stays asked; every other session's case stays refused.
 - **A call is decided as the harness decides it** (W1-05's and W1-38's harness): a `permissions.deny` rule of the
   generated settings refuses before any hook is asked; otherwise the PreToolUse commands the settings register for
   Bash are run through `sh -c`, the event's JSON on standard input, `CLAUDE_PROJECT_DIR` set to the project, with
