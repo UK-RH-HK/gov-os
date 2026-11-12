@@ -22,6 +22,7 @@ allowed_paths:
 - src/gov/resources/config.py  # the one new value, gpu_backstop_limit_mib
 - tests/unit/resources/test_w2_157*
 - docs/changes/W2-157-evidence.md
+- docs/probes/DAEO-ozyt/**  # the probe record, so F4 holds at the branch head (run 1's F4 note; the CTO, 2026-11-12 07:20)
 reads:
 - src/gov/resources/**
 - governance/project/orchestration/packages/EMERGENCY-TOOLS-1.md
@@ -45,6 +46,7 @@ kpis:
   - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
+- DEC-1010
 - DEC-1067
 - DEC-1068
 - DEC-1030
@@ -70,3 +72,10 @@ Filed by the product-spec helper of the night audit (DAEO-sdxk's anti-drift audi
 - **Rabbit holes.** Matching processes by name or `ps | grep` (the groups are named, nothing else); reading Windows' shared-usage counter (WSL cannot; the total-minus-64 MiB sign stands).
 
 [DEC-1067 (GPU safety), DEC-1068 (4), DEC-1119 (5)]
+
+## Run 1's notes (the CTO, delegated P2, 2026-11-12 07:20)
+
+F4: the probe record's folder is in allowed_paths (no test change after the review). The lead's L2 key `gpu_backstop_embedders` and
+the three backstop keys outside `template()` (W2-20's frozen key set) stand. Rows: FR-11 (a try/finally so the own group's pause
+happens whatever the item write does), FR-12, FR-13, FR-3 (an owner question: a GPU that cannot be read), FR-4, FR-6 to FR-10.
+After the land the owner's operator adds the three gate.json entries (docs/changes/W2-157-evidence.md).
