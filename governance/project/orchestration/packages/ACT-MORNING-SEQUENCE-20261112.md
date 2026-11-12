@@ -5,7 +5,7 @@ owner called off the night's operator run). **Part 1** is eight ACTs, about 20 m
 hand merges (W2-11, W2-175, W2-176), about 5 minutes. Each `apply.sh` checks only its own files, so no ACT holds another; where one
 must follow another, its `check` refuses until the earlier one is in (named below).
 
-**Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
+**Updated 10:05 (DEC-1142): items 9-11 added (rule 11, the lock, the gate.json keys).** **Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
 
 **Before Part 1:** tell the CTO "starting". The CTO then writes `log/act-in-progress.txt` (no commit on `w2/integrate`, the merge
 queue held) so `git status` stays clean between steps; the CTO lifts it at your "done".
@@ -154,9 +154,35 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > bash $G/apply.sh exempt-verify    # exit 0: the committed map is the allowed before plus exactly the entry
 > ```
 >
+> **9. Rule 11 of the prompt** (the owner's file; DEC-1141 (3), DEC-1142 (10)): the 200k cap removed, line 43's D-10 Opus phrase deleted
+> ```
+> X=.gov-runtime/scratch/orchestrator/acts/MORNING-EXTRA
+> sha256sum $X/rule11.py           # expect 8cc24527a31458ae... (first 16)
+> python3 -I $X/rule11.py check    # expect: rule11: ready (both old texts found once)
+> python3 -I $X/rule11.py apply    # expect: rule11: applied (...)
+> git diff --stat                  # expect: governance/project/prompts/w2-orchestrator.md | 6 ++++--- (or close)
+> git commit -m "Rule 11: no token cap for any session (DEC-1141 (3)); the D-10 Opus phrase deleted (DEC-1140)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141, DEC-1142" --trailer "Role: owner" -- governance/project/prompts/w2-orchestrator.md
+> ```
+>
+> **10. The stale `.git/config.lock`** (empty, read-only, 11-10 21:11). The CTO's note: it is most likely the CLI's own sandbox
+> placeholder (WAVE_3_PARKING W3-P29), so a sandboxed worker may create it again; removing it is harmless. Run it only when no
+> git command is running:
+> ```
+> ls -la .git/config.lock          # expect: -r--r--r-- ... 0 ... .git/config.lock
+> rm -f .git/config.lock && ls .git/config.lock 2>&1 | tail -1    # expect: No such file or directory
+> ```
+>
+> **11. W2-157's three gate.json keys** (the machine's file, class (O); DEC-1067, DEC-1068 (4))
+> ```
+> sha256sum $X/gatejson.py         # expect 666c15fb66172f1e... (first 16)
+> python3 -I $X/gatejson.py check  # expect: gatejson: ready (12 keys now; 3 to add)
+> python3 -I $X/gatejson.py apply  # expect: gatejson: applied (15 keys; the old file kept as gate.json.pre-W2-157)
+> ```
+> (No commit: the file is outside the repository. Undo: `cp ~/.gov-os/machine/gate.json.pre-W2-157 ~/.gov-os/machine/gate.json`.)
+>
 > ```
 > git status --porcelain --untracked-files=no     # expect empty
-> git log --oneline -10                           # the commits, in this order (8 has two)
+> git log --oneline -10                           # the commits, in this order (8 has two; 9 has one; 10 and 11 none)
 > ```
 > Then tell the CTO "done" with the last line of `git log --oneline -1`.
 
