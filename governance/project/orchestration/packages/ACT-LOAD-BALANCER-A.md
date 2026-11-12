@@ -1,5 +1,8 @@
 # ACT-LOAD-BALANCER-A: the dispatcher's launcher checks the resource gate and registers each lead (DEC-1133 (3))
 
+> **Superseded figure (2026-11-12, DEC-1149):** the gate's working size is now 805,306,368 B (0.75 GiB) per live
+> session (ACT-P95-1, applied 16:53). The 2.04 GiB (2,191,601,664 B, DEC-947 item 2) figure below is kept as history.
+
 - **For:** the owner's operator (class (b): it needs the owner's yes), after the CTO has committed the companion test change
   (section 6) and an independent review says READY.
 - **By:** an ACT-preparation helper for the CTO (Sonnet, high; RUBRIC-2), 2026-11-11. Built and rehearsed in a clone and a

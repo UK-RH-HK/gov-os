@@ -129,3 +129,8 @@ The owner's SMART-WORK-1 decision 1 (DEC-983): the smart close becomes the produ
 - **PK-4:** a row (who commits the probe record): the CTO's launch tool, not this ticket; it does not block this land.
 - **PK-5 (c), the CTO (delegated P2, 14:05):** deferred with W2-115b (parked, W3-P32): the green base in a scoped project while the nightly is red. It blocks only this repository's own scoped close, which nothing uses yet (the queue lands); option (a) would widen this ticket to `governance/project/test-map.yaml`, the owner's (DEC-1142 (8)). Reversible on the owner's word.
 - Residuals F-2, F-6, F-8, F-9 as the lead triaged (W2-115b is parked, so they wait with it).
+
+## P1-K decided (the owner, DEC-1150 (2), 2026-11-12)
+
+R2-1 (review round 2, the last): **(a), drop the fallback.** `select.head_without_change` returns the green base when it is an ancestor of HEAD, and nothing otherwise; with no green base every red counts as the change's (fails closed). The fix rides a resume (DEC-802): one acceptance case revised for the not-an-ancestor case, R2-4's two guard cases and R2-5's `-I` fix in the same test-design batch, a fresh engineer, rebuild, lead_verify, gov accept; no review round 3 (DEC-1010). PK-7 deferred with PK-5 (the CTO, delegated P2). Before it lands, the CTO brings the owner how EXAMIN's copy gets its first green base or a recorded list of its standing reds, so W2-27's first closes do not refuse for ever.
+

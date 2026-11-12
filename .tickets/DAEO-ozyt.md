@@ -1,6 +1,6 @@
 ---
 id: DAEO-ozyt
-status: in_progress
+status: closed
 deps: [DAEO-r30l]
 links: [DAEO-r30l, DAEO-5emz]
 created: 2026-11-11T01:20:16Z
@@ -90,3 +90,8 @@ ticket's paths: (1) a group whose live members are all zombies counts as ended; 
 or seconds, a keyword argument whose default keeps the command's behaviour), and every test that calls it passes one; (3) each test reaps
 the process groups it plants. No KPI line changes. One C2 run; it lands through the queue (DEC-989). The owner's temporary skip (P1-B (b))
 cannot take effect without a control-path change (DEC-1144 (2)'s note), so until this lands a hang is stopped by pid.
+
+## The template default moved to W2-121b (the CTO, 2026-11-12 18:5x)
+
+The fix run returned DONE before the default's line could ride it; to land the hang fix at once, the line (DEC-1149 (2)) moved to W2-121b, whose paths hold `src/gov/resources/**`.
+
