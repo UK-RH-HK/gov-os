@@ -73,6 +73,29 @@ structural pass at 883ebbf548b0: NOTICE in mutation (8 of 9 ran families ok), 16
 The mutation NOTICE is the repository's own finding about three tickets, not a fault of the pass. The run wrote only
 links' mark (`.gov-runtime/links/mark`, ignored by git). The lead re-measures on the main tree.
 
+## S5: the lead's measurement on the repository's main tree (2026-11-12)
+
+The code at 4916311219bd, run on the main tree /home/usain/Dynamic-Agentic-Engineering-OS at 010399309d69 with no
+`<base>` (so the main tree's links mark is not moved; links and portability are measured on a clone below):
+
+```
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | ... (+6 more)
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no base given)
+links: skipped (no base given)
+structural pass at 010399309d69: NOTICE in mutation (7 of 8 ran families ok), 9.3 s; a notice, not a refusal
+```
+
+Exit 0, wall 9.37 s (limit: the 50 s bound plus 10 s). `git status --porcelain` of the main tree: 0 lines before and
+after. With a `<base>` (links and portability included), the reviewer's re-measure on a `--shared` clone of
+4916311219bd, base `HEAD~3`: wall 19.66 s, exit 0, the only file written `.gov-runtime/links/mark`.
+
 ## Other runs
 
 - `tests/unit/check`: 134 passed, 88 deselected (the opt-in and the real-model exclusions).
