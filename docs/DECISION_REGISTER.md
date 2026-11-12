@@ -14023,7 +14023,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   question 4 (the owner's time kept for what loosens a control).
 
 ### DEC-1104 — D-4's ten cases by option C; the operator agent approved as recommended; the landing selection's environment fixed before its results are relied on; ACTs given as messages for the owner's operator
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing · **Under:** DEC-1103, DEC-1100, DEC-1101, DEC-1061, DEC-1058, DEC-928 (3), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after ACT-INDEP-WALLS-1 (`147706ae`) and ACT-GATE-CONFIG-1 (`d7490945`) were applied by the owner's operator
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing · **Under:** DEC-1103, DEC-1100, DEC-1101, DEC-1061, DEC-1058, DEC-928 (3), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after ACT-INDEP-WALLS-1 (`147706ae`) and ACT-GATE-CONFIG-1 (`d7490945`) were applied by the owner's operator · **Changed by:** DEC-1141 (6) (the operator agent's hours: asleep only during the nightly; to be applied by ACT)
 - **Decision:**
   - (1) **ACT-D4-RESTORE-1: option C.** The seven green cases into the gates now (the ACT's form B); D-10 decides each
     of the three red-by-design cases (W1-33's auditor, W1-05's install, W1-46's research install): rewrite it for
@@ -14221,7 +14221,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (the owner's time and allowance spent where they buy most).
 
 ### DEC-1118 — USAGE-1's savings A, B and C now, D once verified, E and F as trials after the lift; every session's list-price cost logged; a model-tier investigation for the fresh session
-- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`); items (1) and (2) standing · **Under:** DEC-1117 (3), DEC-1089 (3), DEC-1091, DEC-1110 (2) · **Source:** the owner's message (chat, 2026-11-10), on USAGE-1 §6 and §7 · **Changed by:** DEC-1140 (4) (item (A) for the CTO's own session: up to about a million tokens with compaction, a fresh session each morning after the 09:30 digest)
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`); items (1) and (2) standing · **Under:** DEC-1117 (3), DEC-1089 (3), DEC-1091, DEC-1110 (2) · **Source:** the owner's message (chat, 2026-11-10), on USAGE-1 §6 and §7 · **Changed by:** DEC-1140 (4) (item (A) for the CTO's own session: up to about a million tokens with compaction, a fresh session each morning after the 09:30 digest) · **Changed by:** DEC-1141 (3) (item (A) replaced entirely: no token cap for any session)
 - **Decision:**
   - (1) **Now:** (A) fresh sessions at about 200k tokens of context (a helper or lead hands over through its record;
     the CTO checkpoints and clears at the same limit); (B) the CTO checkpoints and clears before a planned idle of more
@@ -14266,7 +14266,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   (what the emergency built reaches the product by its own route).
 
 ### DEC-1120 — RUBRIC-2: the owner's rubric of model and effort by role and criticality class, replacing OWNER-DECISION-P2-0008 §11 (RUBRIC-1); changes DEC-839 (1)-(3)
-- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`; standing) · **Under:** DEC-1119, DEC-1118, DEC-957 · **Changes:** DEC-839 (1)-(3); DEC-1119 (1) (the rubric found, `packages/RUBRIC-1.md`, is replaced) · **Source:** the owner's message (chat, 2026-11-10), on RUBRIC-1
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`; standing) · **Under:** DEC-1119, DEC-1118, DEC-957 · **Changes:** DEC-839 (1)-(3); DEC-1119 (1) (the rubric found, `packages/RUBRIC-1.md`, is replaced) · **Source:** the owner's message (chat, 2026-11-10), on RUBRIC-1 · **Changed by:** DEC-1141 (3) (the "hand over past about 200k tokens" line: no token cap)
 - **Decision:**
   - (1) **Criticality classes.** C3 critical: the guard, hooks, permissions, the path map, hidden sets, the operator
     agent, class (b) and (O) ACTs, the kernel and the Contract, re-pins, measurement verdicts. C2 significant: product
@@ -14603,7 +14603,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the templates one approved source for every launched session, carrying the owner's three rules).
 
 ### DEC-1140 — Tonight's priorities: usage first (RUBRIC-2 at every launch, quiet notices), context awareness back for every session, then the load balancer, the dispatcher and W2-115; the CTO session to about a million tokens; the free reset: the 80 % brake lifted this week, five leads, 97 % and 99 % lines
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); (5) and (6) for the week to the reset of 11-15, (4) standing · **Under:** DEC-1120, DEC-1118, DEC-1115 (4), DEC-1126, DEC-1089 (3), DEC-1133 (3), DEC-1138 · **Changes:** DEC-1118 (A) for the CTO's own session (see (4)); DEC-1126's 80 % brake lifted for the week (see (5)); DEC-1089 (3) excepted once (see (6)) · **Source:** the owner's messages (chat, 2026-11-11 ~23:05 and ~23:10 UTC)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); (5) and (6) for the week to the reset of 11-15, (4) standing · **Under:** DEC-1120, DEC-1118, DEC-1115 (4), DEC-1126, DEC-1089 (3), DEC-1133 (3), DEC-1138 · **Changes:** DEC-1118 (A) for the CTO's own session (see (4)); DEC-1126's 80 % brake lifted for the week (see (5)); DEC-1089 (3) excepted once (see (6)) · **Source:** the owner's messages (chat, 2026-11-11 ~23:05 and ~23:10 UTC) · **Corrected by:** DEC-1141 (3) (item (4)'s last sentence)
 - **Decision:**
   - (1) **First, usage.** (a) Finish the work that reduces usage; every agent launched by RUBRIC-2 (DEC-1120): workers on C2
     and C1 tickets on Sonnet, high; Opus for C3 and reviews; tonight's lead briefs that say Opus corrected; every new brief
@@ -14620,7 +14620,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     they changed from 2 November to now; the records kept and reported in the digests. After the reset, the forecast
     (at five leads the new allowance also runs out before the next reset) and whether to throttle.
   - (4) **Sessions (changes DEC-1118 (A) for the CTO):** a CTO session runs up to about a million tokens, with compaction;
-    a fresh CTO session every morning after the 09:30 digest and its handover, not at 200k. Leads and helpers keep (A).
+    a fresh CTO session every morning after the 09:30 digest and its handover, not at 200k. [Corrected by DEC-1141 (3): the sentence "Leads and helpers keep (A)." was the CTO's addition, never the owner's decision; no session has a token cap.]
   - (5) **The free reset (the owner's "Weekly reset", until 10 Dec):** the 80 % brake (DEC-1126) is lifted for this week;
     up to five leads, EXAMIN's path first (W2-11, W2-23, W2-110, W2-52), then the off-path tickets. The night hold for
     the nightly stays (DEC-1138 (3)).
@@ -14628,6 +14628,27 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     the CTO pushes the owner at any hour (an exception to DEC-1089 (3), for this only); the owner presses the reset and the
     CTO resumes at once.
 - **Basis:** questions 2 and 4 (cost measured and spent on EXAMIN's path; sessions that resume fresh).
+
+### DEC-1141 — W2-11's K3 CIT-P approved; W2-176's approval withdrawn for its cap; no token cap for any session (DEC-1118 (A) replaced entirely); hand merges of W2-175 and W2-176; the operator agent sleeps only during the nightly
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (3) standing · **Under:** CAP-33, DEC-1116, DEC-1140, DEC-1010, DEC-989, DEC-1104 · **Changes:** DEC-1118 (A) (replaced entirely); DEC-1140 (4) (corrected: its sentence "Leads and helpers keep (A)" was the CTO's addition, never the owner's); DEC-1120 (2) (its "hand over past about 200k tokens"); DEC-989 (two hand merges, (4)); DEC-1104 (5)'s operator hours ((6), to be applied by ACT) · **Source:** the owner's messages (chat, 2026-11-12 ~02:25 to ~02:48 UTC)
+- **Decision:**
+  - (1) **W2-11's K3 CIT-P approved at `dca382f3069f`** (the 17 kernel files' sha256 as the CTO's table of 11-12 ~02:00; the copies
+    byte-identical); review rows: R6 accepted knowingly (W2-128's two guard halves read W2-128's own merge); R1 and R5 rows; R4 to W2-33;
+    the CTO confirmed ACT-CLAUDE-COPIES-5 regenerates discovery's and retrieval's copies (R2).
+  - (2) **W2-176's approval at `3a580a4b4d42` is withdrawn**, because those bytes carry the cap: `HANDOVER_CAP` and the CTO-only branch
+    are removed so every session is reminded once at 85 % of its own model's window; R8 fixed (the text built before the marker); the
+    delta reviewed; the new bytes come to the owner for approval; its registration (ACT-CONTEXT-WATCH-1) after the nightly.
+  - (3) **No token cap for any session** (the CTO, leads, workers, helpers): every session uses its model's full window and compacts,
+    the checkpoint and handover written by the hook before compaction and the read-first line in the summary. This replaces DEC-1118 (A)
+    entirely. The 200k rule is removed from every brief, template, record and tool that carried it; the prompt's rule 11 is the owner's
+    edit. No launch, setting or tool sets a compaction threshold (checked 11-12).
+  - (4) **Hand merges tonight** of W2-175 and W2-176 (an exception to DEC-989), each after S6 and the unit suites run on the merge;
+    ACT-CONTEXT-WATCH-1 after the nightly if it misses 03:00.
+  - (5) No operator run on the night of 11-12; the CTO lifts its freeze and carries on with everything that does not need the owner;
+    the owner resumes at 08:00 with one ordered list.
+  - (6) **The operator agent sleeps only while the nightly runs** (the night hold, from 03:00 until the nightly ends), not from 01:00 to
+    08:00; every other hour it runs; the change (its crontab line and a skip while the night hold is on) comes as the first item at 08:00.
+- **Basis:** questions 2 and 4.
 
 | Version | Date | Change |
 |---|---|---|
@@ -14705,3 +14726,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.521 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1138 (the lead cap five through 11-12's working day, measured; the safety nets kept; no new lead run after 03:00; the p95 ACT rewrites the working size and both peaks). Next free id: DEC-1139. |
 | 0.522 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1139 (W2-175's role templates approved at 4c0c73472fd8 and promoted as 1.0.1; three fixes for the next template delta, (c) to W2-33). Next free id: DEC-1140. |
 | 0.523 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1140 (usage first: RUBRIC-2 at every launch, quiet notices; context awareness back; the load balancer, dispatcher and W2-115; the CTO session to about 1M tokens; the 80 % brake lifted this week, five leads, the 97 % and 99 % lines). Next free id: DEC-1141. |
+| 0.524 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1141 (W2-11 approved; W2-176 withdrawn for its cap; no token cap for any session, DEC-1118 (A) replaced; DEC-1140 (4) corrected; hand merges of W2-175 and W2-176; the operator asleep only during the nightly). Next free id: DEC-1142. |
