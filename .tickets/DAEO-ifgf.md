@@ -39,3 +39,8 @@ track: A
 # W2-121b gov dispatch, part b
 
 Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W2-121-1 (a) and P-W2-121-3 (a), 2026-11-12: these KPI lines moved word for word; it builds on part a's Interface (in W2-121's ticket) and runs after it. The reference is the CTO's dispatcher (`governance/project/orchestration/tools/dispatch/`), never a target.
+
+## Waits on the owner's K9 decision (DEC-1142 (8), 2026-11-12)
+
+Kept for now; whether parts a (closed) and b meet K9's "a dispatcher" for EXAMIN's copy is the owner's decision. Not started before it.
+

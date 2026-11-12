@@ -5,6 +5,8 @@ owner called off the night's operator run). **Part 1** is eight ACTs, about 20 m
 hand merges (W2-11, W2-175, W2-176), about 5 minutes. Each `apply.sh` checks only its own files, so no ACT holds another; where one
 must follow another, its `check` refuses until the earlier one is in (named below).
 
+**Updated 10:05 (DEC-1142): items 9-11 added (rule 11, the lock, the gate.json keys).** **Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
+
 **Before Part 1:** tell the CTO "starting". The CTO then writes `log/act-in-progress.txt` (no commit on `w2/integrate`, the merge
 queue held) so `git status` stays clean between steps; the CTO lifts it at your "done".
 
@@ -152,14 +154,149 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > bash $G/apply.sh exempt-verify    # exit 0: the committed map is the allowed before plus exactly the entry
 > ```
 >
+> **9. Rule 11 of the prompt** (the owner's file; DEC-1141 (3), DEC-1142 (10)): the 200k cap removed, line 43's D-10 Opus phrase deleted
+> ```
+> X=.gov-runtime/scratch/orchestrator/acts/MORNING-EXTRA
+> sha256sum $X/rule11.py           # expect 8cc24527a31458ae... (first 16)
+> python3 -I $X/rule11.py check    # expect: rule11: ready (both old texts found once)
+> python3 -I $X/rule11.py apply    # expect: rule11: applied (...)
+> git diff --stat                  # expect: governance/project/prompts/w2-orchestrator.md | 6 ++++--- (or close)
+> git commit -m "Rule 11: no token cap for any session (DEC-1141 (3)); the D-10 Opus phrase deleted (DEC-1140)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141, DEC-1142" --trailer "Role: owner" -- governance/project/prompts/w2-orchestrator.md
+> ```
+>
+> **10. The stale `.git/config.lock`** (empty, read-only, 11-10 21:11). The CTO's note: it is most likely the CLI's own sandbox
+> placeholder (WAVE_3_PARKING W3-P29), so a sandboxed worker may create it again; removing it is harmless. Run it only when no
+> git command is running:
+> ```
+> ls -la .git/config.lock          # expect: -r--r--r-- ... 0 ... .git/config.lock
+> rm -f .git/config.lock && ls .git/config.lock 2>&1 | tail -1    # expect: No such file or directory
+> ```
+>
+> **11. W2-157's three gate.json keys** (the machine's file, class (O); DEC-1067, DEC-1068 (4))
+> ```
+> sha256sum $X/gatejson.py         # expect 666c15fb66172f1e... (first 16)
+> python3 -I $X/gatejson.py check  # expect: gatejson: ready (12 keys now; 3 to add)
+> python3 -I $X/gatejson.py apply  # expect: gatejson: applied (15 keys; the old file kept as gate.json.pre-W2-157)
+> ```
+> (No commit: the file is outside the repository. Undo: `cp ~/.gov-os/machine/gate.json.pre-W2-157 ~/.gov-os/machine/gate.json`.)
+>
 > ```
 > git status --porcelain --untracked-files=no     # expect empty
-> git log --oneline -10                           # the commits, in this order (8 has two)
+> git log --oneline -10                           # the commits, in this order (8 has two; 9 has one; 10 and 11 none)
 > ```
 > Then tell the CTO "done" with the last line of `git log --oneline -1`.
 
 **Undo, any one:** `bash <its bundle>/apply.sh undo`, then commit the same paths with the subject `<ACT> undone` and
 `--trailer "Role: owner"`. Undo in reverse order if more than one (the path-map chain: 8's exemption, then 7, 6, 5).
+
+## Part 1 as of 10:05 (items 1-4 and 8-11; 5-7 held): the message for the owner's operator
+
+> **Eight steps by hand (items 1-4, 8, 9, 10, 11), in this order, in the main tree. First tell the CTO "starting". Stop at the first step that does not show what is expected, send that
+> line to the CTO, and apply nothing further.**
+>
+> ```
+> cd /home/usain/Dynamic-Agentic-Engineering-OS
+> test -z "$(git status --porcelain --untracked-files=no)" && test ! -e .git/MERGE_HEAD && echo clean      # expect: clean
+> ```
+>
+> **1. ACT-LOAD-BALANCER-A** (the launcher checks the resource gate and registers each lead; DEC-1133 (3))
+> ```
+> A=.gov-runtime/scratch/orchestrator/acts/ACT-LOAD-BALANCER-A
+> sha256sum $A/manifest.json     # expect 0b40f1bfd84b65d043a7e7e2599d0717139461885f8f73462a3f24751b7a8e5f
+> bash $A/apply.sh check         # expect: state before (sha256 03b93044ff98)
+> bash $A/apply.sh apply         # exit 0
+> bash $A/apply.sh verify        # exit 0
+> git diff --name-status         # expect exactly one M: governance/project/orchestration/tools/dispatch/launch_now.sh
+> git commit -m "ACT-LOAD-BALANCER-A: the dispatcher's launcher checks the resource gate and registers each lead (DEC-1133 (3))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1133, DEC-1105" --trailer "Role: owner" -- governance/project/orchestration/tools/dispatch/launch_now.sh
+> ```
+>
+> **2. ACT-CLAUDE-COPIES-4** (the 19 generated copies of W2-175's approved 1.0.1 role templates; DEC-1139)
+> ```
+> G=.gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-4
+> sha256sum $G/manifest.json      # expect 6ab06e85cae2d566c9da540c9ef0ec60c9edc366b6d5e5ccb7401a7d6d99fd17
+> bash $G/apply.sh check && bash $G/apply.sh apply
+> F=$(cut -d'|' -f2 $G/list.txt); git add $F; git diff --cached --name-only | wc -l    # expect 19
+> git commit -m "ACT-CLAUDE-COPIES-4: the .claude/templates role copies, the six .rulesync/subagents sources and the six .claude/agents for W2-175's 1.0.1 templates (19 files)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1139, DEC-1116" --trailer "Role: owner"
+> ```
+>
+> **3. ACT-DISPATCH-1** (the dispatcher enforces the lead cap, one idle item per cause, a held slot counted by its measured load)
+> ```
+> A=.gov-runtime/scratch/orchestrator/acts/ACT-DISPATCH-1
+> sha256sum $A/manifest.json     # expect a20754dd1e9f88db984a467d65bfb2b346e7c94d61cd00b520bca99ac8351070
+> bash $A/apply.sh check         # exit 0
+> bash $A/apply.sh apply         # exit 0
+> bash $A/apply.sh verify        # exit 0
+> git diff --name-status         # expect exactly four M: dispatch/dispatcher.py, dispatch/balancer.py, test_dispatcher.py, test_balancer.py
+> git commit -m "ACT-DISPATCH-1: the dispatcher enforces max_leads, sends one idle item per cause (reminder after 6 h), counts a held slot by its measured load (DEC-1140 (1)(a), (2))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1140, DEC-1118" --trailer "Role: owner" -- governance/project/orchestration/tools/dispatch/dispatcher.py governance/project/orchestration/tools/dispatch/balancer.py tests/unit/orchestration/test_dispatcher.py tests/unit/orchestration/test_balancer.py
+> ```
+>
+> **4. ACT-IDLE-GUARD-2** (the idle check leaves out a returned lead's line and merged tickets, keeps claimed ones, cuts a slow plan at 5 s)
+> ```
+> A=.gov-runtime/scratch/orchestrator/acts/ACT-IDLE-GUARD-2
+> sha256sum $A/manifest.json     # expect a3fe076cf3339f5da0fcd54462f8270467d731d08805215b394f66c725737422
+> bash $A/apply.sh check         # exit 0
+> bash $A/apply.sh apply         # exit 0
+> bash $A/apply.sh verify        # exit 0
+> git diff --name-status         # expect exactly two M: stop_idle_check.py and test_stop_idle_check.py
+> git commit -m "ACT-IDLE-GUARD-2: the idle check leaves out a returned lead's line and merged plan tickets, and cuts a slow plan at 5 s (DEC-1140 (2); ACT-IDLE-GUARD-1 review F1-F3)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1140, DEC-1110" --trailer "Role: owner" -- governance/project/orchestration/tools/stop_idle_check.py tests/unit/orchestration/test_stop_idle_check.py
+> ```
+>
+> **8. ACT-OPERATOR-HOURS-2** (G9 holds only while the night hold is on; DEC-1141 (6)). Not at a :x0 minute (the cron's launch).
+> The CTO already holds integrate ("starting" above), so nothing lands between its two commits. Note step 2's `H` (the first commit's id): an undo uses it (the package's section 5).
+> ```
+> G=.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2
+> sha256sum $G/manifest.json      # expect 7acf024359d6cdbd87c1d487e5d0dc5b64236a45c1ca4e7ce427bcf9db696697
+> bash $G/apply.sh check     # exit 0: "check: ready to apply ..." (every listed file is the before; the operator holds nothing)
+> bash $G/apply.sh apply     # exit 0: six lines "apply: ...", "the install's own APPROVED check: ok", "APPROVED 1e557c49...", "state applied"
+> bash $G/apply.sh verify    # exit 0: "verify: every listed file is the after ..."
+> sha256sum ~/gov-os-operator/install/APPROVED    # expect 1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc
+> git status --short         # 3 M and 1 ?? (opcommon.py, test_w2_148_gates.py, its README.md; the new test_act_operator_hours_2.py)
+> git add governance/project/operator/opcommon.py tests/acceptance/W2-148/test_w2_148_gates.py tests/acceptance/W2-148/README.md tests/unit/operator/test_act_operator_hours_2.py
+> git commit -m "ACT-OPERATOR-HOURS-2: G9 holds only while the night hold is on (DEC-1141 (6)); the fixed quiet hours and the nightly window gone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141" --trailer "Role: owner" -- governance/project/operator/opcommon.py tests/acceptance/W2-148/test_w2_148_gates.py tests/acceptance/W2-148/README.md tests/unit/operator/test_act_operator_hours_2.py
+> # step 2, straight after step 1 (nothing committed between; W1-01 is red until it is in):
+> bash $G/apply.sh exempt           # exit 0: "exempt: added the entry for <12 digits>", then "exempt-verify: the map is the allowed before (sha256 f4029cfb4942 or d50884e3633e) plus exactly the entry for <12 digits> ..."
+> git diff --numstat -- governance/project/path-map.yaml   # expect: 2  0  governance/project/path-map.yaml
+> H=$(git rev-parse HEAD)           # the first commit's full id (exempt wrote it into the map)
+> git add governance/project/path-map.yaml
+> git commit -m "ACT-OPERATOR-HOURS-2: acceptance_exemptions lists its own commit ${H:0:12} (DEC-1136 (2))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1136, DEC-1141" --trailer "Role: owner" -- governance/project/path-map.yaml
+> bash $G/apply.sh exempt-verify    # exit 0: the committed map is the allowed before plus exactly the entry
+> ```
+>
+> **9. Rule 11 of the prompt** (the owner's file; DEC-1141 (3), DEC-1142 (10)): the 200k cap removed, line 43's D-10 Opus phrase deleted
+> ```
+> X=.gov-runtime/scratch/orchestrator/acts/MORNING-EXTRA
+> sha256sum $X/rule11.py           # expect 8cc24527a31458ae... (first 16)
+> python3 -I $X/rule11.py check    # expect: rule11: ready (both old texts found once)
+> python3 -I $X/rule11.py apply    # expect: rule11: applied (...)
+> git diff --stat                  # expect: governance/project/prompts/w2-orchestrator.md | 6 ++++--- (or close)
+> git commit -m "Rule 11: no token cap for any session (DEC-1141 (3)); the D-10 Opus phrase deleted (DEC-1140)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141, DEC-1142" --trailer "Role: owner" -- governance/project/prompts/w2-orchestrator.md
+> ```
+>
+> **10. The stale `.git/config.lock`** (empty, read-only, 11-10 21:11). The CTO's note: it is most likely the CLI's own sandbox
+> placeholder (WAVE_3_PARKING W3-P29), so a sandboxed worker may create it again; removing it is harmless. Run it only when no
+> git command is running:
+> ```
+> ls -la .git/config.lock          # expect: -r--r--r-- ... 0 ... .git/config.lock
+> rm -f .git/config.lock && ls .git/config.lock 2>&1 | tail -1    # expect: No such file or directory
+> ```
+>
+> **11. W2-157's three gate.json keys** (the machine's file, class (O); DEC-1067, DEC-1068 (4))
+> ```
+> sha256sum $X/gatejson.py         # expect 666c15fb66172f1e... (first 16)
+> python3 -I $X/gatejson.py check  # expect: gatejson: ready (12 keys now; 3 to add)
+> python3 -I $X/gatejson.py apply  # expect: gatejson: applied (15 keys; the old file kept as gate.json.pre-W2-157)
+> ```
+> (No commit: the file is outside the repository. Undo: `cp ~/.gov-os/machine/gate.json.pre-W2-157 ~/.gov-os/machine/gate.json`.)
+>
+> ```
+> git status --porcelain --untracked-files=no     # expect empty
+> git log --oneline -10                           # the commits, in this order (1-4 one each, 8 two, 9 one; 10 and 11 none)
+> ```
+> Then tell the CTO "done" with the last line of `git log --oneline -1`.
+
+**Undo, any one:** `bash <its bundle>/apply.sh undo`, then commit the same paths with the subject `<ACT> undone` and
+`--trailer "Role: owner"`. Undo in reverse order if more than one (the path-map chain: 8's exemption, then 7, 6, 5).
+
 
 ## After "done" (the CTO)
 End the freeze; apply ACT-OPERATOR-HOURS-1 (the crontab, class (b), P-ACT-SPLIT; its `check` refuses until 8 is in); a landing
