@@ -7,7 +7,8 @@ branch: w2/W2-176
 base: 1798e82f1201
 ticket: DAEO-ktiw (W2-176)
 author: ticket lead (W2-176)
-review: read-only independent auditors (CAP-33), round 1 READY at 13fd1dd34e32, round 2 (the last, DEC-1010) READY at 7894a35e116f
+review: read-only independent auditors (CAP-33), round 1 READY at 13fd1dd34e32, round 2 (the last, DEC-1010) READY at 7894a35e116f; the cap removed at c10be8fd0266 (section 3.8), not yet reviewed
+approval: the owner withdrew the approval of 3a580a4b4d42 (2026-11-12), whose bytes carry the 200,000 cap; the new bytes (context_watch.py at c10be8fd0266) await independent review and the owner's approval
 decisions_carried: [DEC-1140, DEC-1118, DEC-264, DEC-259, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
 state_class: EVIDENCE
 ---
@@ -16,13 +17,15 @@ state_class: EVIDENCE
 
 This change makes every session hand over before compaction: the PreCompact hook tells the compaction summary to begin
 with a read-the-handover-first line, and a new PostToolUse hook reminds a session once per context window, at 85 % of
-its window (the CTO's session: its model's window; leads and workers: at most 200,000 tokens), to write its checkpoint
+its own model's window (no session has a token cap: the owner, 2026-11-12, section 3.8), to write its checkpoint
 and update its files. It changes a kernel hook and adds one, so it goes through CIT-P (CAP-33). It sets no compaction
 threshold and stops nothing (DEC-838).
 
-**Status: PROPOSED.** Round 1 was READY; the CTO decided its packages (section 3.2 to 3.4); round 2, the last
-(DEC-1010), is READY at `7894a35e116f` (section 3.5). The sha256 column of section 2 is that of the ticket's final
-head. The owner's approval (section 4) is pending.
+**Status: PROPOSED; approval withdrawn, new bytes await review and approval.** Round 1 was READY; the CTO decided its
+packages (section 3.2 to 3.4); round 2, the last (DEC-1010), was READY at `7894a35e116f` (section 3.5). The owner
+withdrew the approval of `3a580a4b4d42` on 2026-11-12, because those bytes carry the 200,000 cap, and ordered the cap
+removed for every session; it is removed at `c10be8fd0266` (section 3.8). The sha256 column of section 2 is that of
+the new head. The new bytes await independent review and the owner's approval (section 4).
 
 ## 1. Evidence and corroboration
 
@@ -49,12 +52,12 @@ Corroboration (official documentation, code.claude.com/docs/en/hooks and /model-
 
 ## 2. Proposal
 
-| File | Change | Base sha256 (at 1798e82f1201) | New sha256 (at the final head, 7894a35e116f) |
+| File | Change | Base sha256 (at 1798e82f1201) | New sha256 (at c10be8fd0266) |
 |---|---|---|---|
 | `template/governance/kernel/hooks/precompact.py` | One plain-text line on stdout on every run, for every role: `Begin the compaction summary with this line: "READ FIRST: <path> ..."`, naming the orchestrator's or lead's CHECKPOINT and its RESUME HERE section, or a worker's brief and record. The checkpoint record, the state block and the systemMessage on error are unchanged; the line comes first, the systemMessage after it. `newest()` skips a file removed between listing and stat (R7) | `eb0174da477ff6f4eab7ca5bb133c667079830aa5c5c64f8f8d8337ad8c95086` | `ee19c22dc02e8ed7207dc535e55744e233d527635729a4d37ef252c8fa7e12cf` |
-| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the session's window (the table: Opus, Sonnet, Haiku 5.5 and Fable 5.2 1,000,000, others 200,000; the CTO's session, `GOV_ROLE` orchestrator on a `class: coordination` ticket, its model's window; every other session at most 200,000); skips events carrying `agent_id`; at 85 % or more, once per context window (a marker under `.gov-runtime/scratch/context_watch/`, removed when usage falls below 50 %), additionalContext with the role's duties (the CTO: RESUME HERE, DECIDED-NOT-DONE, `.gov-runtime/scratch/orchestrator/log/report-state.json`; a lead: its CHECKPOINT; a worker: its record) and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction. Any error: no output, exit 0 | none (new file) | `ed17fbb0e2b3aadbe141403860c914e3a1b14555647c7ab09e2840743e14c731` (at `4dec7ec3c72c`, R8, section 3.7) |
+| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the window of the session's own model, for every session alike, with no cap (the table: Opus, Sonnet, Haiku 5.5 and Fable 5.2 1,000,000; a model not in the table 200,000, a model size, not a cap); skips events carrying `agent_id`; at 85 % or more, once per context window (a marker under `.gov-runtime/scratch/context_watch/`, made only once the text is built (R8), removed when usage falls below 50 %), additionalContext with the role's duties (an orchestrator, the CTO included: its CHECKPOINT via `checkpoint_rel` and its RESUME HERE section; a worker: its record) and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction; the wording names no cap and no handover limit. Any error: no output, exit 0 | none (new file) | `213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242` (at `c10be8fd0266`, the cap removed, section 3.8; was `ed17fbb0e2b3…` at `4dec7ec3c72c`) |
 | `tests/unit/hooks/test_w2_176_precompact.py` | 18 unit cases (S1, F1, R7) | none (new file) | n/a (tests) |
-| `tests/unit/hooks/test_w2_176_context_watch.py` | 48 unit cases (S2, S3, F1, R1, R2, P2, P4, R8), including a 50 MB transcript under 100 ms (median 24.3 ms) | none (new file) | n/a (tests) |
+| `tests/unit/hooks/test_w2_176_context_watch.py` | 77 unit cases (S2, S3, F1, R1, R2, R8 and the cap's removal, section 3.8), including a 50 MB transcript under 100 ms | none (new file) | n/a (tests) |
 | `tests/unit/hooks/test_resume_hooks.py`, `tests/unit/hooks/test_w29_hooks.py` | Assert-only updates of five cases to S1's stdout form (the read-first line first, the JSON object on the last line); the CTO's P1 (a) | (existing) | n/a (tests) |
 
 The three options (DEC-105): apply now (recommended: the owner ordered it live for every session, DEC-1140 (1)(b));
@@ -130,9 +133,36 @@ and W2-62 acceptance regression 147 passed.
 
 R8 fixed at `4dec7ec3c72c` (the text built before the marker; red test at `f50d59033736`).
 
+### 3.8 The cap removed (the owner, 2026-11-12)
+
+The owner's order (chat, 2026-11-12 ~02:30; the CTO records it as DEC-1141, replacing DEC-1118 (A) entirely): no
+session has a token cap; the CTO, leads, workers and helpers each use their model's full window and compact, the
+checkpoint and handover written by the hook before compaction and the summary opening with the read-first line. The
+owner withdrew the approval of `3a580a4b4d42`, because those bytes carry the cap. This replaces P4 (section 3.4) and
+the CTO-only branch of DEC-1140 (4)'s delta.
+
+- **Code** (`c10be8fd0266`): `HANDOVER_CAP` and the coordination-ticket test (`is_cto`) removed; every session's window
+  is its own model's (`limit(model)`); the CTO's wording branch went with the test, so an orchestrator on the
+  coordination ticket gets an orchestrator's text (its CHECKPOINT via `checkpoint_rel`, its RESUME HERE section) and no
+  longer names `DECIDED-NOT-DONE.md` or `report-state.json` (P2's path is gone with the branch). Kept: R8's order, the
+  re-arm below 50 %, the subagent skip, the 256 KiB tail, exit 0 on any error.
+- **Tests first** (`e36a9c51b`, red on the hook at `4dec7ec3c72c`: 33 failed, 44 passed): a lead, an engineer or a test
+  designer on each 1M model silent at 170k, 180k, 200k and 849,999 and reminded at 850k (18 red); no session (the
+  CTO, a lead, an engineer, a test designer) reminded below 85 % of its own window, four 1M models and an unknown one
+  (12 red: the non-CTO sessions on 1M models); an Opus transcript at 180k silent for every session (1 red); the
+  coordination ticket changes nothing in the text (2 red); the wording names no 200k, limit or cap (green before and
+  after, a guard). Removed: the CTO-only cases (DECIDED-NOT-DONE and report-state wording, the coordination-ticket
+  identity cases, the 180k CTO/lead contrast). Two lead cases planted at 190k on Opus moved to 900k.
+- **Green at `c10be8fd0266`**: the file 77 passed; `tests/unit/hooks` 197 passed, 36 deselected (`tests/conftest.py`'s
+  own selection; none of this file's 77 among them); acceptance `W1-29` 42 passed, `W1-49` 63 passed, `W2-62` 42
+  passed (one folder per run, `-m "not local_only" -k "not real and not green_here and not time_limit"`, `HOME` an
+  empty folder).
+
 ## 4. Owner's approval
 
-Pending. The owner approves the bytes of section 2 at the ticket's final head.
+The approval of `3a580a4b4d42` was withdrawn by the owner (2026-11-12): those bytes carry the cap. Pending for the new
+bytes: independent review of `c10be8fd0266` (section 3.8), then the owner approves the bytes of section 2 at the
+ticket's final head.
 
 ## 5. Promotion
 
