@@ -688,3 +688,117 @@ def test_l2_a_planted_file_made_from_the_constant_is_accepted(rig):
     rig.config(**entries)
     values, faults = configuration.backstop_values(rig.env)
     assert faults == [] and [e["port"] for e in values["embedders"]] == [11434, 11435]
+
+
+# ---- L5b: the backstop's own group, when named, is paused last ----------------------------------------------------
+
+def _own_group_rig(rig, position):
+    """Three planted groups; one of them stands in for the backstop's own group (``os.getpgrp`` answers it)."""
+    rig.smi("15900, 24000")
+    rig.config()
+    groups = [rig.job(), rig.job(), rig.job()]
+    own = groups[position]
+    rig.mp.setattr(backstop.os, "getpgrp", lambda: own)
+    seen = {}
+    real = os.killpg
+
+    def killpg(group, sig):
+        if sig == signal.SIGSTOP:
+            seen.setdefault("order", []).append(group)
+            if group == own:
+                seen["log_at_own_stop"] = rig.log.read_text()
+                seen["inbox_at_own_stop"] = sorted(p.name for p in rig.inbox.iterdir()) if rig.inbox.exists() else []
+                seen["others_stopped"] = [rig.state(c.pid) for c in rig.groups if os.getpgid(c.pid) != own]
+        return real(group, sig)
+
+    rig.mp.setattr(backstop.os, "killpg", killpg)
+    return groups, own, seen
+
+
+@pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+    groups, own, seen = _own_group_rig(rig, position)
+    result = backstop.watch(groups, rig.root, rig.env)
+    others = [g for g in groups if g != own]
+    assert seen["order"] == others + [own]
+    assert seen["others_stopped"] == ["T", "T"]
+    assert sum(1 for line in seen["log_at_own_stop"].splitlines() if " TRIP: " in line) == 1
+    assert len(seen["inbox_at_own_stop"]) == 1
+    assert result["tripped"] is True and result["paused"] == others + [own]
+
+
+@pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+def test_l5b_the_start_line_ends_with_the_own_group_note_and_the_item_carries_the_note_line(rig, position):
+    groups, own, seen = _own_group_rig(rig, position)
+    result = backstop.watch(groups, rig.root, rig.env)
+    names = " ".join(str(g) for g in groups)
+    start = rig.log.read_text().splitlines()[0]
+    assert start[20:] == (f"start: limit 15872 MiB; every 5 s; groups {names}; skipped (ended) none; embedders none; "
+                          f"own group {own} named: paused last")
+    paused = [g for g in groups if g != own] + [own]
+    lines = Path(result["inbox_item"]).read_text().splitlines()
+    assert f"paused: {' '.join(str(g) for g in paused)}" in lines
+    for g in paused:
+        assert f"resume: kill -CONT -- -{g}" in lines
+        assert f"stop: kill -TERM -- -{g} && kill -CONT -- -{g}" in lines
+    assert lines[-1] == (f"note: the backstop's own group {own} is paused last; resuming it resumes the backstop, "
+                         "which then ends")
+    assert [line for line in lines if line.startswith("note:")] == [lines[-1]]
+    assert f"paused groups {' '.join(str(g) for g in paused)}" in rig.log.read_text().splitlines()[1]
+
+
+def test_l5b_the_own_group_named_alone_is_stopped_after_the_trip_line_and_the_item(rig):
+    groups, own, seen = _own_group_rig(rig, 0)
+    result = backstop.watch([own], rig.root, rig.env)
+    assert seen["order"] == [own] and result["paused"] == [own]
+    assert " TRIP: " in seen["log_at_own_stop"] and len(seen["inbox_at_own_stop"]) == 1
+
+
+def test_l5b_an_ended_group_is_skipped_beside_the_own_group_which_is_still_stopped_last(rig):
+    rig.smi("15900, 24000")
+    rig.config()
+    ended, other, own = rig.short_job(), rig.job(), rig.job()
+    rig.mp.setattr(backstop.os, "getpgrp", lambda: own)
+    result = backstop.watch([own, ended, other], rig.root, rig.env)
+    assert result["skipped"] == [ended] and result["paused"] == [other, own]
+
+
+def test_l5b_when_the_own_group_is_not_named_there_is_no_note_and_it_is_never_signalled(rig):
+    rig.smi("15900, 24000")
+    rig.config()
+    a, b, unnamed = rig.job(), rig.job(), rig.job()
+    rig.mp.setattr(backstop.os, "getpgrp", lambda: unnamed)
+    sent = []
+    real = os.killpg
+    rig.mp.setattr(backstop.os, "killpg", lambda g, s: (sent.append((g, s)), real(g, s))[1])
+    result = backstop.watch([a, b], rig.root, rig.env)
+    assert "own group" not in rig.log.read_text() and "note:" not in Path(result["inbox_item"]).read_text()
+    assert result["paused"] == [a, b] and {g for g, _ in sent} == {a, b}
+
+
+def test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed(rig):
+    rig.smi("15900, 24000")
+    rig.config()
+    second = rig.job()
+    # gov runs in a session of its own; a job started with & shares its group, as the shell's $$ names it
+    shell = ("sleep 120 >/dev/null 2>&1 & exec " + sys.executable + " -c 'import sys; from gov.cli.main import main; "
+             "sys.exit(main(sys.argv[1:]))' resources --json --backstop $$ " + str(second) + " --root " + str(rig.root))
+    child = subprocess.Popen(["sh", "-c", shell], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                             start_new_session=True, env={**os.environ, **rig.env, "PYTHONPATH": str(REPO / "src")})
+    rig.groups.append(child)
+    own = child.pid
+    deadline = time.monotonic() + 40
+    while rig.state(child.pid) != "T" and time.monotonic() < deadline:
+        time.sleep(0.05)
+    assert rig.state(child.pid) == "T", "gov was never stopped"
+    assert rig.state(rig.groups[0].pid) == "T"  # the second group was paused before the own group
+    log = rig.log.read_text().splitlines()
+    assert log[0].endswith(f"own group {own} named: paused last")
+    assert sum(1 for line in log if " TRIP: " in line) == 1
+    items = list(rig.inbox.iterdir())
+    assert len(items) == 1 and f"paused: {second} {own}" in items[0].read_text().splitlines()
+    os.killpg(own, signal.SIGCONT)
+    out, err = child.communicate(timeout=40)
+    assert child.returncode == 0, err
+    result = json.loads(out)["result"]
+    assert result["tripped"] is True and result["paused"] == [second, own]

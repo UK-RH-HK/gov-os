@@ -11,7 +11,9 @@ touched. Each poll (every ``gpu_backstop_every_s``) checks, in this order, the f
 
 The limit, the period and the embedders come from the gate's one file and nowhere else (``config.backstop_values``, F3):
 no option and no environment variable sets them. Only the groups named are touched, by ``os.killpg`` with their id,
-never a pid, a name or a pattern (S4, F1; L5). It reads only ``nvidia-smi``'s answer, the ``/api/ps`` answers and the
+never a pid, a name or a pattern (S4, F1; L5). When the backstop's own group (``os.getpgrp()``) is named, it is paused
+last, after the other groups, the TRIP line and the inbox item (L5b), so the SIGSTOP that freezes ``gov`` freezes it
+only when everything else is done; ``kill -CONT`` to that group resumes it and the command ends. It reads only ``nvidia-smi``'s answer, the ``/api/ps`` answers and the
 embedder logs, and writes only ``$HOME/.gov-os/machine/gpu-backstop.log`` and, on a trip, the one inbox item under
 ``<root>/.gov-runtime/dispatch/inbox/`` (S5; L6, L7, L9). The result is L8's.
 """
@@ -121,7 +123,7 @@ def _partial_offload(file: str, offsets: dict) -> str | None:
     return None
 
 
-def _inbox_item(root: Path, reason: str, paused: list, skipped: list) -> str:
+def _inbox_item(root: Path, reason: str, paused: list, skipped: list, own: int | None = None) -> str:
     folder = Path(root) / ".gov-runtime" / "dispatch" / "inbox"
     folder.mkdir(parents=True, exist_ok=True)
     stem = f"gpu-backstop-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -133,6 +135,9 @@ def _inbox_item(root: Path, reason: str, paused: list, skipped: list) -> str:
              f"skipped (already ended): {_names(skipped)}"]
     lines += [f"resume: kill -CONT -- -{g}" for g in paused]
     lines += [f"stop: kill -TERM -- -{g} && kill -CONT -- -{g}" for g in paused]
+    if own is not None:
+        lines.append(f"note: the backstop's own group {own} is paused last; resuming it resumes the backstop, "
+                     "which then ends")
     temporary = folder / f".{target.name}.tmp"
     temporary.write_text("\n".join(lines) + "\n", encoding="utf-8")
     os.replace(temporary, target)
@@ -159,8 +164,10 @@ def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
 
     skipped = [g for g in named if not _live(g)]
     offsets = {e["log"]: _log_start(e["log"]) for e in embedders}
+    own = os.getpgrp()
+    tail = f"; own group {own} named: paused last" if own in named else ""
     note(f"start: limit {limit} MiB; every {every} s; groups {_names(named)}; skipped (ended) {_names(skipped)}; "
-         f"embedders {_names(e['port'] for e in embedders)}")
+         f"embedders {_names(e['port'] for e in embedders)}{tail}")
     result = {"tripped": False, "reason": None, "reading": None, "paused": [], "skipped": skipped, "log": str(log),
               "inbox_item": None}
     while True:
@@ -188,17 +195,24 @@ def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
         if reason:
             paused = []
             for g in named:
-                if not _live(g):
+                if g == own or not _live(g):  # the own group is paused last (L5b)
                     continue
                 try:
                     os.killpg(g, signal.SIGSTOP)
                 except (ProcessLookupError, PermissionError, OverflowError):
                     continue
                 paused.append(g)
+            if own in named:
+                paused.append(own)  # it is paused after the line and the item are written, below
             seen = f"{reading[0]}/{reading[1]} MiB" if reading else "none"
             note(f"TRIP: {reason}; reading {seen}; paused groups {_names(paused)}")
             result.update(tripped=True, reason=reason, paused=paused,
                           reading={"used_mib": reading[0], "total_mib": reading[1]} if reading else None,
-                          inbox_item=_inbox_item(root, reason, paused, skipped))
+                          inbox_item=_inbox_item(root, reason, paused, skipped, own if own in named else None))
+            if own in named:  # stops gov too: the owner's `kill -CONT -- -<own>` resumes it, and it returns the result
+                try:
+                    os.killpg(own, signal.SIGSTOP)
+                except (ProcessLookupError, PermissionError, OverflowError):
+                    paused.remove(own)
             return result
         time.sleep(every)
