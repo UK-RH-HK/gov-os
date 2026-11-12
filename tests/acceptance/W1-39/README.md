@@ -69,7 +69,7 @@ rules). No module of `src/gov/lock/` is imported or named.
 | `test_copy_installs_the_kernel_exactly_as_the_template_holds_it` | creates `governance/` (the kernel, both directions) |
 | `test_copy_installs_the_hooks_and_keeps_them_executable` | hooks |
 | `test_copy_installs_the_rulesync_sources` | `.rulesync/` |
-| `test_copy_creates_the_overlay` | the overlay is the path map and nothing else (DEC-493) |
+| `test_copy_creates_the_overlay` | the overlay is exactly the path map, the test map and `close.yaml` (reading `close: scoped`), nothing else (DEC-493, DEC-896 item 2, DEC-903 as changed by DEC-1142 (3)); Rewrite-Reason: DEC-1142 (3) (DEC-903's overlay list names close.yaml), DEC-866 |
 | `test_the_path_map_of_a_fresh_project_is_one_doctors_path_map_part_accepts` | minimal and valid: measured, zero unclassified paths (DEC-493) |
 | `test_a_freshly_created_project_is_at_the_minimal_adoption_level` | CAP-54: kernel only, the minimal level |
 | `test_copy_into_a_folder_that_has_an_overlay_file_keeps_it` | the overlay is under `_skip_if_exists` at install |
