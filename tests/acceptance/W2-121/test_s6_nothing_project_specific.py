@@ -42,7 +42,7 @@ def test_s6_the_dispatcher_code_names_none_of_this_repositorys_branches_paths_or
     assert not hits, f"{len(hits)} line(s) of the dispatcher code name this repository:\n" + "\n".join(hits[:20])
 
 
-@pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band"])
+@pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band", "notifier_command"])
 def test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key(project, key):
     p = project
     entry = p.add_ticket(901)

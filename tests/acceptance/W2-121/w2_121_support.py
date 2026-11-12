@@ -90,6 +90,12 @@ try:
 except OSError:
     nap = 0.0
 time.sleep(nap)
+try:
+    with open(os.path.join(rec, "notify-exit")) as handle:
+        code = int(handle.read().strip() or 0)
+except OSError:
+    code = 0
+sys.exit(code)
 '''
 
 HUNG_GIT = "#!/bin/sh\nexec sleep 8\n"
@@ -542,6 +548,26 @@ class Project:
         target.mkdir(parents=True, exist_ok=True)
         shutil.move(str(item.path), str(target / item.path.name))
 
+    def delete_item(self, item: Item) -> None:
+        """An operator removing a handled item (from ``inbox/`` or from ``inbox/read/``)."""
+        item.path.unlink()
+
+    def problems_json(self, *idents: str) -> list[str]:
+        """The strings under ``problems`` in ``status.json`` that name one of ``idents``."""
+        found: list[str] = []
+        for value in values_under(self.status_json(), "problems"):
+            found += [s for s in strings(value) if any(i in s for i in idents)]
+        return found
+
+    def problem_lines(self, *idents: str) -> list[str]:
+        """The lines of ``status.txt`` after its ``problems`` heading that name one of ``idents``."""
+        lines = self.status_text().splitlines()
+        start = next((n for n, l in enumerate(lines) if l.strip().lower().startswith("problems")), None)
+        if start is None:
+            return []
+        tail = lines[start:]
+        return [l for l in tail if any(i in l for i in idents)]
+
     def read_json(self, name: str):
         return json.loads((self.state / name).read_text(encoding="utf-8"))
 
@@ -570,6 +596,30 @@ class Project:
 
     def set_notify_sleep(self, seconds: float) -> None:
         (self.rec / "notify-sleep").write_text(str(seconds), encoding="utf-8")
+
+    def set_notify_exit(self, code: int) -> None:
+        """The exit code the stub notifier ends with (after its planted sleep); 0 when never set."""
+        (self.rec / "notify-exit").write_text(str(code), encoding="utf-8")
+
+    def finish_session(self, entry: Entry, output: str | None = "status: DONE\n", exit_code: int = 0) -> str:
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            self.set_output(output)
+        self.set_exit(exit_code)
+        before = len(self.launches())
+        self.ready(entry)
+        run = self.tick()
+        assert run.code == 0, run
+        self.wait_launches(before + 1)
+        return self.wait_exit_file(entry.log)
+
+    def returned_item(self, entry: Entry, output: str | None = "status: DONE\n") -> "Item":
+        """Run the entry's session to its end and let one more pass write its return item; that unread item."""
+        self.finish_session(entry, output)
+        run = self.tick()
+        assert run.code == 0, run
+        (item,) = [i for i in self.items() if i.fields.get("log") == entry.log]
+        return item
 
     def launches(self) -> list[dict]:
         docs = []
