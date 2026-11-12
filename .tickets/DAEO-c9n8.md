@@ -1,6 +1,6 @@
 ---
 id: DAEO-c9n8
-status: open
+status: in_progress
 deps: []
 links: [DAEO-61vm]
 created: 2026-11-12T05:40:00Z
@@ -35,6 +35,11 @@ acceptance_tests:
   path: tests/acceptance/W2-170/
   author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C1): the revision with a Rewrite-Reason (DEC-866)'
 track: B
+reads:
+- src/gov/memaudit/preflight.py
+- tests/acceptance/W2-170/conftest.py
+needs:
+- tests/acceptance/W2-170/test_w2_170_s4_map.py
 ---
 # W2-179 W2-170's F3 case and the nightly's clone
 
