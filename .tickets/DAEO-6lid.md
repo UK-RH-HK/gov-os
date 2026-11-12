@@ -1,6 +1,6 @@
 ---
 id: DAEO-6lid
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-cb2b, DAEO-fd0p]
 created: 2026-11-11T01:20:18Z
