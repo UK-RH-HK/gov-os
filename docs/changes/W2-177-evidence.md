@@ -173,3 +173,60 @@ The six cases of this ticket and its five new cases pass. The five reds, none of
 - `tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository`: `core-schema has 1
   findings: .tickets/DAEO-1k7y.md: unknown record type 'bug'`. This ticket's own file, not its change: its `type: bug`
   is not a type the core schema knows. It reddens every tree once the ticket file is in the base.
+
+## Run 2: the acceptance supports' revision (P-W2-177-1 (a), the CTO 07:05) and the verify of 7cde9429ea0c
+
+The CTO ruled P-W2-177-1 (a) and P-W2-177-2 (a) (done on w2/integrate, `type: task`); w2/integrate (c62b66bb4) merged
+in at ee18860f7. An independent test designer (td-1, session a0cc944e-c34e-427b-b311-6532d82128bc, Sonnet, high, C2)
+revised `tests/acceptance/W2-96/w2_96_support.py` `_popen` and `tests/acceptance/W2-56/w2_56_support.py`
+`start_launch` (8f40881d9, `Rewrite-Reason` naming DAEO-1k7y cause (B) and DEC-866): the started process always gets a
+`preexec_fn` that sets SIGINT, SIGTERM and SIGHUP to SIG_IGN when the case names them, otherwise to SIG_DFL, as
+`w2_96_reap.launch_gov` does. No test file changed; no assertion, timeout, marker, skip or parameter. Merged at
+7cde9429e.
+
+### Counts per start form (the three files whole: test_w2_96_at_run_2.py, test_w2_96_at_no_leak.py, test_w2_56_endings.py)
+
+Every run through `heavy_slot.sh`, empty HOME, `PYTHONUSERBASE=/home/usain/.local`; the 9 deselected are the
+repository's opt-in representative rows (`tests/conftest.py:292-317`), the same 9 in every run before and after.
+
+| when | who | form | SIGINT ignored at start | runs | each run |
+|---|---|---|---|---|---|
+| before (ee18860f7) | td-1 | fg | 0 | 1 | 29 passed |
+| before (ee18860f7) | td-1 | setsid-bg | 1 | 1 | 6 failed, 23 passed (430 s): W2-96 premise R11, r9 `[a-second-press-once-the-removal-began]`, r12 `[SIGINT]`, at_no_leak interrupted run; W2-56 s12 `ending_signal...[SIGINT]`, `temp_folder...[SIGINT]` |
+| after (8f40881d9) | td-1 | fg | 0 | 3 | 29 passed (26.9-28.4 s) |
+| after (8f40881d9) | td-1 | setsid-bg | 1 | 3 | 29 passed (24.0-27.9 s) |
+| after (7cde9429e) | lead, TMPDIR in /tmp | fg | 0 | 3 | 29 passed (23.2-23.5 s) |
+| after (7cde9429e) | lead, TMPDIR in /tmp | setsid-bg | 1 | 3 | 29 passed (22.5-23.0 s) |
+| after (7cde9429e) | lead, TMPDIR in /tmp | bg-job | 1 | 3 | 29 passed (21.7-21.9 s) |
+
+td-1's runs were inside the launch sandbox, where `/tmp` is read-only: its TMPDIR fell back to the tree (a
+`pytest-of-usain/` left in W2-177-tests, removed by the lead, never committed); the lead's runs repeat them with TMPDIR
+in `/tmp`. Run files: `.gov-runtime/scratch/acc-forms/{lead-after,lead-after-fg}/` (this tree) and
+`W2-177-tests/.gov-runtime/scratch/acc-forms/{before,after}/` (td-1's).
+
+W2-56's two SIGINT ending cases (DAEO-wnnz, a non-goal) are green after the revision in every form: their cause was
+(B), as S1 said.
+
+### The lead's verify (head 7cde9429ea0c, `lead_verify.sh`: `setsid ... &`, SIGINT ignored, empty HOME)
+
+`RED parallel exit 1 in 1045 s (4270 tests 1 failed 0 errors 10 skipped)`, `.gov-runtime/scratch/lead/log/verify/`.
+The six cases of this ticket, its five new cases, the four W2-96 acceptance cases and W2-02's core-schema case (run
+1's five reds) all pass. The one red is not this ticket's:
+`tests/unit/orchestration/test_w2_149_indep_launch.py::test_f6_a_failed_canary_keeps_its_16_and_counts_its_trace`
+(`assert (14 == 16)`; 14 is `indep_launch.py`'s repository/commit refusal, lines 2209-2216). Not in `skip_known.json`.
+Re-run alone once per form: green on this head (foreground 1 passed in 0.46 s; `setsid` background 1 passed in 0.28 s)
+and on w2/integrate's head 6c9a5bb52 (0.41 s; 0.26 s). A load-sensitive red of the parallel run, outside this ticket's
+paths; it does not fail on w2/integrate alone, so it is not named a shared base red. No other tree's verify or nightly
+log names it.
+The 10 skipped are the opt-in real/bwrap/scratch-tool skips (W2-56 real sandbox 4, test_dispatcher 3, W2-149 bwrap 3).
+
+### gov accept
+
+- `gov accept W2-177`: `ACCEPT_NO_MAP: ticket DAEO-1k7y: the README of tests/unit/accept/ maps no KPI line`. The
+  ticket's `acceptance_tests.path` is `tests/unit/accept/`, which has no README map, and a README there is not in
+  allowed_paths. The ticket's acceptance is the named cases (S2), run above by node id in every form.
+- `gov accept W2-96` (DAEO-ouet, the revised support's folder): pass, 11 lines, 251 passed, 0 failed, 0 skipped.
+- `gov accept W2-56` (DAEO-wnnz, the revised support's folder): 19 of 20 lines pass, totals 292 passed, 0 failed, 4
+  skipped; line success-13 holds one case only, `test_s13_real_sandbox_...`, skipped here by design (the CTO's real
+  run; W2-56's README lines 139, 161). Not this ticket's.
+Outputs: `.gov-runtime/scratch/lead/accept/{W2-96,W2-56}.json`, each run through `heavy_slot.sh`.
