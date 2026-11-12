@@ -39,6 +39,7 @@ kpis:
 profile: FULL
 sources:
 - DEC-1007
+- DAEO-ts4y
 - DEC-1008
 - DEC-1003
 - DEC-979
@@ -102,3 +103,13 @@ The six W2-96 reds in `tests/unit/accept/test_w2_96_{run2,review3,review4}.py` (
 clean-up; red in 13 of 14 recent verifies across eight trees, and in the nightly of 11-12) are shared base reds: each return
 names them; they do not block this ticket's verify, review or land (the queue traces an unowned red against the head
 without the batch). They are not added to `skip_known.json` (that list is for skips). Their fix is its own ticket.
+
+## P-W2-121-6 and P-W2-121-7 (the CTO, delegated P2, 2026-11-12 05:50)
+
+- **P-W2-121-6 (a):** the `type: bug` of DAEO-1k7y and DAEO-c9n8 corrected to `task` on w2/integrate (da6ba9c53); W2-02's
+  core-schema case is green again (4 passed). **The base-red rule from now on:** a red in a lead's verify that is not the
+  ticket's and also fails on w2/integrate's head is a shared base red: named in the return with its evidence, not blocking.
+- **P-W2-121-7 (a):** the fix run now, before review round 2 (the last, DEC-1010): a test-design batch for F-1 to F-5 as
+  behaviours, an engineer for F-1 to F-4 and F-6, rebuild, verify, round 2. F-1: an inbox item, once written, is never written
+  again as unread (a returns-seen record; `never-ran.txt` read). F-2: an escalation is recorded only after the notifier exits 0,
+  retried at a bounded cadence, its failure shown in every pass while it lasts.

@@ -8,6 +8,7 @@
     "checked": {"type": "integer", "minimum": 0},
     "accepted": {"type": "integer", "minimum": 0},
     "revise": {"type": "integer", "minimum": 0},
-    "rejected": {"type": "integer", "minimum": 0}
+    "rejected": {"type": "integer", "minimum": 0},
+    "stopped": {"type": "string", "enum": ["none", "input-missing", "input-malformed", "decisions-conflict", "forbidden-read-needed", "form-not-writable", "not-sealed"]}
   }
 }

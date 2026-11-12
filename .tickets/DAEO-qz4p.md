@@ -1,6 +1,6 @@
 ---
 id: DAEO-qz4p
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-52ku, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 created: 2026-11-11T01:26:23Z
@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
-- tests/acceptance/W2-149/w2_149_support.py  # the 8 cases' planted products in the fixed form (the CTO, P-1 (a), 2026-11-12)
 - governance/project/orchestration/tools/indep_launch.py
 - governance/project/orchestration/tools/indep-schemas/**
 - tests/unit/orchestration/test_w2_173*
@@ -84,3 +83,9 @@ delivered unchecked, though the next steps read them by their form.
   paths; Rewrite-Reason: DEC-866, this ticket's S3 and S4), and W2-149's two unit cases are revised the same way within
   this ticket's own `tests/unit/orchestration/test_w2_173*` or named in the return if they live elsewhere. P-2: the
   `hidden/dropped/` exclusion goes to a small ticket of its own before the audit's first run (11-23).
+
+## Review F1 (the CTO, delegated P2, 2026-11-12 05:45)
+
+(a): `effort` stays required in the counts schema by design; a counts.json written before this change refuses 17 with
+`--counts-only` (fail closed); set-up A's earlier counts are read by `round1_files`, which does not use the schema. F2 and F3 are
+DECIDED-NOT-DONE rows 167-168; F4 is row 169 (the owner's, MEMORY-AUDIT-1).

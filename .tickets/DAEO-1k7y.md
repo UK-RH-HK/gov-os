@@ -4,7 +4,7 @@ status: in_progress
 deps: []
 links: [DAEO-ouet, DAEO-cb2b, DAEO-wnnz]
 created: 2026-11-12T05:03:31Z
-type: bug
+type: task
 priority: 1
 assignee: engineer
 external-ref: W2-177
