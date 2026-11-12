@@ -130,6 +130,22 @@ whole file passes, 49 passed):
   `{"id": "m2", ...}`), and set `classes.json` to `{"m1": {"class": "retrieval_miss", "reason": ...}, "m2": {...}}`. The
   result `{"misses": {"retrieval_miss": 2}}` and the counts assert stay; the `miss-classes.json` assert reads the new text.
 
+## Run 2c: W2-149's two unit cases (the CTO's routing, 2026-11-12 05:10; DEC-866, DEC-105)
+
+The CTO put `tests/unit/orchestration/test_w2_149_indep_launch.py` in the paths and DEC-866 and DEC-105 in the sources
+(`518772b5c`, merged `00c540b67`). Engineer eng-2 (Opus, high, C3) changed only the two cases, as the bullets above state
+(`d37564498`, trailer `Rewrite-Reason: DEC-866, W2-173's S3 and S4`): the checker's planted notes in checker.md §6's form
+for q01 and q02 (accept, revise; the result 2/1/1/0 unchanged), the asserts reading that text and its sha256; the auditor's
+`misses.jsonl` lines in auditor.md §2's form with ids m1 and m2, `classes.json` keyed by them. No assertion removed or
+weakened; the script was not touched.
+
+| Check (head `d37564498`) | Result |
+|---|---|
+| W2-149's and W2-173's unit files, whole-file form with `--optin lifted,breadth` | 161 passed |
+| `gov accept W2-173` | pass: 79 passed, 0 failed, 0 skipped (each line as in run 2) |
+| `gov accept W2-149` | 174 passed, 0 failed, 35 skipped; every line passes but success-26, whose only 2 cases are live (the CTO's) |
+| `lead_verify` (whole suite, parallel) | 4072 tests, 7 failed, 41 skipped: the six W2-96 signal cases (shared base reds, the CTO's ruling P-W2-121-5; W2-177 fixes them) and `tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository` on `.tickets/DAEO-1k7y.md` (`type: bug`, from `518772b5c`, the same at w2/integrate's tip `fbf97f2a0`; not this ticket's paths) |
+
 ## Risks
 - `--counts-only` on a counts.json written before this change refuses 17 (its object lacks the now-required `effort`).
   The set-up A runs already on disk are such files; `round1_files` reads them without the schema and is unaffected.
