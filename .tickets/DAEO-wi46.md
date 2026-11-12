@@ -33,7 +33,7 @@ kpis:
   failure:
   - 'A KPI that names code, or a KPI with no failure line, passed by the skill''s check. Verify: a planted spec with a KPI that names a function and another with no failure line goes through the skill''s check: both are refused and named; the check never prints a pass for either.'
   - 'A spec whose test data has no source, owner or licence, passed; unsecurable data skipped instead of escalated. Verify: a planted spec with test data and no owner, and one with unsecurable data: the check refuses the first and the second yields a P1 package; no pass line is printed for either.'
-  - 'A skill section missing, or the body far over the template''s size without reference files. Verify: a planted copy of the skill with the Never section removed, and one with a 400-line body and no reference files, each fail the skill validator naming the section or the size; the real skill passes.'
+  - 'A skill section missing, or the body far over the template''s size without reference files. Verify: a planted copy of the skill with the Never section removed, and one with a 400-line body and no reference files, fail, the first by the acceptance test''s own section check naming the section, the second by the skill validator naming the size (`SKILL_BODY_TOO_LONG`); the real skill passes both. [re-worded, DEC-1156 (5): the shared validator checks no sections]'
   - 'An imported part with no licence record, or a licence that does not allow the use. Verify: a planted imported part with no licence record and one with a forbidding licence: each is refused naming the part; neither is adopted.'
   - 'A generated copy edited by hand or out of step with its source. Verify: a planted hand edit in one generated copy: the adapter check prints DRIFT naming it; `diff -r` of each copy against the source is empty on the real tree.'
   lifted:
@@ -63,3 +63,11 @@ list_rows: []
 Card: ROLES-RESEARCH-1 §5.3 item 7, approved (DEC-959 item 8), with the owner's test-data section.
 
 - **Starts after W2-11 r1 merges** (the skill template). **Paths:** a new skill folder and its generated copies; W2-11 holds the existing skills, so no overlap.
+
+## Interface (DEC-1052; P-W2-98-IF-1 (a), the owner, DEC-1156 (5), 2026-11-12)
+
+- **I1 The skill's check** is `template/governance/kernel/skills/spec-writing/check_spec.py`, standard library only, run as `python3 <skill>/check_spec.py <spec.md>`; it is part of the skill (as `systematic-debugging/find-polluter.sh` is), copied with it.
+- **I2 The spec's form,** stated in the one-level reference `spec-form.md`: nine `##` headings (Problem; Users and scenarios; Goals; Non-goals; KPIs; Test data; Out of scope; Open questions; Accepted by); each KPI `- K<n>: <behaviour>` with a `Fails if:` line; Test data a table with the columns source / kind (imported or synthetic) / owner / licence or recipe / privacy / secrets / hidden half / secured.
+- **I3 Output:** `REFUSED <part>: <reason>` per failed item, exit 1; `P1 Test data: <source> cannot be secured`, which also writes `<spec>.P1.md`, exit 2; `PASS` only when every item holds, exit 0. "Names code" means a code span, `name(`, a path with an extension, or a dotted or snake_case identifier.
+- **I4 Imports:** `imports.yaml` in the skill folder, in `vendored.yaml`'s form, and `<!-- imported: <part> -->` markers in copied text; `check_spec.py --imports <folder>` refuses a part with no record or a licence outside the allowed list, naming the part.
+- **F3** is re-worded above: the section half is the acceptance test's own section check; the validator keeps the size half.
