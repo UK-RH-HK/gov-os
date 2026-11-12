@@ -62,3 +62,28 @@ ran from the engineer's sandbox scratch (`s9.py`, 50 lines: it reads the three `
 | F4 | the strict close's suites pass unchanged (W1-30, W2-07, W2-57, W2-66, `tests/unit/close`) | the strict suites |
 
 S12 (the trailers switch) is not built in this run (P4: its CIT-P, review and the owner's approval first).
+
+## eng-3 (iteration 3): the last three reds
+
+- **S6, a candidate that cannot be isolated** (`batch._entangled`): two candidates whose commits past the base overlap
+  (one built on the other, or both on a common unmerged commit) cannot be isolated, because the build without one
+  still holds its work through the other. The batch is refused with `CANDIDATE_NOT_ISOLATED` before anything runs,
+  even where the run would be green (fail closed). It names the candidate whose work the other holds. Every refusal
+  of the scoped batch (`isolate`, or `run` in a scoped project) also prints `<CODE>: <reason>` on stderr; the strict
+  batch prints as before (F4). Unit test: `test_w2_115_batch.py::test_s6_a_candidate_built_on_another_cannot_be_isolated_and_the_code_is_printed`.
+- **S4, three rounds for a load-sensitive red** (`attribution.load_sensitive`, `attribute`): a `latency` entry is
+  matched in every form the serial phase takes: the file, the node id, a parametrised id, a folder (with or without
+  `/`), a leading `./`, a tab before ` #`. The kind is the word after the route whatever follows it (`latency`,
+  `latency (x): r`, `Latency`), or the first word where the route is left out. A load-sensitive red runs its 3
+  rounds on the head without the change even where a full green nightly of that head would stand for one run
+  (rounds on both sides). The planted project's exact cause was not seen (the tests are not read): the close's own
+  end-to-end run in a unit test already gave 1 + 3 + 3. Unit tests: `test_w2_115_attribution.py::test_s4_a_latency_entry_is_matched_in_every_form_the_serial_phase_takes`
+  (8 forms), `::test_s4_a_load_sensitive_red_runs_its_rounds_without_the_change_even_with_a_nightly`, and
+  `test_w2_115_close.py::test_s4_a_latency_entry_red_gets_three_rounds_each_way_in_the_close` (2 forms).
+- **S2, a governance file alone** (`select._bookkeeping`): the wider change always holds the green record's own file,
+  committed after the head it names. Where a change holds governance files, no code, and only record places that are
+  bookkeeping, those records select nothing. Bookkeeping means the ticket's own `.tickets/<id>.md`, its own
+  `docs/close/<id>/` and `docs/checkpoints/<id>/`, and the green records the change is counted from. The reading is
+  narrow: another ticket's file or record, and any other record place, still selects `record_reading`. Bookkeeping
+  alone (no governance file) still selects `record_reading` (records alone), and code beside it is unchanged (own
+  suite, `record_reading`, `every_close`). Unit test: `test_w2_115_select.py::test_s2_governance_alone_beside_the_tickets_bookkeeping_selects_nothing`.
