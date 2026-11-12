@@ -16,11 +16,19 @@ seed from the ready half and the switch are ``gov.rebuild.integration``'s. It ta
 
 Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
 ``gov.rebuild.watch``).
+
+The semantic store is asked for exactly when ``--no-embeddings`` is not given and the path map has a namespace whose
+``embedding_policy`` is ``embedded``; otherwise it says ``requested: false`` and no embedder is called. Asked for and
+not recreated (unavailable, hung, failed part way), the rebuild fails ``REBUILD_FAILED`` (``store: semantic``) through
+``gov.close.rebuild_gate`` and writes no warm-base record (W2-124; DEC-1027 C). Every other store that was to be built
+and was not is named in ``not_built`` and the result says ``complete: false`` while it stays ok (W2-124 S5).
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+
+from gov.close.rebuild_gate import check
 
 ACT_PATHS = (".gov-runtime/**",)
 CLASS = "act"
@@ -194,7 +202,36 @@ def run(root: Path, args, config: dict) -> dict:
     finally:
         if fd is not None:
             os.close(fd)
-    return result | ending
+    result = result | ending
+    check(result)  # asked for and not recreated: REBUILD_FAILED, never an ok answer (W2-124 S1)
+    return result
+
+
+def _not_built(root: Path, stores: dict, has_path_map: bool) -> list[dict]:
+    """Every store that was to be built and was not, with its reason (W2-124 S5): a store that says ``requested: false``
+    (the vectors with ``--no-embeddings`` or nothing to embed) is never one. The reason names what the project lacks:
+    the path map, or ``.gitleaks.toml`` where the secrets scan is on and the file is absent."""
+    from gov.secrets import CONFIG_REL, scan_on
+
+    lacks, key = None, None
+    if not has_path_map:
+        lacks, key = "no path map: nothing is classified as indexable", "path map"
+    else:
+        try:
+            if scan_on(root) and not (Path(root) / CONFIG_REL).is_file():
+                lacks = f"no {CONFIG_REL}: the secrets scan has no rules, so nothing is let through to the index"
+                key = CONFIG_REL
+        except Exception:  # an unreadable switch is the stores' own failure to name
+            lacks = None
+    named = []
+    for name, store in stores.items():
+        if not isinstance(store, dict) or store.get("status") == "recreated" or store.get("requested") is False:
+            continue
+        reason = str(store.get("reason", "no reason given"))
+        if lacks and key not in reason:  # the store's own words (a bare KeyError) do not say what is missing
+            reason = f"{lacks} ({reason})"
+        named.append({"store": name, "reason": reason})
+    return named
 
 
 def _build(root: Path, args, config: dict, watch) -> dict:
@@ -273,13 +310,17 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             "reason": "no path map: nothing is classified as indexable",
         }
 
-    if not embeddings:
-        # Not asked for (DEC-530): the embedding endpoint is not asked and its program is not started.
+    asked_for = embeddings and isinstance(config.get("path-map.yaml"), dict) and none_embedded(config) is None
+    if not embeddings or not asked_for:
+        # Not asked for: the embedding endpoint is not asked and its program is not started (DEC-530; W2-124 S2).
         watch.skip("semantic")
         stores["semantic"] = {
             "status": "not_recreated",
             "requested": False,
-            "reason": f"{NO_EMBEDDINGS} was given: the semantic vectors were not asked for",
+            "reason": f"{NO_EMBEDDINGS} was given: the semantic vectors were not asked for" if not embeddings else
+            ("no path map: no namespace is embedded, so the semantic vectors were not asked for"
+             if not has_path_map else f"{none_embedded(config) or 'the path map names no namespace to embed'}; "
+                                      "the semantic vectors were not asked for"),
         }
     else:
         with watch.stage("semantic"):
@@ -354,12 +395,15 @@ def _build(root: Path, args, config: dict, watch) -> dict:
         except (OSError, sqlite3.Error) as exc:  # the stores stand; the tree is only no warm base
             print(f"rebuild: {seed.RECORD_REL} not written, so this tree is no warm base: {exc}", file=sys.stderr)
 
+    not_built = _not_built(root, stores, has_path_map)
     built = {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
         "secrets_counts": secrets_counts,
+        "complete": not not_built,
+        "not_built": not_built,
     } | ({} if seeded is None else {"seed": seeded})
     if not scan_on(root):  # DEC-1045: the filter gave nothing to gitleaks, and the report says so
         secrets_counts["scan"] = built["secrets_scan"] = SCAN_OFF

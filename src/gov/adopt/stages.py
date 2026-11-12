@@ -27,6 +27,7 @@ AUDITOR = "independent-auditor"
 # A native package layout: a package manifest, and what lies under the ``src/`` folder beside it (CAP-44.j).
 MANIFESTS = ("pyproject.toml", "setup.py", "setup.cfg", "package.json", "Cargo.toml", "pom.xml", "build.gradle")
 REFS = "refs/gov/adoption"
+SEMANTIC_NOT_RECREATED = "SEMANTIC_NOT_RECREATED"  # the finding of a semantic store asked for and not recreated (W2-124)
 POLICIES = (EMBEDDED, "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
 
 
@@ -367,17 +368,54 @@ def guard(run: Run) -> None:
 
 
 def rebuild(run: Run, result: dict) -> dict:
-    """The index refresh that follows the moves and the retirement: ``gov rebuild``, after the record's commit."""
+    """The index refresh that follows the moves and the retirement: ``gov rebuild``. A semantic store asked for and not
+    recreated (``REBUILD_FAILED``, store ``semantic``) never fails adoption: ``result`` then carries the finding
+    ``SEMANTIC_NOT_RECREATED`` with its reason and the command that recreates it, and the stores from the error's
+    details (W2-124, DEC-1027 C). Any other failure of the refresh is ``INDEX_REFRESH_FAILED``."""
     from gov.rebuild import command
 
+    findings: list = []
     try:
         stores = command.run(run.root, run.args, run.config)["stores"]
-        if stores["lexical"]["status"] != "recreated":
-            raise refuse("INDEX_NOT_REFRESHED", str(stores["lexical"]))
     except GovError as exc:
-        raise refuse("INDEX_REFRESH_FAILED", f"stage {run.stage} is done and committed ({result['record']}), but the "
-                     f"index refresh that follows it (gov rebuild) failed: {exc.message}") from None
-    return {**result, "rebuild": stores}
+        details = exc.details if isinstance(exc.details, dict) else {}
+        if exc.code != "REBUILD_FAILED" or details.get("store") != "semantic":
+            raise _refresh_failed(run, result, exc.message) from None
+        stores = details.get("stores") or {}
+        findings = [{"code": SEMANTIC_NOT_RECREATED, "store": "semantic", "reason": details.get("reason", exc.message),
+                     "command": "gov rebuild"}]
+    if (stores.get("lexical") or {}).get("status") != "recreated":
+        raise _refresh_failed(run, result, str(stores.get("lexical")))
+    return {**result, "rebuild": stores, **({"findings": findings} if findings else {})}
+
+
+def _refresh_failed(run: Run, result: dict, message: str) -> GovError:
+    return refuse("INDEX_REFRESH_FAILED", f"stage {run.stage} is done and committed ({result['record']}), but the "
+                  f"index refresh that follows it (gov rebuild) failed: {message}")
+
+
+class _RefreshFirst:
+    """A6's run, whose record's commit (the batches done) runs ``rebuild`` first, so that the committed record holds
+    the finding of a semantic store not recreated; a failed batch's record is committed as it was. A refresh that
+    fails is raised after the record's commit (``failed``), as it always was."""
+
+    def __init__(self, run: Run):
+        self._run, self.failed = run, None
+
+    def __getattr__(self, name: str):
+        return getattr(self._run, name)
+
+    def finish(self, data: dict, extra: dict | None = None, **result) -> dict:
+        if data.get("status") != "done":
+            return self._run.finish(data, extra, **result)
+        refreshed = {}
+        try:
+            refreshed = rebuild(self._run, {"record": project.record_path(self._run.stage)})
+        except Exception as exc:  # whatever stops the refresh: the record is committed first, then it is raised
+            self.failed = exc
+        found = refreshed.get("findings")
+        done = self._run.finish({**data, **({"findings": found} if found else {})}, extra, **result)
+        return {**done, **{key: value for key, value in refreshed.items() if key != "record"}}
 
 
 # --------------------------------------------------------------------------
@@ -442,9 +480,13 @@ def a6(run: Run) -> dict:
         problems.append("code intelligence is off in the path map: importers are not established, nothing is moved")
     if problems:
         raise refuse("PLAN_NOT_EXECUTABLE", "; ".join(problems) + ": run the stages again from A1", problems=problems)
-    return rebuild(run, safety.migrate(run, plan, state, _batch, {
+    refreshing = _RefreshFirst(run)
+    result = safety.migrate(refreshing, plan, state, _batch, {
         "path_map_hash": run.hashes["A3"], "backup_ref": baseline["backup_ref"],
-        "index_refresh": "gov rebuild, run after this record's commit"}))
+        "index_refresh": "gov rebuild, run as this record is committed: a semantic store not recreated is its finding"})
+    if refreshing.failed is not None:
+        raise refreshing.failed
+    return result
 
 
 def a8(run: Run) -> dict:
