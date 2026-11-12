@@ -10,9 +10,9 @@ DEC-1003, INVESTIGATION-1 Q-1).
   run without one where it does not. A run that ends by its time limit is ``timed_out``.
 - **A red** (S4): every failing test is run again alone in the clone at the commit closed; one green alone is a
   flaky candidate, named, never the change's. A red alone is judged against the head without the change (the
-  tested code, the same clone reset to it), one run each way, three rounds each way only for a case that declares
-  itself load-sensitive (``@pytest.mark.load_sensitive`` on the test or its module: in the test's code, never a
-  list). It is not the change's only if the head without the change has it red with the same failure type; a
+  tested code, the same clone reset to it), one run each way, three rounds each way only for a load-sensitive case
+  (an entry of the serial phase's own list whose comment's kind is ``latency``; no accepted-reds or
+  ``load_sensitive`` list, no marker). It is not the change's only if the head without the change has it red with the same failure type; a
   timeout, an unknown type and a case the head without the change cannot run (``absent``) never match. The
   nightly's recorded result is read first, and stands for the run without the change when that night ran on that
   very commit; no clone is built for a nightly baseline.
@@ -23,7 +23,6 @@ close's).
 
 from __future__ import annotations
 
-import ast
 import json
 import os
 import re
@@ -39,7 +38,7 @@ CLONE_REL = ".gov-runtime/close/clone"
 KEEP = ".gov-runtime/"  # the clone's stores, kept by every reset
 TIMEOUT, UNKNOWN, ABSENT = "timeout", "unknown", "absent"
 NEVER_MATCH = (TIMEOUT, UNKNOWN, ABSENT)
-LOAD_SENSITIVE_MARK = "load_sensitive"
+LATENCY = "latency"  # the serial-only list's comment kind that makes an entry load-sensitive
 LOAD_SENSITIVE_ROUNDS = 3
 TIMED_OUT_EXITS = (124, 137)  # timeout(1): the limit reached, and the kill after it
 _LAUNCH = ("import subprocess, sys\n"
@@ -277,31 +276,22 @@ def judge(with_change: list[str | None], without: list[str | None]) -> tuple[boo
 
 
 def load_sensitive(clone: Path, test: str) -> bool:
-    """Whether the test declares itself load-sensitive in its own code: ``@pytest.mark.load_sensitive`` on its
-    function or class, or in its module's ``pytestmark``."""
-    path, _, rest = test.partition("::")
+    """Whether the test is load-sensitive: an entry of the serial phase's own list
+    (``gov.close.pytest_plugin.gov_close_serial_only.LIST_REL``) names it and that entry's comment's kind is
+    ``latency`` (``<entry>  # serial: latency: <reason>``), in the tested code. The serial phase's own reading; no
+    accepted-reds or ``load_sensitive`` list is read (F2), and no pytest marker counts."""
+    from gov.close.pytest_plugin.gov_close_serial_only import LIST_REL, declares
+
     try:
-        tree = ast.parse((Path(clone) / path).read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, SyntaxError, ValueError):
+        text = (Path(clone) / LIST_REL).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
         return False
-
-    def marked(node) -> bool:
-        return any(isinstance(n, ast.Attribute) and n.attr == LOAD_SENSITIVE_MARK for n in ast.walk(node))
-
-    for node in tree.body:
-        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "pytestmark"
-                                                for t in node.targets) and marked(node.value):
+    for line in text.splitlines():
+        entry, _, comment = (" " + line).partition(" #")
+        entry = entry.strip()
+        kind = re.match(r"\s*serial:\s*([\w-]+)\s*:", comment)
+        if entry and kind and kind.group(1) == LATENCY and declares(entry, test):
             return True
-    names = [re.sub(r"\[.*\]$", "", n) for n in rest.split("::") if n]
-    body = tree.body
-    for name in names:
-        found = next((n for n in body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-                      and n.name == name), None)
-        if found is None:
-            return False
-        if any(marked(d) for d in found.decorator_list):
-            return True
-        body = getattr(found, "body", [])
     return False
 
 

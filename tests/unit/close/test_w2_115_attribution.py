@@ -52,14 +52,27 @@ def test_s4_failure_types():
     assert attribution.failure_type("", "something odd") == attribution.UNKNOWN
 
 
-def test_s4_load_sensitive_is_declared_in_the_tests_code(tmp_path):
-    (tmp_path / "t.py").write_text("import pytest\n\n@pytest.mark.load_sensitive\ndef test_a():\n    pass\n\n"
-                                   "def test_b():\n    pass\n", encoding="utf-8")
-    (tmp_path / "m.py").write_text("import pytest\npytestmark = [pytest.mark.load_sensitive]\n\n"
-                                   "def test_c():\n    pass\n", encoding="utf-8")
-    assert attribution.load_sensitive(tmp_path, "t.py::test_a")
-    assert not attribution.load_sensitive(tmp_path, "t.py::test_b")
-    assert attribution.load_sensitive(tmp_path, "m.py::test_c")
+SERIAL_LIST = "tests/acceptance/serial-only.txt"
+
+
+def test_s4_load_sensitive_is_a_latency_entry_of_the_serial_list(tmp_path):
+    """A load-sensitive case is an entry of the serial phase's own list whose comment's kind is ``latency``; another
+    kind, an unlisted case, or a pytest marker is not."""
+    (tmp_path / "tests/acceptance").mkdir(parents=True)
+    (tmp_path / SERIAL_LIST).write_text(
+        "# the serial phase's list\n"
+        "tests/acceptance/W-1/test_a.py::test_a  # serial: latency: p95 under 100 ms\n"
+        "tests/acceptance/W-1/test_m.py  # serial: latency: a whole module timed\n"
+        "tests/acceptance/W-1/test_b.py::test_b  # serial: shared-state: one database\n", encoding="utf-8")
+    (tmp_path / "tests/acceptance/W-1").mkdir()
+    (tmp_path / "tests/acceptance/W-1/test_c.py").write_text(
+        "import pytest\n\n@pytest.mark.load_sensitive\ndef test_c():\n    pass\n", encoding="utf-8")
+    assert attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_a.py::test_a")
+    assert attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_m.py::test_x[1]")
+    assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_b.py::test_b")
+    assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_c.py::test_c")  # a marker is not
+    assert not attribution.load_sensitive(tmp_path, "tests/acceptance/W-1/test_a.py::test_ab")
+    assert not attribution.load_sensitive(tmp_path / "nowhere", "tests/acceptance/W-1/test_a.py::test_a")
 
 
 # --- the attribution on a planted project ------------------------------------------
@@ -105,8 +118,8 @@ def test_s4_a_test_the_change_added_is_the_changes(tmp_path):
 
 
 def test_s4_load_sensitive_gets_three_rounds_others_one(tmp_path, monkeypatch):
-    marked = "import pytest\n\n@pytest.mark.load_sensitive\ndef test_x():\n    assert 1 == 2\n"
-    repo = project(tmp_path, extra={"tests/unit/test_x.py": marked, "tests/unit/test_y.py": FAILS.replace("x", "y")})
+    repo = project(tmp_path, extra={"tests/unit/test_x.py": FAILS, "tests/unit/test_y.py": FAILS.replace("x", "y"),
+                                    SERIAL_LIST: "tests/unit/test_x.py::test_x  # serial: latency: timed\n"})
     change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)\n#\n"})
     calls = []
     real = attribution.run_alone
