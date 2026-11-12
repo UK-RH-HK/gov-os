@@ -1,7 +1,8 @@
 """The state folder ``<root>/.gov-runtime/dispatch/`` and the files in it (the ticket's Interface section).
 
 ``ready.txt`` (the orchestrator's list), ``started.txt`` (one line a start: ``<log name> <time> <W2> <ticket id>``),
-``never-ran.txt``, ``escalated.txt``, ``land.txt`` and ``land-done.txt`` (the landing step's, part b; shown here only),
+``never-ran.txt``, ``items-written.txt`` (every inbox item ever written: it outlives the item), ``escalated.txt`` (the
+escalations sent), ``escalate-failed.txt`` (the failed attempts of the notifier), ``land.txt`` and ``land-done.txt`` (the landing step's, part b; shown here only),
 ``inbox/`` and ``inbox/read/`` (one text item per event), ``logs/<log name>`` and ``logs/<log name>.exit`` (a session's
 output and, when it ends, its exit code), ``status.json``, ``status.txt``, ``peaks.json``, ``OFF``, ``tick.lock``.
 """
@@ -17,6 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 FOLDER = Path(".gov-runtime") / "dispatch"
+WRITTEN = "items-written.txt"  # one line per inbox item ever written: ``<item name> <time>``
 SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._=+-]*$")
 
 
@@ -130,12 +132,25 @@ class State:
     def all_items(self) -> list["Item"]:
         return self.items(self.inbox) + self.items(self.read)
 
+    def written(self, name: str) -> bool:
+        """Whether the item was ever written: the record ``items-written.txt`` (it outlives the item, deleted from
+        ``inbox/`` or ``inbox/read/``), or the item itself in either folder (a state from before the record), or, for a
+        never-ran item, its line in ``never-ran.txt``."""
+        if (self.inbox / name).exists() or (self.read / name).exists():
+            return True
+        if name in {line.split()[0] for line in self.lines(WRITTEN)}:
+            return True
+        suffix = ".never-ran.txt"
+        return name.endswith(suffix) and name[:-len(suffix)] in {line.split()[0] for line in self.lines("never-ran.txt")}
+
     def write_item(self, name: str, lines: list[str]) -> Path | None:
-        """The item ``inbox/<name>``, whole, never over one that is there (unread or read): None when it exists."""
-        path = self.inbox / name
-        if path.exists() or (self.read / name).exists():
+        """The item ``inbox/<name>``, whole, never twice, ever (F-1): None when it was written before, whether it is
+        still there (unread or read) or was deleted since. The record is appended after the item is in place."""
+        if self.written(name):
             return None
+        path = self.inbox / name
         self.write_whole(path, "\n".join(lines) + "\n")
+        self.append(WRITTEN, f"{name} {stamp()}")
         return path
 
     # --- the lock --------------------------------------------------------------------------------------------------

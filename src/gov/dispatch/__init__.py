@@ -57,8 +57,16 @@ codes) is as the lead's brief reads it. Departures and additions, named:
 - A program that timed out is not run again in the same pass, so a hung one costs one timeout. A timeout in an entry's
   check is that entry's named reason; in the notifier it is a ``problems`` line of the status. A launch that cannot be
   spawned leaves ``<log name>.exit`` holding 127 (it becomes a return) and fails the pass (exit 1).
-- An escalation is recorded in ``escalated.txt`` before the notifier runs: at most once, a failing notifier is named in
-  the status and not retried.
+- An escalation is recorded in ``escalated.txt`` only when the notifier exits 0 (F-2). A notifier that fails, times out
+  or cannot be started leaves it due: retried no sooner than ``notify_retry_s`` (default 600) after the last attempt, and
+  named in the status's ``problems`` in every pass until it is sent or the item is read; a timeout ends that pass's
+  escalations (the rest are named as not sent, not recorded). A failed notifier never fails the pass.
+- ``notifier_command`` is required at load (F-3): a missing one is exit 2 naming the key, nothing started.
+- An inbox item is written once, ever (F-1): ``items-written.txt`` outlives the item, so one deleted from ``inbox/`` or
+  ``inbox/read/`` is never written again (nor its escalation raised again).
+- A ``files_changed`` path resolves only when git knows it (in HEAD, in the history, or existing and ignored): an
+  untracked, not-ignored or only staged path is unresolved (F-4). When git cannot answer, the item says ``unchecked:
+  could not be checked (<the failure>): <names>``, never ``unresolved:`` (F-6).
 - The OFF file: the pass writes only the status, which says OFF. The launch runs in the ticket's worktree.
 - The items are named ``<log name>.return.txt``, ``<log name>.never-ran.txt`` and ``<log name>.owner.txt``; a line of
   ``started.txt`` is ``<log name> <time> <W2> <ticket id>``.

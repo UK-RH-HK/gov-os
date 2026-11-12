@@ -2,7 +2,9 @@
 
 Read here, as the project's own keys are, not by ``gov.config``. Nothing is defaulted that names a branch, a path of
 the project's own or a ticket: ``integration_branch`` and ``worktrees_root`` have no default, and neither have
-``max_leads``, ``stagger_s`` and ``cpu_band``. A missing or malformed value is a ``ConfigError`` naming its key.
+``max_leads``, ``stagger_s`` and ``cpu_band``. ``notifier_command`` is required too (a missing one is an error at load,
+never in the middle of a pass that has started a session, F-3); ``notify_retry_s`` (default 600) is the least time between
+two attempts of a notifier that failed. A missing or malformed value is a ``ConfigError`` naming its key.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ class Config:
     cpu_band: float
     integration_branch: str
     worktrees_root: str
+    notifier_command: list
     briefs_dir: str = ".gov-runtime/dispatch/briefs"
     launch_command: list = field(default_factory=lambda: list(DEFAULT_LAUNCH))
     never_ran_after_s: float = 300
@@ -39,7 +42,7 @@ class Config:
     job_markers: dict = field(default_factory=dict)
     nightly_hold: dict | None = None
     landing_command: list | None = None
-    notifier_command: list | None = None
+    notify_retry_s: float = 600
 
 
 def _bad(key: str, why: str) -> ConfigError:
@@ -71,8 +74,10 @@ def _text(values: dict, key: str, default=None) -> str:
     return value
 
 
-def _argv(values: dict, key: str, default=None):
+def _argv(values: dict, key: str, default=None, *, required=False):
     if key not in values or values[key] is None:
+        if required:
+            raise _bad(key, "is missing")
         return default
     value = values[key]
     if not isinstance(value, list) or not value or not all(isinstance(a, str) and a for a in value):
@@ -120,6 +125,7 @@ def load(root: Path) -> Config:
         cpu_band=_number(values, "cpu_band"),
         integration_branch=_text(values, "integration_branch"),
         worktrees_root=_text(values, "worktrees_root"),
+        notifier_command=_argv(values, "notifier_command", required=True),
         briefs_dir=_text(values, "briefs_dir", Config.briefs_dir),
         launch_command=launch,
         never_ran_after_s=_number(values, "never_ran_after_s", 300),
@@ -130,5 +136,5 @@ def load(root: Path) -> Config:
         job_markers=_markers(values),
         nightly_hold=_hold(values),
         landing_command=_argv(values, "landing_command", None),
-        notifier_command=_argv(values, "notifier_command", None),
+        notify_retry_s=_number(values, "notify_retry_s", 600),
     )

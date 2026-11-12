@@ -122,7 +122,7 @@ def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
             ctx.started_logs.add(entry.log)
             continue
         skipped.append({"W2": entry.w2, "log": entry.log, "line": entry.line, "reason": why})
-    raised = returns.escalate(ctx, conf, problems)
+    raised = returns.escalate(ctx, conf, problems, now)
 
     code = EXIT_OK if began is not None or not refused else EXIT_REFUSED
     data = {

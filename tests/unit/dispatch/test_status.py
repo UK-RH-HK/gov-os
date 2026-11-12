@@ -95,7 +95,8 @@ def test_a_missing_configuration_is_exit_2_named(project):
 def test_a_missing_or_malformed_value_is_exit_2_named(project):
     for key, value in (("max_leads", None), ("integration_branch", None), ("worktrees_root", None),
                        ("stagger_s", "soon"), ("cpu_band", -1), ("max_leads", True), ("launch_command", "gov launch"),
-                       ("notifier_command", []), ("nightly_hold", {"from": "25:00", "until": "06:00"}),
+                       ("notifier_command", []), ("notifier_command", None), ("notifier_command", "notify"),
+                       ("notify_retry_s", -1), ("notify_retry_s", "soon"), ("nightly_hold", {"from": "25:00", "until": "06:00"}),
                        ("job_markers", ["x"]), ("command_timeout_s", 0)):
         project.write_config(**{key: value})
         code, _ = project.tick()
@@ -110,6 +111,17 @@ def test_a_missing_or_malformed_value_is_exit_2_named(project):
         project.settings.pop("job_markers", None)
         project.write_config()
     assert project.tick()[0] == 0
+
+
+def test_a_missing_notifier_is_exit_2_at_load_and_nothing_is_started(project):
+    project.write_config(notifier_command=None)
+    project.ticket("W2-1")
+    project.ready(project.entry("W2-1"))
+    code, _ = project.tick()
+    first = project.status_text().splitlines()[0]
+    assert code == 2 and first.startswith("PASS FAILED") and "notifier_command" in first
+    assert project.started() == [] and project.launches() == []
+    assert project.status()["ok"] is False
 
 
 def test_a_malformed_yaml_file_is_exit_2(project):

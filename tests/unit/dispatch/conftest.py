@@ -35,8 +35,14 @@ sys.exit(int(os.environ.get("STUB_LAUNCH_EXIT", "0")))
 STUB_NOTIFY = """import os, sys
 with open(os.environ["STUB_NOTIFY_LOG"], "a") as log:
     log.write(" ".join(sys.argv[1:]) + "\\n")
+sys.exit(int(os.environ.get("STUB_NOTIFY_EXIT", "0")))
 """
 HANG = """import time
+time.sleep(30)
+"""
+HANG_LOGGED = """import os, sys, time
+with open(os.environ["STUB_NOTIFY_LOG"], "a") as log:
+    log.write(" ".join(sys.argv[1:]) + "\\n")
 time.sleep(30)
 """
 
@@ -62,13 +68,14 @@ class Project:
         (root / "launch_stub.py").write_text(STUB_LAUNCH)
         (root / "notify_stub.py").write_text(STUB_NOTIFY)
         (root / "hang_stub.py").write_text(HANG)
+        (root / "hang_logged_stub.py").write_text(HANG_LOGGED)
         monkeypatch.setenv("HOME", str(self.home))
         monkeypatch.setenv("GOV_RESOURCES_PROC", str(self.proc))
         monkeypatch.setenv("STUB_LAUNCH_LOG", str(self.launch_log))
         monkeypatch.setenv("STUB_NOTIFY_LOG", str(self.notify_log))
         for key, value in GIT_ENV.items():
             monkeypatch.setenv(key, value)
-        for name in ("GOV_RESOURCES_STAT", "STUB_LAUNCH_EXIT"):
+        for name in ("GOV_RESOURCES_STAT", "STUB_LAUNCH_EXIT", "STUB_NOTIFY_EXIT"):
             monkeypatch.delenv(name, raising=False)
         self.memory(20 * GIB)
         self.loads(1.0, 1.0)

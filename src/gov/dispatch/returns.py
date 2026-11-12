@@ -1,14 +1,23 @@
 """Returns (S4, S8, S9; DEC-1014): every wake the caller gets is an inbox item a pass writes.
 
-- A finished session (its ``logs/<log name>.exit`` exists) becomes ``inbox/<log name>.return.txt``, once: an item of that
-  name in ``inbox/`` or ``inbox/read/`` is the record that it was written. Its ``status:`` is the ``status:`` line the log
+- A finished session (its ``logs/<log name>.exit`` exists) becomes ``inbox/<log name>.return.txt``, once, ever: the record
+  that an item was written is ``items-written.txt`` (``state.State.write_item``), outside ``inbox/``, so an item deleted
+  after it was read (or unread) is never written again; an item in ``inbox/`` or ``inbox/read/`` also counts as written
+  (F-1). Its ``status:`` is the ``status:`` line the log
   holds (the last), else ``exit <code>``. Every commit id (7 to 40 hex) on its ``commits:`` lines and every path on its
   ``files_changed:`` lines is resolved against git in the ticket's worktree; what does not resolve is named on one
-  ``unresolved:`` line (none: no such line).
+  ``unresolved:`` line (none: no such line). A relative path resolves only when git knows it: in HEAD's tree, in the
+  history, or existing and ignored; an untracked, not-ignored (or only staged) path is unresolved (F-4). When git cannot
+  answer (a timeout, a failure) they are named on ``unchecked: could not be checked (<the failure>): <names>`` instead,
+  never as unresolved (F-6).
 - A start that never ran (in ``started.txt`` past ``never_ran_after_s``, no process of its ticket, no ``.exit``) becomes
   ``inbox/<log name>.never-ran.txt``, once, and a line of ``never-ran.txt``.
-- An item unread (still in ``inbox/``) past ``unread_escalate_s`` runs ``notifier_command`` once, the item's path its
-  last argument; ``escalated.txt`` records it before the command runs, so it is never raised twice.
+- An item unread (still in ``inbox/``) past ``unread_escalate_s`` runs ``notifier_command``, the item's path its last
+  argument. The escalation is recorded in ``escalated.txt`` (so never run again) only when the notifier exits 0 (F-2). A
+  notifier that fails (non-zero, a timeout, cannot be started) leaves it due: ``escalate-failed.txt`` keeps the last
+  attempt and its failure, the escalation is tried again no sooner than ``notify_retry_s`` after it, and every pass names
+  the item and the failure in its ``problems`` until it is sent or the item is read. A timeout ends the pass's escalations:
+  the ones still due are not run, not recorded, and named as not sent. A failed notifier never fails the pass.
 """
 
 from __future__ import annotations
@@ -17,13 +26,14 @@ import re
 from pathlib import Path
 
 from gov.dispatch import state as states
-from gov.dispatch.config import Config, ConfigError
+from gov.dispatch.config import Config
 from gov.dispatch.shell import CommandFailed, Runner
 
 LABEL = re.compile(r"^\s*[-*]?\s*\**\s*(status|commits|files_changed)\s*\**\s*:\s*\**\s*(.*?)\s*$", re.I)
 LABELLED = re.compile(r"^\s*[-*]?\s*\**\s*[a-z_]+\s*\**\s*:")
 BULLET = re.compile(r"^\s+[-*]?\s*(.+?)\s*$")
 HEX = re.compile(r"\b[0-9a-f]{7,40}\b")
+FAILED = "escalate-failed.txt"  # the notifier's failed attempts: ``<item name> <time> <the failure>``
 TAIL_BYTES = 256 * 1024
 MAX_NAMED = 200
 NOT_PATHS = {"none", "n/a", "-", "and", "the", "(none)", "(see", "tbd"}
@@ -82,10 +92,19 @@ def unresolved(runner: Runner, folder: Path, ids: list[str], paths: list[str]) -
         if path.startswith("/"):
             if not Path(path).exists():
                 missing.append(path)
-        elif runner.git(folder, "cat-file", "-e", f"HEAD:{path}").code != 0 and not (folder / path).exists() \
-                and not runner.git(folder, "log", "-1", "--format=%h", "--", path).out.strip():
+        elif not _known(runner, folder, path):
             missing.append(path)
     return missing
+
+
+def _known(runner: Runner, folder: Path, path: str) -> bool:
+    """Git knows a relative path: in HEAD's tree, in the history, or existing and ignored (an untracked, not-ignored or
+    only staged file is not known: F-4)."""
+    if runner.git(folder, "cat-file", "-e", f"HEAD:{path}").code == 0:
+        return True
+    if runner.git(folder, "log", "-1", "--format=%h", "--", path).out.strip():
+        return True
+    return (folder / path).exists() and runner.git(folder, "check-ignore", "-q", "--", path).code == 0
 
 
 def _text(path: Path) -> str:
@@ -106,7 +125,7 @@ def finished(ctx, problems: list[str]) -> list[str]:
         if not exit_file.exists():
             continue
         name = f"{start.log}.return.txt"
-        if (ctx.state.inbox / name).exists() or (ctx.state.read / name).exists():
+        if ctx.state.written(name):
             continue
         code = _text(exit_file).strip() or "unknown"
         log = parse(_text(ctx.state.logs / start.log))
@@ -125,10 +144,11 @@ def finished(ctx, problems: list[str]) -> list[str]:
             try:
                 missing = unresolved(ctx.runner, folder, ids, paths)
             except CommandFailed as failure:
-                missing = ids + paths
                 problems.append(f"{start.log}: its commits and paths could not be checked: {failure}")
-            if missing:
-                lines.append("unresolved: " + " ".join(missing))
+                lines.append(f"unchecked: could not be checked ({failure}): " + " ".join(ids + paths))
+            else:
+                if missing:
+                    lines.append("unresolved: " + " ".join(missing))
         if ctx.state.write_item(name, lines):
             written.append(name)
     return written
@@ -154,22 +174,51 @@ def never_ran(ctx, now) -> list[str]:
     return written
 
 
-def escalate(ctx, conf: Config, problems: list[str]) -> list[str]:
-    """Run the notifier once for each item unread past ``unread_escalate_s``."""
+def _failures(ctx) -> dict:
+    """The last failed attempt of each item's escalation: ``{item name: (time, the failure)}`` (the file is appended to,
+    the last line of an item holds)."""
+    out = {}
+    for line in ctx.state.lines(FAILED):
+        parts = line.split(None, 2)
+        moment = states.parse_time(parts[1]) if len(parts) > 1 else None
+        if moment:
+            out[parts[0]] = (moment, parts[2] if len(parts) > 2 else "unknown")
+    return out
+
+
+def escalate(ctx, conf: Config, problems: list[str], now=None) -> list[str]:
+    """Run the notifier for each item unread past ``unread_escalate_s`` and not yet sent; the names of those sent.
+
+    Recorded in ``escalated.txt`` only when the notifier exits 0. A failed attempt is kept in ``escalate-failed.txt`` and
+    named in ``problems`` in every pass while it lasts; it is retried no sooner than ``notify_retry_s`` after it."""
+    now = now or states.now()
     done = {line.split()[0] for line in ctx.state.lines("escalated.txt")}
-    raised = []
+    failed = _failures(ctx)
+    raised, timed_out = [], False
     for item in ctx.state.items():
-        if item.age_s <= conf.unread_escalate_s or item.path.name in done:
+        name = item.path.name
+        if item.age_s <= conf.unread_escalate_s or name in done:
             continue
-        if conf.notifier_command is None:
-            raise ConfigError(f"notifier_command: needed to escalate {item.path.name}, unread for {item.age_s:.0f} s")
-        ctx.state.append("escalated.txt", f"{item.path.name} {states.stamp()}")
+        if timed_out:
+            problems.append(f"escalation of {name}: not sent (the notifier timed out earlier in this pass)")
+            continue
+        before = failed.get(name)
+        if before and (now - before[0]).total_seconds() < conf.notify_retry_s:
+            problems.append(f"escalation of {name}: not sent, due again {conf.notify_retry_s:g} s after the attempt of "
+                            f"{states.stamp(before[0])} ({before[1]})")
+            continue
+        why = None
         try:
             result = ctx.runner.run([*conf.notifier_command, str(item.path)], cwd=ctx.root)
+            if result.code != 0:
+                why = f"the notifier ended with {result.code}"
         except CommandFailed as failure:
-            problems.append(f"escalation of {item.path.name}: {failure}")
+            why = str(failure)
+            timed_out = conf.notifier_command[0] in ctx.runner.hung
+        if why is None:
+            ctx.state.append("escalated.txt", f"{name} {states.stamp(now)}")
+            raised.append(name)
             continue
-        if result.code != 0:
-            problems.append(f"escalation of {item.path.name}: the notifier ended with {result.code}")
-        raised.append(item.path.name)
+        ctx.state.append(FAILED, f"{name} {states.stamp(now)} {' '.join(why.split())}")
+        problems.append(f"escalation of {name}: not sent ({why})")
     return raised
