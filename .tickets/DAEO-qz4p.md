@@ -16,9 +16,11 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- tests/acceptance/W2-149/w2_149_support.py  # the 8 cases' planted products in the fixed form (the CTO, P-1 (a), 2026-11-12)
 - governance/project/orchestration/tools/indep_launch.py
 - governance/project/orchestration/tools/indep-schemas/**
 - tests/unit/orchestration/test_w2_173*
+- tests/unit/orchestration/test_w2_149_indep_launch.py  # W2-149's two unit cases in the fixed form (run 2's unresolved; the CTO, 2026-11-12 05:10)
 - docs/changes/W2-173-evidence.md
 kpis:
   success:
@@ -40,6 +42,8 @@ sources:
 - DEC-1113
 - DEC-1050
 - DEC-1073
+- DEC-866
+- DEC-105
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-173/
@@ -72,3 +76,11 @@ delivered unchecked, though the next steps read them by their form.
 - **Not here:** the briefs, the schedule, the measure.
 
 [DEC-1120 (2)-(3); DEC-1101 (2)]
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-12), run 1's P-1 (a) (DEC-105 apply now; DEC-866):** S5 reads "W2-149's cases
+  pass, with the 8 cases' planted products in the fixed form": this ticket's stricter delivery and result checks (S3, S4)
+  break 8 W2-149 cases whose fixtures plant the old form; a test-design batch updates `GOOD_DELIVERY` and `GOOD_RESULT` for
+  the checker and auditor and adds `effort` to `COUNTS_KEYS` in `tests/acceptance/W2-149/w2_149_support.py` (now in the
+  paths; Rewrite-Reason: DEC-866, this ticket's S3 and S4), and W2-149's two unit cases are revised the same way within
+  this ticket's own `tests/unit/orchestration/test_w2_173*` or named in the return if they live elsewhere. P-2: the
+  `hidden/dropped/` exclusion goes to a small ticket of its own before the audit's first run (11-23).
