@@ -23,6 +23,8 @@ allowed_paths:
 - tests/unit/check/**
 - tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py  # one test-designer revision: _others() leaves out elapsed_s (Rewrite-Reason: P-W2-45-1 item 2; DEC-1148 (4))
 - tests/unit/ci/test_ci_command.py  # one revision: line 80 == "RED" and line 73's comment (Rewrite-Reason: P-W2-45-1 item 5; DEC-1148 (4))
+- docs/probes/DAEO-neam/**  # the probe record (P-W2-45-5 (a), the CTO, 2026-11-12)
+- tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py  # one test-designer revision: line 49 and its docstring, Rewrite-Reason P-W2-45-1 item 5 (DEC-1153 (1))
 kpis:
   success:
   - 'The decision checker runs within the gov check budget on a 200-decision, 20k-commit repository Verify: a planted repository of 200 decisions and 20,000 commits: `gov check` runs the decision checker and its recorded time is within the gov check budget (the budget''s value printed beside it) [W2-H018].'
@@ -119,3 +121,13 @@ Proposal (all in src/gov/check/runner.py unless named):
 ## Widened by the owner (DEC-1148 (4), P1-J (a), 2026-11-12)
 
 Two older tests assert what the accepted Interface changed: R1 (W2-95's `_others()`, `elapsed_s` is a wall time) by the test designer; R2 (`test_ci_command.py:80`, OPENSPEC_ABSENT is RED) by the engineer or designer. One revision each, each with its Rewrite-Reason; nothing else in either file changes.
+
+## Run 3's packages (2026-11-12)
+
+- **P-W2-45-3 (a)** (the CTO, delegated P2): a fix round inside the paths: a test-design batch (a history with one merge in six, an interrupt case), one engineer (`checker.py` passes over merges whose parents hold the decision's file unchanged; `runner.py` stops the group on any exception: F2, F3), then review round 2, the last (DEC-1010). F4 to F6 are rows.
+- **P-W2-45-5 (a)** (the CTO): the probe folder added.
+- **P-W2-45-4** (the W1-40 case, a widening): with the owner.
+
+## P-W2-45-4 decided (the owner, DEC-1153 (1), 2026-11-12)
+
+(a): `tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py` added for one test-designer revision: line 49 expects a non-zero exit and RED, its docstring (lines 46-47) says so, `Rewrite-Reason: P-W2-45-1 item 5`; nothing else in the file changes. It rides run 4's batch with P-W2-45-3 (a).

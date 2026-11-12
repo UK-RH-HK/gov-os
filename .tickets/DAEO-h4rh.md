@@ -96,6 +96,7 @@ kpis:
   - 'The first numbered, frozen release is cut by the owner and hash-checked (two builds give the same bytes; the wheel and every file match the manifest), recorded in docs/plan/wave-2/examin-copy/release-check.md, before W2-81''s proving-ground run and this ticket''s adoption [DEC-1089, DEC-954 Q8c, DEC-772]'
   - 'Exit criterion 7: CAP-45.a moved to Wave 3 by an approved CIT-P note (docs/changes/W2-27-CIT-P.md), or named as an exception the owner accepts [DEC-1089]'
   - 'The copy''s `governance/project/facts.yaml` holds EXAMIN''s own commands (`launch_worker` = `gov launch`, `wait_for` = `gov wait`, `lead_verify` = EXAMIN''s own verify command, the rest from the adoption''s defaults), and every role''s brief (the five worker roles and the lead''s run kinds) builds with `gov brief` in the copy; the copy carries no `governance/project/secrets.yaml` or one with `scan: on`, so the secrets scan stays on there Verify: `gov brief <role> <ticket>` exits 0 in the copy for each worker role and each lead run kind on one of its tickets; `gov check` there shows the secrets-indexing check measured (not "off by configuration") [DEC-1148 (2), DEC-1045]'
+  - 'Before any scoped close in the copy, its suite runs once in full at the adoption commit (`gov close --full`); every red there is either fixed or listed in the copy''s `governance/project/path-map.yaml` `accepted_reds` (test, the owner''s decision, reason, fixed_by) by an ACT the owner approves, so the full close passes and its record (`docs/close/<id>/CL-*.md`, scope full) is the copy''s first green base; a red the owner does not accept blocks the adoption, not a later close Verify: the copy holds a full close record at the adoption commit before its first scoped close; that scoped close judges its reds against the record''s head; each `accepted_reds` entry names an owner''s decision that resolves [DEC-1151, DEC-1150 (2), DEC-757, DEC-1134]'
   failure: []
 profile: FULL
 sources:
@@ -164,3 +165,12 @@ W2-81's proving-ground run. [DEC-1090]
 ## A line added by the owner (DEC-1148 (2), item 4 (a1), 2026-11-12)
 
 The copy's facts file holds EXAMIN's commands and every role's brief builds there; the secrets scan stays on in the copy (DEC-1045 lifted it on this repository only). Depends on W2-174's facts step and W2-160 (`gov wait`).
+
+## The copy's first green base (the owner, DEC-1151, 2026-11-12)
+
+W2-115's close takes as its green base only a full close's record or a green night (P1-K (a): no fallback), so the copy runs one full close at adoption, its standing reds listed by the owner's decision in `accepted_reds`; the line above.
+
+## The copy's commit (the owner's C1, DEC-1143 (2); confirmed 2026-11-12, DEC-1151 (2))
+
+W2-27's adoption runs on EXAMIN's copy `~/gov-os-workbench/examin` at `0a82082495f52df068c3c6b518969b419f02fe95` (the one commit of its 46 uncommitted entries, made on the owner's word at 10:45; the copy is clean at it), through a launch clone under `~/gov-os-runs/` as W2-94's was; the same commit EXAMIN's question set was written on (W2-94's run `20261112T185806Z-examin-r1`, scaffold commit `48459935c435` whose only parent it is, `COPY-HEAD.txt` holding it). A different commit of the copy needs the owner's word and a new question set.
+

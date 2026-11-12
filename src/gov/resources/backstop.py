@@ -11,7 +11,9 @@ touched. Each poll (every ``gpu_backstop_every_s``) checks, in this order, the f
 
 The limit, the period and the embedders come from the gate's one file and nowhere else (``config.backstop_values``, F3):
 no option and no environment variable sets them. Only the groups named are touched, by ``os.killpg`` with their id,
-never a pid, a name or a pattern (S4, F1; L5). When the backstop's own group (``os.getpgrp()``) is named, it is paused
+never a pid, a name or a pattern (S4, F1; L5). A group whose members are all zombies has ended (its job is over, only
+its parent has not reaped it); a paused member is live. ``watch(..., max_polls=n)`` ends after n polls without a trip
+(default: no bound). When the backstop's own group (``os.getpgrp()``) is named, it is paused
 last, after the other groups, the TRIP line and the inbox item (L5b), so the SIGSTOP that freezes ``gov`` freezes it
 only when everything else is done; ``kill -CONT`` to that group resumes it and the command ends. It reads only ``nvidia-smi``'s answer, the ``/api/ps`` answers and the
 embedder logs, and writes only ``$HOME/.gov-os/machine/gpu-backstop.log`` and, on a trip, the one inbox item under
@@ -41,6 +43,8 @@ SMI_TIMEOUT_S = 20
 PS_TIMEOUT_S = 3
 READING = re.compile(r"^\s*(\d+)\s*,\s*(\d+)\s*$")
 OFFLOAD = re.compile(r"offloaded (\d+)/(\d+) layers to GPU")
+PROC = "/proc"
+ZOMBIE_STATES = "ZXx"  # zombie, dead (Linux's two spellings of dead)
 
 
 def _stamp() -> str:
@@ -51,16 +55,74 @@ def _names(groups) -> str:
     return " ".join(str(g) for g in groups) or "none"
 
 
+def _state_and_group(text: str) -> tuple[str, int] | None:
+    """``(state, process group id)`` from a ``/proc/<pid>/stat`` line, read after its last ``)`` (the command name may
+    hold spaces and parentheses); ``None`` for a line that does not have the fields."""
+    fields = text[text.rfind(")") + 1:].split() if ")" in text else []
+    try:
+        return fields[0], int(fields[2])  # state, then ppid, then pgrp
+    except (IndexError, ValueError):
+        return None
+
+
+def _thread_runs(pid: str) -> bool:
+    """A zombie thread-group leader whose other threads still run is not an ended process (it is listed under
+    ``/proc/<pid>/task``); anything unreadable is no thread running."""
+    try:
+        threads = os.listdir(f"{PROC}/{pid}/task")
+    except OSError:
+        return False
+    for thread in threads:
+        if thread == pid:
+            continue
+        try:
+            with open(f"{PROC}/{pid}/task/{thread}/stat", "rb") as handle:
+                read = _state_and_group(handle.read().decode("utf-8", "replace"))
+        except OSError:
+            continue
+        if read is not None and read[0] not in ZOMBIE_STATES:
+            return True
+    return False
+
+
+def _all_ended(group: int) -> bool:
+    """True when ``/proc`` shows at least one member of ``group`` and every member found is a zombie (``Z``) or dead
+    (``X``) with no thread still running: the group has ended although signal 0 still reaches it. A paused member
+    (``T``, ``t``) is live. No
+    ``/proc``, or no member found, is no evidence of an end (False); a process that vanishes while read is skipped.
+    Only the group id is looked at, never a name or a pattern (S4)."""
+    try:
+        names = os.listdir(PROC)
+    except OSError:
+        return False
+    found = False
+    for name in names:
+        if not name.isdigit():
+            continue
+        try:
+            with open(f"{PROC}/{name}/stat", "rb") as handle:
+                read = _state_and_group(handle.read().decode("utf-8", "replace"))
+        except OSError:  # gone while read
+            continue
+        if read is None or read[1] != group:
+            continue
+        if read[0] not in ZOMBIE_STATES or _thread_runs(name):
+            return False
+        found = True
+    return found
+
+
 def _live(group: int) -> bool:
     """Signal 0 to the group: it exists (a group we may not signal exists too); a number beyond what a process group
-    id can be (``os.killpg`` raises OverflowError) names no group, so it counts as ended (L5)."""
+    id can be (``os.killpg`` raises OverflowError) names no group, so it counts as ended (L5). A group that exists but
+    whose members are all zombies has ended too: its job is over and only its parent has not yet reaped it."""
     try:
         os.killpg(group, 0)
     except (ProcessLookupError, OverflowError):
         return False
     except PermissionError:
         return True
-    return True
+    return not _all_ended(group)
 
 
 def read_gpu(env: dict) -> tuple[tuple[int, int] | None, str | None]:
@@ -144,8 +206,21 @@ def _inbox_item(root: Path, reason: str, paused: list, skipped: list, own: int |
     return str(target)
 
 
-def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
-    """Watch the named process groups until a trip or until every one has ended; the result of L8."""
+def _pause(seconds: float) -> None:
+    """The watch's own pause between two polls, and nothing else's. A test replaces this name, never ``time.sleep``:
+    ``time`` is one module for the whole process, and ``subprocess`` waits on a child with it (DEC-1144 (2))."""
+    time.sleep(seconds)
+
+
+def watch(groups: list[int], root: Path, env: dict | None = None, *, max_polls: int | None = None) -> dict:
+    """Watch the named process groups until a trip or until every one has ended; the result of L8.
+
+    ``max_polls`` (keyword only; default ``None``: no bound, the command's behaviour) ends the watch after that many
+    polls without a trip while a group is still live: it logs one ``end: the bound of <n> polls reached; no trip`` line
+    and returns the untripped result (no new key). It is a number of polls, not of seconds: a test replaces the sleep,
+    so a count bounds it whatever the clock does (DEC-1144 (2))."""
+    if max_polls is not None and (isinstance(max_polls, bool) or not isinstance(max_polls, int) or max_polls < 1):
+        raise GovError("RESOURCE_ARGUMENTS_INVALID", f"max_polls is not a positive whole number: {max_polls!r}")
     env = dict(os.environ if env is None else env)
     values, faults = config.backstop_values(env)
     if faults:
@@ -170,10 +245,12 @@ def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
          f"embedders {_names(e['port'] for e in embedders)}{tail}")
     result = {"tripped": False, "reason": None, "reading": None, "paused": [], "skipped": skipped, "log": str(log),
               "inbox_item": None}
+    polls = 0
     while True:
         if not any(_live(g) for g in named):
             note(f"end: every watched group has ended ({_names(named)})")
             return result
+        polls += 1
         reading, why = read_gpu(env)
         if why:
             note(f"no GPU reading: {why}")
@@ -215,4 +292,10 @@ def watch(groups: list[int], root: Path, env: dict | None = None) -> dict:
                 except (ProcessLookupError, PermissionError, OverflowError):
                     paused.remove(own)
             return result
-        time.sleep(every)
+        if max_polls is not None and polls >= max_polls:
+            still = [g for g in named if _live(g)]
+            if still:
+                note(f"end: the bound of {max_polls} polls reached; no trip; groups still live {_names(still)}")
+                return result
+            continue  # every group ended during the poll: the top of the loop logs that end
+        _pause(every)
