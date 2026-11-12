@@ -191,3 +191,13 @@ Inside one `measure` call, as `run_measure.sh`: ready check (probe, then `contro
    confirm it: a missing set ends the ready check (`STOPPED notready`), and the first live run shows it.
 10. `pool-import`'s exclusions (category `nonexistent-id`, ids `h24`, `m60`) stand; the count guard (79 and 138) refuses a
     mismatch with nothing written.
+
+## PKG-W2-171-F5-1 and run 2's readings (the CTO, delegated P2, 2026-11-12 07:12)
+
+- **(a) now, (b) before the land:** W2-170's F5 path case is a branch-scoped red on this branch (it judges any branch against
+  W2-170's paths): named in the return, it does not block this ticket's review. W2-180 (DAEO-weh2, C1) makes it judge only
+  W2-170's own branch; it must land before this ticket's land, or the queue attributes the red to this batch. Not skip_known.json.
+- **Readings confirmed:** `counts.attempt` holds the attempt's name (Interface item 3); a control with 0 question lines is
+  `notready`, 1 to 39 lines or no `families:` line is `control` (item 5); S2's planted set has 40 questions (W2-170's preflight
+  passes 36 to 40; S2's "12" is read as "a planted set"); refusal precedence and `search.ok` for a degraded answer are as built,
+  stated in the evidence; eng-1's pool restart after `MS-POOLFAULT` stands. The heavy-slot TMPDIR sits outside `~/gov-os-runs`.
