@@ -219,3 +219,56 @@ def test_s2_a_task_output_file_no_process_holds_open_is_not_running(w):
     (w.tasks / "bg3.output").write_text("done\n", encoding="utf-8")
     result = _blocked_idle(w)
     assert {"DAEO-u101", "DAEO-u102"} <= ids_named(result.reason)
+
+
+# --- review round 1, B1 (FR-1): a reused pid is not running work -----------------------------------------------------------
+#
+# A pid file's process counts as running only when it started no later than 15 minutes (900 s, a slack for clock steps) after
+# the file's mtime; one that started later is not the process the file named (that one is gone) and is not counted or named
+# as running, as a dead pid is not. A process that started before the file was written, or within the 15 minutes after,
+# still counts. The planted process is unrelated to any launcher (its command line says nothing of a job).
+
+D = 24 * H
+
+
+def _pid_file(w, pid, *, file_age, started_ago, rel=".gov-runtime/jobs/launch/old.pid"):
+    """A leftover pid file written ``file_age`` ago whose number now belongs to an unrelated live process that started
+    ``started_ago`` ago; no exit file."""
+    w.proc(pid, "python3 -m http.server 8000", started_ago=started_ago)
+    path = w.root / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"{pid}\n", encoding="utf-8")
+    support.set_age(path, file_age)
+    return path
+
+
+def test_s2_a_reused_pid_is_not_a_running_job(w):
+    w.unblocked()
+    w.status()
+    _pid_file(w, 4301, file_age=2 * D, started_ago=10 * M)
+    result = _blocked_idle(w)
+    assert ids_named(result.reason) == {"DAEO-u101", "DAEO-u102"}, f"the block names each unblocked item:\n{result}"
+    assert "4301" not in result.reason + result.message, f"the reused pid is not named as running:\n{result}"
+
+
+@pytest.mark.parametrize("gap_min", [20, 110], ids=["20-min-after-the-file", "110-min-after-the-file"])
+def test_s2_a_process_started_more_than_the_slack_after_the_pid_file_is_not_counted(w, gap_min):
+    w.unblocked()
+    w.status()
+    _pid_file(w, 4302, file_age=2 * H, started_ago=2 * H - gap_min * M)
+    result = _blocked_idle(w)
+    assert {"DAEO-u101", "DAEO-u102"} <= ids_named(result.reason), f"a process that started later is not it:\n{result}"
+    assert "4302" not in result.reason + result.message, f"the pid is not named as running:\n{result}"
+
+
+@pytest.mark.parametrize("started_ago,file_age", [
+    pytest.param(50 * M, 1 * H, id="10-min-after-the-file"),
+    pytest.param(46 * M, 1 * H, id="14-min-after-the-file"),
+    pytest.param(2 * H, 1 * H, id="an-hour-before-the-file"),
+])
+def test_s2_a_process_started_before_or_within_the_slack_after_the_pid_file_still_counts(w, started_ago, file_age):
+    w.unblocked()
+    w.status()
+    _pid_file(w, 4303, file_age=file_age, started_ago=started_ago)
+    result = w.run("idle")
+    assert_let_through(result, r"running|pid|job", "a pid file's process that started before, or within 15 minutes after, it")
