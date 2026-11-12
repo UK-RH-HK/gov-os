@@ -1,27 +1,28 @@
 ---
 id: W2-176-CIT-P
 type: change-impact-proposal
-status: DRAFT
+status: PROPOSED
 date: 2026-11-12
 branch: w2/W2-176
 base: 1798e82f1201
 ticket: DAEO-ktiw (W2-176)
 author: ticket lead (W2-176)
-review: one read-only independent auditor (CAP-33), round 1 READY at 13fd1dd34e32
-decisions_carried: [DEC-1140, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
+review: read-only independent auditors (CAP-33), round 1 READY at 13fd1dd34e32, round 2 (the last, DEC-1010) READY at 7894a35e116f
+decisions_carried: [DEC-1140, DEC-1118, DEC-264, DEC-259, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
 state_class: EVIDENCE
 ---
 
 # W2-176: change-impact proposal (CIT-P) on the PreCompact hook and a new PostToolUse context watch
 
 This change makes every session hand over before compaction: the PreCompact hook tells the compaction summary to begin
-with a read-the-handover-first line, and a new PostToolUse hook reminds a session once, at 85 % of its model's
-context window, to write its checkpoint and update its files. It changes a kernel hook and adds one, so it goes
-through CIT-P (CAP-33). It sets no compaction threshold and stops nothing (DEC-838).
+with a read-the-handover-first line, and a new PostToolUse hook reminds a session once per context window, at 85 % of
+its window (the CTO's session: its model's window; leads and workers: at most 200,000 tokens), to write its checkpoint
+and update its files. It changes a kernel hook and adds one, so it goes through CIT-P (CAP-33). It sets no compaction
+threshold and stops nothing (DEC-838).
 
-**Status: DRAFT.** Round 1's review is READY (section 3), but the lead found one wrong path after it (section 3.3)
-and five older unit tests outside the ticket's paths are red by S1 (section 3.2). Both go to the CTO as packages. The
-sha256 column of section 2 is that of the round 1 head and will be rewritten at the ticket's final head.
+**Status: PROPOSED.** Round 1 was READY; the CTO decided its packages (section 3.2 to 3.4); round 2, the last
+(DEC-1010), is READY at `7894a35e116f` (section 3.5). The sha256 column of section 2 is that of the ticket's final
+head. The owner's approval (section 4) is pending.
 
 ## 1. Evidence and corroboration
 
@@ -48,12 +49,13 @@ Corroboration (official documentation, code.claude.com/docs/en/hooks and /model-
 
 ## 2. Proposal
 
-| File | Change | Base sha256 (at 1798e82f1201) | New sha256 (at 13fd1dd34e32, round 1) |
+| File | Change | Base sha256 (at 1798e82f1201) | New sha256 (at the final head, 7894a35e116f) |
 |---|---|---|---|
-| `template/governance/kernel/hooks/precompact.py` | One plain-text line on stdout on every run, for every role: `Begin the compaction summary with this line: "READ FIRST: <path> ..."`, naming the orchestrator's or lead's CHECKPOINT and its RESUME HERE section, or a worker's brief and record. The checkpoint record, the state block and the systemMessage on error are unchanged; the line comes first, the systemMessage after it | `eb0174da477ff6f4eab7ca5bb133c667079830aa5c5c64f8f8d8337ad8c95086` | `adde0bbeca5854d0da3fce5776f5db066a88a09301a1901b5cd7e8a37380605f` |
-| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the model's window (Opus, Sonnet, Haiku 5.5 and Fable 5.2: 1,000,000; others 200,000); at 85 % or more, once per session (a marker under `.gov-runtime/scratch/context_watch/`), additionalContext with the role's duties and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction. Any error: no output, exit 0 | none (new file) | `4f62182637698dbdf7f5d5c79480a3eb50be5505b6dc0418bd479dae5ca7ca18` |
-| `tests/unit/hooks/test_w2_176_precompact.py` | 16 unit cases (S1, F1) | none (new file) | n/a (tests) |
-| `tests/unit/hooks/test_w2_176_context_watch.py` | 34 unit cases (S2, S3, F1), including a 50 MB transcript under 100 ms (median 16.8 ms) | none (new file) | n/a (tests) |
+| `template/governance/kernel/hooks/precompact.py` | One plain-text line on stdout on every run, for every role: `Begin the compaction summary with this line: "READ FIRST: <path> ..."`, naming the orchestrator's or lead's CHECKPOINT and its RESUME HERE section, or a worker's brief and record. The checkpoint record, the state block and the systemMessage on error are unchanged; the line comes first, the systemMessage after it. `newest()` skips a file removed between listing and stat (R7) | `eb0174da477ff6f4eab7ca5bb133c667079830aa5c5c64f8f8d8337ad8c95086` | `ee19c22dc02e8ed7207dc535e55744e233d527635729a4d37ef252c8fa7e12cf` |
+| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the session's window (the table: Opus, Sonnet, Haiku 5.5 and Fable 5.2 1,000,000, others 200,000; the CTO's session, `GOV_ROLE` orchestrator on a `class: coordination` ticket, its model's window; every other session at most 200,000); skips events carrying `agent_id`; at 85 % or more, once per context window (a marker under `.gov-runtime/scratch/context_watch/`, removed when usage falls below 50 %), additionalContext with the role's duties (the CTO: RESUME HERE, DECIDED-NOT-DONE, `.gov-runtime/scratch/orchestrator/log/report-state.json`; a lead: its CHECKPOINT; a worker: its record) and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction. Any error: no output, exit 0 | none (new file) | `c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c` |
+| `tests/unit/hooks/test_w2_176_precompact.py` | 18 unit cases (S1, F1, R7) | none (new file) | n/a (tests) |
+| `tests/unit/hooks/test_w2_176_context_watch.py` | 47 unit cases (S2, S3, F1, R1, R2, P2, P4), including a 50 MB transcript under 100 ms (median 24.3 ms) | none (new file) | n/a (tests) |
+| `tests/unit/hooks/test_resume_hooks.py`, `tests/unit/hooks/test_w29_hooks.py` | Assert-only updates of five cases to S1's stdout form (the read-first line first, the JSON object on the last line); the CTO's P1 (a) | (existing) | n/a (tests) |
 
 The three options (DEC-105): apply now (recommended: the owner ordered it live for every session, DEC-1140 (1)(b));
 defer (sessions keep compacting with no read-first line and no reminder); re-baseline (none: no closed specification
@@ -83,13 +85,46 @@ finding). KPI lines S1, S2, S3, F1 and F2: pass. Findings, none blocking:
 `::test_precompact_appends_one_block_and_sessionstart_warns`, `::test_a_checkpoint_precompact_cannot_write_is_left_as_it_was`,
 `::test_a_write_that_fails_part_way_leaves_the_checkpoint_as_it_was` and
 `tests/unit/hooks/test_w29_hooks.py::TestPreCompactCombined::test_checkpoint_failure_reports_systemmessage`. Their
-assertions on the checkpoint and the message hold; only their stdout shape conflicts with S1. Package P1 to the CTO.
+assertions on the checkpoint and the message hold; only their stdout shape conflicts with S1. Package P1; the CTO
+decided (a): the two files joined the ticket's paths for assert-only updates, done at `317955a4b`.
 
 ### 3.3 Found by the lead after round 1
 
-`context_watch.py:70` names the CTO's report-state as `<root>/log/report-state.json`; the file is
-`.gov-runtime/scratch/orchestrator/log/report-state.json` (checked in the main tree on 2026-11-12). In scope (S2: the
-role's own list), ordinary work for the CTO. Package P2 to the CTO; a fix needs round 2 of the review (DEC-1010).
+`context_watch.py:70` named the CTO's report-state as `<root>/log/report-state.json`; the file is
+`.gov-runtime/scratch/orchestrator/log/report-state.json`. Package P2; the CTO decided (a): corrected, with R7, at
+`7894a35e1`.
+
+### 3.4 The CTO's decisions on run 1's packages (DEC-1112 (3), 2026-11-12, recorded in the ticket)
+
+P1 (a) and P2 (a) above; P3: R2 (subagent events skipped) and R1 (re-armed below 50 %) in this delta, not as ACT entry
+criteria; P4: leads and workers reminded against `min(model window, 200,000)` (DEC-1118 (A)), the CTO's own session
+against its model's window (DEC-1140 (4)), in this delta (it answers R5's DEC-1118 point). One fresh engineer batch
+(Opus 5.5, high, class C3, session `b33af278-3a0b-4622-b7f5-dd4ad3a7dd43`): tests first at `317955a4b`, code at
+`7894a35e1`.
+
+### 3.5 Round 2 (the last, DEC-1010): READY
+
+A fresh read-only independent auditor (Opus 5.5, high, class C3), probe head `7894a35e116f` against base
+`1798e82f1201`, session `c07b0a81-dbea-40e1-8ada-31dbf17a0330`. `verdict.py` reads its block as READY (True, no
+reasons). KPI lines S1, S2, S3, F1 and F2: pass; P1 to P4, R1, R2 and R7 checked as decided; the two older test files
+changed only in assertions; a hostile `GOV_TICKET` (traversal, missing, directory, oversized, `class:` past 4 KiB or
+in the body) falls to the 200,000 cap. One finding, not blocking:
+
+| id | where | finding | scope / ordinary work / consequence |
+|---|---|---|---|
+| R8 | `context_watch.py:126-129` | The window's marker is made before the reminder text is built; if building it fails (for a lead, the import of `checkpoint_rel` from `precompact.py` beside it), that window's reminder is spent silently until usage falls below 50 %. Only a partial copy or rename of the hooks folder reaches it | in / no / other |
+
+R3 and R6 stay recorded rows (ordinary work no, consequence other). R8 is recorded here; building the text before
+the marker closes it, a candidate for the registration ACT's entry criteria or a follow-up (no third round, DEC-1010).
+
+### 3.6 Verification at the final head
+
+`lead_verify` at `7894a35e116f`: 4005 tests, 7 failed, 6 skipped. P1's five reds are gone. One case,
+`tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request`,
+passed alone on a re-run (load-sensitive). Six `tests/unit/accept/test_w2_96_*` signal and timeout cases were also red
+at round 1's verification and alone then; neither those tests nor this delta reference the other (the delta changes no
+`src/` file), so they are not caused by this change. The engineer's runs: unit hooks folder 167 passed; W1-29, W1-49
+and W2-62 acceptance regression 147 passed.
 
 ## 4. Owner's approval
 
@@ -99,5 +134,5 @@ Pending. The owner approves the bytes of section 2 at the ticket's final head.
 
 After the owner's approval: the ticket's branch lands through the queue, and the CTO runs the class (b) ACT that
 registers `context_watch.py` under PostToolUse in `.claude/settings.json` (DEC-315; class-rules row
-agents-skills-kernel). R1 and R2 are entry criteria of that ACT (the reviewer's recommendation). The PreCompact
-registration is unchanged.
+agents-skills-kernel). R1 and R2 are closed in this delta (section 3.4); R8 may be named as that ACT's entry
+criterion. The PreCompact registration is unchanged.
