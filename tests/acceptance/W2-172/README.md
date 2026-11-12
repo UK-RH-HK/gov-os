@@ -49,9 +49,13 @@ read as the Interface says: they are called, never copied or changed.
   lines of the driver's own process (`python -m gov.memaudit run`) give the commands it really started, in order, and whose
   `open`, `os.listdir`, `os.scandir` and `os.walk` lines under the sets root must be none for the driver itself and are present
   for the launch script's process and for `preflight` (the spy is shown to see).
-- **Path hygiene (S1, F1):** every path that can appear on a printed command line holds none of `fixtures/`, `runs/`,
-  `indep-walls/` or `hidden` (`say`'s own refusal word); `conftest.clean_paths` asserts it before each world is used, and the
-  planted runs folder is `launch-log`.
+- **Path hygiene (S1, F1):** every path the test's world builds and that can appear on a printed command line (`sets`,
+  `repo`, `link`, `stub`, `gov`, `claude`, `gate_stub`, `shim`) holds none of `fixtures/`, `runs/`, `indep-walls/` or `hidden`
+  (`say`'s own refusal word); `conftest.clean_paths` asserts it before each world is used, and the planted runs folder is
+  `launch-log`. The repository's own location (`W.SRC`) and the interpreter (`sys.executable`) are not the world's: a clone
+  under `gov-os-runs/` (the merge queue's) is legal. The greps over printed lines and child argv (`W.forbidden_in_text`,
+  `W.forbidden_in_argv`) skip exactly one thing, the `sys.executable` token (the `<py>` first word of a step line, the first
+  element of an argv), and fail on a word anywhere else. Rewrite-Reason: the merge queue's clone path (21:19 ejection).
 - **No network, no GPU, no model, no store but the planted file.** No case is marked `local_only`; no test, class, parameter id
   or file name holds `real`, `green_here` or `time_limit`. The only cases that wait are the two gate cases (a poll of 1 second,
   at most 2 and 30), the two-runs-at-once case (a launch stub that sleeps 4 seconds) and the polls of the latter, all bounded.

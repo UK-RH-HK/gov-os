@@ -76,6 +76,9 @@ def test_s1_every_launch_line_names_only_the_sets_root_the_brief_and_its_hash_at
 
 
 def test_s1_the_printed_command_lines_hold_no_folder_of_the_sets_root(ran):
+    """Rewrite-Reason: the merge queue's clone path (21:19 ejection). The grep skips only the line's first word when it is
+    exactly ``sys.executable`` (``<py>``, Interface item 2): ``W.forbidden_in_text`` removes that one token, so a word in
+    any other token still fails, and an interpreter under ``gov-os-runs/`` does not."""
     world, run = ran("words")
     C.assert_ok(run)
     for path in (world.sets, world.repo, world.link, world.stub, world.gov, world.claude):
@@ -83,8 +86,7 @@ def test_s1_the_printed_command_lines_hold_no_folder_of_the_sets_root(ran):
     lines = W.step_lines(run)
     assert len(lines) == len(W.STEPS)
     for name, line in lines:
-        for word in W.FORBIDDEN:
-            assert word not in line, (name, word, line)
+        assert W.forbidden_in_text(line) == [], (name, line)
         assert str(world.sets) + "/" not in line, (name, line)
 
 

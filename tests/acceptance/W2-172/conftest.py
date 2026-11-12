@@ -40,10 +40,14 @@ def template(tmp_path_factory):
 
 
 def clean_paths(world: W.World) -> None:
-    """The precondition of S1/F1's substring grep: no path that can appear on a printed command line holds a folder
-    word of the sets root (nor ``hidden``, ``say``'s own refusal word)."""
-    for path in (world.sets, world.repo, world.link, world.stub, world.gov, world.claude, world.gate_stub, world.shim,
-                 W.SRC, sys.executable):
+    """The precondition of S1/F1's substring grep: no path the test's world builds, and that can appear on a printed
+    command line, holds a folder word of the sets root (nor ``hidden``, ``say``'s own refusal word).
+
+    The repository's own location (``W.SRC``) and the interpreter (``sys.executable``) are not the world's: no test prints
+    ``W.SRC``, and the interpreter's token is the one the greps let pass (``W.forbidden_in_text``). A clone under
+    ``gov-os-runs/`` (the merge queue's) is therefore not refused here.
+    Rewrite-Reason: the merge queue's clone path (21:19 ejection)"""
+    for path in (world.sets, world.repo, world.link, world.stub, world.gov, world.claude, world.gate_stub, world.shim):
         text = str(path) + "/"
         bad = [w for w in W.FORBIDDEN if w in text]
         assert not bad, f"{path} holds {bad}: rename the test or its folder (path hygiene)"
