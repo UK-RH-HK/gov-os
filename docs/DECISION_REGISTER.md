@@ -14727,6 +14727,69 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     W2-115b (`33b5651eb`).
 - **Basis:** the owner's message of 2026-11-12 ~14:10 answering the CTO's seven P1 packages.
 
+### DEC-1145 — W2-146's kernel path-map schema approved (CAP-33) at ebdbabd2e0d3; a non-compiling id form refused at use, the config check's gap a row
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1144 (3), DEC-1071 (5), DEC-1099 (2)
+- **Decision:**
+  - (1) **"W2-146 CIT-P approved at ebdbabd2e0d3"**, after reading the 15 added lines of
+    `template/governance/kernel/schemas/path-map.schema.json` (sha256 before `7a1a1cd8cbf6fb073e2e1eb6f816d2ba83e2b647e2dc94efb1dfa96f359a8469`,
+    after `d22efa5ada515c8cd0132b8c4960e7aa4d34d4e3fe345b07f576cedfba0fc7be`; record `docs/changes/W2-146-CIT-P.md`). W2-146 lands
+    through the queue at that commit (DEC-989).
+  - (2) **The owner's check, answered by the CTO:** `"format": "regex"` is enforced only by a validator given a format checker. A pattern
+    that does not compile is refused at use: `gov retrieve`'s reader (`gov.retrieval.lexical.id_forms`) stops with `CONFIG_INVALID` naming
+    `id_forms[<i>]` (acceptance: `tests/acceptance/W2-146/test_w2_146_reader.py`, the pattern `(`; the schema cases use
+    `Draft202012Validator(..., format_checker=FormatChecker())`). The project's own path-map check (`gov.config`, hand-written per W1-08)
+    does not read `id_forms`, so a broken form is caught at the first retrieve, not at check time: DECIDED-NOT-DONE row 174.
+- **Basis:** the owner's message of 2026-11-12 ~14:35.
+
+### DEC-1146 — A resource gate's refusal is a wait, not a refusal under the two-refusal rule (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:45, P1-I (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1142 (9), DEC-1088 (5)
+- **Decision:**
+  - (1) **A resource gate's refusal** (memory, CPU, disk, a heavy slot) is a wait, not a refusal under the two-refusal rule: the session
+    relaunches when the gate opens, without asking the owner. The two-refusal rule (DEC-1142 (9)) covers permission refusals: the guard,
+    the sandbox, a hook.
+  - (2) The P1-D check (DEC-1144 (4)) is relaunched once the CTO's merge checks free the gate.
+  - (3) Into the common lead brief beside the two-refusal rule.
+- **Basis:** P1-I; the P1-D reviewer and W2-152's re-probe each stopped after two memory-gate refusals (2026-11-12 14:05-14:28).
+
+### DEC-1147 — W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~15:00, P1-H (a); recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1145, DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"W2-152 CIT-P approved at 09fc68645c0c, after the fact":** `template/governance/kernel/schemas/facts.schema.json`, sha256 before
+    `be3e204355c0dd4c98cc584b72a1cef5eaa4733ca9a7feec8684b728026af7a6`, after `3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c`
+    (15 added, 1 removed: `ready` required, and the `ready.new_since` date property), on w2/integrate since the CTO's merge `b0bbd373f`
+    (2026-11-09 23:07). The missing record `docs/changes/W2-152-CIT-P.md` is written; then W2-152 closes through the queue.
+    **Corrected the same day (the CTO, DEC-861):** the CTO reported these bytes as unapproved since 11-09; in fact DEC-1116 (1) approved
+    them on 2026-11-10 within W2-128's set (TEMPLATES-APPROVAL-1's table lists `facts.schema.json` at `3141d5da...`), so they were
+    unapproved on w2/integrate for about a day, not three; DEC-1147 (1) is a second, explicit approval. The record was written by the
+    CTO (orchestrator), as W2-146's lead wrote W2-146's: the launcher refused a product-spec worker on an engineer ticket (DEC-995).
+  - (2) **To the owner next:** whether the facts file an adoption writes carries `ready.new_since` set to the adoption's own date, before
+    W2-27 (a fix if not); row 173's route (a kernel path needs an approval line before any merge, in the queue and in the CTO's hand-merge
+    check), without a new ticket; a scan of every commit on w2/integrate since 11-02 touching `template/governance/kernel/**`, each with its
+    approval line or none.
+- **Basis:** the owner's message of 2026-11-12 ~15:00 answering P1-H.
+
+### DEC-1148 — Five kernel files approved by their bytes; the adoption's facts file by W2-174 with the CTO filling a project's commands (a1); the kernel gate in the CTO's tools; W2-45 widened for two revisions
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~16:00-16:30; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1147 (2), DEC-974, DEC-105, DEC-1045, DEC-715, DEC-996 (2), DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"kernel bytes approved: adopt/SKILL.md 641a347b, pretooluse.py c2c8f0af, settings.json 3aaa82e5, secrets-indexing.yaml 8dae63e8,
+    test-map.schema.json 0e4105ef"** (full sha256: `641a347b9b14101dde711f3550f087e714e404575f780be2a3cd91ff2925102d`,
+    `c2c8f0af783a7e605113e0154dcf143eca63a34221293a325e5553904aa9e3a6`, `3aaa82e5b53aa4809fdfd38d442f4f00320bde2d133b022849c35c30a14ddf9a`,
+    `8dae63e8188b6b5498c1ce7fe36e2565dc38129ad0ff551ee16820ddb5567f83`, `0e4105ef08727a8598feabcb929627d598cac4e2e74bcde0e0e81355b9bdf384`),
+    after reading the diffs: W2-52's adopt-skill text (landed 11-12 03:07 without approval, against DEC-996 (2); `d71113b6` before it was
+    W1-41's text, W2-83a never built its clause, nothing lost); W2-110's guard hook; W2-56's settings rule (the `Bash(gov launch:*)` allow
+    approved knowingly, DEC-715); the scan switch's check line (DEC-1045 (4)); the test map's description (DEC-1050 (2)). The scan stays
+    off on this repository only (`governance/project/secrets.yaml`, DEC-1045); EXAMIN's adoption keeps it on (W2-27's line, (2)).
+  - (2) **Item 4 (a1):** W2-174 gains the facts-file KPI line and `src/gov/adopt/facts.py` (product defaults, named placeholders for a
+    command with no product form), its S3 fixture carries its own filled facts file; W2-27 gains one line (the copy's facts file holds
+    EXAMIN's commands, every role's brief builds there, the secrets scan stays on); W2-160 (`gov wait`) moves onto EXAMIN's path after
+    W2-159 lands; a row for the three commands (`lead_verify`, `launch_worker`, `wait_for`) the kernel facts schema requires.
+  - (3) **Item 5 (a):** the kernel gate in the CTO's own tools (`kernel_gate.py`, the approved list `kernel-approved.txt`, called by
+    `land.py` before any enqueue and by `hand_merge_check.sh` before any merge) today, with its one review; the product queue
+    (`merge_queue.py`) by ACT later.
+  - (4) **Item 6 (a), P1-J:** W2-45 widened by `tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py` and
+    `tests/unit/ci/test_ci_command.py` for one revision each, each with its Rewrite-Reason (P-W2-45-1 items 2 and 5).
+- **Basis:** the owner's messages of 2026-11-12 ~16:00 and ~16:30.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14808,3 +14871,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
 | 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
 | 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
+| 0.528 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1145 (W2-146's kernel path-map schema approved at ebdbabd2e0d3; a non-compiling id form refused at use, the config check a row), DEC-1146 (a resource gate's refusal is a wait, not a two-refusal refusal; standing). Next free id: DEC-1147. |
+| 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |
+| 0.530 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1148 (five kernel files approved by their bytes; the adoption's facts file (a1), W2-27's line, W2-160 onto the path; the kernel gate in the CTO's tools; W2-45 widened for two revisions). Next free id: DEC-1149. |

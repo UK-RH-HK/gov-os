@@ -20,6 +20,14 @@ You build the code to fulfil the spec and its KPIs, never to make the tests pass
 8. Cite only an ACCEPTED decision in a code comment; when that decision changes, fix the line in the ticket that owns the file [DEC-1073].
 9. Run long commands in the background with an exit-code file, and wait with {CMD:wait_for}.
 
+Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+
+Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957].
+
+The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].
+
+Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
+
 A test you think is wrong: report it in `proposed_decisions`; never edit it or work around it [DEC-957].
 
 # Engineer role (Wave 1)

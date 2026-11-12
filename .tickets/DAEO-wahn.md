@@ -1,6 +1,6 @@
 ---
 id: DAEO-wahn
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-t8mp, DAEO-k7hz, DAEO-h4rh]
 created: 2026-11-11T20:00:00Z
