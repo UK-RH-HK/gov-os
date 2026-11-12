@@ -258,19 +258,61 @@ def _once(objects: _Objects, key: tuple, make):
     return objects.known[key]
 
 
+def _changes(root: Path) -> dict[str, tuple[str, frozenset]]:
+    """For every commit of ``HEAD`` with one parent: ``(parent, the Markdown paths it changes against it)``, learnt
+    in one pass of git over the history (no rename detection). A commit with no parent or several is not listed;
+    where git cannot give the pass, nothing is listed and every commit is read as it was before."""
+    try:
+        raw = _git(root, "log", "--no-abbrev", "--no-notes", "--no-show-signature", "--no-color", "--no-renames",
+                   "--diff-merges=off", "-r", "--raw", "-z", "--format=%x01%H %P", "HEAD")
+    except GovError:
+        return {}
+    changes, current, expect_path = {}, None, False
+    for token in raw.split(b"\0"):
+        if expect_path:  # the path of the entry whose mode line came just before
+            expect_path = False
+            if current is not None and token.endswith(b".md"):
+                current[1].add(token.decode("utf-8", "replace"))
+            continue
+        token = token.lstrip(b"\n")
+        if token.startswith(b"\x01"):  # a commit: its id and its parents
+            names = token[1:].decode("ascii", "replace").split()
+            current = None
+            if len(names) == 2:
+                current = changes[names[0]] = (names[1], set())
+        elif token.startswith(b":"):  # an entry of the commit's diff, its path comes next
+            expect_path = True
+    return {commit: (parent, frozenset(paths)) for commit, (parent, paths) in changes.items()}
+
+
 def _approved(root: Path, objects: _Objects, path: str, record_id: str) -> bool:
     """Whether the decision ``record_id`` that ``HEAD`` holds ACTIVE at ``path`` carries the owner's fact.
 
     Walked by ancestry from ``HEAD``. A commit that continues the ACTIVE decision of its parents (``_held``) is
-    approved as they are; the commit that is the change is approved by its own trailer."""
+    approved as they are; the commit that is the change is approved by its own trailer.
+
+    A commit with one parent that leaves the file at ``path`` as its parent has it continues that parent, which
+    holds the same decision ACTIVE (every commit of the walk does): such a commit is passed over without a read
+    (``_changes``), so the walk reads only the commits that change the file or that are not plain."""
     start = (objects.read("HEAD")[0], path)
     if objects.file(*start)[0] is None:  # a path the batch cannot ask for
         return False
+    changes = _once(objects, ("changes",), lambda: _changes(root)) \
+        if objects.file(*start)[1:] == (record_id, "ACTIVE") else {}
+
+    def settle(at: tuple) -> tuple:
+        commit, file = at
+        while commit in changes and file not in changes[commit][1]:
+            commit = changes[commit][0]
+        return commit, file
+
+    start = settle(start)
     held, passes, todo = {}, {}, [start]
     while todo:  # a commit is settled after the parents it continues
         at = todo[-1]
         if at not in held:
-            held[at] = _held(root, objects, *at, record_id)
+            before, change = _held(root, objects, *at, record_id)
+            held[at] = [settle(older) for older in before], change
         before, change = held[at]
         todo += [older for older in before if older not in passes]
         if todo[-1] != at:
