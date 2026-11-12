@@ -67,8 +67,22 @@
 # 00:25 b2f0511f: W2-52 run 6 (P-9 (a) decided; one test-design batch; the old probe holds)
 # returned (log exists), retired 00:59 b2f0511f: W2-52 DAEO-siiz W2-52-A5-r6.md W2-52-A5-r6.json
 # 00:35 b2f0511f: W2-110 run (P-W2-110-5 (a): W2-105's fixture roster by a test designer)
-W2-110 DAEO-3r1j W2-110-A5-r2.md W2-110-A5-r2.json
+# returned (log exists), retired 01:58 b2f0511f: W2-110 DAEO-3r1j W2-110-A5-r2.md W2-110-A5-r2.json
 # 00:47 b2f0511f: W2-176 run 2 (run 1's P1-P4 decided; review round 2 the last)
-W2-176 DAEO-ktiw W2-176-A5-run2.md W2-176-A5-run2.json
+# returned (log exists), retired 01:58 b2f0511f: W2-176 DAEO-ktiw W2-176-A5-run2.md W2-176-A5-run2.json
 # 00:51 b2f0511f: W2-23 run 4 (P-W2-23-7 (a): round 2 on S3, the last)
-W2-23 DAEO-kmcr W2-23-A5-run4.md W2-23-A5-run4.json
+# returned (log exists), retired 01:58 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run4.md W2-23-A5-run4.json
+# 01:36 b2f0511f: W2-121 run 1 (DEC-1140 (5); claimed; class C2)
+# returned (log exists), retired 01:58 b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run1.md W2-121-A5-run1.json
+# 01:36 b2f0511f: W2-173 run 1 (DEC-1140 (5); claimed; class C3)
+# returned (log exists), retired 01:58 b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run1.md W2-173-A5-run1.json
+# 01:41 b2f0511f: W2-171 run 1 (DEC-1140 (5); the slot W2-121's packages freed; class C2)
+# returned (log exists), retired 01:58 b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run1.md W2-171-A5-run1.json
+# 01:58 b2f0511f: W2-121 part a run 2 (split and Interface decided aafa67f74; class C2)
+# returned (killed by the 02:00 network outage), retired 02:15 b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run2.md W2-121-A5-run2.json
+# 02:13 b2f0511f: W2-173 resume after the 02:00 network outage (workers done)
+# returned PACKAGES 02:40, retired b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run1b.md W2-173-A5-run1b.json
+# 02:13 b2f0511f: W2-121 part a run 2 again after the 02:00 network outage
+W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json
+# 02:46 b2f0511f: W2-173 run 2 (P-1 (a) decided 70e5840d9)
+W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json

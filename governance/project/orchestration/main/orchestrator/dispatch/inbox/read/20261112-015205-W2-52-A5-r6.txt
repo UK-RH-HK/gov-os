@@ -1,0 +1,8 @@
+log: W2-52-A5-r6.json
+W2: W2-52
+status: DONE. The head to land is a77ef5f20089; `git status --short` is empty. W2-52's suite passes 65/65 outside the sandbox. lead_verify has 10 reds: 8 pass alone, and 2 come from this worktree's folder being named `W2-52`.
+
+task: W2-52 (DAEO-siiz) run 6: one test-design batch per the CTO's P-9 (a), merge it, run lead_verify.sh, return DONE with the head to land (no fresh review).
+status: DONE. The head to land is a77ef5f20089; `git status --short` is empty. W2-52's suite passes 65/65 outside the sandbox. lead_verify has 10 reds: 8 pass alone, and 2 come from this worktree's folder being named `W2-52`.
+work_completed:
+- **Batch 1 (td-2):** added W2-52 to `_CBM_SUITES` in `tests/conftest.py`, with the docstring and comment mentions as in 5fc7681a1. The embedding stand-in now answers the device listing (`/api/ps`, m

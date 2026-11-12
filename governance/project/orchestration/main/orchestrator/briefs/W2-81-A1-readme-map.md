@@ -68,7 +68,7 @@ what you changed.
 - Single simple commands; edit with the Edit tool. A refusal is taken, not routed round; **refused twice for the same call:
   stop and say so**. Hidden-half rule as in `EMG-common.md`: never `~/gov-os-eval/`, `~/gov-os-runs/`, folders named
   `hidden` or `memory-verdict`.
-- Estimate: 20 minutes, mostly the two runs. Context: hand over past about 200k tokens.
+- Estimate: 20 minutes, mostly the two runs. Context: there is no token cap (the owner, 2026-11-12, replacing DEC-1118 (A)).
 
 ## Return
 The twelve fields first, as labelled lines at the start of their own lines, short: task, status, work_completed,

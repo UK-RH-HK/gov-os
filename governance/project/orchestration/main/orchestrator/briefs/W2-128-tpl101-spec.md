@@ -46,5 +46,5 @@ add `class` to the ticket template as version 1.0.1; the owner approves its hash
 - `EMG-common.md` holds, its hidden-half rule included. No GPU, no installs, no other test runs. Never
   `git worktree prune`. Single simple Bash commands. Any wait by pid only, never a name match.
 - Row W2-L423's rule: under `.gov-runtime/`, commit hashes are written as 12 digits and none of that rule's keywords.
-- If your context passes ~200k tokens, commit what is done, write a hand-over note in your return and stop.
+- Context: there is no token cap: use your model's full window; before compaction the hook writes your checkpoint and the summary opens with the read-first line (the owner, 2026-11-12, replacing DEC-1118 (A)).
 - Estimate: 20 minutes. Return the twelve fields, short.

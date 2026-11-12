@@ -1,0 +1,7 @@
+log: W2-121-A5-run1.json
+W2: W2-121
+status: PACKAGES
+
+task: DAEO-cb2b (W2-121)
+status: PACKAGES
+work_completed: Did the first calls: identity is orchestrator/DAEO-cb2b, the tree is /home/usain/gov-os-worktrees/W2-121 on w2/W2-121, and there was no checkpoint. Read the ticket, DEC-1007, DEC-1008, the command-module rules in `src/gov/cli/main.py`, `src/gov/launch/command.py`, `src/gov/resources/{slots,config,gate}.py`, and the README and sizes of the reference dispatcher. I launched no worker, because the ticket fails the interface check and the paths check, and it cannot be built in one run. The brief says to return PACKAGES in that case rather th

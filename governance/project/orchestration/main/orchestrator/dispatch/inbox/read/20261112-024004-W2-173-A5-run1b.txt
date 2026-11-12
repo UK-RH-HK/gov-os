@@ -1,0 +1,10 @@
+log: W2-173-A5-run1b.json
+W2: W2-173
+status: PACKAGES
+
+task: DAEO-qz4p (W2-173), ticket lead, build run 1, resumed after the 02:00 network outage
+status: PACKAGES
+work_completed:
+- Resumed from CHECKPOINT.md. I did not relaunch td-1 or eng-1: both had exited 0 and I read their returns from their logs. Both returned PACKAGES over the same conflict between S5 and the other KPI lines.
+- Run 1's lead had already merged the tests at b6d2f6f90 (TESTS-READY written 01:59) and rebuilt the slot (02:00).
+- I ran lead_verify on b6d2f6f90668. Result: RED, 3856 tests, 8 failed, 0 errors, 6 skipped. W2-173's acceptance is 79/79 passed and its unit file 28/28 pa

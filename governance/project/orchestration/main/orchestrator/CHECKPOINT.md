@@ -1,6 +1,29 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-12 01:10 UTC: session `b2f0511f`; next free id DEC-1141 (DEC-1140 recorded `566c26beb`)
+## RESUME HERE — 2026-11-12 02:50 UTC: session `b2f0511f`; the owner sleeps until 08:00; next free id DEC-1142 (DEC-1141 `decee2eaf`)
+**Read the 01:10 block below too; this block replaces it where they differ.**
+- **The owner (DEC-1141):** W2-11's K3 CIT-P approved `dca382f3069f`; W2-176's approval withdrawn (its cap): new bytes after the
+  no-cap engineer (pid 3275711, log `~/gov-os-worktrees/W2-176/.gov-runtime/scratch/lead/log/W2-176-A2-nocap.json`) and a delta
+  review; **no token cap for any session** (40 briefs fixed, originals `drafts/no-cap-20261112/briefs-before/`; register, DIF,
+  START-NEXT-SESSION, DND row 98, W2-176's ticket committed); rule 11's edit is the owner's (text in the chat of 02:30); hand
+  merges of W2-175 and W2-176 allowed (S6/units first); **no operator run tonight**; the operator agent asleep only during the
+  nightly (ACT-OPERATOR-HOURS-1 being built, `drafts/operator-hours-1/`, first item at 08:00; the old hours came from
+  ACT-OPERATOR-1's crontab under DEC-1104 (2), (5), aligned to the quiet hours). Push the owner only for the 99 % reset.
+- **The freeze is lifted** (`log/act-in-progress.ended-20261112-0248.txt`). The night hold: no commit on integrate and no new lead
+  from 03:00 until the nightly ends.
+- **Yes lines received:** ACT A (23:38), ACT-CLAUDE-COPIES-4 (02:33), ACT-CLAUDE-COPIES-5 (02:34). **Missing:** ACT-DISPATCH-1
+  `a20754dd`, ACT-IDLE-GUARD-2 `a3fe076c`. ACT-CONTEXT-WATCH-1 (review READY on the old hook hash) is rebuilt on the new bytes.
+- **For 08:00, one ordered list:** (1) ACT-OPERATOR-HOURS-1; (2) the two missing yes lines; (3) one by-hand message: ACT A,
+  ACT-CLAUDE-COPIES-4, ACT-DISPATCH-1, ACT-IDLE-GUARD-2, then (after the CTO's W2-11 and W2-175 hand merges) ACT-CLAUDE-COPIES-5;
+  (4) decisions: W2-176's new hook bytes; P-W2-23-8 ((a)); rule 11's edit; W2-121 parts a+b vs K9; W2-148 S15 ((2));
+  ACCEPTED-REDS-1; PATHMAP-EXP-1; ACT-IDLE-GUARD-2's parked list (mine); ACT-DISPATCH-1's F2 6-hour reminder.
+- **Leads:** W2-115 run 2 (brake cleared to 45), W2-121 part a run 2b, W2-173 run 2 (released 02:46). W2-52 DONE: land queued
+  02:48 (`W2-52=a77ef5f20089`). W2-23 waits for P-W2-23-8. W2-171 waits for its Interface (`drafts/w2-171-iface/INTERFACE.md`,
+  ten open items). Queue of after-the-nightly work: `drafts/after-done/QUEUE.md`.
+- **Watchers:** inbox waiter, helper_watch, sentinel_check, bare_watch, store backstop, usage_log, usage_lines (97/99), the
+  hourly measure_week record; digests CronCreate 09:02 and 18:02 (the owner resumes at 08:00).
+
+## RESUME HERE (history) — 2026-11-12 01:10 UTC: session `b2f0511f`; next free id DEC-1141 (DEC-1140 recorded `566c26beb`)
 **Read the 22:25 block below too; this block replaces it where they differ.**
 - **The owner tonight:** DEC-1139 (W2-175 approved); DEC-1140 (usage first: RUBRIC-2 at every launch, quiet notices,
   context awareness back; then ACT A, the dispatcher's cap, F1-F3, row 159, W2-115; measuring from 11-02; the CTO session

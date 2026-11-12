@@ -1,0 +1,311 @@
+{
+  "ticket": "DAEO-52ku",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "pass",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "pass",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-5",
+      "outcome": "pass",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-6",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-7",
+      "outcome": "pass",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-8",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-9",
+      "outcome": "pass",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 1
+    },
+    {
+      "kpi": "success-10",
+      "outcome": "fail",
+      "passed": 4,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-11",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 1
+    },
+    {
+      "kpi": "success-12",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 1
+    },
+    {
+      "kpi": "success-13",
+      "outcome": "fail",
+      "passed": 1,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-14",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-15",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-16",
+      "outcome": "fail",
+      "passed": 9,
+      "failed": 2,
+      "skipped": 2
+    },
+    {
+      "kpi": "success-17",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-18",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-19",
+      "outcome": "pass",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-20",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-21",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-22",
+      "outcome": "pass",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-23",
+      "outcome": "pass",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-24",
+      "outcome": "pass",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-25",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 9
+    },
+    {
+      "kpi": "success-26",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "kpi": "success-27",
+      "outcome": "pass",
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-28",
+      "outcome": "pass",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 1
+    },
+    {
+      "kpi": "success-29",
+      "outcome": "pass",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "kpi": "success-30",
+      "outcome": "pass",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-31",
+      "outcome": "pass",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 17
+    },
+    {
+      "kpi": "failure-1",
+      "outcome": "pass",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-2",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-3",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-4",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-5",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-6",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-7",
+      "outcome": "fail",
+      "passed": 2,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-8",
+      "outcome": "fail",
+      "passed": 1,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-9",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-10",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-11",
+      "outcome": "pass",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 8
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 168,
+    "failed": 6,
+    "skipped": 35
+  }
+}

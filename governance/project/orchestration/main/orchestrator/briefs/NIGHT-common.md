@@ -23,5 +23,5 @@ which part is yours.
   DEC-1124 (Q23), DEC-1125 (the latency a named red; the memory audit weekly; tonight).
 - **Plain language** in what the owner reads (`docs/style/PLAIN-LANGUAGE.md` if present): short sentences, no
   invented jargon, figures with units.
-- **Context:** hand over past about 200k tokens (DEC-1118): write what you have and what remains in your return.
+- **Context:** there is no token cap: use your model's full window; before compaction the hook writes your checkpoint and the summary opens with the read-first line (the owner, 2026-11-12, replacing DEC-1118 (A)).
 - **Return** the twelve fields as in `EMG-common.md`, short; the payload after.

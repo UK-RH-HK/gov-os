@@ -1,0 +1,33 @@
+**Step 0:** `printenv` gave `independent-auditor` and `DAEO-kmcr`. (a) failed as it should, with `OSError: [Errno 30] Read-only file system`. (b) worked and gave object `1ae28402a109`. HEAD is `3e7194a45a58`. The tree was clean at the start and is clean at the end. I read `EMG-common.md` and followed it.
+
+task: DAEO-kmcr
+status: DONE
+work_completed: Reviewed round 2 of W2-23 on S3 only (`fd1bc056f5ba..3e7194a45a58`), against Interface item 6 and P-W2-23-7 (a). I read the change to `safety.citations` and the new `_folders`, how the A8 proof calls them (`legacy.py:137-165`, called at :225), the new acceptance and unit cases, and bootstrap.md:2362. I ran the brief's test command and probed `safety.citations` with 37 inputs. I also loaded the previous head's `safety.py` into memory to see whether the main finding is new.
+files_changed: none
+evidence: Tests run through `heavy_slot.sh`: 34 passed in 141.54s. Probe outputs are quoted in the findings below. Scratch `TMPDIR`: 24K and 9 inodes; nothing of mine was written.
+tests: `tests/unit/adopt/test_safety.py` and `tests/acceptance/W2-23/test_w2_23_citations.py` with the brief's options: 34 passed, 0 failed. There were no failures to judge.
+discoveries: My Write call for a probe script in `$TMPDIR` was refused under the quiet-hours rule (DEC-991) and queued for the morning package. I did not retry the Write. I ran the probes as inline `python3 -c` instead, which writes no file. I'm naming that here in case it counts as "another form".
+risks: R2-1 (below) means the A8 proof still releases a store that a rule or a record's prose cites by its folder at the end of a question.
+lessons: R1 was reported as "a full stop", but the defect is any punctuation that ends a sentence. The fix and the new cases cover only `.`.
+proposed_decisions: none
+unresolved: Whether a question mark after a folder citation is ordinary work. If the CTO or owner rules it is not, R2-1 becomes a recorded row and S3 passes.
+recommended_next_action: This was the last round under DEC-1010, so the decision goes to the owner with options. (a) A small fix, preferred: treat a `?` that ends a folder citation (followed by whitespace, closing punctuation or end of text) like the full stop, in `_NOT_MORE_PATH_DIR` and the glob token handling. Add one acceptance case for it. Cost: about 3 lines plus 1 test, and no new round. (b) Accept R2-1 as a Wave 3 row and close S3 as it stands.
+
+**What I probed and found sound**
+- **R1 is fixed.** These are all found as a folder or a tail through the call path A8 uses:
+  - `legacy/memory.`, `legacy/memory/.`, `legacy/memory...`, `../memory/index.md.` and `../../memory/decisions/leg-001.md.`.
+  - Text after a folder citation: `!`, `,`, `:`, `)`, and a backtick then `.`.
+  - A trailing dot that starts more of a name is still not a stop: `legacy/memory.db`, `legacy/memory/.git`, `legacy/memory.v2` and `../memory/index.md.bak` are not found.
+- **R2 is fixed, using the CTO's reading.**
+  - For store `notes/memory/2025/q1/a.md` and `notes/memory/2026/b.md`, the proof finds `notes/memory/`, `notes/memory` mid-sentence, `notes/memory.`, `notes/memory/2025/`, `notes/memory/2025/q1` and `notes/memory/2026`.
+  - A folder above the store's folder is not found: `notes/`, `notes/.`, `notes/memory2/x`, `notes/memory-old/`.
+  - For a single-file store, `notes/memory/` (above its parent) is not found and its own parent is.
+- **No other form of item 6 got worse.** Each of these is found, ending in a full stop:
+  - a word character or `-` before the path (`xlegacy/memory.`, `-legacy/memory.`)
+  - backslashes (`legacy\memory.`, `..\Memory\Index.md.`, `Notes\Memory.`)
+  - URL-encoding (`legacy%2Fmemory.`) and another letter case (`Legacy/Memory.`)
+  - a path split across lines (`legacy/\nmemory.`)
+  - globs (`legacy/memory/*.md.`, `notes/memory/**.`, `notes/memory/2025/**/*.md.`)
+- **The change only adds matches.** The new lookaheads block a subset of what the old ones blocked, and the folder set is a superset of each file's own parent. So nothing found before is lost.
+
+

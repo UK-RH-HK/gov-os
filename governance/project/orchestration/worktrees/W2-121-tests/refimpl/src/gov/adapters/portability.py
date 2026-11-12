@@ -1,0 +1,423 @@
+"""Adapter/model-portability check (CAP-38.b): the kernel, the rulesync sources and the generated adapters agree.
+
+Three comparisons, each a finding when it fails or cannot be made:
+1. the installed rulesync with the version the project's tool registry expects (DEC-127);
+2. each kernel role and kernel skill file with its source under ``.rulesync/``, and a role's tools
+   with its source's ``claudecode.tools`` (DEC-471);
+3. the generated files, byte for byte, with what rulesync generates from the sources into an empty
+   temporary folder; a file of the generated folders that rulesync does not write has no source.
+   When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
+   applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
+A role with a kernel role template (W2-153, DEC-1050) has its source compared with ``compose(root, role)``: the
+source's own rulesync front matter, with the role's skills list under ``claudecode: skills:`` (where rulesync passes
+it to the generated agent, DEC-1112 (3)), the template's body, one blank line and the role file's body (S3 amended,
+DEC-1112 (3)), so the agent carries the role file's labelled fields.
+The generated template copies under ``.claude/templates/`` are compared byte for byte with the kernel's templates;
+``--write-templates <dir>`` writes those copies into ``<dir>`` (the copies' folder itself), the ACT's step.
+And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
+and matchers with the paths normalised (DEC-805), except that postToolUse and postToolUseFailure, which ACT 1
+lifted from the repository's source only, are no drift while the template alone has them (DEC-971 item 3; it
+ends with W2-08, when they return).
+
+Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+import yaml
+
+from gov.guard import heldout
+from gov.launch.launcher import ROLE_TEMPLATES, TEMPLATES_REL
+
+REGISTRY = "governance/project/tool-registry.yaml"
+KERNEL_ROOTS = ("governance/kernel", "template/governance/kernel")  # adopted project, this repository
+SOURCES = ".rulesync"
+HOOKS_SOURCE = "hooks.jsonc"
+# The two hook events ACT 1 lifted from the repository's hooks source and not the template's (DEC-953 item 2):
+# no drift while only the template has them (DEC-971 item 3). It ends with W2-08: once they are back in both
+# sources they are compared as any other event, and this constant goes.
+LIFTED_HOOK_EVENTS = frozenset({"postToolUse", "postToolUseFailure"})
+GENERATE = ("generate", "--targets", "claudecode,agentsmd",
+            "--features", "rules,hooks,permissions,subagents,commands,skills", "--input-roots")
+GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
+TOOLS = frozenset("Agent Bash Edit Glob Grep NotebookEdit Read Skill Task TodoWrite WebFetch WebSearch Write".split())
+TOOLS_FIELD = re.compile(r"^[-*]\s+\*\*Tools:?\*\*:?(.*(?:\n[ \t]+\S.*)*)", re.MULTILINE)
+# Seconds, for each of the two rulesync calls (W2-57). Measured beside a 40-worker parallel run at loads up to 48:
+# --version took at most 2.3 s and generate 4.2 s, yet closes saw a call pass 10 s. Both calls at their limits,
+# with the check's own work, still end inside the 60 s gov check gives a declaration that states none (runner.py),
+# so a call that never answers ends the check red with its own finding, not cut off by the runner.
+TIME_LIMIT = 25
+# W2-153 S3 (DEC-1050): the kernel skills each role's subagent preloads, from the ticket (not the templates' own
+# front matter).
+ROLE_SKILLS = {
+    "engineer": ["test-driven-development"],
+    "independent-test-designer": ["test-design"],
+    "independent-auditor": ["audit"],
+    "product-spec": ["change"],
+    "research": ["discovery"],
+    "orchestrator": ["orchestration"],
+}
+# W2-153 S4: the kernel templates copied byte for byte into .claude/templates/ (written only by an ACT, DEC-315).
+TEMPLATE_COPIES = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                   "role-reviewer", "role-lead", "role-cto")
+
+
+def _finding(code: str, message: str, file: str | None = None) -> dict:
+    return {"code": code, "message": message, **({"file": file} if file else {})}
+
+
+def _expected_version(root: Path) -> tuple[str | None, str]:
+    """The rulesync version the tool registry records, or ``(None, reason)``."""
+    try:
+        data = yaml.safe_load((root / REGISTRY).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
+        return None, f"{REGISTRY} cannot be read ({type(exc).__name__})"
+    tools = data.get("tools") if isinstance(data, dict) else None
+    for entry in tools if isinstance(tools, list) else []:
+        if isinstance(entry, dict) and entry.get("name") == "rulesync" and entry.get("version"):
+            return str(entry["version"]), ""
+    return None, f"{REGISTRY} has no rulesync entry with a version"
+
+
+def _find_rulesync() -> str | None:
+    explicit = os.environ.get("RULESYNC_BIN")
+    if explicit:
+        return explicit if os.path.isfile(explicit) else None
+    return shutil.which("rulesync")
+
+
+def _run(binary: str, *args: str, cwd: Path) -> tuple[int | None, str, str]:
+    """``(exit code, stdout, stderr)``; the exit code is None when rulesync gave no answer."""
+    try:
+        done = subprocess.run([binary, *args], capture_output=True, text=True, cwd=str(cwd),
+                              timeout=TIME_LIMIT, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        return None, "", f"no answer within {TIME_LIMIT} seconds"
+    except OSError as exc:
+        return None, "", str(exc)
+    return done.returncode, done.stdout, done.stderr
+
+
+def _version_finding(root: Path, binary: str | None) -> dict | None:
+    """Comparison 1. None only when the installed version is the expected one."""
+    expected, reason = _expected_version(root)
+    if expected is None:
+        return _finding("RULESYNC_VERSION_UNKNOWN", f"{reason}: the expected rulesync version is not known")
+    if binary is None:
+        return _finding("RULESYNC_ABSENT", f"rulesync not found (expected version {expected})")
+    code, out, err = _run(binary, "--version", cwd=root)
+    if code != 0:
+        return _finding("RULESYNC_FAILED", f"rulesync --version: {(err or out).strip() or f'exit {code}'}")
+    if out.strip() != expected:
+        return _finding("RULESYNC_VERSION_DIFFERS",
+                        f"installed rulesync is {out.strip()}, {REGISTRY} expects {expected}")
+    return None
+
+
+def _split(path: Path) -> tuple[object, str]:
+    """``(frontmatter, body)`` of a Markdown file. The blank lines between the frontmatter and the
+    first line of the body are dropped: rulesync drops them, and it is the one tolerated difference."""
+    return _split_text(path.read_text(encoding="utf-8"))
+
+
+def _split_text(text: str) -> tuple[object, str]:
+    """``_split`` on a file's text."""
+    end = text.find("\n---", 3) if text.startswith("---") else -1
+    if end < 0:
+        return None, text.lstrip("\n")
+    try:
+        front = yaml.safe_load(text[3:end])
+    except yaml.YAMLError:
+        front = text[3:end]
+    return front, text[end + 4:].partition("\n")[2].lstrip("\n")
+
+
+def _tools_difference(role_body: str, front: object) -> str:
+    """Empty when the tool names in the kernel role's Tools field (whole words, from the label to the
+    end of its indented lines) are the set of the source's ``claudecode.tools``; else the difference."""
+    field = TOOLS_FIELD.search(role_body)
+    adapter = front.get("claudecode") if isinstance(front, dict) else None
+    listed = adapter.get("tools") if isinstance(adapter, dict) else None
+    if field is None or not isinstance(listed, list):
+        return "no Tools field in the kernel role" if field is None else "the source states no claudecode.tools"
+    kernel, source = set(re.findall(r"[A-Za-z]+", field.group(1))) & TOOLS, {str(tool) for tool in listed}
+    if kernel == source:
+        return ""
+    return f"only in the source {sorted(source - kernel)}, only in the kernel role {sorted(kernel - source)}"
+
+
+def _kernel(root: Path) -> Path | None:
+    return next((root / rel for rel in KERNEL_ROOTS if (root / rel).is_dir()), None)
+
+
+def _role_template(kernel: Path, role: str) -> Path | None:
+    """The kernel role template a role's source is composed from (W2-153 S3); None for a role with none."""
+    stem = ROLE_TEMPLATES.get(role)
+    template = kernel / "templates" / f"{stem}.md" if stem else None
+    return template if template is not None and template.is_file() else None
+
+
+def _front_block(text: str) -> str:
+    """The front matter of a Markdown file's text as written, its closing ``---`` line included; empty for none.
+    Its end is found as ``_split`` finds it."""
+    end = text.find("\n---", 3) if text.startswith("---") else -1
+    return "" if end < 0 else text[:end + 4] + text[end + 4:].partition("\n")[0] + "\n"
+
+
+def compose(root: Path | str, role: str) -> str:
+    """The full text a role's rulesync source must have (W2-153 S3 amended, DEC-1112 (3)): the source's own rulesync
+    front matter as written (with ``claudecode.skills``), one blank line, the kernel role template's body, one blank
+    line, and the kernel role file's body, its front matter (if any) stripped by ``_split``. A role without a
+    template has the role file's body alone after the front matter. The check compares each source with this text,
+    and the copies ACT's builder writes it. Raises ``FileNotFoundError`` without a kernel, a role file or a source."""
+    root = Path(root)
+    kernel = _kernel(root)
+    if kernel is None:
+        raise FileNotFoundError(f"no kernel folder under {root} ({' or '.join(KERNEL_ROOTS)})")
+    role_body = _split(kernel / "roles" / f"{role}.md")[1]
+    front = _front_block((root / SOURCES / "subagents" / f"{role}.md").read_text(encoding="utf-8"))
+    template = _role_template(kernel, role)
+    body = role_body if template is None else _split(template)[1].rstrip("\n") + "\n\n" + role_body
+    return front + "\n" + body if front else body
+
+
+def _skills_difference(role: str, front: object) -> str:
+    """Empty when the source's ``claudecode.skills`` list is the role's (an absent list is empty) and the source has
+    no top-level ``skills:``, which rulesync 24.0.0 drops (DEC-1112 (3)); else what differs."""
+    front = front if isinstance(front, dict) else {}
+    if "skills" in front:
+        return f"a top-level skills list {front['skills']!r}, which rulesync drops; it belongs under claudecode"
+    adapter = front.get("claudecode")
+    listed = adapter.get("skills", []) if isinstance(adapter, dict) else []
+    expected = ROLE_SKILLS.get(role, [])
+    if isinstance(listed, list) and sorted(str(skill) for skill in listed) == sorted(expected):
+        return ""
+    return f"the source lists {listed!r} under claudecode, the role's are {expected!r}"
+
+
+def _template_findings(root: Path) -> list[dict]:
+    """W2-153 S4: each kernel template of ``TEMPLATE_COPIES`` has a byte copy under ``.claude/templates/``; a copy
+    missing or differing is a finding naming it. None where the kernel holds no templates."""
+    kernel = _kernel(root)
+    if kernel is None or not (kernel / "templates").is_dir():
+        return []
+    findings = []
+    for stem in TEMPLATE_COPIES:
+        kept, copy = kernel / "templates" / f"{stem}.md", root / TEMPLATES_REL / f"{stem}.md"
+        if not kept.is_file():
+            continue
+        rel, origin = f"{TEMPLATES_REL}/{stem}.md", str(kept.relative_to(root))
+        if not copy.is_file():
+            findings.append(_finding("TEMPLATE_COPY_MISSING", f"no copy of {origin}", rel))
+        elif copy.read_bytes() != kept.read_bytes():
+            findings.append(_finding("TEMPLATE_COPY_DIFFERS", f"is not a byte copy of {origin}", rel))
+    return findings
+
+
+def write_templates(root: Path, folder: Path) -> int:
+    """``--write-templates <folder>``: the eight copies, written into ``folder`` (the copies' folder itself, e.g.
+    ``.claude/templates``) and nothing else. Nothing is written when a kernel template is missing."""
+    kernel = _kernel(root)
+    kept = [kernel / "templates" / f"{stem}.md" for stem in TEMPLATE_COPIES] if kernel is not None else []
+    missing = [str(path.relative_to(root)) for path in kept if not path.is_file()]
+    if kernel is None or missing:
+        reason = f"no kernel folder ({' or '.join(KERNEL_ROOTS)})" if kernel is None else f"missing: {missing}"
+        print(json.dumps({"written": [], "error": f"the template copies were not written: {reason}"}, indent=1))
+        return 1
+    folder.mkdir(parents=True, exist_ok=True)
+    written = []
+    for path in kept:
+        (folder / path.name).write_bytes(path.read_bytes())
+        written.append(str(folder / path.name))
+    print(json.dumps({"written": written}, indent=1))
+    return 0
+
+
+def _kernel_findings(root: Path) -> tuple[list[dict], int]:
+    """Comparison 2, both ways: ``(findings, number of kernel files compared)``. A role is compared by
+    body and by tools (the rest of its source's frontmatter is rulesync's own), a SKILL.md by body and
+    frontmatter, any other file of a skill folder by bytes. Each finding names the rulesync source."""
+    kernel = _kernel(root)
+    if kernel is None:
+        return [_finding("KERNEL_ABSENT", f"no kernel folder ({' or '.join(KERNEL_ROOTS)})")], 0
+    sources = root / SOURCES
+    pairs = [(role, sources / "subagents" / role.name) for role in sorted((kernel / "roles").glob("*.md"))]
+    held = sorted((sources / "subagents").glob("*.md"))
+    for skill in sorted(path.parent for path in (kernel / "skills").rglob("SKILL.md")):
+        files = sorted(path for path in skill.rglob("*") if path.is_file())
+        pairs += [(path, sources / "skills" / skill.name / path.relative_to(skill)) for path in files]
+        held += sorted(path for path in (sources / "skills" / skill.name).rglob("*") if path.is_file())
+    if not pairs:
+        return [_finding("KERNEL_EMPTY", f"{kernel.relative_to(root)} holds no role and no skill")], 0
+
+    findings = []
+    for kernel_file, source in pairs:
+        rel, origin = str(source.relative_to(root)), str(kernel_file.relative_to(root))
+        if not source.is_file():
+            findings.append(_finding("SOURCE_MISSING", f"no rulesync source for {origin}", rel))
+            continue
+        if kernel_file.parent.name == "roles":
+            (_front, role_body), (front, source_body) = _split(kernel_file), _split(source)
+            # W2-153 S3 amended: the source against compose(), the one composition the copies ACT also writes
+            same = _split_text(compose(root, kernel_file.stem))[1] == source_body
+            template = _role_template(kernel, kernel_file.stem)
+            if template is not None:
+                origin = f"its composition of {template.relative_to(root)} and {origin}"
+                if (skills := _skills_difference(kernel_file.stem, front)) and same:
+                    findings.append(_finding("SOURCE_DIFFERS", f"skills are not the role's: {skills}", rel))
+            if tools := _tools_difference(role_body, front):
+                findings.append(_finding("SOURCE_TOOLS_DIFFER", f"tools are not those of "
+                                         f"{kernel_file.relative_to(root)}: {tools}", rel))
+        elif kernel_file.name == "SKILL.md":
+            same = _split(kernel_file) == _split(source)
+        else:
+            same = kernel_file.read_bytes() == source.read_bytes()
+        if not same:
+            findings.append(_finding("SOURCE_DIFFERS", f"differs from {origin}", rel))
+    expected = {source for _kernel_file, source in pairs}
+    findings += [_finding("SOURCE_WITHOUT_KERNEL", "rulesync source with no kernel file",
+                          str(path.relative_to(root))) for path in held if path not in expected]
+    return findings, len(pairs)
+
+
+def _jsonc(text: str) -> object:
+    """``text`` read as JSON with comments and trailing commas, both outside strings only."""
+    out, i, quoted = [], 0, False
+    while i < len(text):
+        char = text[i]
+        if quoted:
+            out.append(char)
+            if char == "\\":
+                out.append(text[i + 1:i + 2])
+                i += 1
+            elif char == '"':
+                quoted = False
+        elif text.startswith("//", i):
+            i = text.find("\n", i)
+            i = len(text) if i < 0 else i
+            continue
+        elif text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            i = len(text) if end < 0 else end + 2
+            continue
+        elif char == ",":
+            rest = text[i + 1:].lstrip()
+            if not rest.startswith(("}", "]")):
+                out.append(char)
+        else:
+            quoted = char == '"'
+            out.append(char)
+        i += 1
+    return json.loads("".join(out))
+
+
+def _hook_matchers(path: Path) -> dict[str, list[str]]:
+    """Each hook event of a rulesync hooks source with the sorted matchers of its hooks (``""`` for none)."""
+    hooks = _jsonc(path.read_text(encoding="utf-8")).get("hooks")
+    if not isinstance(hooks, dict):
+        raise ValueError("no hooks object")
+    return {event: sorted(str(entry.get("matcher") or "") if isinstance(entry, dict) else "" for entry in entries)
+            for event, entries in hooks.items() if isinstance(entries, list)}
+
+
+def _hooks_findings(root: Path) -> list[dict]:
+    """The template's hooks source against the repository's, where the kernel is the template's (DEC-805): by
+    hook events and matchers, so that the hooks' paths, their order and the command around them are no drift.
+    One finding per drifted event, naming it, but none for a lifted event only the template has (DEC-971 item 3);
+    none where the template has no hooks source."""
+    template = root / "template" / SOURCES / HOOKS_SOURCE
+    if not (root / KERNEL_ROOTS[1]).is_dir() or not template.is_file():
+        return []
+    kept_rel, ours_rel = str(template.relative_to(root)), f"{SOURCES}/{HOOKS_SOURCE}"
+    read = []
+    for rel in (kept_rel, ours_rel):
+        try:
+            read.append(_hook_matchers(root / rel))
+        except (OSError, UnicodeDecodeError, ValueError, AttributeError) as exc:
+            return [_finding("HOOKS_UNREADABLE", f"cannot be read as a hooks source ({type(exc).__name__}); "
+                             "the hooks sources were not compared", rel)]
+    kept, ours = read
+    findings = []
+    for event in sorted(set(kept) | set(ours)):
+        if event in LIFTED_HOOK_EVENTS and event in kept and event not in ours:
+            continue
+        if event not in ours or event not in kept:
+            where = kept_rel if event in kept else ours_rel
+            findings.append(_finding("HOOKS_EVENT_DIFFERS", f"hook event {event} is only in {where}", ours_rel))
+        elif kept[event] != ours[event]:
+            here, there = ([m or "(none)" for m in side[event]] for side in (ours, kept))
+            findings.append(_finding("HOOKS_MATCHER_DIFFERS",
+                                     f"hook event {event}: matchers {here} here, {there} in {kept_rel}", ours_rel))
+    return findings
+
+
+def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
+    """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
+    sources into an empty temporary folder; each file it writes there is compared byte for byte with the
+    project's, and a file of the generated folders that it did not write is a file without a source.
+    Without a root rule rulesync has no source for CLAUDE.md and AGENTS.md and would not write them.
+    A project with a held-out file has the generator's Read deny rules written into the generated
+    settings first (DEC-635); a step that fails is a finding of fixed text, and nothing is compared."""
+    rules = sorted((root / SOURCES / "rules").glob("*.md"))
+    if not any(isinstance(front := _split(rule)[0], dict) and front.get("root") is True for rule in rules):
+        return [_finding("ROOT_RULE_ABSENT", f"{SOURCES}/rules/ holds no rule marked root: true: "
+                         "CLAUDE.md and AGENTS.md have no source; the generated files were not compared")], 0
+    with tempfile.TemporaryDirectory() as fresh:
+        code, out, err = _run(binary, *GENERATE, str((root / SOURCES).resolve()), cwd=Path(fresh))
+        if code == 0 and os.path.lexists(root / heldout.CONFIG_REL):
+            try:
+                heldout.write_read_rules(str(root), os.path.join(fresh, heldout.SETTINGS_REL))
+            except Exception as exc:  # its text may quote the held-out file: the type only
+                return [_finding("HELD_OUT_STEP_FAILED", "the held-out step could not be applied to the generated "
+                                 f"settings ({type(exc).__name__}); the generated files were not compared")], 0
+        made = {str(path.relative_to(fresh)): path.read_bytes()
+                for path in sorted(Path(fresh).rglob("*")) if path.is_file()}
+    if code != 0 or not made:
+        reason = (err or out).strip()[-500:] or f"exit {code}, {len(made)} files written"
+        return [_finding("RULESYNC_FAILED", f"rulesync generate: {reason}")], 0
+    findings = [_finding("GENERATED_DIFFERS", "is not what rulesync generates from its sources", rel)
+                for rel, content in made.items()
+                if not (root / rel).is_file() or (root / rel).read_bytes() != content]
+    held = sorted(str(path.relative_to(root)) for folder in GENERATED_FOLDERS
+                  for path in (root / folder).rglob("*") if path.is_file())
+    findings += [_finding("GENERATED_WITHOUT_SOURCE", "rulesync generates no such file from its sources", rel)
+                 for rel in held if rel not in made]
+    return findings, len(made)
+
+
+def main(argv: list[str] | tuple[str, ...] = ()) -> int:
+    root = Path.cwd()
+    if argv:
+        if len(argv) == 2 and argv[0] == "--write-templates":
+            return write_templates(root, Path(argv[1]))
+        print("usage: python3 -m gov.adapters.portability [--write-templates <dir>]", file=sys.stderr)
+        return 2
+    binary = _find_rulesync()
+    version = _version_finding(root, binary)
+    findings, kernel_files = _kernel_findings(root)
+    findings += _template_findings(root)
+    findings += _hooks_findings(root)
+    generated_files = 0
+    if version is not None:
+        version["message"] += "; the generated files were not compared"
+        findings.insert(0, version)
+    else:
+        generated, generated_files = _generated_findings(root, binary)
+        findings += generated
+    compared = {"rulesync_version": version is None, "kernel_files": kernel_files,
+                "generated_files": generated_files}
+    print(json.dumps({"findings": findings, "compared": compared}, indent=1))
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

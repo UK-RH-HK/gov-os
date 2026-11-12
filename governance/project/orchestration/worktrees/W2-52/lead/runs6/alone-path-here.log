@@ -1,0 +1,35 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_s1_the_code_graph_tool_is_off_path_in_a_suite_other_than_w1_16_and_w1_20 _
+
+sessions = [{'code': 0, 'daemons': ['/tmp/gov-cbm-1000-29ikq1dq/5022759d13b78532', '/tmp/gov-cbm-1000-29ikq1dq/e315932b7f5ae438']...'}], 'output': '...                                                                      [100%]\n3 passed in 0.13s\n'}]
+
+    def test_s1_the_code_graph_tool_is_off_path_in_a_suite_other_than_w1_16_and_w1_20(sessions):
+        for session in sessions:
+            seen = [note["found"] for note in session["notes"] if note["kind"] == "which"]
+            assert seen, f"the probe session did not run\n{session['output']}"
+>           assert seen == [None], f"{TOOL} is on PATH in the probe's suite: {seen[0]}"
+E           AssertionError: codebase-memory-mcp is on PATH in the probe's suite: /home/usain/.local/bin/codebase-memory-mcp
+E           assert ['/home/usain...e-memory-mcp'] == [None]
+E             
+E             At index 0 diff: '/home/usain/.local/bin/codebase-memory-mcp' != None
+E             Use -v to get more diff
+
+tests/acceptance/W2-56/test_w2_56_suite_daemon.py:99: AssertionError
+_ test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x738a2a523d10>
+
+    def test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path(monkeypatch):
+        """W2-56 S1, through tests/conftest.py: this session's folder is named, and the real tool is off PATH here."""
+        monkeypatch.undo()
+        base = os.environ.get(codeintel.BASE_ENV)
+        assert base and Path(base).is_dir()
+>       assert shutil.which(codeintel.TOOL) is None
+E       AssertionError: assert '/home/usain/.local/bin/codebase-memory-mcp' is None
+E        +  where '/home/usain/.local/bin/codebase-memory-mcp' = <function which at 0x738a2bd52020>('codebase-memory-mcp')
+E        +    where <function which at 0x738a2bd52020> = shutil.which
+E        +    and   'codebase-memory-mcp' = codeintel.TOOL
+
+tests/unit/codeintel/test_codeintel.py:168: AssertionError
+2 failed in 0.95s

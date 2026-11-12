@@ -1,0 +1,72 @@
+........................................................................ [ 55%]
+...........F.....F.....F...................F.............F               [100%]
+=================================== FAILURES ===================================
+_ test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass _
+tests/acceptance/W2-121/test_s4_returns.py:44: in test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass
+    assert item.lines[1].startswith("W2:") and item.fields["W2"] == entry.w2, item.text
+                                               ^^^^^^^^^^^^^^^^^
+E   KeyError: 'W2'
+____________ test_s4_a_start_that_never_ran_is_one_inbox_item_once _____________
+tests/acceptance/W2-121/test_s4_returns.py:123: in test_s4_a_start_that_never_ran_is_one_inbox_item_once
+    assert item.fields["log"] == entry.log and item.fields["W2"] == entry.w2, item.text
+                                               ^^^^^^^^^^^^^^^^^
+E   KeyError: 'W2'
+_ test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox __
+tests/acceptance/W2-121/test_s5_status.py:65: in test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox
+    assert any(has_figure(v, 3.5) for v in where("load")), "the load 3.5 is not in the status" + explain(p, r)
+E   AssertionError: the load 3.5 is not in the status
+E     exit 0 in 0.1s
+E     --- stdout ---
+E     
+E     --- stderr ---
+E     
+E     --- status.txt ---
+E     pass 2026-11-12T02:41:06Z ok=True
+E     kinds: 
+E     queue: ["W2-950=0123456789ab", "W2-951=ba9876543210"]
+E     inbox: [{"file": "0001.txt", "text": "log: W2-960-A5-x.json\nW2: W2-960\nstatus: DONE\n\nplanted item\n"}, {"file": "0002.txt", "text": "log: W2-962-A5-x.json\nW2: W2-962\nstatus: DONE\n\nplanted item\n"}]
+E     
+E   assert False
+E    +  where False = any(<generator object test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox.<locals>.<genexpr> at 0x7e796b8db920>)
+_ test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item _
+tests/acceptance/W2-121/test_s7_review_rounds.py:28: in test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item
+    assert owner[0].fields.get("W2") == bad.w2 and owner[0].fields.get("log") == bad.log, owner[0].text
+E   AssertionError: log: W2-901-A5-run.json
+E     W2: W2-901
+E     status: owner
+E     
+E     
+E   assert (None == 'W2-901')
+E    +  where None = <built-in method get of dict object at 0x7e796b7f8300>('W2')
+E    +    where <built-in method get of dict object at 0x7e796b7f8300> = {'log': 'W2-901-A5-run.json', 'status': 'owner'}.get
+E    +      where {'log': 'W2-901-A5-run.json', 'status': 'owner'} = Item(path=PosixPath('/tmp/gov-launch-olde196x/claude-1000/pytest-of-usain/pytest-3/test_s7_a_ticket_with_two_prob0/pro...atch/inbox/1794451280106-owner-W2-901-A5-run.json.txt'), text='log: W2-901-A5-run.json\nW2: W2-901\nstatus: owner\n\n').fields
+E    +  and   'W2-901' = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text="# Review brief\n\nrun: review\n\nReview the ticket's work and return the twelve fields.\n").w2
+____________ test_s9_the_item_is_the_same_item_with_its_first_lines ____________
+tests/acceptance/W2-121/test_s9_resolved_returns.py:91: in test_s9_the_item_is_the_same_item_with_its_first_lines
+    assert item.fields["W2"] == entry.w2 and re.search(GHOST_COMMIT, item.text)
+           ^^^^^^^^^^^^^^^^^
+E   KeyError: 'W2'
+=============================== warnings summary ===============================
+tests/acceptance/W2-121/test_s3_peaks.py: 45 warnings
+  /home/usain/gov-os-worktrees/W2-121-tests/tests/acceptance/W2-121/w2_121_support.py:278: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return {datetime.datetime.now().strftime("%Y-%m-%d"), datetime.datetime.utcnow().strftime("%Y-%m-%d")}
+
+tests/acceptance/W2-121/test_s5_status.py::test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox
+tests/acceptance/W2-121/test_s5_status.py::test_s5_a_failing_pass_says_so_at_the_top_and_leaves_no_stale_status
+  /home/usain/gov-os-worktrees/W2-121-tests/tests/acceptance/W2-121/w2_121_support.py:261: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    utc, local = datetime.datetime.utcnow(), datetime.datetime.now()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 6 durations ==============================
+3.33s call     tests/acceptance/W2-121/test_s8_no_watcher.py::test_s8_every_wake_is_an_inbox_item_written_by_a_pass_and_nothing_else_wakes_the_caller
+2.93s call     tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_the_dispatcher_starts_the_entries_of_a_plan_list_in_the_lists_own_order
+2.59s call     tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_an_entry_that_is_not_on_the_plan_list_is_not_started
+2.39s call     tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_hung_notifier_ends_the_pass_in_bounded_time_with_the_command_named
+2.38s call     tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_with_no_stagger_each_pass_starts_the_next_entry_in_order
+2.08s call     tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_hung_git_ends_the_pass_in_bounded_time_with_the_check_named_as_failed
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_a_start_that_never_ran_is_one_inbox_item_once
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item
+FAILED tests/acceptance/W2-121/test_s9_resolved_returns.py::test_s9_the_item_is_the_same_item_with_its_first_lines

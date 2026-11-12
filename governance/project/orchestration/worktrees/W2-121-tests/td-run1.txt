@@ -1,0 +1,2730 @@
+FFFFF.......FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 56%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                 [100%]
+=================================== FAILURES ===================================
+_____ test_f1_no_session_starts_for_an_off_list_not_ready_or_running_entry _____
+
+project = <w2_121_support.Project object at 0x76bcef527f20>
+
+    def test_f1_no_session_starts_for_an_off_list_not_ready_or_running_entry(project):
+        p = project
+        off_list = p.add_ticket(901)
+        unclean = p.add_ticket(902, dirty=True)
+        no_claim = p.add_ticket(903, claim="worktree_only")
+        no_brief = p.add_ticket(904, brief="Fill in {SOMETHING} first\n")
+        running = p.add_ticket(905)
+        unread = p.add_ticket(906)
+        p.plant_lead(running.ticket)
+        p.plant_item("0001.txt", "W2-906-A5-earlier.json", unread.w2)
+        p.ready(unclean, no_claim, no_brief, running, unread)  # off_list is not on it
+        for _ in range(2):
+            r = p.tick()
+>           assert r.code == 0, r
+E           AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E             gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E             ", seconds=0.12022330499894451)
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12022330499894451).code
+
+tests/acceptance/W2-121/test_f1_failure.py:27: AssertionError
+_____________ test_f1_no_session_starts_without_room_for_its_peak ______________
+
+project = <w2_121_support.Project object at 0x76bcef527980>
+
+    def test_f1_no_session_starts_without_room_for_its_peak(project):
+        p = project
+        entries = [p.add_ticket(901), p.add_ticket(902)]
+        p.history([hist("lead", 1.0, 9)])
+        p.set_machine(mem_gib=6.0)
+        p.ready(*entries)
+        r = p.tick()
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.13049681600386975)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13049681600386975).code
+
+tests/acceptance/W2-121/test_f1_failure.py:40: AssertionError
+__ test_f1_a_session_the_lead_count_ignores_in_the_logs_does_not_hold_a_start __
+
+project = <w2_121_support.Project object at 0x76bcef32ae40>
+
+    def test_f1_a_session_the_lead_count_ignores_in_the_logs_does_not_hold_a_start(project):
+        """The lead count is the processes': planted worker and non-session processes are not counted against ``max_leads``."""
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(max_leads=1)
+        p.plant_lead("DAEO-r001", role="engineer")
+        p.plant_process(["tail", "-f", "DAEO-r002.log"])
+        p.plant_process(["python3", "-c", "print('GOV_ROLE orchestrator GOV_TICKET DAEO-r003')"])
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1234501800063299).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1234501800063299) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef32ae40>.tick
+
+tests/acceptance/W2-121/test_f1_failure.py:54: AssertionError
+____ test_f1_the_lead_count_is_the_processes_and_nothing_else_holds_a_start ____
+
+project = <w2_121_support.Project object at 0x76bcef32a600>
+
+    def test_f1_the_lead_count_is_the_processes_and_nothing_else_holds_a_start(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(max_leads=1)
+        pid = p.plant_lead("DAEO-r001")
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12030387799313758).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12030387799313758) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef32a600>.tick
+
+tests/acceptance/W2-121/test_f1_failure.py:65: AssertionError
+________________ test_f1_every_finished_session_is_in_the_inbox ________________
+
+project = <w2_121_support.Project object at 0x76bcef55ff50>
+
+    def test_f1_every_finished_session_is_in_the_inbox(project):
+        p = project
+        entries = [p.add_ticket(n) for n in (901, 902, 903)]
+        p.ready(*entries)
+        for count in (1, 2, 3):
+>           assert p.tick().code == 0
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11807801000395557).code
+E            +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11807801000395557) = tick()
+E            +      where tick = <w2_121_support.Project object at 0x76bcef55ff50>.tick
+
+tests/acceptance/W2-121/test_f1_failure.py:79: AssertionError
+_ test_s10_the_dispatcher_starts_the_entries_of_a_plan_list_in_the_lists_own_order _
+
+project = <w2_121_support.Project object at 0x76bcef1af350>
+
+    def test_s10_the_dispatcher_starts_the_entries_of_a_plan_list_in_the_lists_own_order(project):
+        p = project
+        text, fields = planted_list(p)
+        order = [f[3] for f in fields]
+        assert order != sorted(order), f"premise: the plan's order is that of the ids: {order}"
+        for count in (1, 2, 3):
+            r = p.tick()
+>           assert r.code == 0, r
+E           AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E             gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E             ", seconds=0.11792821800190723)
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11792821800190723).code
+
+tests/acceptance/W2-121/test_s10_plan_ready_list.py:44: AssertionError
+________ test_s10_an_entry_that_is_not_on_the_plan_list_is_not_started _________
+
+project = <w2_121_support.Project object at 0x76bcef1af410>
+
+    def test_s10_an_entry_that_is_not_on_the_plan_list_is_not_started(project):
+        p = project
+        text, fields = planted_list(p)
+        stranger = p.add_ticket(909)  # claimed, a worktree, a complete brief: but the plan was made without it
+        for _ in range(4):
+>           assert p.tick().code == 0
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11091135799506446).code
+E            +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11091135799506446) = tick()
+E            +      where tick = <w2_121_support.Project object at 0x76bcef1af410>.tick
+
+tests/acceptance/W2-121/test_s10_plan_ready_list.py:59: AssertionError
+_______ test_s10_the_plan_lists_comment_lines_are_not_malformed_entries ________
+
+project = <w2_121_support.Project object at 0x76bcef21aa20>
+
+    def test_s10_the_plan_lists_comment_lines_are_not_malformed_entries(project):
+        p = project
+        text, fields = planted_list(p)
+        assert any(line.lstrip().startswith("#") for line in text.splitlines()), "premise: the plan's list has comment lines"
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10945228499622317)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10945228499622317).code
+
+tests/acceptance/W2-121/test_s10_plan_ready_list.py:72: AssertionError
+_____________________ test_s1_tick_does_one_pass_and_exits _____________________
+
+project = <w2_121_support.Project object at 0x76bcef218dd0>
+
+    def test_s1_tick_does_one_pass_and_exits(project):
+        p = project
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11309263300063321)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11309263300063321).code
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:34: AssertionError
+__________ test_s1_second_tick_exits_4_at_the_lock_and_writes_nothing __________
+
+project = <w2_121_support.Project object at 0x76bcef219820>
+
+    def test_s1_second_tick_exits_4_at_the_lock_and_writes_nothing(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.ready(entry)
+        p.write_config()
+        fd = hold_lock(p.state)
+        try:
+            before = snapshot(p.state)
+            r = p.tick()
+            after = snapshot(p.state)
+>           assert r.code == 4, r
+E           AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E             gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E             ", seconds=0.12271839199820533)
+E           assert 2 == 4
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12271839199820533).code
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:49: AssertionError
+_______________ test_s1_the_lock_is_released_when_the_pass_ends ________________
+
+project = <w2_121_support.Project object at 0x76bcef21a690>
+
+    def test_s1_the_lock_is_released_when_the_pass_ends(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12509929200314218).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12509929200314218) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef21a690>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:61: AssertionError
+_______________ test_s1_two_ticks_started_together_run_one_pass ________________
+
+project = <w2_121_support.Project object at 0x76bcef21b380>
+
+    def test_s1_two_ticks_started_together_run_one_pass(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.ready(first, second)
+        a, b = p.tick_popen(), p.tick_popen()
+        codes = sorted([a.wait(timeout=90), b.wait(timeout=90)])
+        outputs = [a.stdout.read() + a.stderr.read(), b.stdout.read() + b.stderr.read()]
+>       assert codes[0] == 0 and codes[1] in (0, 4), (codes, outputs)
+E       AssertionError: ([2, 2], ["usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'sta...close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         "])
+E       assert (2 == 0)
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:75: AssertionError
+_______________________ test_s1_off_file_stops_the_pass ________________________
+
+project = <w2_121_support.Project object at 0x76bcef25f6e0>
+
+    def test_s1_off_file_stops_the_pass(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.ready(entry)
+        (p.state / "OFF").write_text("", encoding="utf-8")
+        before = snapshot(p.state)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11765414100227645)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11765414100227645).code
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:88: AssertionError
+_______ test_s1_off_file_also_stops_the_returns_and_removing_it_resumes ________
+
+project = <w2_121_support.Project object at 0x76bcef25c620>
+
+    def test_s1_off_file_also_stops_the_returns_and_removing_it_resumes(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.ready(first)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13722830500046257).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13722830500046257) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef25c620>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:101: AssertionError
+____________________ test_s1_status_prints_the_status_text _____________________
+
+project = <w2_121_support.Project object at 0x76bcef21b110>
+
+    def test_s1_status_prints_the_status_text(project):
+        p = project
+        p.ready(p.add_ticket(901))
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1322175840032287).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1322175840032287) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef21b110>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:118: AssertionError
+__________________ test_s1_status_prints_the_json_under_json ___________________
+
+project = <w2_121_support.Project object at 0x76bcef21a7e0>
+
+    def test_s1_status_prints_the_json_under_json(project):
+        import json
+    
+        p = project
+        p.ready(p.add_ticket(901))
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10996423700271407).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10996423700271407) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef21a7e0>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:132: AssertionError
+______ test_s1_status_says_when_the_last_pass_is_older_than_three_minutes ______
+
+project = <w2_121_support.Project object at 0x76bcef21a870>
+
+    def test_s1_status_says_when_the_last_pass_is_older_than_three_minutes(project):
+        p = project
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11443497899745125).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11443497899745125) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef21a870>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:143: AssertionError
+___________________ test_s1_a_fresh_status_is_not_called_old ___________________
+
+project = <w2_121_support.Project object at 0x76bcef218a40>
+
+    def test_s1_a_fresh_status_is_not_called_old(project):
+        p = project
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12124485099775484).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12124485099775484) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef218a40>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:156: AssertionError
+________________ test_s1_status_runs_no_pass_and_writes_nothing ________________
+
+project = <w2_121_support.Project object at 0x76bcef1ad8b0>
+
+    def test_s1_status_runs_no_pass_and_writes_nothing(project):
+        p = project
+        p.ready(p.add_ticket(901))
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11517534899758175).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11517534899758175) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef1ad8b0>.tick
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:165: AssertionError
+_________ test_s1_a_usage_error_is_exit_2_and_names_the_actions[args0] _________
+
+project = <w2_121_support.Project object at 0x76bcef1af350>, args = ['bogus']
+
+    @pytest.mark.parametrize("args", [["bogus"], []])
+    def test_s1_a_usage_error_is_exit_2_and_names_the_actions(project, args):
+        r = project.gov("dispatch", *args)
+        assert r.code == 2, r
+>       assert "tick" in (r.out + r.err) and "status" in (r.out + r.err), r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10968476199923316)
+E       assert ('tick' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n"))
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10968476199923316).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10968476199923316).err
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:177: AssertionError
+_________ test_s1_a_usage_error_is_exit_2_and_names_the_actions[args1] _________
+
+project = <w2_121_support.Project object at 0x76bcef25ddf0>, args = []
+
+    @pytest.mark.parametrize("args", [["bogus"], []])
+    def test_s1_a_usage_error_is_exit_2_and_names_the_actions(project, args):
+        r = project.gov("dispatch", *args)
+        assert r.code == 2, r
+>       assert "tick" in (r.out + r.err) and "status" in (r.out + r.err), r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1188475759990979)
+E       assert ('tick' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n"))
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1188475759990979).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1188475759990979).err
+
+tests/acceptance/W2-121/test_s1_lock_off_status.py:177: AssertionError
+___ test_s2_one_session_starts_a_pass_the_first_eligible_in_the_lists_order ____
+
+project = <w2_121_support.Project object at 0x76bcef25c8f0>
+
+    def test_s2_one_session_starts_a_pass_the_first_eligible_in_the_lists_order(project):
+        p = project
+        entries = [p.add_ticket(n) for n in (903, 901, 902)]  # a list order that is no order of ids
+        p.cfg(stagger_s=3600)
+        p.ready(*entries)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10975411999970675)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10975411999970675).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:28: AssertionError
+_____________________ test_s2_the_next_start_is_staggered ______________________
+
+project = <w2_121_support.Project object at 0x76bcef25c710>
+
+    def test_s2_the_next_start_is_staggered(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.cfg(stagger_s=3600)
+        p.ready(first, second)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11746486899937736).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11746486899937736) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef25c710>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:40: AssertionError
+_______ test_s2_with_no_stagger_each_pass_starts_the_next_entry_in_order _______
+
+project = <w2_121_support.Project object at 0x76bcef25f3b0>
+
+    def test_s2_with_no_stagger_each_pass_starts_the_next_entry_in_order(project):
+        p = project
+        entries = [p.add_ticket(n) for n in (903, 901, 902)]
+        p.ready(*entries)
+        for count in (1, 2, 3):
+>           assert p.tick().code == 0
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11638792899611872).code
+E            +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11638792899611872) = tick()
+E            +      where tick = <w2_121_support.Project object at 0x76bcef25f3b0>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:54: AssertionError
+_ test_s2_the_launch_gets_the_brief_on_stdin_and_the_entrys_names_and_logs_its_output _
+
+project = <w2_121_support.Project object at 0x76bcef2df410>
+
+    def test_s2_the_launch_gets_the_brief_on_stdin_and_the_entrys_names_and_logs_its_output(project):
+        p = project
+        entry = p.add_ticket(901, brief="# Brief 901\nThe planted brief text.\n")
+        p.set_output("hello from the stub session")
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.111930011997174).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.111930011997174) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2df410>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:68: AssertionError
+__________ test_s2_the_exit_code_of_a_session_is_kept_beside_its_log ___________
+
+project = <w2_121_support.Project object at 0x76bcef2dc200>
+
+    def test_s2_the_exit_code_of_a_session_is_kept_beside_its_log(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_exit(7)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12860366600216366).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12860366600216366) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2dc200>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:83: AssertionError
+____ test_s2_the_log_name_is_in_started_txt_before_the_launch_command_runs _____
+
+project = <w2_121_support.Project object at 0x76bcef25f6b0>
+
+    def test_s2_the_log_name_is_in_started_txt_before_the_launch_command_runs(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11825654999847757).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11825654999847757) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef25f6b0>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:92: AssertionError
+_______ test_s2_the_launch_is_detached_and_the_pass_does_not_wait_for_it _______
+
+project = <w2_121_support.Project object at 0x76bcef25cad0>
+
+    def test_s2_the_launch_is_detached_and_the_pass_does_not_wait_for_it(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_sleep(25)
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11801030100468779)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11801030100468779).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:103: AssertionError
+__________________ test_s2_a_log_name_is_never_started_twice ___________________
+
+project = <w2_121_support.Project object at 0x76bcef25c4d0>
+
+    def test_s2_a_log_name_is_never_started_twice(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        dup = f"{second.w2} {second.ticket} {second.brief} {first.log}"  # one log name on two lines
+        p.ready(first, dup)
+        for _ in range(3):
+>           assert p.tick().code == 0
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.124090379998961).code
+E            +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.124090379998961) = tick()
+E            +      where tick = <w2_121_support.Project object at 0x76bcef25c4d0>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:116: AssertionError
+______________ test_s2_an_entry_not_on_the_list_is_never_started _______________
+
+project = <w2_121_support.Project object at 0x76bcef1af440>
+
+    def test_s2_an_entry_not_on_the_list_is_never_started(project):
+        p = project
+        listed, other, third = p.add_ticket(901), p.add_ticket(902), p.add_ticket(903)
+        p.ready(listed)
+        for _ in range(3):
+>           assert p.tick().code == 0
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1302180889979354).code
+E            +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1302180889979354) = tick()
+E            +      where tick = <w2_121_support.Project object at 0x76bcef1af440>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:127: AssertionError
+______ test_s2_comments_and_blank_lines_are_ignored_and_are_not_malformed ______
+
+project = <w2_121_support.Project object at 0x76bcef219be0>
+
+    def test_s2_comments_and_blank_lines_are_ignored_and_are_not_malformed(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.ready("# a comment line", "", "   ", "  # an indented comment W2-999 DAEO-zzzz b.md L.json", entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10947146599937696)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10947146599937696).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:138: AssertionError
+___________ test_s2_no_ready_list_starts_nothing_and_is_not_an_error ___________
+
+project = <w2_121_support.Project object at 0x76bcef21af90>
+
+    def test_s2_no_ready_list_starts_nothing_and_is_not_an_error(project):
+        p = project
+        p.add_ticket(901)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11710978599876398)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11710978599876398).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:148: AssertionError
+_____ test_s2_a_malformed_line_is_named_and_the_other_lines_are_still_read _____
+
+project = <w2_121_support.Project object at 0x76bcef2183e0>
+
+    def test_s2_a_malformed_line_is_named_and_the_other_lines_are_still_read(project):
+        p = project
+        good = p.add_ticket(901)
+        p.ready("W2-903 DAEO-bad3 briefX.md", "justoneword", good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.114304025999445)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.114304025999445).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:159: AssertionError
+________ test_s2_the_claim_must_be_committed_on_the_integration_branch _________
+
+project = <w2_121_support.Project object at 0x76bcef2dc740>
+
+    def test_s2_the_claim_must_be_committed_on_the_integration_branch(project):
+        p = project
+        bad, good = p.add_ticket(901, claim="worktree_only"), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12063201400451362)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12063201400451362).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:171: AssertionError
+__________ test_s2_the_claim_must_be_committed_at_the_worktrees_head ___________
+
+project = <w2_121_support.Project object at 0x76bcef2de7b0>
+
+    def test_s2_the_claim_must_be_committed_at_the_worktrees_head(project):
+        p = project
+        bad, good = p.add_ticket(901, claim="integration_only"), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12502064000000246)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12502064000000246).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:182: AssertionError
+_______ test_s2_a_ticket_not_claimed_anywhere_is_skipped_with_its_reason _______
+
+project = <w2_121_support.Project object at 0x76bcef2dda00>
+
+    def test_s2_a_ticket_not_claimed_anywhere_is_skipped_with_its_reason(project):
+        p = project
+        bad, good = p.add_ticket(901, claim="none"), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11685004500031937)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11685004500031937).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:193: AssertionError
+____________ test_s2_a_worktree_with_a_tracked_change_is_not_clean _____________
+
+project = <w2_121_support.Project object at 0x76bcef2deed0>
+
+    def test_s2_a_worktree_with_a_tracked_change_is_not_clean(project):
+        p = project
+        bad, good = p.add_ticket(901, dirty=True), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1161477220011875)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1161477220011875).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:204: AssertionError
+_________ test_s2_an_untracked_file_does_not_make_the_worktree_unclean _________
+
+project = <w2_121_support.Project object at 0x76bcef2e6900>
+
+    def test_s2_an_untracked_file_does_not_make_the_worktree_unclean(project):
+        p = project
+        entry = p.add_ticket(901, untracked=True)
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10853093300102046)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10853093300102046).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:215: AssertionError
+___________ test_s2_an_incomplete_brief_is_skipped_and_named[at-at] ____________
+
+project = <w2_121_support.Project object at 0x76bcef2dd850>, kind = 'at-at'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11826050200033933)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11826050200033933).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+___________ test_s2_an_incomplete_brief_is_skipped_and_named[blank] ____________
+
+project = <w2_121_support.Project object at 0x76bcef2de7b0>, kind = 'blank'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10789834299794165)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10789834299794165).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+___________ test_s2_an_incomplete_brief_is_skipped_and_named[empty] ____________
+
+project = <w2_121_support.Project object at 0x76bcef2dcd70>, kind = 'empty'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1208560410013888)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1208560410013888).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+__________ test_s2_an_incomplete_brief_is_skipped_and_named[missing] ___________
+
+project = <w2_121_support.Project object at 0x76bcef2185f0>, kind = 'missing'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11952957899484318)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11952957899484318).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+____________ test_s2_an_incomplete_brief_is_skipped_and_named[slot] ____________
+
+project = <w2_121_support.Project object at 0x76bcef21b2f0>, kind = 'slot'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11721359899820527)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11721359899820527).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+________ test_s2_an_incomplete_brief_is_skipped_and_named[slot-digits] _________
+
+project = <w2_121_support.Project object at 0x76bcef1af200>
+kind = 'slot-digits'
+
+    @pytest.mark.parametrize("kind", sorted(BRIEFS))
+    def test_s2_an_incomplete_brief_is_skipped_and_named(project, kind):
+        p = project
+        bad, good = p.add_ticket(901, brief=BRIEFS[kind]), p.add_ticket(902)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1315861449984368)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1315861449984368).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:230: AssertionError
+_ test_s2_braces_that_are_not_an_unfilled_slot_do_not_make_a_brief_incomplete __
+
+project = <w2_121_support.Project object at 0x76bcef25e240>
+
+    def test_s2_braces_that_are_not_an_unfilled_slot_do_not_make_a_brief_incomplete(project):
+        p = project
+        text = 'Use {lower_case} and {Mixed} and {"a": 1} and { } and {1X}.\nDone.\n'
+        entry = p.add_ticket(901, brief=text)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13208815500547644).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13208815500547644) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef25e240>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:241: AssertionError
+_____________ test_s2_a_relative_brief_resolves_against_briefs_dir _____________
+
+project = <w2_121_support.Project object at 0x76bcef25ec60>
+
+    def test_s2_a_relative_brief_resolves_against_briefs_dir(project):
+        p = project
+        folder = p.tmp / "my-briefs"
+        p.cfg(briefs_dir=str(folder))
+        entry = p.add_ticket(901, brief=None)
+        p.write_brief(entry.brief, "From the configured briefs folder.\n", folder)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12008236099791247).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12008236099791247) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef25ec60>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:253: AssertionError
+_________________ test_s2_an_absolute_brief_path_is_used_as_is _________________
+
+project = <w2_121_support.Project object at 0x76bcef2e5220>
+
+    def test_s2_an_absolute_brief_path_is_used_as_is(project):
+        p = project
+        entry = p.add_ticket(901, brief=None)
+        path = p.write_brief("elsewhere.md", "An absolute brief.\n", p.tmp / "elsewhere")
+        p.ready(f"{entry.w2} {entry.ticket} {path} {entry.log}")
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1278890899993712).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1278890899993712) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e5220>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:263: AssertionError
+_ test_s2_the_worktree_is_found_under_a_worktrees_root_relative_to_the_project _
+
+project = <w2_121_support.Project object at 0x76bcef2e6d50>
+
+    def test_s2_the_worktree_is_found_under_a_worktrees_root_relative_to_the_project(project):
+        p = project
+        p.wt_root = p.tmp / "wts"
+        p.wt_root.mkdir()
+        p.cfg(worktrees_root="../wts")
+        entry = p.add_ticket(901)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12330721900070785).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12330721900070785) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e6d50>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:275: AssertionError
+________________ test_s2_a_running_ticket_is_skipped_and_named _________________
+
+project = <w2_121_support.Project object at 0x76bcef2e56a0>
+
+    def test_s2_a_running_ticket_is_skipped_and_named(project):
+        p = project
+        bad, good = p.add_ticket(901), p.add_ticket(902)
+        p.plant_lead(bad.ticket)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.14132930600317195)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.14132930600317195).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:286: AssertionError
+___ test_s2_a_process_that_only_mentions_the_ticket_is_not_a_running_ticket ____
+
+project = <w2_121_support.Project object at 0x76bcef2e55e0>
+
+    def test_s2_a_process_that_only_mentions_the_ticket_is_not_a_running_ticket(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.plant_process(["tail", "-f", f"{entry.ticket}.log"])
+        p.plant_lead(entry.ticket, role="engineer")  # a worker's settings: GOV_ROLE is not orchestrator
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12197277000086615).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12197277000086615) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e55e0>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:298: AssertionError
+____________ test_s2_an_unread_return_holds_its_entry_and_is_named _____________
+
+project = <w2_121_support.Project object at 0x76bcef2e6f30>
+
+    def test_s2_an_unread_return_holds_its_entry_and_is_named(project):
+        p = project
+        bad, good = p.add_ticket(901), p.add_ticket(902)
+        p.plant_item("0001-return.txt", "W2-901-A5-earlier.json", bad.w2)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10846548999688821)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10846548999688821).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:309: AssertionError
+___________ test_s2_a_return_that_was_read_no_longer_holds_its_entry ___________
+
+project = <w2_121_support.Project object at 0x76bcef2e5700>
+
+    def test_s2_a_return_that_was_read_no_longer_holds_its_entry(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.plant_item("0001-return.txt", "W2-901-A5-earlier.json", entry.w2, read=True)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10646440200071083).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10646440200071083) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e5700>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:320: AssertionError
+________ test_s2_another_tickets_unread_return_does_not_hold_the_entry _________
+
+project = <w2_121_support.Project object at 0x76bcef2e6450>
+
+    def test_s2_another_tickets_unread_return_does_not_hold_the_entry(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.plant_item("0001-return.txt", "W2-950-A5-other.json", "W2-950")
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11089499299851013).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11089499299851013) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e6450>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:330: AssertionError
+_______ test_s2_a_shut_gate_starts_nothing_names_every_entry_and_exits_3 _______
+
+project = <w2_121_support.Project object at 0x76bcef25ea50>
+
+    def test_s2_a_shut_gate_starts_nothing_names_every_entry_and_exits_3(project):
+        p = project
+        entries = [p.add_ticket(901), p.add_ticket(902)]
+        p.set_machine(mem_gib=1.5)  # the floor 1 GiB + one working size 1 GiB are not available: W2-20's memory condition
+        assert p.gate_reading()["open"] is False
+        p.ready(*entries)
+        r = p.tick()
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11877346700202907)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11877346700202907).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:342: AssertionError
+_______ test_s2_a_full_disk_starts_nothing_names_every_entry_and_exits_3 _______
+
+project = <w2_121_support.Project object at 0x76bcef25d910>
+
+    def test_s2_a_full_disk_starts_nothing_names_every_entry_and_exits_3(project):
+        p = project
+        entries = [p.add_ticket(901), p.add_ticket(902)]
+        p.set_machine(disk_free_gib=1)
+        assert p.gate_reading()["open"] is False
+        p.ready(*entries)
+        r = p.tick()
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12409683100122493)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12409683100122493).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:357: AssertionError
+_______ test_s2_max_leads_counts_the_running_sessions_from_the_processes _______
+
+project = <w2_121_support.Project object at 0x76bcef2191c0>
+
+    def test_s2_max_leads_counts_the_running_sessions_from_the_processes(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(max_leads=2)
+        p.plant_lead("DAEO-r001")
+        p.plant_lead("DAEO-r002")
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11965288100327598)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11965288100327598).code
+
+tests/acceptance/W2-121/test_s2_start_rules.py:372: AssertionError
+___________________ test_s2_below_max_leads_the_entry_starts ___________________
+
+project = <w2_121_support.Project object at 0x76bcef2184d0>
+
+    def test_s2_below_max_leads_the_entry_starts(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(max_leads=3)
+        p.plant_lead("DAEO-r001")
+        p.plant_lead("DAEO-r002")
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12708118300361093).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12708118300361093) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2184d0>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:385: AssertionError
+_________ test_s2_a_start_with_no_process_yet_counts_toward_max_leads __________
+
+project = <w2_121_support.Project object at 0x76bcef2dda00>
+
+    def test_s2_a_start_with_no_process_yet_counts_toward_max_leads(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.cfg(max_leads=1)
+        p.set_sleep(10)  # the first session is still launching: no marker process, no .exit file
+        p.ready(first, second)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12704351400316227).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12704351400316227) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2dda00>.tick
+
+tests/acceptance/W2-121/test_s2_start_rules.py:396: AssertionError
+_ test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it[5.5-False] _
+
+project = <w2_121_support.Project object at 0x76bcef2dd760>, mem_gib = 5.5
+starts = False
+
+    @pytest.mark.parametrize("mem_gib, starts", [(5.5, False), (6.5, True)])
+    def test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it(project, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.history([hist("lead", 1.0, 3), hist("lead", 2.0, 5), hist("lead", 1.5, 4)])  # the peak is the maximum: 5 GiB
+        p.set_machine(mem_gib=mem_gib)  # the gate needs 2 GiB: open; the room above the floor is mem_gib - 1
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2dd760>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11669250399427256)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11669250399427256)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11669250399427256).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+_ test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it[6.5-True] _
+
+project = <w2_121_support.Project object at 0x76bcef3737d0>, mem_gib = 6.5
+starts = True
+
+    @pytest.mark.parametrize("mem_gib, starts", [(5.5, False), (6.5, True)])
+    def test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it(project, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.history([hist("lead", 1.0, 3), hist("lead", 2.0, 5), hist("lead", 1.5, 4)])  # the peak is the maximum: 5 GiB
+        p.set_machine(mem_gib=mem_gib)  # the gate needs 2 GiB: open; the room above the floor is mem_gib - 1
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef3737d0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1181081750037265)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1181081750037265)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1181081750037265).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+_ test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it[2.0-False] _
+
+project = <w2_121_support.Project object at 0x76bcef373920>, busy = 2.0
+starts = False
+
+    @pytest.mark.parametrize("busy, starts", [(2.0, False), (0.5, True)])
+    def test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it(project, busy, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(cpu_band=1)
+        p.history([hist("lead", 4.0, 0.5), hist("lead", 6.0, 0.5)])  # the peak: 6 cores
+        p.set_machine(nproc=8, busy=busy)  # 8 - 2 - 1 = 5 < 6 refused; 8 - 0.5 - 1 = 6.5 >= 6 admitted
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef373920>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11618881100002909)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11618881100002909)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11618881100002909).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+_ test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it[0.5-True] _
+
+project = <w2_121_support.Project object at 0x76bcef371580>, busy = 0.5
+starts = True
+
+    @pytest.mark.parametrize("busy, starts", [(2.0, False), (0.5, True)])
+    def test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it(project, busy, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(cpu_band=1)
+        p.history([hist("lead", 4.0, 0.5), hist("lead", 6.0, 0.5)])  # the peak: 6 cores
+        p.set_machine(nproc=8, busy=busy)  # 8 - 2 - 1 = 5 < 6 refused; 8 - 0.5 - 1 = 6.5 >= 6 admitted
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef371580>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12297304700041423)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12297304700041423)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12297304700041423).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+________ test_s3_the_peaks_still_ahead_of_a_running_job_are_kept_for_it ________
+
+project = <w2_121_support.Project object at 0x76bcef2df440>
+
+    def test_s3_the_peaks_still_ahead_of_a_running_job_are_kept_for_it(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(job_markers={"rebuild": "rebuild-job-marker"})
+        p.history([hist("rebuild", 1.0, 2), hist("rebuild", 1.0, 6)])  # a rebuild peaks at 6 GiB; the lead has no history: W
+        p.plant_process(["python3", "rebuild-job-marker", "--root", "x"], rss_bytes=GIB // 2)
+        p.set_machine(mem_gib=6.5)  # ahead: ~5.5 GiB; 6.5 - 1 - 5.5 = 0 < the lead's 1 GiB
+        p.ready(entry)
+        r = p.tick()
+>       assert_refused(p, entry, r)
+
+tests/acceptance/W2-121/test_s3_peaks.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2df440>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11124884500168264)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11124884500168264)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11124884500168264).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+________ test_s3_without_the_running_rebuild_the_same_machine_has_room _________
+
+project = <w2_121_support.Project object at 0x76bcef21ae70>
+
+    def test_s3_without_the_running_rebuild_the_same_machine_has_room(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(job_markers={"rebuild": "rebuild-job-marker"})
+        p.history([hist("rebuild", 1.0, 2), hist("rebuild", 1.0, 6)])
+        p.set_machine(mem_gib=6.5)
+        p.ready(entry)
+>       assert_started(p, entry, p.tick())
+
+tests/acceptance/W2-121/test_s3_peaks.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef21ae70>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11962690299696987)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11962690299696987)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11962690299696987).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+_______ test_s3_a_rebuild_with_room_over_its_peak_ahead_admits_the_start _______
+
+project = <w2_121_support.Project object at 0x76bcef21bcb0>
+
+    def test_s3_a_rebuild_with_room_over_its_peak_ahead_admits_the_start(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(job_markers={"rebuild": "rebuild-job-marker"})
+        p.history([hist("rebuild", 1.0, 2), hist("rebuild", 1.0, 6)])
+        p.plant_process(["python3", "rebuild-job-marker"], rss_bytes=GIB // 2)
+        p.set_machine(mem_gib=8.5)  # 8.5 - 1 - 5.5 = 2 >= 1
+        p.ready(entry)
+>       assert_started(p, entry, p.tick())
+
+tests/acceptance/W2-121/test_s3_peaks.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef21bcb0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11524595400260296)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11524595400260296)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11524595400260296).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+___ test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-4.0-False] ____
+
+project = <w2_121_support.Project object at 0x76bcef25ce30>, floor = 1, work = 2
+mem_gib = 4.0, starts = False
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef25ce30>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11256693799805362)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11256693799805362)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11256693799805362).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+____ test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-5.5-True] ____
+
+project = <w2_121_support.Project object at 0x76bcef2e5010>, floor = 1, work = 2
+mem_gib = 5.5, starts = True
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2e5010>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11155906999920262)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11155906999920262)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11155906999920262).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+___ test_s3_the_floor_and_the_working_size_are_the_gates_own[1-4-7.0-False] ____
+
+project = <w2_121_support.Project object at 0x76bcef2e5670>, floor = 1, work = 4
+mem_gib = 7.0, starts = False
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2e5670>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12514842100063106)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12514842100063106)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12514842100063106).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+____ test_s3_the_floor_and_the_working_size_are_the_gates_own[1-4-9.5-True] ____
+
+project = <w2_121_support.Project object at 0x76bcef371430>, floor = 1, work = 4
+mem_gib = 9.5, starts = True
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef371430>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13112239800102543)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.13112239800102543)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13112239800102543).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+___ test_s3_the_floor_and_the_working_size_are_the_gates_own[4-2-7.0-False] ____
+
+project = <w2_121_support.Project object at 0x76bcef373ec0>, floor = 4, work = 2
+mem_gib = 7.0, starts = False
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef373ec0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12332770499779144)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12332770499779144)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12332770499779144).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+____ test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-7.0-True] ____
+
+project = <w2_121_support.Project object at 0x76bcef371af0>, floor = 1, work = 2
+mem_gib = 7.0, starts = True
+
+    @pytest.mark.parametrize("floor, work, mem_gib, starts", [
+        (1, 2, 4.0, False), (1, 2, 5.5, True),     # a lead with no history peaks at W = 2: 4 - 1 - 1.5 = 1.5 < 2 ; 5.5 -> 3 >= 2
+        (1, 4, 7.0, False), (1, 4, 9.5, True),     # W = 4 read from gate.json: 7 - 1 - 3.5 = 2.5 < 4 ; 9.5 -> 5 >= 4
+        (4, 2, 7.0, False), (1, 2, 7.0, True),     # the floor F = 4 read from gate.json: 7 - 4 - 1.5 = 1.5 < 2 ; F = 1 -> 4.5 >= 2
+    ])
+    def test_s3_the_floor_and_the_working_size_are_the_gates_own(project, floor, work, mem_gib, starts):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_gate(floor_gib=floor, work_gib=work)
+        p.plant_lead("DAEO-r001", rss_bytes=GIB // 2)  # a running lead: a kind with no history peaks at the working size
+        p.set_machine(mem_gib=mem_gib)
+        assert p.gate_reading()["open"] is True
+        p.ready(entry)
+        r = p.tick()
+>       assert_started(p, entry, r) if starts else assert_refused(p, entry, r)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s3_peaks.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef371af0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11293612400186248)
+
+    def assert_started(p, entry, r):
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11293612400186248)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11293612400186248).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:45: AssertionError
+___________ test_s3_the_status_prints_each_kinds_peak_with_its_date ____________
+
+project = <w2_121_support.Project object at 0x76bcef44bc20>
+
+    def test_s3_the_status_prints_each_kinds_peak_with_its_date(project):
+        p = project
+        p.history([hist("lead", 1.5, 3), hist("lead", 2.5, 5), hist("rebuild", 2.0, 2), hist("rebuild", 3.0, 1),
+                   hist("close", 4.0, 6), hist("queue", 5.0, 4), hist("queue", 1.0, 7), hist("check", 6.0, 3)])
+        expected = {"lead": (2.5, 5), "rebuild": (3.0, 2), "close": (4.0, 6), "queue": (5.0, 7), "check": (6.0, 3)}
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12382632899971213)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12382632899971213).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:130: AssertionError
+_____________ test_s3_a_kinds_peak_is_the_maximum_over_its_history _____________
+
+project = <w2_121_support.Project object at 0x76bcef4499a0>
+
+    def test_s3_a_kinds_peak_is_the_maximum_over_its_history(project):
+        p = project
+        p.history([hist("lead", 1.0, 9.0, hours_ago=30), hist("lead", 3.0, 2.0, hours_ago=2), hist("lead", 2.0, 4.0, hours_ago=1)])
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13738133700098842).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13738133700098842) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef4499a0>.tick
+
+tests/acceptance/W2-121/test_s3_peaks.py:148: AssertionError
+______ test_s3_peaks_are_refreshed_from_the_history_when_older_than_a_day ______
+
+project = <w2_121_support.Project object at 0x76bcef449550>
+
+    def test_s3_peaks_are_refreshed_from_the_history_when_older_than_a_day(project):
+        p = project
+        p.history([hist("lead", 2.0, 5)])
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13141725200694054).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13141725200694054) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef449550>.tick
+
+tests/acceptance/W2-121/test_s3_peaks.py:156: AssertionError
+_____________ test_s3_missing_peaks_are_computed_from_the_history ______________
+
+project = <w2_121_support.Project object at 0x76bcef373680>
+
+    def test_s3_missing_peaks_are_computed_from_the_history(project):
+        p = project
+        p.history([hist("lead", 2.0, 5)])
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.14819055599946296).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.14819055599946296) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef373680>.tick
+
+tests/acceptance/W2-121/test_s3_peaks.py:175: AssertionError
+______________ test_s3_the_job_history_file_is_the_configured_one ______________
+
+project = <w2_121_support.Project object at 0x76bcef370350>
+
+    def test_s3_the_job_history_file_is_the_configured_one(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(history="var/jobs.jsonl")
+        p.history([hist("lead", 1.0, 5)], rel="var/jobs.jsonl")
+        p.set_machine(mem_gib=5.5)  # refused only if the configured history is read: 5.5 - 1 < 5 (with no history: W = 1 fits)
+        p.ready(entry)
+        r = p.tick()
+>       assert_refused(p, entry, r)
+
+tests/acceptance/W2-121/test_s3_peaks.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef370350>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+r = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13710003300366225)
+
+    def assert_refused(p, entry, r):
+>       assert r.code == 3, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.13710003300366225)
+E       assert 2 == 3
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13710003300366225).code
+
+tests/acceptance/W2-121/test_s3_peaks.py:35: AssertionError
+_ test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass _
+
+project = <w2_121_support.Project object at 0x76bcef2e6030>
+
+    def test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass(project):
+        p = project
+        entry = p.add_ticket(901)
+>       finished(p, entry, "task: planted\nstatus: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2e6030>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'task: planted\nstatus: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11407578000216745)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11407578000216745).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+___________ test_s4_the_items_status_is_the_returns_own_status_line ____________
+
+project = <w2_121_support.Project object at 0x76bcef2e5e20>
+
+    def test_s4_the_items_status_is_the_returns_own_status_line(project):
+        p = project
+        entry = p.add_ticket(901)
+>       finished(p, entry, "task: planted\nstatus: PACKAGES\nwork_completed: none\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef2e5e20>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'task: planted\nstatus: PACKAGES\nwork_completed: none\n'
+exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11042504299985012)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11042504299985012).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+_______ test_s4_without_a_status_line_the_items_status_is_the_exit_code ________
+
+project = <w2_121_support.Project object at 0x76bcef25d910>
+
+    def test_s4_without_a_status_line_the_items_status_is_the_exit_code(project):
+        p = project
+        entry = p.add_ticket(901)
+>       finished(p, entry, "the session printed no return at all", exit_code=7)
+
+tests/acceptance/W2-121/test_s4_returns.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef25d910>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'the session printed no return at all', exit_code = 7
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12379977099772077)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12379977099772077).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+_________________ test_s4_no_item_while_the_session_still_runs _________________
+
+project = <w2_121_support.Project object at 0x76bcef21b1a0>
+
+    def test_s4_no_item_while_the_session_still_runs(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_sleep(8)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12134709899692098).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12134709899692098) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef21b1a0>.tick
+
+tests/acceptance/W2-121/test_s4_returns.py:74: AssertionError
+________________ test_s4_every_finished_session_is_its_own_item ________________
+
+project = <w2_121_support.Project object at 0x76bcef44a330>
+
+    def test_s4_every_finished_session_is_its_own_item(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+>       finished(p, first, "status: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef44a330>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'status: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12001174600300146)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12001174600300146).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+______________ test_s4_an_item_that_was_read_is_not_written_again ______________
+
+project = <w2_121_support.Project object at 0x76bcef449b50>
+
+    def test_s4_an_item_that_was_read_is_not_written_again(project):
+        p = project
+        entry = p.add_ticket(901)
+>       finished(p, entry, "status: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef449b50>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'status: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1146713380003348)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1146713380003348).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+____________ test_s4_a_start_that_never_ran_is_one_inbox_item_once _____________
+
+project = <w2_121_support.Project object at 0x76bcef448740>
+
+    def test_s4_a_start_that_never_ran_is_one_inbox_item_once(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(never_ran_after_s=1)
+        p.set_sleep(20)  # the session never shows as a marker process in the planted /proc, and never ends
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10958712600404397).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10958712600404397) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef448740>.tick
+
+tests/acceptance/W2-121/test_s4_returns.py:114: AssertionError
+__ test_s4_a_start_with_a_marker_process_has_run_and_raises_no_never_ran_item __
+
+project = <w2_121_support.Project object at 0x76bcef44aed0>
+
+    def test_s4_a_start_with_a_marker_process_has_run_and_raises_no_never_ran_item(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(never_ran_after_s=1)
+        p.set_sleep(20)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11991582599875983).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11991582599875983) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef44aed0>.tick
+
+tests/acceptance/W2-121/test_s4_returns.py:137: AssertionError
+____ test_s4_an_item_unread_past_the_configured_time_runs_the_notifier_once ____
+
+project = <w2_121_support.Project object at 0x76bcef4143b0>
+
+    def test_s4_an_item_unread_past_the_configured_time_runs_the_notifier_once(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(unread_escalate_s=1)
+>       finished(p, entry, "status: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef4143b0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'status: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12506904800102348)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12506904800102348).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+_ test_s4_an_item_unread_for_less_than_the_configured_time_raises_no_escalation _
+
+project = <w2_121_support.Project object at 0x76bcef4155b0>
+
+    def test_s4_an_item_unread_for_less_than_the_configured_time_raises_no_escalation(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(unread_escalate_s=3600)
+>       finished(p, entry, "status: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef4155b0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'status: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11861451499862596)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11861451499862596).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+______________ test_s4_an_item_that_was_read_raises_no_escalation ______________
+
+project = <w2_121_support.Project object at 0x76bcef44b170>
+
+    def test_s4_an_item_that_was_read_raises_no_escalation(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(unread_escalate_s=1)
+>       finished(p, entry, "status: DONE\n")
+
+tests/acceptance/W2-121/test_s4_returns.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef44b170>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+output = 'status: DONE\n', exit_code = 0
+
+    def finished(p, entry, output=None, exit_code=0):
+        """Start the entry's session (a stub that prints ``output`` and exits) and wait until its ``.exit`` file exists."""
+        if output is not None:
+            p.set_output(output)
+        p.set_exit(exit_code)
+        before = len(p.launches())
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12005475800106069)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12005475800106069).code
+
+tests/acceptance/W2-121/test_s4_returns.py:30: AssertionError
+___ test_s5_the_status_holds_the_running_sessions_counted_from_the_processes ___
+
+project = <w2_121_support.Project object at 0x76bcef449730>
+
+    def test_s5_the_status_holds_the_running_sessions_counted_from_the_processes(project):
+        p = project
+        p.plant_lead("DAEO-r001")
+        p.plant_lead("DAEO-r002")
+        p.plant_process(["tail", "-f", "DAEO-r003.log"])  # a mention is no session
+        p.plant_lead("DAEO-r004", role="engineer")  # nor is a worker
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12259256800462026)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12259256800462026).code
+
+tests/acceptance/W2-121/test_s5_status.py:37: AssertionError
+_ test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox __
+
+project = <w2_121_support.Project object at 0x76bcef44a510>
+
+    def test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_machine(mem_gib=12, load=(3.5, 2.0, 1.0))
+        p.land("W2-950=0123456789ab\nW2-951=ba9876543210\n")
+        land_before = ((p.state / "land.txt").read_text(), (p.state / "land.txt").stat().st_mtime_ns)
+        p.plant_item("0001.txt", "W2-960-A5-x.json", "W2-960")
+        p.plant_item("0002.txt", "W2-962-A5-x.json", "W2-962")
+        p.plant_item("0003.txt", "W2-961-A5-x.json", "W2-961", read=True)
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11596285300038289)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11596285300038289).code
+
+tests/acceptance/W2-121/test_s5_status.py:59: AssertionError
+_______ test_s5_session_counts_do_not_come_from_started_txt_or_the_logs ________
+
+project = <w2_121_support.Project object at 0x76bcef2dd490>
+
+    def test_s5_session_counts_do_not_come_from_started_txt_or_the_logs(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.set_sleep(10)
+        p.ready(first, second)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12626922400522744).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12626922400522744) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2dd490>.tick
+
+tests/acceptance/W2-121/test_s5_status.py:88: AssertionError
+__________ test_s5_the_status_files_are_replaced_by_rename_every_pass __________
+
+project = <w2_121_support.Project object at 0x76bcef2e5e20>
+
+    def test_s5_the_status_files_are_replaced_by_rename_every_pass(project):
+        p = project
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11907545600115554).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11907545600115554) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e5e20>.tick
+
+tests/acceptance/W2-121/test_s5_status.py:100: AssertionError
+_____ test_s5_a_failing_pass_says_so_at_the_top_and_leaves_no_stale_status _____
+
+project = <w2_121_support.Project object at 0x76bcef370320>
+
+    def test_s5_a_failing_pass_says_so_at_the_top_and_leaves_no_stale_status(project):
+        p = project
+        entry = p.add_ticket(901)
+>       assert p.tick().code == 0  # a good pass first: a status that says it succeeded
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12145874699490378).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12145874699490378) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef370320>.tick
+
+tests/acceptance/W2-121/test_s5_status.py:113: AssertionError
+_ test_s6_the_dispatcher_code_names_none_of_this_repositorys_branches_paths_or_ticket_ids _
+
+    def test_s6_the_dispatcher_code_names_none_of_this_repositorys_branches_paths_or_ticket_ids():
+>       assert DISPATCH.is_dir(), f"{DISPATCH} does not exist: the dispatcher is not built"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-121-tests/src/gov/dispatch does not exist: the dispatcher is not built
+E       assert False
+E        +  where False = is_dir()
+E        +    where is_dir = PosixPath('/home/usain/gov-os-worktrees/W2-121-tests/src/gov/dispatch').is_dir
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:34: AssertionError
+_ test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[integration_branch] _
+
+project = <w2_121_support.Project object at 0x76bcef4151f0>
+key = 'integration_branch'
+
+    @pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band"])
+    def test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key(project, key):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg_drop(key)
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name integration_branch
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'integration_branch' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12134366799728014).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12134366799728014).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:53: AssertionError
+_ test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[max_leads] _
+
+project = <w2_121_support.Project object at 0x76bcef417680>, key = 'max_leads'
+
+    @pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band"])
+    def test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key(project, key):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg_drop(key)
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name max_leads
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'max_leads' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12058356400666526).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12058356400666526).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:53: AssertionError
+_ test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[stagger_s] _
+
+project = <w2_121_support.Project object at 0x76bcef414380>, key = 'stagger_s'
+
+    @pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band"])
+    def test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key(project, key):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg_drop(key)
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name stagger_s
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'stagger_s' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1216851270000916).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1216851270000916).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:53: AssertionError
+_ test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[cpu_band] __
+
+project = <w2_121_support.Project object at 0x76bcef416a80>, key = 'cpu_band'
+
+    @pytest.mark.parametrize("key", ["integration_branch", "max_leads", "stagger_s", "cpu_band"])
+    def test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key(project, key):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg_drop(key)
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name cpu_band
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'cpu_band' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11177581799711334).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11177581799711334).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:53: AssertionError
+_ test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[max_leads-many] _
+
+project = <w2_121_support.Project object at 0x76bcef4041a0>, key = 'max_leads'
+value = 'many'
+
+    @pytest.mark.parametrize("key, value", [("max_leads", "many"), ("stagger_s", -5), ("cpu_band", "wide"),
+                                            ("launch_command", "gov launch lead"), ("notifier_command", "notify-send")])
+    def test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key(project, key, value):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(**{key: value})
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name max_leads
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'max_leads' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13043930700223427).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13043930700223427).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:67: AssertionError
+_ test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[stagger_s--5] _
+
+project = <w2_121_support.Project object at 0x76bcef417d40>, key = 'stagger_s'
+value = -5
+
+    @pytest.mark.parametrize("key, value", [("max_leads", "many"), ("stagger_s", -5), ("cpu_band", "wide"),
+                                            ("launch_command", "gov launch lead"), ("notifier_command", "notify-send")])
+    def test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key(project, key, value):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(**{key: value})
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name stagger_s
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'stagger_s' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11155963599594543).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11155963599594543).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:67: AssertionError
+_ test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[cpu_band-wide] _
+
+project = <w2_121_support.Project object at 0x76bcef415370>, key = 'cpu_band'
+value = 'wide'
+
+    @pytest.mark.parametrize("key, value", [("max_leads", "many"), ("stagger_s", -5), ("cpu_band", "wide"),
+                                            ("launch_command", "gov launch lead"), ("notifier_command", "notify-send")])
+    def test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key(project, key, value):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(**{key: value})
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name cpu_band
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'cpu_band' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11840826200204901).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11840826200204901).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:67: AssertionError
+_ test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[launch_command-gov launch lead] _
+
+project = <w2_121_support.Project object at 0x76bcef414500>
+key = 'launch_command', value = 'gov launch lead'
+
+    @pytest.mark.parametrize("key, value", [("max_leads", "many"), ("stagger_s", -5), ("cpu_band", "wide"),
+                                            ("launch_command", "gov launch lead"), ("notifier_command", "notify-send")])
+    def test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key(project, key, value):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(**{key: value})
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name launch_command
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'launch_command' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11098618899995927).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11098618899995927).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:67: AssertionError
+_ test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[notifier_command-notify-send] _
+
+project = <w2_121_support.Project object at 0x76bcef371070>
+key = 'notifier_command', value = 'notify-send'
+
+    @pytest.mark.parametrize("key, value", [("max_leads", "many"), ("stagger_s", -5), ("cpu_band", "wide"),
+                                            ("launch_command", "gov launch lead"), ("notifier_command", "notify-send")])
+    def test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key(project, key, value):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(**{key: value})
+        p.ready(entry)
+        r = p.tick()
+        assert r.code == 2, r
+>       assert key in r.out + r.err, f"the configuration error does not name {key}\n{r}"
+E       AssertionError: the configuration error does not name notifier_command
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E       assert 'notifier_command' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12147488800110295).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12147488800110295).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:67: AssertionError
+______________ test_s6_no_dispatch_yaml_is_a_configuration_error _______________
+
+project = <w2_121_support.Project object at 0x76bcef2e4bf0>
+
+    def test_s6_no_dispatch_yaml_is_a_configuration_error(project):
+        p = project
+        p.ready(p.add_ticket(901))
+        p.raw_config = "<absent>"
+        r = p.tick()
+        assert r.code == 2, r
+>       assert re.search(r"dispatch\.yaml|integration_branch", r.out + r.err), r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.10844797300524078)
+E       assert None
+E        +  where None = <function search at 0x76bcf1126340>('dispatch\\.yaml|integration_branch', ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n"))
+E        +    where <function search at 0x76bcf1126340> = re.search
+E        +    and   '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10844797300524078).out
+E        +    and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.10844797300524078).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:78: AssertionError
+______ test_s6_a_dispatch_yaml_that_is_not_yaml_is_a_configuration_error _______
+
+project = <w2_121_support.Project object at 0x76bcef2decf0>
+
+    def test_s6_a_dispatch_yaml_that_is_not_yaml_is_a_configuration_error(project):
+        p = project
+        p.ready(p.add_ticket(901))
+        p.raw_config = "dispatch: [unclosed\n  integration_branch: : :\n"
+        r = p.tick()
+        assert r.code == 2, r
+>       assert "dispatch.yaml" in r.out + r.err, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11262828300095862)
+E       assert 'dispatch.yaml' in ('' + "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +  where '' = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11262828300095862).out
+E        +  and   "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n" = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11262828300095862).err
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:89: AssertionError
+______ test_s6_the_integration_branch_is_the_configured_one_not_a_default ______
+
+project = <w2_121_support.Project object at 0x76bcef44bc80>
+
+    def test_s6_the_integration_branch_is_the_configured_one_not_a_default(project):
+        p = project
+        entry = p.add_ticket(901)
+        support.git(p.root, "branch", "-m", "integ", "trunk-line")
+        p.cfg(integration_branch="trunk-line")
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11046661699947435).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11046661699947435) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef44bc80>.tick
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:98: AssertionError
+_ test_s6_a_hung_git_ends_the_pass_in_bounded_time_with_the_check_named_as_failed _
+
+project = <w2_121_support.Project object at 0x76bcef4492e0>
+
+    def test_s6_a_hung_git_ends_the_pass_in_bounded_time_with_the_check_named_as_failed(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(command_timeout_s=1)
+        p.ready(entry)
+        p.hung_git()
+        r = p.tick(timeout=60)
+        assert r.seconds < 40, f"the pass took {r.seconds:.0f}s with every git call hung for 8s and command_timeout_s 1\n{r}"
+        p.settle()
+        assert p.launches() == [], "a session started although the claim could not be checked"
+        status = p.status_text() if (p.state / "status.txt").is_file() else ""
+        said = status + r.out + r.err
+>       assert re.search(TIMED_OUT, said) and "git" in said, f"the hung git is not named as a failed check\n{explain(p, r)}"
+E       AssertionError: the hung git is not named as a failed check
+E         
+E         exit 2 in 0.1s
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         
+E         --- status.txt ---
+E         (no status.txt)
+E       assert (None)
+E        +  where None = <function search at 0x76bcf1126340>('(?i)time[ds]?[- ]?out|timed out', "usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (choose from 'status', 'che... 'close', 'adopt', 'pause', 'accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n")
+E        +    where <function search at 0x76bcf1126340> = re.search
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:115: AssertionError
+_ test_s6_a_hung_notifier_ends_the_pass_in_bounded_time_with_the_command_named _
+
+project = <w2_121_support.Project object at 0x76bcef4058e0>
+
+    def test_s6_a_hung_notifier_ends_the_pass_in_bounded_time_with_the_command_named(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.cfg(unread_escalate_s=1, command_timeout_s=1)
+        p.set_exit(0)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12723780100350268).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12723780100350268) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef4058e0>.tick
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:124: AssertionError
+______ test_s6_a_pass_killed_after_the_launch_never_starts_that_log_again ______
+
+project = <w2_121_support.Project object at 0x76bcef4074a0>
+
+    def test_s6_a_pass_killed_after_the_launch_never_starts_that_log_again(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.set_sleep(4)
+        p.ready(entry)
+        proc = p.tick_popen()
+>       p.wait_launches(1)  # the launch command has run
+        ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s6_nothing_project_specific.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-121/w2_121_support.py:580: in wait_launches
+    wait_for(lambda: len(self.launches()) >= count, timeout, what=f"{count} launch record(s) of the stub")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+predicate = <function Project.wait_launches.<locals>.<lambda> at 0x76bcef3dce00>
+timeout = 20.0, step = 0.05, what = '1 launch record(s) of the stub'
+
+    def wait_for(predicate, timeout: float = 20.0, step: float = 0.05, what: str = "the condition"):
+        """A bounded poll; the predicate's last truthy value, else AssertionError."""
+        end = time.monotonic() + timeout
+        while True:
+            value = predicate()
+            if value:
+                return value
+            if time.monotonic() >= end:
+>               raise AssertionError(f"timed out after {timeout:.0f}s waiting for {what}")
+E               AssertionError: timed out after 20s waiting for 1 launch record(s) of the stub
+
+tests/acceptance/W2-121/w2_121_support.py:165: AssertionError
+_ test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item _
+
+project = <w2_121_support.Project object at 0x76bcef406c00>
+
+    def test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item(project):
+        p = project
+        bad, good = p.add_ticket(901, brief=REVIEW), p.add_ticket(902)
+        p.probes(bad, 2)
+        p.ready(bad, good)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.11017577700113179)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.11017577700113179).code
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:23: AssertionError
+____________________ test_s7_the_owner_item_is_written_once ____________________
+
+project = <w2_121_support.Project object at 0x76bcef448e90>
+
+    def test_s7_the_owner_item_is_written_once(project):
+        p = project
+        bad = p.add_ticket(901, brief=REVIEW)
+        p.probes(bad, 3)
+        p.ready(bad)
+        for round_ in range(3):
+            r = p.tick()
+>           assert r.code == 0, r
+E           AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E             gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E             ", seconds=0.1257850940019125)
+E           assert 2 == 0
+E            +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1257850940019125).code
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:39: AssertionError
+______________ test_s7_a_ticket_with_one_probe_record_is_started _______________
+
+project = <w2_121_support.Project object at 0x76bcef44b470>
+
+    def test_s7_a_ticket_with_one_probe_record_is_started(project):
+        p = project
+        entry = p.add_ticket(901, brief=REVIEW)
+        p.probes(entry, 1)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12851347599644214).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12851347599644214) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef44b470>.tick
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:54: AssertionError
+_______________ test_s7_a_ticket_with_no_probe_record_is_started _______________
+
+project = <w2_121_support.Project object at 0x76bcef2e7770>
+
+    def test_s7_a_ticket_with_no_probe_record_is_started(project):
+        p = project
+        entry = p.add_ticket(901, brief=REVIEW)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.14416810600232566).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.14416810600232566) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef2e7770>.tick
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:64: AssertionError
+_ test_s7_a_brief_that_is_not_a_review_launch_is_started_whatever_the_records __
+
+project = <w2_121_support.Project object at 0x76bcef373d40>
+
+    def test_s7_a_brief_that_is_not_a_review_launch_is_started_whatever_the_records(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.probes(entry, 3)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12598859099671245).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12598859099671245) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef373d40>.tick
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:74: AssertionError
+___ test_s7_only_the_markdown_records_of_the_tickets_own_folder_are_counted ____
+
+project = <w2_121_support.Project object at 0x76bcef417560>
+
+    def test_s7_only_the_markdown_records_of_the_tickets_own_folder_are_counted(project):
+        p = project
+        entry, other = p.add_ticket(901, brief=REVIEW), p.add_ticket(902, brief=REVIEW)
+        p.probes(entry, 1)
+        p.probes(entry, 1, suffix=".txt")  # a second file, but not a record
+        p.commit(entry, f"docs/probes/{entry.ticket}/notes.json", "{}\n")
+        p.probes(other, 3)  # another ticket's records
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12126301999524003).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12126301999524003) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef417560>.tick
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:88: AssertionError
+_______________ test_s7_the_probes_folder_is_the_configured_one ________________
+
+project = <w2_121_support.Project object at 0x76bcef404ef0>
+
+    def test_s7_the_probes_folder_is_the_configured_one(project):
+        p = project
+        p.cfg(probes_dir="records/probes")
+        entry = p.add_ticket(901, brief=REVIEW)
+        p.probes(entry, 2, folder="records/probes")
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.13608485099393874)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.13608485099393874).code
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:101: AssertionError
+__________________ test_s7_the_refusal_is_named_in_the_status __________________
+
+project = <w2_121_support.Project object at 0x76bcef406e10>
+
+    def test_s7_the_refusal_is_named_in_the_status(project):
+        p = project
+        bad = p.add_ticket(901, brief=REVIEW)
+        p.probes(bad, 2)
+        p.ready(bad)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.12519199400412617)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12519199400412617).code
+
+tests/acceptance/W2-121/test_s7_review_rounds.py:113: AssertionError
+_ test_s8_every_wake_is_an_inbox_item_written_by_a_pass_and_nothing_else_wakes_the_caller _
+
+project = <w2_121_support.Project object at 0x76bcef404290>
+
+    def test_s8_every_wake_is_an_inbox_item_written_by_a_pass_and_nothing_else_wakes_the_caller(project):
+        p = project
+        first, second = p.add_ticket(901), p.add_ticket(902)
+        p.set_output("task: planted\nstatus: DONE\n")
+        p.ready(first, second)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12277940900094109).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12277940900094109) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef404290>.tick
+
+tests/acceptance/W2-121/test_s8_no_watcher.py:19: AssertionError
+______ test_s8_a_pass_leaves_no_process_of_its_own_running_after_it_exits ______
+
+project = <w2_121_support.Project object at 0x76bcef384170>
+
+    def test_s8_a_pass_leaves_no_process_of_its_own_running_after_it_exits(project):
+        """After ``tick`` exits, the only process still running is the detached session the launch command made."""
+        import os
+    
+        p = project
+        entry = p.add_ticket(901)
+        p.set_sleep(6)
+        p.ready(entry)
+        r = p.tick()
+>       assert r.code == 0, r
+E       AssertionError: Run(code=2, out='', err="usage: gov [-h] <command> ...
+E         gov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')
+E         ", seconds=0.1239336739963619)
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1239336739963619).code
+
+tests/acceptance/W2-121/test_s8_no_watcher.py:46: AssertionError
+________________ test_s9_short_and_full_commit_ids_both_resolve ________________
+
+project = <w2_121_support.Project object at 0x76bcef3849e0>
+
+    def test_s9_short_and_full_commit_ids_both_resolve(project):
+        p = project
+        entry = p.add_ticket(901)
+        full = p.commit(entry, "src/real_file.py", "x = 1\n")
+>       item = item_for(p, entry, return_text(f"{full[:7]} short, {full} full", "src/real_file.py"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef3849e0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+text = 'task: planted\nstatus: DONE\nwork_completed: planted\nfiles_changed: src/real_file.py\nevidence: ok\ntests: none\ndis...ecisions: none\nrecommended_next_action: none\ncommits: bed6ba8 short, bed6ba8b8c9f2b9f5038127393873c39af640d27 full\n'
+
+    def item_for(p, entry, text):
+        p.set_output(text)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1293795469973702).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...accept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.1293795469973702) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef3849e0>.tick
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:33: AssertionError
+________ test_s9_only_the_commits_and_files_changed_lines_are_resolved _________
+
+project = <w2_121_support.Project object at 0x76bcef385ca0>
+
+    def test_s9_only_the_commits_and_files_changed_lines_are_resolved(project):
+        p = project
+        entry = p.add_ticket(901)
+        full = p.commit(entry, "src/real_file.py", "x = 1\n")
+>       item = item_for(p, entry, return_text(
+            f"{full[:12]} planted", "src/real_file.py",
+            "evidence: ran against deadbee9999 and checked", "lessons: read src/also_missing.py before changing it"))
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef385ca0>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+text = 'task: planted\nstatus: DONE\nwork_completed: planted\nfiles_changed: src/real_file.py\nevidence: ok\ntests: none\ndis...a8b8c9f planted\nevidence: ran against deadbee9999 and checked\nlessons: read src/also_missing.py before changing it\n'
+
+    def item_for(p, entry, text):
+        p.set_output(text)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12034269399737241).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12034269399737241) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef385ca0>.tick
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:33: AssertionError
+____________ test_s9_the_item_is_the_same_item_with_its_first_lines ____________
+
+project = <w2_121_support.Project object at 0x76bcef386360>
+
+    def test_s9_the_item_is_the_same_item_with_its_first_lines(project):
+        p = project
+        entry = p.add_ticket(901)
+        full = p.commit(entry, "src/real_file.py", "x = 1\n")
+>       item = item_for(p, entry, return_text(f"{GHOST_COMMIT} ghost", "src/real_file.py"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+p = <w2_121_support.Project object at 0x76bcef386360>
+entry = Entry(w2='W2-901', ticket='DAEO-a901', brief='b901.md', log='W2-901-A5-run.json', n=901, brief_text='# Brief for the planted ticket\n\nDo the planted work and return the twelve fields.\n')
+text = 'task: planted\nstatus: DONE\nwork_completed: planted\nfiles_changed: src/real_file.py\nevidence: ok\ntests: none\ndis...ne\nrisks: none\nlessons: none\nproposed_decisions: none\nrecommended_next_action: none\ncommits: deadbee1234f ghost\n'
+
+    def item_for(p, entry, text):
+        p.set_output(text)
+        p.ready(entry)
+>       assert p.tick().code == 0
+E       assert 2 == 0
+E        +  where 2 = Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12641245599661488).code
+E        +    where Run(code=2, out='', err="usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice: 'dispatch' (ch...ccept', 'brief', 'ci', 'launch', 'links', 'plan', 'release', 'resources', 'telemetry')\n", seconds=0.12641245599661488) = tick()
+E        +      where tick = <w2_121_support.Project object at 0x76bcef386360>.tick
+
+tests/acceptance/W2-121/test_s9_resolved_returns.py:33: AssertionError
+==================================== PASSES ====================================
+============================= slowest 8 durations ==============================
+20.01s call     tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_pass_killed_after_the_launch_never_starts_that_log_again
+1.13s call     tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_hung_git_ends_the_pass_in_bounded_time_with_the_check_named_as_failed
+0.22s call     tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_an_entry_that_is_not_on_the_plan_list_is_not_started
+0.21s call     tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_the_plan_lists_comment_lines_are_not_malformed_entries
+0.21s call     tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_the_dispatcher_starts_the_entries_of_a_plan_list_in_the_lists_own_order
+0.19s call     tests/acceptance/W2-121/test_f1_failure.py::test_f1_no_session_starts_for_an_off_list_not_ready_or_running_entry
+0.19s call     tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_only_the_markdown_records_of_the_tickets_own_folder_are_counted
+0.19s call     tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_two_ticks_started_together_run_one_pass
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_machine_has_the_gate_open
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_machine_can_shut_the_gate[change0-memory]
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_machine_can_shut_the_gate[change1-disk]
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_machine_can_shut_the_gate[change2-load]
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_lead_carries_the_launchers_marker
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_planted_planted_processes_are_read_by_the_gates_own_reader
+PASSED tests/acceptance/W2-121/test_premise.py::test_premise_claim_layouts_in_git
+FAILED tests/acceptance/W2-121/test_f1_failure.py::test_f1_no_session_starts_for_an_off_list_not_ready_or_running_entry
+FAILED tests/acceptance/W2-121/test_f1_failure.py::test_f1_no_session_starts_without_room_for_its_peak
+FAILED tests/acceptance/W2-121/test_f1_failure.py::test_f1_a_session_the_lead_count_ignores_in_the_logs_does_not_hold_a_start
+FAILED tests/acceptance/W2-121/test_f1_failure.py::test_f1_the_lead_count_is_the_processes_and_nothing_else_holds_a_start
+FAILED tests/acceptance/W2-121/test_f1_failure.py::test_f1_every_finished_session_is_in_the_inbox
+FAILED tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_the_dispatcher_starts_the_entries_of_a_plan_list_in_the_lists_own_order
+FAILED tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_an_entry_that_is_not_on_the_plan_list_is_not_started
+FAILED tests/acceptance/W2-121/test_s10_plan_ready_list.py::test_s10_the_plan_lists_comment_lines_are_not_malformed_entries
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_tick_does_one_pass_and_exits
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_second_tick_exits_4_at_the_lock_and_writes_nothing
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_the_lock_is_released_when_the_pass_ends
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_two_ticks_started_together_run_one_pass
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_off_file_stops_the_pass
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_off_file_also_stops_the_returns_and_removing_it_resumes
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_prints_the_status_text
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_prints_the_json_under_json
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_says_when_the_last_pass_is_older_than_three_minutes
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_a_fresh_status_is_not_called_old
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_runs_no_pass_and_writes_nothing
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_a_usage_error_is_exit_2_and_names_the_actions[args0]
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_a_usage_error_is_exit_2_and_names_the_actions[args1]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_one_session_starts_a_pass_the_first_eligible_in_the_lists_order
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_next_start_is_staggered
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_with_no_stagger_each_pass_starts_the_next_entry_in_order
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_launch_gets_the_brief_on_stdin_and_the_entrys_names_and_logs_its_output
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_exit_code_of_a_session_is_kept_beside_its_log
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_log_name_is_in_started_txt_before_the_launch_command_runs
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_launch_is_detached_and_the_pass_does_not_wait_for_it
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_log_name_is_never_started_twice
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_entry_not_on_the_list_is_never_started
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_comments_and_blank_lines_are_ignored_and_are_not_malformed
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_no_ready_list_starts_nothing_and_is_not_an_error
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_malformed_line_is_named_and_the_other_lines_are_still_read
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_claim_must_be_committed_on_the_integration_branch
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_claim_must_be_committed_at_the_worktrees_head
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_ticket_not_claimed_anywhere_is_skipped_with_its_reason
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_worktree_with_a_tracked_change_is_not_clean
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_untracked_file_does_not_make_the_worktree_unclean
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[at-at]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[blank]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[empty]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[missing]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[slot]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_incomplete_brief_is_skipped_and_named[slot-digits]
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_braces_that_are_not_an_unfilled_slot_do_not_make_a_brief_incomplete
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_relative_brief_resolves_against_briefs_dir
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_absolute_brief_path_is_used_as_is
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_the_worktree_is_found_under_a_worktrees_root_relative_to_the_project
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_running_ticket_is_skipped_and_named
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_process_that_only_mentions_the_ticket_is_not_a_running_ticket
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_an_unread_return_holds_its_entry_and_is_named
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_return_that_was_read_no_longer_holds_its_entry
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_another_tickets_unread_return_does_not_hold_the_entry
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_shut_gate_starts_nothing_names_every_entry_and_exits_3
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_full_disk_starts_nothing_names_every_entry_and_exits_3
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_max_leads_counts_the_running_sessions_from_the_processes
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_below_max_leads_the_entry_starts
+FAILED tests/acceptance/W2-121/test_s2_start_rules.py::test_s2_a_start_with_no_process_yet_counts_toward_max_leads
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it[5.5-False]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_start_is_refused_under_the_leads_memory_peak_and_made_over_it[6.5-True]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it[2.0-False]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_start_is_refused_under_the_leads_cpu_peak_and_made_over_it[0.5-True]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_peaks_still_ahead_of_a_running_job_are_kept_for_it
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_without_the_running_rebuild_the_same_machine_has_room
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_rebuild_with_room_over_its_peak_ahead_admits_the_start
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-4.0-False]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-5.5-True]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[1-4-7.0-False]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[1-4-9.5-True]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[4-2-7.0-False]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_floor_and_the_working_size_are_the_gates_own[1-2-7.0-True]
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_status_prints_each_kinds_peak_with_its_date
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_a_kinds_peak_is_the_maximum_over_its_history
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_peaks_are_refreshed_from_the_history_when_older_than_a_day
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_missing_peaks_are_computed_from_the_history
+FAILED tests/acceptance/W2-121/test_s3_peaks.py::test_s3_the_job_history_file_is_the_configured_one
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_a_finished_session_becomes_one_inbox_item_and_no_more_on_the_next_pass
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_the_items_status_is_the_returns_own_status_line
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_without_a_status_line_the_items_status_is_the_exit_code
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_no_item_while_the_session_still_runs
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_every_finished_session_is_its_own_item
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_an_item_that_was_read_is_not_written_again
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_a_start_that_never_ran_is_one_inbox_item_once
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_a_start_with_a_marker_process_has_run_and_raises_no_never_ran_item
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_an_item_unread_past_the_configured_time_runs_the_notifier_once
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_an_item_unread_for_less_than_the_configured_time_raises_no_escalation
+FAILED tests/acceptance/W2-121/test_s4_returns.py::test_s4_an_item_that_was_read_raises_no_escalation
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_the_status_holds_the_running_sessions_counted_from_the_processes
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_the_status_holds_load_memory_gate_slots_peaks_ahead_queue_and_inbox
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_session_counts_do_not_come_from_started_txt_or_the_logs
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_the_status_files_are_replaced_by_rename_every_pass
+FAILED tests/acceptance/W2-121/test_s5_status.py::test_s5_a_failing_pass_says_so_at_the_top_and_leaves_no_stale_status
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_the_dispatcher_code_names_none_of_this_repositorys_branches_paths_or_ticket_ids
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[integration_branch]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[max_leads]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[stagger_s]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_missing_configuration_value_is_exit_2_and_names_the_key[cpu_band]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[max_leads-many]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[stagger_s--5]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[cpu_band-wide]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[launch_command-gov launch lead]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_malformed_configuration_value_is_exit_2_and_names_the_key[notifier_command-notify-send]
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_no_dispatch_yaml_is_a_configuration_error
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_dispatch_yaml_that_is_not_yaml_is_a_configuration_error
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_the_integration_branch_is_the_configured_one_not_a_default
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_hung_git_ends_the_pass_in_bounded_time_with_the_check_named_as_failed
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_hung_notifier_ends_the_pass_in_bounded_time_with_the_command_named
+FAILED tests/acceptance/W2-121/test_s6_nothing_project_specific.py::test_s6_a_pass_killed_after_the_launch_never_starts_that_log_again
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_a_ticket_with_two_probe_records_is_not_started_and_is_one_owner_item
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_the_owner_item_is_written_once
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_a_ticket_with_one_probe_record_is_started
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_a_ticket_with_no_probe_record_is_started
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_a_brief_that_is_not_a_review_launch_is_started_whatever_the_records
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_only_the_markdown_records_of_the_tickets_own_folder_are_counted
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_the_probes_folder_is_the_configured_one
+FAILED tests/acceptance/W2-121/test_s7_review_rounds.py::test_s7_the_refusal_is_named_in_the_status
+FAILED tests/acceptance/W2-121/test_s8_no_watcher.py::test_s8_every_wake_is_an_inbox_item_written_by_a_pass_and_nothing_else_wakes_the_caller
+FAILED tests/acceptance/W2-121/test_s8_no_watcher.py::test_s8_a_pass_leaves_no_process_of_its_own_running_after_it_exits
+FAILED tests/acceptance/W2-121/test_s9_resolved_returns.py::test_s9_short_and_full_commit_ids_both_resolve
+FAILED tests/acceptance/W2-121/test_s9_resolved_returns.py::test_s9_only_the_commits_and_files_changed_lines_are_resolved
+FAILED tests/acceptance/W2-121/test_s9_resolved_returns.py::test_s9_the_item_is_the_same_item_with_its_first_lines
+121 failed, 7 passed, 2 deselected in 40.21s

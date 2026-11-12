@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-013505.out
+Structural: after the landing of W2-110 (base 7b8d732f3057)
+status: structural pass at 3592b398e02d: NOTICE in mutation (9 of 10 families ok), 26.1 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 1 finding: .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: ok [1 kernel role, skill, hook or .rulesync path(s) changed since 7b8d732f3057]
+links: ok (0 new since 7b8d732f3057c56d27443fead4ecfe3f3aaef27e, 1607 standing)
+structural pass at 3592b398e02d: NOTICE in mutation (9 of 10 families ok), 26.1 s; a notice, not a refusal

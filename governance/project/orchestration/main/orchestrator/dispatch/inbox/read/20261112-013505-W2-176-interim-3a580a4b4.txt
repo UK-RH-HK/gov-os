@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-176
+status: interim result 3a580a4b4: W2-176: CIT-P record, proposed: round 2 READY at 7894a35e116f, the CTO's package decisions, R8 recorded, sha256 at the final head, verification

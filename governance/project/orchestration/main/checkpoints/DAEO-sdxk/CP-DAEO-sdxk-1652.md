@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-sdxk-1652
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-sdxk at stop
+task: DAEO-sdxk
+task_status: open
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-12T01:45:11Z'
+inputs:
+- id: DAEO-sdxk
+  version: e12f8a30c
+  hash: sha256:83908c45e7c968d7dea1f83ceb9e9d469f34fac886eb8b5ac2fd240ea9fbc880
+head_commit: 6e46f985b0a7c0f713cf21786a58327ce65cf8fe
+---
+
+# CP-DAEO-sdxk-1652 — DAEO-sdxk at stop
+
+## Next action
+
+Resume after stop

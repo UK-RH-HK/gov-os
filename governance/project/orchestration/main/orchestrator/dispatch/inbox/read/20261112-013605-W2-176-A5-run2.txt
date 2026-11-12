@@ -1,0 +1,11 @@
+log: W2-176-A5-run2.json
+W2: W2-176
+status: DONE. Verified head `3a580a4b4d42` (code head `7894a35e116f`; the last commit changes only the CIT-P record). The owner's approval (CIT-P §4) is still pending.
+
+task: DAEO-ktiw (W2-176), ticket lead, run 2 (resume after run 1's packages)
+status: DONE. Verified head `3a580a4b4d42` (code head `7894a35e116f`; the last commit changes only the CIT-P record). The owner's approval (CIT-P §4) is still pending.
+work_completed:
+- Resumed from CHECKPOINT. Built a fresh engineer brief from the CTO's decisions P1–P4. The context packet needed `--budget 12000`, because the 9000 ceiling was 202 tokens short.
+- eng-2 (Opus 5.5, high, C3, projection 5) did all of the decisions, tests first:
+  - P1 (a): assert-only updates to the five older reds.
+  - P2 (a): the report

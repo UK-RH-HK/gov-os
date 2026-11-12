@@ -1,0 +1,9 @@
+W2-121 (DAEO-cb2b): merge the independent acceptance tests (td-1, 0384e71db794) into the build branch
+
+130 cases in tests/acceptance/W2-121/ for part a (S1-S10, F1's start half); 123 red on the missing command at the
+test designer's run, 7 premise guards green.
+
+Task: DAEO-cb2b
+Role: orchestrator
+Implements: DEC-1007, DEC-1008, DEC-1010, DEC-1014, DEC-1084, DEC-1088, DEC-995, DEC-944, DEC-982, DEC-1003
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

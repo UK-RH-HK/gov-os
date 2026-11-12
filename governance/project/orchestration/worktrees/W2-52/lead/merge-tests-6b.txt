@@ -1,0 +1,6 @@
+Merge w2/W2-52-tests into w2/W2-52: run 6's test-design batch 2 (P-9 (a)): the query embedder's address given to the stand-in (GOV_QUERY_OLLAMA_HOST)
+
+Task: DAEO-siiz
+Implements: DEC-741, DEC-1065, DEC-1033, DEC-1112
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,64 @@
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_a_candidate_that_cannot_be_isolated_refuses_the_batch 
+AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project --json exit code: 3 stdout: {"ok": false, "command": "batch", "result": {}, "sessi
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('gov.close.batch', 'run', 'PROJ-aaaa', 'PROJ-b1b1', 'PROJ-c1c1', '--root', '/tmp/gov-os-lead-W2-115/pytest-o...": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"]}}}\n', stderr='', seconds=3.1333521970009315)
+code = 'CANDIDATE_NOT_ISOLATED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+        assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+        text = refusal_text(run)
+        if code is not None:
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project --json
+E           exit code: 3
+E           stdout:
+E           {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "BATCH_UNEXPLAINED", "message": "1 red(s) no single candidate explains: tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget; nothing lands", "details": {"base": "1cab34a461cf268861d99a820508d56e0513e0de", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": [], "landed": [], "land_commit": null, "reds": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project/.gov-runtime/close/batch/20261112T023547Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget": []}, "unexplained": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"]}}}
+E           
+E           stderr:
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_reds.py::test_only_the_load_sensitive_case_gets_three_rounds 
+AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs assert 2 >= 4  +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_unowned0/project/.gov-runti...t/other.py': '# the gadget\n', 'src/gov/widget/thing.p
+unowned = <conftest.Unowned object at 0x7d8fe115c890>
+
+    def test_only_the_load_sensitive_case_gets_three_rounds(unowned):
+        """S4: the load-sensitive case (a ``latency`` entry of the serial-only list) gets 3 rounds each way."""
+        support.passed(unowned.run)
+        runs = unowned.project.told_runs("test_bb_timing")
+        head, base = support.head_side(runs), support.base_side(runs)
+>       assert len(head) >= 4, f"the load-sensitive red did not get 3 rounds alone after its run: {len(head)} head runs"
+E       AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs
+E       assert 2 >= 4
+E        +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_unowned0/project/.gov-runti...t/other.py': '# the gadget\n', 'src/gov/widget/thing.py': '# the widget, CHANGED\n'}, 'time': 1794450979.3382328, ...}])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:77: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_selection.py::test_governance_files_alone_select_nothing_by_themselves 
+AssertionError: a governance file selected the record readers: ['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'] assert not True  +  where True = <function names at 0x7d8fe3477ce0>(['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'], 'tests/acceptance/W2
+make_project = <function make_project.<locals>.make at 0x7d8fe0c82de0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/test_governance_files_alone_se0/sa...xPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/test_governance_files_alone_se0/sandbox/elsewhere'))
+
+    def test_governance_files_alone_select_nothing_by_themselves(make_project, sandbox):
+        """S2: a change to a governance file alone selects nothing by itself (no other suite, not the record readers)."""
+        project = make_project()
+        project.work({support.GOVERNANCE_FILE: "notes: changed\n"})
+        suites = _selected(project, sandbox)["suites"]
+        for wbs in OTHERS:
+            assert not support.names(suites, support.suite_of(wbs)), f"a governance file selected {wbs}: {suites}"
+>       assert not support.names(suites, support.RR_RECORDS), f"a governance file selected the record readers: {suites}"
+E       AssertionError: a governance file selected the record readers: ['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register']
+E       assert not True
+E        +  where True = <function names at 0x7d8fe3477ce0>(['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'], 'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register')
+E        +    where <function names at 0x7d8fe3477ce0> = support.names
+E        +    and   'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register' = support.RR_RECORDS
+
+tests/acceptance/W2-115/test_w2_115_selection.py:67: AssertionError

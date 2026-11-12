@@ -1,0 +1,6 @@
+W2-23 (DAEO-kmcr): merge the acceptance tests' round-2 S3 cases (9dc7b24af, td-4b: sentence-final folder and tail citations; a nested store cited by its folder; P-W2-23-7 (a)) into the build
+
+Task: DAEO-kmcr
+Role: orchestrator
+Implements: DEC-729, DEC-1052, DEC-954, DEC-315, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

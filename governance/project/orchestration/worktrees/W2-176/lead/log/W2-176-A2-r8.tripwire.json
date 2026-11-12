@@ -1,0 +1,21 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "7e04abcb8659",
+   "after": "20b33403fea4"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M tests/unit/close/test_w2_115_attribution.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "head",
+   "before": "3a580a4b4d42",
+   "after": "ad13a5b36c65"
+  }
+ ]
+}

@@ -1,18 +1,21 @@
 {
  "scope": "scoped",
  "why_full": [],
- "core_changed": [],
+ "core_changed": [
+  "tests/conftest.py"
+ ],
  "unplaced": [
   ".claude/skills/adopt/SKILL.md"
  ],
- "base": "898dd6b5f5e1ee8706798aa08693fd49b1da9c2d",
- "head": "369b4a8cc5ef131c720789cbfd89e534a4071a29",
+ "base": "d43d552d4384a2c11a1f136c51f48c392d709d8c",
+ "head": "e7280f1bb07e3d255ea22e6505a930c7578f0fc0",
  "governance_left_out": [
   ".tickets/DAEO-siiz.md",
   "docs/checkpoints/DAEO-siiz/CP-DAEO-siiz-0002.md",
   "docs/checkpoints/DAEO-siiz/CP-DAEO-siiz-0005.md",
   "docs/checkpoints/DAEO-siiz/CP-DAEO-siiz-0008.md",
   "docs/checkpoints/DAEO-siiz/CP-DAEO-siiz-0014.md",
+  "docs/checkpoints/DAEO-siiz/CP-DAEO-siiz-0016.md",
   "docs/probes/DAEO-siiz/PR-DAEO-siiz.md"
  ],
  "changed": [
@@ -31,6 +34,7 @@
   "tests/acceptance/W2-52/test_w2_52_unchanged.py",
   "tests/acceptance/W2-52/test_w2_52_verdict_conditions.py",
   "tests/acceptance/W2-52/w2_52_support.py",
+  "tests/conftest.py",
   "tests/unit/adopt/test_lite_gates.py"
  ],
  "selected": [
@@ -50,6 +54,7 @@
       "src/gov/adopt/stages.py",
       "template/.rulesync/skills/adopt/SKILL.md",
       "template/governance/kernel/skills/adopt/SKILL.md",
+      "tests/conftest.py",
       "tests/unit/adopt/test_lite_gates.py"
      ]
     },
@@ -1607,7 +1612,8 @@
      "paths": [
       "src/gov/adopt/command.py",
       "src/gov/adopt/lite_gates.py",
-      "src/gov/adopt/stages.py"
+      "src/gov/adopt/stages.py",
+      "tests/conftest.py"
      ]
     }
    ]
@@ -1633,6 +1639,18 @@
    ]
   },
   {
+   "target": "tests/acceptance/W1-27/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-9nys",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
    "target": "tests/acceptance/W1-41/",
    "why": [
     {
@@ -1644,6 +1662,18 @@
       "src/gov/adopt/stages.py",
       "template/governance/kernel/skills/adopt/SKILL.md",
       "tests/unit/adopt/test_lite_gates.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-126/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-jpr0",
+     "paths": [
+      "tests/conftest.py"
      ]
     }
    ]
@@ -1668,6 +1698,42 @@
      "ticket": "DAEO-t8mp",
      "paths": [
       "template/.rulesync/skills/adopt/SKILL.md"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-76/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-tgk2",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-56/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-wnnz",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-141/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-xwro",
+     "paths": [
+      "tests/conftest.py"
      ]
     }
    ]
@@ -2072,25 +2138,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-26/test_w1_26_skill_validator.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-26/test_w1_26_taxonomy.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_adoption.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_drift.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_held_out.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_recovery_check.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_schema.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w2_67_codegraph_folders.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w2_67_copies.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-27/test_w2_67_temp_folders.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-28/test_w1_28_cancel.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-28/test_w1_28_command.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W1-28/test_w1_28_freeze.py",
@@ -2248,7 +2295,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-116",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-122",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-123",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-126",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-129",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-13",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-131",
@@ -2258,7 +2304,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-136",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-137",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-138",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-141",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-142",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-145",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-147",
@@ -2284,7 +2329,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-54/test_w2_54_time_limit.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-55",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-56",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-57",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-58",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-59",
@@ -2312,7 +2356,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-69",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-71",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-72",
-  "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-76",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-77",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-81",
   "--ignore=/home/usain/gov-os-worktrees/W2-52/tests/acceptance/W2-84",
@@ -3266,25 +3309,6 @@
   "tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
   "tests/acceptance/W1-26/test_w1_26_skill_validator.py",
   "tests/acceptance/W1-26/test_w1_26_taxonomy.py",
-  "tests/acceptance/W1-27/test_w1_27_adoption.py",
-  "tests/acceptance/W1-27/test_w1_27_drift.py",
-  "tests/acceptance/W1-27/test_w1_27_held_out.py",
-  "tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
-  "tests/acceptance/W1-27/test_w1_27_recovery_check.py",
-  "tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_schema.py",
-  "tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
-  "tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
-  "tests/acceptance/W1-27/test_w2_67_codegraph_folders.py",
-  "tests/acceptance/W1-27/test_w2_67_copies.py",
-  "tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
-  "tests/acceptance/W1-27/test_w2_67_temp_folders.py",
   "tests/acceptance/W1-28/test_w1_28_cancel.py",
   "tests/acceptance/W1-28/test_w1_28_command.py",
   "tests/acceptance/W1-28/test_w1_28_freeze.py",
@@ -3442,7 +3466,6 @@
   "tests/acceptance/W2-116/",
   "tests/acceptance/W2-122/",
   "tests/acceptance/W2-123/",
-  "tests/acceptance/W2-126/",
   "tests/acceptance/W2-129/",
   "tests/acceptance/W2-13/",
   "tests/acceptance/W2-131/",
@@ -3452,7 +3475,6 @@
   "tests/acceptance/W2-136/",
   "tests/acceptance/W2-137/",
   "tests/acceptance/W2-138/",
-  "tests/acceptance/W2-141/",
   "tests/acceptance/W2-142/",
   "tests/acceptance/W2-145/",
   "tests/acceptance/W2-147/",
@@ -3478,7 +3500,6 @@
   "tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
   "tests/acceptance/W2-54/test_w2_54_time_limit.py",
   "tests/acceptance/W2-55/",
-  "tests/acceptance/W2-56/",
   "tests/acceptance/W2-57/",
   "tests/acceptance/W2-58/",
   "tests/acceptance/W2-59/",
@@ -3506,7 +3527,6 @@
   "tests/acceptance/W2-69/",
   "tests/acceptance/W2-71/",
   "tests/acceptance/W2-72/",
-  "tests/acceptance/W2-76/",
   "tests/acceptance/W2-77/",
   "tests/acceptance/W2-81/",
   "tests/acceptance/W2-84/",

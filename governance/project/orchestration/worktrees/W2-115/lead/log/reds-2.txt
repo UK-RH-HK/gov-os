@@ -1,0 +1,335 @@
+=== tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r14_a_stopp
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 41846.584485367, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+=== tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r16_an_own_
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 41912.077373837, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_a_candidate_that_cannot_be_isolated_refuses_the_batch 
+AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project --json exit code: 3 stdout: {"ok": false, "command": "batch", "result": {}, "sessi
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('gov.close.batch', 'run', 'PROJ-aaaa', 'PROJ-b1b1', 'PROJ-c1c1', '--root', '/tmp/gov-os-lead-W2-115/pytest-o...": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"]}}}\n', stderr='', seconds=3.1333521970009315)
+code = 'CANDIDATE_NOT_ISOLATED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+        assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+        text = refusal_text(run)
+        if code is not None:
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project --json
+E           exit code: 3
+E           stdout:
+E           {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "BATCH_UNEXPLAINED", "message": "1 red(s) no single candidate explains: tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget; nothing lands", "details": {"base": "1cab34a461cf268861d99a820508d56e0513e0de", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": [], "landed": [], "land_commit": null, "reds": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_batch_isolation0/project/.gov-runtime/close/batch/20261112T023547Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget": []}, "unexplained": ["tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget"]}}}
+E           
+E           stderr:
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_reds.py::test_only_the_load_sensitive_case_gets_three_rounds 
+AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs assert 2 >= 4  +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_unowned0/project/.gov-runti...t/other.py': '# the gadget\n', 'src/gov/widget/thing.p
+unowned = <conftest.Unowned object at 0x7d8fe115c890>
+
+    def test_only_the_load_sensitive_case_gets_three_rounds(unowned):
+        """S4: the load-sensitive case (a ``latency`` entry of the serial-only list) gets 3 rounds each way."""
+        support.passed(unowned.run)
+        runs = unowned.project.told_runs("test_bb_timing")
+        head, base = support.head_side(runs), support.base_side(runs)
+>       assert len(head) >= 4, f"the load-sensitive red did not get 3 rounds alone after its run: {len(head)} head runs"
+E       AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs
+E       assert 2 >= 4
+E        +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/w2_115_unowned0/project/.gov-runti...t/other.py': '# the gadget\n', 'src/gov/widget/thing.py': '# the widget, CHANGED\n'}, 'time': 1794450979.3382328, ...}])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:77: AssertionError
+
+=== tests/acceptance/W1-39/test_w1_39_copy.py::test_copy_creates_the_overlay 
+AssertionError: `copier copy` created more in the overlay than the path map and the test map DEC-903 names: ['governance/project/close.yaml', 'governance/project/path-map.yaml', 'governance/project/test-map.yaml'] assert ['governance/...est-map.yaml'] == ['governance/...est-map.yaml']      At index 
+installed = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw1/w1-39-pristine0/product')
+
+    def test_copy_creates_the_overlay(installed):
+        """The created project has its overlay, ``governance/project/``: a path map and a test map, and nothing else
+        (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are in their own file).
+    
+        The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``; the test
+        map beside it: ``governance/project/test-map.yaml``.
+        """
+        test_map_rel = f"{support.OVERLAY_REL}/test-map.yaml"
+        files = support.files_under(installed, support.OVERLAY_REL) if (installed / support.OVERLAY_REL).is_dir() else []
+        assert support.PATH_MAP_REL in files, \
+            f"`copier copy` created no {support.PATH_MAP_REL} (the overlay of KPI success 1; DEC-493). It created: {files}"
+        assert test_map_rel in files, \
+            f"`copier copy` created no {test_map_rel} (DEC-896 item 2, DEC-903). It created: {files}"
+>       assert files == sorted([support.PATH_MAP_REL, test_map_rel]), \
+            f"`copier copy` created more in the overlay than the path map and the test map DEC-903 names: {files}"
+E       AssertionError: `copier copy` created more in the overlay than the path map and the test map DEC-903 names: ['governance/project/close.yaml', 'governance/project/path-map.yaml', 'governance/project/test-map.yaml']
+E       assert ['governance/...est-map.yaml'] == ['governance/...est-map.yaml']
+E         
+E         At index 0 diff: 'governance/project/close.yaml' != 'governance/project/path-map.yaml'
+E         Left contains one more item: 'governance/project/test-map.yaml'
+E         Use -v to get more diff
+
+tests/acceptance/W1-39/test_w1_39_copy.py:70: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_selection.py::test_governance_files_alone_select_nothing_by_themselves 
+AssertionError: a governance file selected the record readers: ['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'] assert not True  +  where True = <function names at 0x7d8fe3477ce0>(['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'], 'tests/acceptance/W2
+make_project = <function make_project.<locals>.make at 0x7d8fe0c82de0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/test_governance_files_alone_se0/sa...xPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw2/test_governance_files_alone_se0/sandbox/elsewhere'))
+
+    def test_governance_files_alone_select_nothing_by_themselves(make_project, sandbox):
+        """S2: a change to a governance file alone selects nothing by itself (no other suite, not the record readers)."""
+        project = make_project()
+        project.work({support.GOVERNANCE_FILE: "notes: changed\n"})
+        suites = _selected(project, sandbox)["suites"]
+        for wbs in OTHERS:
+            assert not support.names(suites, support.suite_of(wbs)), f"a governance file selected {wbs}: {suites}"
+>       assert not support.names(suites, support.RR_RECORDS), f"a governance file selected the record readers: {suites}"
+E       AssertionError: a governance file selected the record readers: ['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register']
+E       assert not True
+E        +  where True = <function names at 0x7d8fe3477ce0>(['tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register'], 'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register')
+E        +    where <function names at 0x7d8fe3477ce0> = support.names
+E        +    and   'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register' = support.RR_RECORDS
+
+tests/acceptance/W2-115/test_w2_115_selection.py:67: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] 
+AssertionError: assert 0 == (128 + 2)  +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7d498c67dda0>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] 
+AssertionError: assert False  +  where False = exists()  +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] 
+AssertionError: assert 0 == (128 + 2)  +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+launch = <function planted.<locals>.launch at 0x7d498c60cd60>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_ctrl
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 42044.731335368, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-13/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+=== tests/acceptance/W2-77/test_w2_77_failed_removal.py::test_a_failed_clean_up_does_not_change_the_verdict 
+AssertionError: a failed clean-up changed the record's other keys: ['base', 'branch', 'cleanup', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict'] assert {
+night = <test_w2_77_failed_removal.LockedNight object at 0x783e26c43b90>
+
+    def test_a_failed_clean_up_does_not_change_the_verdict(night):
+        result = support.green(night.run)
+        record, _ = support.record_of(night.project, night.run)
+        assert record.get("verdict") == support.GREEN and result.get("verdict") == support.GREEN, \
+            f"a failed clean-up changed the night's verdict: {record.get('verdict')!r}"
+>       assert set(record) - {support.CLEANUP_KEY} == support.RECORD_KEYS, \
+            f"a failed clean-up changed the record's other keys: {sorted(record)}"
+E       AssertionError: a failed clean-up changed the record's other keys: ['base', 'branch', 'cleanup', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_failed_removal.py:120: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today 
+AssertionError: the green envelope's result is not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict'] 
+nights = <test_w2_77_unchanged.Nights object at 0x783e26c41760>
+
+    def test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        result = support.green(nights.green_run)
+        data = nights.green_run.envelope()
+        assert data.get("command") == support.COMMAND, f"the envelope's command is not {support.COMMAND!r}: {data}"
+>       assert set(result) == support.RECORD_KEYS | {"record"}, \
+            f"the green envelope's result is not the record and its path: {sorted(result)}"
+E       AssertionError: the green envelope's result is not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:37: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key 
+AssertionError: the record's keys changed: added ['secrets_full_scan'], lost [] assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})      Extra items in the left set:   'secrets_full_scan'   Use -v to get more diff
+nights = <test_w2_77_unchanged.Nights object at 0x783e26c41760>
+
+    def test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key(nights):
+        support.green(nights.green_run)
+        record, rel = support.record_of(nights.green_project, nights.green_run)
+        assert support.CLEANUP_KEY not in record, f"a night whose clone was removed has a cleanup key in {rel}: {record}"
+>       assert set(record) == support.RECORD_KEYS, \
+            (f"the record's keys changed: added {sorted(set(record) - support.RECORD_KEYS)}, "
+             f"lost {sorted(support.RECORD_KEYS - set(record))}")
+E       AssertionError: the record's keys changed: added ['secrets_full_scan'], lost []
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:49: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today 
+AssertionError: the red envelope's details are not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict'] 
+nights = <test_w2_77_unchanged.Nights object at 0x783e26c41760>
+
+    def test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        error = support.red(nights.red_run)
+        details = error.get("details") or {}
+>       assert set(details) == support.RECORD_KEYS | {"record"}, \
+            f"the red envelope's details are not the record and its path: {sorted(details)}"
+E       AssertionError: the red envelope's details are not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:69: AssertionError
+

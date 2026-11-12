@@ -1,0 +1,18 @@
+......................F
+=================================== FAILURES ===================================
+__________________ test_s1_status_prints_the_json_under_json ___________________
+tests/acceptance/W2-121/test_s1_lock_off_status.py:135: in test_s1_status_prints_the_json_under_json
+    shown = support.unwrap(json.loads(r.out))
+                           ^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/json/decoder.py:355: in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_prints_the_json_under_json
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!

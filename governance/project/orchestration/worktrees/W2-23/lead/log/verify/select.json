@@ -4,7 +4,7 @@
  "core_changed": [],
  "unplaced": [],
  "base": "abef7e045133f5a3d2295c7a877cf5537a5219f2",
- "head": "fd1bc056f5bace0ce714fbd8b8f7f82267c10da4",
+ "head": "3e7194a45a58245f8eede08f6956a7d1ca0b6633",
  "governance_left_out": [],
  "changed": [
   "src/gov/adapters/command.py",

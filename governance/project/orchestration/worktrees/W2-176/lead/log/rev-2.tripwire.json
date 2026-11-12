@@ -1,0 +1,86 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "f4f9c3204a10",
+   "after": "ac6ae3b5b767"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M src/gov/close/batch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M src/gov/close/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M src/gov/close/nightly.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M src/gov/close/select.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M src/gov/close/tool.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": " M template/governance/project/test-map.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": "?? governance/project/close.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": "?? src/gov/close/attribution.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line gone",
+   "line": "?? template/governance/project/close.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-115/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "acceptance folder",
+   "folder": "W2-115"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "head",
+   "before": "fd1bc056f5ba",
+   "after": "9dc7b24afe7f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-23/test_w2_23_citations.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-23/w2_23_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

@@ -1,0 +1,60 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "6e46f985b0a7",
+   "after": "70e5840d9f47"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "6e46f985b0a7",
+   "after": "70e5840d9f47"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "aafa67f74eff",
+   "after": "70e5840d9f47"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "head",
+   "before": "6e46f985b0a7",
+   "after": "30c0ed45414f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "head",
+   "before": "6e46f985b0a7",
+   "after": "0384e71db794"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-173",
+   "change": "head",
+   "before": "b6d2f6f90668",
+   "after": "ca91895c066c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-173-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "head",
+   "before": "4dec7ec3c72c",
+   "after": "3b6c5cb79d39"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-176-CIT-P.md"
+  }
+ ]
+}

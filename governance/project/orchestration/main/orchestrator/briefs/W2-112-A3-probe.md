@@ -39,7 +39,7 @@ do not fix.
   of the keywords `tools/keyword_warn.py` looks for (they are written in parts in that file; never copy them out).
 - **Scratch budget: 30 GB and 2,000,000 files and folders** outside the tracked tree. Report `du -sh` and `du -s --inodes` of
   your `TMPDIR` in `evidence`, and remove your clone and probe folders when done.
-- **Context:** past about 200k tokens, hand over: write what you have and what remains, status PARTIAL.
+- **Context:** there is no token cap: use your model's full window; before compaction the hook writes your checkpoint and the summary opens with the read-first line (the owner, 2026-11-12, replacing DEC-1118 (A)).
 
 ## The head you review: a clone of `w2/integrate`
 

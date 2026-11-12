@@ -1,0 +1,176 @@
+--- A. the bundle and the clone (w2/integrate, W2-176 not yet merged)
+clone of the main tree's w2/integrate
+ok   A0.0 the clone's .claude/settings.json is the frozen before (the bundle is not stale)
+ok   A0.0 the main tree's .claude/settings.json (read only) is the frozen before
+ok   A0.0 before/ and after/ copies hash as list.txt says
+ok   A0.1 the clone's .rulesync/hooks.jsonc is the frozen before (the bundle is not stale)
+ok   A0.1 the main tree's .rulesync/hooks.jsonc (read only) is the frozen before
+ok   A0.1 before/ and after/ copies hash as list.txt says
+ok   A1 the hook file is absent in the clone (W2-176 is not merged)
+--- B. the order: the hook file absent (before W2-176's merge)
+     refused: template/governance/kernel/hooks/context_watch.py is absent (W2-176 is not merged here); the registration would run a missing script on every Bash call; nothing touched
+ok   B1 check refuses: the hook file is absent (exit 6)
+     refused: template/governance/kernel/hooks/context_watch.py is absent (W2-176 is not merged here); the registration would run a missing script on every Bash call; nothing touched
+ok   B2 apply refuses: the hook file is absent (exit 6)
+ok   B3.0 apply wrote nothing to .claude/settings.json
+ok   B3.1 apply wrote nothing to .rulesync/hooks.jsonc
+     not applied: .claude/settings.json
+ok   B4 verify refused before the apply (exit 3)
+     already in place: .claude/settings.json (undo)
+     already in place: .rulesync/hooks.jsonc (undo)
+ok   B5 undo before the apply changes nothing (exit 0)
+     what the registration would do with the file absent (the registered command, run as Claude Code runs it):
+     PINNED/bin/python: can't open file 'CLONE/template/governance/kernel/hooks/context_watch.py': [Errno 2] No such file or directory
+ok   B6 the registered command on a tree without the file exits 2 with "can't open file" (a blocking error on every Bash call)
+--- C. W2-176 merged in the clone only, and the entry criterion
+      create mode 100644 template/governance/kernel/hooks/context_watch.py
+      create mode 100644 tests/unit/hooks/test_w2_176_context_watch.py
+      create mode 100644 tests/unit/hooks/test_w2_176_precompact.py
+ok   C1 git merge --no-ff --no-edit of W2-176's head (exit 0)
+ok   C2 template/governance/kernel/hooks/context_watch.py is the bytes the owner approves (sha256 c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c)
+ok   C3 the clone is clean after the merge
+ok   C4.0 the merge left .claude/settings.json as the frozen before
+ok   C4.1 the merge left .rulesync/hooks.jsonc as the frozen before
+     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 b53505457407, approved c6dabb5eed39); nothing touched
+ok   C5 check refuses a hook file that is not the approved bytes (exit 6)
+     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 b53505457407, approved c6dabb5eed39); nothing touched
+ok   C6 apply refuses it too (exit 6)
+     state before; template/governance/kernel/hooks/context_watch.py in place as approved
+ok   C7 check: state before, the hook file in place (exit 0)
+     not applied: .claude/settings.json
+ok   C8 verify refused before the apply (exit 3)
+     the checks that are red on the old files (the registration is not there yet):
+     FAIL: settings events
+ok   check 1 as written (exit 1, count -)
+ok   check 0 as written (exit 0, count -)
+ok   check 2 as written (exit 0, count -)
+     .claude/settings.json
+     .rulesync/hooks.jsonc
+ok   check 4 as written (exit 0, count -)
+--- D. the baseline on the merged clone, before the apply
+     findings: none | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+ok   D1 adapter-portability on w2/integrate + W2-176: no findings
+     pytest: 166 passed, 1 skipped, 36 deselected
+ok   D2 tests/unit/hooks (W2-176's cases and the hook suites), before the apply: exit 0, 166 passed
+--- E. the plain apply
+ok   E1 plain apply (no option, no env) (exit 0)
+ok   E2.0 .claude/settings.json is the frozen after, byte for byte
+ok   E3.0 the mode of .claude/settings.json is kept (644)
+ok   E2.1 .rulesync/hooks.jsonc is the frozen after, byte for byte
+ok   E3.1 the mode of .rulesync/hooks.jsonc is kept (644)
+ok   E4 git status shows exactly two modified files and nothing else
+ok   E5 no temp file left beside the files
+     M	.claude/settings.json
+     M	.rulesync/hooks.jsonc
+     added/removed: 12	0	.claude/settings.json
+     added/removed: 8	0	.rulesync/hooks.jsonc
+     moved: .claude/settings.json
+ok   E6 check refused after the apply (exit 3)
+ok   E7 verify exit 0 (exit 0)
+     already in place: .claude/settings.json (apply)
+     already in place: .rulesync/hooks.jsonc (apply)
+ok   E8 apply again changes nothing (exit 0)
+--- F. every manifest check exactly as written, then portability
+ok   check 0 as written (exit 0, count -)
+     6
+ok   check 1 as written (exit 0, count 6)
+ok   check 2 as written (exit 0, count -)
+     7
+ok   check 3 as written (exit 0, count 7)
+     .claude/settings.json
+     .rulesync/hooks.jsonc
+ok   check 4 as written (exit 0, count -)
+     findings: none | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+ok   F1 adapter-portability after the apply: no findings (settings.json is what rulesync generates from the source)
+     findings: ['HOOKS_MATCHER_DIFFERS .rulesync/hooks.jsonc', 'GENERATED_DIFFERS .claude/settings.json'] | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+ok   F2 the all-tools form (matcher "*") in the source is a finding: HOOKS_MATCHER_DIFFERS (and the generated settings differ)
+ok   F3 the source is the frozen after again
+--- G. the registered command, run on planted PostToolUse events (a worker at 90 % of a 200,000 window)
+ok   G0 the command in the applied settings is the frozen one
+     exit 0; stdout keys: ['hookSpecificOutput'] / PostToolUse ; additionalContext (cut): Context watch: this session has used 85 % or more of its context window. Write your checkpoint now and update every file that needs it: your record (g ...paction: carry on with your work once the handover is written.
+ok   G1 first call at 90 %: one additionalContext, exit 0, no stderr
+     second call: exit 0; stdout 0 bytes
+ok   G2 second call in the same window: no output
+ok   G3 a fall to 40 % re-arms: the next 90 % call reminds once more
+ok   G4 a subagent's event (agent_id): no output
+     files the hook wrote in the project: .gov-runtime/scratch/context_watch/g1
+ok   G5 the hook wrote one file, the session's marker under .gov-runtime/scratch/context_watch/
+--- H. the tests, applied state, one folder per run through the heavy-slot gate
+     pytest: 65 passed
+ok   H1 W2-176's two unit files: exit 0, 65 passed
+     pytest: 166 passed, 1 skipped, 36 deselected
+ok   H2 tests/unit/hooks (the hook suites): exit 0, 166 passed
+     pytest: 42 passed, 3 deselected
+ok   H3 tests/acceptance/W1-29: exit 0, 42 passed
+     pytest: 71 passed, 1 skipped, 33 deselected
+ok   H4 tests/acceptance/W1-49: exit 0, 71 passed
+     pytest: 43 passed, 15 deselected
+ok   H5 tests/acceptance/W2-62: exit 0, 43 passed
+     the suites that read the repository's settings, hooks source and portability:
+     pytest: 94 passed, 40 deselected
+ok   H6 tests/unit/adapters: exit 0, 94 passed
+     pytest: 61 passed, 7 deselected
+ok   H7 tests/unit/gitenv: exit 0, 61 passed
+     pytest: 30 passed, 35 deselected
+ok   H8 tests/acceptance/W2-05: exit 0, 30 passed
+     pytest: 48 passed, 7 deselected
+ok   H8 tests/acceptance/W2-59: exit 0, 48 passed
+     pytest: 14 passed
+ok   H8 tests/acceptance/W2-65: exit 0, 14 passed
+     pytest: 26 passed, 62 deselected
+ok   H8 tests/acceptance/W2-106: exit 0, 26 passed
+     status after the tests:  M .claude/settings.json
+     status after the tests:  M .rulesync/hooks.jsonc
+ok   H9 the tests left exactly the two applied files modified
+--- I. undo, re-apply, and the apply.sh states
+ok   I1 undo (exit 0)
+ok   I2.0 .claude/settings.json is the original, byte for byte, mode kept
+ok   I2.1 .rulesync/hooks.jsonc is the original, byte for byte, mode kept
+ok   I3 the clone is clean after the undo
+     findings: none | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+ok   I4 adapter-portability after the undo: no findings
+     state before; template/governance/kernel/hooks/context_watch.py in place as approved
+ok   I5 check: state before (exit 0)
+ok   I6 apply again (exit 0)
+ok   I7 verify (exit 0)
+     findings: none | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+ok   I8 adapter-portability after the re-apply: no findings
+     6
+ok   check 1 as written (exit 0, count 6)
+     7
+ok   check 3 as written (exit 0, count 7)
+ok   I9 undo, the hook file still in place (exit 0)
+     moved: .claude/settings.json
+ok   I10 check refuses a file that changed (exit 3)
+     moved: .claude/settings.json (neither the before nor the after; apply refused, nothing touched)
+ok   I11 apply refuses (neither before nor after) (exit 3)
+ok   I12 apply wrote nothing to the other file
+ok   I13 apply (exit 0)
+     not applied: .rulesync/hooks.jsonc
+ok   I14 a half-applied state: verify refuses (exit 3)
+     already in place: .claude/settings.json (apply)
+ok   I15 a half-applied state: apply finishes it (exit 0)
+ok   I16 verify (exit 0)
+     already in place: .claude/settings.json (undo)
+ok   I17 a half-applied state: undo takes it back (exit 0)
+ok   I18 the clone is back to the original
+     the frozen copy does not hash as listed: DRAFTS/tmp/tampered/after/repo/.rulesync/hooks.jsonc
+ok   I19 a tampered frozen copy: apply refuses (4) (exit 4)
+ok   I20 nothing was written
+     moved: .rulesync/hooks.jsonc (neither the before nor the after; apply refused, nothing touched)
+ok   I21 a missing file: apply refuses (exit 3)
+ok   I22 nothing was created in its place
+     moved: .rulesync/hooks.jsonc (neither the before nor the after; apply refused, nothing touched)
+ok   I23 a link: apply refuses (exit 3)
+ok   I24 the clone is clean again
+--- J. the other ACTs of the night, the live files, the class
+     mine: ['.claude/settings.json', '.rulesync/hooks.jsonc']
+     clashes: none
+ok   J1 the bundle touches none of the other ACTs' files (ACT A, DISPATCH-1, IDLE-GUARD-2, CLAUDE-COPIES-4)
+ok   J2.0 the main tree's .claude/settings.json is unchanged
+ok   J2.1 the main tree's .rulesync/hooks.jsonc is unchanged
+ok   J3 the planted HOME is empty
+ok   J4 the operator's own classifier (act_class.py, read only) votes b for the bundle (settings row and .rulesync/**, control paths)
+
+REHEARSAL PASS
+failures: 0

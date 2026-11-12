@@ -1,0 +1,1177 @@
+"""Core decision logic for the PreToolUse default-deny guard (W1-02)."""
+
+from __future__ import annotations
+
+import glob
+import os
+import re
+import shlex
+import stat
+import tempfile
+from pathlib import Path
+
+from gov.guard import runs
+from gov.util.gitenv import GIT_DIRS, git_binary
+from gov.util.patterns import _has_glob, _match_pattern
+from gov.util.tickets import _parse_frontmatter
+
+KNOWN_ROLES = frozenset({
+    "orchestrator", "product-spec", "independent-test-designer",
+    "engineer", "independent-auditor",
+    "research",  # DEC-163: held to its ticket's allowed_paths, like engineer
+    "ticket-lead",  # DEC-434: may write only scratch/checkpoint; no path patterns
+})
+WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit",
+                         "MultiEdit"})  # DEC-685: judged exactly like Edit
+READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
+# DEC-685: the tools let through without a path judgement, each with its
+# reason.  With the read tools, the write tools and Bash these are the tools
+# the guard knows: every other name is refused, compared as it was sent.
+LISTED_TOOLS = {
+    "Agent": "starts a subagent; writes no file and runs no command itself, and every call of the subagent reaches the guard on its own",
+    "Task": "the earlier name of the same subagent tool",
+    "Skill": "loads a skill's instructions into the session; writes no file, runs no command",
+    "ToolSearch": "returns the definitions of tools; writes no file, runs no command",
+    "WebFetch": "fetches a web page; writes no file of the project, runs no command",
+    "WebSearch": "searches the web; writes no file of the project, runs no command",
+    "ListAgents": "lists the session's agents; reads and writes no file",
+    "SendMessage": "sends a message to an agent, whose own calls reach the guard",
+    "TaskStop": "stops a background task of the session; writes no file, runs no command",
+    "TodoWrite": "keeps the session's to-do list, which the harness holds; no file of the project",
+    "TaskCreate": "adds to the session's task list, which the harness holds; no file of the project",
+    "TaskUpdate": "changes the session's task list, which the harness holds; no file of the project",
+    "TaskList": "reads the session's task list, which the harness holds; no file of the project",
+    "TaskGet": "reads one task of the session's task list, which the harness holds; no file of the project",
+    "AskUserQuestion": "asks the user a question; writes no file, runs no command",
+    "EnterPlanMode": "switches the session's plan mode on; writes no file of the project, runs no command",
+    "ExitPlanMode": "switches the session's plan mode off; writes no file of the project, runs no command",
+}
+FREEZE_FLAG = ".gov-runtime/freeze"
+FREEZE_MARKER = b"FROZEN"  # DEC-402: the word of a real flag's marker line
+_FREEZE_HEAD = 65536       # the most that is read of a flag
+ACCEPTANCE = "tests/acceptance"
+_GOV_RUNTIME = ".gov-runtime"
+_PUNCT = frozenset("();<>|&\n")
+_WRITE_CMDS = frozenset({"touch", "rm", "mv", "cp", "mkdir"})
+_ASSIGN_RE = re.compile(r"^[A-Za-z_]\w*=")
+_UNRESOLVABLE = "/<guard-unresolvable>"
+# DEC-758 1: the most paths a copy into a folder is judged as; beyond, the
+# call is not known to be free of what is refused.
+_MOST_LANDED = 10000
+
+
+# -- frontmatter and pattern matching: gov.util.tickets and gov.util.patterns (W2-150) --
+
+# -- ticket loading ------------------------------------------------------------
+
+def _load_ticket(root: str, tid: str) -> dict | None:
+    if not tid or "/" in tid or os.sep in tid:
+        return None
+    d = Path(root) / ".tickets"
+    if not d.is_dir():
+        return None
+    p = d / f"{tid}.md"
+    if p.is_file():
+        try:
+            return _parse_frontmatter(p.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            return None
+    try:
+        for p in sorted(d.glob("*.md")):
+            if not p.is_file():
+                continue
+            try:
+                fm = _parse_frontmatter(p.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError):
+                continue
+            if fm and fm.get("wbs_id") == tid:
+                return fm
+    except OSError:
+        pass
+    return None
+
+
+def _get_allowed_paths(role: str, tid: str | None, root: str,
+                       *, session_role: str | None = None) -> list[str]:
+    if role == "orchestrator":
+        # DEC-156: the wide scope applies only in an orchestrator session.
+        # An orchestrator subagent in a non-orchestrator session falls
+        # through to the ticket-path rule (DEC-136 batch 3).  A missing
+        # session role gives no wide scope (DEC-179).
+        if session_role == "orchestrator":
+            return ["**"]
+        # Fall through: use the ticket's allowed_paths when the ticket's
+        # role is orchestrator; otherwise the orchestrator subagent gets
+        # nothing beyond the scratch set.
+    if role == "ticket-lead":
+        return []
+    if role not in KNOWN_ROLES or not tid:
+        return []
+    t = _load_ticket(root, tid)
+    if not t or t.get("status") != "in_progress":
+        return []
+    if role == "independent-test-designer":
+        return [ACCEPTANCE + "/**"]
+    if t.get("role") != role:
+        return []
+    return [p for p in t.get("allowed_paths", [])
+            if not _is_under_acceptance(p.rstrip("*/ "))]
+
+
+# -- path helpers --------------------------------------------------------------
+
+def _is_under_acceptance(relpath: str) -> bool:
+    return relpath == ACCEPTANCE or relpath.startswith(ACCEPTANCE + "/")
+
+
+def _is_gov_runtime_protected(relpath: str) -> bool:
+    """True when *relpath* is under ``.gov-runtime/`` but NOT under ``scratch/``.
+
+    DEC-176: the freeze flag, snapshots, findings and records are denied
+    to the orchestrator.  ``scratch/**`` stays writable.
+    """
+    if relpath != _GOV_RUNTIME and not relpath.startswith(_GOV_RUNTIME + "/"):
+        return False
+    scratch = _GOV_RUNTIME + "/scratch"
+    return relpath != scratch and not relpath.startswith(scratch + "/")
+
+
+def _is_in_scratch(path: str, root: str) -> bool:
+    real = os.path.realpath(path)
+    rr = os.path.realpath(root)
+    scratch = os.path.join(rr, ".gov-runtime", "scratch")
+    if real == scratch or real.startswith(scratch + "/"):
+        return True
+    tmp = os.path.realpath(tempfile.gettempdir())
+    if rr == tmp or rr.startswith(tmp + "/"):
+        return False
+    return real == tmp or real.startswith(tmp + "/")
+
+
+def _at_or_under(real: str, rr: str) -> bool:
+    return real == rr or real.startswith(rr + "/")
+
+
+def _path_allowed(path: str, root: str, patterns: list[str], role: str,
+                  own: str | None = None) -> bool:
+    real = os.path.realpath(path)
+    if real == "/dev/null":
+        return True
+    if role not in KNOWN_ROLES:
+        return False
+    if role == "independent-test-designer" and not patterns:
+        return False
+    if _is_in_scratch(real, root):
+        return True
+    # DEC-728, DEC-743: the session's own folder under ~/gov-os-runs.
+    if own is not None and runs.holds(own, real):
+        return True
+    rr = os.path.realpath(root)
+    if not real.startswith(rr + "/") and real != rr:
+        return False
+    rel = real[len(rr) + 1:]
+    if role != "independent-test-designer" and _is_under_acceptance(rel):
+        return False
+    # DEC-176, DEC-180: .gov-runtime/ other than scratch/** is denied to
+    # every role (the freeze flag, snapshots, findings and records), also
+    # on a ticket that names it.
+    if _is_gov_runtime_protected(rel):
+        return False
+    return any(_match_pattern(rel, p) for p in patterns)
+
+
+# -- Bash target resolution (DEC-115) -----------------------------------------
+
+def _expand_token(token: str) -> str | None:
+    """Expand ``~`` and environment variables in a Bash write target.
+
+    Returns the expanded string, or ``None`` when the target is unresolvable.
+    Uses ``os.environ`` (the hook process's own environment).
+    """
+    if not token:
+        return None
+    if '`' in token:
+        return None
+    if '$(' in token:
+        return None
+    if token.endswith('$'):
+        return None
+
+    # Tilde at the start.
+    if token.startswith('~'):
+        expanded = os.path.expanduser(token)
+        if expanded.startswith('~'):
+            return None
+        token = expanded
+
+    # Environment variables.
+    if '$' not in token:
+        return token
+
+    parts: list[str] = []
+    i = 0
+    while i < len(token):
+        if token[i] != '$':
+            parts.append(token[i])
+            i += 1
+            continue
+        if i + 1 >= len(token):
+            return None
+        nxt = token[i + 1]
+        if nxt == '{':
+            close = token.find('}', i + 2)
+            if close == -1:
+                return None
+            name = token[i + 2:close]
+            if (not name
+                    or not all(c.isalnum() or c == '_' for c in name)
+                    or name[0].isdigit()):
+                return None
+            val = os.environ.get(name)
+            if val is None:
+                return None
+            parts.append(val)
+            i = close + 1
+        elif nxt.isalpha() or nxt == '_':
+            j = i + 1
+            while j < len(token) and (token[j].isalnum() or token[j] == '_'):
+                j += 1
+            name = token[i + 1:j]
+            val = os.environ.get(name)
+            if val is None:
+                return None
+            parts.append(val)
+            i = j
+        else:
+            return None
+
+    return ''.join(parts)
+
+
+# -- Bash write analysis -------------------------------------------------------
+
+def _is_punct(tok: str) -> bool:
+    return bool(tok) and all(c in _PUNCT for c in tok)
+
+
+def _option_after_operand(args: list[str]) -> bool:
+    """True when an option is written after a word that is not one."""
+    seen = False
+    for a in args:
+        if not a.startswith("-"):
+            seen = True
+        elif seen:
+            return True
+    return False
+
+
+# DEC-765: the options of cp, mv and install as GNU coreutils 9.4 reads them:
+# the short letters that take no value, those that take one (joined to the
+# letter or as the next word), and the long names.  A long name ending in
+# "=" takes a value (after "=" or as the next word), one ending in "?" only
+# after "="; a name after "/" is the key it is read as.
+_COPY_SPEC = {
+    "cp": ("abdfHilLnPprRsTuvxZ", "St",
+           "archive attributes-only backup?/b copy-contents debug dereference "
+           "force interactive link/l no-clobber no-dereference no-preserve= "
+           "no-target-directory/T one-file-system parents path/parents "
+           "preserve? recursive reflink? remove-destination sparse= "
+           "strip-trailing-slashes suffix=/S symbolic-link target-directory=/t "
+           "update? verbose context? help version"),
+    "mv": ("bfinTuvZ", "St",
+           "backup?/b context debug force interactive no-clobber no-copy "
+           "no-target-directory/T strip-trailing-slashes suffix=/S "
+           "target-directory=/t update? verbose help version"),
+    "install": ("bcCdDpsTvZ", "gmoSt",
+                "backup?/b compare context? debug directory/d group= mode= "
+                "no-target-directory/T owner= preserve-context "
+                "preserve-timestamps strip strip-program= suffix=/S "
+                "target-directory=/t verbose help version"),
+}
+
+
+def _long_options(spec: str) -> dict[str, tuple[str, str]]:
+    out = {}
+    for word in spec.split():
+        word, _, key = word.partition("/")
+        name = word.rstrip("=?")
+        out[name] = (key or name, word[len(name):])
+    return out
+
+
+_COPY_LONG = {name: _long_options(spec[2]) for name, spec in _COPY_SPEC.items()}
+# DEC-774: the options with which cp replaces a link at the place it writes
+# rather than writing through it (a backup, --remove-destination, and -f,
+# which may), and those with which it copies a source that is a link as a
+# link, so replacing the link it lands on.  install and mv always replace.
+_CP_REPLACING = frozenset({"b", "S", "remove-destination", "f", "force"})
+_CP_AS_LINK = frozenset({"P", "d", "no-dereference", "a", "archive",
+                         "r", "R", "recursive"})
+
+
+def _copy_args(name: str, args: list[str]) -> tuple[
+        list[str], dict[str, list[str]], list[str] | None] | None:
+    """DEC-765: read the arguments of ``cp``, ``mv`` or ``install`` as the
+    tool does: an option's value is a value, and nothing after ``--`` is an
+    option.
+
+    Returns the operands, the options read (each key with its values) and,
+    when an option is written after an operand, the words after the first
+    operand that may be the destination (with POSIXLY_CORRECT set each word
+    after the first operand is one); ``None`` when an option cannot be read.
+    """
+    flags, valued, _ = _COPY_SPEC[name]
+    longs = _COPY_LONG[name]
+    operands: list[str] = []
+    opts: dict[str, list[str]] = {}
+    after: list[str] = []
+    late = False
+
+    def _operand(w: str) -> None:
+        if operands:
+            after.append(w)
+        operands.append(w)
+
+    def _next() -> str | None:
+        """The next word, as the value of an option."""
+        nonlocal i
+        if i >= len(args):
+            return None
+        i += 1
+        if operands and not args[i - 1].startswith("-"):
+            after.append(args[i - 1])
+        return args[i - 1]
+
+    i = 0
+    while i < len(args):
+        a = args[i]
+        i += 1
+        if a == "--":
+            for w in args[i:]:
+                _operand(w)
+            break
+        if a == "-" or not a.startswith("-"):
+            _operand(a)
+            continue
+        late = late or bool(operands)
+        if a.startswith("--"):
+            opt, eq, val = a[2:].partition("=")
+            found = ({longs[opt]} if opt in longs else
+                     {v for n, v in longs.items() if n.startswith(opt)})
+            if len(found) != 1:
+                return None
+            (key, kind), = found
+            if eq and not kind:
+                return None
+            if kind == "=" and not eq:
+                val = _next()
+                if val is None:
+                    return None
+            opts.setdefault(key, []).append(val)
+            continue
+        for j, c in enumerate(a[1:], 2):
+            if c in flags:
+                opts.setdefault(c, []).append("")
+                continue
+            if c not in valued:
+                return None
+            val = a[j:] or _next()
+            if val is None:
+                return None
+            opts.setdefault(c, []).append(val)
+            break
+    return operands, opts, (after if late else None)
+
+
+def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
+    """Return absolute write-target paths, or None when the command is read-only.
+
+    Tokenises with shlex (newline as punctuation, ``#`` not a comment),
+    splits on non-redirect punctuation, then inspects each simple command
+    for redirects and the plain write commands (DEC-111).  Each write target
+    is resolved first (DEC-115): ``~``, ``~user`` and environment variables
+    are expanded from the hook's own environment; globs are matched against
+    the file system; anything still unresolvable maps to a sentinel that
+    fails every allow-list check.
+    """
+    try:
+        lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n")
+        lex.whitespace_split = True
+        lex.whitespace = " \t\r"
+        lex.commenters = ""
+        tokens = list(lex)
+    except ValueError:
+        return [_UNRESOLVABLE]
+
+    ecwd = cwd
+    ecwd_ok = True
+    targets: list[str] = []
+    link_sources: list[str] = []  # what the links made by this command name
+    link_dests = 0                # how many of *targets* are their destinations
+    hard_sources: list[str] = []  # the files a hard link gives a second name
+    replace_any = replace_links = False  # DEC-774: set for each cp, install, mv
+
+    def _replaces(src: str) -> bool:
+        """DEC-774: a write of *src* onto a link replaces the link, rather
+        than writing through it."""
+        return replace_any or (replace_links and os.path.islink(src))
+
+    def _paths(raw: str) -> list[str] | None:
+        """Expand and glob-expand *raw* into absolute paths, not resolved:
+        ``[]`` for /dev/null, ``None`` when it is unresolvable."""
+        exp = _expand_token(raw)
+        if exp is None or '{' in exp or '}' in exp:
+            return None
+        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
+            return []
+        if not os.path.isabs(exp) and not ecwd_ok:
+            return None
+        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+        if _has_glob(exp):
+            return glob.glob(p) or None
+        return [p]
+
+    def _resolve(raw: str, targets: list[str] = targets) -> None:
+        """Expand, glob-expand and resolve *raw* into *targets*."""
+        found = _paths(raw)
+        if found is None:
+            targets.append(_UNRESOLVABLE)
+        else:
+            targets.extend(os.path.realpath(p) for p in found)
+
+    def _land(src: str, dst: str) -> None:
+        """DEC-758 1: *src* copied to *dst* writes *dst*; when both are
+        folders that exist, each entry of *src* in *dst* too, and so on."""
+        pending = [(src, dst)]
+        while pending:
+            src, dst = pending.pop()
+            real = os.path.realpath(dst)
+            targets.append(real)
+            if os.path.islink(dst) and _replaces(src):
+                # DEC-774: the link at *dst* is replaced, not followed: a
+                # form the guard does not read.
+                targets.append(_UNRESOLVABLE)
+            if len(targets) > _MOST_LANDED:
+                targets.append(_UNRESOLVABLE)
+                return
+            try:
+                if not (os.path.isdir(src)
+                        and stat.S_ISDIR(os.stat(real).st_mode)):
+                    continue
+                names = os.listdir(src)
+            except (FileNotFoundError, NotADirectoryError):
+                continue
+            except OSError:
+                targets.append(_UNRESOLVABLE)
+                return
+            pending.extend((os.path.join(src, n), os.path.join(real, n))
+                           for n in names)
+
+    def _into(dest: str, sources: list[str], *, itself: bool,
+              merge: bool) -> None:
+        """DEC-758 1: a copy, install or move of *sources* into the folder
+        *dest* is judged as each file it writes there, as a direct write
+        would be: ``<dest>/<name of the source>``, and each entry of a
+        source written ``s/.`` (and, when *merge*, of every source).
+
+        *itself*: *dest* is the last operand, judged itself, and a folder
+        only when one is there; otherwise it is a ``-t`` folder.
+        """
+        found = _paths(dest)
+        if found is None:
+            targets.append(_UNRESOLVABLE)
+            return
+        for d in found:
+            real = os.path.realpath(d)
+            if itself:
+                targets.append(real)
+                # DEC-774: onto a link to a file or to nothing, or with -T
+                # onto any link, the write replaces the link itself.
+                if (os.path.islink(d) and (merge or not os.path.isdir(real))
+                        and any(got is None or any(map(_replaces, got))
+                                for got in map(_paths, sources))):
+                    targets.append(_UNRESOLVABLE)
+                try:
+                    if not stat.S_ISDIR(os.stat(real).st_mode):
+                        continue
+                except (FileNotFoundError, NotADirectoryError):
+                    continue
+                except OSError:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+            for raw in sources:
+                got = _paths(raw)
+                if got is None:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+                for src in got:
+                    base = os.path.basename(src.rstrip("/"))
+                    contents = base in ("", ".", "..")
+                    if contents and not itself:
+                        targets.append(_UNRESOLVABLE)
+                        continue
+                    if not contents:
+                        _land(src, os.path.join(real, base))
+                    if contents or merge:
+                        _land(src, real)
+
+    def _copies(nf: list[str], dirs: list[str], dests: list[str],
+                merge: bool) -> None:
+        """DEC-758 1: the folders a ``cp``, ``install`` or ``mv`` call writes
+        into, beside the targets judged before: each ``-t`` folder, and each
+        word that may be the destination.  *merge* (-T,
+        --no-target-directory): a source folder's entries land in the
+        destination itself."""
+        for d in dirs:
+            _into(d, nf, itself=False, merge=merge)
+        if not dirs:
+            for dest in dests:
+                _into(dest, [a for a in nf if a != dest], itself=True,
+                      merge=merge)
+
+    # Split on non-redirect punctuation into simple commands.
+    # A punctuation token containing '>' stays with its command (redirect).
+    # '<' stays too (input redirect, not a write).
+    cmds: list[list[str]] = []
+    cur: list[str] = []
+    for tok in tokens:
+        if _is_punct(tok) and ">" not in tok and tok != "<":
+            if cur:
+                cmds.append(cur)
+                cur = []
+        else:
+            cur.append(tok)
+    if cur:
+        cmds.append(cur)
+
+    for scmd in cmds:
+        words: list[str] = []
+        i = 0
+        while i < len(scmd):
+            t = scmd[i]
+            if _is_punct(t) and ">" in t:
+                # A bare digit just before a redirect is the fd number.
+                if words and words[-1].isdigit():
+                    words.pop()
+                # >& followed by a digit or '-' is fd duplication.
+                if t == ">&" and i + 1 < len(scmd) and (
+                    scmd[i + 1].isdigit() or scmd[i + 1] == "-"
+                ):
+                    i += 2
+                    continue
+                # Otherwise the next word-token is the target file.
+                if i + 1 < len(scmd) and not _is_punct(scmd[i + 1]):
+                    _resolve(scmd[i + 1])
+                    i += 2
+                    continue
+                i += 1
+                continue
+            if t == "<":
+                i += 2  # skip input redirect and its target
+                continue
+            words.append(t)
+            i += 1
+
+        if not words:
+            continue
+
+        # Skip leading NAME=value environment assignments.
+        idx = 0
+        while idx < len(words) and _ASSIGN_RE.match(words[idx]):
+            idx += 1
+        if idx >= len(words):
+            continue
+
+        name = os.path.basename(words[idx])
+        args = words[idx + 1:]
+
+        if name in ("pushd", "popd"):
+            ecwd_ok = False
+            continue
+        if name == "cd":
+            if not args:
+                h = os.environ.get("HOME")
+                if h is None:
+                    ecwd_ok = False
+                else:
+                    ecwd = h
+                    ecwd_ok = True
+                continue
+            d = args[0]
+            if d.startswith("-"):
+                ecwd_ok = False
+                continue
+            exp = _expand_token(d)
+            if exp is None or _has_glob(exp) or '{' in exp or '}' in exp:
+                ecwd_ok = False
+            elif not os.path.isabs(exp) and not ecwd_ok:
+                pass  # ecwd stays invalid
+            else:
+                ecwd = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+                ecwd_ok = True
+            continue
+        if name == "tee":
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a)
+            continue
+        if name == "sed":
+            if any(a in ("-i", "--in-place")
+                   or (a.startswith("-i") and len(a) > 2)
+                   or a.startswith("--in-place=")
+                   for a in args):
+                seen_expr = False
+                for a in args:
+                    if a.startswith("-"):
+                        continue
+                    if not seen_expr:
+                        seen_expr = True
+                        continue
+                    _resolve(a)
+            continue
+        if name in ("touch", "rm", "mkdir"):
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a)
+            continue
+        if name == "rmdir":
+            # DEC-743 1 (R7): rmdir is judged for ~/gov-os-runs itself only.
+            found: list[str] = []
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a, found)
+            targets.extend(t for t in found if t == runs.root())
+            continue
+        if name == "link":
+            # DEC-334: both names of the hard link are judged.
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a)
+            continue
+        if name in ("cp", "mv", "install"):
+            parsed = _copy_args(name, args)
+            if parsed is None or "parents" in parsed[1]:
+                # DEC-764: an option the guard cannot read, or cp --parents,
+                # which writes <folder>/<source as written>: the landed path
+                # is not known, so the call is refused, as ln -t is.
+                targets.append(_UNRESOLVABLE)
+                continue
+            nf, opts, after = parsed
+            dirs = opts.get("t", [])
+            # The destination is the last operand.  With an option after an
+            # operand, every word after the first operand is judged as it
+            # (DEC-765: as the call is read with POSIXLY_CORRECT set).
+            dests = (after if after is not None
+                     else nf[-1:] if len(nf) >= 2 else [])
+            before = len(targets)
+            if name == "mv":
+                # DEC-334: the target directory is a write target in every
+                # spelling of the option, beside the operands.
+                for a in nf + dirs:
+                    _resolve(a)
+                # DEC-774: a link moved away is written at its own path, not
+                # its target's; its own path resolves to the target, so the
+                # folder whose entry the move takes away is judged.
+                for a in nf if dirs or after is not None else nf[:-1]:
+                    for p in _paths(a) or []:
+                        if os.path.islink(p):
+                            targets.append(os.path.realpath(os.path.dirname(p)))
+            elif name == "install" and not dirs and "d" in opts:
+                # install -d: every operand is a directory it makes.
+                for a in nf:
+                    _resolve(a)
+                continue
+            else:
+                if name == "cp" and "l" in opts:
+                    # DEC-334: cp -l makes hard links to its sources.
+                    for a in (nf if dirs else nf[:-1]):
+                        _resolve(a, hard_sources)
+                # -t, --target-directory: every operand is a source, and the
+                # copy lands in the directory under the operand's own name.
+                for d in dirs:
+                    for a in nf:
+                        base = os.path.basename(a.rstrip("/"))
+                        if base in ("", ".", ".."):
+                            targets.append(_UNRESOLVABLE)
+                        else:
+                            _resolve(os.path.join(d, base) if d else d)
+                if not dirs:
+                    for a in dests:
+                        _resolve(a)
+            merge = "T" in opts
+            replace_any = name != "cp" or not _CP_REPLACING.isdisjoint(opts)
+            replace_links = not _CP_AS_LINK.isdisjoint(opts)
+            _copies(nf, dirs, dests, merge)
+            if "b" in opts or "S" in opts:
+                # DEC-765: a backup lands beside each file the call replaces
+                # (a folder too, for a move with -T), as <file><suffix>; a
+                # suffix that is empty or holds a slash is read as "~".
+                suffix = opts.get("S", ["~"])[-1]
+                if not suffix or "/" in suffix:
+                    suffix = "~"
+                targets.extend(
+                    t + suffix for t in targets[before:]
+                    if t != _UNRESOLVABLE and (
+                        not os.path.isdir(t) or (name == "mv" and merge)))
+            continue
+        if name == "ln":
+            # DEC-311: the destination of a symbolic or a hard link is a
+            # write target.  A form whose destination is not the last
+            # operand (-t, --target-directory, "--", an option after an
+            # operand, whose value would be read as the destination) is
+            # refused.
+            if _option_after_operand(args) or any(
+                    a == "--" or a.startswith("--t")
+                    or (a.startswith("-") and not a.startswith("--")
+                        and "t" in a)
+                    for a in args):
+                targets.append(_UNRESOLVABLE)
+                continue
+            nf = [a for a in args if not a.startswith("-")]
+            before = len(targets)
+            if len(nf) >= 2:
+                _resolve(nf[-1])
+            elif nf:
+                # "ln <target>" links under the target's name, here.
+                _resolve(os.path.basename(nf[0].rstrip("/")) or ".")
+            link_dests += len(targets) - before
+            # What the link names, for a write through it in this command.
+            # A relative name of a symbolic link is read from the link's
+            # directory, which is not resolved here: it is refused.
+            symbolic = any(a.startswith("--s")
+                           or (a.startswith("-") and not a.startswith("--")
+                               and "s" in a)
+                           for a in args)
+            for a in (nf[:-1] if len(nf) >= 2 else nf):
+                if not symbolic:
+                    # DEC-334: a hard link is a second name of the file.
+                    _resolve(a, hard_sources)
+                elif not os.path.isabs(_expand_token(a) or ""):
+                    link_sources.append(_UNRESOLVABLE)
+                else:
+                    _resolve(a, link_sources)
+
+    # A command that makes a link and writes anything else may write through
+    # the link: what the link names is judged as a write target too.
+    if len(targets) > link_dests:
+        targets.extend(link_sources)
+    # DEC-334: a later call could write through a hard link, so its source is
+    # judged as a write target whatever else the command does.
+    targets.extend(hard_sources)
+
+    return targets or None
+
+
+# -- the freeze mirror (DEC-429) -----------------------------------------------
+
+# W2-L160: git from the system's own folders, never whatever comes first on
+# the inherited PATH; the helper's folders and resolver, one for the guard.
+_GIT_DIRS = GIT_DIRS
+# DEC-783 item 2: the look-up's own limit, inside the hook's 20 s deadline.
+_LOOKUP_S = 15
+
+
+class FreezeLookupUnavailable(Exception):
+    """The freeze look-up could not be made: no git resolved, or it passed
+    its own limit.  The guard refuses the call (DEC-580)."""
+
+
+def _git_binary() -> str | None:
+    return git_binary(_GIT_DIRS)
+
+
+def _mirror_path(project_root: str) -> Path:
+    """The mirror file for this project: ``~/.local/state/gov-os/<key>/freeze``
+    where ``<key>`` is ``sha256(realpath(git-common-dir))``.
+
+    Raises ``FreezeLookupUnavailable`` when no git is resolved by absolute
+    path or the look-up passes ``_LOOKUP_S``."""
+    import hashlib
+    import subprocess as _sp
+    from gov.util.gitenv import git_env
+    git = _git_binary()
+    if git is None:
+        raise FreezeLookupUnavailable("no git resolved by absolute path")
+    try:
+        # No inherited GIT_* variable and no system or global configuration
+        # (a trace setting there) reaches it (DEC-710).
+        raw = _sp.run([git, "-C", project_root, "rev-parse", "--git-common-dir"],
+                      capture_output=True, text=True, check=True,
+                      stdin=_sp.DEVNULL, timeout=_LOOKUP_S,
+                      env=git_env(None, pinned=True)).stdout.strip()
+        if not os.path.isabs(raw):
+            raw = os.path.join(project_root, raw)
+        common = os.path.realpath(raw)
+    except _sp.TimeoutExpired:
+        raise FreezeLookupUnavailable(
+            f"git rev-parse gave no answer within {_LOOKUP_S} s") from None
+    except Exception:
+        common = os.path.realpath(project_root)
+    key = hashlib.sha256(common.encode()).hexdigest()
+    return Path.home() / ".local" / "state" / "gov-os" / key / "freeze"
+
+
+def _mirror_frozen(project_root: str, *, strict: bool = False) -> bool:
+    """True when the mirror says frozen or the mirror folder is unreadable (fail closed, DEC-429).
+
+    A look-up that could not be made reads as frozen; with ``strict`` it
+    raises ``FreezeLookupUnavailable`` instead, for the guard to refuse."""
+    try:
+        mirror = _mirror_path(project_root)
+    except FreezeLookupUnavailable:
+        if strict:
+            raise
+        return True
+    except Exception:
+        return True
+    try:
+        if not mirror.parent.exists():
+            return False
+        if not os.access(str(mirror.parent), os.R_OK):
+            return True
+        if not mirror.exists():
+            return False
+        head = mirror.read_bytes()[:_FREEZE_HEAD]
+        return FREEZE_MARKER in head.replace(b"\x00", b"").upper()
+    except OSError:
+        return True
+
+
+# -- the freeze flag (DEC-402) -------------------------------------------------
+
+def freeze_state(project_root: str) -> str:
+    """Read the freeze flag: ``"absent"``, ``"unmarked"`` or ``"frozen"``.
+
+    Frozen when the flag carries the marker word, in any letter case and
+    with its NUL bytes taken out (a near spelling of the marker line, or
+    the line in UTF-16 or UTF-32), or when something is at the path that
+    cannot be read as a file (DEC-179).  An empty file, text without the
+    word and a character device (what the sandbox puts at the path) are an
+    unmarked presence, which the hook records.  Only a regular file is
+    opened, and only its head is read.
+    """
+    path = os.path.join(project_root, FREEZE_FLAG)
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        # A dangling link where the runtime folder should be hides the
+        # folder that would hold the flag: the guard cannot tell.
+        runtime = os.path.dirname(path)
+        if os.path.islink(runtime) and not os.path.exists(runtime):
+            return "frozen"
+        return "absent"
+    except NotADirectoryError:
+        return "absent"
+    except OSError:
+        return "frozen"
+    try:
+        st = os.stat(path)
+        if stat.S_ISCHR(st.st_mode) or (stat.S_ISREG(st.st_mode)
+                                        and st.st_size == 0):
+            return "unmarked"
+        if not stat.S_ISREG(st.st_mode):
+            return "frozen"
+        fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            head = os.read(fd, _FREEZE_HEAD + 1)
+        finally:
+            os.close(fd)
+    except OSError:
+        return "frozen"
+    if len(head) > _FREEZE_HEAD:
+        return "frozen"  # too large to read whole: the guard cannot tell
+    if FREEZE_MARKER in head.replace(b"\x00", b"").upper():
+        return "frozen"
+    return "unmarked"
+
+
+# -- the lift form of gov pause (DEC-409) --------------------------------------
+
+LIFT_REFUSAL = ("the lift form of gov pause (--off) is refused to every agent "
+                "session: only the owner lifts a freeze, in person (DEC-409)")
+_LIFT_PUNCT = frozenset("();<>|&\n`")
+# What starts a shell, an interpreter or a Claude Code session: the lift
+# form anywhere in the text of its pipeline is refused.
+_STARTERS = frozenset({"bash", "sh", "dash", "zsh", "ksh", "eval", "claude",
+                       "node", "perl", "ruby"})
+_PYTHON_RE = re.compile(r"python[\d.]*$")
+_GOV_RE = re.compile(r"(?<![\w.-])gov(?![\w-])")
+_PAUSE_RE = re.compile(r"(?<![\w-])pause(?![\w-])")
+_OFF_RE = re.compile(r"(?<![\w-])--off(?![\w-])")
+
+
+def _is_gov_word(word: str) -> bool:
+    return (os.path.basename(word) == "gov" or word == "gov.cli.main"
+            or word.endswith("gov/cli/main.py"))
+
+
+def _substitutions(word: str) -> list[str]:
+    """The command substitutions a quoted word holds: between backticks,
+    and from ``$(`` to its closing parenthesis."""
+    bodies = word.split("`")[1::2]
+    start = word.find("$(")
+    while start >= 0:
+        depth, end = 1, start + 2
+        while end < len(word) and depth:
+            depth += {"(": 1, ")": -1}.get(word[end], 0)
+            end += 1
+        bodies.append(word[start + 2:end])
+        start = word.find("$(", end)
+    return bodies
+
+
+def _pipeline_lifts(pipeline: list[list[str]]) -> bool:
+    for words in pipeline:
+        for i, word in enumerate(words):
+            if _is_gov_word(word) and "pause" in words[i + 1:]:
+                rest = words[i + 1:]
+                if "--off" in rest[rest.index("pause"):]:
+                    return True
+            if any(_lift_in(body) for body in _substitutions(word)):
+                return True
+    words = [word for command in pipeline for word in command]
+    if not any(os.path.basename(w) in _STARTERS
+               or _PYTHON_RE.match(os.path.basename(w)) for w in words) and not (
+            "launch" in words and any(_is_gov_word(w) for w in words)):
+        return False
+    text = " ".join(words)
+    gov = _GOV_RE.search(text)
+    pause = gov and _PAUSE_RE.search(text, gov.end())
+    return bool(pause and _OFF_RE.search(text, pause.end()))
+
+
+def _lift_in(command: str) -> bool:
+    lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n`")
+    lex.whitespace_split = True
+    lex.whitespace = " \t\r"
+    lex.commenters = ""
+    pipeline: list[list[str]] = [[]]
+    for tok in [*lex, ";"]:
+        if (not tok or not all(c in _LIFT_PUNCT for c in tok)
+                or "<" in tok or ">" in tok):
+            pipeline[-1].append(tok)  # a redirect stays inside its command
+        elif "|" in tok and "||" not in tok:
+            pipeline.append([])
+        else:
+            if _pipeline_lifts(pipeline):
+                return True
+            pipeline = [[]]
+    return False
+
+
+def lift_refusal(command) -> str:
+    """Why a Bash command is refused for the lift form of ``gov pause``,
+    or ``""`` when it does not hold it.
+
+    The form is a gov word (a word whose last part is ``gov``, the module
+    ``gov.cli.main``, the file ``gov/cli/main.py``) followed by ``pause``
+    and ``--off``: as words of one command that is run, also inside a
+    command substitution, or anywhere in the text of a pipeline that starts
+    a shell, an interpreter, a Claude Code session or ``gov launch``.  One
+    quoted word that a command only reads or stores is not the form.  A
+    command that cannot be read is refused.
+    """
+    try:
+        return LIFT_REFUSAL if _lift_in(command) else ""
+    except Exception:
+        return ("the command cannot be read, so it is not known to be free "
+                "of the lift form of gov pause (--off): refused (DEC-409)")
+
+
+# -- an answer in bounded time (DEC-562) ---------------------------------------
+
+# The most the guard reads of a Bash command, and of what the command's
+# substitutions hold together, in characters.  Every check reads the
+# command word by word: beyond this no answer comes in bounded time.
+MOST_READ = 32768
+LONG_REFUSAL = ("the command, what its substitutions hold, its brace "
+                "expansions, or the paths and name filters of a search in "
+                "it, are more than the guard "
+                "reads in bounded time, so it is not known to be "
+                "free of what is refused: refused to every role (DEC-562)")
+# The most the guard resolves of a file tool's path or glob, in characters:
+# no file is opened by a longer path, and resolving one costs its length
+# times its folders.
+MOST_PATH = 4096
+LONG_PATH_REFUSAL = ("a path or a glob of the call is longer than the guard "
+                     "resolves in bounded time, so it is not known to be free "
+                     "of what is refused: refused to every role (DEC-562)")
+# The fields of a file tool's call that are resolved as a path or a glob.
+_PATH_FIELDS = {"Read": ("file_path",), "Grep": ("path", "glob"),
+                "Glob": ("path", "pattern"), "Write": ("file_path",),
+                "Edit": ("file_path",), "MultiEdit": ("file_path",),
+                "NotebookEdit": ("notebook_path",)}
+
+
+def _long_path(tool_name, tool_input: dict) -> bool:
+    """True when a path or a glob of a file tool's call is longer than the
+    guard resolves."""
+    fields = _PATH_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    return any(isinstance(tool_input.get(key), str)
+               and len(tool_input[key]) > MOST_PATH for key in fields)
+
+
+# DEC-880 item 1: the fields of a file tool's call that name a path, a
+# leading ``~`` of which is judged as its expanded form by every rule.
+_HOME_FIELDS = {"Read": ("file_path",), "Grep": ("path",),
+                "Glob": ("path", "pattern"), "Write": ("file_path",),
+                "Edit": ("file_path",), "MultiEdit": ("file_path",),
+                "NotebookEdit": ("notebook_path",)}
+HOME_REFUSAL = ("a path of the call starts with a ~ the guard cannot expand "
+                "(no HOME, or a user the system does not know), so it is not "
+                "known to be free of what is refused: refused (DEC-880)")
+
+
+def _expand_home(tool_name, tool_input: dict) -> dict | None:
+    """*tool_input* with a leading ``~`` of each path field expanded: ``~``
+    against the guard's own HOME, ``~user`` against the system's users;
+    ``None`` when one cannot be expanded (fail closed)."""
+    fields = _HOME_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    out = tool_input
+    for key in fields:
+        value = tool_input.get(key)
+        if not (isinstance(value, str) and value.startswith("~")):
+            continue
+        if value.split("/", 1)[0] == "~" and not os.environ.get("HOME"):
+            return None
+        exp = os.path.expanduser(value)
+        if exp.startswith("~"):
+            return None
+        out = {**out, key: exp}
+    return out
+
+
+# -- main decision -------------------------------------------------------------
+
+def decide(
+    tool_name: str,
+    tool_input: dict,
+    project_root: str,
+    role: str | None,
+    ticket_id: str | None,
+    subagent_type: str | None = None,
+    cwd: str | None = None,
+    flag: str | None = None,
+) -> tuple[str, str]:
+    """Return ``("allow", "")`` or ``("deny", "<reason>")``.
+
+    *flag* is the freeze flag's state when the caller has read it
+    (``freeze_state``); it is read here otherwise.
+    """
+    frozen = (flag or freeze_state(project_root)) == "frozen"
+    if not frozen:
+        try:
+            frozen = _mirror_frozen(project_root, strict=True)
+        except FreezeLookupUnavailable as exc:
+            return "deny", f"the freeze look-up failed: {exc} (fail closed, DEC-580)"
+    erole = (role or "").strip() or ""
+
+    # CAP-62.a: no Bash call leaves the sandbox, whatever the role.
+    if tool_name == "Bash" and tool_input.get("dangerouslyDisableSandbox"):
+        return "deny", "dangerouslyDisableSandbox is denied to every role"
+
+    # DEC-562: no Bash call is longer than the guard reads in bounded time.
+    if tool_name == "Bash":
+        command = tool_input.get("command")
+        if isinstance(command, str) and len(command) > MOST_READ:
+            return "deny", LONG_REFUSAL
+    # DEC-880 item 1: a file tool's path with a leading ~ is judged as its
+    # expanded form; one the guard cannot expand refuses.
+    tool_input = _expand_home(tool_name, tool_input)
+    if tool_input is None:
+        return "deny", HOME_REFUSAL
+    # Nor does a file tool's call hold a path longer than the guard resolves.
+    if _long_path(tool_name, tool_input):
+        return "deny", LONG_PATH_REFUSAL
+
+    # DEC-409: no agent Bash call holds the lift form, whatever the role.
+    if tool_name == "Bash":
+        refusal = lift_refusal(tool_input.get("command", ""))
+        if refusal:
+            return "deny", refusal
+
+    # DEC-162, DEC-215: no call names a held-out path, whatever the tool
+    # and the role.  A broken held-out.yaml stops every call (DEC-218).
+    from gov.guard.heldout import HeldOutError, load_held_out, names_held_out
+    try:
+        held_out = load_held_out(project_root)
+    except HeldOutError as exc:
+        return "deny", f"{exc}: every call is denied until the owner repairs it"
+    if held_out and names_held_out(tool_name, tool_input, project_root,
+                                   cwd or project_root, held_out):
+        return "deny", "the call names a held-out path"
+
+    # DEC-548, DEC-553, DEC-562: no call gives the settings file or the
+    # held-out file a second name, nor holds more than the guard reads in
+    # bounded time; reads of the two files are open (DEC-821 item 3).
+    from gov.guard.protected import read_refusal
+    refusal = read_refusal(tool_name, tool_input, project_root,
+                           cwd or project_root)
+    if refusal:
+        return "deny", refusal
+
+    # DEC-820, DEC-821: reads are open but for secrets (a), the
+    # counterpart's work on the ticket (c) and the hidden part of an
+    # evaluation set that measures the session (d).
+    if tool_name in READ_TOOLS or tool_name == "Bash":
+        from gov.guard.reads import policy_refusal
+        refusal = policy_refusal(tool_name, tool_input, project_root,
+                                 cwd or project_root, erole or None, ticket_id,
+                                 subagent_type)
+        if refusal:
+            return "deny", refusal
+
+    if tool_name in READ_TOOLS or tool_name in LISTED_TOOLS:
+        return "allow", ""
+
+    # Collect write targets.
+    if tool_name == "Bash":
+        wt = _extract_bash_write_targets(
+            tool_input.get("command", ""), cwd or project_root)
+        if wt is None:
+            return "allow", ""
+        write_targets = wt
+    elif tool_name in WRITE_TOOLS:
+        pk = "notebook_path" if tool_name == "NotebookEdit" else "file_path"
+        ps = tool_input.get(pk, "")
+        if not ps:
+            return "deny", f"{tool_name}: no file path"
+        if not os.path.isabs(ps):
+            ps = os.path.join(cwd or project_root, ps)
+        ap = os.path.realpath(ps)
+        if ap == "/dev/null":
+            return "allow", ""
+        write_targets = [ap]
+    else:
+        # DEC-685: default-deny, for every role, frozen or not.
+        return "deny", (f"the tool '{tool_name}' is not known to the guard: "
+                        "refused to every role (DEC-685)")
+
+    # Frozen: deny all writes.
+    if frozen:
+        return "deny", "frozen: all writes denied"
+
+    # Determine the acting role (DEC-117, DEC-125, DEC-113).
+    if subagent_type is not None:
+        if subagent_type not in KNOWN_ROLES:
+            return "deny", f"subagent type '{subagent_type}' is not a known role"
+        if erole not in KNOWN_ROLES:
+            return "deny", f"role '{erole}' is not a known role"
+        acting_role = subagent_type
+    else:
+        if erole not in KNOWN_ROLES:
+            return "deny", f"role '{erole}' is not a known role"
+        acting_role = erole
+
+    pats = _get_allowed_paths(acting_role, ticket_id, project_root,
+                              session_role=erole)
+    # The own folder neither holds the project nor lies in it, so only a target outside the project needs it.
+    rr = os.path.realpath(project_root)
+    own = (runs.own_folder(project_root, ticket_id, acting_role)
+           if any(not _at_or_under(os.path.realpath(t), rr) for t in write_targets) else None)
+    for tgt in write_targets:
+        if not _path_allowed(tgt, project_root, pats, acting_role, own):
+            lbl = "Bash write" if tool_name == "Bash" else tool_name
+            return "deny", f"{lbl} to '{tgt}' denied for role '{acting_role}'"
+
+    return "allow", ""

@@ -1,0 +1,7 @@
+log: W2-110-A5-r2.json
+W2: W2-110
+status: DONE. W2-105 now passes 28 of 28 and the guard suites 1016 of 1016. The scoped run had 7 reds; all 7 pass when re-run alone, and none comes from this change. One thing must be cleared before landing: `gov check`'s `core-mutation` is red because of the CTO's edit to the ticket file (see risks).
+
+task: W2-110 (DAEO-3r1j), run after the resume. Carry out the CTO's decision P-W2-110-5 (a): one test-design batch gives W2-105's fixture a roster naming DAEO-zz91, then merge it, re-run W2-105, the guard suites and the scoped set, and return the head to land.
+status: DONE. W2-105 now passes 28 of 28 and the guard suites 1016 of 1016. The scoped run had 7 reds; all 7 pass when re-run alone, and none comes from this change. One thing must be cleared before landing: `gov check`'s `core-mutation` is red because of the CTO's edit to the ticket file (see risks).
+work_completed: I added the tests wo

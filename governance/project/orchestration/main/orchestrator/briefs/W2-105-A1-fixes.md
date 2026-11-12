@@ -92,7 +92,7 @@ git commit -m "W2-105: the base commit of the install cases is W2-56's gov launc
   (row W2-L423). Waits and stops by pid only.
 - Scratch budget 30 GB and 2,000,000 files and folders outside the tracked tree; report `du -sh` and `du -s --inodes` of
   your `TMPDIR` in `evidence`; clean it.
-- Estimate: 15 minutes, a few dollars. Past about 200k tokens, hand over and return PARTIAL.
+- Estimate: 15 minutes, a few dollars. There is no token cap (the owner, 2026-11-12, replacing DEC-1118 (A)).
 
 ## Return
 

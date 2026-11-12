@@ -1,0 +1,115 @@
+--- A. the bundle and the clone
+clone of the main tree's w2/integrate: w2/integrate
+ok   A0.0 the clone's stop_idle_check.py is the frozen before (the bundle is not stale)
+ok   A0.0 the main tree's stop_idle_check.py (read only) is the frozen before
+ok   A0.0 before/ and after/ copies hash as list.txt says
+ok   A0.1 the clone's test_stop_idle_check.py is the frozen before (the bundle is not stale)
+ok   A0.1 the main tree's test_stop_idle_check.py (read only) is the frozen before
+ok   A0.1 before/ and after/ copies hash as list.txt says
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/stop_idle_check.py
+ok   A2 verify refused before the apply (exit 3)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (undo)
+     already in place: tests/unit/orchestration/test_stop_idle_check.py (undo)
+ok   A3 undo before the apply changes nothing (exit 0)
+--- B. the existing tests of test_stop_idle_check.py on the OLD hook (the baseline)
+     result: 31 passed
+ok   B1 test_stop_idle_check.py, old hook, old tests: exit 0
+--- C. the new test cases on the OLD hook: red
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_a_used_log_line_whose_lead_returned_unread_is_left_out_and_named_in_the_log
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_only_the_line_with_the_unread_return_is_left_out_and_a_read_return_names_it_again
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_r2_a_claimed_ticket_with_a_fresh_branch_at_integrates_head_stays_named
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_r2_a_truly_merged_ticket_is_left_out_and_named_in_the_log
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_the_blocks_text_says_to_comment_out_a_line_whose_ticket_needs_no_new_run
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f2_a_branch_with_commits_of_its_own_is_launchable_and_the_integration_branch_is_never_a_ticket
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f2_a_plan_ticket_already_merged_into_integrate_is_left_out_and_named_in_the_log
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f2_an_unreadable_repository_names_every_plan_ticket_and_says_so
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f2_when_every_plan_ticket_is_merged_nothing_is_launchable_and_the_close_work_is_named
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f3_a_plan_that_hangs_is_cut_inside_the_hooks_own_10_second_timeout_and_named
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f3_the_two_timeouts_together_stay_inside_the_hook_entrys_10_seconds
+     result: 11 failed, 45 passed
+ok   C1 the new test file on the old hook: exit 1
+ok   C2 at least 8 of the cases fail on the old hook (11)
+     round 2 (the review's F1): the same new test file on the ROUND-1 hook (the frozen after of acts/ACT-IDLE-GUARD-2.r1):
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_r2_a_claimed_ticket_with_a_fresh_branch_at_integrates_head_stays_named
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_f1_r2_a_fresh_branch_stays_named_when_integrate_has_moved_on_and_when_it_is_the_only_ticket
+     result: 2 failed, 54 passed
+ok   C4 the round-2 test file on the round-1 hook: exit 1
+ok   C5 on the round-1 hook the two fresh-branch cases are red and the truly-merged case is green
+     Traceback (most recent call last):
+       File "<stdin>", line 84, in <module>
+     AssertionError: Idle check (ACT-IDLE-GUARD-1; DEC-1110 (1), DEC-1109 (3)): the gate is open, the machine is not full and 1 of 3 leads run, and 2 launchable: W2-105 DAEO-zpdj (already started for W2-17
+ok   check 1 as written (exit 1, count -)
+     (check 1, the hook's behaviour, is red on the old hook: it tells the two apart)
+ok   check 0 as written (exit 0, count -)
+     governance/project/orchestration/tools/stop_idle_check.py
+     tests/unit/orchestration/test_stop_idle_check.py
+ok   check 2 as written (exit 0, count -)
+ok   C3 the clone is clean again (old hook, old tests)
+--- D. the plain apply
+ok   D1 plain apply (no option, no env) (exit 0)
+ok   D2.0 stop_idle_check.py is the frozen after, byte for byte
+ok   D3.0 the mode of stop_idle_check.py is kept (644)
+ok   D2.1 test_stop_idle_check.py is the frozen after, byte for byte
+ok   D3.1 the mode of test_stop_idle_check.py is kept (644)
+ok   D4 git status shows exactly two modified files and nothing else
+ok   D5 no temp file left beside the files
+     moved: governance/project/orchestration/tools/stop_idle_check.py
+ok   D6 check refused after the apply (exit 3)
+ok   D7 verify exit 0 (exit 0)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (apply)
+     already in place: tests/unit/orchestration/test_stop_idle_check.py (apply)
+ok   D8 apply again changes nothing (exit 0)
+--- E. every manifest check exactly as written, then the tests: green
+ok   check 0 as written (exit 0, count -)
+     4
+ok   check 1 as written (exit 0, count 4)
+     governance/project/orchestration/tools/stop_idle_check.py
+     tests/unit/orchestration/test_stop_idle_check.py
+ok   check 2 as written (exit 0, count -)
+     result: 56 passed
+ok   E1 test_stop_idle_check.py, new hook, new tests: exit 0
+     baseline: 31 passed | new cases on the old hook: 11 failed, 45 passed | after the apply: 56 passed | new file on the round-1 hook: 2 failed, 54 passed
+     result: 21 passed
+ok   E2 the other hook suites still green (stop_waiter, safety nets): exit 0
+--- F. the new hook against the real gov plan (a planted orchestrator folder, the real gov, the main tree's branches read only)
+ok   F1 the hook ran against the real gov plan: exit 0, nothing on standard error
+ok   F2 no plan temp file left
+ok   F3 no merged ticket of the main tree is named launchable, W2-00 never, and the plan and the branch listing both read
+--- G. undo, and the apply.sh states
+ok   G1 undo (exit 0)
+ok   G2.0 stop_idle_check.py is the original, byte for byte, mode kept
+ok   G2.1 test_stop_idle_check.py is the original, byte for byte, mode kept
+ok   G3 the clone is clean after the undo
+ok   G4 check: state before (exit 0)
+     moved: governance/project/orchestration/tools/stop_idle_check.py
+ok   G5 check refuses a file that changed (exit 3)
+     moved: governance/project/orchestration/tools/stop_idle_check.py (neither the before nor the after; apply refused, nothing touched)
+ok   G6 apply refuses (neither before nor after) (exit 3)
+ok   G7 apply wrote nothing to the other file
+ok   G8 apply (exit 0)
+     not applied: tests/unit/orchestration/test_stop_idle_check.py
+ok   G9 a half-applied state: verify refuses (exit 3)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (apply)
+ok   G10 a half-applied state: apply finishes it (exit 0)
+ok   G11 verify (exit 0)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (undo)
+ok   G12 a half-applied state: undo takes it back (exit 0)
+ok   G13 the clone is back to the original
+     the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/dispatch-1/tmp/tampered2/after/repo/governance/project/orchestration/tools/
+ok   G14 a tampered frozen copy: apply refuses (4) (exit 4)
+ok   G15 nothing was written
+     moved: tests/unit/orchestration/test_stop_idle_check.py (neither the before nor the after; apply refused, nothing touched)
+ok   G16 a missing file: apply refuses (exit 3)
+ok   G17 nothing was created in its place
+     moved: tests/unit/orchestration/test_stop_idle_check.py (neither the before nor the after; apply refused, nothing touched)
+ok   G18 a link: apply refuses (exit 3)
+ok   G19 the clone is clean again
+--- H. the live files are unchanged (read only)
+ok   H1.0 the main tree's stop_idle_check.py is unchanged
+ok   H1.1 the main tree's test_stop_idle_check.py is unchanged
+ok   H2 the planted HOME is empty
+ok   H3 the main tree's governance/ and tests/ are clean
+
+REHEARSAL PASS
+failures: 0

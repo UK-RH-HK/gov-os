@@ -1,0 +1,5 @@
+W2-115 (DAEO-emq1): merge the acceptance tests' revision (td-2, 0bae231ad): S4's no-baseline-clone check spares the S10 warm clone
+
+Task: DAEO-emq1
+Role: orchestrator
+Implements: DEC-983, DEC-1001, DEC-1083, DEC-1052

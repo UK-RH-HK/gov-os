@@ -1,0 +1,7 @@
+log: W2-23-A5-run4.json
+W2: W2-23
+status: PACKAGES. Review round 2 is NOT READY on S3. Finding R2-1 (a citation of the store's folder that ends in `?` is not found) blocks. DEC-1010 allows no third round, so P-W2-23-8 goes to the owner once.
+
+task: DAEO-kmcr (W2-23), run 4 (resume, then build, then review round 2 on S3, as the CTO decided in P-W2-23-7 (a))
+status: PACKAGES. Review round 2 is NOT READY on S3. Finding R2-1 (a citation of the store's folder that ends in `?` is not found) blocks. DEC-1010 allows no third round, so P-W2-23-8 goes to the owner once.
+work_completed: Did the CTO's P-W2-23-7 (a) in order. td-4b added 7 S3 acceptance cases: 6 were red before the fix and 1 is a green control. I merged them at 4111fab26. eng-4 fixed `safety.citations` at 3e7194a45: (R1) a folder or `../` tail that ends a sentence with `.` is n

@@ -6,12 +6,15 @@
   "template/governance/kernel/hooks/precompact.py"
  ],
  "unplaced": [],
- "base": "1798e82f1201e27c7b33c023d1e1c0f77d01bc4f",
- "head": "13fd1dd34e32ea357418b9fa978398d3d19dc540",
+ "base": "0f62ebbba559e40d7c20762ff3edcdf6c1e3ee46",
+ "head": "7894a35e116f30622d3177881b0e6777fed31083",
  "governance_left_out": [],
  "changed": [
+  "docs/changes/W2-176-CIT-P.md",
   "template/governance/kernel/hooks/context_watch.py",
   "template/governance/kernel/hooks/precompact.py",
+  "tests/unit/hooks/test_resume_hooks.py",
+  "tests/unit/hooks/test_w29_hooks.py",
   "tests/unit/hooks/test_w2_176_context_watch.py",
   "tests/unit/hooks/test_w2_176_precompact.py"
  ],
@@ -26,8 +29,11 @@
      "reason": "OVERLAP",
      "ticket": "DAEO-ktiw",
      "paths": [
+      "docs/changes/W2-176-CIT-P.md",
       "template/governance/kernel/hooks/context_watch.py",
       "template/governance/kernel/hooks/precompact.py",
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -51,6 +57,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -70,6 +78,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -89,6 +99,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -108,6 +120,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -127,6 +141,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -146,6 +162,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -165,6 +183,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -184,6 +204,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -203,6 +225,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -222,6 +246,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -241,6 +267,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -260,6 +288,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -279,6 +309,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -298,6 +330,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -317,6 +351,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -336,6 +372,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -355,6 +393,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -374,6 +414,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -393,6 +435,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -412,6 +456,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -431,6 +477,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -450,6 +498,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -469,6 +519,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -488,6 +540,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -507,6 +561,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -526,6 +582,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -545,6 +603,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -564,6 +624,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -583,6 +645,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -602,6 +666,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -621,6 +687,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -640,6 +708,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -659,6 +729,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -678,6 +750,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -697,6 +771,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -716,6 +792,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -735,6 +813,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -754,6 +834,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -773,6 +855,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -792,6 +876,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -811,6 +897,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -830,6 +918,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -849,6 +939,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -868,6 +960,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -887,6 +981,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -906,6 +1002,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -925,6 +1023,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -944,6 +1044,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -963,6 +1065,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -982,6 +1086,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1001,6 +1107,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1020,6 +1128,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1039,6 +1149,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1058,6 +1170,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1077,6 +1191,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1096,6 +1212,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1115,6 +1233,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1134,6 +1254,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1153,6 +1275,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1172,6 +1296,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1191,6 +1317,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1210,6 +1338,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1229,6 +1359,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1248,6 +1380,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1267,6 +1401,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1286,6 +1422,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1305,6 +1443,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1324,6 +1464,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1343,6 +1485,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1362,6 +1506,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1381,6 +1527,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1400,6 +1548,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1419,6 +1569,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1438,6 +1590,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1457,6 +1611,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1476,6 +1632,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1495,6 +1653,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1514,6 +1674,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1533,6 +1695,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1552,6 +1716,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1571,6 +1737,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1590,6 +1758,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1609,6 +1779,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1628,6 +1800,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1647,6 +1821,8 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1665,6 +1841,8 @@
      "ticket": "DAEO-32n6",
      "paths": [
       "template/governance/kernel/hooks/precompact.py",
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1686,6 +1864,8 @@
      "reason": "OVERLAP",
      "ticket": "DAEO-e82f",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1699,6 +1879,8 @@
      "reason": "OVERLAP",
      "ticket": "DAEO-juee",
      "paths": [
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]
@@ -1722,6 +1904,8 @@
      "paths": [
       "template/governance/kernel/hooks/context_watch.py",
       "template/governance/kernel/hooks/precompact.py",
+      "tests/unit/hooks/test_resume_hooks.py",
+      "tests/unit/hooks/test_w29_hooks.py",
       "tests/unit/hooks/test_w2_176_context_watch.py",
       "tests/unit/hooks/test_w2_176_precompact.py"
      ]

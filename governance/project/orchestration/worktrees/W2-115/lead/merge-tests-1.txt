@@ -1,0 +1,5 @@
+W2-115 (DAEO-emq1): merge the acceptance tests (td-1, 01ececd0b758): S1-S11, S13, F1-F4; S12 waits for its CIT-P
+
+Task: DAEO-emq1
+Role: orchestrator
+Implements: DEC-983, DEC-1052, DEC-963

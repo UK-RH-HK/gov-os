@@ -1,0 +1,845 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+.............F.........................................................F [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+.............FFFF.........F............................................. [ 24%]
+........F....................................................F...F...... [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+.....................................F.................................. [ 37%]
+.............F.....................F.................................... [ 39%]
+................F.................................F.F................... [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+................F...F...........F....................................... [ 46%]
+..........................................F............................. [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+.............................................F.......................... [ 62%]
+..........................................sss........................... [ 63%]
+...............................F........................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+.....................F.................................................. [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+...............................FF.F..................................... [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+...................sss.................................................. [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+....................................................................     [100%]
+=================================== FAILURES ===================================
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x7ee59562e700>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 39299.776128044, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+__________________ test_s3_select_prints_the_set_and_options ___________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw5/test_s3_select_prints_the_set_0')
+
+    def test_s3_select_prints_the_set_and_options(tmp_path):
+        repo = project(tmp_path)
+        change(repo, {"src/pkg/core.py": "def add(a, b):\n    return b + a\n"})
+        done = _cli(repo.root, "--select", TICKET)
+        assert done.returncode == 0, done.stderr
+        printed = json.loads(done.stdout)
+        chosen = select.scoped(repo.root, TICKET)
+>       assert printed == {"ticket": TICKET, "suites": chosen["suites"], "pytest_options": chosen["pytest_options"]}
+E       AssertionError: assert {'pytest_opti...et': 'T-0001'} == {'pytest_opti...et': 'T-0001'}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'pytest_options': ['-p', 'no:cacheprovider', '-o', 'tmp_path_retention_policy=failed', '-o', 'junit_family=xunit1']} != {'pytest_options': ['-p', 'no:cacheprovider', '-o', 'tmp_path_retention_policy=failed', '-o', 'junit_family=xunit1', ...]}
+E         Use -v to get more diff
+
+tests/unit/close/test_w2_115_select.py:175: AssertionError
+_______________________ test_only_the_culprit_goes_back ________________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_only_the_culprit_goes_back(culprit):
+        """S6, F3: the culprit C is not closed and its work is not on ``main``; it alone goes back (A and B do not)."""
+        assert culprit.project.ticket_status(C) != "closed", f"the culprit closed\n{culprit.run.describe()}"
+        assert not support.is_ancestor(culprit.project, culprit.commits[C]), "the culprit's work landed on main"
+        back = [t for t in (A, B) if not culprit.landed(t)]
+>       assert not back, f"candidates that are not the culprit went back too: {back}\n{culprit.run.describe()}"
+E       AssertionError: candidates that are not the culprit went back too: ['PROJ-aaaa', 'PROJ-b1b1']
+E         gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/project --json
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E             sys.exit(main())
+E                      ^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E             result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E             "scope": closed[_evidence.KEY]["scope"]})
+E                      ~~~~~~^^^^^^^^^^^^^^^
+E         KeyError: 'evidence'
+E         
+E       assert not ['PROJ-aaaa', 'PROJ-b1b1']
+
+tests/acceptance/W2-115/test_w2_115_batch.py:76: AssertionError
+______________________ test_the_rest_land_on_the_same_run ______________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_the_rest_land_on_the_same_run(culprit):
+        """S6: A and B land (merged into ``main``, closed) and both close records name the same commit closed."""
+        for ticket in (A, B):
+>           assert culprit.landed(ticket), f"{ticket} did not land\n{culprit.run.describe()}"
+E           AssertionError: PROJ-aaaa did not land
+E             gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/project --json
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E             EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E             Traceback (most recent call last):
+E               File "<frozen runpy>", line 198, in _run_module_as_main
+E               File "<frozen runpy>", line 88, in _run_code
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E                 sys.exit(main())
+E                          ^^^^^^
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E                 result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E                 "scope": closed[_evidence.KEY]["scope"]})
+E                          ~~~~~~^^^^^^^^^^^^^^^
+E             KeyError: 'evidence'
+E             
+E           assert False
+E            +  where False = landed('PROJ-aaaa')
+E            +    where landed = <test_w2_115_batch.Batch object at 0x78820c483ad0>.landed
+
+tests/acceptance/W2-115/test_w2_115_batch.py:82: AssertionError
+_________________ test_the_build_without_the_culprit_is_green __________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_the_build_without_the_culprit_is_green(culprit):
+        """S6: the red test passed on a build holding A's work and not C's: the merged result without the culprit."""
+        runs = culprit.project.told_runs("test_cc_reads_the_gadget")
+        without = [r for r in runs if "CHANGED" in (r["seen"][support.WIDGET] or "")
+                   and "BROKEN" not in (r["seen"][support.GADGET] or "")]
+>       assert without and all(r["ok"] for r in without), f"no green run of the build without the culprit: {runs}"
+E       AssertionError: no green run of the build without the culprit: [{'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/sandbox/tmp/gov-nightly-exugaujs/tree', 'worker': 'gw6', 'seen': {'src/gov/widget/thing.py': '# the widget\n', 'src/gov/gadget/other.py': '# the gadget\n', 'src/gov/core/base.py': '# the shared core\n', 'docs/DECISION_REGISTER.md': '# The decision register\n\nNothing decided yet.\n'}, 'ok': True, 'time': 1794448397.7468045}]
+E       assert ([])
+
+tests/acceptance/W2-115/test_w2_115_batch.py:92: AssertionError
+_______ test_the_culprit_is_named_and_nothing_landed_before_it_was_found _______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_the_culprit_is_named_and_nothing_landed_before_it_was_found(culprit):
+        """S6: the close records name C among the culprits; no commit on ``main`` ever held C's change and no revert was
+        made (the culprit was found before anything landed, never by taking merged code out)."""
+        culprits = culprit.project.record(A).get("culprits")
+>       assert isinstance(culprits, list) and any(C in str(c) or "W2-c1" in str(c) for c in culprits), \
+            f"the close record does not name the culprit: {culprits!r}"
+E       AssertionError: the close record does not name the culprit: []
+E       assert (True and False)
+E        +  where True = isinstance([], list)
+E        +  and   False = any(<generator object test_the_culprit_is_named_and_nothing_landed_before_it_was_found.<locals>.<genexpr> at 0x7882076cd9a0>)
+
+tests/acceptance/W2-115/test_w2_115_batch.py:99: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x7ee59562efc0>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 39368.269997343, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7ee595712ca0>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+__________ test_a_red_no_single_candidate_explains_refuses_the_batch ___________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2'), _trace=<plugg...osixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2'), _retention_count=3, _retention_policy='failed')
+
+    def test_a_red_no_single_candidate_explains_refuses_the_batch(tmp_path_factory):
+        """S6, F3: A and B each break the same test: no single candidate explains the red; the batch is refused with
+        BATCH_UNEXPLAINED and closes nothing."""
+        batch = Batch(tmp_path_factory.mktemp("w2_115_batch_unexplained"), {BB_BOTH: BOTH_NOT_BROKEN}, [
+            (A, "W2-aa", {support.WIDGET: "# the widget, CHANGED BROKEN\n"}, None),
+            (B, "W2-b1", {BOLT: "# a bolt, CHANGED\n"}, None),
+            (C, "W2-c1", {support.GADGET: "# the gadget, BROKEN\n"}, None)],
+            bb_paths=["src/gov/widget/**", "src/gov/gadget/**"])
+>       support.assert_refused(batch.run, support.BATCH_UNEXPLAINED)
+
+tests/acceptance/W2-115/test_w2_115_batch.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('gov.close.batch', 'run', 'PROJ-aaaa', 'PROJ-b1b1', 'PROJ-c1c1', '--root', '/tmp/gov-os-lead-W2-115/pytest-o...ed[_evidence.KEY]["scope"]})\n             ~~~~~~^^^^^^^^^^^^^^^\nKeyError: \'evidence\'\n', seconds=33.53694318400085)
+code = 'BATCH_UNEXPLAINED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+        assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+        text = refusal_text(run)
+        if code is not None:
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name BATCH_UNEXPLAINED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_unexplained0/project --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           Traceback (most recent call last):
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E               sys.exit(main())
+E                        ^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E               result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E               "scope": closed[_evidence.KEY]["scope"]})
+E                        ~~~~~~^^^^^^^^^^^^^^^
+E           KeyError: 'evidence'
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+________________________ test_copy_creates_the_overlay _________________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+installed = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw0/w1-39-pristine0/product')
+
+    def test_copy_creates_the_overlay(installed):
+        """The created project has its overlay, ``governance/project/``: a path map and a test map, and nothing else
+        (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are in their own file).
+    
+        The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``; the test
+        map beside it: ``governance/project/test-map.yaml``.
+        """
+        test_map_rel = f"{support.OVERLAY_REL}/test-map.yaml"
+        files = support.files_under(installed, support.OVERLAY_REL) if (installed / support.OVERLAY_REL).is_dir() else []
+        assert support.PATH_MAP_REL in files, \
+            f"`copier copy` created no {support.PATH_MAP_REL} (the overlay of KPI success 1; DEC-493). It created: {files}"
+        assert test_map_rel in files, \
+            f"`copier copy` created no {test_map_rel} (DEC-896 item 2, DEC-903). It created: {files}"
+>       assert files == sorted([support.PATH_MAP_REL, test_map_rel]), \
+            f"`copier copy` created more in the overlay than the path map and the test map DEC-903 names: {files}"
+E       AssertionError: `copier copy` created more in the overlay than the path map and the test map DEC-903 names: ['governance/project/close.yaml', 'governance/project/path-map.yaml', 'governance/project/test-map.yaml']
+E       assert ['governance/...est-map.yaml'] == ['governance/...est-map.yaml']
+E         
+E         At index 0 diff: 'governance/project/close.yaml' != 'governance/project/path-map.yaml'
+E         Left contains one more item: 'governance/project/test-map.yaml'
+E         Use -v to get more diff
+
+tests/acceptance/W1-39/test_w1_39_copy.py:70: AssertionError
+__________ test_a_candidate_that_cannot_be_isolated_refuses_the_batch __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2'), _trace=<plugg...osixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2'), _retention_count=3, _retention_policy='failed')
+
+    def test_a_candidate_that_cannot_be_isolated_refuses_the_batch(tmp_path_factory):
+        """S6: A causes the red and B's branch is made from A's, so the build without A cannot be made: the batch is
+        refused with CANDIDATE_NOT_ISOLATED and nothing lands."""
+        batch = Batch(tmp_path_factory.mktemp("w2_115_batch_isolation"), {BB_WIDGET: support.WIDGET_NOT_BROKEN}, [
+            (A, "W2-aa", {support.WIDGET: "# the widget, CHANGED BROKEN\n"}, None),
+            (B, "W2-b1", {BOLT: "# a bolt, CHANGED\n"}, "w2/W2-aa"),
+            (C, "W2-c1", {"src/gov/gadget/__init__.py": "# the gadget's package\n"}, None)])
+>       support.assert_refused(batch.run, support.CANDIDATE_NOT_ISOLATED)
+
+tests/acceptance/W2-115/test_w2_115_batch.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('gov.close.batch', 'run', 'PROJ-aaaa', 'PROJ-b1b1', 'PROJ-c1c1', '--root', '/tmp/gov-os-lead-W2-115/pytest-o...ed[_evidence.KEY]["scope"]})\n             ~~~~~~^^^^^^^^^^^^^^^\nKeyError: \'evidence\'\n', seconds=31.77899674299988)
+code = 'CANDIDATE_NOT_ISOLATED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+        assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+        text = refusal_text(run)
+        if code is not None:
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_isolation0/project --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           Traceback (most recent call last):
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E               sys.exit(main())
+E                        ^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E               result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E               "scope": closed[_evidence.KEY]["scope"]})
+E                        ~~~~~~^^^^^^^^^^^^^^^
+E           KeyError: 'evidence'
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x7ee595711b20>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x7ee59570f1a0>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_ test_the_nightly_rebuilds_the_stores_with_the_full_secrets_scan_before_its_run _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x7882076b1940>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_the_nightly_rebuilds_the_0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_the_nightly_rebuilds_the_0/sandbox/elsewhere'))
+
+    def test_the_nightly_rebuilds_the_stores_with_the_full_secrets_scan_before_its_run(make_project, sandbox):
+        """S8: with ``GOV_SECRETS_FULL_SCAN`` unset in the caller's environment, the nightly's record says
+        ``secrets_full_scan: true``, and a store under ``.gov-runtime/`` was written after the nightly began and before
+        the first planted test ran."""
+        project = make_project(nightly=None)
+        env = support.quiet_env(sandbox)
+        assert "GOV_SECRETS_FULL_SCAN" not in env
+        started = time.time()
+        run = support.run_module(project, sandbox, support.NIGHTLY_MODULE, "main", env=env)
+        envelope = support.envelope(run)
+        body = envelope.get("result") if envelope.get("ok") else (envelope.get("error") or {}).get("details")
+        rel = (body or {}).get("record")
+        assert isinstance(rel, str) and rel.startswith(support.NIGHTLY_DIR_REL + "/"), \
+            f"the nightly names no record under {support.NIGHTLY_DIR_REL}/\n{run.describe()}"
+        record = json.loads((project.root / rel).read_text(encoding="utf-8"))
+        assert record.get("secrets_full_scan") is True, f"the nightly's record does not say the full scan ran: {record}"
+        times = [r["time"] for case in os.listdir(project.told) for r in project.told_runs(case)]
+        assert times, f"the nightly ran no planted test\n{run.describe()}"
+        first_test = min(times)
+        store = project.root / ".gov-runtime"
+        rebuilt = [p for p in store.rglob("*") if p.is_file()
+                   and not {"close", "nightly"} & set(p.relative_to(store).parts)
+                   and started <= p.stat().st_mtime <= first_test]
+>       assert rebuilt, "no store under .gov-runtime/ was rebuilt between the nightly's start and its first test"
+E       AssertionError: no store under .gov-runtime/ was rebuilt between the nightly's start and its first test
+E       assert []
+
+tests/acceptance/W2-115/test_w2_115_nightly.py:40: AssertionError
+_____________ test_only_the_load_sensitive_case_gets_three_rounds ______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+unowned = <conftest.Unowned object at 0x788207689340>
+
+    def test_only_the_load_sensitive_case_gets_three_rounds(unowned):
+        """S4: the load-sensitive case (a ``latency`` entry of the serial-only list) gets 3 rounds each way."""
+        support.passed(unowned.run)
+        runs = unowned.project.told_runs("test_bb_timing")
+        head, base = support.head_side(runs), support.base_side(runs)
+>       assert len(head) >= 4, f"the load-sensitive red did not get 3 rounds alone after its run: {len(head)} head runs"
+E       AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs
+E       assert 2 >= 4
+E        +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtim...t/other.py': '# the gadget\n', 'src/gov/widget/thing.py': '# the widget, CHANGED\n'}, 'time': 1794448502.3779116, ...}])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:73: AssertionError
+_______________ test_no_clone_is_built_for_the_nightly_baseline ________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+unowned = <conftest.Unowned object at 0x788207689340>
+
+    def test_no_clone_is_built_for_the_nightly_baseline(unowned):
+        """S4: no folder for a nightly baseline exists after the run, in the project or in the close's temporary
+        folder."""
+        support.passed(unowned.run)
+        words = ("baseline", "nightly")
+        found = (support.paths_named(unowned.project.root / ".gov-runtime", words)
+                 + support.paths_named(unowned.sandbox.tmpdir, words))
+>       assert not found, f"a nightly-baseline clone was built: {found}"
+E       AssertionError: a nightly-baseline clone was built: ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/clone/docs/close/nightly']
+E       assert not ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/clone/docs/close/nightly']
+
+tests/acceptance/W2-115/test_w2_115_reds.py:93: AssertionError
+_____ test_records_alone_select_the_record_reading_suites_and_nothing_else _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x788207db8e00>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_records_alone_select_the_0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_records_alone_select_the_0/sandbox/elsewhere'))
+
+    def test_records_alone_select_the_record_reading_suites_and_nothing_else(make_project, sandbox):
+        """S2: a change to record places alone selects the record-reading suites the test map names, nothing else."""
+        project = make_project()
+        project.record_commit({support.REGISTER_REL: "# The decision register\n\nOne decision.\n"})
+        suites = _selected(project, sandbox)["suites"]
+>       assert support.names(suites, support.RR_RECORDS), f"the record-reading suite is not selected: {suites}"
+E       AssertionError: the record-reading suite is not selected: ['tests/acceptance/W2-aa/']
+E       assert False
+E        +  where False = <function names at 0x78820e2d0a40>(['tests/acceptance/W2-aa/'], 'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register')
+E        +    where <function names at 0x78820e2d0a40> = support.names
+E        +    and   'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register' = support.RR_RECORDS
+
+tests/acceptance/W2-115/test_w2_115_selection.py:55: AssertionError
+_____ test_a_change_nothing_maps_is_refused_with_its_reason_never_widened ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x788207db8b80>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_change_nothing_maps_is_0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_change_nothing_maps_is_0/sandbox/elsewhere'))
+
+    def test_a_change_nothing_maps_is_refused_with_its_reason_never_widened(make_project, sandbox):
+        """S2: a planted change with no mapping exits with SELECTION_REFUSED and its reason, and prints no set."""
+        project = make_project()
+        project.merged({support.UNPLACED: "# odd\n"})
+        project.work({support.WIDGET: "# the widget, CHANGED\n"})
+        project.ready(sandbox)
+        run = project.select(sandbox)
+>       assert run.returncode == 2, f"a refused selection does not exit 2\n{run.describe()}"
+E       AssertionError: a refused selection does not exit 2
+E         gov close --select PROJ-aaaa
+E         exit code: 0
+E         stdout:
+E         {"ticket": "PROJ-aaaa", "suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}
+E         
+E         stderr:
+E         
+E       assert 0 == 2
+E        +  where 0 = Run(args=('close', '--select', 'PROJ-aaaa'), returncode=0, stdout='{"ticket": "PROJ-aaaa", "suites": ["tests/acceptanc...path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}\n', stderr='', seconds=0.3990559369995026).returncode
+
+tests/acceptance/W2-115/test_w2_115_selection.py:77: AssertionError
+___________ test_a_scoped_close_of_a_change_nothing_maps_is_refused ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x788207dbb9c0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_scoped_close_of_a_chang0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_scoped_close_of_a_chang0/sandbox/elsewhere'))
+
+    def test_a_scoped_close_of_a_change_nothing_maps_is_refused(make_project, sandbox):
+        """S2: the scoped close itself refuses an unmapped change with SELECTION_REFUSED rather than widening."""
+        project = make_project()
+        project.merged({support.UNPLACED: "# odd\n"})
+        project.work({support.WIDGET: "# the widget, CHANGED\n"})
+        project.ready(sandbox)
+        run = project.close(sandbox)
+>       support.assert_refused(run, support.SELECTION_REFUSED)
+
+tests/acceptance/W2-115/test_w2_115_selection.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":..."docs/close/nightly/NR-20261001T010000Z-08a294c4008a.json"}}, "session": ""}\n', stderr='', seconds=1.6603484570005094)
+code = 'SELECTION_REFUSED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+>       assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command was not refused
+E       gov close PROJ-aaaa --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close": "scoped", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "commit": "8f42b9e93a126e22f69298a687d7185437c6dd19", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 3, "failed": 0, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "review": {"verdict": "READY", "record": null}, "reds": [], "culprits": [], "clone": {"path": ".gov-runtime/close/clone", "reused": false, "replaced": null}, "nightly": {"read": true, "record": "docs/close/nightly/NR-20261001T010000Z-08a294c4008a.json"}}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-115/w2_115_support.py:394: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x7ee59570f7e0>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 39507.264445807, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_________ test_trees_leave_out_the_briefs_and_set_up_a_also_the_guard __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+s = <test_w2_149_setup_a.Sgx object at 0x731bea69d070>
+
+    def test_trees_leave_out_the_briefs_and_set_up_a_also_the_guard(s):
+        rc, sgx, _ = s.go("sgx1-writer-tuning", seed=3, dry=True)
+        rc2, mem, _ = s.launch(seed=3, dry=True)
+>       assert rc == rc2 == 0
+E       assert 14 == 0
+
+tests/unit/orchestration/test_w2_149_setup_a.py:262: AssertionError
+_______________________ test_a_refused_selection_exits_2 _______________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x788207d39bc0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0')
+
+    def test_a_refused_selection_exits_2(make_project, sandbox, tmp_path):
+        """S13: a change nothing maps: the selection is refused, exit 2, SELECTION_REFUSED said, ``verify.exit`` holds 2."""
+        project = make_project()
+        project.merged({support.UNPLACED: "# odd\n"})
+        project.work({support.WIDGET: "# the widget, CHANGED\n"})
+        project.ready(sandbox)
+        out = tmp_path / "verify-out"
+        run = project.verify(sandbox, out=out)
+>       assert run.returncode == support.VERIFY_EXIT_REFUSED, f"a refused selection does not exit 2\n{run.describe()}"
+E       AssertionError: a refused selection does not exit 2
+E         gov close --verify PROJ-aaaa --out /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/verify-out
+E         exit code: 0
+E         stdout:
+E         verify PROJ-aaaa: exit 0: green; parallel 3 passed, 0 failed, 0 errors, 0 skipped; serial 0 passed, 0 failed, 0 errors, 0 skipped
+E         
+E         stderr:
+E         
+E       assert 0 == 2
+E        +  where 0 = Run(args=('close', '--verify', 'PROJ-aaaa', '--out', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_... failed, 0 errors, 0 skipped; serial 0 passed, 0 failed, 0 errors, 0 skipped\n', stderr='', seconds=2.7674999030059553).returncode
+E        +  and   2 = support.VERIFY_EXIT_REFUSED
+
+tests/acceptance/W2-115/test_w2_115_verify.py:87: AssertionError
+______________ test_a_failed_clean_up_does_not_change_the_verdict ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+night = <test_w2_77_failed_removal.LockedNight object at 0x7037aa598e00>
+
+    def test_a_failed_clean_up_does_not_change_the_verdict(night):
+        result = support.green(night.run)
+        record, _ = support.record_of(night.project, night.run)
+        assert record.get("verdict") == support.GREEN and result.get("verdict") == support.GREEN, \
+            f"a failed clean-up changed the night's verdict: {record.get('verdict')!r}"
+>       assert set(record) - {support.CLEANUP_KEY} == support.RECORD_KEYS, \
+            f"a failed clean-up changed the record's other keys: {sorted(record)}"
+E       AssertionError: a failed clean-up changed the record's other keys: ['base', 'branch', 'cleanup', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_failed_removal.py:120: AssertionError
+_______ test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today _______
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        result = support.green(nights.green_run)
+        data = nights.green_run.envelope()
+        assert data.get("command") == support.COMMAND, f"the envelope's command is not {support.COMMAND!r}: {data}"
+>       assert set(result) == support.RECORD_KEYS | {"record"}, \
+            f"the green envelope's result is not the record and its path: {sorted(result)}"
+E       AssertionError: the green envelope's result is not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:37: AssertionError
+___ test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key ____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key(nights):
+        support.green(nights.green_run)
+        record, rel = support.record_of(nights.green_project, nights.green_run)
+        assert support.CLEANUP_KEY not in record, f"a night whose clone was removed has a cleanup key in {rel}: {record}"
+>       assert set(record) == support.RECORD_KEYS, \
+            (f"the record's keys changed: added {sorted(set(record) - support.RECORD_KEYS)}, "
+             f"lost {sorted(support.RECORD_KEYS - set(record))}")
+E       AssertionError: the record's keys changed: added ['rebuild', 'secrets_full_scan'], lost []
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:49: AssertionError
+________ test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        error = support.red(nights.red_run)
+        details = error.get("details") or {}
+>       assert set(details) == support.RECORD_KEYS | {"record"}, \
+            f"the red envelope's details are not the record and its path: {sorted(details)}"
+E       AssertionError: the red envelope's details are not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:69: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-115/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2785066) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+26 failed, 4140 passed, 6 skipped, 6 warnings in 1055.75s (0:17:35)

@@ -1,0 +1,436 @@
+=== tests/unit/close/test_w2_115_select.py::test_s3_select_prints_the_set_and_options 
+AssertionError: assert {'pytest_opti...et': 'T-0001'} == {'pytest_opti...et': 'T-0001'}      Omitting 2 identical items, use -vv to show   Differing items:   {'pytest_options': ['-p', 'no:cacheprovider', '-o', 'tmp_path_retention_policy=failed', '-o', 'junit_family=xunit1']} != {'pytest_options': ['
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw5/test_s3_select_prints_the_set_0')
+
+    def test_s3_select_prints_the_set_and_options(tmp_path):
+        repo = project(tmp_path)
+        change(repo, {"src/pkg/core.py": "def add(a, b):\n    return b + a\n"})
+        done = _cli(repo.root, "--select", TICKET)
+        assert done.returncode == 0, done.stderr
+        printed = json.loads(done.stdout)
+        chosen = select.scoped(repo.root, TICKET)
+>       assert printed == {"ticket": TICKET, "suites": chosen["suites"], "pytest_options": chosen["pytest_options"]}
+E       AssertionError: assert {'pytest_opti...et': 'T-0001'} == {'pytest_opti...et': 'T-0001'}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'pytest_options': ['-p', 'no:cacheprovider', '-o', 'tmp_path_retention_policy=failed', '-o', 'junit_family=xunit1']} != {'pytest_options': ['-p', 'no:cacheprovider', '-o', 'tmp_path_retention_policy=failed', '-o', 'junit_family=xunit1', ...]}
+E         Use -v to get more diff
+
+tests/unit/close/test_w2_115_select.py:175: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_only_the_culprit_goes_back 
+AssertionError: candidates that are not the culprit went back too: ['PROJ-aaaa', 'PROJ-b1b1']   gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/project --json   exit code: 1   stdout:      stderr:   EMBEDDE
+E       AssertionError: candidates that are not the culprit went back too: ['PROJ-aaaa', 'PROJ-b1b1']
+E         gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/project --json
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E             sys.exit(main())
+E                      ^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E             result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E             "scope": closed[_evidence.KEY]["scope"]})
+E                      ~~~~~~^^^^^^^^^^^^^^^
+E         KeyError: 'evidence'
+E         
+E       assert not ['PROJ-aaaa', 'PROJ-b1b1']
+
+tests/acceptance/W2-115/test_w2_115_batch.py:76: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_the_rest_land_on_the_same_run 
+AssertionError: PROJ-aaaa did not land   gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/project --json   exit code: 1   stdout:      stderr:   EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieva
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E             EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E             Traceback (most recent call last):
+E               File "<frozen runpy>", line 198, in _run_module_as_main
+E               File "<frozen runpy>", line 88, in _run_code
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E                 sys.exit(main())
+E                          ^^^^^^
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E                 result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E                 "scope": closed[_evidence.KEY]["scope"]})
+E                          ~~~~~~^^^^^^^^^^^^^^^
+E             KeyError: 'evidence'
+E             
+E           assert False
+E            +  where False = landed('PROJ-aaaa')
+E            +    where landed = <test_w2_115_batch.Batch object at 0x78820c483ad0>.landed
+
+tests/acceptance/W2-115/test_w2_115_batch.py:82: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_the_build_without_the_culprit_is_green 
+AssertionError: no green run of the build without the culprit: [{'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/sandbox/tmp/gov-nightly-exugaujs/tree', 'worker': 'gw6', 'seen': {'src/gov/widget/thing.py': '# the widget\n', 'src/gov/gadget/other.py': '# the 
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_the_build_without_the_culprit_is_green(culprit):
+        """S6: the red test passed on a build holding A's work and not C's: the merged result without the culprit."""
+        runs = culprit.project.told_runs("test_cc_reads_the_gadget")
+        without = [r for r in runs if "CHANGED" in (r["seen"][support.WIDGET] or "")
+                   and "BROKEN" not in (r["seen"][support.GADGET] or "")]
+>       assert without and all(r["ok"] for r in without), f"no green run of the build without the culprit: {runs}"
+E       AssertionError: no green run of the build without the culprit: [{'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_culprit0/sandbox/tmp/gov-nightly-exugaujs/tree', 'worker': 'gw6', 'seen': {'src/gov/widget/thing.py': '# the widget\n', 'src/gov/gadget/other.py': '# the gadget\n', 'src/gov/core/base.py': '# the shared core\n', 'docs/DECISION_REGISTER.md': '# The decision register\n\nNothing decided yet.\n'}, 'ok': True, 'time': 1794448397.7468045}]
+E       assert ([])
+
+tests/acceptance/W2-115/test_w2_115_batch.py:92: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_the_culprit_is_named_and_nothing_landed_before_it_was_found 
+AssertionError: the close record does not name the culprit: [] assert (True and False)  +  where True = isinstance([], list)  +  and   False = any(<generator object test_the_culprit_is_named_and_nothing_landed_before_it_was_found.<locals>.<genexpr> at 0x7882076cd9a0>)
+culprit = <test_w2_115_batch.Batch object at 0x78820c483ad0>
+
+    def test_the_culprit_is_named_and_nothing_landed_before_it_was_found(culprit):
+        """S6: the close records name C among the culprits; no commit on ``main`` ever held C's change and no revert was
+        made (the culprit was found before anything landed, never by taking merged code out)."""
+        culprits = culprit.project.record(A).get("culprits")
+>       assert isinstance(culprits, list) and any(C in str(c) or "W2-c1" in str(c) for c in culprits), \
+            f"the close record does not name the culprit: {culprits!r}"
+E       AssertionError: the close record does not name the culprit: []
+E       assert (True and False)
+E        +  where True = isinstance([], list)
+E        +  and   False = any(<generator object test_the_culprit_is_named_and_nothing_landed_before_it_was_found.<locals>.<genexpr> at 0x7882076cd9a0>)
+
+tests/acceptance/W2-115/test_w2_115_batch.py:99: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_a_red_no_single_candidate_explains_refuses_the_batch 
+AssertionError: the refusal does not name BATCH_UNEXPLAINED gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_unexplained0/project --json exit code: 1 stdout:  stderr: EMBEDDER_UNAVAILABLE: Ollama is unavailable: sema
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name BATCH_UNEXPLAINED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_unexplained0/project --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           Traceback (most recent call last):
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E               sys.exit(main())
+E                        ^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E               result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E               "scope": closed[_evidence.KEY]["scope"]})
+E                        ~~~~~~^^^^^^^^^^^^^^^
+E           KeyError: 'evidence'
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_batch.py::test_a_candidate_that_cannot_be_isolated_refuses_the_batch 
+AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_isolation0/project --json exit code: 1 stdout:  stderr: EMBEDDER_UNAVAILABLE: Ollama is unavailable: s
+>           assert code in text, f"the refusal does not name {code}\n{run.describe()}"
+                   ^^^^^^^^^^^^
+E           AssertionError: the refusal does not name CANDIDATE_NOT_ISOLATED
+E           gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_batch_isolation0/project --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E           Traceback (most recent call last):
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 653, in <module>
+E               sys.exit(main())
+E                        ^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 640, in main
+E               result, code = run(Path(args.root), args.tickets) if args.action == "run" \
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-115/src/gov/close/batch.py", line 442, in run
+E               "scope": closed[_evidence.KEY]["scope"]})
+E                        ~~~~~~^^^^^^^^^^^^^^^
+E           KeyError: 'evidence'
+
+tests/acceptance/W2-115/w2_115_support.py:397: AssertionError
+
+=== tests/acceptance/W1-39/test_w1_39_copy.py::test_copy_creates_the_overlay 
+AssertionError: `copier copy` created more in the overlay than the path map and the test map DEC-903 names: ['governance/project/close.yaml', 'governance/project/path-map.yaml', 'governance/project/test-map.yaml'] assert ['governance/...est-map.yaml'] == ['governance/...est-map.yaml']      At index 
+installed = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw0/w1-39-pristine0/product')
+
+    def test_copy_creates_the_overlay(installed):
+        """The created project has its overlay, ``governance/project/``: a path map and a test map, and nothing else
+        (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are in their own file).
+    
+        The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``; the test
+        map beside it: ``governance/project/test-map.yaml``.
+        """
+        test_map_rel = f"{support.OVERLAY_REL}/test-map.yaml"
+        files = support.files_under(installed, support.OVERLAY_REL) if (installed / support.OVERLAY_REL).is_dir() else []
+        assert support.PATH_MAP_REL in files, \
+            f"`copier copy` created no {support.PATH_MAP_REL} (the overlay of KPI success 1; DEC-493). It created: {files}"
+        assert test_map_rel in files, \
+            f"`copier copy` created no {test_map_rel} (DEC-896 item 2, DEC-903). It created: {files}"
+>       assert files == sorted([support.PATH_MAP_REL, test_map_rel]), \
+            f"`copier copy` created more in the overlay than the path map and the test map DEC-903 names: {files}"
+E       AssertionError: `copier copy` created more in the overlay than the path map and the test map DEC-903 names: ['governance/project/close.yaml', 'governance/project/path-map.yaml', 'governance/project/test-map.yaml']
+E       assert ['governance/...est-map.yaml'] == ['governance/...est-map.yaml']
+E         
+E         At index 0 diff: 'governance/project/close.yaml' != 'governance/project/path-map.yaml'
+E         Left contains one more item: 'governance/project/test-map.yaml'
+E         Use -v to get more diff
+
+tests/acceptance/W1-39/test_w1_39_copy.py:70: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_nightly.py::test_the_nightly_rebuilds_the_stores_with_the_full_secrets_scan_before_its_run 
+AssertionError: no store under .gov-runtime/ was rebuilt between the nightly's start and its first test assert []
+        the first planted test ran."""
+        project = make_project(nightly=None)
+        env = support.quiet_env(sandbox)
+        assert "GOV_SECRETS_FULL_SCAN" not in env
+        started = time.time()
+        run = support.run_module(project, sandbox, support.NIGHTLY_MODULE, "main", env=env)
+        envelope = support.envelope(run)
+        body = envelope.get("result") if envelope.get("ok") else (envelope.get("error") or {}).get("details")
+        rel = (body or {}).get("record")
+        assert isinstance(rel, str) and rel.startswith(support.NIGHTLY_DIR_REL + "/"), \
+            f"the nightly names no record under {support.NIGHTLY_DIR_REL}/\n{run.describe()}"
+        record = json.loads((project.root / rel).read_text(encoding="utf-8"))
+        assert record.get("secrets_full_scan") is True, f"the nightly's record does not say the full scan ran: {record}"
+        times = [r["time"] for case in os.listdir(project.told) for r in project.told_runs(case)]
+        assert times, f"the nightly ran no planted test\n{run.describe()}"
+        first_test = min(times)
+        store = project.root / ".gov-runtime"
+        rebuilt = [p for p in store.rglob("*") if p.is_file()
+                   and not {"close", "nightly"} & set(p.relative_to(store).parts)
+                   and started <= p.stat().st_mtime <= first_test]
+>       assert rebuilt, "no store under .gov-runtime/ was rebuilt between the nightly's start and its first test"
+E       AssertionError: no store under .gov-runtime/ was rebuilt between the nightly's start and its first test
+E       assert []
+
+tests/acceptance/W2-115/test_w2_115_nightly.py:40: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_reds.py::test_only_the_load_sensitive_case_gets_three_rounds 
+AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs assert 2 >= 4  +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtim...t/other.py': '# the gadget\n', 'src/gov/widget/thing.p
+unowned = <conftest.Unowned object at 0x788207689340>
+
+    def test_only_the_load_sensitive_case_gets_three_rounds(unowned):
+        """S4: the load-sensitive case (a ``latency`` entry of the serial-only list) gets 3 rounds each way."""
+        support.passed(unowned.run)
+        runs = unowned.project.told_runs("test_bb_timing")
+        head, base = support.head_side(runs), support.base_side(runs)
+>       assert len(head) >= 4, f"the load-sensitive red did not get 3 rounds alone after its run: {len(head)} head runs"
+E       AssertionError: the load-sensitive red did not get 3 rounds alone after its run: 2 head runs
+E       assert 2 >= 4
+E        +  where 2 = len([{'ok': False, 'root': '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtim...t/other.py': '# the gadget\n', 'src/gov/widget/thing.py': '# the widget, CHANGED\n'}, 'time': 1794448502.3779116, ...}])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:73: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_reds.py::test_no_clone_is_built_for_the_nightly_baseline 
+AssertionError: a nightly-baseline clone was built: ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/clone/docs/close/nightly'] assert not ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/cl
+unowned = <conftest.Unowned object at 0x788207689340>
+
+    def test_no_clone_is_built_for_the_nightly_baseline(unowned):
+        """S4: no folder for a nightly baseline exists after the run, in the project or in the close's temporary
+        folder."""
+        support.passed(unowned.run)
+        words = ("baseline", "nightly")
+        found = (support.paths_named(unowned.project.root / ".gov-runtime", words)
+                 + support.paths_named(unowned.sandbox.tmpdir, words))
+>       assert not found, f"a nightly-baseline clone was built: {found}"
+E       AssertionError: a nightly-baseline clone was built: ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/clone/docs/close/nightly']
+E       assert not ['/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/w2_115_unowned0/project/.gov-runtime/close/clone/docs/close/nightly']
+
+tests/acceptance/W2-115/test_w2_115_reds.py:93: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_selection.py::test_records_alone_select_the_record_reading_suites_and_nothing_else 
+AssertionError: the record-reading suite is not selected: ['tests/acceptance/W2-aa/'] assert False  +  where False = <function names at 0x78820e2d0a40>(['tests/acceptance/W2-aa/'], 'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register')  +    where <function names at 0x78820e2d0a40>
+make_project = <function make_project.<locals>.make at 0x788207db8e00>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_records_alone_select_the_0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_records_alone_select_the_0/sandbox/elsewhere'))
+
+    def test_records_alone_select_the_record_reading_suites_and_nothing_else(make_project, sandbox):
+        """S2: a change to record places alone selects the record-reading suites the test map names, nothing else."""
+        project = make_project()
+        project.record_commit({support.REGISTER_REL: "# The decision register\n\nOne decision.\n"})
+        suites = _selected(project, sandbox)["suites"]
+>       assert support.names(suites, support.RR_RECORDS), f"the record-reading suite is not selected: {suites}"
+E       AssertionError: the record-reading suite is not selected: ['tests/acceptance/W2-aa/']
+E       assert False
+E        +  where False = <function names at 0x78820e2d0a40>(['tests/acceptance/W2-aa/'], 'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register')
+E        +    where <function names at 0x78820e2d0a40> = support.names
+E        +    and   'tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register' = support.RR_RECORDS
+
+tests/acceptance/W2-115/test_w2_115_selection.py:55: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_selection.py::test_a_change_nothing_maps_is_refused_with_its_reason_never_widened 
+AssertionError: a refused selection does not exit 2   gov close --select PROJ-aaaa   exit code: 0   stdout:   {"ticket": "PROJ-aaaa", "suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_po
+make_project = <function make_project.<locals>.make at 0x788207db8b80>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_change_nothing_maps_is_0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_change_nothing_maps_is_0/sandbox/elsewhere'))
+
+    def test_a_change_nothing_maps_is_refused_with_its_reason_never_widened(make_project, sandbox):
+        """S2: a planted change with no mapping exits with SELECTION_REFUSED and its reason, and prints no set."""
+        project = make_project()
+        project.merged({support.UNPLACED: "# odd\n"})
+        project.work({support.WIDGET: "# the widget, CHANGED\n"})
+        project.ready(sandbox)
+        run = project.select(sandbox)
+>       assert run.returncode == 2, f"a refused selection does not exit 2\n{run.describe()}"
+E       AssertionError: a refused selection does not exit 2
+E         gov close --select PROJ-aaaa
+E         exit code: 0
+E         stdout:
+E         {"ticket": "PROJ-aaaa", "suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}
+E         
+E         stderr:
+E         
+E       assert 0 == 2
+E        +  where 0 = Run(args=('close', '--select', 'PROJ-aaaa'), returncode=0, stdout='{"ticket": "PROJ-aaaa", "suites": ["tests/acceptanc...path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}\n', stderr='', seconds=0.3990559369995026).returncode
+
+tests/acceptance/W2-115/test_w2_115_selection.py:77: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_selection.py::test_a_scoped_close_of_a_change_nothing_maps_is_refused 
+AssertionError: the command was not refused gov close PROJ-aaaa --json exit code: 0 stdout: {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close": "scoped", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "
+>       support.assert_refused(run, support.SELECTION_REFUSED)
+
+tests/acceptance/W2-115/test_w2_115_selection.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":..."docs/close/nightly/NR-20261001T010000Z-08a294c4008a.json"}}, "session": ""}\n', stderr='', seconds=1.6603484570005094)
+code = 'SELECTION_REFUSED'
+
+    def assert_refused(run, code=None):
+        """The command was refused (no ``ok: true``, a non-zero exit); with ``code``, its text names that code."""
+        try:
+            ok = json.loads(run.stdout).get("ok")
+        except (ValueError, AttributeError):
+            ok = None
+>       assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command was not refused
+E       gov close PROJ-aaaa --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close": "scoped", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "commit": "8f42b9e93a126e22f69298a687d7185437c6dd19", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 3, "failed": 0, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "review": {"verdict": "READY", "record": null}, "reds": [], "culprits": [], "clone": {"path": ".gov-runtime/close/clone", "reused": false, "replaced": null}, "nightly": {"read": true, "record": "docs/close/nightly/NR-20261001T010000Z-08a294c4008a.json"}}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-115/w2_115_support.py:394: AssertionError
+
+=== tests/acceptance/W2-115/test_w2_115_verify.py::test_a_refused_selection_exits_2 
+AssertionError: a refused selection does not exit 2   gov close --verify PROJ-aaaa --out /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/verify-out   exit code: 0   stdout:   verify PROJ-aaaa: exit 0: green; parallel 3 passed, 0 failed, 0 errors, 0 skipped;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/san...ixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0')
+
+    def test_a_refused_selection_exits_2(make_project, sandbox, tmp_path):
+        """S13: a change nothing maps: the selection is refused, exit 2, SELECTION_REFUSED said, ``verify.exit`` holds 2."""
+        project = make_project()
+        project.merged({support.UNPLACED: "# odd\n"})
+        project.work({support.WIDGET: "# the widget, CHANGED\n"})
+        project.ready(sandbox)
+        out = tmp_path / "verify-out"
+        run = project.verify(sandbox, out=out)
+>       assert run.returncode == support.VERIFY_EXIT_REFUSED, f"a refused selection does not exit 2\n{run.describe()}"
+E       AssertionError: a refused selection does not exit 2
+E         gov close --verify PROJ-aaaa --out /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_a_refused_selection_exits0/verify-out
+E         exit code: 0
+E         stdout:
+E         verify PROJ-aaaa: exit 0: green; parallel 3 passed, 0 failed, 0 errors, 0 skipped; serial 0 passed, 0 failed, 0 errors, 0 skipped
+E         
+E         stderr:
+E         
+E       assert 0 == 2
+E        +  where 0 = Run(args=('close', '--verify', 'PROJ-aaaa', '--out', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-0/popen-gw2/test_... failed, 0 errors, 0 skipped; serial 0 passed, 0 failed, 0 errors, 0 skipped\n', stderr='', seconds=2.7674999030059553).returncode
+E        +  and   2 = support.VERIFY_EXIT_REFUSED
+
+tests/acceptance/W2-115/test_w2_115_verify.py:87: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_failed_removal.py::test_a_failed_clean_up_does_not_change_the_verdict 
+AssertionError: a failed clean-up changed the record's other keys: ['base', 'branch', 'cleanup', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict
+night = <test_w2_77_failed_removal.LockedNight object at 0x7037aa598e00>
+
+    def test_a_failed_clean_up_does_not_change_the_verdict(night):
+        result = support.green(night.run)
+        record, _ = support.record_of(night.project, night.run)
+        assert record.get("verdict") == support.GREEN and result.get("verdict") == support.GREEN, \
+            f"a failed clean-up changed the night's verdict: {record.get('verdict')!r}"
+>       assert set(record) - {support.CLEANUP_KEY} == support.RECORD_KEYS, \
+            f"a failed clean-up changed the record's other keys: {sorted(record)}"
+E       AssertionError: a failed clean-up changed the record's other keys: ['base', 'branch', 'cleanup', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_failed_removal.py:120: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today 
+AssertionError: the green envelope's result is not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        result = support.green(nights.green_run)
+        data = nights.green_run.envelope()
+        assert data.get("command") == support.COMMAND, f"the envelope's command is not {support.COMMAND!r}: {data}"
+>       assert set(result) == support.RECORD_KEYS | {"record"}, \
+            f"the green envelope's result is not the record and its path: {sorted(result)}"
+E       AssertionError: the green envelope's result is not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:37: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key 
+AssertionError: the record's keys changed: added ['rebuild', 'secrets_full_scan'], lost [] assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})      Extra items in the left set:   'rebuild'   'secrets_full_scan'   Use -v to get more diff
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key(nights):
+        support.green(nights.green_run)
+        record, rel = support.record_of(nights.green_project, nights.green_run)
+        assert support.CLEANUP_KEY not in record, f"a night whose clone was removed has a cleanup key in {rel}: {record}"
+>       assert set(record) == support.RECORD_KEYS, \
+            (f"the record's keys changed: added {sorted(set(record) - support.RECORD_KEYS)}, "
+             f"lost {sorted(support.RECORD_KEYS - set(record))}")
+E       AssertionError: the record's keys changed: added ['rebuild', 'secrets_full_scan'], lost []
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:49: AssertionError
+
+=== tests/acceptance/W2-77/test_w2_77_unchanged.py::test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today 
+AssertionError: the red envelope's details are not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 
+nights = <test_w2_77_unchanged.Nights object at 0x7037aa5996a0>
+
+    def test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today(nights):
+        error = support.red(nights.red_run)
+        details = error.get("details") or {}
+>       assert set(details) == support.RECORD_KEYS | {"record"}, \
+            f"the red envelope's details are not the record and its path: {sorted(details)}"
+E       AssertionError: the red envelope's details are not the record and its path: ['base', 'branch', 'created', 'distribution', 'failures', 'findings', 'head', 'junit_xml', 'packages', 'per_test_timeout', 'rebuild', 'record', 'scope', 'secrets_full_scan', 'tests_run', 'tmp_path_retention_policy', 'tree', 'verdict']
+E       assert {'base', 'bra...indings', ...} == frozenset({'b...ndings', ...})
+E         
+E         Extra items in the left set:
+E         'rebuild'
+E         'secrets_full_scan'
+E         Use -v to get more diff
+
+tests/acceptance/W2-77/test_w2_77_unchanged.py:69: AssertionError
+

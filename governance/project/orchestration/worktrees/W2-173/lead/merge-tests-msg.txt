@@ -1,0 +1,9 @@
+Merge w2/W2-173-tests (DAEO-qz4p): the acceptance tests for S1-S5 and F1-F4 (td-1, 85a357d36)
+
+The independent test designer's suite under tests/acceptance/W2-173/, merged into the engineer's branch between its
+batches. The lead dropped DEC-1065 from the test commit's Implements trailer (not in the ticket's sources; DEC-927).
+
+Task: DAEO-qz4p
+Role: orchestrator
+Implements: DEC-1101, DEC-1120, DEC-1112, DEC-1113, DEC-1050, DEC-1073
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

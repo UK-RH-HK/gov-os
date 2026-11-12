@@ -1,0 +1,7 @@
+W2-173 (DAEO-qz4p): acceptance tests for S1-S5 and failure lines 1-4 (effort passed and recorded, the writer's and checker's stop word, the checker's notes and the auditor's classes checked at delivery), red on dac438772
+
+Task: DAEO-qz4p
+Role: independent-test-designer
+Implements: DEC-1101, DEC-1120, DEC-1112, DEC-1113
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
