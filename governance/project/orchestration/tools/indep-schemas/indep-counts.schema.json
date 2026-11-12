@@ -96,6 +96,21 @@
       ],
       "pattern": "^[0-9a-f]{64}$"
     },
+    "effort": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        null
+      ],
+      "description": "The brief's effort, passed to the session as --effort (W2-173 S1); null when the brief names none or before it is read. Not in required: a counts.json written before W2-173 still reads with --counts-only."
+    },
     "template_ok": {
       "type": "boolean"
     },
