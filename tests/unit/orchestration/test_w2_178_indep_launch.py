@@ -163,6 +163,6 @@ def test_the_auditors_set_of_only_dropped_files_builds_nothing_10(w):
     rc, counts, _ = w.launch("auditor", audit="e0", seed=3, dry=True)
     assert rc == 10, counts
     assert_counts(counts, 10, "refused")
-    assert counts["reason"] == "input"
+    assert counts["reason"] == indep_launch.CODES[10]  # code 10 names its reason in one word for every cause
     assert tree_hash(w.sets) == before
     nothing_built(w)
