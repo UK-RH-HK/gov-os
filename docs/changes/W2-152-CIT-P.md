@@ -1,7 +1,7 @@
 ---
 id: W2-152-CIT-P
 type: change-impact-proposal
-status: APPROVED
+status: ACCEPTED
 date: 2026-11-12
 branch: w2/W2-152
 base: b0bbd373f^1 (w2/integrate before the merge)
@@ -10,7 +10,7 @@ ticket: DAEO-o5x1 (W2-152)
 task: DAEO-o5x1
 author: orchestrator (the CTO, written after the fact, DEC-1147; the form of W2-146's record, written by its ticket lead)
 review: READY, round 2, independent auditor (governance/project/orchestration/reviews/w2-152-r1.md; docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md)
-approved: owner, 2026-11-12, after the fact ("W2-152 CIT-P approved at 09fc68645c0c, after the fact", DEC-1147 (1))
+approved: owner, 2026-11-10, within W2-128's set (DEC-1116 (1): TEMPLATES-APPROVAL-1's table lists facts.schema.json at sha256 3141d5da...); again, explicitly, 2026-11-12 ("W2-152 CIT-P approved at 09fc68645c0c, after the fact", DEC-1147 (1))
 decisions_carried: [DEC-1088]
 decisions_applied: [DEC-1088, DEC-1050, DEC-1147]
 state_class: EVIDENCE
@@ -19,9 +19,12 @@ state_class: EVIDENCE
 # W2-152: change-impact record (CIT-P) on the kernel's facts schema, written after the fact
 
 **Written after the fact.** This change's kernel bytes were merged into `w2/integrate` by the CTO's merge `b0bbd373f`
-(2026-11-09 23:07 UTC) before any CIT-P record or owner approval (CAP-33). Nothing in the merge path asked for an approval line
-(DECIDED-NOT-DONE row 173). The owner found it through W2-152's resume of 2026-11-12, read the lines below and approved them after
-the fact the same day (DEC-1147 (1)). This record states what was merged; it proposes nothing new.
+(2026-11-09 23:07 UTC) before any CIT-P record or owner approval (CAP-33); nothing in the merge path asked for an approval line
+(DECIDED-NOT-DONE row 173). The next day, 2026-11-10, the owner approved these exact bytes within W2-128's template set: DEC-1116 (1)
+approves the bytes of TEMPLATES-APPROVAL-1's table, which lists `facts.schema.json` at `3141d5da...` (the after hash below). So the bytes
+were on w2/integrate unapproved for about a day, and no CIT-P record of W2-152's own existed. On 2026-11-12 the CTO, missing DEC-1116's
+table, reported them as unapproved since 11-09; the owner read the lines below and approved them again (DEC-1147 (1)); the CTO's
+report was corrected the same day. This record states what was merged; it proposes nothing new.
 
 ## 1. What triggers the change
 
@@ -95,10 +98,14 @@ F3: without the key the dependency-field check switched off silently).
   it reads `ready`; that is a separate item with the owner (DEC-1147 (2)).
 - Every brief built with `gov brief` since 11-09, and the 11-11 re-pin (DEC-1125 (3)), use this schema.
 
-## 6. Verification and independent review
+## 6. Owner's approval
+
+- 2026-11-10, DEC-1116 (1): within W2-128's template set, TEMPLATES-APPROVAL-1's table (`facts.schema.json`, `3141d5da...`).
+- 2026-11-12, DEC-1147 (1): "W2-152 CIT-P approved at 09fc68645c0c, after the fact".
+
+## 7. Verification and independent review
 
 - Review: two rounds by an independent auditor (`governance/project/orchestration/reviews/w2-152-r1.md`); round 2 READY on
   `09fc68645c0c` (2026-11-09). Round 1 read the facts schema: S10 pass (`format: date` and the date pattern); F3 fixed in the fix round.
   The review judged the code against the KPI lines; it was not a CIT-P review.
 - `gov accept W2-152`: 67/67 on the merged head `e25bdca86bc1` (2026-11-12 resume; `docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md`).
-- The owner's approval: DEC-1147 (1), after reading the lines in section 2.
