@@ -14757,8 +14757,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (1) **"W2-152 CIT-P approved at 09fc68645c0c, after the fact":** `template/governance/kernel/schemas/facts.schema.json`, sha256 before
     `be3e204355c0dd4c98cc584b72a1cef5eaa4733ca9a7feec8684b728026af7a6`, after `3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c`
     (15 added, 1 removed: `ready` required, and the `ready.new_since` date property), on w2/integrate since the CTO's merge `b0bbd373f`
-    (2026-11-09 23:07) without approval until now. The missing record `docs/changes/W2-152-CIT-P.md` is written by a product-spec worker
-    as the CTO proposed; then W2-152 closes through the queue.
+    (2026-11-09 23:07). The missing record `docs/changes/W2-152-CIT-P.md` is written; then W2-152 closes through the queue.
+    **Corrected the same day (the CTO, DEC-861):** the CTO reported these bytes as unapproved since 11-09; in fact DEC-1116 (1) approved
+    them on 2026-11-10 within W2-128's set (TEMPLATES-APPROVAL-1's table lists `facts.schema.json` at `3141d5da...`), so they were
+    unapproved on w2/integrate for about a day, not three; DEC-1147 (1) is a second, explicit approval. The record was written by the
+    CTO (orchestrator), as W2-146's lead wrote W2-146's: the launcher refused a product-spec worker on an engineer ticket (DEC-995).
   - (2) **To the owner next:** whether the facts file an adoption writes carries `ready.new_since` set to the adoption's own date, before
     W2-27 (a fix if not); row 173's route (a kernel path needs an approval line before any merge, in the queue and in the CTO's hand-merge
     check), without a new ticket; a scan of every commit on w2/integrate since 11-02 touching `template/governance/kernel/**`, each with its
