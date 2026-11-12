@@ -343,7 +343,7 @@ def _measure(root: Path, tickets: list[str]) -> dict:
     if check["blocks"]:
         raise GovError("BATCH_CHECK_BLOCKED", f"the governance checks block at {head[:12]}: no regression runs and "
                        "nothing closes", {"head": head, "check_result": check, "loads": loads}, exit_code=EXIT_RED)
-    night = nightly.night(root, head)
+    night = nightly.night(root, head, rebuild=False)  # rebuilt above (today's, F4)
     rel = night.pop("record")
     skips = [s for named in night["junit_xml"] for s in _evidence.read_junit(root, root / named)["skips"]]
     record = {**night, "kind": KIND, "tickets": list(tickets),

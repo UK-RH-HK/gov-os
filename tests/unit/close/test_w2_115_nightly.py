@@ -21,15 +21,15 @@ def test_s8_the_stores_are_rebuilt_with_the_full_scan_before_the_run(tmp_path, m
     monkeypatch.setattr(close_command, "_run_tests", lambda *a, **k: events.append(("tests",)) or real_tests(*a, **k))
     result = nightly.night(repo.root, "main")
     assert [e[0] for e in events] == ["rebuild", "tests"]
-    assert events[0][1] == "1" and events[0][2] is True
-    assert events[0][3] != str(repo.root)  # the night's own worktree, never the working tree
+    assert events[0][1] == "1" and events[0][2] is False
+    assert events[0][3] == str(repo.root)  # the project worktree's stores, kept after the night
     assert "GOV_SECRETS_FULL_SCAN" not in os.environ  # the caller's environment as it was
     record = json.loads((repo.root / result["record"]).read_text(encoding="utf-8"))
     assert record["secrets_full_scan"] is True
-    assert record["rebuild"]["GOV_SECRETS_FULL_SCAN"] == "1"
+    assert "rebuild" not in record  # one deterministic key, nothing time-varying
 
 
-def test_s8_a_failed_rebuild_is_said_in_the_record(tmp_path, monkeypatch):
+def test_s8_a_failed_rebuild_is_said_in_the_record(tmp_path, monkeypatch, capsys):
     repo = project(tmp_path)
 
     def fails(*a, **k):
@@ -37,7 +37,15 @@ def test_s8_a_failed_rebuild_is_said_in_the_record(tmp_path, monkeypatch):
     monkeypatch.setattr(rebuild_command, "run", fails)
     result = nightly.night(repo.root, "main")
     record = json.loads((repo.root / result["record"]).read_text(encoding="utf-8"))
-    assert record["secrets_full_scan"] is False and "no store" in record["rebuild"]["error"]
+    assert record["secrets_full_scan"] is False and "rebuild" not in record
+    assert "no store" in capsys.readouterr().err
+
+
+def test_s8_the_strict_batchs_night_does_not_rebuild_again(tmp_path, monkeypatch):
+    repo = project(tmp_path, mode=None)
+    monkeypatch.setattr(rebuild_command, "run", lambda *a, **k: (_ for _ in ()).throw(AssertionError("rebuilt")))
+    result = nightly.night(repo.root, "main", rebuild=False)
+    assert result["secrets_full_scan"] is False
 
 
 def test_s8_the_caller_cannot_switch_the_full_scan_off(tmp_path, monkeypatch):
