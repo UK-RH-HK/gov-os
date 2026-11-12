@@ -29,3 +29,25 @@ def test_session_watch_is_recorded_and_its_module_is_looked_up_in_the_underscore
     assert commands.check(tmp_path) == []
     (tmp_path / "src" / "gov" / "session_watch" / "command.py").unlink()
     assert [f["command"] for f in commands.check(tmp_path)] == ["session-watch"]
+
+
+def _plant_every_command(root, folder_of):
+    for command in commands.GOV_COMMANDS:
+        folder = root / "src" / "gov" / folder_of(command)
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "command.py").write_text("")
+    (root / "src" / "gov" / "lock").mkdir(exist_ok=True)
+    (root / "src" / "gov" / "lock" / "__main__.py").write_text("")
+
+
+def test_the_existence_check_takes_the_underscore_folder_alone_and_finds_no_folder(tmp_path):
+    _plant_every_command(tmp_path, lambda command: command.replace("-", "_"))
+    assert not (tmp_path / "src" / "gov" / "session-watch").exists()  # the underscore folder alone
+    assert commands.check(tmp_path) == []
+    # a folder of the command's own name, as it is, passes as well
+    own = tmp_path / "own"
+    _plant_every_command(own, lambda command: command)
+    assert commands.check(own) == []
+    # no folder at all: a finding
+    (tmp_path / "src" / "gov" / "session_watch" / "command.py").unlink()
+    assert [f["command"] for f in commands.check(tmp_path)] == ["session-watch"]
