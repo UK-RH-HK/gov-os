@@ -4,13 +4,13 @@ type: change-impact-proposal
 status: ACCEPTED
 date: 2026-11-12
 branch: w2/W2-152
-base: b0bbd373f^1 (w2/integrate before the merge)
-head: 09fc68645c0c (the code reviewed and merged)
+base: 'b0bbd373f^1 (w2/integrate before the merge)'
+head: '09fc68645c0c (the code reviewed and merged)'
 ticket: DAEO-o5x1 (W2-152)
 task: DAEO-o5x1
-author: orchestrator (the CTO, written after the fact, DEC-1147; the form of W2-146's record, written by its ticket lead)
-review: READY, round 2, independent auditor (governance/project/orchestration/reviews/w2-152-r1.md; docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md)
-approved: owner, 2026-11-10, within W2-128's set (DEC-1116 (1): TEMPLATES-APPROVAL-1's table lists facts.schema.json at sha256 3141d5da...); again, explicitly, 2026-11-12 ("W2-152 CIT-P approved at 09fc68645c0c, after the fact", DEC-1147 (1))
+author: 'orchestrator (the CTO, written after the fact, DEC-1147; the form of W2-146''s record, written by its ticket lead)'
+review: 'READY, round 2, independent auditor (governance/project/orchestration/reviews/w2-152-r1.md; docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md)'
+approved: 'owner, 2026-11-10, within W2-128''s set (DEC-1116 (1): TEMPLATES-APPROVAL-1''s table lists facts.schema.json at sha256 3141d5da...); again, explicitly, 2026-11-12 ("W2-152 CIT-P approved at 09fc68645c0c, after the fact", DEC-1147 (1))'
 decisions_carried: [DEC-1088]
 decisions_applied: [DEC-1088, DEC-1050, DEC-1147]
 state_class: EVIDENCE
