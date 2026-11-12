@@ -10,7 +10,7 @@ assignee: independent-test-designer
 external-ref: W2-180
 tags: [wave-2, test-revision, memory, audit, lite]
 wbs_id: W2-180
-title: 'W2-170''s F5 path case judges any branch against W2-170''s own paths, so every later memaudit ticket (W2-171 first) is red on it and the queue would refuse its land'
+title: 'W2-170''s F5 and W2-173''s branch-names cases judge any branch against W2-170''s own paths, so every later memaudit ticket (W2-171 first) is red on it and the queue would refuse its land'
 class: test-revision
 state_class: AUTHORITATIVE
 role: independent-test-designer
@@ -20,6 +20,8 @@ waits_on: []
 allowed_paths:
 - tests/acceptance/W2-170/test_w2_170_f5_paths.py
 - tests/acceptance/W2-170/README.md
+- tests/acceptance/W2-173/test_w2_173_unchanged.py  # the same any-branch form (DECIDED-NOT-DONE row 171; the CTO, 07:35)
+- tests/acceptance/W2-173/README.md
 est_loc: 15
 reads:
 - tests/acceptance/W2-170/conftest.py
@@ -48,3 +50,9 @@ merge-base with w2/integrate and checks the result against W2-170's allowed_path
 files W2-170's paths do not list, so the case is red on W2-171's branch, and the merge queue's candidate merge of W2-171 would
 be red too, attributed to W2-171's batch: the land refused. The CTO's ruling: (a) a branch-scoped red for W2-171's review now,
 and this ticket (b), which must land before W2-171's land. Class C1. A test revision with a Rewrite-Reason (DEC-866).
+
+## Widened (the CTO, 2026-11-12 07:35)
+
+W2-173's `test_w2_173_unchanged.py` (failure lines 3-4, `branch_names()`: the merge-base of HEAD with w2/integrate) has the same
+form: W2-178 (DAEO-7oxm, running, in indep_launch.py) would be red on it. S1 applies to it too: judged only on `w2/W2-173`,
+skipped with its reason on any other branch, a candidate merge or w2/integrate. Its paths are added.
