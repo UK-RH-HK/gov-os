@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import re
 import shlex
+import site
 import subprocess
 import sys
 from pathlib import Path
@@ -150,7 +151,8 @@ def run_plugin(root: Path, work: Path, *, given: tuple[str, ...] | None = None, 
     out, log = work / f"{name}.out", work / f"{name}.ran"
     env = clean_environment()
     env.update({"PYTHONPATH": str(PLUGIN_FOLDER), serial_only.ROOT_VARIABLE: str(root), RAN: str(log),
-                "HOME": str(work), "PYTHONDONTWRITEBYTECODE": "1"})
+                "HOME": str(work), "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONUSERBASE": site.getuserbase()})  # where pytest is installed, whatever ``HOME`` the run has
     cmd = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "--no-header", "--tb=line",
            "-p", serial_only.PLUGIN]
     if given is not None:
