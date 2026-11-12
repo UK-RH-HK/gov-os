@@ -1,6 +1,6 @@
 ---
 id: DAEO-3r1j
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-31T12:40:27Z
