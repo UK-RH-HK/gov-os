@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/cli/main.py  # P-W2-159-1 (a): a hyphenated command maps to its underscore folder (about 4 lines; the CTO, 2026-11-12 08:22)
 - tests/unit/session_watch/**
 - docs/changes/W2-159-evidence.md
+- docs/probes/DAEO-6lid/**  # the probe record, so the branch's path case holds at its head (as W2-157's; the CTO, 2026-11-12 12:50)
 reads:
 - src/gov/dispatch/**
 - src/gov/plan/**

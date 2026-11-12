@@ -21,6 +21,8 @@ allowed_paths:
 - governance/project/facts.yaml
 - template/governance/kernel/schemas/facts.schema.json
 - docs/changes/W2-152-evidence.md
+- docs/probes/DAEO-o5x1/**  # the probe record (the CTO, 2026-11-12 14:00)
+- docs/changes/W2-152-CIT-P.md  # the kernel schema's CIT-P for the owner (CAP-33)
 kpis:
   success:
   - 'S1 gov brief <role> <ticket> prints on stdout the filled T-0 (template/governance/kernel/templates/brief.md) for that role, from only the ticket file, governance/project/facts.yaml and the kernel templates; two runs on the same inputs are byte-identical. Verify: a golden-file test per worker role on a fixture repository [DEC-1050, DEC-1052] (W2-128 TPL-3 S1)'
@@ -40,7 +42,6 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-1050
-- DEC-1052
 - DEC-1083
 - DEC-1088
 - DEC-1112
@@ -88,3 +89,12 @@ refusals are built here; W2-128 closes after both.
     pattern), so `"soon"` is refused.
 
 **Not here:** the launcher flag and the generated copies (W2-153); the templates' text (W2-128).
+
+## Resume 11-12's packages (the CTO, delegated P2, DEC-1112 (3), 2026-11-12)
+
+- **P1 (a), the context ceiling:** DEC-1052 dropped from `sources` (7,150 -> about 5,290 mandatory tokens, limit 6,000); its intent is in
+  the KPI lines and INTENT-DEC-1052.md, and commits still name it in `Implements:`.
+- **P2 (a), the review:** round 2's READY of 11-09 on `09fc68645c0c` stands as the probe record (STANDARD; the 11-12 merge of
+  w2/integrate resolved no conflict in a judged file, DEC-895); no re-probe. F7-F15 are Wave 3 rows.
+- **Held for the owner (P1-H):** this ticket's `template/governance/kernel/schemas/facts.schema.json` change (the required `ready`
+  key, 15 lines) reached w2/integrate on 11-09 with no CIT-P approval (CAP-33). The close waits on the owner's decision.

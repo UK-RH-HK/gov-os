@@ -1,6 +1,6 @@
 ---
 id: DAEO-neam
-status: open
+status: in_progress
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:12Z
@@ -21,6 +21,8 @@ allowed_paths:
 - src/gov/check/commands.py
 - src/gov/decisions/checker.py
 - tests/unit/check/**
+- tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py  # one test-designer revision: _others() leaves out elapsed_s (Rewrite-Reason: P-W2-45-1 item 2; DEC-1148 (4))
+- tests/unit/ci/test_ci_command.py  # one revision: line 80 == "RED" and line 73's comment (Rewrite-Reason: P-W2-45-1 item 5; DEC-1148 (4))
 kpis:
   success:
   - 'The decision checker runs within the gov check budget on a 200-decision, 20k-commit repository Verify: a planted repository of 200 decisions and 20,000 commits: `gov check` runs the decision checker and its recorded time is within the gov check budget (the budget''s value printed beside it) [W2-H018].'
@@ -80,3 +82,40 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-45), as approved (DEC-729). The list row
   - An absent tool of a hard-block check is red, not yellow [W2-M130, W2-M265].
   - A hard-block key is covered only by a check of hard-block tier [W2-M211, W2-M259].
   - The time limit is stated and tested [W2-M151].
+
+## Interface (DEC-1052; P-W2-45-1 accepted as a whole, item 5 as written: an absent tool of a hard-block check is RED, openspec included; the CTO, 2026-11-12 12:58)
+
+Proposal (all in src/gov/check/runner.py unless named):
+
+1. **Tier = the declaration's `severity`.** "Hard-block tier" means `severity: hard-block`. `tier:` (G0-G5) is not read.
+2. **Time fields (S1, S5).** Every check result gains `elapsed_s` (wall seconds, float) and `time_limit_s` (the limit
+   applied: its `timeout-seconds`, else `TIMEOUT_S`). The runner's result gains top-level `time_limit_s` (= `TIMEOUT_S`,
+   60, DEC-595). Built-in checks carry both too.
+3. **S1, the budget.** The `gov check` budget of the decision checker is the time limit of the check that runs it,
+   core-authority: 60 s (TIMEOUT_S; its declaration states none). Verified by a planted repository of 200 decision
+   records and 20,000 commits (built with `git fast-import`) holding the core-authority declaration: `gov check --json`
+   exits, and core-authority's entry has `elapsed_s` < `time_limit_s`, both printed. Speed work only in
+   `src/gov/decisions/checker.py`.
+4. **S2, not green.** A check is GREEN only when it exits 0 with no finding. Exit 0 also yields findings when: the
+   success form `{"ok": true, "result": R}` has a non-empty `R.findings`; or any JSON mapping in the output (top level
+   or R) has `"unmeasured": true` -> finding `CHECK_UNMEASURED` with its `reason`; or non-JSON output contains the word
+   "unmeasured" -> `CHECK_UNMEASURED`. Status from findings as now: RED if hard-block, YELLOW if warning.
+5. **S3, absent tool.** Exit code 127, or OSError on start -> finding `CHECK_TOOL_ABSENT` naming the command's first
+   word; RED when hard-block (never YELLOW), YELLOW when warning. The built-in `openspec-validate` (hard-block) follows
+   the same rule: `OPENSPEC_ABSENT` becomes RED. (Cost: a machine without openspec gets a red `gov check`; openspec
+   and gitleaks are installed here. Alternative (b): leave openspec YELLOW, named as a residual against S3.)
+6. **S4, tier coverage.** A path-map policy key of strength hard-block whose covering declarations (`enforces`) are all
+   of severity warning -> a `policy-<key>` result, severity hard-block, RED, finding `POLICY_TIER_TOO_LOW` with
+   `policy`, `checks` (the covering ids) and a message naming the key. "Refused" = that RED result and `gov check`'s
+   non-zero exit (unchanged). One hard-block declaration covering it -> no policy result (accepted). An uncovered key
+   keeps `POLICY_NOT_COVERED`.
+7. **S5, time limit.** A check past its limit is stopped with its whole process group (`start_new_session=True`,
+   `killpg` on timeout, so a grandchild holding the pipe cannot keep the runner waiting) -> finding `CHECK_TIMED_OUT`
+   (was `CHECK_FAILED`) carrying `time_limit_s`; status by severity. Unit test in `tests/unit/check/` (engineer): a
+   planted check `sleep 30` with `timeout-seconds: 1` -> `CHECK_TIMED_OUT`, `time_limit_s` 1 printed, ends in < 10 s.
+8. **Unchanged:** family roll-up, `gov check`'s exit code rule, the not-applicable (exit 2) path, `commands.py`
+   (W2-159's line kept; touched only if a module list needs it).
+
+## Widened by the owner (DEC-1148 (4), P1-J (a), 2026-11-12)
+
+Two older tests assert what the accepted Interface changed: R1 (W2-95's `_others()`, `elapsed_s` is a wall time) by the test designer; R2 (`test_ci_command.py:80`, OPENSPEC_ABSENT is RED) by the engineer or designer. One revision each, each with its Rewrite-Reason; nothing else in either file changes.

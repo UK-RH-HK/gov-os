@@ -35,6 +35,10 @@ in WALL.json and the counts (null when the brief names none). A memory writer's 
 not `none` delivers nothing (21). The checker's notes.md and the auditor's classes.json are checked against their
 briefs' fixed form (section 6) and the result's counts before they are delivered (else 20, nothing lands).
 
+The auditor's copy of a set (W2-178; W2-170's Interface, DEC-1101 (2)): every file of the set's hidden half except
+those under its `hidden/dropped/` folder (any depth below it); the writer's round 2 and the checker's copies are
+unchanged. A link anywhere under `hidden/` still refuses 10, and a set empty after the exclusion refuses 10 as any other.
+
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
 budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
 the counts object (indep-schemas/indep-counts.schema.json), also written as <runs>/indep/<kind>/<run>/counts.json
@@ -773,6 +777,8 @@ def plan_inputs(kind, rnd, root, set_name, audit):
             rels = plain_files(hidden)
         except (ValueError, OSError):
             raise Refuse(10, "input")
+        if kind == "auditor":  # W2-178: the auditor's copy leaves out hidden/dropped/ (a plain file "dropped" stays)
+            rels = [r for r in rels if not r.startswith("dropped" + os.sep)]
         if not rels:
             raise Refuse(10, "input")
         return [(os.path.join(hidden, r), os.path.join("input", "set", r)) for r in rels]

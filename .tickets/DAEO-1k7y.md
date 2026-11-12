@@ -1,6 +1,6 @@
 ---
 id: DAEO-1k7y
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-ouet, DAEO-cb2b, DAEO-wnnz]
 created: 2026-11-12T05:03:31Z
@@ -25,8 +25,6 @@ allowed_paths:
 - tests/unit/accept/w2_96_reap.py
 - tests/unit/accept/test_w2_177*
 - docs/changes/W2-177-evidence.md
-- tests/acceptance/W2-96/w2_96_support.py  # P-W2-177-1 (a): _popen's signal start state, a test designer's revision (the CTO, 2026-11-12 07:05)
-- tests/acceptance/W2-56/w2_56_support.py  # P-W2-177-1 (a): start_launch's signal start state, the same revision
 est_loc: 80
 kpis:
   success:

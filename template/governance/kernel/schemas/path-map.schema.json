@@ -117,6 +117,11 @@
         { "const": "auto" }
       ]
     },
+    "id_forms": {
+      "description": "Optional. The id forms of the project beside the built-in shape: each a name and a regular expression (Python's), read by the id reader of `gov retrieve` (DEC-1071 (5), DEC-1099 (2)). May be empty.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/id_form" }
+    },
     "decision_register": {
       "description": "Optional. The project's decision register: the path of the file from the project's root (DEC-479).",
       "$ref": "#/$defs/text"
@@ -136,6 +141,16 @@
       "description": "A project-relative path or glob in the path map's language: `*` stays inside one folder, `**` crosses folders.",
       "type": "string",
       "pattern": "^[^/]"
+    },
+    "id_form": {
+      "description": "One id form: its `name` and its `pattern`, a regular expression that compiles; a match is read as an id when it is a whole token.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "pattern"],
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "pattern": { "type": "string", "minLength": 1, "format": "regex" }
+      }
     },
     "evaluation_set": {
       "description": "One evaluation set: `visible` the measured sessions read, `hidden` (non-empty) they are refused, and `measures`, the roles and/or tickets it measures (at least one non-empty list).",

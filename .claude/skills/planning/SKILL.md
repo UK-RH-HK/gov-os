@@ -3,6 +3,8 @@ name: planning
 description: >-
   Method for emitting schema-valid tickets, gap tickets and readiness rows
   during planning.
+metadata:
+  version: 1.0.0
 ---
 # Planning
 

@@ -1,6 +1,6 @@
 ---
 id: DAEO-kmcr
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -23,7 +23,6 @@ allowed_paths:
 - template/governance/project/path-map.yaml
 - tests/unit/adopt/**
 - tests/unit/adapters/**
-- tests/acceptance/W1-41/test_w1_41_migration.py
 - fixtures/adopt/**
 - CLAUDE.md
 - AGENTS.md

@@ -51,6 +51,7 @@ import sqlite3
 import subprocess
 import sys
 import time
+from collections.abc import Sequence
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -184,9 +185,58 @@ def kept_out(root: Path, paths) -> dict[str, str]:
     return kept
 
 
-def ids_in(text: str) -> list[str]:
-    """The id-shaped tokens of ``text``, each once, in order."""
-    return list(dict.fromkeys(name for name in ID_SHAPE.findall(text) if any(char.isdigit() for char in name)))
+def id_forms(root: Path) -> tuple[re.Pattern, ...]:
+    """The id forms the path map declares (``id_forms``: a ``name`` and a ``pattern`` each; W2-146, DEC-1071 (5),
+    DEC-1099 (2)), compiled with no flags; ``()`` when there is no path map, no ``id_forms`` or an empty list. Reads
+    only that key. An entry that is no map, has no non-empty string ``name`` or ``pattern``, or whose pattern does not
+    compile is ``CONFIG_INVALID`` naming ``id_forms[<i>]``: a form that is ignored is the stop failing open."""
+    map_rel = f"{PROJECT_DIR}/path-map.yaml"
+    place = Path(root) / map_rel
+    document = read_yaml(place, "CONFIG_INVALID", map_rel) if place.is_file() else None
+    entries = document.get("id_forms") if isinstance(document, dict) else None
+    if entries is None:
+        return ()
+
+    def invalid(where: str, reason: str) -> GovError:
+        return GovError("CONFIG_INVALID", f"{map_rel}: {where}: {reason}", {"file": map_rel, "key": where})
+
+    if not isinstance(entries, list):
+        raise invalid("id_forms", "must be a list")
+    forms = []
+    for index, entry in enumerate(entries):
+        where = f"id_forms[{index}]"
+        if not isinstance(entry, dict):
+            raise invalid(where, "must be a map with a name and a pattern (not a map)")
+        for field in ("name", "pattern"):
+            if not isinstance(entry.get(field), str) or not entry[field]:
+                raise invalid(where, f"needs a non-empty string {field}")
+        try:
+            forms.append(re.compile(entry["pattern"]))
+        except re.error as exc:
+            raise invalid(where, f"the pattern does not compile: {exc}") from None
+    return tuple(forms)
+
+
+_BEFORE_WHOLE, _AFTER_WHOLE = re.compile(r"(?<![\w-])"), re.compile(r"(?![\w]|-\w)")  # whole_id's edges, at a span
+
+
+def ids_in(text: str, forms: Sequence[re.Pattern] = ()) -> list[str]:
+    """The id-shaped tokens of ``text``, each once, in order. ``forms`` (``id_forms``) adds the matches of each form
+    that are a whole token (``whole_id``'s rule, at the match's span); where candidates overlap the earlier one is kept,
+    and of two from the same place the longer, so ``SPEC-4.2`` under a dotted form is read whole, not as ``SPEC-4``
+    beside it. With no form this is the built-in shape alone, as before."""
+    if not forms:
+        return list(dict.fromkeys(name for name in ID_SHAPE.findall(text) if any(char.isdigit() for char in name)))
+    spans = [match.span() for match in ID_SHAPE.finditer(text) if any(char.isdigit() for char in match.group())]
+    for form in forms:
+        spans += [span for span in (match.span() for match in form.finditer(text))
+                  if span[1] > span[0] and _BEFORE_WHOLE.match(text, span[0]) and _AFTER_WHOLE.match(text, span[1])]
+    kept, last = [], 0
+    for start, end in sorted(spans, key=lambda span: (span[0], span[0] - span[1])):
+        if start >= last:
+            kept.append(text[start:end])
+            last = end
+    return list(dict.fromkeys(kept))
 
 
 def whole_id(name: str) -> re.Pattern:

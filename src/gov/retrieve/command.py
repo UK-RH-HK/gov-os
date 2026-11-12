@@ -7,7 +7,8 @@ Exit code 1: ``STORE_MISSING``, no store was loaded; ``STORE_UNREADABLE``, the s
 (W2-13: never a traceback); ``CONTINUATION_INVALID``, the token is none.
 
 The stated gap (RETR-X-02; AR-9, DEC-900, W2-13). The ids a request names are the question's id-shaped tokens
-(``gov.retrieval.lexical.ids_in``), each ``--id`` and the ``--ticket``. When it names some, every one is id-shaped,
+(``gov.retrieval.lexical.ids_in``: the built-in shape and the id forms the path map declares, ``id_forms``, W2-146;
+a malformed form is ``CONFIG_INVALID``, never skipped), each ``--id`` and the ``--ticket``. When it names some, every one is id-shaped,
 and every one exists nowhere (no record has it and no line of the index holds it as a whole token), the request
 stops with ``UNRESOLVED_IDS``, each id a gap ``UNRESOLVED``, no evidence and no continuation: nothing unrelated is
 offered in its place. The line is drawn at "every": when one named id exists, the request is retrieved as before
@@ -56,9 +57,10 @@ def _nowhere(root: Path, query: str, named: list[str] = ()) -> tuple[list[str], 
     from gov.cli.errors import GovError
     from gov.retrieval import lexical
 
-    if any(lexical.ids_in(name) != [name] for name in named):
+    forms = lexical.id_forms(root)  # W2-146: the id forms the path map declares; a malformed one is CONFIG_INVALID
+    if any(lexical.ids_in(name, forms) != [name] for name in named):
         return None  # a symbol name, or no id: the closure asks the code index for it
-    names = list(dict.fromkeys([*lexical.ids_in(query), *named]))
+    names = list(dict.fromkeys([*lexical.ids_in(query, forms), *named]))
     if not names:
         return None
     try:

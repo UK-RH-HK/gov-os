@@ -546,7 +546,8 @@ other restart is an ACT.
   (DEC-1116's template review), **landing before EXAMIN's copy (W2-27 depends on it)**. Basis: questions 1 and 4.
 - DEC-1138 (2026-11-11, (1) until the end of 11-12's working day): **the lead cap is five**, measured; the 3 GiB floor, `mem_guard`
   and **the hold below 5 GB available on any lead's next launch** stay; **no new lead run after 03:00** before the nightly;
-  the p95 ACT rewrites the working size and both peak figures. Basis: question 2.
+  the p95 ACT rewrites the working size and both peak figures (the working size done by DEC-1149: 805,306,368 B per
+  session, ACT-P95-1, applied 11-12 16:53; the peaks by 11-19). Basis: question 2.
 - DEC-1139 (2026-11-11): **W2-175's role templates approved at `4c0c73472fd8`, promoted as 1.0.1** (the seven
   `role-*.md` and six composed `template/.rulesync/subagents`); the copies by ACT (class (b)); three fixes ride the one-bar
   CIT-P (RV1 engineer wording, RV3 lead/CTO read tests and code), the composed files' stale "Wave 1" sections to W2-33. Basis: question 2.
@@ -561,3 +562,10 @@ other restart is an ACT.
   **no token cap for any session** (CTO, leads, workers, helpers): full window and compaction, the hook writing the checkpoint and the
   read-first line (DEC-1118 (A) replaced entirely; DEC-1140 (4) corrected); hand merges of W2-175 and W2-176 tonight; **the operator
   agent asleep only during the nightly** (by ACT at 08:00). Basis: questions 2 and 4.
+- DEC-1149 (2026-11-12, (3) standing): **the gate's working size 0.75 GiB (805,306,368 B) per live session** (ACT-P95-1,
+  applied); the floor, the 5 GB hold, `mem_guard` and the OOM trip unchanged; **usage never stops a lead or a worker**
+  (tracked and reported only; the 99 % push a report), **the runaway brake stays a stop** (it guards against looping);
+  the two peaks re-measured from the ledger by 11-19. DEC-947 item 2, DEC-1138 (4), DEC-1140 (6), DEC-1115 (4) changed.
+- DEC-1150 (2026-11-12): **W2-88 split** into W2-88a (the adopt skill's kernel text, with W2-174's S5) and W2-88b (the
+  real-repository proofs, copies only); P1-K (a) W2-115's fallback dropped; P1-L (a) W2-124's 13 files revised, each case
+  keeping its guard.

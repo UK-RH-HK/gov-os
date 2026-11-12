@@ -2,25 +2,37 @@
 
 **One line added to `governance/project/path-map.yaml`, class (b). It frees W2-40 (`DAEO-6ox0`, EXP-002), which the merge queue ejected at 21:38 UTC on 11-11.**
 
+**Round 3: a rebuild on REDS's new after, the one line byte-identical (as round 2 was for the other two).**
+- **Why:** the owner's operator applied ACT-OPERATOR-HOURS-2 this morning; its second commit (`6b8634d2c`: G9 holds only while the night hold is on; `acceptance_exemptions` lists its own commit `8ed7561b68a3`, DEC-1136 (2)) added one entry, two lines (412-413), to `governance/project/path-map.yaml`, so the live map is now `30233a092a4b` (it was `f4029cfb4942`). The two ACTs before this one are rebuilt on it (round 3), so this ACT's before moved with them. The round 2 bundle (manifest `9a945c99201d4c2c...`, reviewed READY) refuses on every map of the
+  new chain and is kept untouched as `.gov-runtime/scratch/orchestrator/acts/ACT-PATHMAP-EXP-1.r2-9a945c99/` (with its review).
+- **What changed:** this ACT's before `5654eca4c139` to `e4281125cf0e`; its after `d50884e3633e` to `805bd918d467`; the hunk's line numbers did **not** move (`@@ -95,0 +96 @@` in both: the line is above the two new
+  `acceptance_exemptions` lines); so `list.txt`, the two copies, `apply.sh` (comment lines only: the before hash, and the rebuild hint, which now names `drafts/pathmap-exp-1/insert_exp.py`), the rehearsal log and the manifest. The chain is `30233a092a4b` (live) to `1fe00f43d8ab` (ACT-EXAMIN-SETS-1) to `e4281125cf0e` (ACT-ACCEPTED-REDS-1) to `805bd918d467` (ACT-PATHMAP-EXP-1).
+- **What did not:** the one added line (`      - "experiments/**"` after `docs/probes/**` in `doc-records`; the diff of the new after against the new before equals round 2's diff, rehearsal H22, H23), `apply.sh`'s logic, the `list.txt` shape,
+  the manifest keys, the two checks (each run as written; check 2 exits 1 on the before map), class (b), the owner's decision inside the yes line (the embedding of experiment records), W2-40's plan. The line was made in rounds 1 and 2 by one
+  exact-text replacement typed by hand; round 3 wrote it down as `drafts/pathmap-exp-1/insert_exp.py` (refused unless the anchor line is written once; checks the result), which **reproduces round 2's after copy from round 2's before copy byte for byte**.
+- **Rehearsal:** now one clone with the other two (one `--no-hardlinks` clone of `w2/integrate`'s head, all three bundles in order): section 3 below. The round 2 rehearsal's W2-40 merge step (G, H, J of the old table) was **not re-run** in round 3 (the task was the chain; the line, the checks and the
+  18-namespace probe are unchanged); say so if it should be.
+- **New manifest sha256 `b26fe623d7a685ec7083a224e5f21af4a51503bae4d836d020df32290b73ff5c`** (`sha8` b26fe623). A new review is needed; the bundle holds no `review.md` yet.
+
 ## 0. What the owner says
 
-One line, after ACT-EXAMIN-SETS-1 and ACT-ACCEPTED-REDS-1 are in the map (this ACT's before is the map those two leave, `5654eca4c139`):
+One line, after ACT-EXAMIN-SETS-1 and ACT-ACCEPTED-REDS-1 are in the map (this ACT's before is the map those two leave, `e4281125cf0e`):
 
-yes ACT-PATHMAP-EXP-1 9a945c99
+yes ACT-PATHMAP-EXP-1 b26fe623
 
-(`9a945c99` is the first 8 hex of the manifest's sha256 below. Class **(b)**: the operator classifier says `b`, row `path-map`, "a change the row does not allow as (a)": the
+(`b26fe623` is the first 8 hex of the manifest's sha256 below. Class **(b)**: the operator classifier says `b`, row `path-map`, "a change the row does not allow as (a)": the
 line adds a pattern to a namespace, which no `only_added` list of the row covers. It is not a ratchet list, so it is not (O).)
 
 - **Who applies:** the operator agent, from the repository root, after ACT-EXAMIN-SETS-1 and then ACT-ACCEPTED-REDS-1 (REDS is the owner's hand: its commit is `Role: owner`).
   Route: `bash <bundle>/apply.sh check`, then `apply`, then `verify`; the commit is `Role: operator` with `Act: ACT-PATHMAP-EXP-1`, and the ticket trailer the main tree's hooks need.
   `apply.sh` does not commit.
 - **What changes:** one line in `namespaces.doc-records.paths`, after `"docs/probes/**"`: `      - "experiments/**"`. Nothing else (the diff is one added line; rehearsal section A).
-- **The order:** EXAMIN-SETS-1 (`f4029cfb4942` to `0ec1d20da86a`), ACCEPTED-REDS-1 (`0ec1d20da86a` to `5654eca4c139`), then this ACT (`5654eca4c139` to `d50884e3633e`).
+- **The order:** EXAMIN-SETS-1 (`30233a092a4b` to `1fe00f43d8ab`), ACCEPTED-REDS-1 (`1fe00f43d8ab` to `e4281125cf0e`), then this ACT (`e4281125cf0e` to `805bd918d467`).
   On any other map `apply.sh check` says `state other` and touches nothing.
-- **The check line it must print before the apply:** `state before (sha256 5654eca4c139)`. After the apply: `state applied (sha256 d50884e3633e)`, and `verify` exits 0.
+- **The check line it must print before the apply:** `state before (sha256 e4281125cf0e)`. After the apply: `state applied (sha256 805bd918d467)`, and `verify` exits 0.
   Anything else: stop and tell the CTO.
 - **Undo:** `bash <bundle>/apply.sh undo` (byte for byte, only while the map is as this ACT left it; undo this one first if it is on top of the others).
-- **Then:** the CTO re-queues W2-40 (head `29753c768def`); its two red tests go green (rehearsed below).
+- **Then:** the CTO re-queues W2-40 (head `29753c768def`); its two red tests go green (rehearsed in round 2, section 3 of the round 2 text below; not re-run in round 3).
 
 ## 1. Why, and why this line (found in the code, and a correction to the brief)
 
@@ -48,29 +60,46 @@ Not changed (and why): `systems.research-and-experiments.where` (documentation o
 
 ## 2. The files
 
-**Bundle:** `.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/`. **Manifest sha256
-`9a945c99201d4c2c49cbd522c38b3ebee5b2fa0c09dbb5f9e62f852721b6e93c`** (`sha8` 9a945c99). Every file below is also in its `files` map.
+**Bundle (round 3):** `.gov-runtime/scratch/orchestrator/acts/ACT-PATHMAP-EXP-1/` (built in `drafts/pathmap-exp-1/acts-r3/ACT-PATHMAP-EXP-1/`). **Manifest sha256
+`b26fe623d7a685ec7083a224e5f21af4a51503bae4d836d020df32290b73ff5c`** (`sha8` b26fe623). Every file below is also in its `files` map.
 The form is ACCEPTED-REDS-1's exactly (same `apply.sh` logic, `list.txt` shape and manifest keys); `claimed_class` is `b`.
 
 | File | sha256 |
 |---|---|
-| `before/repo/governance/project/path-map.yaml` (ACCEPTED-REDS-1's `after/` copy, byte for byte: `5654eca4c139`) | `5654eca4c139be0e2f8457593a685fcd9d747657e952215e3c46bcac45998211` |
-| `after/repo/governance/project/path-map.yaml` (`d50884e3633e`: the before plus the one line) | `d50884e3633e6e778626a17a0cae62f37778ff7f1903b2a557ad7920e9bbbb4d` |
-| `apply.sh` | `d51e8749d3ab80a0bf5194cb81027bbe28fd2ea0515473d4354d72cda5b45d6e` |
-| `list.txt` | `ee4fc76d9483104877df4c5540eefb2ae4750f130a3f328ac4b66f9b183d79c2` |
-| `rehearsal.log` (ends `checks: 21; failures: 0`) | `f981a313350fe4234358c0f02dbf3fc5edaa2ff25cd666d1a18fd3e352c85877` |
+| `before/repo/governance/project/path-map.yaml` (ACCEPTED-REDS-1 round 3's `after/` copy, byte for byte: `e4281125cf0e`) | `e4281125cf0ecdd5e8af4edd9c8a2d43b8f4d4693ef05387250384dcb1ac3e47` |
+| `after/repo/governance/project/path-map.yaml` (`805bd918d467`: the before plus the one line) | `805bd918d46787b61be2abea8934e5f50619833f5f7eb8bd7ed6c981d649e9b1` |
+| `apply.sh` | `092cdd9162b240025c2af8d48573a292abc760967e95d8d967f7cdb0e39d0fa7` |
+| `list.txt` | `cd613e4f0cfbcb216e87ac8862858772933f97682036b4bd72d7f51e1d42122a` |
+| `rehearsal.log` (the chain's, `drafts/examin-sets/rehearsal.r3.log`, ends `failures: 0`) | `52097d78c545f4f0bfe7b09369fd358124c97a52579376fd256c665914733bf1` |
+
+Round 2's (manifest `9a945c99...`, before `5654eca4c139`, after `d50884e3633e`, its own log `f981a313...`) is in `acts/ACT-PATHMAP-EXP-1.r2-9a945c99/` with its review, untouched.
 
 **The manifest's two checks** (each run as written with `bash -c` in the rehearsal): `PYTHONPATH=src python3 -m gov.check.pathmap` (exit 0), and a `python3 -I -c` that reads the map and asserts:
 `doc-records.paths` is exactly the three old patterns plus `experiments/**`; 18 namespaces; `experiments/**` is in exactly one; four sample experiment paths each match exactly one namespace;
 `doc-records` is `not embedded`; `accepted_reds` still has its two entries (exit 0; exit 1 on the before map).
 
 **If the order changes** (another path-map ACT lands first, or EXAMIN or REDS is re-built): `apply.sh check` prints `state other`, exit 3, and nothing is touched. Never edit this bundle.
-Rebuild the after copy from the then-current map by adding the same one line to `doc-records` (an exact-text replacement that must match once, in the style of
-`.gov-runtime/scratch/orchestrator/drafts/examin-sets/tools/insert_entries.py`), copy `apply.sh`, write `list.txt` with the new before and after, run
-`.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/build_manifest.py`, rehearse again, and have the new bundle reviewed. The one line is the same in every order.
+Rebuild the after copy from the then-current map by adding the same one line to `doc-records` (an exact-text replacement that must match once:
+`.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/insert_exp.py`), copy `apply.sh`, write `list.txt` with the new before and after, run
+`.gov-runtime/scratch/orchestrator/drafts/examin-sets/tools/build_r3.py` (it builds all three bundles of the chain; `drafts/pathmap-exp-1/build_manifest.py` is the round 1 and 2 form), rehearse again, and have the new bundle reviewed. The one line is the same in every order.
 If W2-40 is re-based and its files move to another root, the ACT is not needed at all.
 
-## 3. The rehearsal (`rehearsal.log`; clone of `w2/integrate`, `--no-hardlinks`; the live tree only read; scripts `rehearse-1.sh`, `rehearse-2.sh` beside the bundle)
+## 3. The rehearsal (round 3: the chain's `rehearsal.log`, `drafts/examin-sets/rehearsal.r3.log`, ends `failures: 0`, 193 checks; one `--no-hardlinks` clone of `w2/integrate`'s head, the live tree only read; script `drafts/examin-sets/tools/rehearse_r3.sh`)
+The log holds no head, pid, date or count line of the live tree (nor a test count or a time); two runs gave byte for byte equal logs. This ACT's steps are B4b, B8, D16, H10 to H34, I0a to I0f, I9 and J (EP):
+
+| Step | Result |
+|---|---|
+| A. preconditions | the clone's map is `30233a092a4b`; EXP's before is REDS's after (A1b, and `cmp` of the bundle files); the chain is `30233a092a4b` (live) to `1fe00f43d8ab` (ACT-EXAMIN-SETS-1) to `e4281125cf0e` (ACT-ACCEPTED-REDS-1) to `805bd918d467` (ACT-PATHMAP-EXP-1) |
+| B. wrong order | on `30233a092a4b` (B4b) and on EXAMIN's after (D16): check, apply, undo, verify all exit 3; the map unchanged, `git status` empty, no temp file; the r2 bundle refuses on the live map (B8) |
+| C to H9. the other two | EXAMIN's plain apply and commit; REDS's plain apply and its `Role: owner` commit (their packages) |
+| H10 to H21. this ACT | check prints `state before (sha256 e4281125cf0e)`; verify before the apply exits 3; undo with nothing applied says so, exit 0; apply gives `805bd918d467`, mode 644, `git status` lists only the map, no temp file; the map equals the frozen after, byte for byte; verify exit 0; apply again changes nothing; check says `state applied` |
+| H22, H23. the line | the diff of the new after against the new before is the one added line `      - "experiments/**"`, equal to round 2's diff (the hunk header is `@@ -95,0 +96 @@` in both: no offset) |
+| HX. manifest checks, as written | applied map: check 1 (`gov.check.pathmap`) exit 0, check 2 exit 0; on the before map check 2 exits 1 |
+| H30 to H34 | committed in the clone as the agent would (`Role: operator`, `Act: ACT-PATHMAP-EXP-1`); the ratchet still counts both REDS entries; `gov.check.pathmap` exit 0 and `tests/acceptance/W1-01` green on the chain's end state (the ACT touches no file under `tests/acceptance/`, so DEC-1136 (2) adds no entry) |
+| I. undo | EXP undo first (REDS's and EXAMIN's undo with it on top refuse), byte for byte back to `e4281125cf0e`; undo again says nothing to undo |
+| J. refusals | a changed map and a link: check, apply, undo refuse (exit 3); a link at the old fixed temp name is not followed; a tampered frozen copy exit 4; folder not writable exit 5, map untouched, no temp file |
+
+### Round 2's section 3 (history: round 2's own rehearsal, with W2-40's merge in a clone; its hashes are round 2's: `f4029cfb4942`, `0ec1d20da86a`, `5654eca4c139`, `d50884e3633e`)
 
 | Step | Result |
 |---|---|

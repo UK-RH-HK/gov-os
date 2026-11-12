@@ -20,6 +20,7 @@ allowed_paths:
 - src/gov/memaudit/**
 - tests/unit/memaudit/**
 - docs/changes/W2-171-evidence.md
+- docs/probes/DAEO-k1e2/**  # the probe record, so the branch's path case holds at its head (as W2-157's; the CTO, 2026-11-12 12:50)
 kpis:
   success:
   - 'S1 The control runs first: the standing visible-40 set is measured with the audit''s declared configuration, and its hit@5 must be within 2 of the last audit''s control (the first audit''s control is within 2 of 34, E0''s figure, DEC-1097 (1)(b)). Outside that, nothing is measured, the counts say `control out of range`, and `USED` is left as written by W2-170. Verify: planted fake `gov` returning a control at 34, 33 and 31: the first two proceed, the third stops before the audit set''s first search [DEC-1097 (1), DEC-1101 (1)]'

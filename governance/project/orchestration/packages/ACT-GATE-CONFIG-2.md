@@ -1,5 +1,8 @@
 # ACT-GATE-CONFIG-2: W2-20's machine gate file rewritten for round 2's format, frozen from W2-20's head 28fbcfebf
 
+> **Superseded figure (2026-11-12, DEC-1149):** the gate's working size is now 805,306,368 B (0.75 GiB) per live
+> session (ACT-P95-1, applied 16:53). The 2.04 GiB (2,191,601,664 B, DEC-947 item 2) figure below is kept as history.
+
 - **For:** the owner's operator. It replaces one file under HOME, outside every repository, and keeps the old one. It
   changes no tracked file.
 - **By:** the CTO, 2026-11-09, on the CTO's ruling of the same day (1). Built and rehearsed with HOME pointed at a
