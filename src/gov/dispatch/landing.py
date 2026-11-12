@@ -21,6 +21,7 @@ from pathlib import Path
 from gov.dispatch import procs
 from gov.dispatch import state as states
 from gov.dispatch.shell import CommandFailed
+from gov.resources import machine
 from gov.util.gitenv import git_env
 
 APPROVAL = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*=[0-9a-f]{12}$")
@@ -205,17 +206,33 @@ def _index_locked(ctx) -> bool:
     return (folder / "index.lock").exists()
 
 
-def conflicting_close(ctx, running, w2s: set[str], changes: list[str]) -> str | None:
+def close_arguments(table: dict, marker: str) -> dict[int, set[str]]:
+    """The arguments of every process matching the close marker, by pid. A close run under a shell wrapper
+    (``sh -c "cd x && <close command> <id>"``) is the wrapper in the jobs (its child is part of it), but the ids are
+    the child's own arguments: so the children are read too (not a lead, not this process)."""
+    own, found = os.getpid(), {}
+    for pid, info in table.items():
+        if pid == own or marker not in info["cmdline"]:
+            continue
+        arguments = procs.arguments(pid)
+        if procs.lead_marker(arguments) is None:
+            found[pid] = set(arguments)
+    return found
+
+
+def conflicting_close(ctx, running, w2s: set[str], changes: list[str], table: dict | None = None) -> str | None:
     """Why a running close holds the landing back, or None: a ticket it closes is in the set, or it is committing its
     records (``index.lock`` there, or every tracked change under ``close_record_paths``)."""
     closes = [job for job in running.jobs if job["kind"] == "close"]
     if not closes:
         return None
     wanted = w2s | ticket_ids(ctx.root, w2s)
-    for job in closes:
-        shared = sorted(set(procs.arguments(job["pid"])) & wanted)
+    marker = ctx.conf.job_markers.get("close")
+    table = machine.processes() if table is None else table
+    for pid, arguments in sorted(close_arguments(table, marker).items() if marker else []):
+        shared = sorted(arguments & wanted)
         if shared:
-            return f"a close (pid {job['pid']}) is closing {', '.join(shared)}, in the landing"
+            return f"a close (pid {pid}) is closing {', '.join(shared)}, in the landing"
     prefixes = ctx.conf.close_record_paths
     if _index_locked(ctx):
         return f"a close (pid {closes[0]['pid']}) is committing its records (index.lock)"

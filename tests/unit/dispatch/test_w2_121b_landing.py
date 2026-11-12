@@ -135,6 +135,32 @@ def test_ticket_ids_map_a_w2_id_through_external_ref_or_wbs_id(tmp_path):
     assert landing.ticket_ids(tmp_path / "missing", {"W2-1"}) == set()
 
 
+def _plant(root: Path, pid: int, *argv: str) -> None:
+    (root / str(pid)).mkdir(parents=True)
+    (root / str(pid) / "cmdline").write_bytes(b"\0".join(a.encode() for a in argv) + b"\0")
+
+
+def test_a_close_under_a_shell_wrapper_is_read_from_its_child(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    proc = tmp_path / "proc"
+    _plant(proc, 500, "bash", "-c", "cd /x && gov-close-stub W2-7 ; echo done")
+    _plant(proc, 501, "python3", "/opt/gov/gov-close-stub", "W2-7")
+    _plant(proc, 600, "sh", "-c", "gov-close-stub W2-8 ; echo done")
+    _plant(proc, 601, "python3", "/opt/gov/gov-close-stub", "W2-8")
+    monkeypatch.setenv("GOV_RESOURCES_PROC", str(proc))
+    table = {500: {"ppid": 1, "cmdline": "bash -c cd /x && gov-close-stub W2-7 ; echo done"},
+             501: {"ppid": 500, "cmdline": "python3 /opt/gov/gov-close-stub W2-7"},
+             600: {"ppid": 1, "cmdline": "sh -c gov-close-stub W2-8 ; echo done"},
+             601: {"ppid": 600, "cmdline": "python3 /opt/gov/gov-close-stub W2-8"},
+             700: {"ppid": 1, "cmdline": "sleep 100"}}
+    assert set(landing.close_arguments(table, "gov-close-stub")) == {500, 501, 600, 601}
+    ctx = SimpleNamespace(root=tmp_path, runner=SimpleNamespace(git=lambda *a: SimpleNamespace(code=1, out="")),
+                          conf=SimpleNamespace(job_markers={"close": "gov-close-stub"}, close_record_paths=[]))
+    jobs = SimpleNamespace(jobs=[{"kind": "close", "pid": 500}, {"kind": "close", "pid": 600}])
+    assert "W2-7" in landing.conflicting_close(ctx, jobs, {"W2-7"}, [], table)
+    assert landing.conflicting_close(ctx, jobs, {"W2-9"}, [], table) is None
+
+
 # --- the heavy steps ------------------------------------------------------------------------------------------------
 
 TABLE = {10: {"ppid": 1}, 11: {"ppid": 10}, 12: {"ppid": 11}, 20: {"ppid": 1}, 30: {"ppid": 31}, 31: {"ppid": 30}}
