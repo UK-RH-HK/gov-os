@@ -27,3 +27,9 @@
 - No tree written, the live map untouched, the clone removed.
 - Scratch: 199M and 9643 inodes.
 - `ps` showed no ollama or llama-server process.
+
+## The reviewer's verdict block (as returned; READY computed by verdict.py)
+
+```verdict
+{"kpis": [{"kpi": "act-pathmap-exp-1", "verdict": "pass", "findings": [{"id": "F1", "scope": "out", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
+```

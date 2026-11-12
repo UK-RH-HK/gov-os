@@ -61,7 +61,10 @@ TOOLS_COUNTED = ("Read", "Grep", "Glob", "Write", "Edit", "MultiEdit", "TodoWrit
                  "Task", "Agent", "NotebookEdit", "Skill", "other")
 COUNTS_KEYS = {"act", "kind", "run", "set", "round", "commit", "brief_sha256", "approved_sha256", "template_ok",
                "seed_sha256", "override", "selection", "session", "out", "delivered", "traces", "status", "code",
-               "reason"}
+               "reason",
+               # Revised for W2-173 S1 (DEC-1120 (2)-(3), DEC-866): every counts object carries the brief's `effort`,
+               # a string or null.
+               "effort"}
 NESTED_KEYS = {"selection": {"changed", "sample", "overlap"},
                "session": {"exit", "is_error", "turns", "cost_usd", "duration_s", "refusals"},
                "refusals": set(TOOLS_COUNTED),
@@ -944,16 +947,39 @@ def _program(path: Path, template: str, **values):
 
 # -- outputs a session may leave in out/ --------------------------------------------------------------------------
 
+# Revised for W2-173 S3 and S4 (DEC-1101 (2), DEC-866; the CTO's P-1 (a), 2026-11-12): the checker's notes and the
+# auditor's classes are planted in the memory audit briefs' fixed forms (checker.md §6, auditor.md §6), which the
+# launch script now checks at delivery. The checker's notes hold one line per file of the set its planting stages in
+# input/set/ (memory-verdict-3/hidden: q01.yaml, q02.yaml, sub/q03.yaml; the ids q01, q02, q03), in id order; their
+# verdicts (accept, revise, accept) are GOOD_RESULT["checker"]'s counts. The auditor's classes hold one entry per line
+# of the planted runs/audit-1/misses.jsonl (m1, m2, m3); GOOD_RESULT["auditor"]["misses"] is their counts, all five
+# classes named (auditor.md §6's result form).
+CHECKER_NOTES = "".join(x + "\n" for x in (
+    "# Cross-check notes",
+    "## Questions",
+    "q01 | accept | - | also: docs/d01.md#Planted doc 1 | the anchor holds the deciding line",
+    "q02 | revise | R6-SPAN-MISSES | also: none | the anchor ends before the deciding line",
+    "q03 | accept | - | also: none | the question reads one way only",
+    "## The set",
+    "domains: code 1, decisions 1, tickets 0, plan 0, contract 0, none 1",
+    "categories: decision 1, contract 0, plan 0, ticket 0, exact-string 1, callers 0, code-paraphrase 1, "
+    "kernel-template 0, multi-file 0, failure-memory 0, history 0, nonexistent-id 0",
+    "keyword: any 0, all 0",
+    "supersession 0, kernel roles or skills 0, failure or lesson 0, drawn changed 3, drawn sample or none 0",
+    "set codes: none"))
+AUDITOR_CLASSES = {"m1": {"class": "retrieval_miss", "reason": "the gold place never reached the agent"},
+                   "m2": {"class": "retrieval_miss", "reason": "the gold place never reached the agent"},
+                   "m3": {"class": "gold_wrong", "reason": "the gold span ends before the deciding line"}}
 GOOD_RESULT = {"writer": {"questions": 3, "by_kind": {"fact": 2, "procedure": 1}, "by_area": {"code": 2, "docs": 1}},
                "checker": {"checked": 3, "accepted": 2, "revise": 1, "rejected": 0},
-               "auditor": {"misses": {"retrieval_miss": 2, "gold_wrong": 1}},
+               "auditor": {"misses": {c: sum(1 for v in AUDITOR_CLASSES.values() if v["class"] == c)
+                                      for c in AUDIT_CLASSES}},
                "labeller": {"labelled": 23, "allow": 20, "refuse": 3}}
 GOOD_DELIVERY = {"writer": {"set/q01.yaml": "id: q01\nquestion: planted one\n",
                             "set/q02.yaml": "id: q02\nquestion: planted two\n",
                             "set/sub/q03.yaml": "id: q03\nquestion: planted three\n"},
-                 "checker": {"notes.md": "# Cross-check notes (planted)\n- q01 accepted\n"},
-                 "auditor": {"classes.json": json.dumps({"m1": "retrieval_miss", "m2": "retrieval_miss",
-                                                         "m3": "gold_wrong"})},
+                 "checker": {"notes.md": CHECKER_NOTES},
+                 "auditor": {"classes.json": json.dumps(AUDITOR_CLASSES)},
                  "labeller": {"labels.jsonl": "".join(json.dumps({"id": f"a{n:02d}", "label": "allow"}) + "\n"
                                                       for n in range(1, 24))}}
 

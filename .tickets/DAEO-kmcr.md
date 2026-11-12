@@ -133,3 +133,12 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-23), as approved (DEC-729). The list row
   added to the paths for its one failed-batch case only, revised by W2-23's test designer to read the per-run rollback
   refs (Rewrite-Reason: DEC-866, Interface item 2). P-W2-23-6 (b): the fixture programme moves under
   `tests/unit/adapters/fixtures/programme/` (inside the paths), so no path-map change; `fixtures/adopt/**` stays unused.
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-12), run 3's P-W2-23-7 (a):** review round 1 NOT READY on S3 (R1, R2: in
+  scope, ordinary work, fail open; reproduced at the head). Round 2, limited to S3, the last under DEC-1010: the test
+  designer adds the sentence-final and nested-store cases, then the engineer fixes `src/gov/adopt/safety.py` (about lines
+  287-291), then review round 2 on S3. R2's reading of "the store's folder": the deepest folder holding all the store's
+  files, and each folder between it and a file.
+
+## P-W2-23-8 (the owner, DEC-1142 (2), 2026-11-12 ~09:50)
+
+(a): R2-1 fixed (a `?` or other sentence end after a folder or `/` tail: `legacy/memory?`, `legacy/memory/?`, `notes/memory?` found), one test case by the test designer and the fix (about 3 lines in `_NOT_MORE_PATH_DIR` and the glob token handling), with the lead's verification in place of a third review round (DEC-1010 excepted by the owner for this round).

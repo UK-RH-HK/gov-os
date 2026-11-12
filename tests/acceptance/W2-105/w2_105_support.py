@@ -75,6 +75,12 @@ TICKETS = {
 TICKET_OF = {ENGINEER: "DAEO-zz90", TEST_DESIGNER: "DAEO-zz90", ORCHESTRATOR: COORDINATION_TICKET,
              PRODUCT_SPEC: "DAEO-zz92", AUDITOR: "DAEO-zz93", RESEARCH: "DAEO-zz97", NO_ROLE: None}
 
+# The project's roster names its coordination ticket (DEC-971 item 4, DEC-980; P-W2-110-5 (a)): only the orchestrator
+# on that ticket is the CTO whose install the guard asks; without the key every session is refused (fail closed).
+ROSTER_REL = "governance/project/roster.yaml"
+ROSTER_TEXT = ("# The project's roster (W2-105 fixture, P-W2-110-5 (a)).\n"
+               f"coordination_ticket: {COORDINATION_TICKET}\n")
+
 
 # --------------------------------------------------------------------------
 # The project
@@ -82,10 +88,11 @@ TICKET_OF = {ENGINEER: "DAEO-zz90", TEST_DESIGNER: "DAEO-zz90", ORCHESTRATOR: CO
 
 def make_project(base):
     """A project generated from the template (Copier, then rulesync generate), with a ticket in progress for each
-    role, a product file and the research ticket's experiment folder, committed. Never run a hook in it."""
+    role, a product file, the research ticket's experiment folder and a roster naming the coordination ticket,
+    committed. Never run a hook in it."""
     project = kernel_wiring.generate_project(base)
     files = {"README.md": "# A product of the Gov OS kernel\n", "src/app/main.py": "VALUE = 1\n",
-             f"{EXPERIMENT_REL}/README.md": "# Experiment 901\n"}
+             f"{EXPERIMENT_REL}/README.md": "# Experiment 901\n", ROSTER_REL: ROSTER_TEXT}
     for number, (ticket_id, (role, paths)) in enumerate(sorted(TICKETS.items()), start=1):
         files[f".tickets/{ticket_id}.md"] = check_support.ticket_text(
             ticket_id=ticket_id, wbs_id=f"W2-9{number}", role=role, allowed_paths=paths)
