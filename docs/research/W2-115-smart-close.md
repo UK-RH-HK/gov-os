@@ -31,7 +31,7 @@ here to be re-run; `-I` keeps the records' folder out of the import path):
 
 ```python
 """S9: close_build.py's recorded verdict beside this close's judgement of the same records (W2-115, F-7).
-Run: PYTHONPATH=<worktree>/src python3 -I s9.py <close-build log folder>"""
+Run: PYTHONPATH=<worktree>/src python3 s9.py <close-build log folder>"""
 import json
 import sys
 import xml.etree.ElementTree as ET
