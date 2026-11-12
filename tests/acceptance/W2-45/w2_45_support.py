@@ -251,3 +251,127 @@ def repo_with_decisions(project: Project, decisions: int = 200, commits: int = 2
                           capture_output=True, env=_git_env(project.root.parent))
     assert done.returncode == 0, f"git fast-import failed: {done.stderr.decode()}"
     git(project.root, "reset", "-q", "--hard", "main")
+
+
+def repo_with_merge_history(project: Project, decisions: int = 200, commits: int = 20000) -> int:
+    """Fill ``project`` (an empty git repository) with ``decisions`` decision records and ``commits`` commits in all,
+    of which one in six is a merge, built with ``git fast-import``. Returns the number of merges.
+
+    The first ``decisions`` commits each add one decision file ``docs/adr/DEC-<n>.md`` (``status: ACTIVE``, the
+    owner's trailer). The rest is ordinary branch work in blocks of six commits: a side branch of three commits
+    (each touches a file under ``src/``; every third block the second one is the owner's revision of a decision),
+    two commits on ``main`` that touch other files under ``src/``, and the merge of the side branch into ``main``
+    (an engineer's merge: only the side branch changed the decision files, so it sets nothing)."""
+    assert commits > decisions and (commits - decisions) % 6 == 0
+    base = 1_792_000_000  # 2026-10-14: after the date from which the trailer is read from the final block
+    stream, marks, clock = [], {"next": 0, "main": None}, {"now": base}
+
+    def commit(ref: str, message: str, files: dict, *, parent=None, merge=None) -> int:
+        marks["next"] += 1
+        mark = marks["next"]
+        clock["now"] += 1
+        data = message.encode()
+        stream.append(f"commit refs/heads/{ref}\nmark :{mark}\n"
+                      f"committer {AUTHOR['name']} <{AUTHOR['email']}> {clock['now']} +0000\n"
+                      f"data {len(data)}\n{message}\n")
+        if parent is not None:
+            stream.append(f"from :{parent}\n")
+        if merge is not None:
+            stream.append(f"merge :{merge}\n")
+        for rel, text in files.items():
+            body = text.encode()
+            stream.append(f"M 100644 inline {rel}\ndata {len(body)}\n{text}\n")
+        stream.append("\n")
+        return mark
+
+    def decision_text(number: int, revision: int) -> str:
+        return (f"---\nid: DEC-{number:03d}\ntype: decision\nstatus: ACTIVE\ntitle: Decision {number}\n---\n"
+                f"# DEC-{number:03d}\n\nrevision {revision}\n")
+
+    revisions = {}
+    for number in range(1, decisions + 1):
+        revisions[number] = 0
+        marks["main"] = commit("main", f"decision {number}\n\nTask: setup\nRole: owner",
+                               {f"docs/adr/DEC-{number:03d}.md": decision_text(number, 0)})
+    merges = 0
+    for block in range((commits - decisions) // 6):
+        fork = marks["main"]
+        side_files, tip = {}, fork
+        for step in range(3):
+            n = block * 6 + step
+            if step == 1 and block % 3 == 0:
+                number = (block % decisions) + 1
+                revisions[number] += 1
+                files = {f"docs/adr/DEC-{number:03d}.md": decision_text(number, revisions[number])}
+                tip = commit("side", f"revise decision {number}\n\nTask: setup\nRole: owner", files, parent=tip)
+            else:
+                files = {f"src/side{n % 50}.txt": f"line {n}\n"}
+                tip = commit("side", f"side work {n}\n\nTask: work\nRole: engineer", files, parent=tip)
+            side_files.update(files)
+        for step in (3, 4):
+            n = block * 6 + step
+            marks["main"] = commit("main", f"main work {n}\n\nTask: work\nRole: engineer",
+                                   {f"src/main{n % 50}.txt": f"line {n}\n"}, parent=marks["main"])
+        marks["main"] = commit("main", f"Merge side {block}\n\nTask: work\nRole: engineer", side_files,
+                               parent=marks["main"], merge=tip)
+        merges += 1
+    done = subprocess.run(["git", "-C", str(project.root), "fast-import", "--quiet", "--force"],
+                          input="".join(stream).encode(), capture_output=True, env=_git_env(project.root.parent))
+    assert done.returncode == 0, f"git fast-import failed: {done.stderr.decode()}"
+    git(project.root, "update-ref", "-d", "refs/heads/side")
+    git(project.root, "reset", "-q", "--hard", "main")
+    return merges
+
+
+def process_alive(pid: int) -> bool:
+    """Whether the process ``pid`` runs (a zombie waiting to be reaped is not running)."""
+    try:
+        with open(f"/proc/{pid}/stat", encoding="utf-8") as stat:
+            return stat.read().rsplit(")", 1)[1].split()[0] != "Z"
+    except (FileNotFoundError, ProcessLookupError):
+        return False
+
+
+def read_pid_file(path: Path, seconds: float = 0.0):
+    """The integer in ``path`` once it holds one (waiting up to ``seconds`` for it), else ``None``."""
+    deadline = time.monotonic() + seconds
+    while True:
+        try:
+            return int(Path(path).read_text().strip())
+        except (FileNotFoundError, ValueError):
+            if time.monotonic() >= deadline:
+                return None
+            time.sleep(0.05)
+
+
+def wait_until_gone(pids, seconds: float = 5.0) -> list:
+    """Wait up to ``seconds`` for every process of ``pids`` to end; returns those still running."""
+    deadline = time.monotonic() + seconds
+    alive = [pid for pid in pids if process_alive(pid)]
+    while alive and time.monotonic() < deadline:
+        time.sleep(0.1)
+        alive = [pid for pid in alive if process_alive(pid)]
+    return alive
+
+
+def kill_leftovers(pids) -> None:
+    """Stop, by pid, each of ``pids`` that still runs (a test cleans up whatever it started, even when it fails)."""
+    import signal
+    for pid in pids:
+        if pid and process_alive(pid):
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+def start_check(project: Project, out_dir: Path) -> subprocess.Popen:
+    """``gov check --json`` in ``project`` started as a process of this test's own group, with the environment
+    ``Project.check`` builds; its output goes to files under ``out_dir``. SIGINT is restored to its default in the
+    child, so a SIGINT sent to it reaches Python's handler even when the test runs from a background job."""
+    import signal
+    out_dir.mkdir(parents=True, exist_ok=True)
+    args = [sys.executable, "-m", "gov.cli.main", "check", "--json", "--root", str(project.root)]
+    return subprocess.Popen(args, cwd=str(project.root), env=project.env(), stdin=subprocess.DEVNULL,
+                            stdout=open(out_dir / "stdout.txt", "wb"), stderr=open(out_dir / "stderr.txt", "wb"),
+                            preexec_fn=lambda: signal.signal(signal.SIGINT, signal.SIG_DFL))

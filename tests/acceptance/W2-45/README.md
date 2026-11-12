@@ -64,6 +64,12 @@ holds a part of the KPI line that is already true and must stay true.
 | S5 | `test_s5_timeout.py::test_s5_the_whole_process_group_of_a_timed_out_check_is_stopped` | `CHECK_FAILED`, not `CHECK_TIMED_OUT`. |
 | S5 | `test_s5_timeout.py::test_s5_a_timed_out_warning_check_is_yellow` | `CHECK_FAILED`, not `CHECK_TIMED_OUT` (status YELLOW already). |
 | S5 | `test_s5_timeout.py::test_s5_a_check_inside_its_limit_is_not_timed_out` | the entry has no `time_limit_s` (`KeyError`). |
+| S1 (W2-H018, review round 1, F1): the same on a history with merges, one commit in six | `test_s1_decision_checker_merges.py::test_s1_merges_decision_checker_runs_within_the_gov_check_budget_on_a_history_with_merges` | core-authority has `CHECK_TIMED_OUT` (the reviewer measured 132.8 s for the checker on such a history); no `elapsed_s` / `time_limit_s` beside it. |
+| S1 | `test_s1_decision_checker_merges.py::test_s1_merges_the_planted_repository_has_200_decisions_20000_commits_and_a_merge_in_six` *(guard, fixture check)* | none: it passes on the base (20,000 commits, 3,300 merges, 200 records). |
+| S1 | `test_s1_decision_checker_merges.py::test_s1_merges_the_decision_checker_still_reports_an_agent_s_decision_merged_from_a_side_branch` *(guard: at a small scale, an engineer's ACTIVE decision set on a side branch and merged is still `ACTIVE_UNAPPROVED`, the owner's one is not)* | none: it passes on the base and must stay true when the checker is made faster over merges. |
+| S1 | `test_s1_decision_checker_merges.py::test_s1_merges_core_authority_is_still_red_on_an_active_pair_merged_from_a_side_branch` *(guard: through `gov check`, core-authority names a decision ACTIVE while superseded that the owner added on a side branch)* | none: it passes on the base. |
+| S5 (review round 1, F2): the check's group is stopped when `gov check` is interrupted | `test_s5_group_stopped.py::test_s5_an_interrupted_gov_check_stops_the_whole_process_group_of_the_running_check` | after SIGINT to `gov check` and its end, the check's shell and its grandchild are still running 5 s later (the check runs in its own session). |
+| S5 (review round 1, F3): the check's group is stopped when the limit is huge | `test_s5_group_stopped.py::test_s5_a_check_with_a_huge_limit_leaves_no_process_behind_whatever_gov_check_ends_with` | `gov check` ends with an `OverflowError` (`timeout-seconds: 3000000`) and the check's shell and grandchild are still running 5 s later. |
 
 ## What the Interface leaves open (not tested)
 
@@ -72,3 +78,15 @@ holds a part of the KPI line that is already true and must stay true.
 - The roll-up of `elapsed_s` into families, the value of `elapsed_s` of a not-applicable check, and the budget of any
   check other than core-authority.
 - Whether `gov check`'s total time is bounded; only the timed-out cases are bounded, below 10 s.
+
+## Run 4 (review round 1's fix batch)
+
+- `test_s1_decision_checker_merges.py`: the history is built by `repo_with_merge_history` (`git fast-import`, blocks of
+  six commits: three on a side branch, two on `main`, the merge; every third block's second side commit is the owner's
+  revision of a decision; merges are an engineer's, only the side changed the decision files). The guard case's
+  rules are those of `tests/unit/decisions/test_decisions.py` (an engineer's commit is no approval; an ordinary merge
+  sets nothing). The big case is load-sensitive, like S1's.
+- `test_s5_group_stopped.py`: the exit form of `gov check` after SIGINT (F2) or on a huge limit (F3, a known row,
+  W2-L167) is not asserted; only that no process of the check is left 5 s after `gov check` has ended. F3's planted
+  grandchild sleeps 25 s: a runner that clamps the limit and waits the check out ends after it, with nothing left.
+  A runner that refuses the limit before starting the check passes F3 with no pid file.
