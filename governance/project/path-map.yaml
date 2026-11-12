@@ -93,6 +93,7 @@ namespaces:
       - "docs/close/**"
       - "docs/checkpoints/**"
       - "docs/probes/**"
+      - "experiments/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
