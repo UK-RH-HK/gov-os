@@ -7,11 +7,92 @@ Ticket DAEO-emq1 (W2-115), build run 2, engineer. Branch `w2/W2-115`. The scoped
 
 `close_build.py` could not be run from the engineer's sandbox: it clones into `~/gov-os-runs/W2-00/close/`,
 rebuilds stores, runs gitleaks and writes the main repository's records, all outside the sandbox's write paths, and
-each recorded run took between 1.3 and 3 hours. So its **recorded** verdicts are used, cited by path, and this close's
-side is computed from the same records: each red's runs alone with and without the change (close_build's `trace`,
-`flaky_candidates`) go through this close's own judgement (`gov.close.attribution.judge`), the failure type read
-from the run's own `parallel.xml` by this close's reader (`gov.close.attribution.failure_type`), and the scoped
-close's rule applied (a caused red refuses, every other red closes with a repair ticket).
+each recorded run took between 1.3 and 3 hours. So its **recorded** verdicts are used, cited by path.
+
+**The method, exactly (F-7).** "This close's verdict" below is **not** a run of this close (`gov close`) on those
+batches: no test was run for this table, and no clone was built. It was **computed from close_build.py's records**:
+
+1. **Run:** nothing of the tests. Only the script below, which reads three files per batch.
+2. **Read from the records:** each batch's `run.json` (close_build's own verdict string; its `flaky_candidates`, the
+   reds it recorded as green when run alone with the change; its `trace`, per red the number of rounds and how many
+   were red alone with the change, `red_with`, and without it, `red_without`) and its `parallel.xml` (the failure
+   message of each red, from which this close's reader `gov.close.attribution.failure_type` takes the failure type).
+3. **Computed:** each red's alone-runs, rebuilt as lists of outcomes from those counts, are fed into this close's own
+   judgement `gov.close.attribution.judge`; the scoped close's rule then gives the verdict (any caused red: REFUSED;
+   else CLOSED, every other red named with a repair ticket).
+4. **Not compared: the failure types without the change.** close_build records the run without the change by its exit
+   code only (`red_without` is a count), so no failure type exists there to compare. The script **assumes** a red
+   without the change carries the same type as the run with it; on these records this close's same-type rule (S4)
+   is therefore not exercised, only its counts. A batch where the type differs on the two heads would be caused by
+   this close and could be unowned by close_build; these records cannot show it.
+
+The script (the whole of it; it was first run from the engineer's sandbox scratch and not committed, so it is given
+here to be re-run; `-I` keeps the records' folder out of the import path):
+
+```python
+"""S9: close_build.py's recorded verdict beside this close's judgement of the same records (W2-115, F-7).
+Run: PYTHONPATH=<worktree>/src python3 -I s9.py <close-build log folder>"""
+import json
+import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from gov.close.attribution import failure_type, judge
+
+RUNS = [("W2-71-20261030-161658", "clean"), ("W2-107-20261031-184805", "caused red"),
+        ("W2-107-20261031-202743", "unowned red")]
+
+
+def failing(xml: Path) -> dict:
+    """{node id: failure type} of every failure or error in a JUnit file, read by this close's reader."""
+    out = {}
+    for case in ET.parse(xml).getroot().iter("testcase"):
+        for bad in list(case.findall("failure")) + list(case.findall("error")):
+            path = case.get("classname", "").replace(".", "/") + ".py"
+            node = f"{case.get('file') or path}::{case.get('name')}"
+            out[node] = failure_type(bad.get("message"), bad.text)
+    return out
+
+
+def verdict(folder: Path) -> tuple[str, str, list]:
+    run = json.loads((folder / "run.json").read_text(encoding="utf-8"))
+    types = failing(folder / "parallel.xml")
+    rows = []
+    for test in run.get("flaky_candidates") or []:  # recorded green when run alone with the change
+        rows.append((test,) + judge([None], []))
+    for test, t in (run.get("trace") or {}).items():
+        kind = next((v for k, v in types.items() if k.endswith(test.split("::", 1)[1]) and
+                     k.split("::")[0].rsplit("/", 1)[-1] == test.split("::")[0].rsplit("/", 1)[-1]), "unknown")
+        n = t["rounds"]
+        # close_build records the run without the change by its exit code only: a red there is ASSUMED to carry
+        # the same failure type as the run with the change (the types are not compared: they are not recorded)
+        with_change = [kind] * t["red_with"] + [None] * (n - t["red_with"])
+        without = [kind] * t["red_without"] + [None] * (n - t["red_without"])
+        rows.append((test,) + judge(with_change, without))
+    caused = any(r[1] for r in rows)
+    return run["verdict"], "REFUSED" if caused else "CLOSED", rows
+
+
+def main(log: str) -> int:
+    equal_all = True
+    print("| Batch | Kind | close_build.py verdict | This close's verdict | Equal |\n|---|---|---|---|---|")
+    for name, kind in RUNS:
+        recorded, ours, rows = verdict(Path(log) / name)
+        theirs = "REFUSED" if recorded.startswith("REFUSED") else "CLOSED"
+        equal_all &= theirs == ours
+        print(f"| `{name}` | {kind} | {theirs} | {ours} | {'yes' if theirs == ours else 'NO'} |")
+        for test, caused, ftype, reason in rows:
+            print(f"<!-- {name}: {test}: caused={caused} type={ftype}: {reason} -->", file=sys.stderr)
+    return 0 if equal_all else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1]))
+```
+
+**Re-run at `ce6a2addf362`** (2026-11-12, fix round 1, eng-5): saved as `s9.py` in the sandbox's TMPDIR and run as
+`PYTHONPATH=/home/usain/gov-os-worktrees/W2-115/src python3 s9.py <records folder>`: it printed the table below
+unchanged and exited 0 (equal on all three); the per-red lines it printed are the details below.
 
 Records: `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/close-build/<run>/`
 (`run.json`, `close.txt`, `parallel.xml`, `unowned.txt`).
@@ -33,12 +114,12 @@ Equal on all three. The details, per batch:
   (`W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs`) not caused.
 - `W2-107-20261031-202743` (unowned red): `close_build.py` recorded `CLOSED (build-phase close, DEC-953)`, the red
   named in `unowned.txt`. This close: the W1-28 red with AssertionError 3/3 and red without the change 3/3, not
-  caused, named in the record with a repair ticket; the W2-50 failure green alone, so CLOSED. Two limits, stated: (1) `close_build.py` records the run without the change by its exit code
-only, so a red there is taken to carry the same failure type as the run with the change (this close checks the type
-itself; on these records it cannot); (2) none of the fifteen recorded runs had a parallel run with no failure at
-all, so the clean batch is the one whose only failure was green alone. The script that computed this close's side
-ran from the engineer's sandbox scratch (`s9.py`, 50 lines: it reads the three `run.json` and `parallel.xml` and calls
-`attribution.judge`).
+  caused, named in the record with a repair ticket; the W2-50 failure green alone, so CLOSED. Two limits, stated: (1) the
+failure types without the change were not compared (method, item 4: close_build does not record them); (2) none of the
+fifteen recorded runs had a parallel run with no failure at all, so the clean batch is the one whose only failure was
+green alone. The table is this close's judgement applied to close_build's recorded runs, not a run of this close; a
+run of `gov close` on these batches was not made (it needs the batches' clones and hours of tests outside the
+sandbox).
 
 ## One row per KPI line
 
