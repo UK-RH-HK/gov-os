@@ -52,9 +52,9 @@ Corroboration (official documentation, code.claude.com/docs/en/hooks and /model-
 | File | Change | Base sha256 (at 1798e82f1201) | New sha256 (at the final head, 7894a35e116f) |
 |---|---|---|---|
 | `template/governance/kernel/hooks/precompact.py` | One plain-text line on stdout on every run, for every role: `Begin the compaction summary with this line: "READ FIRST: <path> ..."`, naming the orchestrator's or lead's CHECKPOINT and its RESUME HERE section, or a worker's brief and record. The checkpoint record, the state block and the systemMessage on error are unchanged; the line comes first, the systemMessage after it. `newest()` skips a file removed between listing and stat (R7) | `eb0174da477ff6f4eab7ca5bb133c667079830aa5c5c64f8f8d8337ad8c95086` | `ee19c22dc02e8ed7207dc535e55744e233d527635729a4d37ef252c8fa7e12cf` |
-| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the session's window (the table: Opus, Sonnet, Haiku 5.5 and Fable 5.2 1,000,000, others 200,000; the CTO's session, `GOV_ROLE` orchestrator on a `class: coordination` ticket, its model's window; every other session at most 200,000); skips events carrying `agent_id`; at 85 % or more, once per context window (a marker under `.gov-runtime/scratch/context_watch/`, removed when usage falls below 50 %), additionalContext with the role's duties (the CTO: RESUME HERE, DECIDED-NOT-DONE, `.gov-runtime/scratch/orchestrator/log/report-state.json`; a lead: its CHECKPOINT; a worker: its record) and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction. Any error: no output, exit 0 | none (new file) | `c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c` |
+| `template/governance/kernel/hooks/context_watch.py` | New PostToolUse hook: reads the transcript's last 256 KiB, the last non-sidechain assistant usage over the session's window (the table: Opus, Sonnet, Haiku 5.5 and Fable 5.2 1,000,000, others 200,000; the CTO's session, `GOV_ROLE` orchestrator on a `class: coordination` ticket, its model's window; every other session at most 200,000); skips events carrying `agent_id`; at 85 % or more, once per context window (a marker under `.gov-runtime/scratch/context_watch/`, removed when usage falls below 50 %), additionalContext with the role's duties (the CTO: RESUME HERE, DECIDED-NOT-DONE, `.gov-runtime/scratch/orchestrator/log/report-state.json`; a lead: its CHECKPOINT; a worker: its record) and the read-first line, and the sentence that it is a handover aid, not a stop and not an early compaction. Any error: no output, exit 0 | none (new file) | `ed17fbb0e2b3aadbe141403860c914e3a1b14555647c7ab09e2840743e14c731` (at `4dec7ec3c72c`, R8, section 3.7) |
 | `tests/unit/hooks/test_w2_176_precompact.py` | 18 unit cases (S1, F1, R7) | none (new file) | n/a (tests) |
-| `tests/unit/hooks/test_w2_176_context_watch.py` | 47 unit cases (S2, S3, F1, R1, R2, P2, P4), including a 50 MB transcript under 100 ms (median 24.3 ms) | none (new file) | n/a (tests) |
+| `tests/unit/hooks/test_w2_176_context_watch.py` | 48 unit cases (S2, S3, F1, R1, R2, P2, P4, R8), including a 50 MB transcript under 100 ms (median 24.3 ms) | none (new file) | n/a (tests) |
 | `tests/unit/hooks/test_resume_hooks.py`, `tests/unit/hooks/test_w29_hooks.py` | Assert-only updates of five cases to S1's stdout form (the read-first line first, the JSON object on the last line); the CTO's P1 (a) | (existing) | n/a (tests) |
 
 The three options (DEC-105): apply now (recommended: the owner ordered it live for every session, DEC-1140 (1)(b));
@@ -125,6 +125,10 @@ passed alone on a re-run (load-sensitive). Six `tests/unit/accept/test_w2_96_*` 
 at round 1's verification and alone then; neither those tests nor this delta reference the other (the delta changes no
 `src/` file), so they are not caused by this change. The engineer's runs: unit hooks folder 167 passed; W1-29, W1-49
 and W2-62 acceptance regression 147 passed.
+
+### 3.7 R8
+
+R8 fixed at `4dec7ec3c72c` (the text built before the marker; red test at `f50d59033736`).
 
 ## 4. Owner's approval
 
