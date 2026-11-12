@@ -14676,6 +14676,26 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     `.git/config.lock` removed, and W2-157's three `gate.json` keys. The free weekly reset was pressed at about 09:50 (DEC-1140 (6)).
 - **Basis:** questions 2 and 4.
 
+### DEC-1143 — EXAMIN-SETS-1's owner answers: the two writer briefs approved; C1 the workbench copy at one new commit; C2 the launch clone; C3 20; C4 the release step kept; C5 10 per repository and 13 variants; C6 the writer writes data only; C7 by roles; C8 no checker
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~10:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-1130 (3), DEC-1101 (2)-(3), DEC-1082 (3), DEC-723 (3), DEC-736, DEC-757 (6), DEC-1136, DEC-1142 (8)
+- **Decision:**
+  - (1) **The two fixed writer briefs approved as they stand:** `EXAMIN-writer.md` (W2-94) sha256
+    `d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f` and `PROVING-GROUND-writer.md` (W2-93) sha256
+    `57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c`; both name `effort: high`, now passed to the session (W2-173 S1).
+  - (2) **C1:** EXAMIN's copy is `~/gov-os-workbench/examin`, after one new commit there of its uncommitted files, made on the owner's
+    word: `0a82082495f52df068c3c6b518969b419f02fe95` (2026-11-12 10:45 UTC; 42 files: `.gitignore` and `CLAUDE.md` modified, the 40
+    untracked added; the other four "modified" files differed from HEAD only in CRLF line endings, which the copy's `core.autocrlf=input`
+    normalises, so they match the commit and are unchanged on disk). The original `~/EXAMIN APP` stays untouched (`a7cf346c28d7`, its
+    46 uncommitted files as they were). That commit is the one the set pins and the one W2-27 (the adoption on the copy) uses.
+  - (3) **C2:** the launch clone of the copy at that commit with one scaffold commit (no code). **C3:** 20 questions. **C4:** the release
+    step kept; the owner reads the visible half before releasing it. **C5:** 10 per repository and 13 variants. **C7:** `measures` by roles.
+  - (4) **C6:** the writer writes the data only; the validator (`validate_hidden.py`, already in W2-93's paths) is written by an
+    independent test designer under W2-93. W2-81 closed: where the runner's `--sets-root <root>` option goes, without a new ticket,
+    comes to the owner before anything is built (the CTO's recommendation: W2-93's paths gain `tests/acceptance/W2-81/w2_81_run.py` and
+    `tests/acceptance/W2-81/test_w2_81_runner.py` for that test designer's revision, with one KPI line).
+  - (5) **C8:** no checker for W2-94.
+- **Basis:** questions 2 and 4.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14755,3 +14775,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.524 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1141 (W2-11 approved; W2-176 withdrawn for its cap; no token cap for any session, DEC-1118 (A) replaced; DEC-1140 (4) corrected; hand merges of W2-175 and W2-176; the operator asleep only during the nightly). Next free id: DEC-1142. |
 
 | 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
+| 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |

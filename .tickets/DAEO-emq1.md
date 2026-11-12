@@ -122,3 +122,10 @@ The owner's SMART-WORK-1 decision 1 (DEC-983): the smart close becomes the produ
 - **PK-1 (a) and (c), the owner (DEC-1142 (3)):** W1-39's `test_copy_creates_the_overlay` revised by the test designer (Rewrite-Reason: DEC-1142 (3), DEC-866) to accept the template's `governance/project/close.yaml` in the overlay; DEC-903's overlay list names it (changed by DEC-1142 (3)).
 - **PK-2 (a), the CTO (delegated P2):** W2-77's four key-set cases revised by the test designer to allow the nightly record's `secrets_full_scan` (Rewrite-Reason: DEC-966 item 4, S8).
 - One test-design batch for both, then verify, the FULL review and the probe record. The acceptance paths above are for that revision only and are dropped after the land.
+
+## Review round 1's packages (2026-11-12 ~11:25)
+
+- **PK-3 (a), the CTO (delegated P2):** F-1's fix: reds are judged against the green base when it is an ancestor of HEAD, else the parent of the oldest own commit (DEC-988 item 3, DEC-989); F-3 (a culprit whose red is its own new test is blamed once confirmed alone) and F-7 (the research doc states its method, or its script is committed beside it) folded into the same fix round; then review round 2, the last (DEC-1010).
+- **PK-4:** a row (who commits the probe record): the CTO's launch tool, not this ticket; it does not block this land.
+- **PK-5:** the owner's (DEC-974, DEC-1142 (8)): the green base in a scoped project while the nightly is red; option (a) needs `governance/project/test-map.yaml`, outside this ticket's paths. It blocks this repository's own scoped close, not this land.
+- Residuals F-2, F-6, F-8, F-9 as the lead triaged (W2-115b is parked, so they wait with it).

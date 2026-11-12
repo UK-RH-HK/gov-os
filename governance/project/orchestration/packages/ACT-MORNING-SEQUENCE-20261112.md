@@ -5,7 +5,7 @@ owner called off the night's operator run). **Part 1** is eight ACTs, about 20 m
 hand merges (W2-11, W2-175, W2-176), about 5 minutes. Each `apply.sh` checks only its own files, so no ACT holds another; where one
 must follow another, its `check` refuses until the earlier one is in (named below).
 
-**Updated 10:05 (DEC-1142): items 9-11 added (rule 11, the lock, the gate.json keys).** **Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
+**Updated 10:05 (DEC-1142): items 9-11 added (rule 11, the lock, the gate.json keys). Corrected 10:50: the two scripts' sha256 had been given swapped (the CTO's error, caught by the owner's operator at item 9).** **Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
 
 **Before Part 1:** tell the CTO "starting". The CTO then writes `log/act-in-progress.txt` (no commit on `w2/integrate`, the merge
 queue held) so `git status` stays clean between steps; the CTO lifts it at your "done".
@@ -157,7 +157,7 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > **9. Rule 11 of the prompt** (the owner's file; DEC-1141 (3), DEC-1142 (10)): the 200k cap removed, line 43's D-10 Opus phrase deleted
 > ```
 > X=.gov-runtime/scratch/orchestrator/acts/MORNING-EXTRA
-> sha256sum $X/rule11.py           # expect 8cc24527a31458ae... (first 16)
+> sha256sum $X/rule11.py           # expect 666c15fb66172f1e0cbbe4631bd56bb4a37967d0451be4b466501c84a6f147e9
 > python3 -I $X/rule11.py check    # expect: rule11: ready (both old texts found once)
 > python3 -I $X/rule11.py apply    # expect: rule11: applied (...)
 > git diff --stat                  # expect: governance/project/prompts/w2-orchestrator.md | 6 ++++--- (or close)
@@ -174,7 +174,7 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 >
 > **11. W2-157's three gate.json keys** (the machine's file, class (O); DEC-1067, DEC-1068 (4))
 > ```
-> sha256sum $X/gatejson.py         # expect 666c15fb66172f1e... (first 16)
+> sha256sum $X/gatejson.py         # expect 8cc24527a31458ae47d9bf2604730a168e25d51f275b25186c98cd32fc750235
 > python3 -I $X/gatejson.py check  # expect: gatejson: ready (12 keys now; 3 to add)
 > python3 -I $X/gatejson.py apply  # expect: gatejson: applied (15 keys; the old file kept as gate.json.pre-W2-157)
 > ```
@@ -265,7 +265,7 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 > **9. Rule 11 of the prompt** (the owner's file; DEC-1141 (3), DEC-1142 (10)): the 200k cap removed, line 43's D-10 Opus phrase deleted
 > ```
 > X=.gov-runtime/scratch/orchestrator/acts/MORNING-EXTRA
-> sha256sum $X/rule11.py           # expect 8cc24527a31458ae... (first 16)
+> sha256sum $X/rule11.py           # expect 666c15fb66172f1e0cbbe4631bd56bb4a37967d0451be4b466501c84a6f147e9
 > python3 -I $X/rule11.py check    # expect: rule11: ready (both old texts found once)
 > python3 -I $X/rule11.py apply    # expect: rule11: applied (...)
 > git diff --stat                  # expect: governance/project/prompts/w2-orchestrator.md | 6 ++++--- (or close)
@@ -282,7 +282,7 @@ yes ACT-CONTEXT-WATCH-1 5bdfa098
 >
 > **11. W2-157's three gate.json keys** (the machine's file, class (O); DEC-1067, DEC-1068 (4))
 > ```
-> sha256sum $X/gatejson.py         # expect 666c15fb66172f1e... (first 16)
+> sha256sum $X/gatejson.py         # expect 8cc24527a31458ae47d9bf2604730a168e25d51f275b25186c98cd32fc750235
 > python3 -I $X/gatejson.py check  # expect: gatejson: ready (12 keys now; 3 to add)
 > python3 -I $X/gatejson.py apply  # expect: gatejson: applied (15 keys; the old file kept as gate.json.pre-W2-157)
 > ```

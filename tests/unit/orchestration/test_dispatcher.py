@@ -2756,3 +2756,233 @@ def test_o_a1_the_floor_and_the_trip_wire_are_kept(wp):
     tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 600)
     s = status(wp)
     assert not s["admit"] and s["admit_reason"] == "no floor in gate-config.json (fail closed)" and calls(wp) == []
+
+
+# ---- ACT-DISPATCH-1 (DEC-1140 (1)(a), (2); DEC-1118 H; DEC-1052 O-A1): the lead cap enforced, the idle item once per cause,
+# ---- the forecast counting a held slot at its measured load --------------------------------------------------------------
+
+def one_line_ready(w, *lines):
+    (w.d / "ready.txt").write_text("".join(line + "\n" for line in lines))
+
+
+def idle_items(w):
+    return sorted((w.d / "inbox").glob("*-idle-headroom*.txt")) if (w.d / "inbox").is_dir() else []
+
+
+def test_dispatch_1_the_lead_cap_refuses_a_start_with_its_reason(w):
+    """DEC-1140 (2): max_leads 2 with two leads running: no start, each startable line waits 'lead cap: 2 of 2
+    running'; the same two leads under a cap of 3 leave room, so the first line starts."""
+    conf(w, max_leads=2)
+    leads(w, 2)
+    assert tick(w).returncode == 0
+    s = status(w)
+    assert calls(w) == [] and s["ready_waits"] == {"W2-A T-A": "lead cap: 2 of 2 running",
+                                                    "W2-B T-B": "lead cap: 2 of 2 running"}, s["ready_waits"]
+    assert s["max_leads"] == 2 and s["started_this_tick"] is None
+    conf(w, max_leads=3)
+    tick(w, DISPATCH_NOW=NOW + 130)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_a_launch_pending_counts_against_the_cap_and_no_cap_is_no_refusal(w):
+    """Running plus pending launches reach the cap: the second line waits on it (the first start is a launch pending
+    for 10 minutes); with no max_leads in the configuration the cap does not refuse (the forecast alone admits)."""
+    conf(w, max_leads=1)
+    tick(w)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+    tick(w, DISPATCH_NOW=NOW + 130)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+    assert status(w)["ready_waits"]["W2-B T-B"] == "lead cap: 1 of 1 running", status(w)["ready_waits"]
+    conf(w)
+    tick(w, DISPATCH_NOW=NOW + 260)
+    assert calls(w)[-1] == "launch W2-B T-B B.md W2-B-A5-run1.json"
+    assert "lead cap" not in json.dumps(status(w)["ready_waits"])
+
+
+def test_dispatch_1_a_cap_with_a_line_that_waits_for_another_reason_keeps_that_reason(w):
+    """The cap is checked after the CTO's own preparation checks: a line with no brief still says so."""
+    conf(w, max_leads=2)
+    leads(w, 2)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-B T-B MISSING.md W2-B-A5-run1.json")
+    tick(w)
+    waits = status(w)["ready_waits"]
+    assert waits["W2-A T-A"] == "lead cap: 2 of 2 running" and waits["W2-B T-B"] == "no brief MISSING.md", waits
+
+
+def idle_world(w, **cfg):
+    """One ready line whose log was already used (started, its launch pending expired), a cap of 3, no lead running."""
+    conf(w, max_leads=3, **cfg)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json")
+    tick(w)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_the_same_waiting_set_gives_one_idle_item_not_two(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1
+    body = idle_items(w)[0].read_text()
+    assert "skipped for a used or returned log: W2-A T-A (already started for W2-A-A5-run1.json)" in body
+    assert "or comment the line out of ready.txt if its ticket needs no new run" in body
+    assert not any(x.startswith("W2: ") for x in body.splitlines())
+    for n in range(1, 8):  # more passes of the same cause: logged, not sent
+        tick(w, DISPATCH_NOW=NOW + 700 + 60 * n)
+    assert len(idle_items(w)) == 1
+    log_text = (w.d / "dispatch.log").read_text()
+    assert log_text.count("idle with headroom: inbox item written (used:W2-A T-A)") == 1
+    assert "the same cause, last item" in log_text and "logged only" in log_text
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+
+
+def test_dispatch_1_a_pass_where_idle_does_not_hold_forgets_nothing(w):
+    """The 11-11 flood: idle stopped holding for one pass (a shut gate) and the cause was forgotten, so it was sent
+    again a few minutes later. Now the last cause is kept until a start or a changed cause."""
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1
+    tick(w, DISPATCH_NOW=NOW + 760, DISPATCH_GATE_CMD="false")
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+    tick(w, DISPATCH_NOW=NOW + 820)
+    tick(w, DISPATCH_NOW=NOW + 880)
+    assert len(idle_items(w)) == 1
+
+
+def test_dispatch_1_a_returned_log_and_an_empty_list_are_separate_causes(w):
+    conf(w, max_leads=3)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json")
+    (w.orch / "log" / "W2-A-A5-run1.json").write_text('{"returned": true}\n')  # the log already holds a return
+    tick(w)
+    assert calls(w) == [] and len(idle_items(w)) == 1
+    assert "W2-A T-A (W2-A-A5-run1.json already holds a return)" in idle_items(w)[0].read_text()
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+    one_line_ready(w)  # an empty list is another cause
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(idle_items(w)) == 2 and "(0 line(s) in ready.txt)" in idle_items(w)[-1].read_text()
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "empty"
+
+
+def test_dispatch_1_a_changed_waiting_set_is_a_new_cause_and_a_start_clears_the_last_one(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-O T-O O.md W2-O-A5-run1.json")  # T-O: claim not committed
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert len(idle_items(w)) == 2
+    state = json.loads((w.d / "idle-headroom-reported.json").read_text())
+    assert state["cause"] == "used:W2-A T-A|waiting:W2-O T-O", state
+    assert "waiting for other reasons: W2-O T-O (claim not committed" in idle_items(w)[-1].read_text()
+    one_line_ready(w, "W2-B T-B B.md W2-B-A5-run1.json")  # startable: a real start clears the cause
+    tick(w, DISPATCH_NOW=NOW + 900)
+    assert calls(w)[-1].startswith("launch W2-B")
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text()) == {}
+
+
+def test_dispatch_1_the_cause_is_the_names_of_the_waiting_lines_not_their_reasons(w):
+    """The key is the sorted names: a waiting line whose reason changes between passes is still the same cause."""
+    idle_world(w)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-O T-O O.md W2-O-A5-run1.json")
+    tick(w, DISPATCH_NOW=NOW + 700)
+    (w.repo / ".tickets" / "T-O.md").write_text(ticket("T-O", "in_progress"))
+    git(w.repo, "add", "-A")
+    git(w.repo, "commit", "-q", "-m", "claim")
+    (w.wt / "W2-O" / ".tickets" / "T-O.md").write_text(ticket("T-O", "open"))  # now: the worktree does not read in_progress
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert len(idle_items(w)) == 1, [p.read_text()[:200] for p in idle_items(w)]
+    assert "does not read in_progress" in status(w)["ready_waits"]["W2-O T-O"]
+
+
+def test_dispatch_1_the_same_cause_is_sent_again_after_six_hours_as_a_reminder(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    tick(w, DISPATCH_NOW=NOW + 700 + 5 * 3600 + 3000)  # 5 h 50 min after the item
+    assert len(idle_items(w)) == 1
+    tick(w, DISPATCH_NOW=NOW + 700 + 6 * 3600 + 60)
+    items = idle_items(w)
+    assert len(items) == 2 and "reminder: the same cause for 6 h" in items[-1].read_text()
+    assert "as a reminder after 6 h" in (w.d / "dispatch.log").read_text()
+
+
+def test_dispatch_1_no_idle_item_without_a_cap_at_the_cap_or_in_a_dry_pass(w):
+    idle_world(w)
+    tick(w, "--dry", DISPATCH_NOW=NOW + 700)
+    assert idle_items(w) == [] and not (w.d / "idle-headroom-reported.json").exists()
+    conf(w)  # no cap
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert idle_items(w) == []
+    conf(w, max_leads=1)
+    leads(w, 1)
+    tick(w, DISPATCH_NOW=NOW + 820)
+    assert idle_items(w) == []
+
+
+def test_dispatch_1_an_old_form_of_the_reported_file_is_one_more_item_not_an_error(w):
+    idle_world(w)
+    (w.d / "idle-headroom-reported.json").write_text(json.dumps({"used:W2-A T-A": NOW}))
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1 and status(w)["failures"] == []
+
+
+SLOT_CMD = "flock -n -o /tmp/gov-os-heavy-slot-{n}.lock tail -f /dev/null"
+
+
+def held_slots(w, n=3):
+    """n heavy slots held, each by a flock process outside any lead (found as a job of kind slot, phase test)."""
+    w.procs.write_text(json.dumps([{"cmd": SLOT_CMD.format(n=i + 1), "cwd": str(w.wt / "W2-O"), "pid": 600 + i, "ppid": 1,
+                                    "age_s": 3000, "rss_kb": 50_000, "cpu_ticks": 100} for i in range(n)]))
+
+
+def measured(w, cpu, n=3, first=NOW - 900, count=8, phase="test"):
+    """jobs-load.json as the dispatcher writes it: each slot job seen since `first`, `count` samples at `cpu` cores."""
+    (w.d / "jobs-load.json").write_text(json.dumps({
+        f"{600 + i}:{phase}": {"first": first, "s": [[NOW - 60 * (count - k), cpu] for k in range(count)]}
+        for i in range(n)}))
+
+
+def test_dispatch_1_three_held_slots_at_a_low_measured_load_admit_a_lead(wp):
+    """DEC-1140 (2): 2026-11-11 23:21, three held slots (3 x 6) priced at their whole peak: 'CPU 23.4 of 18' on a machine 3
+    of 20 busy. Held slots measured at 0.05 cores for 10 minutes are counted at the floor (1.0 each): the lead is admitted."""
+    held_slots(wp)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    tick(wp)
+    s = status(wp)
+    assert {j["kind"] for j in s["jobs"]} == {"slot"} and len(s["jobs"]) == 3 and s["forecast"]["lead"]["ok"] is False, s["forecast"]["lead"]
+    assert "running jobs' peaks" in s["forecast"]["lead"]["reason"] and "measured load" not in s["forecast"]["lead"]["reason"]
+    measured(wp, 0.05)
+    wp.calls.write_text("")
+    (wp.d / "started.txt").write_text("")
+    tick(wp, DISPATCH_NOW=NOW)
+    s = status(wp)
+    assert s["forecast"]["lead"]["ok"] is True, s["forecast"]["lead"]
+    cpu = s["forecast"]["lead"]["resources"]["cpu"]
+    assert "3 of them at their measured load" in cpu["text"] and cpu["need"] < 8, cpu
+    assert calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_a_slot_measured_busy_a_job_seen_only_briefly_and_the_switch_keep_the_whole_peak(wp):
+    held_slots(wp)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    measured(wp, 5.5)  # the slots really ran 5.5 cores in the window: counted at that, not at the floor
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+    measured(wp, 0.05, first=NOW - 120, count=2)  # seen for two minutes only: the phase's peak, as before
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+    assert "measured load" not in status(wp)["forecast"]["lead"]["reason"]
+    measured(wp, 0.05)
+    conf(wp, memory_rule="literal", held_load=False)  # the switch: off
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+
+
+def test_dispatch_1_the_measured_load_is_recorded_a_pass_and_forgotten_when_the_job_ends(wp):
+    held_slots(wp, 2)
+    tick(wp)
+    rec = json.loads((wp.d / "jobs-load.json").read_text())
+    assert sorted(rec) == ["600:test", "601:test"] and len(rec["600:test"]["s"]) == 1
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert len(json.loads((wp.d / "jobs-load.json").read_text())["600:test"]["s"]) == 2
+    wp.procs.write_text("[]")
+    tick(wp, DISPATCH_NOW=NOW + 120)
+    assert json.loads((wp.d / "jobs-load.json").read_text()) == {}
+    held_slots(wp, 1)
+    tick(wp, "--dry", DISPATCH_NOW=NOW + 180)
+    assert json.loads((wp.d / "jobs-load.json").read_text()) == {}  # a dry pass writes nothing

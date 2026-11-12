@@ -44,13 +44,19 @@ the forecast alone admits), and a launchable ticket, the turn is blocked naming 
 "already holds a return"), or, when the tick counts no ready line (`ready_count` 0), a ticket of `gov plan`'s first
 batch that no lead runs (the plan's `--ready` form; the CTO's own W2-00 left out). An `IDLE-REASON` still ends the
 turn, but the log and the owner's message say a ticket was launchable.
+ACT-IDLE-GUARD-2 (the review's F1 to F3): a used-log line whose W2 has an unread return in `dispatch/inbox` (a `W2: <id>`
+line: the lead returned and waits for the CTO's reading) is left out and named in the log; the block's text says a line
+whose ticket needs no new run is commented out of ready.txt; a plan ticket whose own work is already in w2/integrate
+(`git for-each-ref --merged`, and only when its tip is not on w2/integrate's first-parent line: a branch made at a claim
+with no commit of its own is prepared, not merged, and stays named) is merged and waits for its close, not for a lead: left out and named in the log; and the
+plan runs for at most 5 s and the branch listing for 3 s, inside the Stop hook entry's `timeout: 10`.
 
 A cto-standby.txt does not let a turn end idle here (DEC-1109 (3): unblocked work moves while the owner decides).
 It never fails open silently: an error is named to the owner (`systemMessage`) and in the log, and the turn ends.
 It always exits 0 and prints at most one JSON object. Standard library only.
 Overrides for tests: GOV_STOPIDLE_ORCH, GOV_STOPIDLE_DND, GOV_STOPIDLE_TASKS, GOV_STOPIDLE_SUBAGENTS,
 GOV_STOPIDLE_PROC (a JSON list of {pid, cmdline, start, state, fds} instead of /proc), GOV_STOPIDLE_PIDGLOBS
-(globs joined by ':'), GOV_STOPIDLE_NOW (epoch seconds), GOV_STOPIDLE_GOV (the `gov` program run for the plan).
+(globs joined by ':'), GOV_STOPIDLE_NOW (epoch seconds), GOV_STOPIDLE_GOV (the `gov` program run for the plan), GOV_STOPIDLE_REPO (the repository whose w2/integrate is read).
 """
 import glob
 import json
@@ -63,6 +69,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]  # <repo>/governance/project/orchestration/tools/stop_idle_check.py
+REPO = Path(os.environ.get("GOV_STOPIDLE_REPO") or ROOT)  # where the integration branch is read (a test plants another)
 HOME = Path.home()
 ORCH = Path(os.environ.get("GOV_STOPIDLE_ORCH") or ROOT / ".gov-runtime/scratch/orchestrator")
 DND = Path(os.environ.get("GOV_STOPIDLE_DND")
@@ -76,7 +83,10 @@ WATCHERS = ("inbox_wait.sh", "inbox_wait_quiet.sh", "helper_watch.py", "sentinel
             "store_refresh_daily.sh", "usage_log.sh", "mem_guard.py", "oom_watch.sh")
 USED_LOG = ("already started for", "already holds a return")  # the dispatcher's why_not() answers for a used log
 COORDINATION = "W2-00"  # the CTO's own ticket: in gov plan's first batch, never a lead
-PLAN_TIMEOUT_S = 30
+# ACT-IDLE-GUARD-2 (F3): the live Stop hook entry gives this hook `timeout: 10`; past it Claude Code kills the hook with no
+# log line and the turn ends unchecked. So the plan gets 5 s and the merged-branch listing 3 s: 8 s at the worst.
+PLAN_TIMEOUT_S = 5
+MERGED_TIMEOUT_S = 3
 LAUNCHERS = ("launch_worker.sh --run", "lead_verify.sh", "landing_select.sh")
 START_SLACK_S = 900
 RUN_BOUND_S = 3 * 3600
@@ -302,9 +312,41 @@ def lead_cap():
     return v if isinstance(v, int) and not isinstance(v, bool) and v >= 1 else None
 
 
+def merged_branches(notes):
+    """The ticket branches whose own work is already in the integration branch, `{"W2-131", ...}`, within MERGED_TIMEOUT_S
+    for the two git calls together. ACT-IDLE-GUARD-2 round 2 (review F1): `git for-each-ref --merged` also lists a branch
+    made at a claim (`tk start`) that has no commit of its own, whose tip sits on w2/integrate's first-parent line; such a
+    ticket is prepared, not merged, and stays named. A merged ticket's tip is reached through a merge's second parent, so
+    it is not on that line. (A fast-forward merge puts the tip on the line: that ticket is named, which errs toward
+    naming.) Unreadable: named in `notes`, and nothing is left out (the plan's tickets are all named)."""
+    deadline = time.monotonic() + MERGED_TIMEOUT_S
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True,
+                              timeout=max(0.2, deadline - time.monotonic()), stdin=subprocess.DEVNULL)
+    try:
+        merged = git("for-each-ref", "--merged", "w2/integrate", "--format=%(objectname) %(refname:short)", "refs/heads/w2/")
+        line = git("rev-list", "--first-parent", "w2/integrate")
+    except (OSError, subprocess.SubprocessError) as exc:
+        notes.append(f"merged branches not read ({type(exc).__name__}): the plan's tickets are all named")
+        return set()
+    if merged.returncode or line.returncode:
+        notes.append("merged branches not read (git failed): the plan's tickets are all named")
+        return set()
+    on_line = set(line.stdout.split())
+    out = set()
+    for row in merged.stdout.splitlines():
+        sha, _, name = row.strip().partition(" ")
+        if name.startswith("w2/") and name != "w2/integrate" and sha not in on_line:
+            out.add(name.split("/", 1)[1])
+    return out
+
+
 def plan_first_batch(running, notes):
     """The unlaunched tickets of `gov plan`'s first batch (the plan exits 1 on its own findings: only its output
-    counts): ["W2-105 (DAEO-zpdj)", ...]. An unusable plan is named in `notes`, never relied on."""
+    counts): ["W2-105 (DAEO-zpdj)", ...]. An unusable plan is named in `notes`, never relied on. ACT-IDLE-GUARD-2 (F2):
+    a ticket whose own work is already in w2/integrate (see merged_branches) is merged and waits for its close, not for a lead: left out, and
+    named in `notes` (the log) as "merged, to close"."""
     gov = os.environ.get("GOV_STOPIDLE_GOV") or str(HOME / ".local/bin/gov")
     try:
         fd, tmp = tempfile.mkstemp(prefix="plan-ready-", suffix=".txt", dir=str(LOG.parent))
@@ -317,14 +359,14 @@ def plan_first_batch(running, notes):
                        timeout=PLAN_TIMEOUT_S, cwd=str(ROOT), stdin=subprocess.DEVNULL)
         text = Path(tmp).read_text()
     except (OSError, subprocess.SubprocessError) as exc:
-        notes.append(f"gov plan unusable ({type(exc).__name__})")
+        notes.append(f"gov plan unusable ({type(exc).__name__}, at most {PLAN_TIMEOUT_S} s)")
         return []
     finally:
         try:
             os.unlink(tmp)
         except OSError:
             pass
-    out, batch = [], 0
+    out, batch, candidates = [], 0, []
     for line in text.splitlines():
         if line.startswith("# batch"):
             batch += 1
@@ -332,9 +374,30 @@ def plan_first_batch(running, notes):
         parts = line.split()
         if batch == 1 and len(parts) >= 2 and not line.startswith("#"):
             if parts[0] != COORDINATION and parts[0] not in running:
-                out.append(f"{parts[0]} ({parts[1]})")
+                candidates.append(parts)
     if not batch:
         notes.append("gov plan unusable (no batch in its ready form)")
+    merged = merged_branches(notes) if candidates else set()
+    for parts in candidates:
+        if parts[0] in merged:
+            continue
+        out.append(f"{parts[0]} ({parts[1]})")
+    left = [p[0] for p in candidates if p[0] in merged]
+    if left:
+        notes.append("merged into w2/integrate, to close (not launchable): " + ", ".join(left))
+    return out
+
+
+def unread_return_w2s():
+    """The W2 ids with an unread dispatcher inbox item (`W2: <id>` line): a lead that returned and waits for the CTO."""
+    out = set()
+    try:
+        for f in (ORCH / "dispatch/inbox").glob("*.txt"):
+            m = re.search(r"^W2: (\S+)", f.read_text(), re.M)
+            if m:
+                out.add(m.group(1))
+    except OSError:
+        pass
     return out
 
 
@@ -348,9 +411,14 @@ def launchable(st, notes):
     if cap is not None and running >= cap:
         return None
     waits = st.get("ready_waits") if isinstance(st.get("ready_waits"), dict) else {}
-    found = [f"{k} ({str(v)[:60]})" for k, v in sorted(waits.items()) if any(m in str(v) for m in USED_LOG)]
+    returned = unread_return_w2s()  # ACT-IDLE-GUARD-2 (F1): a lead that returned waits for the CTO's reading, not a start
+    found = [f"{k} ({str(v)[:60]})" for k, v in sorted(waits.items())
+             if any(m in str(v) for m in USED_LOG) and k.split()[0] not in returned]
+    left = [k for k in sorted(waits) if any(m in str(waits[k]) for m in USED_LOG) and k.split()[0] in returned]
+    if left:
+        notes.append("left out, a return waits unread in the dispatcher's inbox: " + ", ".join(left))
     note = " (ready.txt lines the dispatcher skipped for a used or returned log)"
-    if not found and st.get("ready_count") == 0:
+    if not found and not left and st.get("ready_count") == 0:
         found = plan_first_batch(set(map(str, st.get("leads") or [])), notes)
         note = (" (ready.txt is empty; these are gov plan's first batch with no lead running: not yet shown startable, "
                 "a brief or a claim may be missing)")
@@ -505,8 +573,10 @@ def decide(data):
     if idle:  # checked before the Running let-through: whatever else runs, a launchable ticket is not left idle
         reason_text = (f"Idle check (ACT-IDLE-GUARD-1; DEC-1110 (1), DEC-1109 (3)): the gate is open, the machine is not "
                        f"full and {n_run} of {cap if cap is not None else 'no cap'} leads run, and {named}. Start "
-                       f"them now (a ready.txt line with a new log name, or the next batch's tickets), then end the "
-                       f"turn. If none can start, write one line `IDLE-REASON: <why>` (recorded in log/stop-idle.log "
+                       f"them now (a ready.txt line with a new log name, or the next batch's tickets), or comment a line "
+                       f"out of ready.txt when its ticket needs no new run (a lead that returned packages waits for "
+                       f"the owner), then end the turn. If none can start, write one line `IDLE-REASON: <why>` "
+                       f"(recorded in log/stop-idle.log "
                        f"and shown to the owner as stated while a ticket was launchable) and end the turn.")
         STATE.parent.mkdir(parents=True, exist_ok=True)
         STATE.write_text(json.dumps({"session": sid, "turn": turn, "at": time.strftime("%Y-%m-%d %H:%M:%S")}) + "\n")
