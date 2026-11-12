@@ -1,4 +1,5 @@
-"""``python3 -m gov.memaudit preflight|void|declare|measure|judge|classes|pool|pool-import`` (Interface section 1; S1-S8, F1).
+"""``python3 -m gov.memaudit preflight|void|declare|measure|judge|classes|pool|pool-import|run|due|baseline|status|figures``
+(Interface section 1; S1-S8, F1; W2-172 adds the last five).
 
 A thin wrapper: each subcommand calls its module's entry point and prints, through ``say`` only, the lines it produces
 (the W2-171 subcommands print as they go, a line at a time). Exit codes: 0 ok, 1 refused, 2 void or stopped (the owner
@@ -98,7 +99,36 @@ def parser() -> argparse.ArgumentParser:
                         description="Copies the 79 questions of the fresh 80 and the 138 of the earlier sets into the "
                                     "pool; run once by the CTO.")
     pi.add_argument("--sets-root", required=True, metavar="ROOT", help="the sets root")
+    _driver(sub)
     return ap
+
+
+def _driver(sub):
+    """W2-172: the cycle and its schedule (Interface item 1)."""
+    def base(name, help_text, repo=True):
+        sp = sub.add_parser(name, help=help_text, description=help_text)
+        sp.add_argument("--sets-root", required=True, metavar="ROOT", help="the sets root (never opened by the driver)")
+        if repo:
+            sp.add_argument("--repo", metavar="DIR", help="the repository (default: the top level)")
+        return sp
+
+    rn = base("run", "one audit through the launch script, in order; counts only")
+    rn.add_argument("--store-link", metavar="PATH", help="the integration store's link (default: rebuild.yaml's)")
+    rn.add_argument("--launch", metavar="FILE", help="the launch script (default: <repo>/governance/project/"
+                                                     "orchestration/tools/indep_launch.py)")
+    rn.add_argument("--gov", metavar="EXE", help="passed on to measure, judge and pool")
+    rn.add_argument("--claude", metavar="EXE", help="passed on to judge")
+    rn.add_argument("--gate-cmd", metavar="CMD", help="the gate's check, split into words; exit 0 is open (default: none)")
+    rn.add_argument("--force", action="store_true", help="the owner's word: lifts the 5-day refusal only")
+    du = base("due", "whether an audit is due now, its mode and the reason")
+    du.add_argument("--store-link", metavar="PATH", help="the integration store's link (default: rebuild.yaml's)")
+    bl = base("baseline", "the first line of the audits' log: the commit the first audit's changes start from")
+    bl.add_argument("--commit", required=True, metavar="REV", help="the baseline commit")
+    stt = base("status", "audited, or not audited and the next due date, for a retrieval change since a commit")
+    stt.add_argument("--since", required=True, metavar="REV", help="the commit to look from")
+    stt.add_argument("--store-link", metavar="PATH", help="the integration store's link (default: rebuild.yaml's)")
+    fg = base("figures", "one JSON line of an audit's figures, numbers and fixed words only", repo=False)
+    fg.add_argument("--audit", required=True, metavar="NAME", help="the audit's name, memory-audit-<8 digits>")
 
 
 def _run(args, emit) -> str:
@@ -143,6 +173,22 @@ def _run(args, emit) -> str:
     if cmd == "pool":
         from gov.memaudit import pool
         return pool.run(args.sets_root, args.audit, repo=args.repo, gov=args.gov, seed=args.seed, emit=emit)
+    if cmd == "run":
+        from gov.memaudit import driver
+        return driver.run(args.sets_root, repo=args.repo, link=args.store_link, launch=args.launch, gov=args.gov,
+                          claude=args.claude, gate_cmd=args.gate_cmd, force=args.force, emit=emit)
+    if cmd == "due":
+        from gov.memaudit import schedule
+        return schedule.due(args.sets_root, args.repo, args.store_link, emit)
+    if cmd == "baseline":
+        from gov.memaudit import schedule
+        return schedule.baseline(args.sets_root, args.repo, args.commit, emit)
+    if cmd == "status":
+        from gov.memaudit import schedule
+        return schedule.status(args.sets_root, args.repo, args.since, args.store_link, emit)
+    if cmd == "figures":
+        from gov.memaudit import digest
+        return digest.figures(args.sets_root, args.audit, emit)
     from gov.memaudit import pool
     return pool.importing(args.sets_root, emit=emit)
 
