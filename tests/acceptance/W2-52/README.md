@@ -74,6 +74,13 @@ deterministic word-hash vectors. `sqlite_vec` is reached through a folder that h
 package, as in W1-22's support. One case keeps W1-41's dead loopback address so that the semantic canary misses.
 A case whose pass needs vectors is skipped, with that reason, where `sqlite_vec` is not installed.
 
+**The device listing and the code graph (run 6, DEC-1065, W2-56 S1).** The stand-in also answers `GET /api/ps`: the
+embedding model listed as running wholly on the GPU (`size_vram` equal to `size`), the form of W2-32's and W2-54's
+stand-ins; since DEC-1065 the product reads where the model runs and refuses (`EMBEDDER_DEVICE_UNREAD`) when it cannot.
+The real code-graph tool (`codebase-memory-mcp`) stays on `PATH` for this suite (`W2-52` in `tests/conftest.py`'s
+`_CBM_SUITES`), because its adopt stages read the code graph. Inside a sandbox where `/tmp/gov-cbm-<uid>` is read-only
+the stages end in `ADOPT_CODE_GRAPH_UNREADABLE`; the suite is run outside it.
+
 ## The interface the cases hold (readings; the engineer may dispute any point through the lead)
 
 The KPI lines leave the interface open. Each point below is this suite's reading, chosen as close to the sources
