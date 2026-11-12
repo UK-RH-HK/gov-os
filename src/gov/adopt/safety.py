@@ -278,7 +278,7 @@ def _glob(pattern: str) -> re.Pattern:
 # A ``.`` (or a run of them) that ends a citation is a sentence's stop, no part of the path and no bar to the match; a
 # ``.`` followed by more path characters is part of a longer name and blocks it (``memory.db``, ``index.md.bak``).
 _NOT_MORE_PATH = r"(?!\.*[\w-])"
-_NOT_MORE_PATH_DIR = r"(?!\.*[\w/*?\[-])"
+_NOT_MORE_PATH_DIR = r"(?![.?]*[\w/*\[-])"  # a ``?`` (or run of ``?`` and ``.``) that ends it is a question's stop too
 
 
 def _folders(paths: list[str]) -> dict[str, tuple[str, ...]]:
@@ -306,7 +306,9 @@ def citations(text: str, paths: list[str], ids: list[str]) -> list[dict]:
     as found. The forms: the path or id with anything directly before it, backslashes, URL-encoding, another letter
     case, split across lines; the store's folder alone (the deepest folder holding all its files, or any folder
     between that and a file) or a glob that holds the store; ``../`` and only the tail of the path. A full stop that
-    ends a folder or a tail is not part of it. Nothing else is a citation here."""
+    ends a folder or a tail is not part of it, nor is a ``?`` (or a run of ``?`` and full stops) that ends a folder: a
+    question's stop; a ``?`` followed by more path stays a glob character, and a glob's trailing ``?`` is read both
+    ways. Nothing else is a citation here."""
     wanted = []  # (form, cited names, regex)
     for rel in paths:
         low, parts = rel.lower(), rel.lower().split("/")
@@ -323,14 +325,21 @@ def citations(text: str, paths: list[str], ids: list[str]) -> list[dict]:
                 for name in names]
         for m in _GLOB_TOKEN.finditer(normal):
             lead = len(m.group()) - len(m.group().lstrip(_BEFORE_GLOB))
-            bare = m.group()[lead:].rstrip(_AFTER_GLOB)  # a sentence's stop or colon, or a quote, is no part of it
-            token = bare.lstrip("/").removeprefix("./")
-            head = token.split("/", 1)[0]
-            if "/" not in token or not head or any(c in head for c in "*?"):
-                continue  # a glob with no literal folder first (``**/*``, ``*.md``) names no store
-            rx = _glob(token)
-            hits += [("glob", rel, m.start() + lead, m.start() + lead + len(bare)) for rel in paths
-                     if rx.fullmatch(rel.lower()) or rx.fullmatch(rel.lower().rpartition("/")[0])]
+            reads, bare = [], m.group()[lead:]
+            while True:  # a trailing ``?`` is a glob character or a question's stop: read it both ways
+                bare = bare.rstrip(_AFTER_GLOB)  # a sentence's stop or colon, or a quote, is no part of it
+                reads.append(bare)
+                if not bare.endswith("?"):
+                    break
+                bare = bare[:-1]
+            for bare in reads:
+                token = bare.lstrip("/").removeprefix("./")
+                head = token.split("/", 1)[0]
+                if "/" not in token or not head or any(c in head for c in "*?"):
+                    continue  # a glob with no literal folder first (``**/*``, ``*.md``) names no store
+                rx = _glob(token)
+                hits += [("glob", rel, m.start() + lead, m.start() + lead + len(bare)) for rel in paths
+                         if rx.fullmatch(rel.lower()) or rx.fullmatch(rel.lower().rpartition("/")[0])]
         for form, name, start, end in hits:
             raw = text[starts[start]:ends[end - 1]]
             if (name, starts[start]) not in seen:

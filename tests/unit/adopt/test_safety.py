@@ -318,6 +318,35 @@ def test_s3_a_store_with_no_shared_folder_keeps_each_files_own_parent_folder():
     assert [i for i in safety.citations("Read b/ first.", store, []) if i["form"] == "folder"] == []
 
 
+def test_s3_a_folder_ending_a_question_is_found_without_the_question_mark():
+    deep = ["legacy/memory/index.md", "legacy/memory/decisions/leg-001.md"]
+    nested = ["notes/memory/2025/q1/a.md", "notes/memory/2026/b.md"]
+    assert ("folder", "legacy/memory") in _seen("Did you search legacy/memory?", deep)
+    assert ("folder", "legacy/memory/") in _seen("Is it still in legacy/memory/?", deep)
+    assert ("folder", "notes/memory") in _seen("Should we keep notes/memory?", nested)
+    for text in ("Is it legacy/memory??", "Is it (legacy/memory?)", "Is it legacy/memory?!", "Is it “legacy/memory?”"):
+        assert ("folder", "legacy/memory") in _seen(text, deep), text
+    cited = {item["cites"] for item in safety.citations("Should we keep notes/memory?", nested, [])}
+    assert cited == set(nested)
+
+
+def test_s3_a_question_mark_followed_by_more_path_stays_a_glob_character():
+    deep = ["legacy/memory/index.md", "legacy/memory/decisions/leg-001.md"]
+    for text in ("See legacy/memory?x now.", "See legacy/memory/?.md now."):
+        assert [form for form, _ in _seen(text, deep) if form == "folder"] == [], text
+    found = safety.citations("See legacy/memory/decisions/leg-00?.md now.", deep, [])
+    assert [(i["cites"], i["form"], i["found"]) for i in found] == [
+        ("legacy/memory/decisions/leg-001.md", "glob", "legacy/memory/decisions/leg-00?.md")]
+
+
+def test_s3_a_glob_ending_a_question_is_found_without_the_question_mark():
+    deep = ["legacy/memory/index.md", "legacy/memory/decisions/leg-001.md"]
+    assert ("glob", "legacy/memory/*.md") in _seen("Is it legacy/memory/*.md?", deep)
+    assert ("glob", "legacy/memory/**/*.md") in _seen("Is it legacy/memory/**/*.md?!", deep)
+    assert ("glob", "legacy/memory/decisions/leg-00?.md") in _seen("Is it legacy/memory/decisions/leg-00?.md?", deep)
+    assert ("glob", "legacy/memory/decisions/leg-001.m?") in _seen("Is it legacy/memory/decisions/leg-001.m?", deep)
+
+
 def test_s3_the_a8_proof_prints_a_rule_files_url_encoded_citation(root):
     write(root, STORE, "# Legacy memory\n")
     write(root, ".windsurfrules", "Before a vote, read legacy%2Fmemory%2Findex.md.\n")
