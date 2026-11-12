@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
-- tests/acceptance/W2-149/w2_149_support.py  # the 8 cases' planted products in the fixed form (the CTO, P-1 (a), 2026-11-12)
 - governance/project/orchestration/tools/indep_launch.py
 - governance/project/orchestration/tools/indep-schemas/**
 - tests/unit/orchestration/test_w2_173*
