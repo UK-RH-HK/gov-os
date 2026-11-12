@@ -5,6 +5,8 @@ owner called off the night's operator run). **Part 1** is eight ACTs, about 20 m
 hand merges (W2-11, W2-175, W2-176), about 5 minutes. Each `apply.sh` checks only its own files, so no ACT holds another; where one
 must follow another, its `check` refuses until the earlier one is in (named below).
 
+**Held by the owner (09:30): items 5, 6 and 7 do not run today.** ACT-EXAMIN-SETS-1 waits for the owner's answers to its C1-C8 and the approval of its two writer briefs; ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 follow it (their before hashes are its after). Part 1 is items 1-4 and 8; item 8's `exempt` step takes the live map as its before (`f4029cfb4942`), and 5-7 are then rebuilt on the map it leaves. The CTO's recommendation to apply 5 by hand was wrong: withdrawn.
+
 **Before Part 1:** tell the CTO "starting". The CTO then writes `log/act-in-progress.txt` (no commit on `w2/integrate`, the merge
 queue held) so `git status` stays clean between steps; the CTO lifts it at your "done".
 
