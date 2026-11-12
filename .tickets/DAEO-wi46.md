@@ -1,6 +1,6 @@
 ---
 id: DAEO-wi46
-status: open
+status: in_progress
 deps: [DAEO-k7hz]
 links: []
 created: 2026-10-30T23:20:53Z
@@ -20,6 +20,8 @@ allowed_paths:
 # .claude/skills/spec-writing/** out of the paths: generated from the kernel source by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - .rulesync/skills/spec-writing/**
 - template/.rulesync/skills/spec-writing/**
+- docs/changes/W2-98-CIT-P.md  # the kernel skill's CIT-P for the owner (CAP-33; the CTO, 2026-11-12)
+- docs/probes/DAEO-wi46/**  # the probe record (the CTO, 2026-11-12)
 kpis:
   success:
   - 'The skill''s steps produce a spec with: the problem; users and scenarios; goals and non-goals; KPIs written as observable behaviour, each with its failure line, testable without naming code; what is out of scope; open questions as packages; who accepts it. Verify: a planted request run through the skill''s steps on a fresh session yields a spec file; a grep of that spec for each of the eight parts (problem, users and scenarios, goals and non-goals, KPIs each with a failure line, out of scope, open questions as packages, who accepts) finds a heading or labelled line for every one, and a planted request that leaves one part out yields a spec the skill''s check refuses, naming the part [DEC-959 item 8, ROLES-RESEARCH-1 §2.4]'
