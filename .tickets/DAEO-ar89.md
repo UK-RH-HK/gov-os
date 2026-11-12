@@ -1,6 +1,6 @@
 ---
 id: DAEO-ar89
-status: open
+status: in_progress
 deps: []
 links: [DAEO-zqvn]
 created: 2026-11-11T01:07:01Z
@@ -45,6 +45,7 @@ needs: []
 reads:
 - src/gov/retrieve/**
 - src/gov/retrieval/**
+plan_override: DEC-1157  # its waits (W2-138, W2-145) are merged into w2/integrate; merged counts as met for starting (DEC-1157 (9)); closing still waits for them
 waits_on:
 - DAEO-rmhj  # W2-138 and W2-145 write the retrieval and reranker paths first (P1); the profile follows them
 - DAEO-2tfd
