@@ -1,118 +1,69 @@
 ---
 type: probe
 task: DAEO-p8tv
-reviewer_session: 05bd8c31-ea62-49a0-be0c-4e9b18491d2d
-implementer_session: 597ca8ec-0479-44c5-a089-f687a1e9ff61
+reviewer_session: 26522cdc-412b-4c3b-a104-dc236287cfcb
+implementer_session: n/a (two test-designer revisions, ce3269f3b and c6f7b9d6e)
 reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 judged_by: orchestrator
 judgement: pass
-probed_commit: f706a77f5b7e0a641f29a90fda05ef05e2d30dc8
-decisions_applied: [DEC-1101, DEC-1125, DEC-1097, DEC-1038, DEC-1050, DEC-1073]
+probed_commit: 25634cdde4600fddbb80f72e5604e785b711e9e6
+decisions_applied: [DEC-1154, DEC-1155, DEC-1156, DEC-1010]
 ---
 
-# Probe record: W2-172 (DAEO-p8tv), the memory audit's driver and schedule, review round 1
+# Probe record: W2-172 (DAEO-p8tv), the narrow check of the two test revisions after the 21:19 ejection
 
-- **What was probed.** Head `f706a77f5b7e` of `w2/W2-172`: the change from `80da3fbcca0d` (the merged red tests). That is
-  the engineer's `bf21edd96` (`run`, `due`, `baseline`, `status`, `figures` in `src/gov/memaudit/driver.py`,
-  `schedule.py`, `digest.py`, `__main__.py`, and `governance/project/orchestration/tools/memaudit_cron.sh`), the engineer's
-  `f989ca89b` (unit tests and `docs/changes/W2-172-evidence.md`), and the test designer's revision `5193add39` for
-  PKG-W2-172-TESTS-1, merged at `f706a77f5`. It was judged against the ticket's KPI lines S1-S9 and F1-F5, its Interface
-  items 1-12 with O1-O4, and the CTO's decision PKG-W2-172-TESTS-1 (GATE-1 (a), TD-1 (b), TD-2 (b)).
-- **Who probed.** A fresh read-only reviewer: role `independent-auditor`, Opus high, class C2, session
-  `05bd8c31-ea62-49a0-be0c-4e9b18491d2d`, 2026-11-12. It was started through `gov launch` under its OS sandbox. The
-  ticket lead (an orchestrator-role session) commissioned and judged it. It wrote nothing in the repository: its tripwire
-  shows no change in this worktree, and `git status --porcelain` is empty at the head.
-- **Step 0.** A write outside the worktree was refused (read-only file system). `git hash-object -w` and
-  `git update-index --refresh` worked. No local model server was running. `gov.__file__` =
-  `/home/usain/gov-os-worktrees/W2-172/src/gov/__init__.py`.
-- **Threat model (DEC-801, DEC-808).** Honest mistakes and plausible accidents in ordinary work. A finding fails the
-  probe only when it is "Ordinary work: yes" with "Consequence: fails open | loses work".
-- **Verdict: pass, 0 blocking.** All 14 lines pass. There are 6 findings, none of them "yes" with "fails open" or
-  "loses work". The lead's judgement agrees. R1-1, R1-2, R1-3 and R1-5 are residuals for the CTO, and R1-4 and R1-6 are
-  rows.
-- **The verification beside it.** `gov accept W2-172`: pass, 163 passed, 0 failed, 0 skipped. `tests/unit/memaudit`:
-  230 passed. `lead_verify` over the selected suites (4934 tests): 4 red, none this ticket's:
-  - W2-171's F5 path case judges the branch it runs on, so it fails on any later branch (the brief: a path case judges
-    only its own ticket's branch).
-  - Two W2-157 backstop cases were green when run alone (load).
-  - One W2-112 reranker case is red at the base `80da3fbcc` as well (the base-red rule).
+- **What was probed.** Head `25634cdde460` of `w2/W2-172`: only W2-172's changes since its review round 1 record (`0c16d8afb`, reviewed head `f706a77f5b7e`, now `PR-DAEO-p8tv-round-1.md`): the test designer's `ce3269f3b` (path hygiene judges the world's paths, not the repository's own location) and `c6f7b9d6e` (W2-171's F5 judged only on `w2/W2-171`, DEC-1155 (1)). A narrow check (DEC-1154), not a design review.
+- **Who probed.** A fresh read-only reviewer: role `independent-auditor`, Opus high, class C2, session `26522cdc-412b-4c3b-a104-dc236287cfcb`, 2026-11-12, started through `gov launch` under its OS sandbox; commissioned and judged by the CTO (orchestrator). Brief: `.gov-runtime/scratch/orchestrator/briefs/W2-172-fix-check.md`.
 
-## Findings
+# W2-172 (DAEO-p8tv): narrow check of the two test revisions after the 21:19 ejection
 
-### R1-1: the cron wrapper reads an interpreter that cannot import `gov` as "not due" (S9, item 8, O4; non-blocking)
-- **What happened:** with the wrapper's defaults (`/usr/bin/python3`, cwd not the repository), `-m gov.memaudit due`
-  exits 1 with "No module named 'gov'". The wrapper takes that 1 as "not due", logs
-  `{"due": false, ..., "started": false, "exit": 0}` and exits 0. On this machine `gov` imports only from the pinned
-  virtual environment. The wrapper does not change to the repository itself.
-- **What should happen:** a run counts as "not due" only when `due` printed `DUE no`, and any other result is logged with
-  its real code. The repository is the cwd. The ACT that installs the crontab line names a `GOV_MEMAUDIT_PYTHON` that
-  imports `gov` and changes to the repository first (an entry criterion of ACT-MEMORY-AUDIT-CRON-1).
-- Ordinary work: yes (the drafted crontab line plus the O4 default hits it at the first firing).
-- Consequence: other. No audit runs, and the wrapper misreports it as "not due". It fails closed at the release check:
-  `status` answers `not audited`.
+task: DAEO-p8tv
+decisions: [DEC-1154, DEC-1155, DEC-801, DEC-808, DEC-1010, DEC-1014, DEC-1012, DEC-820]
+head: 25634cdde460 (worktree /home/usain/gov-os-worktrees/W2-172, branch w2/W2-172); review round 1 record 0c16d8afb, reviewed head f706a77f5b7e
+KPI: w2-172-fix-check, verdict **pass**
 
-### R1-2: "the last audit commit" includes an audit stopped after USED (S5, S7 RETRIEVAL, item 9; non-blocking, a gap)
-- **What happened:** `schedule.py` takes the last `HISTORY.jsonl` line's commit, measured or not. A retrieval change made
-  before an audit that stopped after USED stops counting as a back-to-weekly trigger, and it drops out of the next
-  digest's RETRIEVAL list. Planted: `due` printed `monthly / stable` with the stopped line and `weekly / retrieval`
-  without it. `status` answered `not audited` both times.
-- **What should happen:** the trigger and the RETRIEVAL line start from the last *measured* audit's commit, or from the
-  `AUDITS.log` line S1 names. The CTO chooses.
-- Ordinary work: yes (a stop after USED is a planned S3 path). Consequence: other (the schedule can stay monthly for up
-  to 28 days; the release check still holds).
+## What was probed and found sound
+- **Scope of the change.** Since `0c16d8afb`, W2-172's own changes are only `ce3269f3b` (5 files under tests/acceptance/W2-172/) and `c6f7b9d6e` (tests/acceptance/W2-171/test_w2_171_f5_paths.py).
+  - Both are `Role: independent-test-designer`, `Task: DAEO-p8tv`, each with a Rewrite-Reason.
+  - The integrate merge `27f34f35c` touches neither ticket folder nor `src/gov/memaudit`, which is identical to the reviewed code.
+- **Path hygiene (ce3269f3b).** Precondition: the world's 8 paths are still checked. The repository's own location and the interpreter are no longer checked; dropping them can only remove false reds.
+  - Run with an interpreter whose own path holds `runs/`, the helpers skip only the exact interpreter token or element.
+  - They still catch a word in any other token, an exe-prefixed path, an `=`-glued interpreter, and `hidden`.
+  - The check that no started command names a path under the sets root is unchanged.
+- **F1 still guards.** In a clone at `…/gov-os-runs/clone`, I planted a driver that opens a file under the sets root. F1 went red ("the driver itself touched the sets root").
+  - The unplanted clone passes: 168 passed, 2 skipped (both F5s, each naming the missing `w2/integrate` reference).
+- **W2-171's F5 (c6f7b9d6e).** On a planted `w2/W2-171` branch in the clone, the real case goes red naming exactly the two outside paths.
+  - A detached HEAD skips with "this is a detached HEAD". The worktree (w2/W2-172) skips with "this is the branch w2/W2-172".
+  - Against W2-170's F5 (W2-180's revision), only docstrings and the planted branch names differ.
+- **Nothing moved.** `gov accept W2-172` passes 163/0/0 with all 14 KPI lines passing. W2-171's folder gives 139 passed and 2 skipped, each skip with its reason (an AF_UNIX sandbox stand-in, and F5's branch). Both runs went through heavy_slot.sh.
 
-### R1-3: a gate-busy stop reads `STOP <step> exit 2` in the digest (S7 line 11, item 8; non-blocking, a gap)
-- **What happened:** no child ran, but the digest invents exit 2. That reads the same as a child's own exit 2. Only the
-  `STOPPED <step> gate busy` line and `COUNTS.json` (`reason: "gate busy"`) name the gate.
-- **What should happen:** the digest names the gate. The Interface's line 11 has no form for this, so the CTO chooses
-  one, e.g. `STOP <step> gate busy`.
-- Ordinary work: yes. Consequence: other (the owner can misread the cause).
+## Findings (recorded rows, none blocking)
+Classification: 2 findings, both out of scope and failing closed; no round proposed.
 
-### R1-4: a launch step that exits 0 without a counts line is read as a clean pass (S1, item 2a; non-blocking, a row)
-- **What happened:** checker-1's missing counts line was read as `{}`, so round 2 was skipped. W2-170's `void` still
-  dropped the marked question.
-- **What should happen:** a launch exit 0 without a readable counts object is a stop at that step.
-- Ordinary work: no (the real launch script always ends with its counts line). Consequence: other.
+**R1. An interpreter whose path holds a sets-root word stops every run.**
+- What was done: I ran the W2-172 suite from the clone with an interpreter at `…/gov-os-runs/venv/bin/python`.
+- What happened: the driver refused every run with exit 4 ("a line that names a sets-root folder was not printed"), and 77 of 163 cases went red.
+- What should have happened: the revision's comment says an interpreter under `gov-os-runs/` does not trip the check. That is true of the test's grep, but the product refuses that line itself.
+- Ordinary work: no, because the project's interpreters (the pin under ~/.local/share, /usr/bin) never live under a sets-root word, and the merge queue's clone passes with the pin. Hitting it takes a venv planted under gov-os-runs.
+- Consequence: other (the product fails closed: it refuses, hides nothing and loses nothing).
+- scope: out (product behaviour from round 1; not part of these two test revisions).
+- Reversed by: a run of the merge queue, or a documented cron set-up, that uses an interpreter under a sets-root word.
 
-### R1-5: after a stop past `void`, QUESTIONS and the other figures print `not reached` (S7; non-blocking, a gap)
-- **What happened:** the figures come only from step 12, so a stop after USED leaves the owner's digest without the kept
-  and dropped counts, although `DROPS.json` exists.
-- **What should happen:** on a stop, the read-only `figures` child runs once. The CTO chooses.
-- Ordinary work: yes. Consequence: other.
+**R2. The pinned gov's accept reports a crash when HOME is empty.**
+- What was done: I ran `gov accept W2-172` with HOME set to an empty scratch folder, as the DEC-1012 run rule asks.
+- What happened: outcome `error`/`crash` with zero counts. The pinned runner strips `PYTHON*` variables including `PYTHONUSERBASE`, so the child pytest cannot be found. The tree's src already carries W2-177's fix; the pin does not.
+- What should have happened: the run completes. It did, 163/0, with the normal HOME and when the folder was run directly with an empty HOME.
+- Ordinary work: yes, because every sandboxed worker following the empty-HOME rule runs `gov accept` through the pin.
+- Consequence: other (fails closed: it reports an error, never a pass).
+- scope: out (the pin's version, not W2-172).
+- Reversed by: a pin built after W2-177 that passes `PYTHONUSERBASE` through, or `gov accept` passing with an empty HOME.
 
-### R1-6: an unexpected end inside the cycle leaves `COUNTS.json` with `stop: null` and no digest (item 5; non-blocking, a row)
-- **What happened:** a line refused by `say` inside the cycle ended the run with exit 4 after the `STARTS.log` line. The
-  lock was released and no set was made.
-- **What should happen:** an unexpected end still records a stop at the current step.
-- Ordinary work: no. Consequence: other.
+## Process notes
+- The guard hook refused a symbolic link into my TMPDIR, and the Write tool was not granted for a `.pth` file in my TMPDIR. These were two different calls, and neither was retried or worked around.
+- `gov accept` then ran with the normal HOME, after I confirmed neither folder has a `local_only`, `real`, `green_here` or `time_limit` case.
+- No tree was written: `git status --porcelain` is empty and HEAD is unchanged.
 
-## Probed and found sound
-1. GATE-1 (a): the driver ran `--gate-cmd "<stub> --check"` as its words before measure, judge and pool.
-2. A gate-busy stop after USED: exit 2, a HISTORY line with `measured: false, used: true`, and the OWNER line. Under the
-   clock seam the polls are counted, not slept.
-3. Churn: the denominator excludes the tree-exclude matches, and the 28-day window goes by committer time (planted
-   2.94 %, as expected).
-4. HISTORY, STARTS and AUDITS.log lines that are not JSON: `due` and `run` complete.
-5. The lock is free after a stop and after an unexpected end, and children do not inherit it.
-6. The wrapper: `grep -c crontab` is 0, the interpreter follows O4, and the exit codes and log line follow item 8.
-7. Read against the code:
-   - F1: the driver opens nothing under the sets root.
-   - F2: the digest's sources are counts and ids only.
-   - Item 3: the checks run in the Interface's order.
-   - S3: the USED boundary is decided by step and code, and an unknown measure code counts as after USED.
-   - The canary is retried only on 16, only on launch steps, and once.
-   - DIGEST.txt and COUNTS.json are written whole by rename.
-   - F5: the engineer's commits touch only allowed paths.
-
-## The engineer's readings (evidence file), as the reviewer judged them
-- Faithful: RN-NAME by `STARTS.log`; a refusal printed as the digest with line 11 `REFUSED <code>`; no `--force` in the
-  digest; the reason-code mapping; polls counted under a fixed clock; the wrapper's default gate
-  `$HOME/.local/bin/gov resources --check`; a canary retry's single STEP line.
-- Fills a gap sensibly: a brief missing at the audit commit is a stop with code 10.
-- Gaps for the CTO:
-  - The main line's tip when no store link resolves (`due`, `status`; low risk).
-  - `status --store-link`: an extra flag that changes no stated behaviour.
-  - The last audit commit (R1-2).
-  - The gate-busy digest line (R1-3).
-  - The figures on a stop (R1-5).
+```verdict
+{"kpis": [{"kpi": "w2-172-fix-check", "verdict": "pass", "findings": [{"id": "R1", "scope": "out", "ordinary_work": "no", "consequence": "other"}, {"id": "R2", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}]}
+```
