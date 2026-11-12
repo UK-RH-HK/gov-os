@@ -539,6 +539,15 @@ def ticket_change(root: Path, ticket: str) -> tuple[list[str], str | None]:
     return paths, base_commit
 
 
+def head_without_change(root: Path, green: str | None, own_base: str | None) -> str | None:
+    """The head a red is judged against (DEC-988 item 3, DEC-989): the green base the change is counted from when
+    it is an ancestor of ``HEAD``, so every commit counted in the change (an untrailered one too) is outside it;
+    else the first parent of the ticket's oldest own commit (``own_base``); None when neither is known."""
+    if green and is_ancestor(Path(root), green):
+        return green
+    return own_base
+
+
 def _module_of(rel: str) -> str | None:
     """The dotted module a Python file is: under ``src/`` relative to it, else relative to the project."""
     if not rel.endswith(".py"):
@@ -746,7 +755,8 @@ def scoped(root: Path, ticket: str) -> dict:
                                + ", ".join(f"{t} ({d})" for t, d in gone))
     suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
-            "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only, "why": {t: why[t] for t in suites}, "base": base_commit,
+            "changed": paths, "own": own_paths, "green_base": green, "records_only": records_only, "why": {t: why[t] for t in suites},
+            "base": head_without_change(root, green, base_commit),
             "head": _git(root, "rev-parse", "HEAD").strip()}
 
 

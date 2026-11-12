@@ -188,3 +188,21 @@ def test_s10_two_closes_in_a_row_reuse_the_clone(tmp_path, no_lists):
     text = (repo.root / f"docs/close/{OTHER}/CL-{OTHER}.md").read_text(encoding="utf-8")
     second = yaml.safe_load(text.split("---\n")[1])
     assert second["clone"] == {"path": ".gov-runtime/close/clone", "reused": True, "replaced": None}
+
+
+def test_f1_an_untrailered_slip_after_the_green_base_is_caused_and_never_closes(tmp_path, no_lists):
+    """F-1: a green test, then an untrailered commit that breaks it, then the ticket's trailered work: the red is
+    judged against the green base, so it is the change's: RED_CAUSED, no record, no repair ticket."""
+    from .test_w2_115_support import green_night
+    repo = project(tmp_path)
+    green_night(repo)
+    repo.commit("slip", files={"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return 0\n"})
+    change(repo, {"src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    with pytest.raises(GovError) as raised:
+        command.run(repo.root, _args(), CONFIG)
+    assert raised.value.code == "RED_CAUSED"
+    [red] = raised.value.details["reds"]
+    assert red["caused"] is True and red["test"].startswith(OWN_SUITE)
+    assert not red.get("repair_ticket")
+    assert not (repo.root / f"docs/close/{TICKET}").exists()
+    assert sorted(p.name for p in (repo.root / ".tickets").glob("*.md")) == [f"{TICKET}.md"]

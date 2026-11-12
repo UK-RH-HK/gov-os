@@ -245,3 +245,47 @@ def test_s3_refused_selection_prints_no_set_exit_2(tmp_path):
     assert done.returncode == 2
     assert done.stdout == ""
     assert done.stderr.startswith("SELECTION_REFUSED: ")
+
+
+# --- F-1 (S4, F1): the head without the change is the green base when it is an ancestor -----------------------
+
+def _oldest_own_parent(repo) -> str:
+    oldest = repo.git("log", "--format=%H", "--grep", f"Task: {TICKET}", "--no-merges").split()[-1]
+    return repo.git("rev-parse", oldest + "^").strip()
+
+
+def test_f1_the_head_without_the_change_is_the_green_base_when_an_ancestor(tmp_path):
+    """An untrailered slip between the green base and the first trailered commit is counted in the change, so it is
+    not in the head the reds are judged against: that head is the green base."""
+    repo = project(tmp_path)
+    green = green_night(repo)
+    repo.commit("slip", files={"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return 0\n"})
+    change(repo, {"src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert chosen["green_base"] == green
+    assert chosen["base"] == green != _oldest_own_parent(repo)
+    assert "src/pkg/feature.py" in chosen["changed"]
+
+
+def test_f1_a_green_base_not_an_ancestor_falls_back_to_the_oldest_own_commits_parent(tmp_path):
+    repo = project(tmp_path)
+    repo.git("checkout", "-q", "-b", "elsewhere")
+    elsewhere = repo.commit("elsewhere", files={"docs/notes.md": "# notes, elsewhere\n"})
+    repo.git("checkout", "-q", "main")
+    record = {"verdict": "green", "head": elsewhere}
+    repo.commit("night", files={"docs/close/nightly/NR-20261101T010000Z-x.json": json.dumps(record) + "\n"})
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert chosen["green_base"] is None
+    assert chosen["base"] == _oldest_own_parent(repo)
+    assert select.head_without_change(repo.root, elsewhere, "abc") == "abc"
+
+
+def test_f1_no_green_base_falls_back_to_the_oldest_own_commits_parent(tmp_path):
+    repo = project(tmp_path)
+    change(repo, {"src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)  # c\n"})
+    change(repo, {"src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    chosen = select.scoped(repo.root, TICKET)
+    assert chosen["green_base"] is None
+    assert chosen["base"] == _oldest_own_parent(repo)
+    assert select.head_without_change(repo.root, None, None) is None
