@@ -112,10 +112,17 @@ def stand_in_vector(text):
 
 
 class EmbeddingStandIn:
-    """An HTTP endpoint on 127.0.0.1 that answers as an embedding server would, with deterministic vectors."""
+    """An HTTP endpoint on 127.0.0.1 that answers as an embedding server would, with deterministic vectors.
+
+    Rewrite-Reason: DEC-1065. The product reads where the embedding model runs (``GET /api/ps``, the device each
+    running model is on) and refuses when it cannot read it; the stand-in lists the model running wholly on the GPU
+    (``size_vram`` equal to ``size``), the form of W2-32's and W2-54's stand-ins."""
 
     def __init__(self):
         model = {"name": EMBED_MODEL, "model": EMBED_MODEL, "digest": "ac6da0dfba84" + "0" * 52}
+        running = {**model, "size": 639150000, "size_vram": 639150000,  # loaded on the GPU: all of it in GPU memory
+                   "expires_at": "2026-10-19T12:05:00Z", "context_length": 8192,
+                   "details": {"family": "qwen3", "parameter_size": "595.78M", "quantization_level": "Q8_0"}}
 
         class Handler(BaseHTTPRequestHandler):
             def answer(self):
@@ -129,6 +136,8 @@ class EmbeddingStandIn:
                     reply = {"version": "0.35.0"}
                 elif route == "/api/tags":
                     reply = {"models": [model]}
+                elif route == "/api/ps":
+                    reply = {"models": [running]}
                 elif route == "/api/embed":
                     given = asked.get("input", "")
                     texts = [given] if isinstance(given, str) else list(given)
