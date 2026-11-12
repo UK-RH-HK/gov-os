@@ -343,7 +343,7 @@ def test_s2_a_shut_gate_starts_nothing_names_every_entry_and_exits_3(project):
     p.settle()
     assert p.launches() == []
     for entry in entries:
-        assert named_with(p, entry.log, r"gate|memory|shut"), f"{entry.log} not named with the gate" + explain(p, r)
+        assert named_with(p, entry.log, r"gate|shut"), f"{entry.log} not named with the gate" + explain(p, r)  # review F-5: the gate, not a memory figure
     assert any(k == "open" and v is False for k, v in support.walk(p.status_json())), "the status does not show a shut gate"
 
 
