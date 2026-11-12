@@ -1,6 +1,6 @@
 ---
 id: DAEO-ozyt
-status: closed
+status: open
 deps: [DAEO-r30l]
 links: [DAEO-r30l, DAEO-5emz]
 created: 2026-11-11T01:20:16Z
@@ -79,3 +79,14 @@ F4: the probe record's folder is in allowed_paths (no test change after the revi
 the three backstop keys outside `template()` (W2-20's frozen key set) stand. Rows: FR-11 (a try/finally so the own group's pause
 happens whatever the item write does), FR-12, FR-13, FR-3 (an owner question: a GPU that cannot be read), FR-4, FR-6 to FR-10.
 After the land the owner's operator adds the three gate.json entries (docs/changes/W2-157-evidence.md).
+
+## Reopened for one fix (the owner, DEC-1144 (2), P1-B (a), 2026-11-12)
+
+`tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log` hung two
+merge-queue runs (1 h 45 min, then 77 min). The cause: the test replaces the backstop's sleep, then calls `watch()` on planted process
+groups; a call that does not trip polls forever, because a group whose members are all zombies (unreaped) or paused still passes
+`os.killpg(g, 0)`. The fix, inside S4 as written ("when every named group has ended on its own, the watch logs it and ends") and this
+ticket's paths: (1) a group whose live members are all zombies counts as ended; (2) `watch()` takes a bound (a maximum number of polls
+or seconds, a keyword argument whose default keeps the command's behaviour), and every test that calls it passes one; (3) each test reaps
+the process groups it plants. No KPI line changes. One C2 run; it lands through the queue (DEC-989). The owner's temporary skip (P1-B (b))
+cannot take effect without a control-path change (DEC-1144 (2)'s note), so until this lands a hang is stopped by pid.
