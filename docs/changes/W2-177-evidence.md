@@ -158,3 +158,18 @@ cases run in every form above by node id; in the folder run R11 runs its first r
   matters there: the acceptance support builds its own environment with `HOME/.local` linked and `PYTHONUSERBASE` set.
 - `nightly_alone.py` re-runs a failing case in the same start form as the run: a red there does not separate a start-form
   cause from a defect of the head (for the nightly's owner, not changed here).
+
+## The lead's verify (head f5f050c87ddf, `lead_verify.sh`: a `setsid ... &` start, SIGINT ignored, empty HOME)
+
+`RED parallel exit 1 in 734 s (3934 tests 5 failed 0 errors 6 skipped)`, `.gov-runtime/scratch/lead/log/verify/`.
+The six cases of this ticket and its five new cases pass. The five reds, none of them in `skip_known.json`:
+
+- Four W2-96 acceptance cases of the same family: `test_w2_96_at_no_leak.py::test_an_interrupted_run_stops_its_child_and_leaves_nothing`,
+  `test_w2_96_at_run_2.py::test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends[a-second-press-once-the-removal-began]`,
+  `::test_r12_..._128_plus_the_signal[SIGINT]` and `::test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored`.
+  Run once in the foreground (real HOME, through the heavy slot), the same four functions, all their parameters,
+  pass: `8 passed in 4.74s`. Their red is cause (B) in the acceptance support's `_popen` (`w2_96_support.py:1380-1388`),
+  outside this ticket's paths: a test designer's revision with a Rewrite-Reason.
+- `tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository`: `core-schema has 1
+  findings: .tickets/DAEO-1k7y.md: unknown record type 'bug'`. This ticket's own file, not its change: its `type: bug`
+  is not a type the core schema knows. It reddens every tree once the ticket file is in the base.
