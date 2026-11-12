@@ -25,6 +25,7 @@ import datetime
 import json
 import os
 import re
+import shlex
 import signal
 import socket
 import subprocess
@@ -652,3 +653,80 @@ def assert_inbox_item(path: Path, *, reason: str, paused: list[int], skipped: li
     expected = ([f"resume: kill -CONT -- -{g}" for g in paused]
                 + [f"stop: kill -TERM -- -{g} && kill -CONT -- -{g}" for g in paused])
     assert sorted(lines[5:]) == sorted(expected), f"the resume and stop lines are not L7's:\n{lines[5:]}"
+
+
+# --- a watch that shares its process group with a job (L5b) ---------------------------------------------------------------
+
+OWN = "own"   # in the ``order`` of ``start_shared_group_watch``: the group the command itself is in
+
+
+class SharedGroupWatch:
+    """``gov resources --backstop ...`` started the way a shell with ``&`` does it: one new session, whose first process
+    is a shell (its pid is the session's and the process group's id); the shell starts a job in the background (same
+    group) and then ``exec``s ``gov``, so ``gov`` and the job share the group whose id is ``pgid`` (``$$``)."""
+
+    def __init__(self, machine: "Machine", watch: Watch, job_pid: int, order: list):
+        self.machine, self.watch, self.job_pid, self.order = machine, watch, job_pid, list(order)
+
+    @property
+    def pgid(self) -> int:
+        """The own group's id: the pid of ``gov`` itself (the shell's pid, kept by ``exec``)."""
+        return self.watch.proc.pid
+
+    @property
+    def groups(self) -> list[int]:
+        """The named groups, in the order named (the own group as its id)."""
+        return [self.pgid if item is OWN else item.pgid if isinstance(item, Job) else int(item) for item in self.order]
+
+    @property
+    def others(self) -> list[Job]:
+        """The named jobs that are in groups of their own."""
+        return [item for item in self.order if isinstance(item, Job)]
+
+    def gov_state(self) -> str | None:
+        return state_of(self.watch.proc.pid)
+
+    def gov_stopped(self) -> bool:
+        return self.gov_state() in STOPPED
+
+    def job_state(self) -> str | None:
+        return state_of(self.job_pid)
+
+    def job_stopped(self) -> bool:
+        return self.job_state() in STOPPED
+
+    def job_signals(self) -> list[int]:
+        path = self.machine.jobs_dir / f"{self.job_pid}.signals"
+        return [int(line) for line in path.read_text().split()] if path.exists() else []
+
+    def resume(self) -> None:
+        """``kill -CONT -- -<own group>``."""
+        os.killpg(self.pgid, signal.SIGCONT)
+
+
+def start_shared_group_watch(machine: "Machine", order: list) -> SharedGroupWatch:
+    """Start the command sharing a group with a job. ``order``: the groups named, in order: ``OWN`` for the shell's own
+    group (``$$``), a ``Job`` the test started (its own group) or an int (a group number, e.g. one that has ended);
+    ``order`` may hold no ``OWN`` (then the shared group is not named). The stand-in ``nvidia-smi`` must be planted
+    first with its first answer gated (``plant_smi(..., gated=[0])``): that answer is released here once the shared job
+    is ready, so no trip can freeze the job before it has installed its handlers."""
+    machine._check_source()
+    machine.write_gate()
+    groups = " ".join("$$" if item is OWN else str(item.pgid if isinstance(item, Job) else int(item)) for item in order)
+    pid_file = machine.work / "shared-job.pid"
+    script = (f"{shlex.quote(sys.executable)} {shlex.quote(str(machine.scripts / 'job.py'))} "
+              f"{shlex.quote(str(machine.jobs_dir))} run & echo $! > {shlex.quote(str(pid_file))}; "
+              f"exec {shlex.quote(sys.executable)} -m gov.cli.main resources --backstop {groups} "
+              f"--root {shlex.quote(str(machine.project))} --json")
+    machine._runs += 1
+    out_path, err_path = machine.work / f"out-{machine._runs}.txt", machine.work / f"err-{machine._runs}.txt"
+    argv = ["sh", "-c", script]
+    proc = subprocess.Popen(argv, cwd=str(machine.project), env=machine.env(), stdin=subprocess.DEVNULL,
+                            stdout=open(out_path, "w"), stderr=open(err_path, "w"), start_new_session=True)
+    machine.procs.append(proc)
+    watch = Watch(proc, argv, out_path, err_path)
+    wait_for(lambda: pid_file.exists() and pid_file.read_text().strip().isdigit(), "the shared job's pid", watch=watch)
+    job_pid = int(pid_file.read_text())
+    wait_for((machine.jobs_dir / f"{job_pid}.ready").exists, "the shared job to be ready", watch=watch)
+    machine.release(0)
+    return SharedGroupWatch(machine, watch, job_pid, order)
