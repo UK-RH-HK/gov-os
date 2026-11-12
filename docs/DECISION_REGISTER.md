@@ -14696,6 +14696,37 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (5) **C8:** no checker for W2-94.
 - **Basis:** questions 2 and 4.
 
+### DEC-1144 — P1-A to P1-G: W2-11 merged by hand; W2-157 reopened for the backstop hang with a temporary skip; W2-146's schema lines read first; a narrow third check of the path-map chain; K9 met by W2-121 a and b with part c's slot line; `--sets-root` in W2-93; reviewers' read-only probes in the quiet hours
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~14:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-989, DEC-1141 (4), DEC-1010, DEC-1131, DEC-1008 (2)-(3), DEC-974, DEC-1142 (7), DEC-1143 (4), DEC-1112 (3), CAP-33
+- **Decision:**
+  - (1) **P1-A (a): W2-11 merged by hand**, an exception to DEC-989 beside DEC-1141 (4)'s two: its seven copy cases could be green only after
+    ACT-CLAUDE-COPIES-5, which applies only after the merge. Merged `6f2234f40` (W2-11 head `6ba93fc8bf35`; kernel bytes as approved at
+    `dca382f3069f`); the owner's operator applied COPIES-5 at once (`a2a74f22f`); W2-11 closes on a green run.
+  - (2) **P1-B (a)+(b): W2-157 (`DAEO-ozyt`) reopened for one fix** inside its own scope: a group of only zombies counts as ended, `watch()`
+    gets a bound, and `test_w2_157_backstop.py` reaps its own groups (one C2 run). Until that fix lands, **one temporary entry** in
+    `skip_known.json` for `tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log`,
+    naming W2-157 as its fix; the fix's land removes it. An exception for a test that cannot finish, not a hidden red.
+    **Found when recording (the CTO, told to the owner):** `skip_known.json` is the skip guard's list of known skips; it causes
+    no skip, and the queue strips `PYTEST_ADDOPTS` (`merge_queue.py` `env()`), so (b) takes effect only through a change to the
+    queue (a control path, by ACT) or to the test (the fix itself). Not built: the fix runs first, and a hang meanwhile is
+    stopped by pid as before.
+  - (3) **P1-C: W2-146's 15 added lines** of `template/governance/kernel/schemas/path-map.schema.json` (`7a1a1cd8…` -> `d22efa5a…`) were
+    pasted to the owner verbatim first; the CAP-33 approval follows the owner's reading, as its own line. Until then W2-146 is held.
+  - (4) **P1-D (a): a narrow independent check** of the path-map chain's round 3 (EXAMIN-SETS-1 `2f814211`, ACCEPTED-REDS-1 `9c20e5e3`,
+    PATHMAP-EXP-1 `b26fe623`), limited to: the entries byte-identical to round 2's; only befores, afters and offsets moved; the chain
+    and its rehearsal. A third round, the owner's exception to DEC-1010 for this rebuild only. The yes lines follow its PASS.
+  - (5) **P1-E option 1: K9's dispatcher is W2-121 parts a and b**, with part c's first KPI line ("every heavy step takes a heavy-job slot",
+    DEC-1008 (3)) moved into W2-121b (`DAEO-ifgf`), a widening by the owner's decision (DEC-974). Parts c (less that line) and d stay
+    parked in Wave 3 (W3-P33, W3-P34).
+  - (6) **P1-F (a): the W2-81 runner's `--sets-root <root>`** goes inside W2-93 (`DAEO-6y0x`): its paths gain
+    `tests/acceptance/W2-81/w2_81_run.py` and `tests/acceptance/W2-81/test_w2_81_runner.py`, for the independent test designer who writes
+    `validate_hidden.py`, with one KPI line: the runner and the validator take `--sets-root <root>`. Answers DEC-1143 (4)'s open point.
+  - (7) **P1-G (a): a reviewer's read-only probes are allowed in the quiet hours**, in its own TMPDIR (outside the repository and the runs
+    folders), touching neither the repository nor the evaluation sets; the two-refusal stop (DEC-1142 (9)) still holds. Into the briefs.
+  - (8) **Read and accepted (delegated P2s, DEC-1112 (3)):** W2-124's P2 (b) and P3 (`fe7bd01ae`); W2-115's PK-5 (c), deferred with
+    W2-115b (`33b5651eb`).
+- **Basis:** the owner's message of 2026-11-12 ~14:10 answering the CTO's seven P1 packages.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14776,3 +14807,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 
 | 0.525 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1142 (W2-176's no-cap bytes approved; P-W2-23-8 (a); W2-115 PK-1 (a)+(c), DEC-903 changed; W2-148 S15 option 2; the operator hours as built; the ticket table, four parked; no new ticket or split without the owner; the two-refusal stop covers another form). Next free id: DEC-1143. |
 | 0.526 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1143 (EXAMIN-SETS-1's answers: the two writer briefs approved; C1 the workbench copy at 0a82082495f5; C2-C5, C7; C6 the writer writes data only, the runner's option to the owner; C8 no checker). Next free id: DEC-1144. |
+| 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
