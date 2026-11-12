@@ -76,11 +76,15 @@ def test_gov_retrieve_cites_nothing_from_the_file_that_holds_the_canary(box, bui
     assert support.CLEAN in support.cited_paths(bundle), f"premise: the clean file {support.CLEAN} is not cited"
 
 
-def test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more(box, repo, tmp_path):
+def test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more(box, repo, tmp_path, ollama):
     """The session's cache (``GOV_SECRETS_CACHE``, the box's own) already holds the fixture's clean verdicts from the
-    shared store's rebuild; two more rebuilds of a fresh clone read from it."""
-    box.rebuild(repo)
-    box.rebuild(repo)
+    shared store's rebuild; two more rebuilds of a fresh clone read from it.
+
+    Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    the fixture's namespace is embedded, so each rebuild is given the healthy stand-in endpoint (as the ``built``
+    fixture's is) and recreates its vectors; the case is about the secrets cache, not the semantic store."""
+    box.rebuild(repo, host=ollama.host)
+    box.rebuild(repo, host=ollama.host)
     check_store(repo, tmp_path)
     assert support.CLEAN in support.ranked_paths(box.search(repo, support.CLEAN_WORDS)), \
         f"the clean file {support.CLEAN} is not found after the second rebuild"

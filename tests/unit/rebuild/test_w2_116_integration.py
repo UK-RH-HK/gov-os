@@ -230,7 +230,12 @@ def test_a_failed_build_never_moves_the_link_and_leaves_the_ready_half_as_it_was
     assert os.path.realpath(link) == str(first.resolve()) and _snapshot(first) == before
     assert not (second / seed.RECORD_REL).exists()  # the half left behind is no warm base
     if how != "stage raises":  # N-2: the build ran; its semantic store was not recreated, so it is not switched to
-        assert raised.value.details["stores"]["semantic"]["status"] == "not_recreated"
+        # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150
+        # (3): the build's own REBUILD_FAILED (store: semantic) is wrapped by the integration's, so the stores the
+        # build made sit one level down, in the wrapped error's details.
+        built = raised.value.details["details"]
+        assert built["store"] == "semantic"
+        assert built["stores"]["semantic"]["status"] == "not_recreated"
 
 
 def test_a_build_killed_half_way_leaves_the_link_and_the_next_refresh_seeds_over_it(project, endpoint, monkeypatch):
@@ -467,8 +472,15 @@ def test_a_model_less_reindex_keeps_the_vectors_and_reports_the_facet_unavailabl
     _commit(project, {"docs/plum.md": "plum orchards\n"})
     monkeypatch.setattr(semantic, "_ready", lambda connection, ensure=None: ollama.WARNING)
     monkeypatch.setattr(semantic, "_ask", lambda *a, **k: pytest.fail("the endpoint was asked"))
-    result = run(project, _args(), load_config(project))
-    assert result["stores"]["semantic"] == {"status": "not_recreated", "reason": ollama.WARNING}
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the model-less re-index of an embedded namespace now fails with REBUILD_FAILED (store: semantic), so the
+    # semantic answer is read from the stores the error carries (the Interface's added ``requested`` key aside).
+    with pytest.raises(GovError) as raised:
+        run(project, _args(), load_config(project))
+    assert raised.value.code == "REBUILD_FAILED" and raised.value.details["store"] == "semantic"
+    semantic_answer = dict(raised.value.details["stores"]["semantic"])
+    semantic_answer.pop("requested", None)
+    assert semantic_answer == {"status": "not_recreated", "reason": ollama.WARNING}
     assert _count(project, "semantic_vector") == vectors > 0
     assert semantic.search(project, "plum", refresh=False)["available"] is False
 
