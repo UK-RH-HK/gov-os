@@ -104,10 +104,57 @@ start_new_session=True)` and no reset of SIGINT, so a pytest started as a backgr
 to the launcher, which keeps it. I did not run them; the evidence is the signal-specific pattern and the shared
 start code path. Probable same cause (B); the fix would be in W2-56's acceptance support (not mine).
 
-## The fix (steps 2 and 3, to follow)
+## The fix
 
-1. (A) `runner._run`: keep the caller's `PYTHONUSERBASE` in the child's environment; every other `PYTHON*` variable
-   stays dropped, `PYTHONPATH` and `PYTHONDONTWRITEBYTECODE` as they are.
+1. (A) `runner._run` (`runner.py`, two lines after the environment is built): keep the caller's `PYTHONUSERBASE` in
+   the child's environment; every other `PYTHON*` variable stays dropped, `PYTHONPATH` and `PYTHONDONTWRITEBYTECODE`
+   as they are. Commit 0ca819544.
 2. (B) `w2_96_reap.launch_gov`: SIGINT, SIGTERM and SIGHUP are set to SIG_IGN when named in `ignore`, and to
-   SIG_DFL otherwise. `gov accept` keeps an inherited ignore unchanged (R11 stays green).
-3. New cases `tests/unit/accept/test_w2_177_start_forms.py`, written red first.
+   SIG_DFL otherwise. `gov accept` keeps an inherited ignore unchanged (R11 stays green: its three parameters pass in
+   every form). Commit 003f3d84e, trailer `Rewrite-Reason`.
+3. New cases `tests/unit/accept/test_w2_177_start_forms.py` (commit 3f1401596), written red first: on the code
+   before the fix three of its five cases failed for the intended reasons (the child's `PYTHONUSERBASE` was `None`;
+   the planted gov started with SIGINT/SIGTERM/SIGHUP `[1, 1, 1]` ignored where `[0, 0, 0]` and `[1, 0, 0]` were
+   expected); the two that passed are guards that hold before and after (no `PYTHON*` variable but the user base
+   passes; the launcher ignores all three when all three are named). The new file has no parametrised case, since the
+   repository's opt-in lists keep only a parametrised case's first row and would report the others as deselected.
+   No assertion, timeout, marker or skip of any W2-96 case changed; `skip_known.json` and `tests/acceptance/` are
+   untouched (`git diff --name-only` against the base lists these four files only: this evidence, `runner.py`,
+   `w2_96_reap.py`, `test_w2_177_start_forms.py`).
+
+## After the fix (S2): ten runs per form
+
+Each run is the nine cases above plus the five of `test_w2_177_start_forms.py`: 14 tests, every run through the
+heavy slot (`inner.sh`, changed by the lead for the CTO's order after incident T1 0556).
+
+| form | SIGINT ignored at start | runs | result |
+|---|---|---|---|
+| empty-home | 0 | 10 | 10 of 10 runs: 14 passed (13.9-14.2 s each), none failed, none skipped |
+| real-home | 0 | 10 | 10 of 10 runs: 14 passed (14.1-14.8 s each) |
+| setsid-bg | 1 | 10 | 10 of 10 runs: 14 passed (14.2-14.5 s each) |
+| bg-job | 1 | 10 | 10 of 10 runs: 14 passed (14.0-14.4 s each) |
+| real-home-bg (the nightly's form) | 1 | 10 | 10 of 10 runs: 14 passed (14.2-14.5 s each) |
+
+Run files: `.gov-runtime/scratch/forms/after/<form>-<i>.txt` and `counts.txt` (the lead's four forms); the
+`real-home-bg` runs were one inline command (same `inner.sh`), output in the sandbox's TMPDIR.
+Before and after, same cases: the six went from 60 s waits (and two 2.4 s asserts) to 14 s for all fourteen tests.
+
+The whole unit folder, once (slot, empty HOME, the command of the brief):
+`env HOME=<tree>/.gov-runtime/scratch/empty-home PYTHONUSERBASE=/home/usain/.local PYTHONPATH=<tree>/src python3 -m
+pytest tests/unit/accept -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real
+and not green_here and not time_limit"`:
+
+    95 passed, 117 deselected in 43.23s
+
+The 117 deselected are the `-k`/`-m` exclusions of the brief and the repository's opt-in lists (parametrised cases'
+other rows); the six and this ticket's five cases are not among them (the six, R11's three parameters and the five new
+cases run in every form above by node id; in the folder run R11 runs its first row only).
+
+## What is not done here (named for the lead)
+
+- The same start-form gap in the W2-96 acceptance support (`_popen`, `w2_96_support.py:1380-1388`) and W2-56's
+  (`start_launch`, `w2_56_support.py:531-537`): acceptance folders, a test designer's revision with a Rewrite-Reason.
+  Five W2-96 acceptance cases and W2-56's two SIGINT cases stay red in a background start until then. Whether (A)
+  matters there: the acceptance support builds its own environment with `HOME/.local` linked and `PYTHONUSERBASE` set.
+- `nightly_alone.py` re-runs a failing case in the same start form as the run: a red there does not separate a start-form
+  cause from a defect of the head (for the nightly's owner, not changed here).
