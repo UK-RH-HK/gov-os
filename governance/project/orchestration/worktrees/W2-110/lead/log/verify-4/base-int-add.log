@@ -1,0 +1,2 @@
+Preparing worktree (detached HEAD d43d552d4)
+HEAD is now at d43d552d4 W2-52 (DAEO-siiz): run 5's P-9 decided (a): one test-design batch for the merged harness (tests/conftest.py's _CBM_SUITES line, the device listing in its stand-in); the old FULL probe holds for a test-only change

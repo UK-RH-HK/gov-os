@@ -1,0 +1,55 @@
+ACT-CLAUDE-COPIES-5 rehearsal; base: integrate with w2/W2-11 58ac442d6820 merged; rulesync 24.0.0
+portability on the base (W2-11 merged, no copies): exit 1; 6 findings: GENERATED_DIFFERS 6
+the 6 skill files: the root .rulesync/skills source, template/.rulesync/skills and the kernel skill are byte-equal
+portability in the generation clone after the copies: exit 0; findings []
+generation clone: 6 files changed: .claude/skills/discovery/SKILL.md, .claude/skills/orchestration/SKILL.md, .claude/skills/orchestration/briefs-and-returns.md, .claude/skills/retrieval/SKILL.md, .claude/skills/test-design/SKILL.md, .claude/skills/test-design/test-kinds.md
+the touched set shares no file with ACT-CLAUDE-COPIES-4 (19 files: .claude/templates, .rulesync/subagents, .claude/agents)
+the before-bytes are the blobs at w2/W2-11 58ac442d6820 (the tree after W2-11 lands): .claude/skills/discovery/SKILL.md: differs from integrate; .claude/skills/orchestration/SKILL.md: same as integrate; .claude/skills/orchestration/briefs-and-returns.md: absent on integrate; .claude/skills/retrieval/SKILL.md: differs from integrate; .claude/skills/test-design/SKILL.md: same as integrate; .claude/skills/test-design/test-kinds.md: absent on integrate
+--- plain integrate (W2-11 not merged): the bundle must refuse, as G7 would
+ok   apply.sh check refuses (moved): exit 3
+ok   the refusal names the first moved file: moved: .claude/skills/discovery/SKILL.md
+ok   check changed nothing
+--- rehearsal on integrate with W2-11 merged (the tree the operator's dry run sees when the ACT is queued after W2-11 lands); HOME planted at a fresh empty folder
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended): exit 1
+ok   check 2 before the apply (red, as intended): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 6 files): exit 0
+ok   check 2 (sha256sum -c, 6 files): exit 0
+ok   the changed set equals the touched list (6 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply (W2-11 merged): exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   portability after the undo: exit 1; 6 findings: GENERATED_DIFFERS 6 (the window's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   check 1 after the re-apply: exit 0
+ok   check 2 after the re-apply: exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- the gated test runs on the merged tree with the ACT applied (one folder per run, through the heavy-job gate)
+ok   tests/acceptance/W2-11: exit 0; 193 passed, 0 failed, 1 skipped
+ok   tests/acceptance/W2-128: exit 0; 121 passed, 0 failed
+ok   tests/acceptance/W2-142: exit 0; 13 passed, 0 failed
+ok   tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+ok   tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   tests/unit/adapters: exit 0; 94 passed, 0 failed
+ok   python3 -m gov.adapters.portability on the merged tree with the ACT applied: exit 0; findings []
+--- the operator's by-hand steps literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+--- with ACT-CLAUDE-COPIES-4 applied first and w2/W2-11 merged after it
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1: exit 0
+ok   check 2: exit 0
+ok   the ACT's six files change on that tree too; none is one of ACT-CLAUDE-COPIES-4's 19
+ok   portability on that tree after the apply: no GENERATED_DIFFERS (exit 1; 13 findings: SOURCE_DIFFERS 6, TEMPLATE_COPY_DIFFERS 7, the rest are ACT-CLAUDE-COPIES-4's window until W2-175 merges)
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0

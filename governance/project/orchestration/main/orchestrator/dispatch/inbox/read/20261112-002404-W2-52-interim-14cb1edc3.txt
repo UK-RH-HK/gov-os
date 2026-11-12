@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-52
+status: interim result 14cb1edc3: W2-52 (DAEO-siiz): checkpoint CP-DAEO-siiz-0016 at run 5's package P-9 (the merge's W2-56 S1 conftest and DEC-1065 device listing leave W2-52's harness red; product fails closed)

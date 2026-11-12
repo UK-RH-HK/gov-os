@@ -29,17 +29,17 @@
   "W2-78",
   "W2-110"
  ],
- "closes_next": "none running; landing: W2-90b (merge queue, re-verifying alone), W2-05 queued; W2-40 EJECTED 21:38 (path map: experiments/** unmapped); next closes: W2-112, W2-149 (held: 35 skipped), W2-66c; refused since the last report: none",
+ "closes_next": "none running; CLOSED since 21:40: W2-90b, W2-05, W2-66c (merge queue), W2-149, W2-112 (DEC-953); W2-40 ejected (path map: ACT-PATHMAP-EXP-1 in review); next: W2-175 after its copies ACT; refused since the last report: none",
  "examin": "forecast FORECAST-W2-3 (11-11): EXAMIN's copy about 11-16 now that usage (A) ended at the lift (DEC-1126 (2)); W2-27 now also depends on W2-156 (batch 13) and W2-174; the memory audit's first run Mon 11-23 (W2-170 to W2-173)",
  "emergency": "ENDED: the lift done 11-11 (re-pin pin-797495bdfc70 at 13:31, the closes 15:3x); usage (A) ended; 80 % brake stays; WSL out-of-memory 14:19 (2,161 rg), recovered 15:04; mem_guard.py running (DEC-1133 (5))",
  "countdown": [
-  "Done 11-11 evening: five closes (W2-04, W2-81, W2-170, W2-105; W2-90b landing); W2-175 run 2 DONE and READY; W2-11 restore worker DONE 21:4x; DEC-1135 to DEC-1138",
+  "Done 11-11 evening: closes W2-04, W2-81, W2-170, W2-105, W2-90b, W2-05, W2-66c, W2-149, W2-112; DEC-1139 (W2-175 approved); W2-11 designer DONE",
   "Waiting on the owner: W2-175's template approval (DEC-1139 on the word); the two ACT r2 yes lines once packaged (EXAMIN-SETS-1, ACCEPTED-REDS-1); W2-148's options package",
-  "Now: W2-90b re-verifying alone in the merge queue; W2-05 queued to land (unblocks batch 5); W2-40 ejected (experiments/** not in the path map: a class (b) ACT); W2-11 designer then r6 resume lead",
+  "Now: leads W2-11 (r6) and W2-23 (run 1); reviews of ACT-PATHMAP-EXP-1 (W2-40's fix) and ACT-LOAD-BALANCER-A running; ACT-CLAUDE-COPIES-4 (W2-175) being built",
   "Then: W2-175 copies ACT, S6 re-run, merge and close; ACT A's companion merge and review; W2-112 and W2-149 closes; W2-66c land and close; W2-23 lead (EXAMIN's path, free of conflicts)",
   "After: EXAMIN's copy about 11-16 (FORECAST-W2-3); the nightly 11-12 04:00; the memory audit's first run 11-23; Wave 2's end about 11-24; usage 78 % at 21:49 (reset 11-15 09:00), the 80 % brake (DEC-1126): past it only EXAMIN's path runs"
  ],
- "owner_action": "P1-approval: W2-175 templates (13 sha256, docs/changes/W2-175-CIT-P.md §2) - the line `W2-175 templates approved at 4c0c73472fd8`; P2: the yes lines on ACT-EXAMIN-SETS-1 r2 and ACT-ACCEPTED-REDS-1 r2 after packaging (next report); W2-148 options (package, next report)",
+ "owner_action": "P2: W2-148-S15 (packages/W2-148-S15.md, option 2 recommended); `yes ACT-ACCEPTED-REDS-1 b8df21d8` (by hand, after EXAMIN-SETS-1 r2, class (a), READY e8020292, which the agent applies); coming: the yes lines for ACT-PATHMAP-EXP-1, ACT-LOAD-BALANCER-A, ACT-CLAUDE-COPIES-4 after their reviews",
  "last_report": "2026-11-11 20:59:52",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",

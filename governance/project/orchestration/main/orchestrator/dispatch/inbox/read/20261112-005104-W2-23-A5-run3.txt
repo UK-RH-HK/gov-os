@@ -1,0 +1,10 @@
+log: W2-23-A5-run3.json
+W2: W2-23
+status: PACKAGES. The FULL review round 1 came back NOT READY: S3 fails on findings R1 and R2, which are in scope, hit ordinary work and fail open. I reproduced both at the head. The fix round needs your answer to P-W2-23-7, so there is no probe record and no landing yet.
+
+task: DAEO-kmcr (W2-23), run 3 (resume → build → review)
+status: PACKAGES. The FULL review round 1 came back NOT READY: S3 fails on findings R1 and R2, which are in scope, hit ordinary work and fail open. I reproduced both at the head. The fix round needs your answer to P-W2-23-7, so there is no probe record and no landing yet.
+work_completed: I did the checkpoint's NEXT line.
+- Merged w2/integrate (abef7e045) back into the branch, clean, at c735912bc.
+- Ran two workers in parallel:
+  - eng-3 (Sonnet high, C2): P-W2-23-4 (b), `AUTO_COMPACT = {}` (DEC-838), so no `env` block is added when neith

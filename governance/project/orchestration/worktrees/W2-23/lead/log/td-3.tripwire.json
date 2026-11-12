@@ -1,0 +1,61 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "abef7e045133",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "abef7e045133",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "a3b35c0afaf1",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "58ac442d6820",
+   "after": "dca382f3069f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "head",
+   "before": "1798e82f1201",
+   "after": "13fd1dd34e32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "status line gone",
+   "line": "?? tests/unit/hooks/test_w2_176_precompact.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "c735912bc422",
+   "after": "c9dafe82a8d7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "head",
+   "before": "c735912bc422",
+   "after": "d5f5a8b9930c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

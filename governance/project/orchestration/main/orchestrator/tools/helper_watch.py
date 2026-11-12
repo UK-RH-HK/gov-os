@@ -195,7 +195,9 @@ def once(a, now, since):
     except (OSError, ValueError):
         state = {}
     found = helpers(a, now, state) + workers(a, now, since)
-    new, written = {}, []
+    # DEC-1140 (1)(a): a reported condition is never forgotten (each condition string carries its own event time), so a
+    # second instance or a condition that drops out of one pass cannot re-send the same item; the state only grows
+    new, written = dict(state), []
     for key, cond, kind, status, last, where in found:
         new[key] = cond
         if state.get(key) != cond:

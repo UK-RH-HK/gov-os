@@ -1,0 +1,6 @@
+W2-23 (DAEO-kmcr): merge the independent acceptance tests (28526529efd0, td-1) into the build
+
+Task: DAEO-kmcr
+Role: orchestrator
+Implements: DEC-729, DEC-1052, DEC-954, DEC-315, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

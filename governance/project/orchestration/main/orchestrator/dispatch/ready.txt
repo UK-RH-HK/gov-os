@@ -46,6 +46,29 @@
 # W2-170 DAEO-61vm W2-170-A5-review.md W2-170-A5-review.json
 # returned 20:25 DONE, merged: W2-170 DAEO-61vm W2-170-A5-fix.md W2-170-A5-fix.json
 # 21:59 b2f0511f: W2-11 r6 resume (restore c174e2c7f, designer c96136eb6 DONE; pre-release check: role-lead.md present, brief 98861 bytes, brace tokens only the key table, log name unused)
-W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json
+# returned (log exists), retired 00:59 b2f0511f: W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json
 # 22:12 b2f0511f: W2-23 run 1 (claimed 219307d1d; DoR by hand; gov brief lead --run build with its part; pre-release check: role-lead.md present, brief 11478 bytes, brace tokens only the key table, log name unused)
-W2-23 DAEO-kmcr W2-23-A5-run1.md W2-23-A5-run1.json
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run1.md W2-23-A5-run1.json
+# 22:19 b2f0511f: W2-23 run 2 (resume: run 1 PACKAGES answered in the ticket; gov brief --run resume)
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run2.md W2-23-A5-run2.json
+# 22:38 b2f0511f: W2-11 r7 resume (r6 PACKAGES decided b9dc19fca/9c0f0fd22; hand-built brief, gov brief KPI_NO_VERIFY; brake cleared, log name unused)
+# returned (log exists), retired 00:59 b2f0511f: W2-11 DAEO-k7hz W2-11-A5-r7-resume.md W2-11-A5-r7-resume.json
+# 23:06 b2f0511f: DEC-1140 (owner: the 80 % brake lifted for the week, up to five leads, EXAMIN first): W2-110 and W2-52 resumes (hand-built, KPI_NO_VERIFY), W2-115 run 1 (claimed); pre-release checks done
+# returned (log exists), retired 00:59 b2f0511f: W2-52 DAEO-siiz W2-52-A5-resume-1111.md W2-52-A5-resume-1111.json
+# returned (log exists), retired 00:59 b2f0511f: W2-115 DAEO-emq1 W2-115-A5-run1.md W2-115-A5-run1.json
+# 23:22 b2f0511f: W2-176 run 1 (DEC-1140 (1)(b); claimed fefc01a93; pre-release checks done)
+# returned (log exists), retired 00:59 b2f0511f: W2-176 DAEO-ktiw W2-176-A5-run1.md W2-176-A5-run1.json
+# 23:25 b2f0511f: W2-23 run 3 (run 2's packages decided in the ticket; class C2 by RUBRIC-2)
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run3.md W2-23-A5-run3.json
+# 23:35 b2f0511f: W2-110 resume (merge-back done by the CTO; class C3)
+# returned (log exists), retired 00:59 b2f0511f: W2-110 DAEO-3r1j W2-110-A5-resume-1111.md W2-110-A5-resume-1111.json
+# 23:57 b2f0511f: W2-115 run 2 (run 1's P1-P5 decided; the queue lines split to W2-115b; S17 waits for its CIT-P)
+# returned (log exists), retired 00:59 b2f0511f: W2-115 DAEO-emq1 W2-115-A5-run2.md W2-115-A5-run2.json
+# 00:25 b2f0511f: W2-52 run 6 (P-9 (a) decided; one test-design batch; the old probe holds)
+# returned (log exists), retired 00:59 b2f0511f: W2-52 DAEO-siiz W2-52-A5-r6.md W2-52-A5-r6.json
+# 00:35 b2f0511f: W2-110 run (P-W2-110-5 (a): W2-105's fixture roster by a test designer)
+W2-110 DAEO-3r1j W2-110-A5-r2.md W2-110-A5-r2.json
+# 00:47 b2f0511f: W2-176 run 2 (run 1's P1-P4 decided; review round 2 the last)
+W2-176 DAEO-ktiw W2-176-A5-run2.md W2-176-A5-run2.json
+# 00:51 b2f0511f: W2-23 run 4 (P-W2-23-7 (a): round 2 on S3, the last)
+W2-23 DAEO-kmcr W2-23-A5-run4.md W2-23-A5-run4.json

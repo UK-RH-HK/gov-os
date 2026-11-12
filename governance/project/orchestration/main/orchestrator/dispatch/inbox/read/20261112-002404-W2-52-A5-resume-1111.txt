@@ -1,0 +1,9 @@
+log: W2-52-A5-resume-1111.json
+W2: W2-52
+status: PACKAGES. The merge leaves 66 of W2-52's own acceptance cases red. In both causes the product refuses correctly (fails closed); W2-52's test setup simply predates two things the merge brought in.
+
+W2-52 can't be returned as DONE yet. The code is fine, but the merge broke W2-52's own acceptance tests, so I'm returning one package (P-9) for your decision.
+
+task: W2-52 (DAEO-siiz) resume of 2026-11-11 (DEC-1140): re-check portability, rebuild, run the suite and the scoped set, decide whether a review is needed, return DONE or PACKAGES
+status: PACKAGES. The merge leaves 66 of W2-52's own acceptance cases red. In both causes the product refuses correctly (fails closed); W2-52's test setup simply predates two things the merge brought in.
+work_completed: confirmed the identity, branch and clea

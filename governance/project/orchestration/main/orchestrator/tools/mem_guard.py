@@ -266,7 +266,10 @@ def step(state, dry):
             state["stop_alert_at"] = t
             inbox_item("rg-stopped", "P1: mem_guard killed %d rg (they were %d; available %d MB; stall %.1f%%); the spawner follows"
                        % (k, n, avail // 1024, psi), "parents (children, pid, cwd, command):\n" + report, dry)
-    elif lvl >= 1 and state.get("watch_alert_at", 0) + CFG["alert_every_s"] < t:
+    elif lvl == 1:
+        # DEC-1140 (1)(a), DEC-1118 H: a level-1 blip needs no action, so it is logged, never sent to the CTO's inbox
+        log("level 1 (logged, not sent): %d rg, available %d MB, stall %.1f%%" % (n, avail // 1024, psi))
+    elif lvl >= 2 and state.get("watch_alert_at", 0) + CFG["alert_every_s"] < t:
         state["watch_alert_at"] = t
         tag = "rg-stop-needed" if lvl == 3 else "rg-watch"
         inbox_item(tag, "%s: %d rg processes (level %d%s); available %d MB; stall %.1f%%"

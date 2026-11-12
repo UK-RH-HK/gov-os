@@ -1,0 +1,232 @@
+# ACT-DISPATCH-1: the dispatcher enforces the lead cap, sends one idle item per cause, and counts a held slot by its measured load (DEC-1140 (1)(a) and (2))
+
+- **For:** the owner's yes, then the owner's operator **by hand** (class (O): section 0). About two minutes in the main tree.
+- **By:** an ACT-preparation helper of the CTO (Sonnet, high; RUBRIC-2, class C1), 2026-11-11 about 23:00 to 24:00 UTC. **Nothing
+  live was changed or started:** no commit, no stage, no live dispatcher, no crontab, no live config. Built and rehearsed in
+  clones (section 6). **Not yet independently reviewed** (section 7).
+- **Under:** DEC-1140 (1)(a) and (2) (the owner's order of 11-11 ~23:05: the dispatcher enforcing the lead cap itself, the idle
+  guard's follow-up, a repeated idle notice for the same cause logged, not sent); DEC-1052 O-A1 (the Load Balancer's forecast is the
+  memory admission; its floor and the out-of-memory trip-wire kept); DEC-1118 H (notices that need no action are logged, not
+  sent); DEC-1133 (3) (the set-up A's order; the dispatcher's start path is the launcher's caller); DEC-1110 (1) (never idle
+  while unblocked work remains: the idle item is the dispatcher's half of it). The manifest's `dec` names them.
+- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/dispatch-1/` (the bundle `acts/ACT-DISPATCH-1/`, the tools in `tools/`, the
+  dry-tick harness `tools/dry_tick.py`). The follow-up ACT for the idle guard's hook is `ACT-IDLE-GUARD-2.md` beside this file.
+
+## 0. Class: (O) as asked (it carries the tests); (b) without them. Your yes, then your operator by hand
+**The yes line: `yes ACT-DISPATCH-1 [[SHA8]]`** (the first 8 digits of the manifest's sha256 in section 3).
+
+I read `governance/project/operator/class-rules.yaml` first and ran the operator's own `act_class.py` (read only) on the bundle:
+
+| File | Row | Class | Control path |
+|---|---|---|---|
+| `governance/project/orchestration/tools/dispatch/dispatcher.py` | `watchers` (`dispatch/**`) | b | yes |
+| `governance/project/orchestration/tools/dispatch/balancer.py` | `watchers` (`dispatch/**`) | b | yes |
+| `tests/unit/orchestration/test_dispatcher.py` | `unknown` (the catch-all: tests are "not an ACT's business") | **O** | no |
+| `tests/unit/orchestration/test_balancer.py` | `unknown` | **O** | no |
+
+**The vote is (O)**, and it is the two test files that make it so. The code alone, the same two files, votes **(b)** (row
+`watchers`, control path; I ran `act_class.py` on that two-file bundle too, rehearsal section I). As you asked, the ACT
+carries the tests, so:
+- The operator agent never takes an (O) ACT (its gate G6 refuses it): **your operator by hand**, as for ACT-IDLE-GUARD-1: the
+  message in section 5 runs `apply.sh` from the bundle and commits with `Role: owner`. The bundle is still in the operator's
+  form (manifest, `apply.sh` deciding by sha256, a rehearsal log, checks run with `bash -c`).
+- **The alternative, if you want the operator agent to take it (class (b)):** a two-file bundle (`dispatcher.py`, `balancer.py`)
+  with the tests as a CTO commit beside it (`companion-tests.diff`, section 4). Rehearsal E4 shows the old tests are green on the
+  new code, so the code could land first and the tests after, with nothing red in between. I did not build that second
+  manifest (two yes lines for one rule); say so and I will, from the same bytes.
+- The idle guard's follow-up F1-F3 is **not** in this bundle: it lives in `stop_idle_check.py`, which is class (O) too (catch-all
+  row), so it is a second ACT, `ACT-IDLE-GUARD-2` (its own package, bundle and yes line). Its wording half (the dispatcher's own
+  item) is in this ACT (change 2, last bullet).
+
+## 1. What changes, and why (the evidence)
+Tonight's evidence (the status of 23:21 and `dispatch.log`):
+- **No start is refused for the cap.** `max_leads` (5 in `dispatch/config.json`) only worded the idle item; the start loop never read it.
+- **41 idle items in one evening** (`idle with headroom: inbox item written`, most "waiting"): the key was the bare word "waiting",
+  and the state forgot the cause whenever idle stopped holding for one pass.
+- **`Forecast: lead: REFUSES, binding CPU: CPU 23.4 of 18 cores (busy 2.66 + running jobs' peaks 18.8 + the newcomer's 2.0)`** on a
+  machine 2.66 of 20 busy, because each held heavy slot (3 x 6) counted its whole 6-worker test peak above what it used now, and
+  leads' short scoped runs keep the slots held. New leads were almost never admitted.
+
+### What the ACT does, by file
+**`dispatch/dispatcher.py`**
+1. **The cap (`why_not`).** Before `admit_safely`, after the CTO's own preparation checks (a line with no brief or no worktree
+   still says so): if `max_leads` is set and running leads plus pending launches have reached it, the line waits with the reason
+   **`lead cap: N of N running`**. No cap set (key absent, not a whole number of 1 or more): no refusal (the forecast alone
+   admits, DEC-1052 O-A1). The stagger, the hung-embedding hold, the pairing, the forecast and the memory floor are untouched.
+   One start a pass was already the rule. `max_leads` in `status.json` is the cap read.
+2. **The idle item (`idle_headroom`, `watch_headroom`).**
+   - The cause key is the **sorted names of the waiting ready lines**: `used:<names of lines skipped for a used or returned log>`,
+     then `waiting:<names of the other waiting lines>` joined by `|`; `empty` for an empty list (as now). Reasons are not in the
+     key, so a line whose reason changes between passes is the same cause.
+   - The state file `dispatch/idle-headroom-reported.json` is now `{"cause": ..., "sent": <time>}`. **A pass in which idle does not
+     hold keeps it** (no forgetting); **a real start clears it**; a changed key is a new cause.
+   - An inbox item is written **only for a new cause, or as a reminder after 6 hours of the same cause** (`IDLE_REMIND_S`; the
+     reminder's text says "reminder: the same cause for N h"). Every other pass is **logged in `dispatch.log`**
+     (`idle with headroom: <cause>; the same cause, last item N min ago: logged only`); an item is logged as before.
+   - The body has no `W2: ` line (that would hold a W2's own start). No item in a dry pass.
+   - **F1's wording (the idle guard's review):** the item now says "write the line again with a new log name ..., **or comment the
+     line out of ready.txt if its ticket needs no new run** (a lead that returned packages waits for the owner)".
+3. **The forecast (`measured_load`, `forecast_state`).** A new `dispatch/jobs-load.json` records, each pass, every running job's
+   measured cores (one sample a pass, keyed by pid and phase). A job measured for **5 minutes (at least 3 samples)** carries
+   `recent_cpu`, the highest sample of the last **10 minutes**. `forecast_state` hands the forecast the floor (**1.0 core**).
+   Defaults are in the code and move with `config.json` keys `held_load_window_s`, `held_load_min_s`, `held_load_floor`;
+   **`"held_load": false` switches it off** (the old reading), no ACT needed (class (O) scratch).
+   A job seen for less than 5 minutes, or in a phase it has just entered, has no `recent_cpu` and counts its phase's whole
+   peak as before. A dry pass reads the file and writes nothing. A fault in the measure leaves every job at its peak and says so
+   (`measured_load_error` in the status).
+
+**`dispatch/balancer.py`** (`forecast`): for the **CPU term only**, a job with `recent_cpu` counts at
+`min(phase peak, max(recent_cpu, what it uses now, floor))` above what it uses now, instead of the phase's whole peak. The text
+says how many jobs it counted so ("..., 3 of them at their measured load"). **RAM and GPU are the same arithmetic as before
+(rehearsed: the two terms are equal with and without the measure).**
+
+**`tests/unit/orchestration/test_dispatcher.py`, `test_balancer.py`** (extended, nothing removed): 14 dispatcher cases and 4
+balancer cases (section 4).
+
+**What the ACT does not do:** it does not change `launch_now.sh` (ACT A's, still pending), the heavy slots, `heavy_slots.conf`, the
+band (14-18), the real-CPU admission, the memory floor, the GPU rule, the stagger or the night hold. It does not start anything.
+
+## 2. Plain-language summary for the owner
+After this, the dispatcher itself will not start a sixth lead when the cap is five: the sixth ready line waits with "lead cap: 5 of
+5 running". The idle note comes once for a waiting set (and once more after 6 hours if nothing changed), not every few minutes;
+the minutes in between are only in the log. And three heavy slots held by leads that are only running short scoped tests no longer
+count as 18 cores about to be used: a slot that has been quiet for 5 minutes counts at its recent load (at least one core), so
+new leads are admitted on a machine that is mostly idle. The cost is honest: if all three slots then start full 6-worker runs
+together, the CPU can reach 20 of 20 (section 8).
+
+## 3. The bundle (`acts/ACT-DISPATCH-1/`, beside this file; the CTO copies it to `.gov-runtime/scratch/orchestrator/acts/`)
+`manifest.json` sha256: **`[[SHA64]]`** (sha8 `[[SHA8]]`).
+
+| File | sha256 (first 16) |
+|---|---|
+| `before/repo/.../dispatch/dispatcher.py` | `[[B0]]` (the live file at the build) |
+| `after/repo/.../dispatch/dispatcher.py` | `[[A0]]` |
+| `before/repo/.../dispatch/balancer.py` | `[[B1]]` (the live file at the build) |
+| `after/repo/.../dispatch/balancer.py` | `[[A1]]` |
+| `before/repo/tests/unit/orchestration/test_dispatcher.py` | `[[B2]]` |
+| `after/repo/tests/unit/orchestration/test_dispatcher.py` | `[[A2]]` |
+| `before/repo/tests/unit/orchestration/test_balancer.py` | `[[B3]]` |
+| `after/repo/tests/unit/orchestration/test_balancer.py` | `[[A3]]` |
+| `apply.sh`, `list.txt`, `rehearsal.log` | in the manifest's `files` |
+
+`apply.sh check | apply | undo | verify`, by `list.txt` (`root|path|before|after`), the same script as ACT-IDLE-GUARD-1's: each file's
+state is decided by its sha256 alone (before, applied, other). **Every file is read first; if one is neither the before nor the
+after, nothing is written** (exit 3). Each frozen copy is hashed against `list.txt` before it is used (exit 4). Writes go to a
+`mktemp` file beside the target, the mode kept, then a rename; no temp file is left. A link or a missing file is refused. `check`
+is exit 0 only on the before; `verify` only on the after.
+
+**Checks** (the manifest's five, each run with `bash -c` from the repository root; none needs pytest, which the operator's planted HOME
+hides; none writes byte-code; each leaves only a small `mktemp` folder in the temp directory): 0 the four files parse; 1 the cap
+(planted `why_not`: two leads under a cap of 3 leave the line startable; at 2 and with one lead and a launch pending it waits
+"lead cap: 2 of 2 running"; no cap never refuses), count 4; 2 the idle item (planted truth: one item for two used lines; none for
+the same set; none across a shut-gate pass; a second for a changed set; a start clears the cause), count 5; 3 the forecast
+(three held slots: refused unmeasured; admitted at 0.05 measured; a slot measured at 5.5 still counted at that; the switch off
+keeps the whole peak), count 4; 4 the four files are tracked. **Checks 1-3 are red on the old files** (rehearsal C).
+
+**Undo:** `bash $A/apply.sh undo` puts the four files back byte for byte (section 5), then a commit with the same trailers.
+**Rollback in short (no ACT):** `"held_load": false` in `dispatch/config.json` restores the old forecast; removing `max_leads` removes
+the cap; the rest needs the undo. `dispatch/jobs-load.json` and the new form of `idle-headroom-reported.json` are scratch state that the
+old code ignores (the old code reads a non-conforming reported file as empty).
+
+## 4. The tests (carried by the ACT: the two test files; `companion-tests.diff` if you take the code-only route)
+18 new cases, extended files, nothing removed ([[RED_NOTE]]):
+- **Cap (3):** two leads at a cap of 2 refuse every startable line with the reason, and 3 starts; a launch pending counts, and no cap
+  never refuses; a line that waits for another reason keeps that reason.
+- **Idle item (8):** one item for a waiting set however many passes; a shut-gate pass forgets nothing; a changed set is a new cause and a
+  start clears it; the cause is the names, not the reasons; a reminder after 6 hours (not at 5 h 50 min); a returned log and an empty
+  list are separate causes; no item without a cap, at the cap or in a dry pass; an old-form reported file is one more item, not an error.
+- **Forecast (3 dispatcher, 4 balancer):** three held slots at a low measured load admit a lead (and were refused unmeasured); a slot
+  measured busy, a job seen for two minutes and the switch off keep the whole peak; the measure is recorded a pass, forgotten when the
+  job ends and not written in a dry pass; the balancer's arithmetic on a measured, an unmeasured and a switched-off job, never above
+  the phase's peak, and RAM and GPU untouched.
+- **Supersedes** the dispatcher hunk of ACT-IDLE-GUARD-1's `companion-tests.diff` (never committed; its four cases are covered here and
+  one of them, "a cleared cause is reported again", is the behaviour this ACT removes on purpose). **Do not commit that hunk.** Its
+  `test_stop_idle_check.py` hunk is carried by ACT-IDLE-GUARD-2.
+
+## 5. The operator's steps: the message
+> **ACT-DISPATCH-1 (DEC-1140 (1)(a), (2)): the dispatcher enforces the lead cap, one idle item per cause, a held slot counted by its measured load.**
+> Class (O), by hand: your yes first: **`yes ACT-DISPATCH-1 [[SHA8]]`**. In the main tree, about two minutes:
+> ```
+> cd /home/usain/Dynamic-Agentic-Engineering-OS
+> A=.gov-runtime/scratch/orchestrator/acts/ACT-DISPATCH-1
+> sha256sum $A/manifest.json     # expect [[SHA64]]
+> git status --porcelain         # expect empty
+> bash $A/apply.sh check         # exit 0 (all four files as frozen)
+> bash $A/apply.sh apply         # exit 0
+> bash $A/apply.sh verify        # exit 0
+> git diff --name-status         # expect exactly four M: dispatch/dispatcher.py, dispatch/balancer.py, test_dispatcher.py, test_balancer.py
+> git commit -m "ACT-DISPATCH-1: the dispatcher enforces max_leads, sends one idle item per cause (reminder after 6 h), counts a held slot by its measured load (DEC-1140 (1)(a), (2))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1140, DEC-1118" --trailer "Role: owner" -- governance/project/orchestration/tools/dispatch/dispatcher.py governance/project/orchestration/tools/dispatch/balancer.py tests/unit/orchestration/test_dispatcher.py tests/unit/orchestration/test_balancer.py
+> ```
+> - **If `check` stops** ("moved: <path>"), send its line to the CTO and apply nothing (`apply.sh` refuses by itself and writes nothing).
+> - **If `git diff --name-status` lists anything besides the four,** commit anyway: the `--` paths limit the commit.
+> - **Undo:** `bash $A/apply.sh undo`, then the same `git commit` with the subject `ACT-DISPATCH-1 undone`.
+> - No restart is needed: the cron tick (`run_tick.sh`) reads its files whole each minute. The first pass after the apply reads the old reported file as empty (one more idle item at most).
+
+**Then the CTO:** watch `dispatch/status.txt` (the Forecast line: "N of them at their measured load"), `dispatch/dispatch.log`
+(`idle with headroom: ... logged only`, no new item) and the first "lead cap: ..." wait; commit nothing else (the tests are in the ACT).
+
+## 6. The rehearsal (`rehearsal.log`; [[OKN]] ok lines, `failures: 0`)
+As the operator will run it (`tools/rehearse.sh`): a `--no-hardlinks` clone of `w2/integrate` (the main tree's head at the build), a
+planted HOME, the clean environment of the operator's dry run (PATH, LANG, TMPDIR, HOME planted, no `GOV_*`), each manifest check run exactly as
+written with `bash -c`, the plain `apply.sh apply` with no option. The unit tests run **scoped, through the heavy-slot gate**
+(`heavy_slot.sh env TMPDIR=... PYTHONPATH=<clone>/src python3 -m pytest tests/unit/orchestration -q -p no:cacheprovider -o tmp_path_retention_policy=failed`).
+In order: A the bundle is not stale (the clone's and the main tree's four files are the frozen before; `check`, `verify` refused,
+`undo` a no-op); B the whole `tests/unit/orchestration` on the old code: **[[BASE]]**; C the new test files on the old code: **[[RED]]**, and
+the three behaviour checks red; D the plain apply: four files the frozen after byte for byte, modes kept, `git status` exactly the four, no temp file left, `verify` 0,
+a second `apply` changes nothing; E the five checks green as written and the whole directory green: **[[GREEN]]**; **E4 the old test
+files on the new code: [[OLDTESTS]]** (so the code-only route is safe); F the dry-tick scenarios in a planted world (below); G undo
+byte for byte and the clone clean; one file moved: `check`, `apply` and `undo` refuse (3) and write nothing to the others; a
+half-applied state finished by `apply` and taken back by `undo`; a tampered frozen copy: exit 4, nothing written; a missing file and a
+link refused; H the live files and the main tree unchanged, the planted HOME empty; I the class vote of the four-file bundle (O) and of
+the two-file code-only bundle (b).
+
+**The dry-tick scenarios** (`tools/dry_tick.py`: a planted repository, six tickets with worktrees and briefs, a stub launcher, planted
+`/proc`-like inputs, **a copy of the live `config.json`** (so `max_leads` is the live 5); never the live dispatch folder; no real
+process, session or launch). The same three scenarios run on the old and the new dispatcher (rehearsal F):
+
+| Scenario | Old dispatcher | New dispatcher |
+|---|---|---|
+| **CAP**: five leads run, six ready lines, `tick --dry` | "started this tick: W2-6" (a sixth lead would start) | `W2-6 T-6: lead cap: 5 of 5 running`, nothing starts |
+| **IDLE**: two leads run, four used-log lines; a pass, a pass a minute later, a shut-gate pass, a pass with the gate open, a pass 7 h later | 1, 1, 1, **2**, 3 inbox items (a shut-gate pass forgets the cause) | **1, 1, 1, 1, 2** (the 2nd is the reminder: "reminder: the same cause for 7 h"); the cause kept across the shut gate |
+| **FORECAST**: three held slots measured at 0.05 cores for 10 minutes, one startable line, `tick --dry` | `CPU 22.7 of 18 cores (busy 3.0 + running jobs' peaks 17.7 + the newcomer's 2.0)`: refused | `forecast lead ok: True`, `CPU 8.0 of 18 cores (busy 3.0 + running jobs' peaks 3.0, 3 of them at their measured load + the newcomer's 2.0)`, "would start W2-1" |
+
+**The log has no head, pid, date, duration or timing line** (the pytest counts only): rebuilt on the same bytes it is the same, and so is the manifest.
+
+**Differences from the real run:**
+- It is a clone of the head at the build; the files are checked by sha256, so a later head that leaves the four files alone changes
+  nothing; one that edits any of them makes `apply.sh check` refuse and the bundle is rebuilt. **ACT A touches `launch_now.sh` only: no clash.**
+- No operator gates G1-G9 ran (an (O) ACT is the owner's by hand; for the (b) route the operator's own dry run is the reviewer's).
+- The dry-tick world has planted processes, `/proc/stat` and memory; the real machine's measured jobs (their `cpu` and `recent_cpu`) come
+  from `/proc` over the five minutes the job has been seen. **The first five minutes after the apply, every running job counts its
+  whole peak (the measure is empty), so the first admissions after the apply look like today's.**
+- The real pytest runs used the user's own HOME (the planted one hides the user-site pytest); no manifest check needs pytest.
+- No real tick ran against the live dispatch folder; the checks and the scenarios use planted folders only.
+
+## 7. The review, residuals
+- **Not independently reviewed.** The CTO starts the independent auditor (a fresh read-only session; it should run section 5's
+  `check` and the five checks in its own clone, and read `measured_load` and the `forecast` change first).
+- **Not done, listed only:** `dispatch/README.md` does not describe `held_load*`, the cap's wait reason, `jobs-load.json` or the new
+  reported-file form (a later edit would itself be a (b) control-path change); the code's docstrings do.
+- A reviewer's lens for the forecast: the measure is a max over a 10-minute window of one-minute averages. A burst shorter than a pass
+  between two passes can be missed; the next pass sees it (the max keeps it for 10 minutes).
+
+## 8. Risks, honestly
+- **The forecast change can admit leads onto an over-full CPU.** Today's rule is conservative to the point of near-never admitting
+  (23.4 of 18 on a 2.66-busy machine). The new rule counts a quiet held slot at 1 core (or its 10-minute max), so with three held slots and
+  a few leads the forecast admits while the slots hold up to 18 cores of possible test work. If all three slots then run full
+  6-worker test runs together beside the new leads' own work, the machine can reach about 20 of 20 busy: slower tests (and a timeout in
+  a test with a tight one), not a crash. **Memory is not touched**: the RAM term still counts every running job's peak above its RSS
+  now and the newcomer's, above the floor in `gate-config.json`.
+- **Guards that remain:** (1) **the real-CPU admission** (`admission()`): measured busy cores plus the embedding server's room at or above
+  20 minus the margin 2 refuses every start, whatever the forecast says; (2) **the memory floor** and the RAM forecast, unchanged
+  (and `tools/oom_watch.sh`, which raises the floor, and `tools/mem_guard.py`, which stops starts); (3) the GPU rule and the reranker
+  slots, unchanged; (4) **the heavy slots themselves**: at most 3 test runs, each confined to its own CPUs by `taskset` (0-5, 6-12, 13-19),
+  so the slots cannot together use more than the machine; (5) **the cap**, now enforced, bounds the number of leads whatever the forecast
+  says; (6) `"held_load": false` in `config.json` turns the measure off at once, no ACT.
+- **A just-started job is not discounted** (5 minutes unmeasured, a new phase starts again), so the risk is the slot that sat quiet and
+  then bursts, not the new one.
+- **The cap refuses while launches are pending for 10 minutes.** A lead that dies at its launch counts as pending until its start is 10
+  minutes old (the existing rule); with the cap at 5 it can hold a place for that time.
+- **`dispatch.log` grows by about one line a minute while idle holds** (the owner's "logged every pass"; the old code logged only an item).
+- **The first idle pass after the apply may send one more item** (the old reported file is read as empty).
+- **`heavy_slots.conf` is not changed.** Raising the workers is a different decision.

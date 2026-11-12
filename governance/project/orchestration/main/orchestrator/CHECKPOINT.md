@@ -1,6 +1,32 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 22:25 UTC: session `b2f0511f` (fresh after b40cba91); next free id DEC-1140
+## RESUME HERE — 2026-11-12 01:10 UTC: session `b2f0511f`; next free id DEC-1141 (DEC-1140 recorded `566c26beb`)
+**Read the 22:25 block below too; this block replaces it where they differ.**
+- **The owner tonight:** DEC-1139 (W2-175 approved); DEC-1140 (usage first: RUBRIC-2 at every launch, quiet notices,
+  context awareness back; then ACT A, the dispatcher's cap, F1-F3, row 159, W2-115; measuring from 11-02; the CTO session
+  to ~1M tokens, fresh each morning after the 09:30 digest; the 80 % brake lifted this week, five leads; 97 % stop, 99 %
+  push); `cpu_band` stays [14, 18] (no interim easing); ACT-DISPATCH-1's yes line in the 09:30 digest.
+- **Closed since 21:40:** W2-90b, W2-05, W2-66c (queue), W2-149, W2-112, W2-55, W2-20 (DEC-953).
+- **Leads (cap 5, one start a pass):** W2-115 run 2, W2-52 run 6 (test-design batch, old probe holds), W2-110 run after
+  P-W2-110-5 (W2-105 fixture roster), W2-176 run 2 (review round 2 the last), W2-23 run 4 (S3 round 2 the last). W2-11
+  DONE at `58ac442d6820` (+ `dca382f30` CIT-P figures): lands only by the morning sequence below.
+- **ACTs:** ACT A: the agent's G4 refused at 23:40 (the CTO's review.md lacked the verdict block; fixed `31a4f050c`); the
+  frozen copy `~/gov-os-operator/acts/ACT-LOAD-BALANCER-A-0b40f1bfd84b` needs the owner's operator to move it aside
+  (`packages/ACT-LOAD-BALANCER-A-REFREEZE.md`), then re-queue the same line. READY for the 09:30 digest: ACT-DISPATCH-1
+  `a20754dd` (by hand, (O); F2's 6-hour reminder to confirm), ACT-CLAUDE-COPIES-4 `6ab06e85`, ACT-CLAUDE-COPIES-5
+  `e602d596`; ACT-IDLE-GUARD-2 round 2 `a3fe076c` under review (pid 1873582, log
+  `~/gov-os-worktrees/W2-153/.gov-runtime/scratch/lead/log/ACT-IDLE-GUARD-2-review-r2.json`). ACT-PATHMAP-EXP-1 `9a945c99`
+  after EXAMIN-SETS-1 and ACCEPTED-REDS-1 (its review.md fixed too).
+- **The morning sequence (owner's word needed for step 4):** hold the queue and nightly; ACT-4 (agent); W2-175 S6, CIT-P
+  ACCEPTED, merge, close; W2-11 merged by hand outside the queue (7 named copy cases red, minutes) ; ACT-5 at once; re-run
+  W2-11/W2-128/W2-142 and portability; close W2-11; release. ACT-4 must precede W2-11 (W2-11 changes two of its files).
+- **Tools tonight:** `launch_worker.sh` enforces RUBRIC-2 from `log/ticket-class.json`; `release_lead.sh` gates every
+  ready line; `spend.py` row 159 fixed; `mem_guard` level 1 logged only (restarted pid 513002); `helper_watch` keeps
+  reported conditions; `usage_lines.sh` (97/99) armed; `measure_week.py record` hourly loop armed; W2-115b filed.
+- **Digest 09:30:** the measures (`measure_week.py daily --md`, `forecast`), the savings (inbox items before/after), the
+  owner items above, W2-11's approval table (as W2-175's), W2-176's CIT-P when ready, W2-115's S17 CIT-P.
+
+## RESUME HERE (history) — 2026-11-11 22:25 UTC: session `b2f0511f` (fresh after b40cba91); next free id DEC-1140
 **Read the 21:40 block below too; this block replaces it where they differ.**
 - **Owner tonight:** DEC-1139 recorded `f13d2a439` (W2-175 approved at `4c0c73472fd8`, promoted 1.0.1; three fixes: (a) RV1, (b) RV3 ride
   the one-bar CIT-P, (c) composed files' "Wave 1" sections to W2-33; DECIDED-NOT-DONE rows 160-161).

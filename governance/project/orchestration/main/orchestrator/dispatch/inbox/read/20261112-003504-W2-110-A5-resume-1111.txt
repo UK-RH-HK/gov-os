@@ -1,0 +1,7 @@
+log: W2-110-A5-resume-1111.json
+W2: W2-110
+status: PACKAGES. All three pinned-gov cases now pass, so P-W2-110-4 is resolved. But the scoped run has 2 new reds, and W2-110 causes them: W2-105's two "the coordination-ticket orchestrator's install is asked" cases fail under W2-110's fail-closed rule. They pass on w2/integrate. Fixing them means revisin
+
+task: W2-110 (DAEO-3r1j) resume of 2026-11-11 (DEC-1140): verify the CTO's merge under the new pin `pin-797495bdfc70`, rerun the three pinned-gov cases, and return DONE or PACKAGES.
+status: PACKAGES. All three pinned-gov cases now pass, so P-W2-110-4 is resolved. But the scoped run has 2 new reds, and W2-110 causes them: W2-105's two "the coordination-ticket orchestrator's install is asked" cases fail under W2-110's fail-closed rule. They pass on w2/integrate. Fixing them means revising another ticket's tests, which is outside this ticket's paths and needs the CTO's approval (P2).
+work_complet

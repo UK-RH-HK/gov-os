@@ -1,0 +1,63 @@
+== tests/acceptance/W1-02 exit 0 :: 71 passed, 3584 deselected in 56.16s
+== tests/acceptance/W1-05 exit 0 :: 30 passed, 68 deselected in 9.24s
+== tests/acceptance/W1-10 exit 0 :: 46 passed, 55 deselected in 10.33s
+== tests/acceptance/W1-28 exit 0 :: 103 passed, 52 deselected in 79.43s (0:01:19)
+== tests/acceptance/W1-31 exit 0 :: 56 passed, 105 deselected in 30.59s
+== tests/acceptance/W1-46 exit 1 :: 122 passed, 359 deselected, 12 errors in 119.47s (0:01:59)
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_an_opaque_bash_write_outside_the_repository_fails[interpreter.txt]
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_file_tool_write_outside_the_repository_is_refused
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails[an-acceptance-test]
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails[the-settings]
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_held_out_directory_looks_empty_from_the_sessions_bash
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_role_and_the_ticket_reach_the_session_and_its_hooks
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_install_outside_the_repository_fails_at_the_write_fence
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_bash_write_to_a_sibling_directory_fails
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_research_allowlist_refuses_a_domain_that_is_not_on_it
+ERROR tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_each_session_uses_a_temp_directory_of_its_own
+== tests/acceptance/W2-116 exit 0 :: 20 passed in 126.24s (0:02:06)
+== tests/acceptance/W2-136 exit 0 :: 76 passed in 11.71s
+== tests/acceptance/W2-148 exit 0 :: 183 passed in 45.64s
+== tests/acceptance/W2-20 exit 0 :: 170 passed, 1 skipped in 96.55s (0:01:36)
+== tests/acceptance/W2-50 exit 0 :: 24 passed, 612 deselected in 28.95s
+== tests/acceptance/W2-56 exit 1 :: 2 failed, 290 passed, 4 skipped in 346.81s (0:05:46)
+FAILED tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGHUP]
+FAILED tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGHUP]
+== tests/acceptance/W2-58 exit 1 :: 1 failed, 99 passed, 705 deselected, 3 errors in 59.14s
+FAILED tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_session_shows_no_phantom_deletion[engineer]
+ERROR tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_collects_its_own_acceptance_tests
+ERROR tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_runs_its_tests_and_sees_their_results
+ERROR tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_test_designer_imports_the_branch_s_changed_code
+== tests/acceptance/W2-61h exit 0 :: 21 passed, 7 skipped, 9 deselected in 5.77s
+== tests/acceptance/W2-62 exit 0 :: 43 passed, 15 deselected in 19.34s
+== tests/acceptance/W2-90 exit 5 :: no tests ran in 0.12s
+== tests/unit/launch exit 0 :: 220 passed, 86 deselected in 9.52s
+== tests/unit/operator exit 0 :: 237 passed in 45.45s
+== tests/unit/orchestration exit 0 :: 456 passed, 6 skipped, 89 deselected in 218.14s (0:03:38)
+== tests/unit/retrieval exit 1 :: 23 failed, 505 passed, 360 deselected in 846.12s (0:14:06)
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_searches_starting_together_start_one_service
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_twenty_concurrent_callers_each_get_their_own_scores
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_socket_is_the_users_alone
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_ties_keep_the_given_order_and_the_answers_match_the_reference
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_ends_after_its_idle_time_and_removes_its_socket
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_stopped_with_sigterm_removes_its_socket
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_below_its_gpu_share_the_service_does_not_start_and_the_search_goes_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu[False]
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_holds_every_gpu_slot_for_its_life
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_killed_service_is_replaced_by_the_next_search
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_killed_mid_request_leaves_the_search_unranked_and_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_that_does_not_answer_in_time_is_left
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_search_s_requests_never_reach_the_service_s_cap
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_that_cannot_start_leaves_the_search_unranked_and_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_bundle_names_who_reranked
+FAILED tests/unit/retrieval/test_w2_13_ranked.py::test_a_missing_store_and_a_folder_without_git_are_unavailable
+FAILED tests/unit/retrieval/test_w2_145_no_private_reranker.py::test_s1_a_stand_in_server_s_failures_keep_the_order_and_start_nothing[an error answer]
+FAILED tests/unit/retrieval/test_w2_145_no_private_reranker.py::test_s1_no_listener_and_a_refused_start_runs_the_service_alone
+== tests/unit/telemetry exit 0 :: 15 passed, 50 deselected in 0.47s
+done

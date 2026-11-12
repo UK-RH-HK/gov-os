@@ -1,0 +1,50 @@
+ACT-CLAUDE-COPIES-4 rehearsal; base: integrate with w2/W2-175 4c0c73472fd8 merged; rulesync 24.0.0
+portability on the base (W2-175 merged, no copies): exit 1; 13 findings: SOURCE_DIFFERS 6, TEMPLATE_COPY_DIFFERS 7
+portability in the generation clone after the copies: exit 0; findings []
+generation clone: 19 files changed or new: .claude/agents/engineer.md, .claude/agents/independent-auditor.md, .claude/agents/independent-test-designer.md, .claude/agents/orchestrator.md, .claude/agents/product-spec.md, .claude/agents/research.md, .claude/templates/role-cto.md, .claude/templates/role-engineer.md, .claude/templates/role-lead.md, .claude/templates/role-product-spec.md, .claude/templates/role-research.md, .claude/templates/role-reviewer.md, .claude/templates/role-test-designer.md, .rulesync/subagents/engineer.md, .rulesync/subagents/independent-auditor.md, .rulesync/subagents/independent-test-designer.md, .rulesync/subagents/orchestrator.md, .rulesync/subagents/product-spec.md, .rulesync/subagents/research.md
+the 13 copies equal the approved sha256 of CIT-P section 2 (7 .claude/templates, 6 .rulesync/subagents)
+--- rehearsal on plain integrate (the main tree before W2-175 merges); HOME planted at a fresh empty folder
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 13 files): exit 0
+ok   check 2 (sha256sum -c, 6 files): exit 0
+ok   the changed set equals the touched list (19 files)
+ok   every target is at its stated after sha256
+info portability after the apply (W2-175 not merged): exit 1; 13 findings: SOURCE_DIFFERS 6, TEMPLATE_COPY_DIFFERS 7
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   check 1 after the re-apply: exit 0
+ok   check 2 after the re-apply: exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- rehearsal on integrate with W2-175 merged; HOME planted at a fresh empty folder
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 13 files): exit 0
+ok   check 2 (sha256sum -c, 6 files): exit 0
+ok   the changed set equals the touched list (19 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply (W2-175 merged): exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   check 1 after the re-apply: exit 0
+ok   check 2 after the re-apply: exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- S6 on the merged tree with the ACT applied: tests/acceptance/W2-128 tests/acceptance/W2-152 tests/acceptance/W2-153
+ok   S6 (W2-128, W2-152, W2-153 acceptance): exit 0; 254 passed, 0 failed
+ok   python3 -m gov.adapters.portability on the merged tree with the ACT applied: exit 0; findings []
+--- section 5 literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "6ab06e85cae2d566c9da540c9ef0ec60c9edc366b6d5e5ccb7401a7d6d99fd17", "touched": 19, "failures": 0}

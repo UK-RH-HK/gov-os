@@ -1,0 +1,461 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+.......................sss.............................................. [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+................................F............F.......................... [ 57%]
+..................................................................sss... [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+....................................................................F... [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+...........................................F.....................F...... [ 82%]
+....................................................F................... [ 84%]
+.....................................................F.................. [ 86%]
+...............F........................................................ [ 87%]
+.F..F.................................F................................. [ 89%]
+....................................F................................... [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+...................................F................                     [100%]
+=================================== FAILURES ===================================
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x7f43d536e120>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-xafn/PR-DAEO-xafn.md': [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}]}
+E       assert not {'docs/probes/DAEO-xafn/PR-DAEO-xafn.md': [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_...bed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 1 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}])
+E       assert not [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-xafn...obed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+__ test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay __
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+adoption = Adoption(project=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw2/test_a_failed_batch_rolls_back0/...gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw2/test_a_failed_batch_rolls_back0/sandbox/elsewhere/proposal.yaml'))
+project = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw2/test_a_failed_batch_rolls_back0/harbour')
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay(adoption, project, interface):
+        """Batch 2 cannot be completed: the folder of one of its two targets exists and takes no new file. Batch 1
+        stays; batch 2 is undone as a whole (its other move too); batch 3 does not run; the tree is what it was at
+        batch 2's rollback point."""
+        baseline = support.tree(project)
+        adoption.through("A5", support.moves_proposal())
+        locked = project / os.path.dirname(support.MOVED_RECORD_TARGET)   # spec/decisions: holds dec-301.md already
+        mode = locked.stat().st_mode
+        locked.chmod(0o555)
+        try:
+            if os.access(locked, os.W_OK):
+                pytest.skip("this user is not held by folder permissions: the batch cannot be made to fail this way")
+            assert support.porcelain(project) == "", "the fixture made the tree dirty"
+            run = adoption.run("A6")
+        finally:
+            locked.chmod(mode)
+        support.assert_refused(run, interface, any_of=(support.MOVED_RECORD, support.MOVED_RECORD_TARGET))
+        point = {item["batch"]: item["rollback_point"] for item in adoption.stages["A4"].front["batches"]}[2]
+        commit = support.resolve(project, point)
+>       assert commit, f"batch 2's rollback point {point} does not resolve after the failure"
+E       AssertionError: batch 2's rollback point refs/gov/adoption/rollback/batch-2 does not resolve after the failure
+E       assert None
+
+tests/acceptance/W1-41/test_w1_41_migration.py:101: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x75c76f1ef060>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/...>
+endtime = 29567.032619657, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____________ test_every_tracked_path_matches_exactly_one_namespace _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_tracked_path_matches_exactly_one_namespace():
+        """The names come from `git ls-files`; no tracked file is opened."""
+        spaces = support.namespaces(support.load_path_map())
+        patterns = {name: [pattern for pattern in value.get("paths") or [] if isinstance(pattern, str)]
+                    for name, value in spaces.items()}
+        tracked = support.tracked_files()
+        nowhere, twice = [], []
+        for path in tracked:
+            found = [name for name, own in patterns.items() if any(support.matches(pattern, path) for pattern in own)]
+            if not found:
+                nowhere.append(path)
+            elif len(found) > 1:
+                twice.append(f"{path} -> {found}")
+>       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
+                             f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
+E       AssertionError: 5 of 4092 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['fixtures/adopt/programme/.rulesync/rules/overview.md', 'fixtures/adopt/programme/AGENTS.md', 'fixtures/adopt/programme/CLAUDE.md', 'fixtures/adopt/programme/README.md', 'fixtures/adopt/programme/claude-settings.json']
+E       assert not ['fixtures/adopt/programme/.rulesync/rules/overview.md', 'fixtures/adopt/programme/AGENTS.md', 'fixtures/adopt/programme/CLAUDE.md', 'fixtures/adopt/programme/README.md', 'fixtures/adopt/programme/claude-settings.json']
+
+tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x7e5834d61ac0>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7e5834d61ac0>
+schema = PosixPath('/home/usain/gov-os-worktrees/W2-23/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-0mtg-PR-DAEO-0mtg': {'commissioned_by': 'orchestrator', 'implementer_session': "unknown (the engineer's log was...lementer_session': '8f696f48-3724-45bd-8ef2-dcc024b3ff5f', 'judged_by': 'orchestrator', 'judgement': 'pass', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-xafn-PR-DAEO-xafn.json::$.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x75c76f1bee80>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/...>
+endtime = 29632.50073022, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x75c76f12c220>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/pyt...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x75c76f1ecea0>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x75c76f1ec680>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/pyt...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_________________ test_every_tracked_path_is_in_one_namespace __________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_tracked_path_is_in_one_namespace():
+        namespaces = _head()
+>       assert [rel for rel in _tracked() if len(_owners(namespaces, rel)) != 1] == []
+E       AssertionError: assert ['fixtures/ad...ettings.json'] == []
+E         
+E         Left contains 5 more items, first extra item: 'fixtures/adopt/programme/.rulesync/rules/overview.md'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_91_full_embeddings.py:76: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x75c76f126840>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/...>
+endtime = 29767.419699912, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-1/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-...bed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}]
+E       assert [{'at': '$.pr...{40}$'", ...}] == []
+E         
+E         Left contains one more item: {'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-xafn/...robed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-23/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=191332) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+13 failed, 3993 passed, 6 skipped, 6 warnings in 925.58s (0:15:25)

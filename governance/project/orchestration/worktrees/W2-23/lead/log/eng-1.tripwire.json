@@ -1,0 +1,71 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "865ea01e94dc",
+   "after": "9c0f0fd22ed1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "219307d1dd04",
+   "after": "11eb9dac44ff"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_adapters.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_citations.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_resume.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_rollback.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_setup.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_space.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/test_w2_23_unheld.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-23/w2_23_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

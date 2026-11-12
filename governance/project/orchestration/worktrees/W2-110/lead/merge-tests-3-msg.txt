@@ -1,0 +1,9 @@
+Merge w2/W2-110-tests into w2/W2-110: W2-105's fixture gains a coordination-ticket roster (P-W2-110-5 (a))
+
+The test designer's one batch (eaa68fa97379): W2-105's generated project plants governance/project/roster.yaml
+with coordination_ticket: DAEO-zz91; nothing else lowered (Rewrite-Reason: DEC-971 item 4, DEC-980).
+
+Task: DAEO-3r1j
+Implements: DEC-980, DEC-971, DEC-957
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

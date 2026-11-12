@@ -1,0 +1,1 @@
+exit 0; findings 0 {'rulesync_version': True, 'kernel_files': 36, 'generated_files': 51}

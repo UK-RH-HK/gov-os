@@ -1,0 +1,16 @@
+task: DAEO-ktiw
+decisions_applied: [DEC-1140, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
+
+## RESUME HERE
+STATE (run 2, resume): CTO decided P1-P4 (ticket's Delegated line, merged d69eed1fc); eng-2 launched 01:05 UTC (opus high C3, proj 5, brief briefs/eng-2.md, context eng-context-2.md --budget 12000) | HEAD: d69eed1fc | NEXT: wait_for log/eng-2.exit; check twelve fields + trailers + tripwire; then rev-2 (last round, DEC-1010) + lead_verify in parallel; CIT-P sha rewrite at final head; links; return DONE | WAITING ON: eng-2 pid 1900353
+STATE (final, run 1): returned PACKAGES P1-P4; W2-96 rerun alone 19 failed/15 passed (not in skip_known; no reference to the delta) | HEAD: 761e80e7894f | NEXT: on the CTO's answer: fresh engineer batch (P1 tests, P2 path, R7, R2 if chosen) then review round 2 (last), CIT-P sha rewrite | WAITING ON: CTO
+STATE (prior): review rev-1 READY (verdict.py True) at 13fd1dd34e32; lead_verify RED 11 = 5 S1 reds (P1) + 6 W2-96 signal/timeout cases (re-run alone in progress, bnh9wwlum); lead found context_watch.py:70 report-state path wrong (P2); CIT-P draft committed 761e80e7894f | HEAD: 761e80e7894f | NEXT: read W2-96 rerun, links, return PACKAGES (P1 widen paths for 5 tests, P2 fix path in same batch + round 2 review, P3 R1/R2 as ACT entry criteria) | WAITING ON: W2-96 rerun
+STATE (earlier): eng-1 done (2 commits, own 50 tests green, regression 147 green); 5 older unit tests red by S1 (outside paths) -> package P1; verify + review in parallel | HEAD: 13fd1dd34e32 | NEXT: wait_for verify.exit and rev-1.exit, then write probe record + CIT-P, return PACKAGES | WAITING ON: lead_verify pid 1158753, reviewer rev-1 pid 1168197
+Workers: eng-1 (engineer, opus high, C3, session 0508bd56-569d-4706-9fa2-2c86d26f77c5) done exit 0; rev-1 (independent-auditor, opus high, C3, session 8035d5c6-1335-4006-8790-318b38724476) done exit 0, READY
+Reds (P1): test_resume_hooks.py::test_an_unset_role_is_not_the_orchestrator, ::test_precompact_appends_one_block_and_sessionstart_warns, ::test_a_checkpoint_precompact_cannot_write_is_left_as_it_was, ::test_a_write_that_fails_part_way_leaves_the_checkpoint_as_it_was; test_w29_hooks.py::TestPreCompactCombined::test_checkpoint_failure_reports_systemmessage
+Tripwire eng-1: other trees' heads moved by other sessions (main 0206c0f7c691 ACT-CLAUDE-COPIES-4 etc.); W2-176 only eng-1's commits
+Rounds: in progress
+Decisions taken: no tests worktree (STANDARD, ticket acceptance_tests.author engineer); CIT-P record written by the lead after the review; windows table all 1M for Opus/Sonnet/Haiku 5.5 + Fable 5.2 (code.claude.com model-config), else 200k
+Open packages: P1 widen paths for the 5 old tests; P2 report-state path fix + round 2; P3 R1/R2 now or ACT entry; P4 leads/workers reminder at ~200k (DEC-1118 (A)) follow-up
+Paths: briefs .gov-runtime/scratch/lead/briefs/ (eng-1.md, eng-context.md built with --budget 9000 from W2-00-store), logs .gov-runtime/scratch/lead/log/
+Facts: PreCompact stdout = compaction instructions, systemMessage discarded (docs); PostToolUse has no model field; usage in transcript message.usage

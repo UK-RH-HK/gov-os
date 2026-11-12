@@ -1,0 +1,9 @@
+== tests/acceptance/W2-11 exit 1 :: 7 failed, 186 passed, 1 skipped in 4.29s
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[discovery]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[retrieval]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]
+done

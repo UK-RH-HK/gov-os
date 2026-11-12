@@ -1,0 +1,103 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "abef7e045133",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "58ac442d6820",
+   "after": "dca382f3069f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "head",
+   "before": "1798e82f1201",
+   "after": "13fd1dd34e32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "status line gone",
+   "line": "?? tests/unit/hooks/test_w2_176_context_watch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "status line gone",
+   "line": "?? tests/unit/hooks/test_w2_176_precompact.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "c735912bc422",
+   "after": "c9dafe82a8d7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": " M src/gov/adapters/merge.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": " M tests/unit/adapters/test_generate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": "R  fixtures/adopt/programme/.rulesync/rules/overview.md -> tests/unit/adapters/fixtures/programme/.rulesync/rules/overview.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": "R  fixtures/adopt/programme/AGENTS.md -> tests/unit/adapters/fixtures/programme/AGENTS.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": "R  fixtures/adopt/programme/CLAUDE.md -> tests/unit/adapters/fixtures/programme/CLAUDE.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": "R  fixtures/adopt/programme/README.md -> tests/unit/adapters/fixtures/programme/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line gone",
+   "line": "R  fixtures/adopt/programme/claude-settings.json -> tests/unit/adapters/fixtures/programme/claude-settings.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-41/test_w1_41_migration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/test_w2_23_adapters.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/w2_23_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

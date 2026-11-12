@@ -1,0 +1,78 @@
+{
+ "act": "ACT-CLAUDE-COPIES-5",
+ "dec": "DEC-315, DEC-992, DEC-1112",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/discovery/SKILL.md",
+   "before": "55800596536681e740e25d74f839083f54a5acf4dfac04cb1683904464b99120",
+   "after": "82d847fa6ff478136ba36a915945d409b69a03a730426071c3d69f68b1a53306"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/orchestration/SKILL.md",
+   "before": "4f25cf7468d9bcab01fb1422b626af107ab369d32967da3b006c9848dd2514cc",
+   "after": "d240afca997bb4e4bae09e95c3907cb7588b10fb4647827c56afd7a24354f651"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/orchestration/briefs-and-returns.md",
+   "before": "5e4eb4e15520c8600ca18d049a10b8c4675ff37803e3759357f3f2194a682760",
+   "after": "4b26908111e1808e9972024c125b9616f17d30a9e9ad7a1bbe99c2c1913664a1"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/retrieval/SKILL.md",
+   "before": "dc745ec3e5e8ba0cfd85f48959ecb53bd09085b74d2ec0b7083f6fc3dfd92c1b",
+   "after": "c5779db4841ef8ff1ca5274d68128ae4d580153d9bf2b48bca69042b87d217f4"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/test-design/SKILL.md",
+   "before": "97d434e36f6ac8ae4232359b59c9ab61322a0ed7d66b27a008bf8df809cca630",
+   "after": "47509c207a02e0a54b80c3895f04ad29fe38a7ebb6e01764e945362922f07cad"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/test-design/test-kinds.md",
+   "before": "8b17d7413061f1134c8614c4c11921b7a674d2526846802780e2fa5b1bb8edaa",
+   "after": "a1da42e665b425adbb5cfb06f2f02d22789f2bd2e36b932ac0a26c1e70d7bf01"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/skills/discovery/SKILL.md": "55800596536681e740e25d74f839083f54a5acf4dfac04cb1683904464b99120",
+  "after/repo/.claude/skills/discovery/SKILL.md": "82d847fa6ff478136ba36a915945d409b69a03a730426071c3d69f68b1a53306",
+  "before/repo/.claude/skills/orchestration/SKILL.md": "4f25cf7468d9bcab01fb1422b626af107ab369d32967da3b006c9848dd2514cc",
+  "after/repo/.claude/skills/orchestration/SKILL.md": "d240afca997bb4e4bae09e95c3907cb7588b10fb4647827c56afd7a24354f651",
+  "before/repo/.claude/skills/orchestration/briefs-and-returns.md": "5e4eb4e15520c8600ca18d049a10b8c4675ff37803e3759357f3f2194a682760",
+  "after/repo/.claude/skills/orchestration/briefs-and-returns.md": "4b26908111e1808e9972024c125b9616f17d30a9e9ad7a1bbe99c2c1913664a1",
+  "before/repo/.claude/skills/retrieval/SKILL.md": "dc745ec3e5e8ba0cfd85f48959ecb53bd09085b74d2ec0b7083f6fc3dfd92c1b",
+  "after/repo/.claude/skills/retrieval/SKILL.md": "c5779db4841ef8ff1ca5274d68128ae4d580153d9bf2b48bca69042b87d217f4",
+  "before/repo/.claude/skills/test-design/SKILL.md": "97d434e36f6ac8ae4232359b59c9ab61322a0ed7d66b27a008bf8df809cca630",
+  "after/repo/.claude/skills/test-design/SKILL.md": "47509c207a02e0a54b80c3895f04ad29fe38a7ebb6e01764e945362922f07cad",
+  "before/repo/.claude/skills/test-design/test-kinds.md": "8b17d7413061f1134c8614c4c11921b7a674d2526846802780e2fa5b1bb8edaa",
+  "after/repo/.claude/skills/test-design/test-kinds.md": "a1da42e665b425adbb5cfb06f2f02d22789f2bd2e36b932ac0a26c1e70d7bf01",
+  "list.txt": "1b3aff497508fbce51898cb26d24bbabf7a75f5bed92331c130718ce6534ccb4",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "65cbd002bdd830e9f0154791b2b5966082e1ed760627cbcfea99937d558224ee"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "65cbd002bdd830e9f0154791b2b5966082e1ed760627cbcfea99937d558224ee"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n82d847fa6ff478136ba36a915945d409b69a03a730426071c3d69f68b1a53306  .claude/skills/discovery/SKILL.md\nd240afca997bb4e4bae09e95c3907cb7588b10fb4647827c56afd7a24354f651  .claude/skills/orchestration/SKILL.md\n4b26908111e1808e9972024c125b9616f17d30a9e9ad7a1bbe99c2c1913664a1  .claude/skills/orchestration/briefs-and-returns.md\nc5779db4841ef8ff1ca5274d68128ae4d580153d9bf2b48bca69042b87d217f4  .claude/skills/retrieval/SKILL.md\n47509c207a02e0a54b80c3895f04ad29fe38a7ebb6e01764e945362922f07cad  .claude/skills/test-design/SKILL.md\na1da42e665b425adbb5cfb06f2f02d22789f2bd2e36b932ac0a26c1e70d7bf01  .claude/skills/test-design/test-kinds.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n224b4d0b33aa1661357dae8099e2b7a9512dba54fceeca803e4b32578b181d0f  .rulesync/skills/discovery/SKILL.md\neae3cb7d0f4e7139d5e30a631a33602b7f10781707141b480420ec71c8201707  .rulesync/skills/orchestration/SKILL.md\n4b26908111e1808e9972024c125b9616f17d30a9e9ad7a1bbe99c2c1913664a1  .rulesync/skills/orchestration/briefs-and-returns.md\n7a191d5b972529b2e34bd1a576759e9e97132d2913c8bcfefa811601bc4ec8a7  .rulesync/skills/retrieval/SKILL.md\ne2a467de0722b16b08ab557a3accda5ae35e42199cb8c9660265436cd59fb29e  .rulesync/skills/test-design/SKILL.md\na1da42e665b425adbb5cfb06f2f02d22789f2bd2e36b932ac0a26c1e70d7bf01  .rulesync/skills/test-design/test-kinds.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

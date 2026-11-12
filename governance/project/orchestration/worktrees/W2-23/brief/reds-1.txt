@@ -1,0 +1,94 @@
+FF.F.                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_s1_a_failed_stage_commit_keeps_the_owners_untracked_files_and_removes_its_record _
+
+project = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_stage_commit_0/harbour')
+box = Box(home=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_stage_commit_0/box/home'), tmp=Po..., elsewhere=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_stage_commit_0/box/elsewhere'))
+
+    def test_s1_a_failed_stage_commit_keeps_the_owners_untracked_files_and_removes_its_record(project, box):
+        """``project.commit``'s restore: stage A1's record commit is refused by the hook."""
+        adoption = support.Adoption(project, box)
+        adoption.ok("A0")
+        before = support.head(project)
+        rule = support.user_material_rule([support.RECORD["A1"]])
+        support.install_hook(project, [{**rule, "refuse": True}])
+        done = adoption.run("A1")
+        support.refusal(done)  # the stage fails, as a refusal (an untracked directory does not raise)
+        problems = support.user_material_problems(project)
+>       assert not problems, "the restore after the failed stage did not keep the owner's untracked files: " \
+            + "; ".join(problems) + f"\n{done.describe()}"
+E       AssertionError: the restore after the failed stage did not keep the owner's untracked files: user-clone/.git (the owner's nested clone) is gone
+E         $ gov adopt --lite --stage A1 --json --session adopter-w2-23
+E         exit 1
+E         --- stdout
+E         {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-23", "error": {"code": "ADOPT_GIT_FAILED", "message": "git commit -q -m gov adopt --lite A1: inventory failed in /tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_stage_commit_0/harbour: the planted pre-commit hook refuses this commit", "details": {"exit_code": 1}}}
+E         
+E         --- stderr
+E         
+E       assert not ["user-clone/.git (the owner's nested clone) is gone"]
+
+tests/acceptance/W2-23/test_w2_23_rollback.py:28: AssertionError
+_ test_s1_a_failed_move_batch_keeps_the_owners_untracked_files_and_removes_its_target _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_move_batch_ke0')
+box = Box(home=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_move_batch_ke0/box/home'), tmp=Po..., elsewhere=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_move_batch_ke0/box/elsewhere'))
+
+    def test_s1_a_failed_move_batch_keeps_the_owners_untracked_files_and_removes_its_target(tmp_path, box):
+        """``_batch``'s restore: batch 1 moves and commits (the owner's files appear then); batch 2's commit is refused.
+        A move needs the code graph, so this case needs ``/tmp/gov-cbm-<uid>`` writable (README, known limit)."""
+        project = support.plant_project(tmp_path / "harbour", code_intelligence=True)
+        adoption = support.Adoption(project, box)
+        adoption.through("A5", [support.entry(support.GUIDE, "MOVE", support.GUIDE_TARGET, batch=1),
+                                support.entry(support.NOTES, "MOVE", support.NOTES_TARGET, batch=2)])
+        support.install_hook(project, [support.user_material_rule([support.GUIDE_TARGET]),
+                                       {"when": [support.NOTES_TARGET], "refuse": True}])
+        done = adoption.run("A6")
+        support.refusal(done)
+        problems = support.user_material_problems(project)
+>       assert not problems, "the restore after the failed batch did not keep the owner's untracked files: " \
+            + "; ".join(problems) + f"\n{done.describe()}"
+E       AssertionError: the restore after the failed batch did not keep the owner's untracked files: user-clone/.git (the owner's nested clone) is gone
+E         $ gov adopt --lite --stage A6 --json --session adopter-w2-23
+E         exit 1
+E         --- stdout
+E         {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-23", "error": {"code": "ADOPT_BATCH_FAILED", "message": "batch 2 failed at docs/notes.txt (archive/notes.txt) and is rolled back to refs/gov/adoption/rollback/20261111T224734Z-2ff461/batch-2 (6af612121298a76c174992146b2a23307a1485ec): git commit -q -m gov adopt --lite A6: batch 2 failed in /tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s1_a_failed_move_batch_ke0/harbour: the planted pre-commit hook refuses this commit; the batches before it stay ([1]), the batches after it did not run; the A6 record (governance/adoption/A6-controlled-migration.md) says status: failed, failed_batch: 2; run `gov adopt --lite --stage A6` again to resume at batch 2", "details": {"batch": 2, "rollback_point": "refs/gov/adoption/rollback/20261111T224734Z-2ff461/batch-2", "done": [1], "run_id": "20261111T224734Z-2ff461", "failed_batch": 2, "record": "governance/adoption/A6-controlled-migration.md"}}}
+E         
+E         --- stderr
+E         
+E       assert not ["user-clone/.git (the owner's nested clone) is gone"]
+
+tests/acceptance/W2-23/test_w2_23_rollback.py:48: AssertionError
+_ test_s3_the_a8_proof_finds_every_listed_form_and_only_the_unlisted_one_is_not_found _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s3_the_a8_proof_finds_eve0')
+box = Box(home=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s3_the_a8_proof_finds_eve0/box/home'), tmp=Po..., elsewhere=PosixPath('/tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-0/test_s3_the_a8_proof_finds_eve0/box/elsewhere'))
+
+    def test_s3_the_a8_proof_finds_every_listed_form_and_only_the_unlisted_one_is_not_found(tmp_path, box):
+        project = support.plant_project(tmp_path / "harbour", extra={**support.store_files(),
+                                                                    **support.citation_files()})
+        done = _adopt_to_a8(project, box)
+        assert done.returncode != 0, "A8 retired the store although every planted file cites it: the proof found " \
+            f"no citer\n{done.describe()}"
+        error = support.refusal(done, "ADOPT_STORE_STILL_CITED")
+        said = support.proof_said(error)
+        missed = [f"{form} ({rel})" for form, (rel, _) in support.LISTED_FORMS.items() if rel not in said]
+>       assert not missed, "the A8 proof does not print these planted citations as found: " + ", ".join(missed) \
+            + f"\n{done.describe()}"
+E       AssertionError: the A8 proof does not print these planted citations as found: glob (.rulesync/rules/cite-glob.md)
+E         $ gov adopt --lite --stage A8 --json --session adopter-w2-23
+E         exit 1
+E         --- stdout
+E         {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-23", "error": {"code": "ADOPT_STORE_STILL_CITED", "message": "the legacy memory store is not retired, it is still cited by DEC-401 (spec/decisions/dec-401.md), id 'LEG-001'; .rulesync/rules/cite-backslashes.md (a rule), path 'legacy\\\\memory\\\\decisions\\\\leg-001.md', id 'leg-001'; .rulesync/rules/cite-dash-before.md (a rule), id 'LEG-001'; .rulesync/rules/cite-dotdot-tail.md (a rule), relative tail '../decisions/leg-001.md', id 'leg-001'; .rulesync/rules/cite-folder.md (a rule), folder 'legacy/memory/'; .rulesync/rules/cite-letter-case.md (a rule), path 'Legacy/Memory/Decisions/Leg-001.md', id 'Leg-001'; .rulesync/rules/cite-split-lines.md (a rule), path 'legacy/memory/\\ndecisions/leg-001.md', id 'leg-001', folder 'legacy/memory/'; .rulesync/rules/cite-url-encoded.md (a rule), path 'legacy%2Fmemory%2Fdecisions%2Fleg-001.md', id 'leg-001': nothing is retired", "details": {"store": ["legacy/memory/decisions/leg-001.md", "legacy/memory/decisions/leg-002.md", "legacy/memory/index.md"], "ids": ["LEG-001", "LEG-002"], "records_read": ["AV-0001", "DEC-401"], "rules_read": [".claude/settings.json", ".rulesync/rules/cite-backslashes.md", ".rulesync/rules/cite-base64.md", ".rulesync/rules/cite-dash-before.md", ".rulesync/rules/cite-dotdot-tail.md", ".rulesync/rules/cite-folder.md", ".rulesync/rules/cite-glob.md", ".rulesync/rules/cite-letter-case.md", ".rulesync/rules/cite-split-lines.md", ".rulesync/rules/cite
+E         [...]
+E         "cites": "LEG-001", "form": "id", "found": "LEG-001"}]}, {"rule": ".rulesync/rules/cite-dotdot-tail.md", "cites": ["LEG-001", "legacy/memory/decisions/leg-001.md"], "found": [{"cites": "legacy/memory/decisions/leg-001.md", "form": "relative tail", "found": "../decisions/leg-001.md"}, {"cites": "LEG-001", "form": "id", "found": "leg-001"}]}, {"rule": ".rulesync/rules/cite-folder.md", "cites": ["legacy/memory/index.md"], "found": [{"cites": "legacy/memory/index.md", "form": "folder", "found": "legacy/memory/"}]}, {"rule": ".rulesync/rules/cite-letter-case.md", "cites": ["LEG-001", "legacy/memory/decisions/leg-001.md"], "found": [{"cites": "legacy/memory/decisions/leg-001.md", "form": "path", "found": "Legacy/Memory/Decisions/Leg-001.md"}, {"cites": "LEG-001", "form": "id", "found": "Leg-001"}]}, {"rule": ".rulesync/rules/cite-split-lines.md", "cites": ["LEG-001", "legacy/memory/decisions/leg-001.md", "legacy/memory/index.md"], "found": [{"cites": "legacy/memory/decisions/leg-001.md", "form": "path", "found": "legacy/memory/\ndecisions/leg-001.md"}, {"cites": "LEG-001", "form": "id", "found": "leg-001"}, {"cites": "legacy/memory/index.md", "form": "folder", "found": "legacy/memory/"}]}, {"rule": ".rulesync/rules/cite-url-encoded.md", "cites": ["LEG-001", "legacy/memory/decisions/leg-001.md"], "found": [{"cites": "legacy/memory/decisions/leg-001.md", "form": "path", "found": "legacy%2Fmemory%2Fdecisions%2Fleg-001.md"}, {"cites": "LEG-001", "form": "id", "found": "leg-001"}]}]}}}
+E         
+E         --- stderr
+E         
+E       assert not ['glob (.rulesync/rules/cite-glob.md)']
+
+tests/acceptance/W2-23/test_w2_23_citations.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-23/test_w2_23_rollback.py::test_s1_a_failed_stage_commit_keeps_the_owners_untracked_files_and_removes_its_record
+FAILED tests/acceptance/W2-23/test_w2_23_rollback.py::test_s1_a_failed_move_batch_keeps_the_owners_untracked_files_and_removes_its_target
+FAILED tests/acceptance/W2-23/test_w2_23_citations.py::test_s3_the_a8_proof_finds_every_listed_form_and_only_the_unlisted_one_is_not_found
+3 failed, 2 passed in 52.42s

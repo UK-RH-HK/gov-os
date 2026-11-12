@@ -115,6 +115,23 @@ PY
 # the spend line's and the brake's W2: the ticket file's own wbs_id, else the folder's (review finding 7)
 WBS=$(sed -n '1,40s/^wbs_id:[[:space:]]*//p' "$tree/.tickets/$ID.md" 2> /dev/null | head -n 1 | tr -d "\"' \r")
 [[ "$WBS" =~ ^[A-Za-z0-9._-]+$ ]] || WBS=$W2
+# RUBRIC-2 at the launch (owner, 2026-11-11 ~23:05, DEC-1140 (1)(a); DEC-1120 (2)): (i) the CTO's class map
+# (log/ticket-class.json, {"<ticket id>": "C0".."C3"}) overrides the lead's --class; (ii) the model by role and class,
+# unless --promoted: product-spec and research on Sonnet; engineer and test designer on Opus only on a C3 ticket, else
+# Sonnet; reviewers and auditors (independent-auditor) keep the model named. Each rewrite is said in the launch output.
+CLASS_MAP=${LAUNCH_CLASS_MAP:-$SPEND_ORCH/log/ticket-class.json} SONNET=${LAUNCH_SONNET:-claude-sonnet-5-5}
+mapped=$(python3 -I -c 'import json,sys
+try: print(json.load(open(sys.argv[1])).get(sys.argv[2],""))
+except Exception: print("")' "$CLASS_MAP" "$ID" 2> /dev/null)
+case "$mapped" in C0|C1|C2|C3) [ "$mapped" != "$cls" ] && say "RUBRIC-2: class $cls -> $mapped (the CTO's class map for $ID)"; cls=$mapped;; esac
+if [ -z "$promoted" ]; then
+  want=$MODEL
+  case "$role" in
+    product-spec|research) want=$SONNET;;
+    engineer|independent-test-designer) [ "$cls" = C3 ] || want=$SONNET;;
+  esac
+  [ "$want" != "$MODEL" ] && { say "RUBRIC-2: model $MODEL -> $want ($role, class $cls)"; MODEL=$want; }
+fi
 logdir=$tree/.gov-runtime/scratch/lead/log dest=$tree/.gov-runtime/scratch/brief
 mkdir -p "$logdir" "$dest" || exit 2
 name=$(basename "$brief" .md) n=1; stem=$name

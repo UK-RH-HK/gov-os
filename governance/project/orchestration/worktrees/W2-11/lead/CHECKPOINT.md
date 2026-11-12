@@ -1,56 +1,32 @@
-# W2-11 (DAEO-k7hz) lead checkpoint: round 2 of 2 (DEC-916), run r6-resume (hand-built brief, DEC-1130 (1))
+# W2-11 (DAEO-k7hz) lead checkpoint: round 2 of 2 (DEC-916), run r7 (resume after r6 PACKAGES; CTO decided R6-1 (b), R6-2 (c), P-a, P-b; b9dc19fca)
 
-STATE: step 3 done (verify + accept), starting step 4/5 | HEAD: c96136eb6xxx (see git) | NEXT: tests worktree, then td-r2 + ps-r2 in parallel | WAITING ON: none
+STATE: DONE | HEAD: 58ac442d6820 (review record over reviewed head 646850506819) | NEXT: nothing for the lead; the CTO lands (merge queue), the class (b) copies ACT (six .claude/skills files), the owner's CAP-33 approval of the combined K3 CIT-P | WAITING ON: none
 
-task: DAEO-k7hz · decisions_applied: DEC-1137, DEC-866, DEC-959, DEC-963, DEC-983, DEC-991, DEC-995, DEC-996, DEC-1010
+task: DAEO-k7hz · decisions_applied: DEC-1112 (3) (P-W2-11-R6-1 (b), P-W2-11-R6-2 (c), P-a, P-b), DEC-1137, DEC-866, DEC-981, DEC-959, DEC-963, DEC-1010, DEC-820
 
-## Step 1 (first calls)
-- identity orchestrator DAEO-k7hz; tree /home/usain/gov-os-worktrees/W2-11, w2/W2-11; status clean.
-- Pre-run commits above merge 4e265aabed5c: c174e2c7f (product-spec, Task DAEO-k7hz, Implements DEC-1137, DEC-866, DEC-959, DEC-847),
-  c96136eb6 (independent-test-designer, Task DAEO-k7hz, Implements DEC-1137, Rewrite-Reason: DEC-1137 re-baseline). Both present.
-- README map numbering: success-1..12 and failure-2 = the ticket's numbering (S5 = loose citations, F2 = DEC-866). OK.
+## Workers (r7), all claude-opus-5-5 / high / C3, sandboxed, sandbox check passed, gov retrieve in brief
+| worker | session | commit | retrieve used | tripwire |
+|---|---|---|---|---|
+| ps-r7 product-spec | baec7ff0-b4fc-47ae-a59c-20232c89c6e9 | 67c9d0c97 | no | CHANGED: own head + W2-23 trees (other lead) |
+| td-r7 designer (W2-11-tests) | f579181f-f1ef-4ad6-a9dd-1d57ae053416 | 9410f5e7e | no | CHANGED: own tests + other trees |
+| ps-r7b product-spec | 4d2d156a-fa69-4d30-bdff-5e28966cf901 | f0cea0f35 | no | CHANGED: own head + other trees |
+| td-r7b designer | feb4292b-efa5-4433-9e1c-40a09fb8975e | 8d0873fcf | no | CHANGED: own tests + other trees |
+| td-r7c designer | b95c0b65-d249-4c69-aecf-eecb70fcaf8e | 83aab41fd | no | CHANGED: own tests + other trees |
+| rv-r2 independent-auditor | (log/rv-r2.json) | none (record committed by lead 58ac442d6) | yes, once | CHANGED: other trees only |
+Merges: merge-tests-r7.txt, -r7b.txt, -r7c.txt (orchestrator, --no-ff). Tests worktree and branch removed.
 
-## Step 2 (read-only verification of the restored skills)
-| line | met? | where |
-|---|---|---|
-| S1 | met | test-design/SKILL.md "How much is enough" (DEC-221, DEC-951 item 5; 2,980/713 named) |
-| S2 | met | orchestration/SKILL.md Briefs bullet 2 (twelve fields, payload after, two-refusal stop, AR-6); briefs-and-returns.md "The return" |
-| S3 | met | SKILL.md Temp hygiene bullet 2 (DEC-820); Decisions bullet 5 (DEC-861, DEC-862); briefs-and-returns.md Policy 2 + decision-record sections |
-| S4 | met | briefs-and-returns.md "The exit audit's reading of MR-3 (DEC-430)"; audit/SKILL.md line 75 |
-| S5 | met | identity DEC-371 (Sessions b1); stop block DEC-537, DEC-948 (Stops b3); DEC-486 kept only for the closed count |
-| S6 | met in sources | no LEAD_CHECKPOINT / context-limit stop / listing refusal / fixed ceiling in skill folder, role file, .rulesync; "No fixed number" (DEC-847); decision-record (DEC-861). .claude copy stale (copies ACT) |
-| S7 | met | test-design SKILL "Kinds and cost" + test-kinds.md |
-| S8 | met (repository-state cases green) | governance/project/orchestration/brief-gaps.md vs common brief |
-| S9 r1 half | met | templates/skill.md sections in order; r2 half NOT met (front matter not closed / no `output`, no Never statement on reads/writes) |
-| S10 | met | test-design SKILL work order, red against base, ISTQB, proportion, README map |
-| S11 | met | orchestration integration-queue.md, nightly-sheriff.md, incident-response.md; qa-review/SKILL.md + scenarios.md |
-| S12 | no case by design | first half retired (DEC-1137 (1)), second half Wave 3 (DEC-1083) |
-| S13, S14, S16 | not met | no text in skill folder |
-| S15 | partly | test-kinds.md load-sensitive row "times the code's own work, never the machine's load (DEC-979 item 1)"; no CPU-time / quiet-reference / same-bound statement |
-| F1 | not met | no rule, no case |
-- body_tokens: orchestration 9976 chars = 2494 tok OK; test-design 5377 = 1345 OK; audit 6534 = 1634 OK; qa-review 4975 = 1244 OK.
-- version == metadata.version in every kernel skill (adopt has no metadata, W2-52's).
-- copies_diff: exactly discovery (copy 1.0.0), retrieval (copy 1.0.0), orchestration (body differs, no metadata), test-design (body differs, no metadata).
+## Results
+- gov accept on 646850506819 (log/accept-r7.txt): 186 passed / 7 failed / 1 skipped: the seven copy cases only (S6 1, S11 2, unmapped 4); F1 62/0.
+- lead_verify: parallel 4646 tests, 13 failed (7 copy cases + 6 W2-96 signal cases, 6 passed alone: rerun-alone-r7.sh), 7 skipped; serial 9/0. scoped, core_changed [], unplaced 13 .claude/skills paths.
+- W2-128 + W2-142: 134 passed (facts s6 needs real HOME). W1-35 green.
+- body_tokens OK (orch 2496, td 1418, audit 1634, qa 1244). copies_diff: six .claude files. merge-tree vs integrate: no conflict.
+- rv-r2: verdict pass, READY (verdict.ready True, []), six rows R1-R6 none blocking.
+- gov context: CONTEXT_OVER_CEILING 27678 of 6000. gov links: 0 new. keyword_warn 0.
 
-## Step 3
-- disk gate open (816 GiB, 64.7M inodes). rebuild-r6 exit 0 (log/rebuild-r6.log).
-- gov accept (log/accept-r6-base.json): exit 3, fail; 99 passed, 7 failed, 1 skipped. Lines pass: S1-S5, S7-S10, F2. Fail: S6 (1), S11 (2), unmapped (4).
-- The 7 failing = exactly the seven copy cases of the brief (pytest -rf confirmed). No other red.
-- No case: S12 (by design), S13, S14, S15, S16, F1, S9 r2 half. Confirms the brief's "Round 2's lines" bullet.
+## Lead rulings in r7 (inside the CTO's (c))
+- test-design description restored to integrate's (text meets W2-128's front-matter guard).
+- W2-128's two skill guards: section and unit halves read at W2-128's own merge (read as "pins"); reviewer R6 asks the CTO to confirm in one line.
 
-## Workers
-(none yet)
-
-## Decisions taken
-- none
-
-## Open packages
-- P-a (open point 3): S16's template half has no file in W2-11's paths.
-- P-b (open point 1): metadata.version read as the one carried repeat (only if a conflict appears).
-- Housekeeping (open point 4, CTO): allowed_paths brief-*.md entry; W2-L257, W2-L258 no longer applicable.
-
-## Brief gaps (running)
-- the whole-folder pytest form with HOME empty finds no pytest (user site) | ticket's part / common brief | 2 (est.)
-
-## Guard refusals
-- none so far
+## Brief gaps (r7)
+- the CTO's (c) named front-matter guards; the section/unit halves of W2-128's guards hid behind first assertions (3 extra batches) | ticket's part | 45 est.
+- gov context refused (DEC-1083 not in store) | tool | 2

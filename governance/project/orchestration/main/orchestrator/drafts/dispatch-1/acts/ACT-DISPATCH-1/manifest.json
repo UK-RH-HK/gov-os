@@ -1,0 +1,77 @@
+{
+ "act": "ACT-DISPATCH-1",
+ "dec": "DEC-1140, DEC-1052, DEC-1118, DEC-1133, DEC-1110",
+ "author": "cto",
+ "claimed_class": "O",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/orchestration/tools/dispatch/dispatcher.py",
+   "before": "bc0c74b119baa8a3b4daa59dce82015bb36f6fd79bb0f9b69e76372ebeb90b33",
+   "after": "dd5e57e2d94b33c108fe90e0e2b9748e70fb84d4285f74da30e44201bd329a54"
+  },
+  {
+   "root": "repo",
+   "path": "governance/project/orchestration/tools/dispatch/balancer.py",
+   "before": "87a56f92ac886c2ce84e5080d7b096948f3e9e0784bb1612e2b5f3398d8e69e6",
+   "after": "551aa6a440b6af4f7609fc529cc4b498e9a05678039ed5fea4983d1e77ebf2f7"
+  },
+  {
+   "root": "repo",
+   "path": "tests/unit/orchestration/test_dispatcher.py",
+   "before": "9d6d3acc896e8ded2de3b6a4f4f2aaa0ec6225aecbf043331da3ea293a021f1e",
+   "after": "85c240b2cb0d9ed6ad7025f6c6acad0c022f7b7bd57c0f3c02ec2224f50ecb66"
+  },
+  {
+   "root": "repo",
+   "path": "tests/unit/orchestration/test_balancer.py",
+   "before": "80fd3e7f482dad28d6beeb849a1b9db3f69f2d84039574bad0d83ccedc796478",
+   "after": "3ceaf3db7a5fbccf9c0e9612912aa085b2af083c0e99ceb5e92c8eaa146f3873"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/orchestration/tools/dispatch/dispatcher.py": "bc0c74b119baa8a3b4daa59dce82015bb36f6fd79bb0f9b69e76372ebeb90b33",
+  "after/repo/governance/project/orchestration/tools/dispatch/dispatcher.py": "dd5e57e2d94b33c108fe90e0e2b9748e70fb84d4285f74da30e44201bd329a54",
+  "before/repo/governance/project/orchestration/tools/dispatch/balancer.py": "87a56f92ac886c2ce84e5080d7b096948f3e9e0784bb1612e2b5f3398d8e69e6",
+  "after/repo/governance/project/orchestration/tools/dispatch/balancer.py": "551aa6a440b6af4f7609fc529cc4b498e9a05678039ed5fea4983d1e77ebf2f7",
+  "before/repo/tests/unit/orchestration/test_dispatcher.py": "9d6d3acc896e8ded2de3b6a4f4f2aaa0ec6225aecbf043331da3ea293a021f1e",
+  "after/repo/tests/unit/orchestration/test_dispatcher.py": "85c240b2cb0d9ed6ad7025f6c6acad0c022f7b7bd57c0f3c02ec2224f50ecb66",
+  "before/repo/tests/unit/orchestration/test_balancer.py": "80fd3e7f482dad28d6beeb849a1b9db3f69f2d84039574bad0d83ccedc796478",
+  "after/repo/tests/unit/orchestration/test_balancer.py": "3ceaf3db7a5fbccf9c0e9612912aa085b2af083c0e99ceb5e92c8eaa146f3873",
+  "apply.sh": "48f07448117cd6e559bd4f3857acb7e7761c00ca6845f6f7570d36cab0cf8858",
+  "list.txt": "07f513d2e170ac4a401a84b57e10954ecf23327cbd0953272456ea0cde9c5af2",
+  "rehearsal.log": "834ae7a55a534a055e7999af97cd642e4e15c82602123f20676a54689895a5d7"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -B -c 'import ast,sys; [ast.parse(open(p).read(), p) for p in sys.argv[1:]]' governance/project/orchestration/tools/dispatch/dispatcher.py governance/project/orchestration/tools/dispatch/balancer.py tests/unit/orchestration/test_dispatcher.py tests/unit/orchestration/test_balancer.py",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I - <<'PYEOF'\n\"\"\"ACT-DISPATCH-1's behaviour check of the lead cap (run from the repository root with `python3 -I - < this file`, in the\nmanifest as a here-document). Imports the dispatcher with its state folder planted in a fresh temporary directory (nothing\nlive is read or written; no tick runs) and asks why_not() about one ready line that passes every other check, with the\nchecks that need a repository, a worktree or the machine's readings replaced by their planted answers. Prints 4 and exits 0\nwhen: two leads under a cap of 3 leave the line startable; two leads under a cap of 2 refuse it with \"lead cap: 2 of 2\nrunning\"; one lead and one launch pending under a cap of 2 refuse it the same way; no cap set never refuses.\"\"\"\nimport importlib.util\nimport os\nimport sys\nimport tempfile\nfrom pathlib import Path\nfrom types import SimpleNamespace\n\nsys.dont_write_bytecode = True\nT = Path(tempfile.mkdtemp(prefix=\"dispatch-1-check-\"))\nos.environ[\"DISPATCH_STATE\"] = str(T)\nos.environ[\"DISPATCH_ORCH\"] = str(T / \"orch\")\nsrc = Path(\"governance/project/orchestration/tools/dispatch/dispatcher.py\").resolve()\nsys.path.insert(0, str(src.parent))\nspec = importlib.util.spec_from_file_location(\"dispatcher_under_check\", src)\nd = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(d)\n\n(T / \"wt\" / \"W2-9\").mkdir(parents=True)\n(T / \"wt\" / \"W2-9\" / \".tickets\").mkdir()\n(T / \"wt\" / \"W2-9\" / \".tickets\" / \"T-9.md\").write_text(\"---\\nid: T-9\\nstatus: in_progress\\n---\\n\")\n(T / \"briefs\").mkdir()\n(T / \"briefs\" / \"B9.md\").write_text(\"a brief\\n\")\nd.WT, d.BRIEFS, d.LOG = T / \"wt\", T / \"briefs\", T / \"log\"\nd.LOG.mkdir()\nd.sh = lambda *a, **k: SimpleNamespace(returncode=0, stdout=\"---\\nstatus: in_progress\\n---\\n\", stderr=\"\")\nd.tree_clean = lambda *a, **k: True\nd.launcher_pending = lambda *a, **k: False\nd.admit_safely = lambda *a, **k: (True, \"planted: admits\")\nentry = [\"W2-9\", \"T-9\", \"B9.md\", \"W2-9-A5-run1.json\"]\n\n\ndef ask(cap, leads, pending=()):\n    cfg = {} if cap is None else {\"max_leads\": cap}\n    t = {\"leads\": [f\"W2-{i}\" for i in range(leads)], \"lead_count\": leads, \"pending_launches\": list(pending), \"_procs\": [],\n         \"_c\": cfg, \"disk_open\": True}\n    return d.why_not(entry, t, set(), set())\n\n\nassert ask(3, 2) is None\nassert ask(2, 2) == \"lead cap: 2 of 2 running\", ask(2, 2)\nassert ask(2, 1, [\"W2-7\"]) == \"lead cap: 2 of 2 running\"\nassert ask(None, 8) is None\nprint(4)\nPYEOF",
+   "exit": 0,
+   "count": 4
+  },
+  {
+   "cmd": "python3 -I - <<'PYEOF'\n\"\"\"ACT-DISPATCH-1's behaviour check of the dispatcher's idle item (run from the repository root with `python3 -I - < this\nfile`, in the manifest as a here-document). Imports the dispatcher with its state folder planted in a fresh temporary\ndirectory (nothing live is read or written; no tick runs) and calls watch_headroom() with a planted truth: the gate open,\ntwo leads, two ready lines whose logs were used, the cap at 5. Prints 5 and exits 0 when: the first pass writes one inbox\nitem that names both lines; the same waiting set again writes none; a pass in which idle does not hold (a shut gate) and\nthen the same set again writes none; a changed waiting set writes a second item; a start clears the remembered cause.\"\"\"\nimport importlib.util\nimport json\nimport os\nimport sys\nimport tempfile\nfrom pathlib import Path\n\nsys.dont_write_bytecode = True\nT = Path(tempfile.mkdtemp(prefix=\"dispatch-1-check-\"))\nos.environ[\"DISPATCH_STATE\"] = str(T)\nos.environ[\"DISPATCH_ORCH\"] = str(T / \"orch\")\nsrc = Path(\"governance/project/orchestration/tools/dispatch/dispatcher.py\").resolve()\nsys.path.insert(0, str(src.parent))\nspec = importlib.util.spec_from_file_location(\"dispatcher_under_check\", src)\nd = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(d)\n\n(T / \"ready.txt\").write_text(\"W2-3 T-3 B3.md W2-3-A5-run1.json\\nW2-4 T-4 B4.md W2-4-A5-run1.json\\n\")\ntruth = {\"gate_open\": True, \"disk_open\": True, \"admit\": True, \"lead_count\": 2, \"pending_launches\": [],\n         \"forecast\": {\"lead\": {\"ok\": True}}}\nshut = dict(truth, gate_open=False)\nwaits = {\"W2-3 T-3\": \"already started for W2-3-A5-run1.json\", \"W2-4 T-4\": \"already holds a return\"}\ncfg = {\"max_leads\": 5}\n\n\ndef items():\n    return sorted(p.read_text() for p in (T / \"inbox\").glob(\"*-idle-headroom*.txt\")) if (T / \"inbox\").is_dir() else []\n\n\nd.watch_headroom(truth, None, waits, cfg, False)\none = items()\nassert len(one) == 1 and \"W2-3 T-3 (already started for\" in one[0] and \"W2-4 T-4 (already holds a return\" in one[0], one\nd.watch_headroom(truth, None, waits, cfg, False)\nassert len(items()) == 1\nd.watch_headroom(shut, None, waits, cfg, False)\nd.watch_headroom(truth, None, waits, cfg, False)\nassert len(items()) == 1, items()\nd.watch_headroom(truth, None, dict(waits, **{\"W2-5 T-5\": \"no brief B5.md\"}), cfg, False)\nassert len(items()) == 2\nd.watch_headroom(truth, \"W2-6\", waits, cfg, False)\nassert json.loads((T / \"idle-headroom-reported.json\").read_text()) == {}\nprint(5)\nPYEOF",
+   "exit": 0,
+   "count": 5
+  },
+  {
+   "cmd": "python3 -I - <<'PYEOF'\n\"\"\"ACT-DISPATCH-1's behaviour check of the forecast's CPU term (run from the repository root with `python3 -I - < this file`,\nin the manifest as a here-document). Imports balancer.py (pure functions, no file read or written) and asks the forecast\nfor a lead start beside three held heavy slots, 3.0 cores busy of the band's 18. Prints 4 and exits 0 when: with no\nmeasure the slots count at their whole peak and the start is refused on CPU; the same slots measured at 0.05 cores count at\nthe floor and the start is admitted; a slot measured at 5.5 cores is still counted at that; the switch off (no floor) keeps\nthe whole peak.\"\"\"\nimport sys\nfrom pathlib import Path\n\nsys.dont_write_bytecode = True\nsys.path.insert(0, str(Path(\"governance/project/orchestration/tools/dispatch\").resolve()))\nimport balancer as lb  # noqa: E402\n\nGB = 1024 * 1024\npk = lb.phase_peaks([])\n\n\ndef slot(cpu, recent=None):\n    j = {\"kind\": \"slot\", \"name\": \"pid 1\", \"phase\": \"test\", \"cpu\": cpu, \"rss_kb\": GB, \"rr\": 0}\n    if recent is not None:\n        j[\"recent_cpu\"] = recent\n    return j\n\n\ndef ask(jobs, **kw):\n    s = {\"busy_cores\": 3.0, \"band_hi\": 18, \"mem_available_kb\": 16 * GB, \"floor_kb\": 3 * GB,\n         \"gpu\": {\"used_mib\": 5734, \"total_mib\": 16303}, \"headroom_mib\": 2048, \"rr_held\": 0, \"rr_slots\": 2, \"jobs\": jobs}\n    s.update(kw)\n    return lb.forecast(s, pk, \"lead\")\n\n\nquiet = [slot(0.05, 0.05), slot(0.8, 0.8), slot(0.03, 0.03)]\na = ask([slot(0.05), slot(0.8), slot(0.03)], held_floor=1.0)\nassert not a[\"ok\"] and a[\"binding\"] == \"CPU\", a[\"reason\"]\nb = ask(quiet, held_floor=1.0)\nassert b[\"ok\"] and b[\"resources\"][\"cpu\"][\"need\"] < 9 and \"3 of them at their measured load\" in b[\"resources\"][\"cpu\"][\"text\"], b[\"reason\"]\nc = ask([slot(0.05, 5.5), slot(0.8, 0.8), slot(0.03, 0.03)], held_floor=1.0)\nassert c[\"resources\"][\"cpu\"][\"need\"] > b[\"resources\"][\"cpu\"][\"need\"] + 4, c[\"reason\"]\ne = ask(quiet)\nassert not e[\"ok\"] and e[\"resources\"][\"cpu\"][\"need\"] == a[\"resources\"][\"cpu\"][\"need\"], e[\"reason\"]\nprint(4)\nPYEOF",
+   "exit": 0,
+   "count": 4
+  },
+  {
+   "cmd": "git ls-files --error-unmatch governance/project/orchestration/tools/dispatch/dispatcher.py governance/project/orchestration/tools/dispatch/balancer.py tests/unit/orchestration/test_dispatcher.py tests/unit/orchestration/test_balancer.py",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "834ae7a55a534a055e7999af97cd642e4e15c82602123f20676a54689895a5d7"
+ }
+}

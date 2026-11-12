@@ -165,8 +165,12 @@ def inbox_item(name, body):
 
 
 def totals(lines):
-    """{W2: {cost, projection, since, launches}}: the cost since the last clear, against the ticket's latest
-    projection_usd (a relaunch of a budgeted brief does not raise it; a clear with --projection-usd sets it)."""
+    """{W2: {cost, projection, since, launches}}: the cost since the last clear, against the sum of the projections of
+    the distinct briefs launched since it (DECIDED-NOT-DONE row 159, DEC-1140 (2): separate runs each bring their own
+    projection, so a W2's several runs no longer trip the brake against the latest one alone). A brief is its log's name
+    less launch_worker's "-2", "-3" suffix, so a relaunch of the same brief counts its latest projection once (review
+    finding 1 kept: relaunching never raises the brake); lines without a log share one key. A clear with --projection-usd
+    adds that figure, a clear without one adds nothing; a line that is not a launch sets nothing."""
     t = {}
     for d in lines:
         w = d.get("wbs")
@@ -175,8 +179,12 @@ def totals(lines):
         e = t.setdefault(w, {"cost": 0.0, "projection": 0.0, "since": d["at"], "launches": 0})
         if d["kind"] == "brake-clear":
             e["cost"], e["since"] = 0.0, d["at"]
-        if num(d.get("projection_usd")):
-            e["projection"] = num(d["projection_usd"])
+            e["base"], e["briefs"] = num(d.get("projection_usd")) or 0.0, {}
+        elif d["kind"] == "launched" and num(d.get("projection_usd")):
+            log = ((d.get("extra") or {}).get("log") or "")
+            key = re.sub(r"-\d+$", "", Path(log).stem) if log else ""
+            e.setdefault("briefs", {})[key] = num(d["projection_usd"])
+        e["projection"] = e.get("base", 0.0) + sum(e.get("briefs", {}).values())
         if d["kind"] not in ("brake", "brake-clear") and num(d.get("cost_usd")) is not None:
             e["cost"] += num(d["cost_usd"])
         e["launches"] += d["kind"] == "launched"

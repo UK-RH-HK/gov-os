@@ -1,0 +1,8 @@
+log: W2-11-A5-r7-resume.json
+W2: W2-11
+status: DONE. The verified and reviewed head is `646850506819`. The review record is committed alone on top of it, so the branch head is `58ac442d6820`. READY was computed by `verdict.ready`: True, with no blocking findings.
+
+task: W2-11 (DAEO-k7hz) run r7: resume after r6's PACKAGES and apply the CTO's decisions (P-W2-11-R6-1 (b), P-W2-11-R6-2 (c), P-a, P-b), then gov accept, verification, the round-2 review (CITP-REVIEW-r2) and DONE
+status: DONE. The verified and reviewed head is `646850506819`. The review record is committed alone on top of it, so the branch head is `58ac442d6820`. READY was computed by `verdict.ready`: True, with no blocking findings.
+work_completed: Five worker batches ran, one writer per worktree; the product-spec and designer batches ran in parallel in separate trees.
+- ps-r7 (product-spec):

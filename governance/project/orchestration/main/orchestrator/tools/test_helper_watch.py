@@ -141,3 +141,21 @@ def test_a_bounded_run_ends_with_a_line_to_re_arm(tmp_path):
                         "--workers-glob", str(tmp_path / "none/*.pid")], capture_output=True, text=True, env=env,
                        timeout=60)
     assert r.returncode == 0 and r.stdout.strip().splitlines()[-1].startswith("HELPER_WATCH ended after")
+
+
+def test_a_reported_condition_is_not_re_sent_after_a_pass_that_does_not_see_it(tmp_path):
+    """DEC-1140 (1)(a): two instances alternating (one sees nothing) used to wipe the state and re-send the same item."""
+    orch, proj = setup(tmp_path)
+    agent(proj, "a0decd5acf76ac330", [entry("assistant", "2026-11-10T02:19:00Z", {"type": "tool_use", "name": "Bash"}),
+                                      entry("user", "2026-11-10T02:21:00Z", {"type": "tool_result"}), ERR],
+          {"agentType": "orchestrator", "description": "Set-up A wiring in W2-149"})
+    run(tmp_path, "2026-11-10T02:31:00Z")
+    assert len(items(orch)) == 1
+    empty = tmp_path / "empty"
+    (empty / SID / "subagents").mkdir(parents=True)
+    env = dict(os.environ, ORCH=str(orch))
+    r = subprocess.run([sys.executable, str(TOOL), "--once", "--projects", str(empty), "--now", "2026-11-10T02:33:00Z",
+                        "--workers-glob", str(tmp_path / "none/*.pid")], capture_output=True, text=True, env=env, timeout=60)
+    assert r.returncode == 0, r.stderr
+    run(tmp_path, "2026-11-10T02:36:00Z")
+    assert len(items(orch)) == 1

@@ -1,0 +1,8 @@
+log: W2-11-A5-r6-resume.json
+W2: W2-11
+status: PACKAGES. Round 2's text and tests are in and S9, S13, S14, S15 and S16 now pass, but DONE is blocked by two P2 disputes about tests (P-W2-11-R6-1, P-W2-11-R6-2). A spend brake on W2-11 also stops the reviewer from launching, so no review ran.
+
+task: DAEO-k7hz (W2-11) round 2 of 2, run r6-resume: verify the restored skills, write round 2's text and tests (S9 round-2 half, S13, S14, S15, S16 skill half, F1), verify, one review, DONE.
+status: PACKAGES. Round 2's text and tests are in and S9, S13, S14, S15 and S16 now pass, but DONE is blocked by two P2 disputes about tests (P-W2-11-R6-1, P-W2-11-R6-2). A spend brake on W2-11 also stops the reviewer from launching, so no review ran.
+work_completed:
+- **Step 2, read-only check before any worker:** both pre-run commits are present with correct trailers: c174e2c7f9e (product-spec) and c961

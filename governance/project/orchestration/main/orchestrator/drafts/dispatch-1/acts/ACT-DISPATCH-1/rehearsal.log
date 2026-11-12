@@ -1,0 +1,202 @@
+--- A. the bundle and the clone
+clone of the main tree's w2/integrate: w2/integrate
+ok   A0.0 the clone's dispatcher.py is the frozen before (the bundle is not stale)
+ok   A0.0 the main tree's dispatcher.py (read only) is the frozen before
+ok   A0.0 before/ and after/ copies hash as list.txt says
+ok   A0.1 the clone's balancer.py is the frozen before (the bundle is not stale)
+ok   A0.1 the main tree's balancer.py (read only) is the frozen before
+ok   A0.1 before/ and after/ copies hash as list.txt says
+ok   A0.2 the clone's test_dispatcher.py is the frozen before (the bundle is not stale)
+ok   A0.2 the main tree's test_dispatcher.py (read only) is the frozen before
+ok   A0.2 before/ and after/ copies hash as list.txt says
+ok   A0.3 the clone's test_balancer.py is the frozen before (the bundle is not stale)
+ok   A0.3 the main tree's test_balancer.py (read only) is the frozen before
+ok   A0.3 before/ and after/ copies hash as list.txt says
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/dispatch/dispatcher.py
+ok   A2 verify refused before the apply (exit 3)
+     already in place: governance/project/orchestration/tools/dispatch/dispatcher.py (undo)
+     already in place: governance/project/orchestration/tools/dispatch/balancer.py (undo)
+     already in place: tests/unit/orchestration/test_dispatcher.py (undo)
+     already in place: tests/unit/orchestration/test_balancer.py (undo)
+ok   A3 undo before the apply changes nothing (exit 0)
+--- B. the existing tests of tests/unit/orchestration on the OLD code (the baseline)
+     result: 456 passed, 6 skipped, 89 deselected
+ok   B1 tests/unit/orchestration, old code, old tests: exit 0
+--- C. the new test cases on the OLD code: red
+     FAILED tests/unit/orchestration/test_balancer.py::test_a_held_slot_measured_low_counts_at_the_floor_not_at_its_peak
+     FAILED tests/unit/orchestration/test_balancer.py::test_a_job_measured_busy_counts_at_its_measured_peak_and_never_above_its_phase_peak
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_a_cap_with_a_line_that_waits_for_another_reason_keeps_that_reason
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_a_changed_waiting_set_is_a_new_cause_and_a_start_clears_the_last_one
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_a_launch_pending_counts_against_the_cap_and_no_cap_is_no_refusal
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_a_pass_where_idle_does_not_hold_forgets_nothing
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_a_returned_log_and_an_empty_list_are_separate_causes
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_an_old_form_of_the_reported_file_is_one_more_item_not_an_error
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_the_lead_cap_refuses_a_start_with_its_reason
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_the_measured_load_is_recorded_a_pass_and_forgotten_when_the_job_ends
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_the_same_cause_is_sent_again_after_six_hours_as_a_reminder
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_the_same_waiting_set_gives_one_idle_item_not_two
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_dispatch_1_three_held_slots_at_a_low_measured_load_admit_a_lead
+     result: 13 failed, 208 passed, 3 skipped, 10 deselected
+ok   C1 the new test files on the old code: exit 1
+ok   C2 at least 10 of the new cases fail on the old code (13)
+     Traceback (most recent call last):
+       File "<stdin>", line 46, in <module>
+     AssertionError: None
+ok   check 1 as written (exit 1, count -)
+     Traceback (most recent call last):
+       File "<stdin>", line 43, in <module>
+     AssertionError: ["log: dispatch.log\nIdle: headroom\nstatus: the gate is open and 2 of 5 leads run, but no ready line is startable (2 line(s) in ready.txt); skipped for a used or returned log: W2-3 T-
+ok   check 2 as written (exit 1, count -)
+     Traceback (most recent call last):
+       File "<stdin>", line 36, in <module>
+     AssertionError: forecast refuses (CPU binding): CPU 21.8 of 18 cores (busy 3.0 + running jobs' peaks 16.8 + the newcomer's 2.0)
+ok   check 3 as written (exit 1, count -)
+     (checks 1, 2 and 3, the behaviour of the cap, the idle item and the forecast, are red on the old files: they tell the two apart)
+ok   check 0 as written (exit 0, count -)
+     governance/project/orchestration/tools/dispatch/dispatcher.py
+     tests/unit/orchestration/test_balancer.py
+     tests/unit/orchestration/test_dispatcher.py
+ok   check 4 as written (exit 0, count -)
+ok   C3 the clone is clean again (old code, old tests)
+--- D. the plain apply
+ok   D1 plain apply (no option, no env) (exit 0)
+ok   D2.0 dispatcher.py is the frozen after, byte for byte
+ok   D3.0 the mode of dispatcher.py is kept (644)
+ok   D2.1 balancer.py is the frozen after, byte for byte
+ok   D3.1 the mode of balancer.py is kept (644)
+ok   D2.2 test_dispatcher.py is the frozen after, byte for byte
+ok   D3.2 the mode of test_dispatcher.py is kept (644)
+ok   D2.3 test_balancer.py is the frozen after, byte for byte
+ok   D3.3 the mode of test_balancer.py is kept (644)
+ok   D4 git status shows exactly four modified files and nothing else
+ok   D5 no temp file left beside the files
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py
+ok   D6 check refused after the apply (exit 3)
+ok   D7 verify exit 0 (exit 0)
+     already in place: governance/project/orchestration/tools/dispatch/dispatcher.py (apply)
+     already in place: governance/project/orchestration/tools/dispatch/balancer.py (apply)
+     already in place: tests/unit/orchestration/test_dispatcher.py (apply)
+     already in place: tests/unit/orchestration/test_balancer.py (apply)
+ok   D8 apply again changes nothing (exit 0)
+--- E. every manifest check exactly as written, then the tests: green
+ok   check 0 as written (exit 0, count -)
+     4
+ok   check 1 as written (exit 0, count 4)
+     5
+ok   check 2 as written (exit 0, count 5)
+     4
+ok   check 3 as written (exit 0, count 4)
+     governance/project/orchestration/tools/dispatch/dispatcher.py
+     tests/unit/orchestration/test_balancer.py
+     tests/unit/orchestration/test_dispatcher.py
+ok   check 4 as written (exit 0, count -)
+     result: 474 passed, 6 skipped, 89 deselected
+ok   E1 tests/unit/orchestration, new code, new tests: exit 0
+     baseline: 456 passed, 6 skipped, 89 deselected | new cases on the old code: 13 failed, 208 passed, 3 skipped, 10 deselected | after the apply: 474 passed, 6 skipped, 89 deselected
+--- E4. the OLD test files on the NEW code (the code-only route: the tests could land after the code)
+     result: 456 passed, 6 skipped, 89 deselected
+ok   E4 tests/unit/orchestration, new code, old test files: exit 0
+     result: 76 passed
+ok   E5 tests/acceptance/W2-136 (it reads the dispatcher's list rules), new code: exit 0
+ok   E6 verify: the new test files are back, the ACT is applied again (exit 0)
+     old test files on the new code: 456 passed, 6 skipped, 89 deselected
+--- F. the dry-tick scenarios in a planted world (the live config.json copied; never the live dispatch folder)
+the new dispatcher:
+     == CAP: five leads run, six ready lines, max_leads 5
+       W2-1 T-1: running
+       W2-2 T-2: running
+       W2-3 T-3: running
+       W2-4 T-4: running
+       W2-5 T-5: running
+       W2-6 T-6: lead cap: 5 of 5 running
+       leads running: 5 | max_leads: 5 | started this tick: None
+       dispatch.log: (nothing logged in a dry pass beyond its decision)
+     == IDLE: two leads run, four ready lines whose logs were used (cap read from the live config)
+       pass 1: inbox idle items 1; remembered: used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 2, one minute later: inbox idle items 1; remembered: used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 3, gate shut (idle does not hold): inbox idle items 1; remembered: used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 4, gate open, same waiting set: inbox idle items 1; remembered: used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 5, 7 hours later: inbox idle items 2; remembered: used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       last item: log: dispatch.log | Idle: headroom | status: (reminder: the same cause for 7 h) the gate is open and 2 of 5 leads run, but no ready line is startable (4 line(s) in ready.txt); skipped for
+       dispatch.log idle lines: 4
+     == FORECAST: three heavy slots held by low-load jobs (measured 0.05 cores for 10 minutes), one startable line
+       jobs: slot test, slot test, slot test
+       forecast lead ok: True | CPU 8.0 of 18 cores (busy 3.0 + running jobs' peaks 3.0, 3 of them at their measured load + the newcomer's 2.0)
+       the line: startable (would start) | dispatch.log: would start W2-1 (T-1) B1.md -> W2-1-A5-run1.json
+ok   F0 the planted world ran (new)
+ok   F1 CAP: the sixth line waits on the cap and nothing starts
+ok   F2 IDLE: the same waiting set (also across a shut-gate pass) gives one item, not two
+ok   F3 IDLE: after 6 hours the same cause is one reminder
+ok   F4 FORECAST: three held slots at a low measured load admit a lead
+the old dispatcher, the same three scenarios:
+     == CAP: five leads run, six ready lines, max_leads 5
+       W2-1 T-1: running
+       W2-2 T-2: running
+       W2-3 T-3: running
+       W2-4 T-4: running
+       W2-5 T-5: running
+       leads running: 5 | max_leads: 5 | started this tick: W2-6
+       dispatch.log: would start W2-6 (T-6) B6.md -> W2-6-A5-run1.json
+     == IDLE: two leads run, four ready lines whose logs were used (cap read from the live config)
+       pass 1: inbox idle items 1; remembered: (old form) used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 2, one minute later: inbox idle items 1; remembered: (old form) used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 3, gate shut (idle does not hold): inbox idle items 1; remembered: (none)
+       pass 4, gate open, same waiting set: inbox idle items 2; remembered: (old form) used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       pass 5, 7 hours later: inbox idle items 3; remembered: (old form) used:W2-3 T-3,W2-4 T-4,W2-5 T-5,W2-6 T-6
+       last item: log: dispatch.log | Idle: headroom | status: the gate is open and 2 of 5 leads run, but no ready line is startable (4 line(s) in ready.txt); skipped for a used or returned log: W2-3 T-3 (
+       dispatch.log idle lines: 3
+     == FORECAST: three heavy slots held by low-load jobs (measured 0.05 cores for 10 minutes), one startable line
+       jobs: slot test, slot test, slot test
+       forecast lead ok: False | CPU 22.7 of 18 cores (busy 3.0 + running jobs' peaks 17.7 + the newcomer's 2.0)
+       the line: not admitted: forecast refuses (CPU binding): CPU 22.7 of 18 cores (busy 3.0 + running jobs' peaks 17.7 + the newcomer's 2.0) | dispatch.log: -
+ok   F5 the planted world ran (old)
+ok   F6 old: the sixth lead would start (no cap)
+ok   F7 old: the same waiting set gives a second item after a shut-gate pass
+ok   F8 old: the same machine is refused on CPU (22.7 of 18)
+--- G. undo, and the apply.sh states
+ok   G1 undo (exit 0)
+ok   G2.0 dispatcher.py is the original, byte for byte, mode kept
+ok   G2.1 balancer.py is the original, byte for byte, mode kept
+ok   G2.2 test_dispatcher.py is the original, byte for byte, mode kept
+ok   G2.3 test_balancer.py is the original, byte for byte, mode kept
+ok   G3 the clone is clean after the undo
+ok   G4 check: state before (exit 0)
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py
+ok   G5 check refuses a file that changed (exit 3)
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py (neither the before nor the after; apply refused, nothing touched)
+ok   G6 apply refuses (neither before nor after) (exit 3)
+ok   G7 apply wrote nothing to the other files
+ok   G8 apply (exit 0)
+     not applied: tests/unit/orchestration/test_dispatcher.py
+ok   G9 a half-applied state: verify refuses (exit 3)
+     already in place: governance/project/orchestration/tools/dispatch/dispatcher.py (apply)
+     already in place: governance/project/orchestration/tools/dispatch/balancer.py (apply)
+     already in place: tests/unit/orchestration/test_balancer.py (apply)
+ok   G10 a half-applied state: apply finishes it (exit 0)
+ok   G11 verify (exit 0)
+     already in place: governance/project/orchestration/tools/dispatch/balancer.py (undo)
+ok   G12 a half-applied state: undo takes it back (exit 0)
+ok   G13 the clone is back to the original
+     the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/dispatch-1/tmp/tampered/after/repo/governance/project/orchestration/tools/d
+ok   G14 a tampered frozen copy: apply refuses (4) (exit 4)
+ok   G15 nothing was written
+     moved: tests/unit/orchestration/test_dispatcher.py (neither the before nor the after; apply refused, nothing touched)
+ok   G16 a missing file: apply refuses (exit 3)
+ok   G17 nothing was created in its place
+     moved: tests/unit/orchestration/test_dispatcher.py (neither the before nor the after; apply refused, nothing touched)
+ok   G18 a link: apply refuses (exit 3)
+ok   G19 the clone is clean again
+--- H. the live files are unchanged (read only)
+ok   H1.0 the main tree's dispatcher.py is unchanged
+ok   H1.1 the main tree's balancer.py is unchanged
+ok   H1.2 the main tree's test_dispatcher.py is unchanged
+ok   H1.3 the main tree's test_balancer.py is unchanged
+ok   H2 the planted HOME is empty
+ok   H3 the main tree's governance/ and tests/ are clean
+--- I. the class vote of the operator's own classifier (act_class.py, read only)
+ok   I1 the four-file bundle (code and tests) votes O: by hand
+ok   I2 the two code files alone vote b (row watchers, control path)
+
+REHEARSAL PASS
+failures: 0

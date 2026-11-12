@@ -1,0 +1,357 @@
+FFFFFFF...................................................FFF....        [100%]
+=================================== FAILURES ===================================
+____ test_a10_passes_on_the_auditors_pass_and_is_recorded_as_its_own_stage _____
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_passes_on_the_auditors_pass_and_is_recorded_as_its_own_stage(a10_passed, needs_vectors):
+        """Success 1 [CAP-44.f]: A10 is a stage of its own, recorded next to the records of A0 to A8."""
+        adoption, outcome, _, _ = a10_passed
+>       rel, front, _ = gates.assert_passed(outcome)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+_________________ test_a10_writes_over_no_other_stages_record __________________
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_writes_over_no_other_stages_record(a10_passed, needs_vectors):
+        adoption, outcome, before, _ = a10_passed
+>       gates.assert_passed(outcome)
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+_____________ test_a10_record_names_the_a8_record_and_the_auditor ______________
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_record_names_the_a8_record_and_the_auditor(a10_passed, needs_vectors):
+        """Success 2 [CAP-44.f]: the A8 legacy memory extraction and retirement, by a fresh auditor session."""
+        adoption, outcome, _, _ = a10_passed
+>       rel, _, text = gates.assert_passed(outcome)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+___ test_a10_record_carries_the_digest_of_the_derived_state_rebuilt_from_git ___
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_record_carries_the_digest_of_the_derived_state_rebuilt_from_git(a10_passed, needs_vectors):
+        """Success 2 [CAP-44.f; CAP-20; CAP-44.h (9)]: the derived state was deleted before the gate; the gate's
+        record carries the digest a rebuild from git gives at the commit it checked."""
+        _, outcome, _, digest = a10_passed
+>       rel, _, text = gates.assert_passed(outcome)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+________________ test_a10_record_names_the_canary_of_each_index ________________
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_record_names_the_canary_of_each_index(a10_passed, needs_vectors):
+        """Success 2 [CAP-44.f; CAP-55]: the canary of each index (lexical, semantic)."""
+        _, outcome, _, _ = a10_passed
+>       rel, _, text = gates.assert_passed(outcome)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+_________________ test_a10_record_names_what_stays_for_wave_3 __________________
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_record_names_what_stays_for_wave_3(a10_passed, needs_vectors):
+        """Success 2 [CAP-44.k; CIT-P §3.2]: the A9 knowledge fabric, CAP-49's memory checks, CAP-47.a's role."""
+        _, outcome, _, _ = a10_passed
+>       rel, _, text = gates.assert_passed(outcome)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+__________ test_a10_record_gives_a_met_condition_a_verdict_can_carry ___________
+
+a10_passed = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), sandbox=Sandbo...Written by `gov adopt --lite --stage A3`.\n', ...}, '94df76a84b2948b61f44e1b49de3bc669277c3bc18aa9598225e06c9de62208b')
+needs_vectors = None
+
+    def test_a10_record_gives_a_met_condition_a_verdict_can_carry(a10_passed, needs_vectors):
+        """Success 3 [CAP-44.h (6), (9)]: conditions in W2-02's form, one naming A10, all 'met'."""
+        _, outcome, _, _ = a10_passed
+>       rel, front, _ = gates.assert_passed(outcome)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_a10_gate.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', ...ance/adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/a10-passed0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+____ test_the_a7_and_a10_records_each_give_a_condition_the_verdict_carries _____
+
+protocol_order = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), sandbox=Sa...adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain=''))
+needs_vectors = None
+
+    def test_the_a7_and_a10_records_each_give_a_condition_the_verdict_carries(protocol_order, needs_vectors):
+        """Success 3 [CAP-44.h]: each record gives at least one condition in W2-02's form; one names A7, one A10;
+        no condition of one record is a condition of the other."""
+        _, a7, _, a10 = protocol_order
+        rel7, front7, _ = gates.assert_passed(a7)
+>       rel10, front10, _ = gates.assert_passed(a10)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_verdict_conditions.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', .../adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+__________ test_a_verdict_reading_both_passing_records_can_be_healthy __________
+
+protocol_order = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), sandbox=Sa...adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain=''))
+needs_vectors = None
+
+    def test_a_verdict_reading_both_passing_records_can_be_healthy(protocol_order, needs_vectors):
+        """Success 3 [CAP-44.h]: with both gates passed, the conditions the two records give are all met, so they
+        keep no verdict from ADOPTED_HEALTHY."""
+        _, a7, _, a10 = protocol_order
+>       found = gates.conditions(gates.assert_passed(a7)[1]) + gates.conditions(gates.assert_passed(a10)[1])
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_verdict_conditions.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', .../adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+_________________ test_the_conditions_say_where_they_come_from _________________
+
+protocol_order = (GateAdoption(project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), sandbox=Sa...adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain=''))
+needs_vectors = None
+
+    def test_the_conditions_say_where_they_come_from(protocol_order, needs_vectors):
+        """Success 3 [CAP-44.h; W2-02]: each condition's source is the item it comes from: CAP-44.f (the lite gate)
+        or CAP-44.h (the verdict's condition)."""
+        _, a7, _, a10 = protocol_order
+        for outcome in (a7, a10):
+>           rel, front, _ = gates.assert_passed(outcome)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-52/test_w2_52_verdict_conditions.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(stage='A10', run=Run(args=('adopt', '--lite', '--stage', 'A10', '--verdict', 'audit/adoption/a10-verdict.md', .../adoption', project=PosixPath('/tmp/gov-os-lead-W2-52/pytest-of-usain/pytest-0/protocol-order0/harbour'), porcelain='')
+
+    def assert_passed(outcome):
+        """The gate passed: the envelope says so, and its record, its own stage, gives conditions all met."""
+        assert_stage_taken(outcome)
+        envelope = base.assert_envelope(outcome.run, support.base.load_interface(REPO_ROOT), command="adopt")
+>       assert envelope["ok"] is True, f"stage {outcome.stage} did not pass\n{outcome.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: stage A10 did not pass
+E       gov adopt --lite --stage A10 --verdict audit/adoption/a10-verdict.md --json --session adopter-001
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-001", "error": {"code": "ADOPT_GATE_NOT_PASSED", "message": "gate A10 did not pass, recorded in governance/adoption/A10-independent-memory-verification.md: the canary of the semantic index: FACET_UNAVAILABLE: misses ['juniper lantern protocol sentinel'], no reason given; the semantic index is recreated", "details": {"record": "governance/adoption/A10-independent-memory-verification.md", "conditions": [{"name": "lite A10 gate: the memory independently verified (CAP-44.h condition 6, lite part)", "source": "CAP-44.f", "state": "not met"}, {"name": "lite A10 gate: the derived state rebuilt from git (CAP-44.h condition 9, lite part)", "source": "CAP-44.h", "state": "met"}]}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E       
+E       added at HEAD: ['governance/adoption/A10-independent-memory-verification.md']
+E       changed at HEAD: []
+
+tests/acceptance/W2-52/w2_52_support.py:465: AssertionError
+10 failed, 55 passed in 168.29s (0:02:48)

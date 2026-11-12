@@ -1,0 +1,91 @@
+FFFF...                                                                  [100%]
+=================================== FAILURES ===================================
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+
+raw_project = <w1_26_support.Project object at 0x7485db782390>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-xafn/PR-DAEO-xafn.md': [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}]}
+E       assert not {'docs/probes/DAEO-xafn/PR-DAEO-xafn.md': [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_...bed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 1 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}])
+E       assert not [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-xafn...obed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+
+check = <w1_08_support.Checker object at 0x7485db7fa990>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7485db7fa990>
+schema = PosixPath('/home/usain/gov-os-worktrees/W2-23/.gov-runtime/scratch/base/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-0mtg-PR-DAEO-0mtg': {'commissioned_by': 'orchestrator', 'implementer_session': "unknown (the engineer's log was...lementer_session': '8f696f48-3724-45bd-8ef2-dcc024b3ff5f', 'judged_by': 'orchestrator', 'judgement': 'pass', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-lead-W2-23/pytest-of-usain/pytest-14/test_the_probe_schema_accepts_0/instances-0/DAEO-xafn-PR-DAEO-xafn.json::$.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_________________ test_core_schema_is_green_on_this_repository _________________
+
+here = (1, [{'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-...bed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-xafn/PR-DAEO-xafn.md', 'field': 'probed_commit', 'schema': 'probe.schema.json', 'at': '$.probed_commit', 'message': "docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'"}]
+E       assert [{'at': '$.pr...{40}$'", ...}] == []
+E         
+E         Left contains one more item: {'at': '$.probed_commit', 'code': 'SCHEMA_INVALID_FIELD', 'field': 'probed_commit', 'message': "docs/probes/DAEO-xafn/...robed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'", ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed
+FAILED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record
+FAILED tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records
+FAILED tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+4 failed, 3 passed, 41 deselected in 28.49s

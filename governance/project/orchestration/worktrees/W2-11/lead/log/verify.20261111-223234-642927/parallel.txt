@@ -1,0 +1,735 @@
+bringing up nodes...
+bringing up nodes...
+
+s....................................................................... [  1%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+...............................F......F..F....F.F..........F..F...F..... [  6%]
+.F........................................FF.....FF..FF..........F...... [  7%]
+.........................................................F.....F........ [  9%]
+.....FF.FF...F.......................................................... [ 10%]
+.....................................................................FF. [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+.......................................F................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+................................................................F....... [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+...............................................................F........ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+....................sss................................................. [ 63%]
+................................................................sss..... [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+...............................F........................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+.F....................F...........F..................................... [ 99%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+_________ test_every_write_step_lies_in_the_skills_output_class[audit] _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'audit'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: audit declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for running an independent fidelity audit against the Contract and governing decisions', 'metadata': {'version': '1.2.0'}, 'name': 'audit', 'version': '1.2.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+________ test_every_write_step_lies_in_the_skills_output_class[change] _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'change'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: change declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for taking a Gov OS change through evidence, proposal, independent review and owner approval to a new version.', 'metadata': {'version': '1.0.0'}, 'name': 'change', 'version': '1.0.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+______ test_every_write_step_lies_in_the_skills_output_class[checkpoint] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'checkpoint'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: checkpoint declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for writing, watching and resuming from structured checkpoints with gov checkpoint', 'metadata': {'version': '1.1.0'}, 'name': 'checkpoint', 'version': '1.1.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_______ test_every_write_step_lies_in_the_skills_output_class[discovery] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'discovery'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: discovery declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for discovery, research, experiments and decision packages during specification work.', 'metadata': {'version': '1.1.0'}, 'name': 'discovery', 'version': '1.1.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_____ test_every_write_step_lies_in_the_skills_output_class[orchestration] _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: orchestration declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for running a wave: parallel tickets under ticket leads, integration, decisions, stops, sessions, briefs, commits and status answers.', 'metadata': {'version': '1.4.0'}, 'name': 'orchestration', 'version': '1.4.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_______ test_every_write_step_lies_in_the_skills_output_class[planning] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'planning'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: planning declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for emitting schema-valid tickets, gap tickets and readiness rows during planning.', 'metadata': {'version': '1.0.0'}, 'name': 'planning', 'version': '1.0.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_______ test_every_write_step_lies_in_the_skills_output_class[qa-review] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'qa-review'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: qa-review declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': "The QA engineer's method: traces each KPI line to its tests and code, checks tests and code against t...s. Use for a ticket's QA before it merges.", 'metadata': {'version': '1.0.0'}, 'name': 'qa-review', 'version': '1.0.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_______ test_every_write_step_lies_in_the_skills_output_class[retrieval] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'retrieval'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: retrieval declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for running gov retrieve — facet retrieval in disposable subagents with validated bundle return', 'metadata': {'version': '1.1.0'}, 'name': 'retrieval', 'version': '1.1.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+______ test_every_write_step_lies_in_the_skills_output_class[test-design] ______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+>       assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
+E       AssertionError: test-design declares no output class, so its write steps cannot be held to one
+E       assert 'output' in {'description': 'Method for independent test design from the specification and KPIs, in parallel with the implementer and never reading its work.', 'metadata': {'version': '1.4.0'}, 'name': 'test-design', 'version': '1.4.0'}
+
+tests/acceptance/W2-11/test_w2_11_round2.py:202: AssertionError
+_________ test_every_copy_carries_the_kernel_skills_body[test-design] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the test-design copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+________ test_every_copy_carries_the_kernel_skills_body[orchestration] _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the orchestration copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[discovery] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'discovery'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: discovery: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
+
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+_____ test_the_skill_carries_one_version_in_all_four_places[orchestration] _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: orchestration: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.4.0', None, '1.4.0', '1.4.0']))
+E        +    where dict_values(['1.4.0', None, '1.4.0', '1.4.0']) = <built-in method values of dict object at 0x73d169f48e80>()
+E        +      where <built-in method values of dict object at 0x73d169f48e80> = {'.claude/skills': None, '.rulesync/skills': '1.4.0', 'template/.rulesync/skills': '1.4.0', 'template/governance/kernel/skills': '1.4.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[retrieval] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'retrieval'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: retrieval: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
+
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[test-design] ______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: test-design: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.4.0', None, '1.4.0', '1.4.0']))
+E        +    where dict_values(['1.4.0', None, '1.4.0', '1.4.0']) = <built-in method values of dict object at 0x73d169db96c0>()
+E        +      where <built-in method values of dict object at 0x73d169db96c0> = {'.claude/skills': None, '.rulesync/skills': '1.4.0', 'template/.rulesync/skills': '1.4.0', 'template/governance/kernel/skills': '1.4.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = '.claude/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling']
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:20: AssertionError
+_ test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation():
+        rule = section(now(TEST_DESIGN), "read")
+>       assert "w2/integrate" in rule, "the test-design skill's read rule does not name w2/integrate (DEC-963)"
+E       AssertionError: the test-design skill's read rule does not name w2/integrate (DEC-963)
+E       assert 'w2/integrate' in '\nThe README maps each KPI line to the tests under it and the expected red reason of each, in the table form gov acce... is refused; a test the map does not name is counted, never named. The form in full: [test-kinds.md](test-kinds.md).\n'
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:110: AssertionError
+______________ test_s11_k4_guard_still_bars_the_held_out_contents ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s11_k4_guard_still_bars_the_held_out_contents():
+        body = s.split(now(ORCHESTRATION))[1]
+        bars = [line for line in sentences(body) if "held-out" in line.lower() and HELD_OUT_BAR.search(line)]
+>       assert bars, "the orchestration skill no longer forbids reading the held-out material's contents"
+E       AssertionError: the orchestration skill no longer forbids reading the held-out material's contents
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:163: AssertionError
+_____ test_s11_skill_version_is_one_minor_above_integrates[orchestration] ______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = 'template/governance/kernel/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", [ORCHESTRATION, TEST_DESIGN], ids=["orchestration", "test-design"])
+    def test_s11_skill_version_is_one_minor_above_integrates(rel):
+        # Round 2b: one minor above integrate as round 2b's cases found it (1.1.0, round 2a's), so 1.2.0
+        major, minor, _ = version_parts(baseline(rel, BASELINE_VERSIONS))
+>       assert version_parts(now(rel)) == (major, minor + 1, 0), \
+            f"{rel}'s version is not {major}.{minor + 1}.0 (one minor above integrate's {major}.{minor}.x)"
+E       AssertionError: template/governance/kernel/skills/orchestration/SKILL.md's version is not 1.2.0 (one minor above integrate's 1.1.x)
+E       assert (1, 4, 0) == (1, 2, 0)
+E         
+E         At index 1 diff: 4 != 2
+E         Use -v to get more diff
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:256: AssertionError
+______ test_s11_skill_version_is_one_minor_above_integrates[test-design] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = 'template/governance/kernel/skills/test-design/SKILL.md'
+
+    @pytest.mark.parametrize("rel", [ORCHESTRATION, TEST_DESIGN], ids=["orchestration", "test-design"])
+    def test_s11_skill_version_is_one_minor_above_integrates(rel):
+        # Round 2b: one minor above integrate as round 2b's cases found it (1.1.0, round 2a's), so 1.2.0
+        major, minor, _ = version_parts(baseline(rel, BASELINE_VERSIONS))
+>       assert version_parts(now(rel)) == (major, minor + 1, 0), \
+            f"{rel}'s version is not {major}.{minor + 1}.0 (one minor above integrate's {major}.{minor}.x)"
+E       AssertionError: template/governance/kernel/skills/test-design/SKILL.md's version is not 1.2.0 (one minor above integrate's 1.1.x)
+E       assert (1, 4, 0) == (1, 2, 0)
+E         
+E         At index 1 diff: 4 != 2
+E         Use -v to get more diff
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:256: AssertionError
+_________ test_s11_guard_test_design_skill_changes_only_its_read_rule __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s11_guard_test_design_skill_changes_only_its_read_rule():
+        old, new = baseline(TEST_DESIGN), now(TEST_DESIGN)
+>       assert _front_without_version(new) == _front_without_version(old), \
+            "the test-design skill's front matter changed beyond its version"
+E       AssertionError: the test-design skill's front matter changed beyond its version
+E       assert {'description...'test-design'} == {'description...'test-design'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'description': 'Method for independent test design from the specification and KPIs, in parallel with the implementer and never reading its work.'} != {'description': 'Method for independent test design from specification and KPIs, without reading implementation.'}
+E         Left contains 1 more item:
+E         {'metadata': {'version': '1.4.0'}}
+E         Use -v to get more diff
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:278: AssertionError
+_______ test_s11_guard_orchestration_skill_changes_only_the_named_parts ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s11_guard_orchestration_skill_changes_only_the_named_parts():
+        old, new = baseline(ORCHESTRATION), now(ORCHESTRATION)
+>       assert _front_without_version(new) == _front_without_version(old), \
+            "the orchestration skill's front matter changed beyond its version"
+E       AssertionError: the orchestration skill's front matter changed beyond its version
+E       assert {'description...rchestration'} == {'description...rchestration'}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'metadata': {'version': '1.4.0'}}
+E         Use -v to get more diff
+
+tests/acceptance/W2-128/test_w2_128_round2a.py:293: AssertionError
+____ test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136 ____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136():
+        rule = section(now(TEST_DESIGN), "read")
+>       assert re.search(r"CAP-38\.c\b", rule), "the read rule does not cite CAP-38.c (independent test authorship)"
+E       AssertionError: the read rule does not cite CAP-38.c (independent test authorship)
+E       assert None
+E        +  where None = <function search at 0x7700003f20c0>('CAP-38\\.c\\b', '\nThe README maps each KPI line to the tests under it and the expected red reason of each, in the table form gov acce... is refused; a test the map does not name is counted, never named. The form in full: [test-kinds.md](test-kinds.md).\n')
+E        +    where <function search at 0x7700003f20c0> = re.search
+
+tests/acceptance/W2-128/test_w2_128_round2b.py:63: AssertionError
+_ test_f1_the_retrieval_skill_is_the_reference_but_for_step_7_and_its_version __
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_f1_the_retrieval_skill_is_the_reference_but_for_step_7_and_its_version():
+        before = support.reference(support.RETRIEVAL)
+        now = STEP_7.sub("", support.current(support.RETRIEVAL), count=1)
+>       assert _versions_set_aside(now) == _versions_set_aside(before), (
+            "the retrieval skill changed outside step 7 and its version line")
+E       AssertionError: the retrieval skill changed outside step 7 and its version line
+E       assert '---\nname: r...t (CAP-51).\n' == '---\nname: r...t (CAP-51).\n'
+E         
+E         Skipping 149 identical leading characters in diff, use -v to show
+E           t aside>"
+E         + metadata:
+E         +   version: "1.1.0"
+E           ---
+E           ...
+E         
+E         ...Full output truncated (25 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-142/test_w2_142_unchanged.py:27: AssertionError
+_ test_f1_the_discovery_skill_is_the_reference_but_for_line_55_s_added_sentence_and_its_version _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_f1_the_discovery_skill_is_the_reference_but_for_line_55_s_added_sentence_and_its_version():
+        before = support.reference(support.DISCOVERY)
+        lines = support.current(support.DISCOVERY).split("\n")
+        held = [i for i, line in enumerate(lines) if line.startswith(support.LINE_55)]
+        assert len(held) == 1, f"line 55's text no longer starts exactly one line ({len(held)})"
+        lines[held[0]] = support.LINE_55
+>       assert _versions_set_aside("\n".join(lines)) == _versions_set_aside(before), (
+            "the discovery skill changed outside line 55's added sentence and its version line")
+E       AssertionError: the discovery skill changed outside line 55's added sentence and its version line
+E       assert '---\nname: d...ady answer.\n' == '---\nname: d...ady answer.\n'
+E         
+E         Skipping 33 identical leading characters in diff, use -v to show
+E           t aside>"
+E         + metadata:
+E         +   version: "1.1.0"
+E           description: Method for discovery, research, experiments and decision packages during specification work.
+E           ---...
+E         
+E         ...Full output truncated (50 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-142/test_w2_142_unchanged.py:37: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x73d16a1853a0>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x73d16a187d80>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/pyt...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x73d16a1874c0>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/...>
+endtime = 27088.000874866, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_______________________ test_hidden_part_file_budget_15 ________________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+w = <test_w2_149_indep_launch.World object at 0x73d16a8a3a70>
+
+    def test_hidden_part_file_budget_15(w):
+        tr = w.sets / "transcripts"
+        tr.mkdir()
+        for i in range(7989):  # with APPROVED: 7,990 hidden files
+            (tr / f"t{i:05d}").write_text("")
+        rc, counts, _ = w.launch(seed=1, dry=True)  # writer round 1: 7 fixed + 3 = 10 expected: exactly 8,000
+>       assert rc == 0, counts
+E       AssertionError: {'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '640e27dc6e61e6868aced6e2e6d78e046a3dc4fe65604e3e67271b7781dfecf1', 'brief_sha256': '8e052d65cbe1333deed4a30bd157258ea4226f695ee3e0a1a4ce9c60f40b4b14', 'code': 14, ...}
+E       assert 14 == 0
+
+tests/unit/orchestration/test_w2_149_indep_launch.py:537: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x791e8e426de0>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/...>
+endtime = 27393.321399369, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x791e8e48a0c0>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/...>
+endtime = 27458.424564466, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-2/popen-gw2/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x791e8e49c180>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-11/pyt...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-11/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=4013236) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+32 failed, 4602 passed, 7 skipped, 6 warnings in 831.96s (0:13:51)

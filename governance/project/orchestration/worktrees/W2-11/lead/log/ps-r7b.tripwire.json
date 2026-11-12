@@ -1,0 +1,25 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "ed0998c2455e",
+   "after": "f0cea0f353d3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-128/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-128/test_w2_128_round2a.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "acceptance folder",
+   "folder": "W2-128"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+== tests/acceptance/W2-11 exit 0 :: 193 passed, 1 skipped in 7.93s
+== tests/acceptance/W2-128 exit 0 :: 121 passed in 14.50s
+== tests/acceptance/W2-142 exit 0 :: 13 passed in 0.44s
+== tests/acceptance/W1-35 exit 0 :: 124 passed, 42 deselected in 274.52s (0:04:34)
+== tests/acceptance/W2-153 exit 0 :: 66 passed in 6.76s
+== tests/unit/adapters exit 0 :: 94 passed, 40 deselected in 3.35s
+== tests/acceptance/W1-30 exit 0 :: 7 passed, 530 deselected in 38.49s
+== tests/acceptance/W1-38 exit 0 :: 42 passed, 159 deselected in 45.17s
+== tests/acceptance/W2-57 exit 0 :: 20 passed, 1 deselected in 316.43s (0:05:16)
+== tests/unit/gitenv exit 0 :: 61 passed, 7 deselected in 5.12s
+== tests/acceptance/W1-33 exit 0 :: 112 passed, 2 deselected in 12.56s
+== tests/acceptance/W1-40 exit 0 :: 38 passed, 35 deselected in 45.84s
+done

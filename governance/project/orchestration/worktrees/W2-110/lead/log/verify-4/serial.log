@@ -1,0 +1,5 @@
+# 2026-11-12T00:26:18Z disk gate: 
+# bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh /usr/bin/python3 -m pytest -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed ...
+..............                                                           [100%]
+14 passed in 34.18s
+# 2026-11-12T00:26:54Z exit 0

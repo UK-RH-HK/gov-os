@@ -1,0 +1,33 @@
+== tests/acceptance/W1-26 exit 1 :: 3 failed, 74 passed, 350 deselected in 159.40s (0:02:39)
+FAILED tests/acceptance/W1-26/test_w1_26_audit_validator.py::TestOutsideGitRepo::test_outside_git_repo_unmeasured
+FAILED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed
+FAILED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record
+== tests/acceptance/W1-30 exit 0 :: 7 passed, 530 deselected in 35.68s
+== tests/acceptance/W1-33 exit 0 :: 112 passed, 2 deselected in 11.76s
+== tests/acceptance/W1-35 exit 0 :: 124 passed, 42 deselected in 278.44s (0:04:38)
+== tests/acceptance/W1-36 exit 0 :: 74 passed, 10 deselected in 2.47s
+== tests/acceptance/W1-38 exit 0 :: 42 passed, 159 deselected in 41.67s
+== tests/acceptance/W1-40 exit 0 :: 38 passed, 35 deselected in 47.89s
+== tests/acceptance/W2-05 exit 1 :: 3 failed, 27 passed, 35 deselected in 65.15s (0:01:05)
+FAILED tests/acceptance/W2-05/test_w2_05_bisect_step.py::test_the_night_s_bisect_leaves_every_branch_head_and_reflog_of_the_project_as_it_was
+FAILED tests/acceptance/W2-05/test_w2_05_bisect_step.py::test_the_night_s_bisect_names_the_commit_that_made_the_test_red
+FAILED tests/acceptance/W2-05/test_w2_05_bisect_step.py::test_each_bisect_step_s_test_sees_only_the_git_variables_of_the_run_that_found_the_red
+== tests/acceptance/W2-57 exit 0 :: 20 passed, 1 deselected in 317.98s (0:05:17)
+== tests/acceptance/W2-66 exit 1 :: 12 failed, 133 passed, 64 deselected in 241.82s (0:04:01)
+FAILED tests/acceptance/W2-66/test_w2_66_deselected_cases.py::test_a_case_left_out_by_deselection_is_named_with_why
+FAILED tests/acceptance/W2-66/test_w2_66_evidence.py::test_every_failing_test_is_named_with_its_failure_text_kept
+FAILED tests/acceptance/W2-66/test_w2_66_evidence.py::test_every_skip_is_named_with_its_reason_and_counted
+FAILED tests/acceptance/W2-66/test_w2_66_evidence.py::test_a_passed_close_names_its_skips_in_the_result_and_the_record
+FAILED tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_scoped_close
+FAILED tests/acceptance/W2-66/test_w2_66_lead_verification.py::test_a_project_s_test_map_changes_nothing_a_plain_run_collects
+FAILED tests/acceptance/W2-66/test_w2_66_moved_files.py::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite
+FAILED tests/acceptance/W2-66/test_w2_66_nightly.py::test_a_red_that_fails_alone_is_a_p1_package_with_git_bisect_over_the_commits_since_the_last_green_night
+FAILED tests/acceptance/W2-66/test_w2_66_nightly.py::test_a_red_that_passes_alone_is_a_flaky_candidate_and_is_not_bisected
+FAILED tests/acceptance/W2-66/test_w2_66_nightly.py::test_a_red_a_scoped_close_since_the_last_green_night_left_out_is_a_p1_package_with_the_map_corrected
+FAILED tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close
+FAILED tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_red_the_renamed_coupled_file_catches_refuses_the_close
+== tests/acceptance/W2-128 exit 0 :: 121 passed in 15.05s
+== tests/acceptance/W2-153 exit 0 :: 66 passed in 6.48s
+== tests/unit/adapters exit 0 :: 94 passed, 40 deselected in 4.10s
+== tests/unit/gitenv exit 0 :: 61 passed, 7 deselected in 5.53s
+done

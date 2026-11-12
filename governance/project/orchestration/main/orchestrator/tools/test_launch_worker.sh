@@ -68,7 +68,7 @@ printf '# W2-99 engineer\nRead %s first.\nBuild it.\n' "$W/common/EMG-common.md"
 printf '# W2-99 review\nRead everything; write nothing.\n' > "$W/briefs/W2-99-review.md"
 export STUB_REC=$W/rec LAUNCH_MAIN=$W/main LAUNCH_COMMON_DIR=$W/common LAUNCH_DISK_GATE=$W/gate.sh \
   LAUNCH_TRIPWIRE=$W/trip.py LAUNCH_TRIAL_DIR=$W/trial LAUNCH_MODEL=claude-opus-5-5  # RUBRIC-2: the model is always named
-CLS=(--class C2)  # every launch here names its class (RUBRIC-2); section 12 tests it absent, invalid and promoted
+CLS=(--class C3)  # C3 so RUBRIC-2's rewrite (section 12b) keeps the model named; every launch here names its class (RUBRIC-2); section 12 tests it absent, invalid and promoted
 LOG=$R/.gov-runtime/scratch/lead/log DEST=$R/.gov-runtime/scratch/brief
 lw() { rm -f "$W"/rec/*; (cd "$R" && bash "$T" "${CLS[@]}" "$@") > "$W/stdout" 2> "$W/stderr"; }
 
@@ -196,7 +196,7 @@ lw --fg --class; check "class: --class last, no value -> exit 2" '[ $? = 2 ]'
 for c in C0 C1 C2 C3; do
   lw --fg --class $c engineer high "$W/briefs/W2-99-eng.md"; check "class: $c is accepted" '[ $? = 0 ] && [ -e "$W/rec/argv" ]'
 done
-CLS=(--class C2)
+CLS=(--class C3)
 LAUNCH_MODEL= lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
 check "model: LAUNCH_MODEL empty, no --model -> exit 2, nothing started, the reason named" '[ $rc = 2 ] && [ ! -e "$W/rec/argv" ] && grep -q "no model named" "$W/stderr"'
 (unset LAUNCH_MODEL; lw --fg engineer high "$W/briefs/W2-99-eng.md"); rc=$?
@@ -206,21 +206,36 @@ LAUNCH_MODEL= lw --fg --model claude-haiku-5 engineer high "$W/briefs/W2-99-eng.
 check "model: --model alone names it: on the launch line and on the dry run's" 'grep -q "^launch engineer T-eng -- -p --model claude-haiku-5 --effort high " "$W/rec/argv" && grep -q -- "--model claude-haiku-5 " "$W/rec/dry_args"'
 LAUNCH_MODEL=claude-opus-5-5 lw --fg --model claude-sonnet-5-5 engineer high "$W/briefs/W2-99-eng.md"
 check "model: --model wins over LAUNCH_MODEL" 'grep -q -- "-p --model claude-sonnet-5-5 --effort" "$W/rec/argv"'
-check "model: no model is built into the tool (no default left)" '! grep -q "claude-opus-5-5\|claude-sonnet-5-5" "$T"'
+check "model: no default model in the tool (the opus id absent; the sonnet id only as RUBRIC-2's rewrite target)" '! grep -q "claude-opus-5-5" "$T" && [ "$(grep -c "claude-sonnet-5-5" "$T")" = 1 ]'
 lw --fg --promoted "" engineer high "$W/briefs/W2-99-eng.md"; check "promoted: an empty reason -> exit 2, nothing started" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
 lw --fg --promoted; check "promoted: no value -> exit 2" '[ $? = 2 ]'
+# 12b. RUBRIC-2 at the launch (DEC-1140 (1)(a)): the model by role and class, the CTO's class map, --promoted keeps it
+lw --fg --class C2 --model claude-opus-5-5 engineer high "$W/briefs/W2-99-eng.md"
+check "rubric: a C2 engineer named on opus runs on sonnet, the rewrite said" 'grep -q -- "-p --model claude-sonnet-5-5 --effort" "$W/rec/argv" && grep -q "RUBRIC-2: model claude-opus-5-5 -> claude-sonnet-5-5" "$W/stderr"'
+LAUNCH_TICKET=T-eng lw --fg --class C3 --model claude-opus-5-5 product-spec high "$W/briefs/W2-99-eng.md"
+check "rubric: product-spec runs on sonnet even on a C3 ticket" 'grep -q -- "-p --model claude-sonnet-5-5 --effort" "$W/rec/argv"'
+lw --fg --class C2 --model claude-opus-5-5 --promoted "two failed reviews (DEC-1120 (3))" engineer high "$W/briefs/W2-99-eng.md"
+check "rubric: --promoted keeps the model named" 'grep -q -- "-p --model claude-opus-5-5 --effort" "$W/rec/argv" && ! grep -q "RUBRIC-2: model" "$W/stderr"'
+lw --fg --class C1 --model claude-opus-5-5 independent-auditor high "$W/briefs/W2-99-review.md"
+check "rubric: a reviewer or auditor keeps the model named" 'grep -q -- "-p --model claude-opus-5-5 --effort" "$W/rec/argv"'
+printf '{"T-eng": "C3"}\n' > "$W/class-map.json"
+LAUNCH_CLASS_MAP=$W/class-map.json lw --fg --class C2 --model claude-opus-5-5 engineer high "$W/briefs/W2-99-eng.md"
+check "rubric: the class map lifts the class (C2 -> C3), so the C3 engineer keeps opus" 'grep -q -- "-p --model claude-opus-5-5 --effort" "$W/rec/argv" && grep -q "RUBRIC-2: class C2 -> C3" "$W/stderr"'
+printf '{"T-eng": "C1"}\n' > "$W/class-map.json"
+LAUNCH_CLASS_MAP=$W/class-map.json lw --fg --class C3 --model claude-opus-5-5 engineer high "$W/briefs/W2-99-eng.md"
+check "rubric: the class map lowers it too (C3 -> C1): sonnet" 'grep -q -- "-p --model claude-sonnet-5-5 --effort" "$W/rec/argv"'
 # the spend line: model, class, tier, promoted beside the old fields
 STUB_COST=0.4 lw --fg --class C1 --model claude-sonnet-5-5 --promoted "two failed reviews (DEC-1120 (3))" engineer high "$W/briefs/W2-99-eng.md"
 last=$(ls -t "$LOG"/*.summary | head -n 1)
 check "spend line: model, class, tier, promoted, and the old fields kept" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"], d[\"promoted\"], d[\"cost_usd\"], d[\"ticket\"], d[\"role\"], d[\"extra\"][\"effort\"])")" = "('"'"'claude-sonnet-5-5'"'"', '"'"'C1'"'"', '"'"'sonnet'"'"', '"'"'two failed reviews (DEC-1120 (3))'"'"', 0.4, '"'"'T-eng'"'"', '"'"'engineer'"'"', '"'"'high'"'"')" ]'
 check "spend line: the stderr launch line names the model, the class and the promotion" 'grep -q "model claude-sonnet-5-5; class C1; promoted: two failed reviews" "$W/stderr"'
 STUB_COST=0.4 lw --fg engineer xhigh "$W/briefs/W2-99-eng.md"
-check "spend line: not promoted -> promoted null; the tier of LAUNCH_MODEL (opus); class C2" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"], d[\"promoted\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C2'"'"', '"'"'opus'"'"', None)" ]'
+check "spend line: not promoted -> promoted null; the tier of LAUNCH_MODEL (opus); class C3" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"], d[\"promoted\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C3'"'"', '"'"'opus'"'"', None)" ]'
 STUB_COST=0.4 lw --class C0 --model claude-haiku-5 --fg independent-auditor medium "$W/briefs/W2-99-review.md"
 check "spend line: a haiku launch -> tier haiku, class C0" '[ "$(lastline "(d[\"tier\"], d[\"class\"])")" = "('"'"'haiku'"'"', '"'"'C0'"'"')" ]'
 STUB_COST=0.4 lw engineer high "$W/briefs/W2-99-eng.md"
 ex=$(sed -n 's/^launch_worker: wait with: bash .*wait_for.sh //p' "$W/stdout"); WAIT_FOR_EVERY=1 bash "$HERE/wait_for.sh" "$ex" 60 > /dev/null
-check "spend line: a detached launch carries the same fields" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C2'"'"', '"'"'opus'"'"')" ]'
+check "spend line: a detached launch carries the same fields" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C3'"'"', '"'"'opus'"'"')" ]'
 # old lines still parse: a 17-key line, a free-form one and an old-style summary, beside the new ones
 ORCHD=$W/main/.gov-runtime/scratch/orchestrator
 printf '%s\n' '{"at": "2026-11-09 10:00", "what": "old normal line", "kind": "launched", "ticket": "T-o", "wbs": "W2-97", "role": "engineer", "cost_usd": 1.0, "cost_source": "x", "input_tokens": null, "output_tokens": 5, "cache_read_tokens": null, "cache_creation_tokens": null, "projection_usd": 4.0, "note": null, "orig_tokens": null, "orig_cost": null, "extra": {"effort": "high"}}' '{"at": "2026-11-09 11:00", "what": "free form", "kind": "agent", "tokens": 5, "cost": "2.00 USD (x)"}' >> "$SP"

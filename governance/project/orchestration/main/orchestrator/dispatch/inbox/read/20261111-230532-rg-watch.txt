@@ -1,0 +1,6 @@
+log: mem-guard.txt
+Memory: rg-watch
+status: P2: 0 rg processes (level 1); available 16795 MB; stall 2.8%
+
+parents (children, pid, cwd, command):
+  rg binaries (of the first 200): 

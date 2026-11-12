@@ -1,0 +1,14 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-115/test_w2_115_strict.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "acceptance folder",
+   "folder": "W2-115"
+  }
+ ]
+}

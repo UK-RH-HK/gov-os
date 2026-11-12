@@ -1,0 +1,9 @@
+log: W2-176-A5-run1.json
+W2: W2-176
+status: PACKAGES
+
+Both hooks are built and the independent review says READY, but I'm returning PACKAGES, not DONE. Five older unit tests fail because of what S1 requires, and fixing them needs a change to the ticket's allowed paths. After the review I also found a wrong file path in the CTO's reminder.
+
+task: DAEO-ktiw (W2-176), ticket lead, build run 1
+status: PACKAGES
+work_completed: Checked on CLI 2.1.322, from the official hooks docs: PreCompact stdout becomes the compaction-summary instructions and its systemMessage is discarded; PostToolUse input has `transcript_path` but no model field; the `additionalC

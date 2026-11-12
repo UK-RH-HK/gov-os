@@ -1,0 +1,30 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "36dac2b74b6f",
+   "after": "67c9d0c971bb"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line added",
+   "line": " M src/gov/adopt/safety.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "status line added",
+   "line": " M tests/unit/adopt/test_safety.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/w2_23_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

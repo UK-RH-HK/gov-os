@@ -1,0 +1,63 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "abef7e045133",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "abef7e045133",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "a3b35c0afaf1",
+   "after": "0206c0f7c691"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-176",
+   "change": "status line added",
+   "line": "?? tests/unit/hooks/test_w2_176_context_watch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "c735912bc422",
+   "after": "c9dafe82a8d7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-41/test_w1_41_migration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/test_w2_23_adapters.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/w2_23_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

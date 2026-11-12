@@ -1,0 +1,4 @@
+# 2026-10-31T18:51:58Z disk gate: 
+# /usr/bin/python3 -c import gov; print(gov.__file__)
+/home/usain/gov-os-worktrees/W2-110/src/gov/__init__.py
+# 2026-10-31T18:51:58Z exit 0

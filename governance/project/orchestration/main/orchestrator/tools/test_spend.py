@@ -246,3 +246,20 @@ def test_rubric2_a_log_of_old_and_new_lines_is_read_summed_and_normalised(tmp_pa
     norm = [json.loads(x) for x in (tmp_path / "orch/log/spend.jsonl.norm").read_text().splitlines()]
     assert len(norm) == 3 and all(tuple(n) == S.KEYS for n in norm)
     assert norm[2]["model"] == "claude-sonnet-5-5" and norm[0]["model"] is None
+
+
+def test_row159_separate_briefs_each_bring_their_projection(tmp_path):
+    """Row 159 (DEC-1140 (2)): three runs of one W2, each within its own projection, do not trip the brake."""
+    for name in ("merge", "restore", "designer"):
+        run(tmp_path, "record", "--what", f"W2-6 {name}", "--kind", "launched", "--wbs", "W2-6", "--cost-usd", "3",
+            "--projection-usd", "2", "--extra", f"log=/x/lead/log/{name}.json")
+    assert run(tmp_path, "check").stdout.startswith("spend check: no ticket past twice")
+
+
+def test_row159_a_relaunched_brief_counts_once(tmp_path):
+    """Row 159 keeps review finding 1: the same brief relaunched (launch_worker's -2 suffix) adds no projection."""
+    for log in ("eng.json", "eng-2.json", "eng-3.json"):
+        run(tmp_path, "record", "--what", "W2-7 eng", "--kind", "launched", "--wbs", "W2-7", "--cost-usd", "1.5",
+            "--projection-usd", "1", "--extra", f"log=/x/lead/log/{log}")
+    out = run(tmp_path, "check").stdout
+    assert out.startswith("BRAKE W2-7: W2-7 has spent 4.50 USD") and "brake at 2.00" in out

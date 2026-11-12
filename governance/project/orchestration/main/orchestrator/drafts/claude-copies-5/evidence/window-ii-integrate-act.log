@@ -1,0 +1,13 @@
+== tests/acceptance/W2-11 ABSENT (no such folder in this tree)
+== tests/acceptance/W2-128 exit 0 :: 121 passed in 13.08s
+== tests/acceptance/W2-142 exit 0 :: 9 passed in 0.37s
+== tests/acceptance/W1-35 exit 0 :: 124 passed, 42 deselected in 274.18s (0:04:34)
+== tests/acceptance/W2-153 exit 0 :: 66 passed in 6.49s
+== tests/unit/adapters exit 0 :: 94 passed, 40 deselected in 3.38s
+== tests/acceptance/W1-30 exit 0 :: 7 passed, 530 deselected in 38.69s
+== tests/acceptance/W1-38 exit 0 :: 42 passed, 159 deselected in 42.89s
+== tests/acceptance/W2-57 exit 0 :: 20 passed, 1 deselected in 316.07s (0:05:16)
+== tests/unit/gitenv exit 0 :: 61 passed, 7 deselected in 5.26s
+== tests/acceptance/W1-33 exit 0 :: 112 passed, 2 deselected in 11.27s
+== tests/acceptance/W1-40 exit 0 :: 38 passed, 35 deselected in 45.99s
+done

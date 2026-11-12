@@ -1,0 +1,182 @@
+{
+ "act": "ACT-CLAUDE-COPIES-4",
+ "dec": "DEC-1139",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/agents/engineer.md",
+   "before": "2466e8214eda42c7f397de95c2227d5c4d68c5382fe21a83e4ff5758991b0473",
+   "after": "b6534ff54b096a90a0a70426cb1909d55935132a7aee4d49c37bef0f80085b14"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/agents/independent-auditor.md",
+   "before": "573665a48b9e44e7de3ae781ea0a1607a9ce5f0f543ae67b36a9718a444dd25d",
+   "after": "c23c52aaac895805070f63ce4579ca97a9edd520f9d9c177bb92301353f9a9fb"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/agents/independent-test-designer.md",
+   "before": "40d3c07edb0f0704f6fe1aece42f8fe37a0ee248351e7b4fdbb6efacc7f05e87",
+   "after": "d8c342ab32898f969c7ecf6ac64b199357dedc01c01678967142bc7f5827c8f5"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/agents/orchestrator.md",
+   "before": "e8c4f361e03b905040ce02249d3cb6b5284dcae7803639b3c1f7915dfd01935f",
+   "after": "ea7d0f3c778ca0732d99497238219fefc6f518fa6c970376d282414b90b03941"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/agents/product-spec.md",
+   "before": "68487bc33a9d17179da6573de9c4dd0e6142db616bd2045b3b9339e1124117c5",
+   "after": "dff074702dbbc32e0f7842849d3854d256dc4ab9991597db88e36da8862eb3d7"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/agents/research.md",
+   "before": "3198adaaa4d2f6cf8ca5c2f6dd70fcd57e1d96de6a106c3761334495fec25478",
+   "after": "7452e856f971f4c8c59da13ed859de322d5bac6721a7576d2aabcdbe1dfa23d7"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-cto.md",
+   "before": "1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8",
+   "after": "013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-engineer.md",
+   "before": "7f18eebbe71129b504b51e01c921f9a2ca125e157db9fbdbae7bc56d738622b3",
+   "after": "6775f2d9b99ee96f10653a12da24a34cbf282da9312b37b4e714206ef333889b"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-lead.md",
+   "before": "8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e",
+   "after": "4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-product-spec.md",
+   "before": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10",
+   "after": "5683e56fab5b7d44923557a4d7a54255ff7bb6c5e4ad88fd54e466ee5a822b5f"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-research.md",
+   "before": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b",
+   "after": "fc41bfc1cf3bd5576080739b16cac992bb9ae912a6519b74b560b6d3af0c5799"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-reviewer.md",
+   "before": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0",
+   "after": "eff256eb02771c1edf8433dc563f190df56df509d2cc8076b91cd6e97bdb65b7"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-test-designer.md",
+   "before": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3",
+   "after": "c1f449fbe338fc32ebc583e7e6ce57afb690bf4339cd7bf41b30a0f52fb8b990"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/engineer.md",
+   "before": "be528c5a52019183df147c5a640aaf347433c293c0184f528c8fc193a9bc6d2d",
+   "after": "33155d8015ac24a628a771596a3a7cb093526ef95821616a0e87564fc8ae9d86"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/independent-auditor.md",
+   "before": "f4fcb152cfaff5ece77bde9706cf8fc93aa63ef1b32f43b247bc14d2a24b6437",
+   "after": "6bd4dfd519f18b3af142b30ce47ffefe1ada25206d86cb09d7314f0ea3a4e08e"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/independent-test-designer.md",
+   "before": "04cc3f44f5c32fd7584debae544d80a9b567053f58477fdabe5f9b64329f2599",
+   "after": "42fae108dda88dd8c42feffe95e3cc75a4496d25be019471ddd4866aabb24c68"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/orchestrator.md",
+   "before": "b2f717c4ecca3d7ae6ea0b4eda6de5021f9425961a4ab1a9c29cc832c71aee54",
+   "after": "692efdee2df95685d9a405c0c835a9b9cfe141ccbeb65b75250bad8ebac40333"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/product-spec.md",
+   "before": "c8c04a03bfc75dd9a8172b65be01652aa3b627b2d130d2f24e013e711275597d",
+   "after": "787f5a04bad04dba13957c9bf321fb607f331a56620e6fa822e8d28a7bc566fa"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/research.md",
+   "before": "2b8e2b217397d4b91ce51cfd5d03b8cc9757d2b20ec5f55fb944bf9347fe674f",
+   "after": "3b9d6a3d28b5320ad23344afe44b43498c6d3bf66d61d48c2d1cdda3bbb1e13a"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/agents/engineer.md": "2466e8214eda42c7f397de95c2227d5c4d68c5382fe21a83e4ff5758991b0473",
+  "after/repo/.claude/agents/engineer.md": "b6534ff54b096a90a0a70426cb1909d55935132a7aee4d49c37bef0f80085b14",
+  "before/repo/.claude/agents/independent-auditor.md": "573665a48b9e44e7de3ae781ea0a1607a9ce5f0f543ae67b36a9718a444dd25d",
+  "after/repo/.claude/agents/independent-auditor.md": "c23c52aaac895805070f63ce4579ca97a9edd520f9d9c177bb92301353f9a9fb",
+  "before/repo/.claude/agents/independent-test-designer.md": "40d3c07edb0f0704f6fe1aece42f8fe37a0ee248351e7b4fdbb6efacc7f05e87",
+  "after/repo/.claude/agents/independent-test-designer.md": "d8c342ab32898f969c7ecf6ac64b199357dedc01c01678967142bc7f5827c8f5",
+  "before/repo/.claude/agents/orchestrator.md": "e8c4f361e03b905040ce02249d3cb6b5284dcae7803639b3c1f7915dfd01935f",
+  "after/repo/.claude/agents/orchestrator.md": "ea7d0f3c778ca0732d99497238219fefc6f518fa6c970376d282414b90b03941",
+  "before/repo/.claude/agents/product-spec.md": "68487bc33a9d17179da6573de9c4dd0e6142db616bd2045b3b9339e1124117c5",
+  "after/repo/.claude/agents/product-spec.md": "dff074702dbbc32e0f7842849d3854d256dc4ab9991597db88e36da8862eb3d7",
+  "before/repo/.claude/agents/research.md": "3198adaaa4d2f6cf8ca5c2f6dd70fcd57e1d96de6a106c3761334495fec25478",
+  "after/repo/.claude/agents/research.md": "7452e856f971f4c8c59da13ed859de322d5bac6721a7576d2aabcdbe1dfa23d7",
+  "before/repo/.claude/templates/role-cto.md": "1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8",
+  "after/repo/.claude/templates/role-cto.md": "013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd",
+  "before/repo/.claude/templates/role-engineer.md": "7f18eebbe71129b504b51e01c921f9a2ca125e157db9fbdbae7bc56d738622b3",
+  "after/repo/.claude/templates/role-engineer.md": "6775f2d9b99ee96f10653a12da24a34cbf282da9312b37b4e714206ef333889b",
+  "before/repo/.claude/templates/role-lead.md": "8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e",
+  "after/repo/.claude/templates/role-lead.md": "4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9",
+  "before/repo/.claude/templates/role-product-spec.md": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10",
+  "after/repo/.claude/templates/role-product-spec.md": "5683e56fab5b7d44923557a4d7a54255ff7bb6c5e4ad88fd54e466ee5a822b5f",
+  "before/repo/.claude/templates/role-research.md": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b",
+  "after/repo/.claude/templates/role-research.md": "fc41bfc1cf3bd5576080739b16cac992bb9ae912a6519b74b560b6d3af0c5799",
+  "before/repo/.claude/templates/role-reviewer.md": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0",
+  "after/repo/.claude/templates/role-reviewer.md": "eff256eb02771c1edf8433dc563f190df56df509d2cc8076b91cd6e97bdb65b7",
+  "before/repo/.claude/templates/role-test-designer.md": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3",
+  "after/repo/.claude/templates/role-test-designer.md": "c1f449fbe338fc32ebc583e7e6ce57afb690bf4339cd7bf41b30a0f52fb8b990",
+  "before/repo/.rulesync/subagents/engineer.md": "be528c5a52019183df147c5a640aaf347433c293c0184f528c8fc193a9bc6d2d",
+  "after/repo/.rulesync/subagents/engineer.md": "33155d8015ac24a628a771596a3a7cb093526ef95821616a0e87564fc8ae9d86",
+  "before/repo/.rulesync/subagents/independent-auditor.md": "f4fcb152cfaff5ece77bde9706cf8fc93aa63ef1b32f43b247bc14d2a24b6437",
+  "after/repo/.rulesync/subagents/independent-auditor.md": "6bd4dfd519f18b3af142b30ce47ffefe1ada25206d86cb09d7314f0ea3a4e08e",
+  "before/repo/.rulesync/subagents/independent-test-designer.md": "04cc3f44f5c32fd7584debae544d80a9b567053f58477fdabe5f9b64329f2599",
+  "after/repo/.rulesync/subagents/independent-test-designer.md": "42fae108dda88dd8c42feffe95e3cc75a4496d25be019471ddd4866aabb24c68",
+  "before/repo/.rulesync/subagents/orchestrator.md": "b2f717c4ecca3d7ae6ea0b4eda6de5021f9425961a4ab1a9c29cc832c71aee54",
+  "after/repo/.rulesync/subagents/orchestrator.md": "692efdee2df95685d9a405c0c835a9b9cfe141ccbeb65b75250bad8ebac40333",
+  "before/repo/.rulesync/subagents/product-spec.md": "c8c04a03bfc75dd9a8172b65be01652aa3b627b2d130d2f24e013e711275597d",
+  "after/repo/.rulesync/subagents/product-spec.md": "787f5a04bad04dba13957c9bf321fb607f331a56620e6fa822e8d28a7bc566fa",
+  "before/repo/.rulesync/subagents/research.md": "2b8e2b217397d4b91ce51cfd5d03b8cc9757d2b20ec5f55fb944bf9347fe674f",
+  "after/repo/.rulesync/subagents/research.md": "3b9d6a3d28b5320ad23344afe44b43498c6d3bf66d61d48c2d1cdda3bbb1e13a",
+  "list.txt": "d35b1884c2b980f1408f4fb1eca33d925412bc09d0e894d0455caec30567f224",
+  "apply.sh": "750391ba7252b24a706803c8cb0a5b6cb2ec36bfa27a8244ac2f762419168663",
+  "rehearsal.log": "f109b28f3183b435f05f139a3ed6057d341bc4e19e887e06f9f3b4ce09bf7598"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "f109b28f3183b435f05f139a3ed6057d341bc4e19e887e06f9f3b4ce09bf7598"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd  .claude/templates/role-cto.md\n6775f2d9b99ee96f10653a12da24a34cbf282da9312b37b4e714206ef333889b  .claude/templates/role-engineer.md\n4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9  .claude/templates/role-lead.md\n5683e56fab5b7d44923557a4d7a54255ff7bb6c5e4ad88fd54e466ee5a822b5f  .claude/templates/role-product-spec.md\nfc41bfc1cf3bd5576080739b16cac992bb9ae912a6519b74b560b6d3af0c5799  .claude/templates/role-research.md\neff256eb02771c1edf8433dc563f190df56df509d2cc8076b91cd6e97bdb65b7  .claude/templates/role-reviewer.md\nc1f449fbe338fc32ebc583e7e6ce57afb690bf4339cd7bf41b30a0f52fb8b990  .claude/templates/role-test-designer.md\n33155d8015ac24a628a771596a3a7cb093526ef95821616a0e87564fc8ae9d86  .rulesync/subagents/engineer.md\n6bd4dfd519f18b3af142b30ce47ffefe1ada25206d86cb09d7314f0ea3a4e08e  .rulesync/subagents/independent-auditor.md\n42fae108dda88dd8c42feffe95e3cc75a4496d25be019471ddd4866aabb24c68  .rulesync/subagents/independent-test-designer.md\n692efdee2df95685d9a405c0c835a9b9cfe141ccbeb65b75250bad8ebac40333  .rulesync/subagents/orchestrator.md\n787f5a04bad04dba13957c9bf321fb607f331a56620e6fa822e8d28a7bc566fa  .rulesync/subagents/product-spec.md\n3b9d6a3d28b5320ad23344afe44b43498c6d3bf66d61d48c2d1cdda3bbb1e13a  .rulesync/subagents/research.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\nb6534ff54b096a90a0a70426cb1909d55935132a7aee4d49c37bef0f80085b14  .claude/agents/engineer.md\nc23c52aaac895805070f63ce4579ca97a9edd520f9d9c177bb92301353f9a9fb  .claude/agents/independent-auditor.md\nd8c342ab32898f969c7ecf6ac64b199357dedc01c01678967142bc7f5827c8f5  .claude/agents/independent-test-designer.md\nea7d0f3c778ca0732d99497238219fefc6f518fa6c970376d282414b90b03941  .claude/agents/orchestrator.md\ndff074702dbbc32e0f7842849d3854d256dc4ab9991597db88e36da8862eb3d7  .claude/agents/product-spec.md\n7452e856f971f4c8c59da13ed859de322d5bac6721a7576d2aabcdbe1dfa23d7  .claude/agents/research.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

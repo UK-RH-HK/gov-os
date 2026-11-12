@@ -1,0 +1,20 @@
+== integ
+exit 0; findings 0 {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+== integ-act
+exit 1; findings 6 {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
+  GENERATED_DIFFERS .claude/skills/discovery/SKILL.md
+  GENERATED_DIFFERS .claude/skills/orchestration/SKILL.md
+  GENERATED_DIFFERS .claude/skills/retrieval/SKILL.md
+  GENERATED_DIFFERS .claude/skills/test-design/SKILL.md
+  GENERATED_WITHOUT_SOURCE .claude/skills/orchestration/briefs-and-returns.md
+  GENERATED_WITHOUT_SOURCE .claude/skills/test-design/test-kinds.md
+== base
+exit 1; findings 6 {'rulesync_version': True, 'kernel_files': 36, 'generated_files': 51}
+  GENERATED_DIFFERS .claude/skills/discovery/SKILL.md
+  GENERATED_DIFFERS .claude/skills/orchestration/SKILL.md
+  GENERATED_DIFFERS .claude/skills/orchestration/briefs-and-returns.md
+  GENERATED_DIFFERS .claude/skills/retrieval/SKILL.md
+  GENERATED_DIFFERS .claude/skills/test-design/SKILL.md
+  GENERATED_DIFFERS .claude/skills/test-design/test-kinds.md
+== base-act
+exit 0; findings 0 {'rulesync_version': True, 'kernel_files': 36, 'generated_files': 51}

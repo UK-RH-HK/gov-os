@@ -1,0 +1,48 @@
+{
+ "act": "ACT-LOAD-BALANCER-A",
+ "dec": "DEC-1133, DEC-1105, DEC-1008, DEC-898",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/orchestration/tools/dispatch/launch_now.sh",
+   "before": "03b93044ff986600a4e47185b7fbbb8b594c77579f42cd35dc206e631e5717ec",
+   "after": "023623ac6ac8b7f3af21db454a6965b8ab321dbe9538c1861390638f9f43859d"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/orchestration/tools/dispatch/launch_now.sh": "03b93044ff986600a4e47185b7fbbb8b594c77579f42cd35dc206e631e5717ec",
+  "after/repo/governance/project/orchestration/tools/dispatch/launch_now.sh": "023623ac6ac8b7f3af21db454a6965b8ab321dbe9538c1861390638f9f43859d",
+  "apply.sh": "2b3510249b703973966044127bf92a54880d2404359876de38c03fcbed3d68a6",
+  "list.txt": "6195d55f076c94dc0124bc76f9a46f255da4a6eb4eae8d2c6cf183eba9346dd8",
+  "rehearsal.log": "fcde2d71b95a5a2ed20f1983f5f6ea515be44fd8f47b6a2c53532ca80ee73792"
+ },
+ "checks": [
+  {
+   "cmd": "bash -n governance/project/orchestration/tools/dispatch/launch_now.sh",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import sys; t=open(\"governance/project/orchestration/tools/dispatch/launch_now.sh\").read(); c=\"\\n\".join(l for l in t.splitlines() if not l.lstrip().startswith(\"#\")); i=[c.index(x) for x in (\"resources --check\",\"resources --register\",\"\\nexec \")]; bad=(\"pgrep\",\"pkill\",\"killall\",\"pidof\"); sys.exit(0 if i==sorted(i) and \"LAUNCH_GATE_SHUT\" in c and \"LAUNCH_NOT_REGISTERED\" in c and \"--append-system-prompt-file\" in c and not any(b in c for b in bad) else 1)'",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "bash <<'EOF'\nset -u\nS=\"$PWD/governance/project/orchestration/tools/dispatch/launch_now.sh\"\nT=\"$(mktemp -d)\" || exit 1\ntrap 'rm -rf \"$T\"' EXIT\nmkdir -p \"$T/orch/tools\" \"$T/orch/briefs\" \"$T/orch/log\" \"$T/bin\" \"$T/trees/W9-1/.claude/templates\"\necho 'exit 0' > \"$T/orch/tools/disk_gate.sh\"\necho brief > \"$T/orch/briefs/B.md\"\necho '# lead' > \"$T/trees/W9-1/.claude/templates/role-lead.md\"\nsed -e \"s#^ORCH=.*#ORCH=$T/orch#\" -e \"s#/home/[A-Za-z0-9_.-]*/gov-os-worktrees#$T/trees#g\" -e \"s#/home/[A-Za-z0-9_.-]*/[.]local/bin#$T/bin#g\" \"$S\" > \"$T/launch.sh\"\ngrep -q \"$T/bin/gov\" \"$T/launch.sh\" || { echo \"the launcher names no gov of its own\"; exit 1; }\nprintf '#!/bin/bash\\necho \"$$\" > \"%s/lead.pid\"\\nexit 0\\n' \"$T\" > \"$T/bin/claude\"\nprintf '#!/bin/bash\\necho \"$*\" >> \"%s/gov.calls\"\\ncase \"$*\" in *--register*) exit 0;; esac\\nexit \"$(cat \"%s/check.rc\")\"\\n' \"$T\" \"$T\" > \"$T/bin/gov\"\nchmod +x \"$T/bin/claude\" \"$T/bin/gov\"\necho 0 > \"$T/check.rc\"\nbash \"$T/launch.sh\" W9-1 DAEO-x B.md L.json < /dev/null > /dev/null 2>&1\nrc=$?\n[ \"$rc\" = 0 ] && [ -f \"$T/lead.pid\" ] || { echo \"open gate: the lead did not start (exit $rc)\"; exit 1; }\n[ \"$(sed -n 1p \"$T/gov.calls\")\" = \"resources --check\" ] || { echo \"the gate was not checked first\"; exit 1; }\n[ \"$(sed -n 2p \"$T/gov.calls\")\" = \"resources --register $(cat \"$T/lead.pid\") --ticket DAEO-x --session-role orchestrator\" ] || { echo \"the lead's own pid was not registered\"; exit 1; }\nrm -f \"$T/lead.pid\" \"$T/gov.calls\"\necho 3 > \"$T/check.rc\"\nbash \"$T/launch.sh\" W9-1 DAEO-x B.md L.json < /dev/null > /dev/null 2>&1\nrc=$?\n[ \"$rc\" = 3 ] || { echo \"shut gate: exit $rc, not 3\"; exit 1; }\n[ ! -f \"$T/lead.pid\" ] || { echo \"shut gate: the lead started\"; exit 1; }\ngrep -q -- \"--register\" \"$T/gov.calls\" && { echo \"shut gate: a lead was registered\"; exit 1; }\necho \"launch_now.sh: open gate checks, registers its own pid and starts; shut gate starts nothing\"\nexit 0\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "grep -q 'bin/gov' tests/unit/launch/test_w2_153_template.py && grep -q '\"bin\" / \"gov\"' tests/acceptance/W2-153/w2_153_support.py",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "fcde2d71b95a5a2ed20f1983f5f6ea515be44fd8f47b6a2c53532ca80ee73792"
+ }
+}

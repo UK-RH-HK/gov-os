@@ -1,0 +1,9 @@
+log: W2-115-A5-run1.json
+W2: W2-115
+status: PACKAGES
+
+I stopped before launching any workers. W2-115's interface isn't fully stated in the ticket, and parts of it need files outside the allowed paths, so under DEC-1052 the answer is PACKAGES. Nothing was built, committed or spent.
+
+task: DAEO-emq1
+status: PACKAGES
+work_completed: Ran the first calls (identity: orchestrator, DAEO-emq1; tree: W2-115 on w2/W2-115; no checkpoint, so a fresh run). Read the ticket, and searched memory twice (SMART-WORK-1, INVESTIGATION-1 B1-1/Q-2, DAEO-zkr9, AUDIT-NIGHT-1 c2). Looked at `src/gov/close/`, `src/gov/cli/main.py` (commands are found from `*/command.py`), b
