@@ -1,6 +1,6 @@
 ---
 id: DAEO-2bdu
-status: open
+status: in_progress
 deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 links: []
 created: 2026-10-30T22:14:08Z
