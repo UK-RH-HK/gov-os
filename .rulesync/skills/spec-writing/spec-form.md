@@ -30,9 +30,18 @@ Each KPI is a line `- K<n>: <behaviour>` followed by an indented line `  Fails i
 The behaviour is something an observer sees or measures, from outside. It is testable without naming code.
 A KPI with no `Fails if:` line is refused; a KPI whose behaviour line names code is refused. Both name the KPI's id.
 
+The KPI line is a `-` or `*` bullet, then `K<n>:` (digits only, the colon right after them; the id may be bold, as
+`**K1**:` or `**K1:**`), then the behaviour. Under `## KPIs`, any other list item (a `-`, `*`, `+` or numbered item,
+such as `- K2 : ...`, `2. K2: ...`, `- K2a: ...` or `- **K2** - ...`) is refused, quoted, unless it is a `Fails if:`
+line. A plain prose line before the first KPI is allowed.
+
+The `Fails if:` label may carry emphasis (`**Fails if:**`, `*Fails if:*`, `_Fails if:_`), and its text may sit on the
+next line. A KPI's behaviour runs from its line to its `Fails if:` line, and the failure text from there to the next list
+item or section; every non-blank line in between, indented or not, belongs to it.
+
 ### What "names code" means
 
-The check applies this to the behaviour, to its indented continuation lines, and to the `Fails if:` text with its continuation lines; a `Fails if:` that names code is refused too, naming the KPI.
+The check applies this to the behaviour with its continuation lines, and to the `Fails if:` text with its continuation lines; a `Fails if:` that names code is refused too, naming the KPI.
 
 The behaviour line names code when it holds any one of:
 
@@ -40,7 +49,8 @@ The behaviour line names code when it holds any one of:
 - `name(`: an identifier directly followed by an opening parenthesis, with no space;
 - a path with an extension, such as `src/app/signup.py` or `config.yaml`;
 - a dotted identifier, such as `account.create` or `Signup.confirm`;
-- a snake_case identifier: a word holding an underscore, such as `send_welcome`.
+- a snake_case identifier: a word with an underscore between letters or digits, such as `send_welcome`, or a
+  double-underscore name such as `__all__`. A word in underscore emphasis (_quickly_) is not one.
 
 Ordinary prose names none of these: hyphenated words (sign-up, forty-eight), a parenthesis after a space
 (options (with cost)), a full stop followed by a space, numbers such as 1.5, and abbreviations such as e.g. and i.e.
@@ -56,11 +66,14 @@ A table under `## Test data`, one row per source, with these header words in thi
 - `kind`: `imported` (taken from outside) or `synthetic` (built).
 - `owner`: who secures it.
 - `licence or recipe`: a licence for an imported row; a recipe (how it is built, with its seed) for a synthetic one.
-- `privacy`: what personal data it holds, or `none`.
-- `secrets`: whether it holds secrets, and how they are kept out.
+- `privacy`: what personal data it holds, or `none`. An empty cell is refused.
+- `secrets`: whether it holds secrets, and how they are kept out, or `none`. An empty cell is refused.
 - `hidden half`: `yes` where the data measures and a half is held apart, `no` where it measures and none is, `n/a`
   where it does not measure. An empty cell is refused.
 - `secured`: `yes`, or `no` where it cannot be secured.
+
+An `owner`, `source` or `licence or recipe` cell holding only a placeholder counts as empty (`-`, an em or en dash,
+`TBD`, `TODO`, `unknown`, `?`, `n/a`, `none`; case, spaces and `*`/`_` emphasis ignored).
 
 A row with `secured: no` is never passed and never skipped: the check prints `P1 Test data: <source> cannot be
 secured`, writes `<spec stem>.P1.md` beside the spec (the source, why as far as the row states, options with their
@@ -89,7 +102,8 @@ Each question is a package, so the decider has what they need:
 Text copied from another source is adopted only with its licence checked and recorded (DEC-959 item 5, DEC-1084).
 The record is `imports.yaml` in the skill folder: a mapping with an `imports:` list (`imports: []` when nothing is
 imported), each entry holding `part`, `source`, `version` and `licence`. Copied text carries the marker
-`<!-- imported: <part> -->`, with the part's name in place of `<part>`.
+`<!-- imported: <part> -->`, with the part's name in place of `<part>`. Only the list under the top-level `imports:`
+key is read; an entry under another key is no record. A part with several records needs an allowed licence on every one.
 
 `python3 check_spec.py --imports <folder>` finds every marker in the folder's text files and prints
 `REFUSED import <part>: no licence record`, or `REFUSED import <part>: licence <licence> is not in the allowed

@@ -25,10 +25,20 @@ CODE_SPAN = re.compile(r"`")
 CALL = re.compile(r"(?<![\w.])[A-Za-z_]\w*\(")
 PATH = re.compile(r"(?<!\w)[\w./-]*\w\.(?:%s)(?!\w)" % EXTENSIONS, re.I)
 DOTTED = re.compile(r"(?<![\w.])[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+(?!\w)")
-SNAKE = re.compile(r"(?<!\w)(?=\w*[A-Za-z])\w*_\w*(?!\w)")
-KPI_LINE = re.compile(r"^\s*[-*]\s+\**K(\d+)\**:\s*(.*)$")
-FAILS_LINE = re.compile(r"^\s*(?:[-*]\s+)?Fails if:\s*(.*)$", re.I)
+# An underscore between letters or digits (send_welcome) or a dunder (__all__); `_quickly_` is emphasis, not code.
+SNAKE = re.compile(r"(?<!\w)(?=\w*[A-Za-z])(?:__[A-Za-z]\w*__|\w*[A-Za-z0-9]_+[A-Za-z0-9]\w*)(?!\w)")
+LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])(?:\s|$)")
+# `- K1: x`, `- **K1**: x` or `- **K1:** x`: a - or * bullet, K and digits, the colon right after (inside or outside the bold).
+KPI_LINE = re.compile(r"^\s*[-*]\s+(\*\*)?K(\d+)(?(1)(?:\*\*:|:\*\*)|:)\s*(.*)$")
+# The label may carry emphasis (**Fails if:**, *Fails if:*, _Fails if:_) and a bullet.
+FAILS_LINE = re.compile(r"^\s*(?:[-*+]\s+)?(?:\*\*|__|\*|_)?Fails if:(?:\*\*|__|\*|_)?\s*(.*)$", re.I)
+PLACEHOLDERS = ("", "-", "—", "–", "tbd", "todo", "unknown", "?", "n/a", "none")
 MARKER = re.compile(r"<!--\s*imported:\s*(.*?)\s*-->")
+
+
+def unstated(value):
+    """True for an empty cell or one holding only a placeholder (emphasis and spaces ignored)."""
+    return value.strip().strip("*_ ").lower() in PLACEHOLDERS
 
 
 def names_code(text):
@@ -64,27 +74,29 @@ def split_sections(text):
 
 
 def check_kpis(lines):
-    """Each KPI is its line, its indented continuation lines, and its Fails if: text with its continuation lines."""
+    """Each KPI is its line, then every non-blank line up to its Fails if: line (indented or not), and the Fails if:
+    text with every non-blank line after it; both end at the next list item or section. A list item that is neither
+    a KPI line in form nor a Fails if: line is refused, quoted."""
     kpis, refused, into = [], [], None
     for line in lines:
         kpi = KPI_LINE.match(line)
-        if kpi:
-            kpis.append([kpi.group(1), [kpi.group(2)], [], False])
-            into = kpis[-1][1]
-            continue
         fails = FAILS_LINE.match(line)
-        if fails and kpis:
+        if kpi:
+            kpis.append([kpi.group(2), [kpi.group(3)], []])
+            into = kpis[-1][1]
+        elif fails and kpis:
             kpis[-1][2].append(fails.group(1))
-            kpis[-1][3] = kpis[-1][3] or bool(fails.group(1).strip())
             into = kpis[-1][2]
-        elif kpis and into is not None and line.strip():
-            if line[0].isspace():
-                into.append(line)
-            else:
-                into = None
+        elif LIST_ITEM.match(line) and not fails:
+            refused.append('REFUSED KPIs: list item "%s" is not a KPI line (- K<n>: <behaviour>) or a Fails if: line'
+                           % line.strip())
+            into = None
+        elif into is not None and line.strip():
+            into.append(line)
     if not kpis:
-        return ["REFUSED KPIs: no K<n> line (- K<n>: <behaviour>)"]
-    for number, behaviour, failure, has_fails in kpis:
+        return refused + ["REFUSED KPIs: no K<n> line (- K<n>: <behaviour>)"]
+    for number, behaviour, failure in kpis:
+        has_fails = any(text.strip() for text in failure)
         kind = names_code("\n".join(behaviour))
         if kind:
             refused.append("REFUSED KPIs: K%s names code (%s)" % (number, kind))
@@ -119,17 +131,20 @@ def check_data(lines):
         def cell(name):
             return row[header.index(name)] if name in header and header.index(name) < len(row) else ""
         source = cell("source")
-        if "source" in header and not source:
+        if "source" in header and unstated(source):
             refused.append("REFUSED Test data: row %d has no source" % number)
             continue
         label = source or "row %d" % number
         kind = cell("kind").lower()
-        if "owner" in header and not cell("owner"):
+        if "owner" in header and unstated(cell("owner")):
             refused.append("REFUSED Test data: %s has no owner" % label)
         if "kind" in header and kind not in ("imported", "synthetic"):
             refused.append("REFUSED Test data: %s has kind '%s' (imported or synthetic)" % (label, cell("kind")))
-        elif "licence or recipe" in header and not cell("licence or recipe"):
+        elif "licence or recipe" in header and unstated(cell("licence or recipe")):
             refused.append("REFUSED Test data: %s has no %s" % (label, "licence" if kind == "imported" else "recipe"))
+        for column in ("privacy", "secrets"):  # `none` is a stated value here; only an empty cell is refused
+            if column in header and not cell(column).strip():
+                refused.append("REFUSED Test data: %s has no %s" % (label, column))
         if "hidden half" in header and cell("hidden half").lower() not in ("yes", "no", "n/a"):
             refused.append("REFUSED Test data: %s has no hidden half (yes, no or n/a)" % label)
         secured = cell("secured").lower()
@@ -179,14 +194,20 @@ def check_spec(path):
 
 
 def read_records(path):
-    """The small YAML form of imports.yaml: `imports:` and a list of part/source/version/licence mappings."""
-    records = []
+    """The small YAML form of imports.yaml: the list under the top-level `imports:` key (and no other key) of
+    part/source/version/licence mappings."""
+    records, top = [], None
     if not path.is_file():
         return records
     for line in path.read_text(encoding="utf-8").splitlines():
         line = re.sub(r"(^|\s)#.*$", "", line)
+        key = re.match(r"^([A-Za-z_][\w-]*):", line)
+        if key:
+            top = key.group(1)
         entry = re.match(r"^\s*-\s+(\w+):\s*(.*)$", line)
         more = re.match(r"^\s+(\w+):\s*(.*)$", line)
+        if top != "imports":
+            continue
         if entry:
             records.append({})
         match = entry or more
@@ -206,11 +227,12 @@ def check_imports(folder):
         parts += [p for p in found if not (p.startswith("<") and p.endswith(">")) and p not in parts]
     refused = []
     for part in parts:
-        mine = [r for r in records if r.get("part") == part and r.get("licence")]
-        if not mine:
+        mine = [r for r in records if r.get("part") == part]
+        bad = [r for r in mine if r.get("licence", "").lower() not in [a.lower() for a in ALLOWED]]
+        if not any(r.get("licence") for r in mine) or (bad and not bad[0].get("licence")):
             refused.append("REFUSED import %s: no licence record" % part)
-        elif not any(r["licence"].lower() in [a.lower() for a in ALLOWED] for r in mine):
-            refused.append("REFUSED import %s: licence %s is not in the allowed list" % (part, mine[0]["licence"]))
+        elif bad:  # every record of a part must carry an allowed licence
+            refused.append("REFUSED import %s: licence %s is not in the allowed list" % (part, bad[0]["licence"]))
     print("\n".join(refused) if refused else "PASS")
     return 1 if refused else 0
 
