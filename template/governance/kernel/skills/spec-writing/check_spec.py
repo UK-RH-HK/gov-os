@@ -64,21 +64,33 @@ def split_sections(text):
 
 
 def check_kpis(lines):
-    kpis, refused = [], []
+    """Each KPI is its line, its indented continuation lines, and its Fails if: text with its continuation lines."""
+    kpis, refused, into = [], [], None
     for line in lines:
         kpi = KPI_LINE.match(line)
         if kpi:
-            kpis.append([kpi.group(1), kpi.group(2), False])
+            kpis.append([kpi.group(1), [kpi.group(2)], [], False])
+            into = kpis[-1][1]
             continue
         fails = FAILS_LINE.match(line)
-        if fails and kpis and fails.group(1).strip():
-            kpis[-1][2] = True
+        if fails and kpis:
+            kpis[-1][2].append(fails.group(1))
+            kpis[-1][3] = kpis[-1][3] or bool(fails.group(1).strip())
+            into = kpis[-1][2]
+        elif kpis and into is not None and line.strip():
+            if line[0].isspace():
+                into.append(line)
+            else:
+                into = None
     if not kpis:
         return ["REFUSED KPIs: no K<n> line (- K<n>: <behaviour>)"]
-    for number, behaviour, has_fails in kpis:
-        kind = names_code(behaviour)
+    for number, behaviour, failure, has_fails in kpis:
+        kind = names_code("\n".join(behaviour))
         if kind:
             refused.append("REFUSED KPIs: K%s names code (%s)" % (number, kind))
+        kind = names_code("\n".join(failure))
+        if kind:
+            refused.append("REFUSED KPIs: K%s names code in its Fails if: line (%s)" % (number, kind))
         if not has_fails:
             refused.append("REFUSED KPIs: K%s has no Fails if: line" % number)
     return refused

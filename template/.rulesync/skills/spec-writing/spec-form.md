@@ -32,6 +32,8 @@ A KPI with no `Fails if:` line is refused; a KPI whose behaviour line names code
 
 ### What "names code" means
 
+The check applies this to the behaviour, to its indented continuation lines, and to the `Fails if:` text with its continuation lines; a `Fails if:` that names code is refused too, naming the KPI.
+
 The behaviour line names code when it holds any one of:
 
 - a code span: text between backticks;
