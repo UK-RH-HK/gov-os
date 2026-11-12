@@ -206,6 +206,12 @@ def _inbox_item(root: Path, reason: str, paused: list, skipped: list, own: int |
     return str(target)
 
 
+def _pause(seconds: float) -> None:
+    """The watch's own pause between two polls, and nothing else's. A test replaces this name, never ``time.sleep``:
+    ``time`` is one module for the whole process, and ``subprocess`` waits on a child with it (DEC-1144 (2))."""
+    time.sleep(seconds)
+
+
 def watch(groups: list[int], root: Path, env: dict | None = None, *, max_polls: int | None = None) -> dict:
     """Watch the named process groups until a trip or until every one has ended; the result of L8.
 
@@ -292,4 +298,4 @@ def watch(groups: list[int], root: Path, env: dict | None = None, *, max_polls: 
                 note(f"end: the bound of {max_polls} polls reached; no trip; groups still live {_names(still)}")
                 return result
             continue  # every group ended during the poll: the top of the loop logs that end
-        time.sleep(every)
+        _pause(every)

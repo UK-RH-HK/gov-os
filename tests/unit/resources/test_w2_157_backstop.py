@@ -27,7 +27,7 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.cli.errors import GovError  # noqa: E402
 from gov.resources import backstop, config as configuration  # noqa: E402
 
-REAL_SLEEP = time.sleep  # the rig replaces time.sleep for the whole process; waits on a process state use this one
+REAL_SLEEP = time.sleep  # time.sleep is never replaced (the backstop's _pause is); waits on a process state use it
 MARK = "w2157-planted"  # argv[1] of every planted process: a leftover is found by it after a run
 SLEEPER = f"import time; time.sleep(120)  # {MARK}"
 
@@ -60,9 +60,8 @@ class Rig:
         self.env = {"HOME": str(self.home), "PATH": f"{self.bin}:/usr/bin:/bin"}
         monkeypatch.setenv("HOME", str(self.home))
         monkeypatch.setenv("PATH", self.env["PATH"])
-        monkeypatch.setattr(time, "sleep", lambda s: None)
-        self.sleeps: list[float] = []
-        self.mp.setattr(backstop.time, "sleep", self.sleeps.append)
+        self.sleeps: list[float] = []  # only the backstop's own pause between polls is replaced, never time.sleep
+        self.mp.setattr(backstop, "_pause", self.sleeps.append)
         self.log = self.home / ".gov-os" / "machine" / "gpu-backstop.log"
         self.inbox = self.root / ".gov-runtime" / "dispatch" / "inbox"
 
@@ -125,6 +124,16 @@ class Rig:
         while self.state(pid) != wanted and time.monotonic() < deadline:
             REAL_SLEEP(0.01)
         assert self.state(pid) == wanted, f"process {pid} never reached state {wanted} (is {self.state(pid)})"
+
+    @classmethod
+    def stopped_state(cls, pid: int, seconds: float = 20) -> str:
+        """The state of ``pid`` once a SIGSTOP sent to it has taken effect: the signal is acted on when the process next
+        runs, so under load /proc still shows R for a while after killpg returned. Gives up (returns the state it
+        has) after ``seconds``, so an assertion on 'T' still fails when the process was never stopped."""
+        deadline = time.monotonic() + seconds
+        while cls.state(pid) != "T" and time.monotonic() < deadline:
+            REAL_SLEEP(0.01)
+        return cls.state(pid)
 
     @staticmethod
     def members(group: int) -> dict[int, str]:
@@ -221,7 +230,7 @@ def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
     result = backstop.watch([job], rig.root, rig.env, max_polls=5)
     assert result["tripped"] is True and result["paused"] == [job]
     assert rig.smi_calls() == 2  # the first reading did not trip, the second did
-    assert rig.state(rig.groups[0].pid) == "T"
+    assert rig.stopped_state(rig.groups[0].pid) == "T"
     assert result["reading"] == {"used_mib": 15900, "total_mib": 24000}
     assert "15900" in result["reason"] and "15872" in result["reason"]
     assert rig.sleeps == [5]
@@ -399,7 +408,7 @@ def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
             with log.open("a") as handle:
                 handle.write("llm: offloaded 20/33 layers to GPU\n")
 
-    rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+    rig.mp.setattr(backstop, "_pause",append_after_first_reading)
     result = backstop.watch([rig.job()], rig.root, rig.env, max_polls=6)
     assert result["tripped"] and rig.smi_calls() == 3
     assert str(log) in result["reason"] and "offloaded 20/33 layers to GPU" in result["reason"]
@@ -416,7 +425,7 @@ def test_s3_an_equal_offload_never_trips_and_a_missing_log_starts_at_zero(rig):
         if len(calls) == 1:
             log.write_text("offloaded 33/33 layers to GPU\n")
 
-    rig.mp.setattr(backstop.time, "sleep", write)
+    rig.mp.setattr(backstop, "_pause",write)
     result = backstop.watch([rig.job()], rig.root, rig.env, max_polls=6)
     assert rig.smi_calls() == 3 and "limit" in result["reason"]
     log.write_text("offloaded 33/33 layers to GPU\noffloaded 1/33 layers to GPU\n")
@@ -430,7 +439,7 @@ def test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log(
         with log.open("a") as handle:
             handle.write("offloaded 1/2 layers to GPU\n")
 
-    rig.mp.setattr(backstop.time, "sleep", append_a_line)
+    rig.mp.setattr(backstop, "_pause",append_a_line)
     rig.smi("24400, 24500")
     rig.config(embedders=[(port, log)])
     def reason(result):
@@ -469,7 +478,7 @@ def test_no_nvidia_smi_on_path_is_no_trip_and_the_watch_goes_on(rig):
             rig.groups[0].kill()
             rig.groups[0].wait()
 
-    rig.mp.setattr(backstop.time, "sleep", kill_after_two)
+    rig.mp.setattr(backstop, "_pause",kill_after_two)
     result = backstop.watch([job], rig.root, rig.env, max_polls=6)
     assert result["tripped"] is False and "no GPU reading" in rig.log.read_text()
     assert result["reading"] is None
@@ -484,7 +493,7 @@ def test_a_trip_without_a_reading_logs_none(rig):
         with log.open("a") as handle:
             handle.write("offloaded 1/2 layers to GPU\n")
 
-    rig.mp.setattr(backstop.time, "sleep", write)
+    rig.mp.setattr(backstop, "_pause",write)
     result = backstop.watch([rig.job()], rig.root, rig.env, max_polls=5)
     assert result["tripped"] and result["reading"] is None and "reading none" in rig.log.read_text()
 
@@ -497,7 +506,7 @@ def test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on(rig)
     named = rig.job()
     other = rig.spawn([sys.executable, "-c", SLEEPER, MARK])
     backstop.watch([named], rig.root, rig.env, max_polls=4)
-    assert rig.state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
+    assert rig.stopped_state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
 
 
 def test_s4_a_group_that_has_ended_is_skipped_and_named(rig):
@@ -542,7 +551,7 @@ def test_s4_a_job_that_ends_first_ends_the_watch_without_a_trip(rig):
         rig.groups[0].kill()
         rig.groups[0].wait()
 
-    rig.mp.setattr(backstop.time, "sleep", end)
+    rig.mp.setattr(backstop, "_pause",end)
     result = backstop.watch([job], rig.root, rig.env, max_polls=5)
     assert result == {"tripped": False, "reason": None, "reading": None, "paused": [], "skipped": [],
                       "log": str(rig.log), "inbox_item": None}
@@ -613,7 +622,7 @@ def test_s5_a_run_with_no_trip_writes_only_its_log(rig):
         rig.groups[0].kill()
         rig.groups[0].wait()
 
-    rig.mp.setattr(backstop.time, "sleep", end)
+    rig.mp.setattr(backstop, "_pause",end)
     backstop.watch([job], rig.root, rig.env, max_polls=5)
     after = {p: (p.stat().st_mtime_ns, p.stat().st_size) for p in rig.tmp.rglob("*") if p.is_file()}
     changed = {p for p in after if before.get(p) != after[p]}
@@ -685,7 +694,7 @@ def test_l1_the_command_trips_and_prints_the_result(rig):
     result = json.loads(done.stdout)["result"]
     assert result["tripped"] is True and result["paused"] == [job] and result["log"] == str(rig.log)
     assert set(result) == {"tripped", "reason", "reading", "paused", "skipped", "log", "inbox_item"}
-    assert rig.state(rig.groups[0].pid) == "T"
+    assert rig.stopped_state(rig.groups[0].pid) == "T"
 
 
 def test_l1_a_missing_limit_is_exit_1_naming_it(rig):
@@ -767,7 +776,8 @@ def _own_group_rig(rig, position):
             if group == own:
                 seen["log_at_own_stop"] = rig.log.read_text()
                 seen["inbox_at_own_stop"] = sorted(p.name for p in rig.inbox.iterdir()) if rig.inbox.exists() else []
-                seen["others_stopped"] = [rig.state(c.pid) for c in rig.groups if os.getpgid(c.pid) != own]
+                # the groups already sent SIGSTOP (an unnamed group is never stopped: nothing to wait for there)
+                seen["others_stopped"] = [rig.stopped_state(c.pid) for c in rig.groups if c.pid in seen["order"][:-1]]
         return real(group, sig)
 
     rig.mp.setattr(backstop.os, "killpg", killpg)
@@ -850,7 +860,7 @@ def test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_p
     while rig.state(child.pid) != "T" and time.monotonic() < deadline:
         REAL_SLEEP(0.05)
     assert rig.state(child.pid) == "T", "gov was never stopped"
-    assert rig.state(rig.groups[0].pid) == "T"  # the second group was paused before the own group
+    assert rig.stopped_state(rig.groups[0].pid) == "T"  # the second group was paused before the own group
     log = rig.log.read_text().splitlines()
     assert log[0].endswith(f"own group {own} named: paused last")
     assert sum(1 for line in log if " TRIP: " in line) == 1
@@ -881,7 +891,7 @@ def test_a_job_that_ends_and_is_not_reaped_ends_the_watch_untripped_by_the_zombi
         rig.groups[0].kill()  # never waited for: it stays a zombie, its group still answers signal 0
         rig.wait_state(rig.groups[0].pid, "Z")
 
-    rig.mp.setattr(backstop.time, "sleep", die_unreaped)
+    rig.mp.setattr(backstop, "_pause",die_unreaped)
     result = backstop.watch([job], rig.root, rig.env, max_polls=4)
     assert result["tripped"] is False and result["skipped"] == [] and rig.smi_calls() == 1
     text = rig.log.read_text()
@@ -1064,11 +1074,25 @@ def test_the_default_has_no_bound_and_polls_on_until_the_group_ends(rig):
             rig.groups[0].kill()
             rig.groups[0].wait()
 
-    rig.mp.setattr(backstop.time, "sleep", end_at_the_ninth)
+    rig.mp.setattr(backstop, "_pause",end_at_the_ninth)
     result = backstop.watch([job], rig.root, rig.env)  # no bound: it ends only because the group ended
     assert result["tripped"] is False and rig.smi_calls() == 9 and len(polls) == 9
     text = rig.log.read_text()
     assert f"end: every watched group has ended ({job})" in text and "bound" not in text
+
+
+def test_a_replaced_backstop_pause_is_not_called_by_subprocess_and_time_sleep_is_untouched(rig):
+    rig.smi("100, 24000")
+    rig.config()
+    slow = rig.bin / "nvidia-smi"  # closes its output at once and exits 0.2 s later: subprocess waits on it with sleeps
+    slow.write_text(f"#!{sys.executable}\nimport os, time\nprint('100, 24000', flush=True)\nos.close(1)\nos.close(2)\n"
+                    "time.sleep(0.2)\n")
+    job = rig.job()
+    assert time.sleep is REAL_SLEEP
+    result = backstop.watch([job], rig.root, rig.env, max_polls=3)
+    assert result["tripped"] is False and result["reading"] is None
+    assert rig.sleeps == [5, 5]  # the period only: none of subprocess's own waits (0.001, 0.002, ...) is in it
+    assert "no GPU reading" not in rig.log.read_text()
 
 
 def test_every_group_a_test_plants_is_reaped_by_the_rigs_teardown(tmp_path, monkeypatch):
