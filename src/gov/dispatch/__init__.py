@@ -63,7 +63,8 @@ codes) is as the lead's brief reads it. Departures and additions, named:
   escalations (the rest are named as not sent, not recorded). A failed notifier never fails the pass.
 - ``notifier_command`` is required at load (F-3): a missing one is exit 2 naming the key, nothing started.
 - An inbox item is written once, ever (F-1): ``items-written.txt`` outlives the item, so one deleted from ``inbox/`` or
-  ``inbox/read/`` is never written again (nor its escalation raised again).
+  ``inbox/read/`` is never written again (nor its escalation raised again). An item a pass finds in either folder that
+  the record does not hold (a state from before it) is recorded as written then (``state.State.record_seen``).
 - A ``files_changed`` path resolves only when git knows it (in HEAD, in the history, or existing and ignored): an
   untracked, not-ignored or only staged path is unresolved (F-4). When git cannot answer, the item says ``unchecked:
   could not be checked (<the failure>): <names>``, never ``unresolved:`` (F-6).

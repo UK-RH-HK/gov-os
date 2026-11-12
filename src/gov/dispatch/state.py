@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 FOLDER = Path(".gov-runtime") / "dispatch"
+ITEM_SUFFIXES = (".return.txt", ".never-ran.txt", ".owner.txt")  # the inbox items a pass writes
 WRITTEN = "items-written.txt"  # one line per inbox item ever written: ``<item name> <time>``
 SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._=+-]*$")
 
@@ -142,6 +143,24 @@ class State:
             return True
         suffix = ".never-ran.txt"
         return name.endswith(suffix) and name[:-len(suffix)] in {line.split()[0] for line in self.lines("never-ran.txt")}
+
+    def record_seen(self) -> list[str]:
+        """Record as written every item found in ``inbox/`` or ``inbox/read/`` that ``items-written.txt`` does not hold
+        (F-1): one the dispatcher did not write itself (a state folder from before the record) counts as written the
+        pass that sees it, so deleting it later does not make a pass write it again. The names newly recorded."""
+        known = {line.split()[0] for line in self.lines(WRITTEN)}
+        added = []
+        for folder in (self.inbox, self.read):
+            try:
+                names = sorted(p.name for p in folder.iterdir() if p.is_file() and p.name.endswith(ITEM_SUFFIXES))
+            except OSError:
+                continue
+            for name in names:
+                if name not in known and not name.startswith("."):
+                    self.append(WRITTEN, f"{name} {stamp()}")
+                    known.add(name)
+                    added.append(name)
+        return added
 
     def write_item(self, name: str, lines: list[str]) -> Path | None:
         """The item ``inbox/<name>``, whole, never twice, ever (F-1): None when it was written before, whether it is

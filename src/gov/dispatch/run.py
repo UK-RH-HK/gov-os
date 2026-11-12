@@ -81,6 +81,7 @@ def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
     pending = [s for s in started if s.log in lately]
     ctx = readiness.Context(root, conf, state, runner, {s.log for s in started}, running.tickets(),
                             {s.ticket for s in pending})
+    state.record_seen()  # an item already in inbox/ or inbox/read/ counts as written (F-1)
     new_returns = returns.finished(ctx, problems)
     never = returns.never_ran(ctx, now)
     ctx.unread = {item.w2 for item in state.items() if item.w2}

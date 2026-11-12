@@ -366,3 +366,35 @@ def test_f6_a_hung_git_names_the_commits_and_paths_as_not_checked_never_as_unres
     assert line.startswith("unchecked: could not be checked (") and "timed out" in line
     assert head in line and "README" in line
     assert any("could not be checked" in p for p in project.status()["problems"])
+
+
+def _planted(project, folder: str) -> "Path":
+    """A return the dispatcher did not write (a state folder from before the record), put in ``inbox/`` or ``inbox/read/``."""
+    start_and_finish(project)
+    place = project.state / "inbox" if folder == "inbox" else project.state / "inbox" / "read"
+    place.mkdir(parents=True, exist_ok=True)
+    item = place / "W2-1-log.return.txt"
+    item.write_text("log: W2-1-log\nW2: W2-1\nstatus: DONE\nkind: return\n")
+    return item
+
+
+def test_f1_an_item_planted_in_the_inbox_counts_as_written_when_a_pass_sees_it(project):
+    item = _planted(project, "inbox")
+    project.tick()
+    project.tick()
+    assert project.inbox() == [item]
+    item.unlink()
+    project.tick()
+    project.tick()
+    assert project.inbox() == [] and list((project.state / "inbox" / "read").iterdir()) == []
+
+
+def test_f1_an_item_planted_in_read_counts_as_written_when_a_pass_sees_it(project):
+    item = _planted(project, "read")
+    project.tick()
+    project.tick()
+    assert project.inbox() == [] and list(item.parent.iterdir()) == [item]
+    item.unlink()
+    project.tick()
+    project.tick()
+    assert project.inbox() == [] and list((project.state / "inbox" / "read").iterdir()) == []
