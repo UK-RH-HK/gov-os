@@ -14832,6 +14832,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **P-W2-160-1 (a):** W2-160's allowed_paths gain `src/gov/session_watch/command.py` for the `helper-watch` action its S3 names (about 20 lines); W2-159, which built the file, is closed.
 - **Basis:** the owner's message of 2026-11-12 ~19:40, after the CTO's two lines each.
 
+### DEC-1154 — A change decided after a ticket's review gets a narrow independent check of that change, without asking the owner; the ticket lands on it (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~20:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1152 (3), DEC-1010, DEC-802, DEC-989
+- **Decision:**
+  - (1) **Standing:** any change the owner decided that is added to a ticket after its review (a widening, a default, a fix riding a resume, DEC-802) gets a narrow independent check of that change only, launched by the CTO without asking; the ticket then lands on that check's passing record. Not a design review and not a full round.
+  - (2) **W2-121b now:** the narrow check of the template default (DEC-1149 (2)) that rode after its review; if it passes, it lands tonight.
+- **Basis:** the owner's message of 2026-11-12 ~20:10, after the queue refused W2-115 and W2-121b for want of a passing record at their heads.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14920,3 +14927,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.532 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1151 (ACT-EXAMIN-WRITERS-INSTALL-1 applied; the two walled writers delivered; W2-27's green-base line). Next free id: DEC-1152. |
 | 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
 | 0.534 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1153 (W2-45 widened by W1-40's case; W2-160 by the session-watch command file). Next free id: DEC-1154. |
+| 0.535 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1154 (a change decided after a review gets a narrow independent check; the ticket lands on it; standing). Next free id: DEC-1155. |
