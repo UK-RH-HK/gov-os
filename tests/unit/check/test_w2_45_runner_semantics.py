@@ -119,6 +119,82 @@ def test_a_grandchild_that_holds_the_pipe_does_not_keep_the_runner_waiting(proje
     assert not _alive(grandchild)
 
 
+def _wait_gone(pid):
+    for _ in range(50):
+        if not _alive(pid):
+            return True
+        time.sleep(0.1)
+    return False
+
+
+def _break_the_wait(monkeypatch, error, started, pidfile=None):
+    """Make the first wait of ``_run_command`` raise ``error``, once the check has started its grandchild (the
+    pid file exists); the pid of the shell is recorded in ``started``. Later waits (the stop's own) are real."""
+    real = runner.subprocess.Popen
+
+    class Broken(real):
+        def communicate(self, input=None, timeout=None):
+            if not started:
+                started.append(self.pid)
+                for _ in range(100):
+                    if pidfile is None or pidfile.exists() and pidfile.read_text().endswith("\n"):
+                        break
+                    time.sleep(0.05)
+                raise error
+            return super().communicate(input, timeout)
+
+    monkeypatch.setattr(runner.subprocess, "Popen", Broken)
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt(), RuntimeError("boom"), OverflowError("timeout is too large")],
+                         ids=lambda error: type(error).__name__)
+def test_an_error_in_the_wait_leaves_no_process_of_the_check_running_and_reaches_the_caller(
+        tmp_path, monkeypatch, error):
+    pidfile, started, grandchild = tmp_path / "grandchild.pid", [], None
+    try:
+        _break_the_wait(monkeypatch, error, started, pidfile)
+        with pytest.raises(type(error)):
+            runner._run_command(f"sleep 30 & echo $! > {shlex.quote(str(pidfile))}; wait", tmp_path)
+        grandchild = int(pidfile.read_text())
+        assert _wait_gone(started[0]), "the shell of the check is still running"
+        assert _wait_gone(grandchild), "a grandchild of the check is still running"
+    finally:
+        monkeypatch.undo()
+        for pid in [*started, grandchild or 0]:
+            if pid and _alive(pid):
+                try:
+                    os.killpg(pid, 9)
+                except (ProcessLookupError, PermissionError):
+                    os.kill(pid, 9)
+
+
+def test_a_limit_too_large_for_the_wait_leaves_the_check_stopped(tmp_path, monkeypatch):
+    """The wait itself fails on a huge stated limit (W2-L167): what was started is still stopped. The traceback
+    stays that row's; here only that the check does not run on without a limit."""
+    started = []
+    real = runner.subprocess.Popen
+
+    class Recording(real):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            started.append(self.pid)
+
+    monkeypatch.setattr(runner.subprocess, "Popen", Recording)
+    try:
+        try:
+            runner._run_command("sleep 30; wait", tmp_path, timeout=10 ** 12)
+        except (OverflowError, ValueError):
+            pass  # what the wait raises on this platform for a limit it cannot hold; a timer that holds it is fine
+        else:
+            pytest.skip("this platform's wait holds the huge limit and the check ended by itself")
+        assert started and _wait_gone(started[0]), "the shell of the check is still running"
+    finally:
+        monkeypatch.undo()
+        for pid in started:
+            if _alive(pid):
+                os.kill(pid, 9)
+
+
 # --------------------------------------------------------------------------
 # S2: a check is green only when it exits 0 with no finding (W2-M129, W2-M212)
 # --------------------------------------------------------------------------

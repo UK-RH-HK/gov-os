@@ -120,6 +120,9 @@ def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[in
         except subprocess.TimeoutExpired:
             _stop(process)
             return None, "", ""  # what it printed before the limit is no answer
+        except BaseException:  # an interrupt or any other error in the wait: the group is not left running
+            _stop(process)
+            raise
     finally:
         shutil.rmtree(xdg_tmp, ignore_errors=True)
 
