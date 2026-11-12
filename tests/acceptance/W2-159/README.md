@@ -13,7 +13,7 @@ the engineer's branch was read; the code read is `w2/integrate`'s (`src/gov/cli/
       PYTHONPATH=<worktree>/src bash <heavy_slot.sh> python3 -m pytest tests/acceptance/W2-159 -q -p no:cacheprovider \
       -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"
 
-About 10 s for the 85 cases (a child process per run of a check, no sleeps, no model, no network). The filter leaves out
+About 10 s for the 94 cases (a child process per run of a check, no sleeps, no model, no network). The filter leaves out
 nothing: no case is named with `real`, `green_here` or `time_limit` and none is marked `local_only`. On the mode-000 case:
 `test_s1_a_session_file_with_mode_000_says_nothing` is skipped when the tests run as root.
 
@@ -84,7 +84,33 @@ bound; the stand-by note always honoured) each turn the cases that name them red
 Not a KPI line of its own: the hyphenated route (P-W2-159-1 (a)): `test_route.py::test_route_gov_session_watch_help_exits_0`
 (red: `invalid choice: 'session-watch'`, exit 2).
 
-Counts by KPI line: S1 15, S2 29, S3 19, S4 11, S5 9, F4 1, route 1 (85 in all; F1, F2 and F3 are the S2, S3, S4 and S5 cases above).
+### Batch 3 (td-3): review round 1's two findings, as behaviour (DEC-136)
+
+Nine cases added to S2 and S3 (and F1) for the two behaviours the reviewer found the suite did not hold. Green on every case of
+batches 1 and 2; of the nine, **five are red on the code as built** (the reasons below) and four are controls that stay green.
+
+**B1 (FR-1), a reused pid is not running work.** A pid file's process counts only when it started no later than 15 minutes
+(900 s, a slack for clock steps) after the file's mtime (the lead's reading); one that started later is not the process the file
+named, is not counted and is not named as running (as a dead pid is not); one that started before the file was written, or
+within the 15 minutes after it, still counts. The planted process is unrelated (`python3 -m http.server 8000`), the pid file has
+no `.exit` beside it, one unblocked pair of items is listed, nothing else runs. The control cases sit at 10 and 14 minutes, the
+not-counted cases at 20 and 110 minutes, never at the 15-minute line itself.
+
+**B2 (FR-2), the two checks keep each other's once-a-turn record.** The planted `gov` program that the idle check's plan runs
+(`GOV_SESSION_WATCH_GOV`) runs the waiter check, whole, for the same session and turn before it prints the plan, so the idle
+check's read of `state.json` (at its start) precedes the waiter's write and the idle check's write follows it; both checks block.
+No sleep and no race: the waiter check ends before the plan returns (a design that serialises the two checks lets the waiter
+end after the plan returns; the fixture then waits, up to 30 s, for the flag file the planted program's child writes).
+
+| KPI id | tests | expected red reason |
+|---|---|---|
+| S2 (B1) | `test_s2_idle.py::test_s2_a_reused_pid_is_not_a_running_job`<br>`test_s2_idle.py::test_s2_a_process_started_more_than_the_slack_after_the_pid_file_is_not_counted[20-min-after-the-file]`<br>`test_s2_idle.py::test_s2_a_process_started_more_than_the_slack_after_the_pid_file_is_not_counted[110-min-after-the-file]` | the check lets the turn end (`systemMessage` "something of yours is running: pid ..." and a log line `through`) instead of blocking naming the two items |
+| S2, F1 (B1 controls; a legitimate wait) | `test_s2_idle.py::test_s2_a_process_started_before_or_within_the_slack_after_the_pid_file_still_counts[10-min-after-the-file]`<br>`test_s2_idle.py::test_s2_a_process_started_before_or_within_the_slack_after_the_pid_file_still_counts[14-min-after-the-file]`<br>`test_s2_idle.py::test_s2_a_process_started_before_or_within_the_slack_after_the_pid_file_still_counts[an-hour-before-the-file]` | none: green on the built code (they guard the fix against over-reach) |
+| S3, F1 (B2) | `test_s3_once_a_turn.py::test_s3_side_by_side_the_state_file_holds_both_checks_records`<br>`test_s3_once_a_turn.py::test_s3_side_by_side_a_third_waiter_call_in_the_same_turn_says_nothing` | `state.json` holds only the idle check's record (the waiter's was dropped), and the third waiter call, in the same turn without `stop_hook_active`, blocks a second time |
+| S3, F1 (B2 control) | `test_s3_once_a_turn.py::test_s3_side_by_side_the_idle_check_does_not_block_again_in_the_same_turn` | none: green on the built code (the idle check's own record survives its write) |
+
+Counts by KPI line: S1 15, S2 35 (29 + 6), S3 22 (19 + 3), S4 11, S5 9, F4 1, route 1 (94 in all; F1, F2 and F3 are the S2, S3, S4
+and S5 cases above).
 
 ## Not tested, by design
 

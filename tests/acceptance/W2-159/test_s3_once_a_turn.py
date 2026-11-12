@@ -9,6 +9,10 @@ in the hook input's ``last_assistant_message``. F1 (a turn blocked twice in a ro
 side. Sources: DEC-1110 (1), DEC-1027.
 """
 
+import json
+import sys
+import time
+
 import pytest
 
 import w2_159_support as support
@@ -127,3 +131,73 @@ def test_s3_an_idle_reason_line_is_found_among_the_turns_assistant_text_items(b)
     result = b.run("idle")
     assert_no_block(result, "(the line is in an assistant text item of the turn, not the last one)")
     assert "the build farm is down" in result.log_text
+
+
+# --- review round 1, B2 (FR-2): the two checks keep each other's once-a-turn record ----------------------------------------
+#
+# Claude Code runs a Stop event's hooks side by side, so on one Stop both checks can be between their reading of the shared
+# state file and their writing of it. Planted here without a race: the idle check's ``gov plan`` (the planted ``gov``
+# program) runs the waiter check for the same session and turn, to its end, before it prints the plan. Both checks block.
+# After both end, ``state.json`` holds both checks' records for the turn, and neither blocks again in that turn.
+
+STUB = r'''
+import json, os, subprocess, sys
+here = os.path.dirname(os.path.abspath(__file__))
+spec = json.load(open(os.path.join(here, "inner.json")))
+for name in ("in", "out", "err", "done"):
+    spec["environment"]["INNER_" + name.upper()] = os.path.join(here, "inner." + name)
+with open(spec["environment"]["INNER_IN"], "w") as handle:
+    handle.write(spec["stdin"])
+script = '"$@" < "$INNER_IN" > "$INNER_OUT" 2> "$INNER_ERR"; echo $? > "$INNER_DONE"'
+child = subprocess.Popen(["sh", "-c", script, "sh"] + spec["argv"], env=spec["environment"], start_new_session=True)
+try:
+    child.wait(timeout=10)
+except subprocess.TimeoutExpired:
+    pass  # a design that serialises the two checks: the waiter ends after this plan returns
+os.execv(sys.executable, [sys.executable, os.path.join(here, "impl.py")] + sys.argv[1:])
+'''
+
+
+@pytest.fixture
+def side_by_side(w):
+    """Both checks block on one Stop and run interleaved: the waiter check runs, whole, inside the idle check's plan."""
+    w.waiter_configured()
+    w.status()
+    program = w.fake_gov(["DAEO-u101", "DAEO-u102"])
+    (w.fake_dir / "stub.py").write_text(STUB, encoding="utf-8")
+    stub = w.fake_dir / "gov-stub"
+    stub.write_text(f"#!/bin/sh\nexec '{sys.executable}' '{w.fake_dir / 'stub.py'}' \"$@\"\n", encoding="utf-8")
+    stub.chmod(program.stat().st_mode)
+    w.gov_path = stub
+    w.write_config()
+    argv = [sys.executable, "-B", "-m", "gov.cli.main", "session-watch", "stop-check", "waiter", "--root", str(w.root)]
+    spec = {"argv": argv, "environment": w.env(), "stdin": json.dumps(w.hook())}
+    (w.fake_dir / "inner.json").write_text(json.dumps(spec), encoding="utf-8")
+    idle = w.run("idle")
+    assert_blocks(idle, "(the idle check's one block of the turn: unblocked items, nothing running)")
+    done = w.fake_dir / "inner.done"
+    for _ in range(300):  # only a design that holds the idle check's run open reaches this wait
+        if done.is_file():
+            break
+        time.sleep(0.1)
+    assert done.is_file(), "the waiter check run inside the plan did not end"
+    assert done.read_text().strip() == "0", f"the waiter check exits 0:\n{(w.fake_dir / 'inner.err').read_text()}"
+    inner = (w.fake_dir / "inner.out").read_text().strip()
+    assert inner, "the waiter check run inside the plan must block (the waiter is unarmed): it said nothing"
+    assert json.loads(inner).get("decision") == "block", f"the waiter check's own block of the turn: {inner}"
+    return w
+
+
+def test_s3_side_by_side_the_state_file_holds_both_checks_records(side_by_side):
+    state = side_by_side.state()
+    assert isinstance(state, dict) and state.get("waiter") and state.get("idle"), \
+        f"after both checks end, state.json holds the waiter's record and the idle check's record: {state}"
+
+
+def test_s3_side_by_side_a_third_waiter_call_in_the_same_turn_says_nothing(side_by_side):
+    third = side_by_side.run("waiter")
+    assert_no_block(third, "(the waiter already blocked this turn, whichever check wrote the state last)")
+
+
+def test_s3_side_by_side_the_idle_check_does_not_block_again_in_the_same_turn(side_by_side):
+    assert_no_block(side_by_side.run("idle"), "(the idle check already blocked this turn)")
