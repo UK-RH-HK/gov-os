@@ -21,6 +21,8 @@ allowed_paths:
 - governance/project/facts.yaml
 - template/governance/kernel/schemas/facts.schema.json
 - docs/changes/W2-152-evidence.md
+- docs/probes/DAEO-o5x1/**  # the probe record (the CTO, 2026-11-12 14:00)
+- docs/changes/W2-152-CIT-P.md  # the kernel schema's CIT-P for the owner (CAP-33)
 kpis:
   success:
   - 'S1 gov brief <role> <ticket> prints on stdout the filled T-0 (template/governance/kernel/templates/brief.md) for that role, from only the ticket file, governance/project/facts.yaml and the kernel templates; two runs on the same inputs are byte-identical. Verify: a golden-file test per worker role on a fixture repository [DEC-1050, DEC-1052] (W2-128 TPL-3 S1)'

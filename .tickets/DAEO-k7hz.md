@@ -21,6 +21,7 @@ allowed_paths:
 - template/governance/kernel/skills/audit/**
 # Every .claude/** line (skills/orchestration, skills/audit, agents/orchestrator.md, skills/*/SKILL.md, skills/test-design, skills/qa-review) is out of the paths: those files are generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - docs/changes/W2-11-CIT-P.md
+- docs/changes/W2-11-CITP-REVIEW-r*.md  # the CIT-P's two review records, moved out of docs/probes/ (the probe-record checks read every file there; the queue ejected the land 12:51; the CTO, 12:55)
 - template/governance/kernel/roles/orchestrator.md
 - .rulesync/subagents/orchestrator.md
 - template/.rulesync/subagents/orchestrator.md

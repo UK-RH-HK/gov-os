@@ -58,3 +58,24 @@ that build projects without an embedder are revised by the test designer where t
 (`Rewrite-Reason: DEC-1027 C`); a project with nothing to embed is not asked for one. Until it lands, the CTO's
 `tools/rebuild_slot.sh` enforces the rule here (exit 75). The close's gate file is named for the engineer to place;
 if the close's own code must change instead, the lead returns a package (W2-115 holds `src/gov/close`).
+
+## Interface (DEC-1052; run 1's P1 (a), the lead's proposal accepted as a whole; the CTO, 2026-11-12 14:02)
+
+- Asked for = no --no-embeddings AND the path map has a namespace with `embedding_policy: embedded`. Otherwise
+  stores.semantic = {status: not_recreated, requested: false, reason} and no embedder is called (S2).
+- Asked for and not recreated (unavailable, hung past the endpoint timeout, failed part way): GovError REBUILD_FAILED,
+  details {store: "semantic", reason, stores}, exit 1; no warm-base record (as today).
+- src/gov/close/rebuild_gate.py: `semantic_failure(result: dict) -> str | None` (a gov rebuild --json envelope or its
+  result; the rule of rebuild_semantic_check.py) and `check(result: dict) -> None` (raises the REBUILD_FAILED above).
+  gov.rebuild.command calls check() on its result, so the close (close/batch.py _rebuild -> command.run) and the queue's
+  prepare (rebuild_slot.sh -> gov rebuild --json) fail through it: no edit to other close files or merge_queue.py.
+- Adoption: stages.rebuild catches REBUILD_FAILED with store "semantic" and finishes; the A6 record (as committed) and
+  the stage's `gov adopt --lite --json` result ("the adoption report") each hold
+  findings: [{code: SEMANTIC_NOT_RECREATED, store: semantic, reason, command: "gov rebuild"}]. The engineer orders
+  rebuild and commit so the committed record holds it. Any other REBUILD_FAILED stays INDEX_REFRESH_FAILED.
+
+## Run 1's P2 and P3 (the CTO, delegated P2, 2026-11-12 14:02)
+
+- **P2 (b):** S2 and S5 both kept; S5 is read in the result: `gov rebuild` keeps exit 0 and `"ok": true`, and the result carries `complete: false` and `not_built: [{store, reason}]` for every store not built (no path map, no `.gitleaks.toml`, a store the path map calls for not built); adoption reads `not_built`. No earlier suite is rewritten for it. W2-26's finding 2 (`"ok": true` on an unadopted clone) stays, named in the result rather than refused.
+- **P3:** with (b), earlier suites should not change; if any turns red, its files come back to the owner by name before any revision (widening is the owner's, DEC-1142 (8)).
+

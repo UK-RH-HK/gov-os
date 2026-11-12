@@ -58,7 +58,12 @@ About 40 s, serial, no model, network or GPU. (`PYTHONUSERBASE` only where pytes
   (base: the merge-base with `w2/integrate`, else `dac438772`) names no template file, the path map, the guard, a file
   named `APPROVED` or a set-up A brief (F3), and only the ticket's `allowed_paths`, `tests/acceptance/W2-173/**` and the
   ticket's own records `.tickets/DAEO-qz4p.md`, `docs/checkpoints/DAEO-qz4p/**`, `docs/probes/DAEO-qz4p/**` (F4;
-  *reading*, W1-01's: a ticket's own file rides its commits).
+  *reading*, W1-01's: a ticket's own file rides its commits). **F3 and F4 are judged only on `w2/W2-173`** (HEAD's full
+  ref `refs/heads/w2/W2-173`, read from the repository the test file sits in): on any other checkout (another
+  ticket's branch, the merge queue's candidate merge on a detached HEAD, `w2/integrate`, a clone's checkout) they are
+  skipped with the reason named (the branch found, or "detached HEAD"), never red and never passed silently. The
+  judgements are `judge_f3_paths(root)` and `judge_f4_paths(root)`; the planted cases below call the same functions
+  (Revision, below).
 
 ## A conflict with S5 (named for the CTO; not settled here)
 
@@ -113,7 +118,31 @@ holds the counts' top-level keys to `COUNTS_KEYS`, which lacks `effort`).
 | F2 | `test_w2_173_stopped.py::test_s2_a_checker_result_that_stopped_delivers_nothing_and_ends_21` | the notes are delivered (exit 0) |
 | F2 | `test_w2_173_notes.py::test_s3_notes_with_a_missing_line_are_refused_20` | the notes are delivered unchecked (exit 0) |
 | F2 | `test_w2_173_classes.py::test_s4_classes_that_do_not_fit_the_form_are_refused_20` | the classes are delivered unchecked (exit 0) |
-| F3 | `test_w2_173_unchanged.py::test_f3_the_branch_changes_no_template_path_map_guard_approved_list_or_set_up_a_brief` | green on this branch (it changes only `tests/acceptance/W2-173/`); judged on the engineer's branch |
-| F4 | `test_w2_173_unchanged.py::test_f4_the_branch_changes_only_the_ticket_s_paths` | green on this branch (it changes only `tests/acceptance/W2-173/`); judged on the engineer's branch |
+| F3 | `test_w2_173_unchanged.py::test_f3_the_branch_changes_no_template_path_map_guard_approved_list_or_set_up_a_brief` | judged only on `w2/W2-173` (green there while it changes only `tests/acceptance/W2-173/`); skipped with its reason on any other checkout |
+| F4 | `test_w2_173_unchanged.py::test_f4_the_branch_changes_only_the_ticket_s_paths` | judged only on `w2/W2-173` (green there while it changes only the ticket's paths); skipped with its reason on any other checkout |
+| F3 | `test_w2_173_unchanged.py::test_f3_planted_w2_173_branch_with_a_forbidden_path_fails_naming_it` | planted `w2/W2-173` with `governance/project/path-map.yaml`: F3's judgement fails naming it |
+| F3 | `test_w2_173_unchanged.py::test_f3_planted_w2_173_branch_with_a_change_outside_its_paths_but_no_forbidden_one_passes` | control: a path outside W2-173's paths but in no forbidden glob passes F3 on planted `w2/W2-173` |
+| F4 | `test_w2_173_unchanged.py::test_f4_planted_w2_173_branch_with_a_change_outside_its_paths_fails_naming_it` | planted `w2/W2-173` with `docs/changes/W2-178-evidence.md`: F4's judgement fails naming it |
+| F3 | `test_w2_173_unchanged.py::test_planted_w2_173_branch_with_a_change_inside_its_paths_passes[f3]` | pass control: `indep_launch.py` on planted `w2/W2-173` passes F3's judgement |
+| F4 | `test_w2_173_unchanged.py::test_planted_w2_173_branch_with_a_change_inside_its_paths_passes[f4]` | pass control: `indep_launch.py` on planted `w2/W2-173` passes F4's judgement |
+| F3 | `test_w2_173_unchanged.py::test_planted_other_ticket_branch_with_the_same_change_is_skipped_with_its_reason[f3]` | the same change on planted `w2/W2-178`: F3's judgement skipped, the reason naming both branches |
+| F4 | `test_w2_173_unchanged.py::test_planted_other_ticket_branch_with_the_same_change_is_skipped_with_its_reason[f4]` | the same change on planted `w2/W2-178`: F4's judgement skipped, the reason naming both branches |
+| F3 | `test_w2_173_unchanged.py::test_planted_other_ticket_branch_with_a_forbidden_path_is_skipped_with_its_reason[f3]` | a forbidden path on planted `w2/W2-178`: F3's judgement skipped |
+| F4 | `test_w2_173_unchanged.py::test_planted_other_ticket_branch_with_a_forbidden_path_is_skipped_with_its_reason[f4]` | a forbidden path on planted `w2/W2-178`: F4's judgement skipped |
+| F3 | `test_w2_173_unchanged.py::test_planted_candidate_merge_on_a_detached_head_is_skipped_with_its_reason[f3]` | a detached `--no-ff` candidate merge of `w2/W2-178` into `w2/integrate`: F3's judgement skipped ("detached HEAD") |
+| F4 | `test_w2_173_unchanged.py::test_planted_candidate_merge_on_a_detached_head_is_skipped_with_its_reason[f4]` | a detached `--no-ff` candidate merge of `w2/W2-178` into `w2/integrate`: F4's judgement skipped ("detached HEAD") |
+| F3 | `test_w2_173_unchanged.py::test_planted_integrate_branch_itself_is_skipped_with_its_reason[f3]` | `w2/integrate` itself: F3's judgement skipped |
+| F4 | `test_w2_173_unchanged.py::test_planted_integrate_branch_itself_is_skipped_with_its_reason[f4]` | `w2/integrate` itself: F4's judgement skipped |
+| F4 | `test_w2_173_unchanged.py::test_planted_paths_are_outside_the_ticket_s_paths_and_inside_it_as_each_case_needs` | the planted paths fall where each case needs them (outside F4's paths and F3's globs; the path map in F3's; `indep_launch.py` inside) |
 
 At `dac438772`: 61 red, 18 green (79 cases).
+
+## Revision (W2-180, DAEO-weh2)
+
+F3 and F4 diffed whatever branch the suite ran on against its merge-base with `w2/integrate` and judged the names against
+W2-173's own forbidden list and `allowed_paths`, so they were red on any other ticket's branch (W2-178's, DAEO-7oxm, which changes
+`indep_launch.py`) and on the merge queue's candidate merge of it, attributed to that ticket's
+batch (the queue had already ejected W2-121 and W2-179 on W2-170's F5 for the same form). Revised under DEC-866 (Rewrite-Reason),
+after W2-170's F5 case (DEC-253, DEC-966, DEC-989): both cases now judge only on `w2/W2-173` and are skipped with their
+reason elsewhere; the judgement is in `judge_f3_paths(root)` and `judge_f4_paths(root)`, called with the repository the
+file sits in and, by the planted cases, with each planted `git init` repository. No other case changed.

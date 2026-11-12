@@ -143,6 +143,10 @@ def launch_gov(root: Path, temp: Path, folder: Path, *, head: str = "", env: dic
         full["W296_RECORD"] = str(record)
 
     def _ignore():
+        # exactly the named signals are ignored, the others at their default: a test process started as a background
+        # job has SIGINT ignored, and gov keeps an inherited ignore (R11), so it would otherwise start with it (W2-177)
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            signal.signal(signum, signal.SIG_IGN if signum in ignore else signal.SIG_DFL)
         for signum in ignore:
             signal.signal(signum, signal.SIG_IGN)
 
