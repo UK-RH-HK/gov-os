@@ -3,6 +3,8 @@ name: retrieval
 description: >-
   Method for running gov retrieve — facet retrieval in disposable subagents with
   validated bundle return
+metadata:
+  version: 1.0.0
 ---
 # Retrieval
 
