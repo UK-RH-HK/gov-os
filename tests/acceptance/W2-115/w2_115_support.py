@@ -298,6 +298,23 @@ class Smart:
             self.write(rel, text)
         return self._commit("work on the ticket", close_support.IMPLEMENTER, close_support.trailers_of(ticket))
 
+    def slip(self, files):
+        """The engineer's commit without a ``Task:`` trailer (an honest slip): ``Role: engineer`` only."""
+        for rel, text in files.items():
+            self.write(rel, text)
+        return self._commit("work on the ticket, its trailer forgotten", close_support.IMPLEMENTER,
+                            (close_support.ENGINEER_ROLE,))
+
+    def elsewhere(self, files, branch="elsewhere"):
+        """A commit on another branch made from the current head; ``main`` is checked out again. Returns it."""
+        self.git("checkout", "-q", "-b", branch)
+        commit = self.merged(files, "work on another branch")
+        self.git("checkout", "-q", "main")
+        return commit
+
+    def tickets(self):
+        return {p.stem for p in (self.root / ".tickets").glob("*.md")}
+
     def ready(self, sandbox, ticket=TICKET):
         run = close_support.run_gov(self.root, sandbox, "checkpoint", "--ticket", ticket, "--trigger", "stop",
                                     "--next", "resume", "--json")

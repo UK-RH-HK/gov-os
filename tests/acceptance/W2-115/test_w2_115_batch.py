@@ -116,6 +116,78 @@ def test_a_red_no_single_candidate_explains_refuses_the_batch(tmp_path_factory):
     batch.nothing_landed()
 
 
+ADDED = f"{support.ADDED_TEST}::test_w2_115_added"
+_SEES_THE_BOLT = f"    WATCH.append({BOLT!r})\n"
+# The culprit's own new test: red wherever it exists.
+NEW_RED = _SEES_THE_BOLT + "    _tell(False)\n    assert False, 'a new red'\n"
+# A new test red only beside another candidate's change (the bolt's or the gadget's), green with its own alone.
+NEW_RED_BESIDE_OTHERS = _SEES_THE_BOLT + (
+    f"    now = _seen()\n    ok = 'CHANGED' not in (now[{BOLT!r}] or '') + (now[{support.GADGET!r}] or '')\n"
+    "    _tell(ok)\n    assert ok, 'the bolt or the gadget changed'\n")
+
+
+class OwnNewTest(Batch):
+    """A adds a new test (``tests/unit/widget/test_w2_115_added.py``) with ``body`` beside its widget change; B
+    changes the bolt, C the gadget; no planted red. Built without A, the test does not exist."""
+
+    def __init__(self, base, body):
+        added = support.telling("test_w2_115_added", base / "told", body)
+        super().__init__(base, {}, [
+            (A, "W2-aa", {support.WIDGET: "# the widget, CHANGED\n", support.ADDED_TEST: added}, None),
+            (B, "W2-b1", {BOLT: "# a bolt, CHANGED\n"}, None),
+            (C, "W2-c1", {support.GADGET: "# the gadget, CHANGED\n"}, None)])
+
+
+@pytest.fixture(scope="module")
+def own_new_test(tmp_path_factory):
+    return OwnNewTest(tmp_path_factory.mktemp("w2_115_batch_own_new_test"), NEW_RED)
+
+
+def test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land(own_new_test):
+    """F-3 (S6, F3): A's red is a test A itself adds; no build without one candidate turns it green (without A it
+    is absent). Once confirmed with A alone, A is the culprit: named in the close records, not closed, its work not
+    on ``main``; B and C land on the same run. Not refused as unexplained."""
+    batch = own_new_test
+    assert batch.project.ticket_status(A) != "closed", f"the culprit closed\n{batch.run.describe()}"
+    assert not support.is_ancestor(batch.project, batch.commits[A]), "the culprit's work landed on main"
+    for ticket in (B, C):
+        assert batch.landed(ticket), f"{ticket} did not land\n{batch.run.describe()}"
+    commits = {batch.project.record(t).get("commit") for t in (B, C)}
+    assert len(commits) == 1 and None not in commits, f"B and C did not land on the same run: {commits}"
+    culprits = batch.project.record(B).get("culprits")
+    assert isinstance(culprits, list) and any(A in str(c) or "W2-aa" in str(c) for c in culprits), \
+        f"the close record does not name the culprit A: {culprits!r}"
+
+
+def test_a_culprit_s_own_new_test_is_confirmed_red_with_that_candidate_alone(own_new_test):
+    """F-3 (S6): the new test ran red on the base plus A only (the widget changed; neither the bolt nor the gadget)."""
+    runs = own_new_test.project.told_runs("test_w2_115_added")
+    alone = [r for r in runs if "CHANGED" in (r["seen"].get(support.WIDGET) or "")
+             and "CHANGED" not in (r["seen"].get(BOLT) or "") + (r["seen"].get(support.GADGET) or "")]
+    assert alone and not any(r["ok"] for r in alone), \
+        f"the red was not confirmed with the culprit alone: {len(alone)} run(s) of the base plus A only\n" \
+        f"{own_new_test.run.describe()}"
+
+
+def test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found(own_new_test):
+    """F-3 (S6, F3): no commit on ``main`` ever held A's new test, and no revert was made."""
+    batch = own_new_test
+    assert batch.project.head() != batch.base, f"nothing landed\n{batch.run.describe()}"
+    touched = batch.project.git("log", "--format=%H %s", f"{batch.base}..main", "--", support.ADDED_TEST).strip()
+    assert not touched, f"main held the culprit's new test at some point: {touched}"
+    reverts = batch.project.git("log", "--format=%s", f"{batch.base}..main", "--grep=Revert").strip()
+    assert not reverts, f"merged code was taken out: {reverts}"
+
+
+def test_a_new_test_green_with_its_candidate_alone_is_not_blamed_and_the_batch_is_refused(tmp_path_factory):
+    """F-3's control (S6, F3): A's new test fails in the batch but passes with A alone (it fails beside B's or C's
+    change, and without B or without C it is still red): not confirmed alone, so no single candidate explains it;
+    refused with BATCH_UNEXPLAINED and nothing lands."""
+    batch = OwnNewTest(tmp_path_factory.mktemp("w2_115_batch_new_test_beside"), NEW_RED_BESIDE_OTHERS)
+    support.assert_refused(batch.run, support.BATCH_UNEXPLAINED)
+    batch.nothing_landed()
+
+
 def test_a_candidate_that_cannot_be_isolated_refuses_the_batch(tmp_path_factory):
     """S6: A causes the red and B's branch is made from A's, so the build without A cannot be made: the batch is
     refused with CANDIDATE_NOT_ISOLATED and nothing lands."""
