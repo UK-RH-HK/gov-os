@@ -110,9 +110,9 @@ def test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none(tmp_
 
 
 def _others(result):
-    """Every check but core-pathmap, and every family but path-map compliance, without provenance."""
+    """Every check but core-pathmap, and every family but path-map compliance, without provenance and elapsed_s (a wall time)."""
     checks = {
-        cid: {k: v for k, v in c.items() if k != "provenance"}
+        cid: {k: v for k, v in c.items() if k not in ("provenance", "elapsed_s")}
         for cid, c in result.checks().items()
         if cid != s.CHECK_ID
     }

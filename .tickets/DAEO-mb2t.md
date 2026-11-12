@@ -1,6 +1,6 @@
 ---
 id: DAEO-mb2t
-status: in_progress
+status: closed
 deps: [DAEO-blwa]
 links: [DAEO-blwa, DAEO-qzrq]
 created: 2026-11-02T10:37:58Z
@@ -35,6 +35,7 @@ allowed_paths:
 - tests/unit/rebuild/test_no_embeddings.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
 - tests/unit/rebuild/test_w2_122_seed.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
 - tests/unit/retrieval/test_w2_32_rebuild_cut.py  # one test-designer revision under S1's rule (P1-L (a), DEC-1150 (3))
+- docs/probes/DAEO-mb2t/**  # the probe record (the CTO, 2026-11-12)
 kpis:
   success:
   - '`gov rebuild` exits non-zero, named (`REBUILD_FAILED`, `store: semantic`), when the semantic store was asked for and not recreated (the embedder unavailable, hung or failing part way); only `--no-embeddings` skips it; never an ok answer over a partial store. Verify: a planted project that asks for a semantic store, with a stub embedder that is unavailable, one that hangs and one that fails part way: `gov rebuild` exits non-zero each time and prints `REBUILD_FAILED` and `store: semantic`; the same project with `--no-embeddings` exits 0; no run prints ok over a partial store [DEC-1015 item 4, DEC-1027 C]'

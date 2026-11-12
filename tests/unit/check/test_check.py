@@ -274,7 +274,7 @@ def test_a_stated_time_limit_reaches_the_runner_and_its_finding_names_it(tmp_pat
     assert slow["timeout-seconds"] == 1 and "timeout-seconds" not in plain
     result = runner._run_declared_check(slow, tmp_path, "abc123")
     assert result["status"] == "RED"
-    assert result["findings"] == [{"code": "CHECK_FAILED",
+    assert result["findings"] == [{"code": "CHECK_TIMED_OUT", "time_limit_s": 1,
                                    "message": "slow did not end within its time limit of 1 seconds"}]
     assert runner._run_declared_check(plain, tmp_path, "abc123")["status"] == "GREEN"
 

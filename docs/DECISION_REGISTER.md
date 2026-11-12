@@ -14832,6 +14832,34 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **P-W2-160-1 (a):** W2-160's allowed_paths gain `src/gov/session_watch/command.py` for the `helper-watch` action its S3 names (about 20 lines); W2-159, which built the file, is closed.
 - **Basis:** the owner's message of 2026-11-12 ~19:40, after the CTO's two lines each.
 
+### DEC-1154 — A change decided after a ticket's review gets a narrow independent check of that change, without asking the owner; the ticket lands on it (standing)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~20:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`; standing) · **Under:** DEC-1152 (3), DEC-1010, DEC-802, DEC-989
+- **Decision:**
+  - (1) **Standing:** any change the owner decided that is added to a ticket after its review (a widening, a default, a fix riding a resume, DEC-802) gets a narrow independent check of that change only, launched by the CTO without asking; the ticket then lands on that check's passing record. Not a design review and not a full round.
+  - (2) **W2-121b now:** the narrow check of the template default (DEC-1149 (2)) that rode after its review; if it passes, it lands tonight.
+- **Basis:** the owner's message of 2026-11-12 ~20:10, after the queue refused W2-115 and W2-121b for want of a passing record at their heads.
+
+### DEC-1155 — P1-N (a): W2-172 widened by W2-171's F5 case for one revision; a sweep of every acceptance test for the two ejection defects
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~21:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-974, DEC-1154, DECIDED-NOT-DONE row 171
+- **Decision:**
+  - (1) **P1-N (a):** W2-172's allowed_paths gain `tests/acceptance/W2-171/test_w2_171_f5_paths.py` for one test-designer revision (F5 judges only on branch w2/W2-171, as W2-180 did for W2-170), riding with W2-172's own conftest fix (its path hygiene refused the queue clone's `runs/` path); a narrow independent check of both changes (DEC-1154's practice), then the land.
+  - (2) **A sweep:** every acceptance test is searched for the same two defects (a path case that judges any branch instead of its own; a hygiene check tripped by the queue's own folder path); one package with each case found and its fix in the 09:00 digest, so no further land is ejected for them.
+- **Basis:** the owner's message of 2026-11-12 ~21:35.
+
+### DEC-1156 — Five lead packages decided at night (ROUTE-1 (a), P-W2-120-1 (b), W2-33 A, W2-113 PKG-1 (a) and PKG-2 (b), P-W2-98-IF-1 (a)); W2-157's and W2-159's F4 fixed now; two standing rules (the CTO fixes decided-behaviour test revisions and own-branch path cases; any lead-stopping decision brought at night)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~22:55; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (7), (8) standing · **Under:** DEC-1052, DEC-1154, DEC-1155, DEC-1153 (2), DEC-1087 (13), DEC-996 (1), DEC-995, DEC-974, DEC-1142 (8), DEC-1083, DEC-105
+- **Decision:**
+  - (1) **W2-160 ROUTE-1 (a):** W2-160's paths gain `tests/unit/session_watch/test_route.py` for its `ACT_PATHS` assertion only (the two-path tuple of DEC-1153 (2)).
+  - (2) **P-W2-120-1 (b):** W2-120's Interface stated (findings with code, file, key, message; exit 1/0); the closed key list lands on every copy, the validator finding the copies itself; vendored skills named without changing the exit; the "no output class" half deferred (lifted on the ticket) until a product-spec follow-up adds `output` to the kernel skills.
+  - (3) **W2-33 Option A:** its Interface states the files, the line forms in W2-60a's reader form, the work-order and one-writer sentences word for word, the QA line heads, S6 as a reviewer probe, and the CIT-P path `docs/changes/W2-33-CIT-P.md`; S2's launcher plan routed to W2-60a, S5's launcher refusal to W2-60b, S7's generated copies and F1's drift to W2-153 (a success line each), S3's guard refusal is W2-60b's own line. **The Senior Engineer:** DEC-1087 (13) keeps the three layers (the CTO as master, a Senior Engineer per stream, its leads and agents) in Wave 2, reversing their move to Wave 3, so W2-33 creates `senior-engineer.md` (its moved CTO/Senior Engineer line restored as a success line); its clauses are not conditional.
+  - (4) **W2-113 PKG-1 (a)** with the three defaults as stated (stage A0 in `stages.py` creates the coordination ticket and writes `coordination_ticket`; an existing named ticket kept; a roster without the key gets only the key; no `tk`: refused, nothing written); **PKG-2 (b):** W2-113's S2 and F2 move into W2-33 with `template/.rulesync/subagents/orchestrator.md`; W2-113 drops both role-file paths.
+  - (5) **P-W2-98-IF-1 (a):** `check_spec.py` in the skill folder is part of the skill, as `find-polluter.sh` is; `spec-form.md`, `imports.yaml`; F3 re-worded (the section half to the acceptance test's own check, the validator keeps the size half).
+  - (6) **W2-157's and W2-159's F4 path cases fixed now,** each judged only on its own branch (the form W2-180 and P1-N used): W2-181 (DAEO-ywb5, built to its checkpoint) returns from W3-P31 (DEC-1142 (8) changed for it) and lands under a narrow independent check; W2-159's F4 is revised by a test designer in W2-160's run 3 (W2-160's paths gain `tests/acceptance/W2-159/test_f4_scope.py`), so W2-160 lands tonight.
+  - (7) **Standing:** a test revision that only records a behaviour the owner already decided (an older case asserting the old behaviour), and a path case that judges any branch instead of its own, are decided and done by the CTO (a test designer writes the revision; the CTO routes it, widening the ticket that meets it by that file), under a narrow independent check (DEC-1154), and listed for the owner's reading; they no longer stop a lead to wait for the owner.
+  - (8) **Standing, at night:** every decision that stops a lead is brought to the owner at once, not only P1s on EXAMIN's path, until the owner says they are asleep.
+  - (9) **The inventory:** every mechanism or rule that stops, holds or delays a lead or a worker, with who set it, the lead-hours it cost today and tonight, and the risk of removing or loosening it, comes to the owner; until the owner decides, every lead nothing in that table truly blocks is started.
+- **Basis:** the owner's message of 2026-11-12 ~22:55, on the CTO's five packages of ~22:45 (`.gov-runtime/scratch/orchestrator/drafts/packages-tonight-2245.md`).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14920,3 +14948,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.532 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1151 (ACT-EXAMIN-WRITERS-INSTALL-1 applied; the two walled writers delivered; W2-27's green-base line). Next free id: DEC-1152. |
 | 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
 | 0.534 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1153 (W2-45 widened by W1-40's case; W2-160 by the session-watch command file). Next free id: DEC-1154. |
+| 0.535 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1154 (a change decided after a review gets a narrow independent check; the ticket lands on it; standing). Next free id: DEC-1155. |
+| 0.536 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1155 (P1-N (a): W2-172 widened by W2-171's F5 case; the sweep for the two ejection defects). Next free id: DEC-1156. |
+| 0.537 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1156 (five lead packages; W2-157's and W2-159's F4 fixed now; two standing rules). Next free id: DEC-1157. |

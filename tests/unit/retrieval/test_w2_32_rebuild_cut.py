@@ -13,6 +13,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
+from gov.cli.errors import GovError  # noqa: E402
 from gov.rebuild.command import add_arguments, run  # noqa: E402
 
 EMBEDDED = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded"}}}}
@@ -42,7 +43,13 @@ def test_the_rebuild_names_the_chunks_the_embedder_s_limit_cut(tmp_path, semanti
 
 def test_a_stage_not_built_still_names_the_cut(tmp_path, semantic_answers):
     semantic_answers.update(available=False, reason="EMBEDDER_ON_CPU: ...", cut=CUT)
-    semantic = run(tmp_path, _args(), EMBEDDED)["stores"]["semantic"]
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # a stage asked for and not built now fails the rebuild (REBUILD_FAILED, store: semantic); its stores, the
+    # semantic one with the cut, are read from the error's details.
+    with pytest.raises(GovError) as raised:
+        run(tmp_path, _args(), EMBEDDED)
+    assert raised.value.code == "REBUILD_FAILED" and raised.value.details["store"] == "semantic"
+    semantic = raised.value.details["stores"]["semantic"]
     assert semantic["status"] == "not_recreated" and semantic["cut"] == CUT
 
 
