@@ -70,9 +70,14 @@ ownership rule of ruling 3 (`test_only_the_matcher_imports_the_measures_private_
 
 ## Results (the whole folders, `-m "not local_only" -k "not real and not green_here and not time_limit"`, `HOME` an empty scratch folder)
 
-- `tests/unit/memaudit` and `tests/acceptance/W2-170` together: **392 passed** (390 on the run before the two renames
-  below, 2 deselected by the `-k` filter's word "real" in their names, since renamed and run: 38 passed in `test_fault.py`).
-  W2-170's own 263 are among them, unchanged.
+- `tests/unit/memaudit` and `tests/acceptance/W2-170` together, on the committed state: **391 passed, 1 failed**.
+  W2-170's own 263 (the 262 other than F5's) are among the passes, unchanged. (An earlier run, before this evidence note
+  was committed, was 390 passed and 2 deselected by the `-k` filter's word "real" in two test names, since renamed.)
+- **The one failure is not W2-171's code:** `tests/acceptance/W2-170/test_w2_170_f5_paths.py` judges the branch it runs
+  on against W2-170's `allowed_paths`, and lists `docs/changes/W2-171-evidence.md` (this file, which W2-171's own ticket
+  and brief require, and which its `allowed_paths` allow) as outside them. It was green until this file was committed and
+  will fail on any W2-171 branch that carries its evidence note. Not edited, not worked round: reported (see the return's
+  `proposed_decisions`).
 - The exclusion left out nothing of W2-171's: no test uses `local_only`, a real embedder, reranker or model.
 
 ## Readings taken (each also in the return's `unresolved`)
