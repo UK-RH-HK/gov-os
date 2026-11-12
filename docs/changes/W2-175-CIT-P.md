@@ -1,7 +1,7 @@
 ---
 id: W2-175-CIT-P
 type: change-impact-proposal
-status: PROPOSED
+status: ACCEPTED
 state_class: EVIDENCE
 date: 2026-11-11
 branch: w2/W2-175
@@ -10,7 +10,7 @@ author: product-spec (W2-175, round 1)
 review: one read-only independent reviewer, reading the delta only (CAP-33, DEC-1116's route)
 decisions_read: [DEC-1137, DEC-820, DEC-861, DEC-1116, DEC-1121, DEC-1050, DEC-105, DEC-957, DEC-963, DEC-1073, DEC-315]
 decisions_carried: [DEC-1137, DEC-820, DEC-861, DEC-957, DEC-963, DEC-1116]
-state: draft (round 1, the text; the review, the approval and the promotion are pending)
+state: approved by the owner at 4c0c73472fd8 and promoted as version 1.0.1 (DEC-1139, 2026-11-11); merged by hand at 61cae50dc after ACT-CLAUDE-COPIES-5 (DEC-1141 (4))
 ---
 
 # W2-175: change-impact proposal (CIT-P) on the seven role templates
@@ -115,11 +115,11 @@ probe record is `docs/probes/DAEO-wahn/PR-DAEO-wahn.md`.
 
 ## 4. Owner's approval
 
-Pending. Not filled by the product-spec session: the owner approves the new bytes (the sha256 column of section 2) by the
-route of DEC-1116.
+Approved by the owner on 2026-11-11 (DEC-1139): "W2-175's role templates approved at 4c0c73472fd8 and promoted as version 1.0.1",
+the bytes of the sha256 column of section 2, by the route of DEC-1116; three fixes for the next template delta. Recorded by the
+orchestrator at the merge (61cae50dc, 2026-11-12, DEC-1141 (4)).
 
 ## 5. Versioned promotion
 
-Pending. On the owner's approval the kernel template set is promoted at the approved bytes: the seven role templates
-from 1.0.0 to 1.0.1; this record's `status` becomes ACCEPTED only then; the `.claude/templates/` copies follow by the
-copies ACT.
+Done (DEC-1139): the seven role templates promoted from 1.0.0 to 1.0.1 at the approved bytes, merged at 61cae50dc;
+this record's `status` is ACCEPTED; the `.claude/templates/` copies follow by the copies ACT.
