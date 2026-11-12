@@ -24,6 +24,7 @@ allowed_paths:
 - docs/probes/DAEO-lrre/**  # the probe record (the CTO, 2026-11-12)
 - template/.rulesync/subagents/orchestrator.md  # W2-113's S2/F2 moved here (DEC-1156 (4))
 - docs/changes/W2-33-CIT-P.md  # the kernel role files' CIT-P for the owner (CAP-33; DEC-1156 (3))
+- tests/acceptance/W1-35/test_w1_35_orchestration.py  # one test-designer revision of the old-layout cases :205, :259-268, :353 (DEC-1156 (7), (3))
 kpis:
   success:
   - 'The ticket lead''s own role file (today a section of orchestrator.md). Verify: the kernel roles folder holds a role file of its own for the ticket lead that names its reads, writes and handover, and `orchestrator.md` no longer carries the ticket lead''s section (a grep for the section''s heading in `orchestrator.md` finds 0 lines) [DEC-954, DEC-236] (folds W2-21 S2)'

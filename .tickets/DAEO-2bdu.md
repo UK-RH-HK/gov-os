@@ -240,3 +240,82 @@ Card: from the owner's DEC-954 Q9f (2026-10-30): "Memory for any repository, not
 ## Split by the owner (DEC-1150 (1), package 1 (a), 2026-11-12; DEC-996 (1))
 
 This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill's order) and its kernel skill paths to **W2-88a** (DAEO-pg6i, product-spec, with W2-174's skill line); proofs (b) and (c), their scale and measure lines and the GitHub-clone failure line to **W2-88b** (DAEO-aks1, research, copies only). Proof (a)'s record moves to `docs/changes/W2-88-evidence.md`; the practice record `docs/research/W2-88-memory-practice.md` goes with the skill text to W2-88a. W2-27 depends on this ticket's tools, not on W2-88b.
+
+## Interface (DEC-1052; P-W2-88-IF-1 (a), the CTO's delegated decision, DEC-1112 (3), 2026-11-12 23:25)
+
+
+### Commands and stages
+1. **`gov adopt --lite --stage MA --out <folder>`**: the memory assessment (S1) and the refactoring plan (S2). It is in no chain (like A7 and A10). `<folder>` must lie outside the project, or the stage refuses with `OUT_INSIDE_PROJECT`. It reads HEAD's blobs one at a time from git objects (`git cat-file --batch`). It writes only under `<folder>`:
+   - `memory-assessment.json`: `commit`, `tracked_files`, `tracked_bytes`, `languages`, `commits`, `largest[]`, `binary[]`, `generated[]`, `minified[]`, `vendored[]` (each item `{path, by: name|header|folder}`), `secrets[]` as `{path, rule}` (never the value), `no_route[]` as `{path, reason: unsupported-language|over-limit}`, `estimate {index_seconds, peak_rss_bytes, disk_bytes, envelope, free_memory_bytes, free_disk_bytes}`, `peak_rss_bytes` (its own peak).
+   - `refactor-plan/RP-<nn>-<kind>.md`: one per blocker, in the kernel ticket form. Frontmatter: `title`, `class`, `allowed_paths`, `kpis.success`, `kpis.failure` (each line ends with ` Verify: …`), `profile`, `sources: [memory-assessment sha256:<hex>]`. The kinds are `vendored-no-folder`, `generated-no-folder`, `namespace-policy`, `over-limit`, `secret`, `no-namespace` and `two-namespaces`.
+   - `refactor-plan/PLAN.md` lists them. A repository with nothing to refactor gets `refactor-plan/NOTHING-TO-REFACTOR.md` instead.
+   - No commit, no `tk` call, no write in the repository.
+2. **A3 gains `--assessment <folder>`.** Without a `memory-assessment.json` for HEAD's commit, A3 refuses with `ASSESSMENT_MISSING`. A3's record cites the assessment's sha256 but copies no proposal.
+3. **`gov adopt --lite --stage A9 --out <folder> [--decision DEC-n]…`** (A9 lite, S3–S6, S10, S11, S18–S23) follows A8 in `project.STAGES`' chain. It runs `gov.rebuild.command.run` in full under W2-76's lock and commits its record under `governance/adoption/`. The record holds:
+   - `stores.<record|lexical|vectors|codegraph>`: `{judged, indexed, refused[{path, reason: secrets|binary|not-embedded|unsupported-language|over-limit}], chunks, vectors, nodes, edges, seconds, peak_rss_bytes}`;
+   - `digests` (4, below);
+   - `standard {reranker, reranker_service, pool, bundle_tokens, widen, gov_pin, embedder, retrieval_yaml_sha256, departures[{setting, value, decision}]}`;
+   - `scale {routes{<route>: query_ms}, vector_scan_ms, budget_ms, envelope}`;
+   - `measure {right_e2e, wrong_claims, hit_at_5, residuals[{name, cause}]}`;
+   - `refresh {command, hook}`.
+
+   The stage is not ok in two cases:
+   - `FABRIC_INCOMPLETE`: a tracked file is in neither list, or a store the path map calls for was not built.
+   - `STANDARD_DEPARTURE`: a setting differs from `fabric.STANDARD` and no `--decision` names it.
+
+   A low measure is never a failure (no bar). A figure over the budget or over the envelope writes `<folder>/SCALE-PROPOSAL.md` (a CIT-P form) and changes no store file. Under `<folder>/memory-audit/` it writes:
+   - `AUDIT-RECORD.json` (S18);
+   - `briefs/` with the three variants (S19);
+   - `ACT-WALLS/` (S22: the walls' template copy, the sets root spec (0700), the approved list, the hidden globs);
+   - the cost block (S23).
+
+   A9 starts no audit, writes no crontab line and applies no ACT. S11's refresh (`gov rebuild --integration <branch>`, W2-116) is installed through the same ACT package, never by the tool.
+
+### Modules (each in this ticket's paths)
+- `adopt/assess.py`: `assess(root: Path, out: Path) -> dict`. It holds the DEC-078 envelope constants and `FILE_LIMIT_BYTES`. "Over the chunker's limit" means a file over `FILE_LIMIT_BYTES` (1,048,576 B, proposed) or with a line over `chunking.READ_CHARS` (32,768). The languages the code graph reads come from `gov.codeintel` if it states them, else from `assess.CODE_GRAPH_SUFFIXES`, with its source. The per-session figure is read from `gov.resources.config` (`working_size_bytes`, 805,306,368 B by DEC-1149), never restated.
+- `adopt/refactor_plan.py`: `plan(assessment: dict, path_map: dict | None, out: Path) -> dict`.
+- `adopt/fabric.py`: `a9(run) -> dict`; `STANDARD = {reranker: "Qwen3-Reranker-0.6B", reranker_service: "shared", pool: <retrieval.yaml's pool: block as Gov OS ships it>, bundle_tokens: 6000, widen: "sections"}`. It reads the adopted repository's `governance/project/retrieval.yaml` and compares with the `gov.memaudit.declare` helpers (`pool_on`, `retrieval`, `gov_pin`).
+- `adopt/memory_sets.py` (S18–S23) imports `gov.memaudit` (`preflight`, `declare`, `layout`, `figures`, `schedule`, `pool`). It defines no function or constant for a pre-flight, a USED marker or figures. It provides:
+  - `audit_record(...)`;
+  - `variants(...)` (only the domain table and the blind list differ);
+  - `walls_act(...)`;
+  - `cost(n_questions) -> {tokens, usd, gpu_minutes, owner_minutes, replace_after}`, from MEMORY-AUDIT-1.md §7;
+  - `launch_check(variant: Path, approved: Path) -> int`, which returns 10 for a variant whose sha256 is not on the approved list (`python3 -m gov.adopt.memory_sets launch-check`).
+
+  S21's `due` and `baseline` are `python3 -m gov.memaudit due|baseline` unchanged.
+- `adopt/stages.py`, `project.py`, `command.py`: the stage ids `MA` and `A9`, A3's `--assessment`, and `--out` and `--decision`.
+
+### The store layout (S4, S10, F3)
+- `store/layout.py`:
+  - `LAYOUT_VERSION = 2`;
+  - `STORES = {record: {file: ".gov-runtime/store.db", tables: {...: columns}}, lexical: {file: ".gov-runtime/store.db", tables: lexical_*}, vectors: {file: ".gov-runtime/store.db", tables: semantic_*}, codegraph: {file: ".gov-runtime/codeintel/", tables: ()}}`;
+  - `STAMP_TABLE = "store_layout"`;
+  - `stamp(conn)`, `version_of(conn) -> int | None`, and `check(conn, path)`, which raises `GovError("STORE_LAYOUT_STALE", "<path>: store layout <found>, this gov reads <LAYOUT_VERSION>; run gov rebuild", {"found": n, "expected": LAYOUT_VERSION})`.
+- Older and newer stamps are both stale.
+- An **unstamped** store is stale (`found: 0`) when a table that `STORES` names is present without one of its columns. The planted case is the store from before W2-03's `register_entries.span`. Otherwise an unstamped store is read as current. Without this, the 35 test files that build a `store.db` by hand would go red outside this ticket's paths.
+- `loader.load` stamps the store. `loader.connect` calls `layout.check` after its existing `STORE_MISSING` check, so a stale store never reports STORE_MISSING.
+- `gov rebuild` replaces a stale store and says so (`layout: {found, expected, rebuilt: true}`).
+
+### The rebuild's digests (S4, F3)
+- `rebuild/command.py`'s result gains `digests: {record, lexical, vectors, codegraph_bytes}`. The first three are sha256s over the sorted rows of their tables. The code graph's bytes are reported, never compared. `digest` (the record graph's) stays as it is.
+- `fabric.check_digests(record)` refuses `DIGESTS_INCOMPLETE` when any of the four is absent.
+- No change to `rebuild`'s other `ok` rules (W2-124's).
+
+### Not this ticket's code (tests read or plant them; none is built here)
+- The guard's refusal of a measured role's read of a verdict set (ACT-GUARD-SETS-1, existing).
+- S15's skill and T-0 text (copied by adoption; W2-142, W2-128, W2-88a).
+- `retrieve.py`'s mapping of "no such table" to "the record store is missing": named for the retrieval tickets (W2-87's file) if `connect`'s check does not make it unreachable. `retrieve.py` reads the store through its own `_graph`, not `connect`.
+
+## Options
+- **(a) As above.** Cost: none beyond the ticket's estimate (750 LOC). Recommended.
+- **(b) The stale check only in a new `layout.open_current(root)`, called by `gov rebuild` and the A9 stage, leaving `connect` unchanged.** Cost: S10's "the open path" holds only for those two callers; every other reader would still report STORE_MISSING or read the store as current (F3 is half met).
+- **(c) Every unstamped store is stale.** Cost: about 35 test files outside this ticket's paths go red. That needs a widening, which this run may not ask for.
+
+**Recommendation:** (a). **Confidence:** medium-high. The figures I could not pin from code are proposed and named for the engineer to confirm: `FILE_LIMIT_BYTES`, the retrieve budget's source and the code graph's language list. **Blocks:** the test design and everything after it (DEC-1052).
+
+## Facts the CTO should know with it
+- **Waits:** `waits_on` W2-142, W2-128 and W2-116 are `in_progress`, and so is W2-145. S15's string test needs W2-142's and W2-128's lines on integrate. S11 uses W2-116's `--integration` (its code is already on this branch). The test designer can write S15 and S11 now; their cases go red until those land.
+- **The CIT-P:** DEC-1150 (1) gives "its CIT-P" (A9 lite into Wave 2, the skill step) to W2-88a, yet `docs/changes/W2-88-CIT-P.md` is still in this ticket's paths, and the body says the lead returns it before the engineer starts. Read with (a), A9 lite's Contract note is W2-88a's and this path stays unused unless the CTO says otherwise.
+
+- **CIT-P:** `docs/changes/W2-88-CIT-P.md` stays in the paths but unused: the Contract CIT-P is W2-88a's (DEC-1150 (1)).
+- **Three values for the engineer to confirm from the code** (proposals, not KPIs): the file-size limit (1 MiB or a line over `chunking.READ_CHARS`), where the retrieve budget comes from, and the code graph's language list.
