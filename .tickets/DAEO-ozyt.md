@@ -1,6 +1,6 @@
 ---
 id: DAEO-ozyt
-status: open
+status: in_progress
 deps: [DAEO-r30l]
 links: [DAEO-r30l, DAEO-5emz]
 created: 2026-11-11T01:20:16Z
