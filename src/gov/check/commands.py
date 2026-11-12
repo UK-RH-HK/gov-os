@@ -17,6 +17,7 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 # session-watch (W2-159, DEC-1110): a hyphenated command, its module in the underscore folder session_watch (what
 # ``gov`` imports); check() accepts that folder or a folder of the command's own name, as it is.
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 
