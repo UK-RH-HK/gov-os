@@ -1,6 +1,6 @@
 ---
 id: DAEO-cb2b
-status: open
+status: in_progress
 deps: [DAEO-r30l]
 links: [DAEO-zkr9, DAEO-r30l, DAEO-ts4y]
 created: 2026-11-01T20:10:00Z
@@ -14,6 +14,7 @@ title: 'gov dispatch: one pass a minute keeps the machine full and the work movi
 class: implementation
 state_class: AUTHORITATIVE
 role: engineer
+waits_on: []
 depends_on:
 - DAEO-r30l
 allowed_paths:
