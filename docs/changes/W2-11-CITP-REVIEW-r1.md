@@ -1,14 +1,4 @@
----
-type: probe
-task: DAEO-k7hz
-reviewer_session: fd80e44c-3cce-4e9d-ab90-82ec65f42711
-implementer_session: 0ffacb20-25c6-46db-a789-b43550056fdb
-reviewer_wrote_nothing: true
-commissioned_by: orchestrator
-judged_by: orchestrator
-judgement: pass
-probed_commit: 095167b86fe3d6fde417cc7ee4d62f6b641d0281
----
+Review record (not a probe record): ticket DAEO-k7hz, probed commit 095167b86fe3d6fde417cc7ee4d62f6b641d0281, reviewer independent-auditor (fresh session fd80e44c-3cce-4e9d-ab90-82ec65f42711; implementer session 0ffacb20-25c6-46db-a789-b43550056fdb; the reviewer wrote nothing; commissioned and judged by the orchestrator), verdict pass, date 2026-11-01.
 
 # CIT-P review, W2-11 (DAEO-k7hz) round 1: the briefs, the orchestration, audit, test-design and qa-review skills, the skill template, the skill versions; pass, seven findings, none fails open or loses work
 

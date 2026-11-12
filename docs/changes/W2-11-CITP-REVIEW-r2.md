@@ -1,11 +1,4 @@
----
-type: probe
-ticket: DAEO-k7hz
-probed_commit: 6468505068196e55e7872692752d383a99610cce
-reviewer: independent-auditor (fresh session)
-verdict: pass
-date: 2026-11-11
----
+Review record (not a probe record): ticket DAEO-k7hz, probed commit 6468505068196e55e7872692752d383a99610cce, reviewer independent-auditor (fresh session), verdict pass, date 2026-11-11.
 # CIT-P review, W2-11 round 2
 
 ## Scope
