@@ -6,14 +6,13 @@
 - **By:** an ACT-preparation helper of the CTO (Sonnet, high; RUBRIC-2, class C1). Round 1: 2026-11-12 about 02:50 to 03:30 UTC.
   **Round 2** (the last review round, DEC-1010): about 03:30 to 04:00 UTC, on the independent review's round 1 (F1-F6). **Nothing live was
   changed or started:** no crontab write (only `crontab -l`, and `crontab -n`, which checks a file and bails out), no commit, no stage,
-  nothing under `~/gov-os-operator`. Built and rehearsed in planted folders (section 6). **Round 2 is not yet reviewed** (section 9).
+  nothing under `~/gov-os-operator`. Built and rehearsed in planted folders (section 6). **Round 2 reviewed READY** (`reviews/ACT-OPERATOR-HOURS-1-review.md`, both rounds; R2-F2 shown to the owner, section 10's `0110` variant the structural option).
 - **Under:** DEC-1141 (6) (the owner, 2026-11-12: "the operator agent sleeps only while the nightly runs", the night hold, from 03:00 until
   the nightly ends; every other hour it runs); it changes DEC-1104 (5)'s operator hours, which ACT-OPERATOR-1 set. DEC-1138 (3) is the
   night hold's own rule. The manifest's `dec` names DEC-1141, DEC-1104, DEC-1138.
 - **Companion:** ACT-OPERATOR-HOURS-2 (`acts/ACT-OPERATOR-HOURS-2/`, manifest sha8 `d3d29237`): the launcher's gate G9 on the same rule.
 - **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/operator-hours-1/` (`build_act.py`: build, rehearse, finalize, gates). The
-  bundle: `.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-1/`. The package is still in drafts: the CTO copies it to
-  `governance/project/orchestration/packages/` (round 1's F6; I may write only in the two folders of my brief).
+  bundle: `.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-1/`. Filed here by the CTO (12119eb31, round 1's F6).
 
 ## 0. The short version, and your line
 1. **One crontab line changes** (line 7, the operator's launcher). Every other line is byte for byte as it is.

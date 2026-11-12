@@ -4,7 +4,7 @@
   ACT-OPERATOR-ROUNDS-1). About one minute. Nothing is committed by the script; the owner commits four repository paths.
 - **By:** an ACT-preparation helper of the CTO (Sonnet, high; RUBRIC-2, class C1), 2026-11-12 from about 02:50 to 03:40 UTC.
   **Nothing live was changed or started:** no write under `~/gov-os-operator`, no crontab write, no commit, no stage, nothing in the
-  main tree. Built and rehearsed in planted folders and a clone (section 6). **Not yet independently reviewed** (section 9).
+  main tree. Built and rehearsed in planted folders and a clone (section 6). **Reviewed READY** (`reviews/ACT-OPERATOR-HOURS-2-review.md`).
 - **Under:** DEC-1141 (6) (the owner, 2026-11-12: "the operator agent sleeps only while the nightly runs (the night hold, from 03:00
   until the nightly ends)... a skip while the night hold is on, so it never applies an ACT during the nightly"); it replaces the
   fixed quiet hours of DEC-1104 (2) in the operator's G9. DEC-1138 (3) is the night hold's own rule. DEC-1104 (4): the operator's own
