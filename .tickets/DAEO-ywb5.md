@@ -1,6 +1,6 @@
 ---
 id: DAEO-ywb5
-status: open
+status: in_progress
 deps: []
 links: [DAEO-ozyt, DAEO-weh2]
 created: 2026-11-12T08:52:00Z
