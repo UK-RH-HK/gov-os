@@ -1,6 +1,6 @@
 ---
 id: DAEO-mb2t
-status: open
+status: in_progress
 deps: [DAEO-blwa]
 links: [DAEO-blwa, DAEO-qzrq]
 created: 2026-11-02T10:37:58Z
