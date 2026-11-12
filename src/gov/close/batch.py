@@ -490,6 +490,23 @@ def _build(clone: Path, base: str, merged: list[dict]) -> str | None:
     return _attribution._git(clone, "rev-parse", "HEAD").stdout.strip()
 
 
+def _entangled(root: Path, base: str, candidates: list[dict]) -> tuple[str, str] | None:
+    """The first candidate that cannot be isolated and the candidate it shares work with: two candidates whose
+    commits past the base overlap (one built on the other, or both on a common unmerged commit), since the build
+    without one still holds its work through the other. Checked before anything runs (fail closed: the batch is
+    refused even when the run would be green). The candidate named is the one whose work the other holds (an
+    ancestor's), else the first in order."""
+    own = {c["name"]: set(_git(root, "rev-list", f"{base}..{c['commit']}").split()) for c in candidates}
+    for n, cand in enumerate(candidates):
+        for other in candidates[n + 1:]:
+            if not own[cand["name"]] & own[other["name"]]:
+                continue
+            if own[other["name"]] <= own[cand["name"]]:
+                return other["name"], cand["name"]
+            return cand["name"], other["name"]
+    return None
+
+
 def _targets(clone: Path, candidates: list[dict], given: list[str] | None) -> dict:
     """The run's selection: the targets given, else the union of the candidates' scoped selections (each a ticket
     of the project) at the merged result."""
@@ -541,6 +558,12 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
             refuse("RUN_INCOMPLETE", f"the run on {name} did not complete: {'; '.join(phases['incomplete'])}")
         return phases
 
+    shared = _entangled(root, base_sha, candidates)
+    if shared:
+        name, other = shared
+        refuse(CANDIDATE_NOT_ISOLATED, f"{name} cannot be isolated: its work shares commits past the base with "
+               f"{other}, so the merged result without {name} still holds its work",
+               candidate=name, shares_with=other)
     whole = _build(clone, base_sha, candidates)
     if whole is None:
         bad = next((c["name"] for n, c in enumerate(candidates) if _build(clone, base_sha, candidates[:n + 1]) is None),
@@ -719,6 +742,18 @@ def refresh(root: Path) -> dict:
     return {"load": loaded, "fresh": True}
 
 
+def _scoped_action(args) -> bool:
+    """The scoped batch's action (``isolate``, or ``run`` in a scoped project); the strict batch prints as today."""
+    from gov.close.command import SCOPED, close_mode
+
+    if args.action == "isolate":
+        return True
+    try:
+        return args.action == "run" and close_mode(Path(args.root)) == SCOPED
+    except GovError:
+        return False
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python3 -m gov.close.batch", description=__doc__.split("\n")[0])
     commands = parser.add_subparsers(dest="action", required=True)
@@ -748,6 +783,8 @@ def main(argv: list[str] | None = None) -> int:
         envelope = {"ok": False, "command": COMMAND, "result": {}, "session": args.session,
                     "error": {"code": error.code, "message": error.message, "details": error.details}}
         print(json.dumps(envelope) if args.json else f"{COMMAND}: {error.code}: {error.message}")
+        if args.json and _scoped_action(args):  # W2-115: the code on stderr too, as the close's refusals print it
+            print(f"{error.code}: {error.message}", file=sys.stderr)
         return error.exit_code
     envelope = {"ok": True, "command": COMMAND, "result": result, "session": args.session}
     print(json.dumps(envelope) if args.json else json.dumps(envelope, indent=2))

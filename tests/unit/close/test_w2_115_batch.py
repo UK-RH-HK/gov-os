@@ -80,6 +80,28 @@ def test_s6_a_candidate_that_cannot_be_isolated_refuses(tmp_path, monkeypatch):
     assert repo.git("rev-parse", "main").strip() == base
 
 
+def test_s6_a_candidate_built_on_another_cannot_be_isolated_and_the_code_is_printed(tmp_path, capsys):
+    """eng-3: c's branch holds b's work, so the build without b still holds it: CANDIDATE_NOT_ISOLATED (not
+    BATCH_UNEXPLAINED), in the JSON envelope's error and on stderr, before anything runs; nothing lands."""
+    import json
+
+    repo = project(tmp_path)
+    base = repo.git("rev-parse", "HEAD").strip()
+    _branch(repo, "a", {"src/pkg/other.py": "def other():\n    return 1  # a\n"})
+    _branch(repo, "b", {"src/pkg/feature.py": BROKEN_FEATURE})
+    _branch(repo, "c", {"docs/c.md": "# c\n"}, base="b")
+    code = batch.main(["isolate", "a", "b", "c", "--base", base, "--test", OWN_SUITE, "--onto", "main",
+                       "--timeout", "120", "--root", str(repo.root), "--json"])
+    out = capsys.readouterr()
+    envelope = json.loads(out.out)
+    assert code != 0 and envelope["ok"] is False
+    assert envelope["error"]["code"] == batch.CANDIDATE_NOT_ISOLATED
+    assert envelope["error"]["details"]["candidate"] == "b" and envelope["error"]["details"]["shares_with"] == "c"
+    assert batch.CANDIDATE_NOT_ISOLATED in out.err
+    assert "runs" not in envelope["error"]["details"]  # refused before anything ran
+    assert repo.git("rev-parse", "main").strip() == base
+
+
 def test_s6_candidates_that_do_not_merge_together_refuse(tmp_path):
     repo = project(tmp_path)
     base = repo.git("rev-parse", "HEAD").strip()
