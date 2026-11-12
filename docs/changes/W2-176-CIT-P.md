@@ -1,15 +1,15 @@
 ---
 id: W2-176-CIT-P
 type: change-impact-proposal
-status: PROPOSED
+status: ACCEPTED
 date: 2026-11-12
 branch: w2/W2-176
 base: 1798e82f1201
 ticket: DAEO-ktiw (W2-176)
 author: ticket lead (W2-176)
 review: read-only independent auditors (CAP-33), round 1 READY at 13fd1dd34e32, round 2 (the last, DEC-1010) READY at 7894a35e116f; the cap removed at c10be8fd0266 (section 3.8), not yet reviewed
-approval: the owner withdrew the approval of 3a580a4b4d42 (2026-11-12), whose bytes carry the 200,000 cap; the new bytes (context_watch.py at c10be8fd0266) await independent review and the owner's approval
-decisions_carried: [DEC-1140, DEC-1118, DEC-264, DEC-259, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
+approval: owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242; the earlier approval of 3a580a4b4d42 (the 200,000 cap) withdrawn (DEC-1141 (2)); merged by hand at 3430341c4 (DEC-1141 (4))
+decisions_carried: [DEC-1140, DEC-1141, DEC-264, DEC-259, DEC-838, DEC-901, DEC-445, DEC-208, DEC-250, DEC-315, CAP-33]
 state_class: EVIDENCE
 ---
 
@@ -163,6 +163,11 @@ the CTO-only branch of DEC-1140 (4)'s delta.
 The approval of `3a580a4b4d42` was withdrawn by the owner (2026-11-12): those bytes carry the cap. Pending for the new
 bytes: independent review of `c10be8fd0266` (section 3.8), then the owner approves the bytes of section 2 at the
 ticket's final head.
+
+Approved by the owner on 2026-11-12 (DEC-1142 (1)): "W2-176's CIT-P approved at 3b6c5cb79d39", `context_watch.py` sha256
+`213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242` (no token cap), after the delta review READY; the delta review's
+F1 (a) amended S2 with no new bytes, and its F2 rides this approval edit (`decisions_carried` names DEC-1141). Merged by hand at
+3430341c4 (DEC-1141 (4)); ACT-CONTEXT-WATCH-1 (`5bdfa098`) registers the hook.
 
 ## 5. Promotion
 
