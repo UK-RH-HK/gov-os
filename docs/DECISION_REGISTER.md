@@ -14809,6 +14809,29 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) **P1-L (a):** W2-124 widened by the 13 files for one test-designer revision each (Rewrite-Reason DEC-1027 C); each revised case keeps what it was guarding (W2-32's fail-closed cases above all); the reviewer checks, case by case, that no case loses its point.
 - **Basis:** the owner's message of 2026-11-12 ~17:00.
 
+### DEC-1151 — ACT-EXAMIN-WRITERS-INSTALL-1 applied; W2-94 launched from the copy at 0a82082 (no new commit needed); EXAMIN's copy's first green base by a full close at adoption (W2-27's line)
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~18:55; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-1143, DEC-1130 (3), DEC-1150 (2), DEC-757, DEC-1134
+- **Decision:**
+  - (1) **`yes ACT-EXAMIN-WRITERS-INSTALL-1 8d1efb01`;** applied by the owner's operator as `ba27e4c0d` (the two briefs at `d37834e0...`, `57820503...`; the walls' approved list from `41e3969aa969`, 30 lines, to `9da7ff2055b0`, 32 lines); the bundle's commit line given its `--` pathspec afterwards (the operator's note).
+  - (2) **W2-94's copy:** the owner asked for one commit of the copy's 46 uncommitted files first; it already existed (`0a82082495f5`, made on the owner's word at 10:45, DEC-1143 (2)), and the copy is clean at it. The launch clone `~/gov-os-runs/W2-94/examin` at `0a82082` with one scaffold commit `48459935c435` (no code). Both walled writers delivered: W2-94 (run `20261112T185806Z-examin-r1`) 20 questions, schema ok; W2-93 (run `20261112T185824Z-adoption-proving-ground-r1`) 60 questions, schema ok; counts only to the CTO. The owner's step 7 (`release_visible.sh`) follows.
+  - (3) **W2-27's green-base line, (a), as the CTO wrote it:** before any scoped close in the copy, a full close at the adoption commit; every red fixed or listed in the copy's `accepted_reds` by an ACT the owner approves; that record is the copy's first green base.
+- **Basis:** the owner's message of 2026-11-12 ~18:55.
+
+### DEC-1152 — EXAMIN's visible half released and final; the commit's pin kept in the run record, the decisions and W2-27's ticket; P1-M (a) a narrow check of W2-115's fix
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~19:20-19:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-1143 (2)-(4), DEC-1151, DEC-1150 (2), DEC-1010
+- **Decision:**
+  - (1) **Step 7 done:** EXAMIN's development half released by the owner's operator (`release_visible.sh`, 10 files, exit 0, `.release-visible.record` written). **The ten questions stand:** the owner's operator checked each against EXAMIN's files at `0a82082495f5`, read only, each confirmed with file and lines. The released half is final.
+  - (2) **The pin:** EXAMIN's set and W2-27's adoption are at `0a82082495f52df068c3c6b518969b419f02fe95` (C1); recorded in the writer's run record, DEC-1143 (2), DEC-1151 (2) and W2-27's ticket; **no ACT pins it in the path map.**
+  - (3) **P1-M (a):** W2-115's fix (P1-K (a)) gets one narrow independent check of the fix only, so the queue has a passing record (a third look, the owner's exception, limited to the fix).
+- **Basis:** the owner's messages of 2026-11-12 ~19:20 and ~19:35.
+
+### DEC-1153 — Two widenings: W2-45 by W1-40's one case (P-W2-45-4 (a)); W2-160 by the session-watch command file (P-W2-160-1 (a))
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~19:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** DEC-974, DEC-1148 (4), DEC-1144, DEC-1052
+- **Decision:**
+  - (1) **P-W2-45-4 (a):** W2-45's allowed_paths gain `tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py` for one test-designer revision (line 49 expects a non-zero exit and RED, its docstring likewise; `Rewrite-Reason: P-W2-45-1 item 5`), as P1-J's two.
+  - (2) **P-W2-160-1 (a):** W2-160's allowed_paths gain `src/gov/session_watch/command.py` for the `helper-watch` action its S3 names (about 20 lines); W2-159, which built the file, is closed.
+- **Basis:** the owner's message of 2026-11-12 ~19:40, after the CTO's two lines each.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14894,3 +14917,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |
 | 0.530 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1148 (five kernel files approved by their bytes; the adoption's facts file (a1), W2-27's line, W2-160 onto the path; the kernel gate in the CTO's tools; W2-45 widened for two revisions). Next free id: DEC-1149. |
 | 0.531 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1149 (the working size 0.75 GiB by ACT-P95-1, applied; the figure everywhere; usage never stops a lead, the runaway brake kept; the peaks by 11-19), DEC-1150 (W2-88 split into W2-88a and W2-88b; P1-K (a); P1-L (a)); DEC-947 item 2, DEC-1138 (4), DEC-1140 (6) and DEC-1115 (4) changed. Next free id: DEC-1151. |
+| 0.532 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1151 (ACT-EXAMIN-WRITERS-INSTALL-1 applied; the two walled writers delivered; W2-27's green-base line). Next free id: DEC-1152. |
+| 0.533 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1152 (EXAMIN's visible half released and final; the commit's pin without an ACT; P1-M (a)). Next free id: DEC-1153. |
+| 0.534 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1153 (W2-45 widened by W1-40's case; W2-160 by the session-watch command file). Next free id: DEC-1154. |

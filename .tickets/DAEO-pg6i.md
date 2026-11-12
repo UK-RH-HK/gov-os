@@ -1,6 +1,6 @@
 ---
 id: DAEO-pg6i
-status: open
+status: in_progress
 deps: []
 links: [DAEO-2bdu, DAEO-zmo4]
 created: 2026-11-12T16:55:43Z
