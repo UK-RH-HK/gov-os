@@ -1,6 +1,6 @@
 ---
 id: DAEO-qz4p
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-52ku, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 created: 2026-11-11T01:26:23Z
