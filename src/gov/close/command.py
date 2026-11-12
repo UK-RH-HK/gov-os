@@ -72,6 +72,7 @@ EXIT_CODES = {
     EXIT_CHECK_FAILED: "verification failed (tests, governance checks, containment)",
     EXIT_BLOCKED: "blocked by escalation or human gate",
 }
+CHILD_EXIT_CODE = True  # W2-115: --select and --verify print their own output and end with their own code
 
 _GOVERNANCE_PREFIXES = (
     "governance/kernel/",  # the installed kernel (DEC-487)
@@ -116,6 +117,16 @@ def add_arguments(parser) -> None:
     parser.add_argument("--check-result", metavar="<file>", default=None,
                         help="the pre-close gate's own gov check --json output, given to every test run "
                              "of the close as GOV_CLOSE_CHECK_RESULT (W2-66)")
+    parser.add_argument("--select", action="store_true", default=False,
+                        help="print the ticket's scoped selection and its pytest options as one JSON object (W2-115)")
+    parser.add_argument("--verify", action="store_true", default=False,
+                        help="a lead's whole verify: the scoped selection, the parallel and the serial phase (W2-115)")
+    parser.add_argument("--out", metavar="<dir>", default=None,
+                        help="--verify's folder (default .gov-runtime/close/verify/<ticket>/)")
+    parser.add_argument("--base", metavar="<commit>", default=None,
+                        help="the scoped close's head without the change (default: the green base the change is "
+                             "counted from when it is an ancestor of HEAD, else none, and every red is the "
+                             "change's)")
 
 
 def run(root: Path, args, config: dict):
@@ -123,6 +134,13 @@ def run(root: Path, args, config: dict):
 
     root = Path(root)
     ticket = args.ticket
+    # W2-115: the selection and the verify for every level; the scoped close where the project chose it (S1)
+    if getattr(args, "select", False) or getattr(args, "verify", False):
+        if args.select and args.verify:
+            raise GovError("INVALID_ARGUMENTS", "--select and --verify are two commands: give one", {})
+        return _select_command(root, ticket) if args.select else _verify_command(root, args, config)
+    if close_mode(root) == SCOPED:
+        return _run_scoped(root, args, config)
     disposition = getattr(args, "disposition", None)
     owner_decision = getattr(args, "owner_decision", None)
 
@@ -1464,3 +1482,390 @@ def _write_close_record(root: Path, ticket: str, record: dict,
     text += f"# {close_id} — Close record for {ticket}\n"
     _state.write_whole(root / close_rel, text)
     return close_rel
+
+
+# ---------------------------------------------------------------------------
+# W2-115: the switch, the scoped close, --select, --verify and the computed verdict
+# ---------------------------------------------------------------------------
+#
+# The project's ``governance/project/close.yaml`` holds ``close: scoped`` or ``close: strict`` (S1). No file is the
+# strict close, everything above unchanged (F4); an unreadable file or another value refuses (fail closed). The
+# scoped close (DEC-953 item 1, DEC-983) runs only the scoped selection (``gov.close.select.scoped``) in the warm
+# clone (``gov.close.attribution``), refuses only on a red its change caused (S4), opens a repair ticket for every
+# other red (S5), computes READY from the reviewer's verdict block (S11) and writes its close record (S7). It
+# reads and writes no accepted-reds or load-sensitive list and runs none of the lifted gates.
+
+CLOSE_MODE_REL = "governance/project/close.yaml"
+SCOPED, STRICT = "scoped", "strict"
+CLOSE_MODES = (SCOPED, STRICT)
+READY = "READY"
+VERDICT_MALFORMED, VERDICT_NOT_REVIEWER, FINDING_BLOCKS = "VERDICT_MALFORMED", "VERDICT_NOT_REVIEWER", "FINDING_BLOCKS"
+VERIFY_DIR = ".gov-runtime/close/verify"
+SCOPED_RUNS_DIR = ".gov-runtime/close/scoped"
+VERIFY_GREEN, VERIFY_RED, VERIFY_REFUSED, VERIFY_INCOMPLETE = 0, 1, 2, 3
+_VERDICT_BLOCK = r"```verdict[ \t]*\r?\n(.*?)\r?\n[ \t]*```"
+_SCOPES, _ORDINARY, _CONSEQUENCES = ("in", "out"), ("yes", "no"), ("fails open", "loses work", "other")
+_BLOCKING = ("fails open", "loses work")
+
+
+def close_mode(root: Path) -> str:
+    """The project's close (S1): ``strict`` without the file; ``CLOSE_MODE_INVALID`` for one that cannot be read
+    or holds another value."""
+    import os
+
+    import yaml
+
+    path = Path(root) / CLOSE_MODE_REL
+    if not os.path.lexists(path):
+        return STRICT
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as e:
+        raise GovError("CLOSE_MODE_INVALID", f"{CLOSE_MODE_REL} cannot be read ({type(e).__name__}): no close runs "
+                       "on a setting it cannot read", {"file": CLOSE_MODE_REL}, exit_code=EXIT_CHECK_FAILED)
+    value = data.get("close") if isinstance(data, dict) else None
+    if value not in CLOSE_MODES:
+        raise GovError("CLOSE_MODE_INVALID", f"{CLOSE_MODE_REL} must hold close: scoped or close: strict, not "
+                       f"{value!r}", {"file": CLOSE_MODE_REL, "close": str(value)}, exit_code=EXIT_CHECK_FAILED)
+    return value
+
+
+def _selection(root: Path, ticket: str) -> dict:
+    try:
+        return _select.scoped(root, ticket)
+    except _select.SelectionRefused as refused:
+        raise GovError(_select.SELECTION_REFUSED, refused.reason, {"ticket": ticket}, exit_code=EXIT_CHECK_FAILED)
+
+
+def _select_command(root: Path, ticket: str) -> int:
+    """``gov close --select <ticket>`` (S3): one JSON object on stdout, exit 0; a refusal on stderr, exit 2."""
+    try:
+        chosen = _select.scoped(root, ticket)
+    except _select.SelectionRefused as refused:
+        print(f"{_select.SELECTION_REFUSED}: {refused.reason}", file=sys.stderr)
+        return VERIFY_REFUSED
+    print(json.dumps({"ticket": ticket, "suites": chosen["suites"], "pytest_options": chosen["pytest_options"]}))
+    return 0
+
+
+# --- the phases, shared by --verify and the scoped close ---------------------
+
+def _empty_junit(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('<?xml version="1.0" encoding="utf-8"?>\n<testsuites><testsuite name="pytest" errors="0" '
+                    'failures="0" skipped="0" tests="0"/></testsuites>\n', encoding="utf-8")
+
+
+def _inside(entry: str, targets: list[str]) -> bool:
+    file = entry.partition("::")[0].rstrip("/")
+    for target in targets:
+        t_file, _, t_case = target.partition("::")
+        t_file = t_file.rstrip("/")
+        if file == t_file and (not t_case or entry.partition("::")[2].startswith(t_case)):
+            return True
+        if file.startswith(t_file + "/"):
+            return True
+    return False
+
+
+def _phases(tree: Path, chosen: dict, folder: Path, timeout: float, workers) -> dict:
+    """The parallel phase, then the serial phase (W2-57's, ``gov.close.serial.phase``) restricted to the entries
+    inside the selection, in ``tree``: ``{"runs", "failing", "complete", "incomplete", "parallel_xml",
+    "serial_xml"}``. A run is complete when pytest ended 0 or 1 and its JUnit file was written."""
+    import importlib.util
+
+    from gov.close import attribution as _attribution, serial as _serial
+    from gov.close.pytest_plugin import gov_close_serial_only as serial_only
+
+    suites, options = list(chosen["suites"]), list(chosen["pytest_options"])
+    try:
+        listed = serial_only.entries(tree)
+        routed = _serial.nightly(tree)
+    except UnicodeDecodeError as e:
+        return {"runs": [], "failing": [], "complete": False, "parallel_xml": None, "serial_xml": None,
+                "incomplete": [f"the serial-only list {serial_only.LIST_REL} is not UTF-8 text ({e})"]}
+    inside = [e for e in listed if _inside(e, suites)]
+    serial_entries = [e for e in _serial.phase(tree, inside) if e in inside]
+    left_out = list(dict.fromkeys(inside))  # serial entries and those routed to the nightly: out of the parallel run
+    parallel_targets = [s for s in suites if s not in left_out]
+    parallel_options = options + [f"--deselect={e}" for e in left_out]
+    if importlib.util.find_spec("xdist") is not None and workers not in (1, None):
+        parallel_options += ["-n", str(workers)]
+    plans = [("parallel", parallel_targets, parallel_options), ("serial", serial_entries, options + (
+        ["-p", "no:xdist"] if importlib.util.find_spec("xdist") is not None else []))]
+    out = {"runs": [], "failing": [], "complete": True, "incomplete": [], "routed_to_nightly": sorted(
+        set(inside) & routed)}
+    for name, targets, opts in plans:
+        xml, log = folder / f"{name}.xml", folder / f"{name}.txt"
+        out[f"{name}_xml"] = str(xml)
+        if not targets:
+            _empty_junit(xml)
+            out["runs"].append({"name": name, "passed": 0, "failed": 0, "errors": 0, "skipped": 0})
+            continue
+        done = _attribution.run_pytest(tree, targets, opts, xml, log, timeout,
+                                       workers=workers if isinstance(workers, int) else None)
+        results = _attribution.read_results(xml, tree)
+        if done["exit"] not in (0, 1) or results is None:
+            out["complete"] = False
+            out["incomplete"].append(f"the {name} run did not complete (pytest exit {done['exit']}"
+                                     f"{', timed out' if done['timed_out'] else ''}"
+                                     f"{', no JUnit file' if results is None else ''}; slot: {done['slot']})")
+            if results is None:
+                continue
+        out["runs"].append({"name": name, **{k: results[k] for k in ("passed", "failed", "errors", "skipped")}})
+        out["failing"] += [{**f, "run": name} for f in results["failures"]]
+        if done["exit"] == 1 and not results["failures"]:
+            out["complete"] = False
+            out["incomplete"].append(f"the {name} run ended 1 and its JUnit file names no failing test")
+    return out
+
+
+def _verify_command(root: Path, args, config: dict) -> int:
+    """``gov close --verify <ticket> [--out <dir>]`` (S13): the selection, then the two phases in the project's
+    tree; ``select.json``, ``parallel.xml``, ``serial.xml``, ``summary.txt`` and, last, ``verify.exit``."""
+    ticket = args.ticket
+    out = Path(args.out) if getattr(args, "out", None) else root / VERIFY_DIR / ticket
+    if not out.is_absolute():
+        out = Path.cwd() / out
+    out.mkdir(parents=True, exist_ok=True)
+    for name in ("verify.exit", "summary.txt", "select.json", "parallel.xml", "serial.xml"):
+        if (out / name).exists():
+            (out / name).unlink()
+
+    def finish(line: str, code: int) -> int:
+        (out / "summary.txt").write_text(line + "\n", encoding="utf-8")
+        print(line)
+        (out / "verify.exit.tmp").write_text(f"{code}\n", encoding="utf-8")
+        (out / "verify.exit.tmp").replace(out / "verify.exit")
+        return code
+
+    try:
+        chosen = _select.scoped(root, ticket)
+    except _select.SelectionRefused as refused:
+        print(f"{_select.SELECTION_REFUSED}: {refused.reason}", file=sys.stderr)
+        return finish(f"verify {ticket}: exit 2: {_select.SELECTION_REFUSED}: {refused.reason}", VERIFY_REFUSED)
+    (out / "select.json").write_text(json.dumps({"ticket": ticket, "suites": chosen["suites"],
+                                                 "pytest_options": chosen["pytest_options"]}) + "\n",
+                                     encoding="utf-8")
+    settings = config.get(SETTINGS_FILE) or {}
+    try:
+        phases = _phases(root, chosen, out, _time_limit(getattr(args, "timeout", None), settings),
+                         _workers(settings))
+    except GovError as e:
+        return finish(f"verify {ticket}: exit 3: {e.code}: {e.message}", VERIFY_INCOMPLETE)
+    counts = "; ".join(f"{r['name']} {r['passed']} passed, {r['failed']} failed, {r['errors']} errors, "
+                       f"{r['skipped']} skipped" for r in phases["runs"])
+    if not phases["complete"]:
+        return finish(f"verify {ticket}: exit 3: {'; '.join(phases['incomplete'])}; {counts}", VERIFY_INCOMPLETE)
+    if phases["failing"]:
+        return finish(f"verify {ticket}: exit 1: {len(phases['failing'])} failing; {counts}", VERIFY_RED)
+    return finish(f"verify {ticket}: exit 0: green; {counts}", VERIFY_GREEN)
+
+
+# --- the computed verdict (S11) ----------------------------------------------
+
+def _last_block(text: str | None) -> str | None:
+    import re
+
+    blocks = re.findall(_VERDICT_BLOCK, text or "", re.S)
+    return blocks[-1] if blocks else None
+
+
+def _block_at(root: Path, rev: str, rel: str) -> str | None:
+    done = _git(root, "show", f"{rev}:./{rel}", ok=(0, 128), code=False)
+    return _last_block(done) if done else None
+
+
+def _block_writer(root: Path, rel: str) -> dict | None:
+    """The commit that last wrote or changed the record's verdict block: ``{"sha", "roles"}``; None where no commit
+    of ``HEAD``'s history holds it."""
+    shas = _git(root, "log", "--format=%H", "HEAD", "--", rel).split()
+    for sha in shas:
+        mine = _block_at(root, sha, rel)
+        parents = _git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
+        before = [_block_at(root, p, rel) for p in parents] or [None]
+        if mine is not None and all(b != mine for b in before):
+            roles = _git(root, "log", "-1", "--format=%(trailers:key=Role,valueonly)", sha).split()
+            return {"sha": sha, "roles": roles}
+        if mine is None and any(b is not None for b in before):
+            return {"sha": sha, "roles": _git(root, "log", "-1", "--format=%(trailers:key=Role,valueonly)",
+                                              sha).split()}
+    return None
+
+
+def _kpi_id(value) -> str | None:
+    import re
+
+    m = re.search(r"([SF])-?(\d+)\s*$", str(value or "").strip(), re.I)
+    return f"{m.group(1).upper()}{int(m.group(2))}" if m else None
+
+
+def review_verdict(root: Path, ticket: str, front: dict) -> dict:
+    """READY computed from the probe record's fenced ``verdict`` block (S11; DEC-1010 item 1, JUDGEMENT.md):
+    ``{"verdict": READY or a refusal code, "record", "reasons"}``. The newest committed record of
+    ``docs/probes/<ticket>/`` with a block decides, by its last block. ``VERDICT_NOT_REVIEWER``: the block was last
+    written by a commit whose ``Role:`` is not the reviewer's alone, or by none. ``VERDICT_MALFORMED``: no block on
+    a FULL ticket, a block that is not the structured form, a KPI line missing, an unknown value. ``FINDING_BLOCKS``:
+    a KPI line marked fail, or a finding in scope, ordinary work yes, that fails open or loses work."""
+    root = Path(root)
+    profile = str(front.get("profile", "STANDARD")).upper()
+    folder = f"docs/probes/{ticket}"
+    order = [p for p in _git(root, "log", "--format=", "--name-only", "HEAD", "--", folder).split("\n") if p]
+    on_disk = sorted(p.relative_to(root).as_posix() for p in (root / folder).glob("*.md")) \
+        if (root / folder).is_dir() else []
+    candidates = list(dict.fromkeys([p for p in order if p in on_disk] + on_disk))
+    with_block = [rel for rel in candidates if _last_block((root / rel).read_text(encoding="utf-8",
+                                                                                 errors="replace"))]
+    if not with_block:
+        if profile != "FULL":
+            return {"verdict": READY, "record": None, "reasons": [f"a {profile} ticket needs no review"]}
+        return {"verdict": VERDICT_MALFORMED, "record": None,
+                "reasons": [f"no probe record under {folder}/ holds a fenced verdict block (fail closed)"]}
+    rel = with_block[0]
+    block = _last_block((root / rel).read_text(encoding="utf-8", errors="replace"))
+
+    def refused(code: str, reasons: list[str]) -> dict:
+        return {"verdict": code, "record": rel, "reasons": reasons}
+
+    writer = _block_writer(root, rel)
+    if writer is None or _block_at(root, "HEAD", rel) != block:
+        return refused(VERDICT_NOT_REVIEWER, [f"{rel}: its verdict block is not committed by a reviewer"])
+    if writer["roles"] != [REVIEWER_ROLE]:
+        return refused(VERDICT_NOT_REVIEWER, [
+            f"{rel}: its verdict block was last written by {writer['sha'][:12]} with Role: "
+            f"{', '.join(writer['roles']) or 'none'}, not the reviewer's ({REVIEWER_ROLE}) alone"])
+    try:
+        data = json.loads(block)
+        kpis = data["kpis"]
+        if not isinstance(kpis, list) or not kpis:
+            raise ValueError("kpis is not a non-empty list")
+    except (ValueError, KeyError, TypeError) as e:
+        return refused(VERDICT_MALFORMED, [f"{rel}: the verdict block is not the structured form ({e})"])
+    malformed, blocks, seen = [], [], set()
+    for k in kpis:
+        if not isinstance(k, dict) or not isinstance(k.get("kpi"), str) or k.get("verdict") not in ("pass", "fail"):
+            malformed.append(f"a KPI entry without a line id and a pass or fail verdict: {json.dumps(k)[:120]}")
+            continue
+        seen.add(_kpi_id(k["kpi"]) or k["kpi"].strip())
+        findings = k.get("findings", [])
+        if not isinstance(findings, list):
+            malformed.append(f"{k['kpi']}: findings is not a list")
+            continue
+        if k["verdict"] == "fail":
+            blocks.append(f"{k['kpi']}: the KPI line is marked fail")
+        for f in findings:
+            if not isinstance(f, dict) or f.get("scope") not in _SCOPES or f.get("ordinary_work") not in _ORDINARY \
+                    or f.get("consequence") not in _CONSEQUENCES:
+                malformed.append(f"{k['kpi']}: a finding without a valid scope, ordinary_work and consequence")
+                continue
+            if f["scope"] == "in" and f["ordinary_work"] == "yes" and f["consequence"] in _BLOCKING:
+                blocks.append(f"{k['kpi']}: {f.get('id', 'a finding')} blocks (in scope, ordinary work, "
+                              f"{f['consequence']})")
+    kpi_lines = front.get("kpis") if isinstance(front.get("kpis"), dict) else {}
+    wanted = [f"S{i}" for i in range(1, len(kpi_lines.get("success") or []) + 1)] + \
+             [f"F{i}" for i in range(1, len(kpi_lines.get("failure") or []) + 1)]
+    missing = [w for w in wanted if w not in seen]
+    if missing:
+        malformed.append(f"incomplete: no verdict for the KPI line(s) {', '.join(missing)}")
+    if malformed:
+        return refused(VERDICT_MALFORMED, [f"{rel}: {m} (fail closed)" for m in malformed])
+    if blocks:
+        return refused(FINDING_BLOCKS, [f"{rel}: {b}" for b in blocks])
+    return {"verdict": READY, "record": rel, "reasons": []}
+
+
+# --- the scoped close -------------------------------------------------------
+
+def _run_scoped(root: Path, args, config: dict):
+    """The scoped close (S1 to S7, S10, S11): its result, or a ``GovError`` naming its refusal."""
+    from datetime import datetime, timezone
+
+    from gov.close import attribution as _attribution
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    ticket = args.ticket
+    front = frontmatter(root / TICKETS_REL / f"{ticket}.md")
+    if front is None:
+        raise GovError("TICKET_UNKNOWN", f"{ticket} is not a ticket of this project", {"ticket": ticket})
+    if str(front.get("status", "")) == "closed":
+        raise GovError("STALE_EVIDENCE", f"ticket {ticket} is already closed", {"ticket": ticket},
+                       exit_code=EXIT_CHECK_FAILED)
+    if getattr(args, "full", False):
+        raise GovError(_select.SELECTION_REFUSED, "--full: the full suite runs only in the nightly (DEC-968); the "
+                       "scoped close runs the selection", {"ticket": ticket}, exit_code=EXIT_CHECK_FAILED)
+    settings = config.get(SETTINGS_FILE) or {}
+    timeout = _time_limit(getattr(args, "timeout", None), settings)
+    workers = _workers(settings)
+    _gates.take_back_interrupted(root, ticket, _close_record_rel(ticket))
+    _check_tree(root, ticket)
+    commit = _git(root, "rev-parse", "HEAD").strip()
+
+    chosen = _selection(root, ticket)
+    own = _select.suite_folder(root, front, str(front.get("wbs_id") or front.get("external-ref") or ticket))
+    if not chosen["records_only"] and _gates.ticket_class(front) not in _gates.EVIDENCE_CLASSES \
+            and not _select.has_suite(root, own):
+        # independent tests first (DEC-953 item 1): a ticket whose change runs its own suite is never closed
+        # without one (records or governance files alone select only record_reading, S2)
+        raise GovError("NO_ACCEPTANCE_TESTS", f"{ticket}'s own acceptance suite {own} holds no test: the scoped "
+                       "close runs it, and nothing closes without it", {"ticket": ticket, "suite": own},
+                       exit_code=EXIT_CHECK_FAILED)
+    review = review_verdict(root, ticket, front)
+    if review["verdict"] != READY:
+        raise GovError(review["verdict"], "; ".join(review["reasons"]),
+                       {"ticket": ticket, "review": review}, exit_code=EXIT_CHECK_FAILED)
+    base = getattr(args, "base", None) or chosen["base"]
+    if base is not None:
+        resolved = _select.full_id(root, base)
+        if resolved is None:
+            raise GovError("BASE_UNKNOWN", f"--base {base} names no commit", {"ticket": ticket})
+        base = resolved
+
+    try:
+        clone = _attribution.prepare(root, commit)
+    except _attribution.CloneError as e:
+        raise GovError("CLOSE_CLONE_FAILED", f"the close's clone cannot be made: {e}", {"ticket": ticket})
+    tree = root / clone["path"]
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    folder = root / SCOPED_RUNS_DIR / ticket / stamp
+    phases = _phases(tree, chosen, folder, timeout, workers)
+    if not phases["complete"]:
+        raise GovError("RUN_INCOMPLETE", "the selection's run did not complete, so nothing is judged: "
+                       + "; ".join(phases["incomplete"]), {"ticket": ticket, "runs": phases["runs"]},
+                       exit_code=EXIT_CHECK_FAILED)
+    if phases["failing"]:
+        try:
+            reds, night = _attribution.attribute(root, tree, commit, base, phases["failing"],
+                                                 chosen["pytest_options"], folder / "alone", timeout)
+        except _attribution.CloneError as e:
+            raise GovError("CLOSE_CLONE_FAILED", f"the clone could not be brought back to {commit[:12]}: {e}",
+                           {"ticket": ticket})
+    else:
+        reading = _attribution.nightly_reading(root)
+        reds, night = [], {"read": reading["read"], "record": reading["record"]}
+    caused = [r for r in reds if r["caused"]]
+    if caused:
+        raise GovError("RED_CAUSED", f"{len(caused)} red(s) caused by the change of {ticket}: "
+                       + "; ".join(f"{r['test']} ({r['failure_type']}): {r['reason']}" for r in caused),
+                       {"ticket": ticket, "reds": reds, "runs": phases["runs"], "selection": chosen["suites"]},
+                       exit_code=EXIT_CHECK_FAILED)
+    for red in reds:
+        red["repair_ticket"] = _tool.open_red_repair(root, ticket, red)
+    record = {
+        "close": SCOPED,
+        "commit": commit,
+        "selection": {"suites": chosen["suites"], "pytest_options": chosen["pytest_options"]},
+        "runs": phases["runs"],
+        "review": {"verdict": review["verdict"], "record": review["record"]},
+        "reds": [{"test": r["test"], "failure_type": r["failure_type"], "caused": r["caused"], "reason": r["reason"],
+                  "repair_ticket": r["repair_ticket"]} for r in reds],
+        "culprits": [],
+        "clone": {"path": clone["path"], "reused": clone["reused"], "replaced": clone["replaced"]},
+        "nightly": {"read": night["read"], "record": night["record"]},
+        "base": base,
+        "changed": chosen["changed"],
+    }
+    commit_files = list(chosen.get("own", chosen["changed"]))
+    close_record_path, checkpoint_path = _record_and_close(root, ticket, record, commit_files)
+    return {"ticket": ticket, "close": SCOPED, "close_record": close_record_path, "checkpoint": checkpoint_path,
+            **{key: record[key] for key in ("commit", "selection", "runs", "review", "reds", "culprits", "clone",
+                                            "nightly")}}

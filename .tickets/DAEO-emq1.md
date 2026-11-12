@@ -1,6 +1,6 @@
 ---
 id: DAEO-emq1
-status: in_progress
+status: closed
 deps: [DAEO-arrl]
 links: []
 created: 2026-10-31T23:52:57Z

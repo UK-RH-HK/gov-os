@@ -33,7 +33,13 @@ def _tiers(box, tmp_path_factory, label):
         root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w2-13-{label}-{tier}") / tier)
         if root is None:
             pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
-        box.rebuild(root)
+        # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150
+        # (3): "no embedding endpoint" is now said as ``--no-embeddings`` (an embedded namespace with a dead endpoint
+        # fails the rebuild); the lexical route alone is timed, and the budget is the same.
+        built = box.gov("rebuild", "--json", "--root", str(root), "--no-embeddings",
+                        timeout=support.MEASURE_TIMEOUT_S).result()
+        assert built.get("stores", {}).get("lexical", {}).get("status") == "recreated", \
+            f"the rebuild did not recreate the lexical index: {built!r}"
         roots[programme] = (root, [query["query"] for query in queries if query.get("programme") == programme])
     return roots
 

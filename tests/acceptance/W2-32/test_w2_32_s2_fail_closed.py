@@ -30,6 +30,20 @@ def _refused_search(box, project):
     return answer
 
 
+def _refused_semantic_store(envelope):
+    """``stores.semantic`` of a rebuild that was asked for its vectors and refused them (DEC-1027 C): ``gov rebuild``
+    fails (``ok: false``, ``REBUILD_FAILED``, ``store: semantic``), and the stores the run built, the semantic
+    refusal among them, are in ``error.details.stores``, not in a result."""
+    error = envelope.get("error") or {}
+    assert envelope.get("ok") is False and error.get("code") == "REBUILD_FAILED", \
+        f"a rebuild that refused its vectors did not fail with REBUILD_FAILED: {envelope}"
+    details = error.get("details") or {}
+    assert details.get("store") == "semantic", f"the failure does not name the semantic store: {details}"
+    store = (details.get("stores") or {}).get("semantic")
+    assert store, f"the failure's stores hold no semantic entry: {details}"
+    return store
+
+
 # ---- the default pin ----
 
 def test_without_configuration_adr_0002s_pin_builds_and_the_planted_questions_are_answered(project, box, standin):
@@ -44,9 +58,11 @@ def test_without_configuration_adr_0002s_pin_builds_and_the_planted_questions_ar
 
 
 def test_an_endpoint_reporting_another_revision_of_the_pinned_model_fails_closed_at_rebuild(project, box, standin):
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the refusal is read from error.details.stores, the refused rebuild now failing with REBUILD_FAILED.
     standin.offer({s.PIN_MODEL: s.OTHER_DIGEST})
     envelope = box.rebuild(project)
-    store = s.semantic_store(envelope)
+    store = _refused_semantic_store(envelope)
     assert store.get("status") != "recreated", f"vectors were built with an unpinned revision: {store}"
     assert s.code_named(store, "MISMATCH"), f"no named error (…_MISMATCH) for the revision mismatch: {store}"
     assert standin.texts_embedded() == [], "nothing is embedded with a model that does not match the pin"
@@ -55,9 +71,11 @@ def test_an_endpoint_reporting_another_revision_of_the_pinned_model_fails_closed
 
 @pytest.mark.parametrize("revision", [..., "", None], ids=["no-revision", "empty-revision", "null-revision"])
 def test_a_configured_model_without_a_revision_fails_closed_at_rebuild(project, box, standin, revision):
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the refusal is read from error.details.stores, the refused rebuild now failing with REBUILD_FAILED.
     s.pin(project, s.SWAP_MODEL, revision)
     envelope = box.rebuild(project)
-    store = s.semantic_store(envelope)
+    store = _refused_semantic_store(envelope)
     assert store.get("status") != "recreated", f"vectors were built with an unpinned model: {store}"
     assert s.code_named(store, "UNPINNED"), f"no named error (…_UNPINNED) for the unpinned model: {store}"
     assert standin.texts_embedded() == [], "nothing is embedded with an unpinned model"
@@ -65,9 +83,11 @@ def test_a_configured_model_without_a_revision_fails_closed_at_rebuild(project, 
 
 def test_a_pinned_model_the_endpoint_does_not_list_fails_closed_at_rebuild(project, box, standin):
     standin.offer({s.PIN_MODEL: s.PIN_DIGEST})
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the refusal is read from error.details.stores, the refused rebuild now failing with REBUILD_FAILED.
     s.pin(project, s.SWAP_MODEL, s.SWAP_DIGEST)
     envelope = box.rebuild(project)
-    store = s.semantic_store(envelope)
+    store = _refused_semantic_store(envelope)
     assert store.get("status") != "recreated", f"vectors were built with a model other than the pinned one: {store}"
     assert s.any_code(store) and s.SWAP_MODEL in str(store), \
         f"the refusal names an error code and the pinned model: {store}"

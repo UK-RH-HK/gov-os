@@ -1,6 +1,6 @@
 ---
 id: DAEO-o5x1
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-t8mp]
 created: 2026-11-09T20:40:06Z
