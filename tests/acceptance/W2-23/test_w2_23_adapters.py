@@ -105,7 +105,10 @@ def test_s2_settings_keep_the_programmes_keys_and_entries_in_order_with_generate
     assert isinstance(env, dict), f"the merged settings hold no env block: {merged}"
     assert list(env)[:1] == ["HARBOUR_PROGRAMME_FLAG"] and env["HARBOUR_PROGRAMME_FLAG"] == "1", \
         f"the programme's env entry is not kept first: {env}"
-    assert any(support.AUTO_COMPACT.search(key) for key in env), f"the env block carries no auto-compact entry: {env}"
+    # Rewrite-Reason: P-W2-23-4 (b), DEC-838, Interface item 5 as reworded 2026-11-11: no compaction threshold; every
+    # session uses its model's full window, so no launch sets one. (First written to require an AUTO_?COMPACT key.)
+    offending = [key for key in env if support.AUTO_COMPACT.search(key)]
+    assert not offending, f"the env block sets a compaction threshold, which DEC-838 forbids: {offending} in {env}"
 
 
 def test_s2_no_instruction_file_is_the_generated_file_alone(tmp_path, box):
