@@ -305,12 +305,29 @@ def test_the_rebuild_says_no_namespace_is_embedded(tmp_path, sandbox, interface,
     run, envelope = rebuild(project, sandbox, interface, MODES[mode])
     ref_run, ref_envelope = reference[mode]
     assert envelope["ok"] is True and run.returncode == 0, f"the rebuild did not succeed\n{run.describe()}"
-    assert (run.returncode, envelope["ok"]) == (ref_run.returncode, ref_envelope["ok"]), \
-        f"the exit code differs from the project with one embedded namespace\n{run.describe()}"
+    if mode == "full":
+        # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150
+        # (3): a full rebuild of the project with one embedded namespace and no embedder is now asked for its vectors
+        # and fails (exit 1, REBUILD_FAILED, store: semantic), with the stores it built in error.details.stores; the
+        # project with no embedded namespace is not asked and still succeeds. Its stores' outcomes are held against
+        # those stores (the ones it built before it failed: the code index comes after the semantic stage), so the
+        # exit code and ok are the reference's only in the mode where the reference succeeds.
+        reference_error = ref_envelope.get("error") or {}
+        assert (ref_run.returncode, ref_envelope["ok"], reference_error.get("code")) == (1, False, "REBUILD_FAILED"), \
+            f"the project with one embedded namespace was not asked for its vectors\n{ref_run.describe()}"
+        reference_stores = {name: (store or {}).get("status") for name, store in
+                            ((reference_error.get("details") or {}).get("stores") or {}).items()}
+        assert "lexical" in reference_stores and "semantic" in reference_stores, f"{reference_stores}\n{ref_run.describe()}"
+        outcomes = {name: status for name, status in stores(envelope).items() if name in reference_stores}
+    else:
+        assert (run.returncode, envelope["ok"]) == (ref_run.returncode, ref_envelope["ok"]), \
+            f"the exit code differs from the project with one embedded namespace\n{run.describe()}"
+        reference_stores = stores(ref_envelope)
+        outcomes = stores(envelope)
     assert stores(envelope).get("lexical") == "recreated", f"the lexical index is not recreated\n{run.describe()}"
-    assert stores(envelope) == stores(ref_envelope), \
+    assert outcomes == reference_stores, \
         f"the stores' outcomes differ from the project with one embedded namespace " \
-        f"({stores(ref_envelope)})\n{run.describe()}"
+        f"({reference_stores})\n{run.describe()}"
     assert says_it(envelope.get("result")), \
         f"the rebuild's answer for the semantic store does not say {WORDS!r}\n{run.describe()}"
 

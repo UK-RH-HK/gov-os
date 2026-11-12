@@ -43,7 +43,13 @@ def make_store(box, root, state):
     if state == "missing":
         return
     if state == "stale":
-        box.rebuild(root)
+        # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150
+        # (3): the case needs a lexical index that is out of date, not vectors, so this rebuild is a ``--no-embeddings``
+        # one (the embedded namespace with no endpoint would now fail the rebuild) and must still recreate the index.
+        built = box.gov("rebuild", "--json", "--root", str(root), "--no-embeddings",
+                        timeout=support.MEASURE_TIMEOUT_S).result()
+        assert built.get("stores", {}).get("lexical", {}).get("status") == "recreated", \
+            f"the rebuild did not recreate the lexical index: {built!r}"
         support.write(root, support.BEST, support.RANKED[support.BEST] + "A line added after the rebuild.\n")
         support.commit(root, "a change after the rebuild")
         return

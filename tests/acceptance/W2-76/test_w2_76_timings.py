@@ -8,6 +8,13 @@ threshold and whether the rebuild was slow (DEC-939 item 2, row W2-L451).
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
+import json
+import re
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
 import pytest
 
 import w2_76_support as support
@@ -18,6 +25,74 @@ pytestmark = support.needs_tools
 # much room for rounding each.
 ROUNDING_S = 0.11
 
+MODEL = "qwen3-embedding:0.6b"
+DIGEST = "ac6da0dfba84" + hashlib.sha256(b"w2-76 stand-in").hexdigest()[:52]   # ADR-0002's pin: the default
+DIMENSIONS = 1024
+
+
+def _vector(text):
+    vector = [0.0] * DIMENSIONS
+    for word in re.findall(r"[a-z0-9]+", str(text).lower()):
+        vector[int.from_bytes(hashlib.sha256(word.encode()).digest()[:4], "big") % DIMENSIONS] += 1.0
+    return vector if any(vector) else [1.0] + [0.0] * (DIMENSIONS - 1)
+
+
+@contextlib.contextmanager
+def _healthy_endpoint():
+    """Ollama's HTTP interface on a loopback port, reporting the pinned model on the GPU and embedding with a
+    stand-in; yields its ``host:port``. Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no
+    embedder); P1-L (a), DEC-1150 (3): a full rebuild of an embedded project needs an endpoint that answers."""
+    entry = {"name": MODEL, "model": MODEL, "digest": DIGEST, "size": 639150000,
+             "details": {"family": "qwen3", "parameter_size": "595.78M", "quantization_level": "Q8_0"}}
+
+    class Handler(BaseHTTPRequestHandler):
+        def answer(self):
+            length = int(self.headers.get("Content-Length") or 0)
+            try:
+                asked = json.loads(self.rfile.read(length).decode("utf-8", "replace")) if length else {}
+            except ValueError:
+                asked = {}
+            route, status = self.path.split("?")[0].rstrip("/"), 200
+            if route == "/api/version":
+                reply = {"version": "0.35.0"}
+            elif route == "/api/tags":
+                reply = {"models": [entry]}
+            elif route == "/api/ps":
+                reply = {"models": [{**entry, "size_vram": entry["size"]}]}
+            elif route == "/api/show":
+                reply = {"details": entry["details"], "capabilities": ["embedding"],
+                         "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS}}
+            elif route in ("/api/embed", "/api/embeddings"):
+                given = asked.get("input", asked.get("prompt", ""))
+                texts = [given] if isinstance(given, str) else list(given)
+                reply = ({"model": MODEL, "embeddings": [_vector(text) for text in texts]} if route == "/api/embed"
+                         else {"embedding": _vector(texts[0] if texts else "")})
+            else:
+                reply, status = {}, 404
+            payload = json.dumps(reply).encode()
+            try:
+                self.send_response(status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+            except OSError:
+                pass
+
+        do_GET = do_POST = do_HEAD = do_DELETE = answer
+
+        def log_message(self, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    server.daemon_threads = True
+    threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True).start()
+    try:
+        yield f"127.0.0.1:{server.server_address[1]}"
+    finally:
+        server.shutdown()
+        server.server_close()
+
 
 def _number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool)
@@ -27,10 +102,17 @@ def _number(value):
 def test_every_stage_timed_in_output_and_record(box, lock, env, form):
     project = support.make_project(box, "project", lock)
 
-    run = support.rebuild(project, env, *form)
+    if form:
+        run = support.rebuild(project, env, *form)
+    else:  # the full rebuild stays full (its semantic stage timed); it is given an endpoint that answers (DEC-1027 C)
+        with _healthy_endpoint() as host:
+            run = support.rebuild(project, {**env, "OLLAMA_HOST": host, "GOV_QUERY_OLLAMA_HOST": host}, *form)
 
     assert run.returncode == 0 and run.envelope().get("ok") is True, f"the rebuild did not succeed\n{run.describe()}"
     result = run.result
+    if not form:
+        assert (result.get("stores") or {}).get("semantic", {}).get("status") == "recreated", \
+            f"the full rebuild did not run its semantic stage\n{run.describe()}"
     timing = result.get("timing")
     assert isinstance(timing, dict), f"the result has no timing\n{run.describe()}"
     missing = [key for key in support.STAGE_KEYS if key not in timing]
