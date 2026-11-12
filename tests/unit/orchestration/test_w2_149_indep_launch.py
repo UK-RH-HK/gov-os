@@ -992,27 +992,44 @@ def test_f8_the_schemas_hashes_are_in_the_wall(w):
 # -- the other kinds -----------------------------------------------------------------------------------------------
 def test_checker_delivers_its_notes(w):
     w.plant_set()
+    notes_text = (  # W2-173 S3: §6's fixed form
+        "# Cross-check notes\n"
+        "## Questions\n"
+        "q01 | accept | - | also: none | the label and its anchor hold\n"
+        "q02 | revise | R6-SPAN-MISSES | also: none | the anchor ends before the deciding line\n"
+        "## The set\n"
+        "domains: code 0, decisions 2, tickets 0, plan 0, contract 0, none 0\n"
+        "categories: decision 2, contract 0, plan 0, ticket 0, exact-string 0, callers 0, code-paraphrase 0, "
+        "kernel-template 0, multi-file 0, failure-memory 0, history 0, nonexistent-id 0\n"
+        "keyword: any 2, all 0\n"
+        "supersession 0, kernel roles or skills 0, failure or lesson 0, drawn changed 0, drawn sample or none 2\n"
+        "set codes: none\n")
     w.stub({"session": "write", "out": {"out/result.json": json.dumps(
-        {"checked": 2, "accepted": 1, "revise": 1, "rejected": 0}), "out/notes.md": "notes\n"}})
+        {"checked": 2, "accepted": 1, "revise": 1, "rejected": 0}), "out/notes.md": notes_text}})
     rc, counts, _ = w.launch("checker")
     assert rc == 0, counts
     assert w.calls()[1]["input"] == ["selection.json", "set"]
     notes = w.sets / "fixtures" / "evaluation" / SET / "XCHECK-r1.md"
-    assert notes.read_text() == "notes\n"
-    assert counts["delivered"] == {"files": 1, "sha256": sha(b"notes\n"), "to": "notes"}
+    assert notes.read_text() == notes_text
+    assert counts["delivered"] == {"files": 1, "sha256": sha(notes_text.encode()), "to": "notes"}
     assert counts["out"]["checked"] == 2 and counts["out"]["questions"] is None
 
 
 def test_auditor_delivers_its_classes_and_the_audit_is_logged(w):
     w.plant_set()
     (w.sets / "runs" / "e0").mkdir(parents=True)
-    (w.sets / "runs" / "e0" / "misses.jsonl").write_text('{"q": 1}\n')
+    (w.sets / "runs" / "e0" / "misses.jsonl").write_text("".join(  # W2-173 S4: classes keyed by the misses' ids
+        json.dumps({"id": i, "question": "q", "gold_answer": "g", "gold_sources": ["s"], "answer": "a",
+                    "outcome": "wrong", "evidence_in_bundle": False}) + "\n" for i in ("m1", "m2")))
+    classes_text = json.dumps({  # W2-173 S4: classes keyed by the misses' ids
+        "m1": {"class": "retrieval_miss", "reason": "no gold place reached the agent"},
+        "m2": {"class": "retrieval_miss", "reason": "the gold span was not in the bundle"}}) + "\n"
     w.stub({"session": "write", "out": {"out/result.json": json.dumps({"misses": {"retrieval_miss": 2}}),
-                                        "out/classes.json": "{}\n"}})
+                                        "out/classes.json": classes_text}})
     rc, counts, _ = w.launch("auditor", audit="e0")
     assert rc == 0, counts
     assert w.calls()[1]["input"] == ["misses.jsonl", "selection.json", "set"]
-    assert (w.sets / "runs" / "e0" / "miss-classes.json").read_text() == "{}\n"
+    assert (w.sets / "runs" / "e0" / "miss-classes.json").read_text() == classes_text
     line = json.loads((w.runs / "AUDITS.log").read_text().splitlines()[-1])
     assert line["commit"] == w.commit and line["run"] == counts["run"] and line["audit"] == "e0"
     assert counts["out"]["misses"] == {"retrieval_miss": 2}

@@ -242,6 +242,81 @@ def template(cpus: list[int] | None = None) -> dict:
     }
 
 
+# The GPU backstop's three values (W2-157, Interface L2): read and checked only by ``gov resources --backstop``. They are
+# in neither VALUES nor OPTIONAL nor template(), so a file without them (or with a malformed one) opens the gate as before
+# and --init-config writes W2-20's frozen key set. This machine's entries are held here for the operator's step (the
+# evidence): never a fallback. ``$HOME`` stands for this machine's home; ``backstop_entries()`` gives it resolved.
+BACKSTOP_KEYS = ("gpu_backstop_limit_mib", "gpu_backstop_every_s", "gpu_backstop_embedders")
+BACKSTOP_ENTRIES = {
+    "gpu_backstop_limit_mib": _entry(15872, "2026-11-04", "DEC-1067 (GPU safety), DEC-1068 (4): 15.5 GiB, 15,872 MiB"),
+    "gpu_backstop_every_s": _entry(5, "2026-11-04", "DEC-1067 (GPU safety), DEC-1068 (4): the poll every 5 seconds"),
+    "gpu_backstop_embedders": _entry(
+        [{"port": 11434, "log": "$HOME/.ollama/serve-11434.log"}, {"port": 11435, "log": "$HOME/.ollama/serve-11435.log"}],
+        "2026-11-04", "DEC-1067 (GPU safety), DEC-1068 (4), DEC-1030: the two shared embedding servers and their logs"),
+}
+
+
+def backstop_entries(env=None) -> dict:
+    """This machine's three entries with ``$HOME`` resolved, as the operator adds them to ``gate.json``."""
+    home = str(Path(_env(env).get("HOME") or Path.home()))
+    entries = json.loads(json.dumps(BACKSTOP_ENTRIES).replace("$HOME", home))
+    return entries
+
+
+def _embedders(value):
+    if not isinstance(value, list):
+        return "a list of {\"port\": <1-65535>, \"log\": <absolute path>} is needed (possibly empty)"
+    for item in value:
+        if (not isinstance(item, dict) or set(item) != {"port", "log"} or _int(1)(item["port"]) or item["port"] > 65535
+                or not isinstance(item["log"], str) or not os.path.isabs(item["log"])):
+            return f"{item!r}: {{\"port\": <1-65535>, \"log\": <absolute path>}} is needed"
+    return None
+
+
+def _every(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not value > 0 or value == float("inf"):
+        return "a number above 0 is needed"
+    return None
+
+
+BACKSTOP_CHECKS = {"gpu_backstop_limit_mib": _int(1), "gpu_backstop_every_s": _every, "gpu_backstop_embedders": _embedders}
+
+
+def backstop_values(env=None) -> tuple[dict, list[dict]]:
+    """``({"limit_mib", "every_s", "embedders"}, faults)``: the backstop's three values from the gate's file, each with its
+    date and source checked; a fault (``{"key", "reading", "why"}``) names each key missing or malformed, or ``gate.json``
+    when the file is missing or not JSON. Nothing is defaulted; the values are empty when any fault is."""
+    file = path(env)
+    try:
+        data = json.loads(file.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}, [{"key": FILE, "reading": None, "why": f"{FILE}: {file} is missing"}]
+    except (OSError, ValueError, UnicodeDecodeError) as error:
+        return {}, [{"key": FILE, "reading": None, "why": f"{FILE}: {file} cannot be read as JSON: {error}"}]
+    if not isinstance(data, dict):
+        return {}, [{"key": FILE, "reading": None, "why": f"{FILE}: {file} is not a JSON object"}]
+    found, faults = {}, []
+    for key, check in BACKSTOP_CHECKS.items():
+        entry = data.get(key)
+        if not isinstance(entry, dict) or "value" not in entry:
+            faults.append(_fault(key, entry, "missing (an object with its value, date and source is needed)"
+                                 if key not in data else "malformed: an object {\"value\", \"date\", \"source\"} is needed"))
+            continue
+        why = check(entry["value"])
+        if why is None and _date(entry.get("date")) is None:
+            why = f"no date (a YYYY-MM-DD 'date' is needed, not {entry.get('date')!r})"
+        if why is None and (not isinstance(entry.get("source"), str) or not entry["source"].strip()):
+            why = "no source (a non-empty 'source' is needed)"
+        if why:
+            faults.append(_fault(key, entry.get("value"), why))
+        else:
+            found[key] = entry["value"]
+    if faults:
+        return {}, faults
+    return {"limit_mib": found["gpu_backstop_limit_mib"], "every_s": found["gpu_backstop_every_s"],
+            "embedders": found["gpu_backstop_embedders"]}, []
+
+
 def write(data: dict, env=None) -> Path:
     """Replace the file whole (a reader never sees half a file); mode 0600."""
     file = path(env)

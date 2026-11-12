@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-115b
-tags: [wave-2, close, queue, full]
+tags: [wave-2, close, queue, full, wave-3, deferred]
 wbs_id: W2-115b
 title: 'gov queue, the product''s merge queue: the queue lines of W2-115, split by its P1 (b)'
 class: implementation
@@ -46,3 +46,7 @@ track: A
 Split from W2-115 (DAEO-emq1) by the CTO's delegated decision on its run 1's P1 (b), 2026-11-11: the six queue success
 lines and two failure lines moved here word for word, with W2-97's queue (`governance/project/orchestration/tools/merge_queue.py`)
 as the reference. Runs after W2-115 (the close it lands through). Class C3 (the landing path).
+
+## Parked (the owner, DEC-1142 (8), 2026-11-12 ~09:50)
+
+Parked in docs/plan/WAVE_3_PARKING.md as W3-P32: filed or split by the CTO without the owner's P1 (DEC-974; the prompt's §3). Not started again in Wave 2 without the owner's decision.
