@@ -33,6 +33,20 @@ def _unavailable_with_a_code(answer, what):
     assert s.any_code(answer), f"{what}: no named code for the unavailable semantic part: {answer}"
 
 
+def _refused_stores(envelope):
+    """The stores of a rebuild that was asked for its vectors and refused them (DEC-1027 C): ``gov rebuild`` fails
+    (``ok: false``, ``REBUILD_FAILED``, ``store: semantic``) and the stores the run built are in
+    ``error.details.stores``, not in a result."""
+    error = envelope.get("error") or {}
+    assert envelope.get("ok") is False and error.get("code") == "REBUILD_FAILED", \
+        f"a rebuild that refused its vectors did not fail with REBUILD_FAILED: {json.dumps(envelope)[:1500]}"
+    details = error.get("details") or {}
+    assert details.get("store") == "semantic", f"the failure does not name the semantic store: {details}"
+    stores = details.get("stores") or {}
+    assert stores.get("semantic"), f"the failure's stores hold no semantic entry: {details}"
+    return stores
+
+
 # ---- the embedders cannot be reached ----
 
 def test_ensure_available_with_the_embedders_unreachable_checks_health_only(box):
@@ -68,12 +82,15 @@ def test_retrieve_with_the_embedders_unreachable_answers_by_keywords(project, bo
 
 
 def test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing(project, box, standin):
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the refusal and the keyword index's state are read from error.details.stores, the rebuild now failing.
     box.host = s.dead_host()
     envelope = box.rebuild(project)
-    store = s.semantic_store(envelope)
+    stores = _refused_stores(envelope)
+    store = stores["semantic"]
     assert store.get("status") != "recreated" and s.any_code(store), \
         f"the semantic store is refused with a named code: {store}"
-    lexical = ((envelope.get("result") or {}).get("stores") or {}).get("lexical") or {}
+    lexical = stores.get("lexical") or {}
     assert lexical.get("status") == "recreated", f"the keyword index is still built: {json.dumps(envelope)[:1500]}"
     assert s.vector_paths(project) == set()
     _nothing_started(box)
@@ -102,9 +119,11 @@ def test_retrieve_with_the_query_embedder_on_the_cpu_answers_by_keywords(project
 
 
 def test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed(project, box, standin):
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the refusal is read from error.details.stores, the rebuild on the CPU now failing with REBUILD_FAILED.
     standin.device = "cpu"
     envelope = box.rebuild(project)
-    store = s.semantic_store(envelope)
+    store = _refused_stores(envelope)["semantic"]
     assert store.get("status") != "recreated" and s.any_code(store), \
         f"a rebuild on the CPU is refused with a named code: {store}"
     assert s.vector_paths(project) == set(), "no vector computed on the CPU is stored"

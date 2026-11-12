@@ -17,6 +17,7 @@ import subprocess
 import pytest
 
 from gov import codeintel
+from gov.cli.errors import GovError
 from gov.rebuild import seed
 from gov.rebuild.command import add_arguments, run
 from gov.retrieval import lexical, ollama, semantic
@@ -225,9 +226,10 @@ def test_a_seed_without_embeddings_keeps_no_vector_and_asks_no_endpoint(base, tr
 @pytest.mark.parametrize("seeded", [False, True])
 @pytest.mark.parametrize("how", ["unavailable", "part way", "hung"])
 def test_a_semantic_store_not_recreated_answers_as_before_and_leaves_no_record(base, tree, endpoint, monkeypatch,
-                                                                                tmp_path, seeded, how):
-    """DEC-1027 C: the rebuild succeeds with ``stores.semantic`` ``not_recreated``, as at the ticket's base; its tree
-    keeps no record, so it is refused as a base and nothing of its partial semantic store is ever copied."""
+                                                                                tmp_path, capsys, seeded, how):
+    """DEC-1027 C: the rebuild fails with ``REBUILD_FAILED`` (store: semantic), its ``stores.semantic`` being
+    ``not_recreated``; its tree keeps no record, so it is refused as a base and nothing of its partial semantic store
+    is ever copied."""
     if how == "unavailable":
         endpoint["fails"], reason = True, semantic.NO_EMBEDDING
     elif how == "part way":  # one text embedded and committed, then the endpoint fails: a partial store
@@ -238,10 +240,22 @@ def test_a_semantic_store_not_recreated_answers_as_before_and_leaves_no_record(b
             raise TimeoutError("the endpoint hung")
         monkeypatch.setattr(semantic, "refresh", hung)
         reason = "the endpoint hung"
-    result = run(tree, _args(*(("--seed", str(base)) if seeded else ())), CONFIG)
-    assert result["stores"]["semantic"] == {"status": "not_recreated", "reason": reason}
-    assert result["stores"]["lexical"]["status"] == "recreated"
-    assert ("seed" in result) is seeded and (not seeded or result["seed"]["status"] == "seeded")
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the semantic store asked for and not recreated now fails the rebuild (REBUILD_FAILED, store: semantic) and
+    # returns no result; the stores it built are read from the error's details (the Interface's ``requested`` key
+    # aside), and every assertion below on the record, the refusal as a base and the copy is kept.
+    with pytest.raises(GovError) as raised:
+        run(tree, _args(*(("--seed", str(base)) if seeded else ())), CONFIG)
+    assert raised.value.code == "REBUILD_FAILED" and raised.value.details["store"] == "semantic"
+    stores = raised.value.details["stores"]
+    answer = {key: value for key, value in stores["semantic"].items() if key != "requested"}
+    assert answer == {"status": "not_recreated", "reason": reason} and raised.value.details["reason"] == reason
+    assert stores["lexical"]["status"] == "recreated"
+    # The failed rebuild returns no result to hold ``seed``; the seed's own line on standard error and the code-graph
+    # home it copied into the tree say that the seeded rebuild was seeded (and the other was not).
+    said = capsys.readouterr().err
+    assert ("rebuild: seed: the base" in said) is seeded
+    assert (tree / codeintel.BASE_REL / "home" / "notes.txt").exists() is seeded
     if how == "part way":  # the store does hold a manifest over partial vectors: exactly what must never seed
         assert semantic.manifest(tree) is not None and 0 < len(_vectors(tree)) < CHUNKS
     assert not (tree / seed.RECORD_REL).exists()
