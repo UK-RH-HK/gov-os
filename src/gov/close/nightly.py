@@ -324,17 +324,27 @@ SECRETS_FULL_SCAN = "GOV_SECRETS_FULL_SCAN"  # W2-115 S8 (DEC-966 item 4): the n
 
 def rebuild_stores(tree: Path) -> dict:
     """The worktree's stores rebuilt before the night's run with the full secrets scan (W2-115 S8):
-    ``GOV_SECRETS_FULL_SCAN=1`` in the rebuild's environment, whatever the caller's. Without the semantic vectors
-    (``--no-embeddings``: no model runs for a worktree that is removed after the night). ``{"ok", "exit",
-    "secrets_full_scan", "error"}``."""
-    env = {**_pytest_env(tree), SECRETS_FULL_SCAN: "1"}
-    cmd = [sys.executable, "-m", "gov.cli.main", "rebuild", "--json", "--no-embeddings", "--root", str(tree)]
+    ``GOV_SECRETS_FULL_SCAN=1`` in the rebuild's environment, whatever the caller's, and the caller's value put back
+    after it. ``gov rebuild`` by its own code, in this process, as the batch rebuilds; without the semantic vectors
+    (``--no-embeddings``: no model runs for a worktree removed after the night). ``{"ok", "error",
+    "GOV_SECRETS_FULL_SCAN"}``."""
+    from gov.config.loader import load_config
+    from gov.rebuild.command import run as rebuild
+
+    before = os.environ.get(SECRETS_FULL_SCAN)
+    os.environ[SECRETS_FULL_SCAN] = "1"
     try:
-        done = subprocess.run(cmd, cwd=str(tree), env=env, capture_output=True, text=True)
-    except OSError as e:
-        return {"ok": False, "exit": None, SECRETS_FULL_SCAN: "1", "error": str(e)}
-    error = None if done.returncode == 0 else " ".join((done.stderr or done.stdout).split())[-400:]
-    return {"ok": done.returncode == 0, "exit": done.returncode, SECRETS_FULL_SCAN: "1", "error": error}
+        rebuild(Path(tree), argparse.Namespace(no_embeddings=True, seed=None, integration=None, json=True),
+                load_config(Path(tree)))
+        outcome = {"ok": True, "error": None}
+    except (GovError, OSError, ValueError) as e:
+        outcome = {"ok": False, "error": f"{getattr(e, 'code', type(e).__name__)}: {getattr(e, 'message', e)}"[:400]}
+    finally:
+        if before is None:
+            os.environ.pop(SECRETS_FULL_SCAN, None)
+        else:
+            os.environ[SECRETS_FULL_SCAN] = before
+    return {**outcome, SECRETS_FULL_SCAN: "1"}
 
 
 def night(root: Path, branch: str, coverage: bool = False) -> dict:

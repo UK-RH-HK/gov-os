@@ -1801,8 +1801,10 @@ def _run_scoped(root: Path, args, config: dict):
 
     chosen = _selection(root, ticket)
     own = _select.suite_folder(root, front, str(front.get("wbs_id") or front.get("external-ref") or ticket))
-    if _gates.ticket_class(front) not in _gates.EVIDENCE_CLASSES and not _select.has_suite(root, own):
-        # independent tests first (DEC-953 item 1): a ticket judged on its tests is never closed without them
+    if not chosen["records_only"] and _gates.ticket_class(front) not in _gates.EVIDENCE_CLASSES \
+            and not _select.has_suite(root, own):
+        # independent tests first (DEC-953 item 1): a ticket whose change runs its own suite is never closed
+        # without one (records or governance files alone select only record_reading, S2)
         raise GovError("NO_ACCEPTANCE_TESTS", f"{ticket}'s own acceptance suite {own} holds no test: the scoped "
                        "close runs it, and nothing closes without it", {"ticket": ticket, "suite": own},
                        exit_code=EXIT_CHECK_FAILED)

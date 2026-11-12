@@ -655,8 +655,13 @@ def scoped(root: Path, ticket: str) -> dict:
             why[target].append(reason)
 
     own = suite_folder(root, front, wbs)
-    if has_suite(root, own):
-        select(own, "OWN")
+    # records or governance files alone select only record_reading, or nothing (S2: "and nothing else"); any other
+    # change, and a ticket without a change of its own, runs the ticket's own suite
+    records_only = bool(paths) and all(_any(p, test_map.get("record_only")) or p.startswith(GOVERNANCE_OVERLAY)
+                                       for p in paths)
+    if not records_only:
+        if has_suite(root, own):
+            select(own, "OWN")
     records, code, placed, modules = [], [], {}, {}
     for p in paths:
         hit = False
@@ -713,11 +718,17 @@ def scoped(root: Path, ticket: str) -> dict:
                                + ", ".join(f"{t} ({d})" for t, d in gone))
     suites = sorted(t for t in why if not any(_within(t, o) for o in why if o != t))
     return {"ticket": ticket, "suites": suites, "pytest_options": pytest_options(test_map),
-            "changed": paths, "why": {t: why[t] for t in suites}, "base": base_commit,
+            "changed": paths, "records_only": records_only, "why": {t: why[t] for t in suites}, "base": base_commit,
             "head": _git(root, "rev-parse", "HEAD").strip()}
 
 
 def pytest_options(test_map: dict | None) -> list[str]:
     """The options every scoped run takes besides its targets: no cache, the retention policy, JUnit's node
-    files. The same on every machine (no plugin's option): a run's time limit is the close's own, around it."""
-    return list(PYTEST_OPTIONS)
+    files, and the test map's per-test limit (``--timeout``, pytest-timeout's) where the interpreter has the plugin,
+    so a test that hangs fails as a timeout (S4) instead of ending the whole run."""
+    import importlib.util
+
+    options = list(PYTEST_OPTIONS)
+    if importlib.util.find_spec("pytest_timeout") is not None:
+        options.append(f"--timeout={settings(test_map)[0]}")
+    return options

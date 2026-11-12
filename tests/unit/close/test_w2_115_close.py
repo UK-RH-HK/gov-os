@@ -103,6 +103,22 @@ def test_f1_a_caused_red_never_closes(tmp_path, no_lists):
     assert frontmatter(repo.root / f".tickets/{TICKET}.md")["status"] == "in_progress"
 
 
+def test_s4_a_test_that_times_out_on_both_heads_never_matches(tmp_path, no_lists):
+    import importlib.util
+    if importlib.util.find_spec("pytest_timeout") is None:
+        pytest.skip("pytest-timeout is not installed: no per-test limit to reach")
+    from .test_w2_115_support import map_data
+    hangs = "import time\n\n\ndef test_hangs():\n    time.sleep(30)\n"
+    repo = project(tmp_path, extra={f"{OWN_SUITE}test_hangs.py": hangs,
+                                    "governance/project/test-map.yaml": yaml.safe_dump(map_data(per_test_timeout=1))})
+    change(repo, {"src/pkg/feature.py": FEATURE})
+    with pytest.raises(GovError) as raised:
+        command.run(repo.root, _args(), CONFIG)
+    assert raised.value.code == "RED_CAUSED"
+    [red] = raised.value.details["reds"]
+    assert red["failure_type"] == "timeout" and red["caused"] is True
+
+
 def test_s2_an_unmapped_change_refuses_the_close_and_runs_nothing(tmp_path, no_lists, runs):
     repo = project(tmp_path)
     change(repo, {"src/pkg/lonely.py": "VALUE = 9\n"})

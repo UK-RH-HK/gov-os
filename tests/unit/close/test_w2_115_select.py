@@ -17,7 +17,9 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _cli(root: Path, *args: str) -> subprocess.CompletedProcess:
+    import os
     env = {"PATH": "/usr/bin:/bin", "PYTHONPATH": str(REPO_ROOT / "src"), "HOME": str(root.parent)}
+    env.update({k: v for k, v in os.environ.items() if k == "PYTHONUSERBASE"})  # the same interpreter's packages
     return subprocess.run([sys.executable, "-m", "gov.cli.main", "close", *args, "--root", str(root)],
                           capture_output=True, text=True, env=env, cwd=str(root))
 
@@ -92,7 +94,8 @@ def test_s2_records_alone_select_record_reading_only(tmp_path):
     repo = project(tmp_path)
     change(repo, {"docs/notes.md": "# notes, more\n"})
     chosen = select.scoped(repo.root, TICKET)
-    assert chosen["suites"] == sorted([OWN_SUITE, "tests/unit/test_records.py"])
+    assert chosen["suites"] == ["tests/unit/test_records.py"]  # "and nothing else": not even the own suite
+    assert chosen["records_only"] is True
 
 
 def test_s2_records_alone_without_an_own_suite(tmp_path):
@@ -106,7 +109,14 @@ def test_s2_records_alone_without_an_own_suite(tmp_path):
 def test_s2_governance_alone_selects_nothing_by_itself(tmp_path):
     repo = project(tmp_path)
     change(repo, {"governance/project/briefs/a.md": "a brief\n"})
-    assert select.scoped(repo.root, TICKET)["suites"] == [OWN_SUITE]
+    assert select.scoped(repo.root, TICKET)["suites"] == []
+
+
+def test_s2_records_and_code_together_run_the_own_suite_and_record_reading(tmp_path):
+    repo = project(tmp_path)
+    change(repo, {"docs/notes.md": "# more\n", "src/pkg/other.py": "def other():\n    return 1  # c\n"})
+    assert select.scoped(repo.root, TICKET)["suites"] == sorted(
+        [OWN_SUITE, "tests/unit/test_other.py", "tests/unit/test_records.py"])
 
 
 def test_s2_unmapped_change_refuses_never_widened(tmp_path):

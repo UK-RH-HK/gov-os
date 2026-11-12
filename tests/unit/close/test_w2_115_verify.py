@@ -34,8 +34,9 @@ def test_s13_one_red_and_one_serial_entry_exit_1_both_junit_files_and_the_summar
         tree, targets, *a, **k))
     out = tmp_path / "verify"
     assert _verify(repo, out) == 1
+    chosen = command._select.scoped(repo.root, TICKET)
     assert json.loads((out / "select.json").read_text()) == {
-        "ticket": TICKET, "suites": [OWN_SUITE], "pytest_options": command._select.PYTEST_OPTIONS}
+        "ticket": TICKET, "suites": [OWN_SUITE], "pytest_options": chosen["pytest_options"]}
     assert "test_alone" not in _cases(out / "parallel.xml") and "test_red" in _cases(out / "parallel.xml")
     assert _cases(out / "serial.xml") == ["test_alone"]
     summary = (out / "summary.txt").read_text().splitlines()

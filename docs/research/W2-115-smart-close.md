@@ -16,13 +16,24 @@ close's rule applied (a caused red refuses, every other red closes with a repair
 Records: `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/close-build/<run>/`
 (`run.json`, `close.txt`, `parallel.xml`, `unowned.txt`).
 
-| Batch (run) | Kind | `close_build.py` (recorded `run.json` `verdict`) | This close | Equal |
+| Batch | Kind | close_build.py verdict | This close's verdict | Equal |
 |---|---|---|---|---|
-| `W2-71-20261030-161658` | clean: no red alone (one failure of the parallel run green alone, a flaky candidate) | CLOSED (build-phase close, DEC-953) | CLOSED: the flaky candidate is not the change's (`green when run alone`) | yes |
-| `W2-107-20261031-184805` | a caused red (and an unowned one) | REFUSED: 1 test(s) red alone, caused by this change | REFUSED (`RED_CAUSED`): `W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` red alone with AssertionError 3/3, green without the change 0/3; `W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` not caused | yes |
-| `W2-107-20261031-202743` | an unowned red | CLOSED (build-phase close, DEC-953), the red named in `unowned.txt` | CLOSED: `W1-28/...fixture_copies.py::...` red with AssertionError 3/3 and red without the change 3/3 → not caused, named in the record with a repair ticket; the W2-50 failure green alone | yes |
+| `W2-71-20261030-161658` | clean | CLOSED | CLOSED | yes |
+| `W2-107-20261031-184805` | caused red | REFUSED | REFUSED | yes |
+| `W2-107-20261031-202743` | unowned red | CLOSED | CLOSED | yes |
 
-Equal on all three. Two limits, stated: (1) `close_build.py` records the run without the change by its exit code
+Equal on all three. The details, per batch:
+
+- `W2-71-20261030-161658` (clean): `close_build.py` recorded `CLOSED (build-phase close, DEC-953)`. No red alone; the
+  parallel run's one failure (`W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here`)
+  was green alone, a flaky candidate. This close: not the change's (`green when run alone`), so CLOSED.
+- `W2-107-20261031-184805` (caused red): `close_build.py` recorded `REFUSED: 1 test(s) red alone, caused by this
+  change`. This close: `W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` red
+  alone with AssertionError 3/3 and green without the change 0/3: caused, so REFUSED (`RED_CAUSED`); the other red
+  (`W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs`) not caused.
+- `W2-107-20261031-202743` (unowned red): `close_build.py` recorded `CLOSED (build-phase close, DEC-953)`, the red
+  named in `unowned.txt`. This close: the W1-28 red with AssertionError 3/3 and red without the change 3/3, not
+  caused, named in the record with a repair ticket; the W2-50 failure green alone, so CLOSED. Two limits, stated: (1) `close_build.py` records the run without the change by its exit code
 only, so a red there is taken to carry the same failure type as the run with the change (this close checks the type
 itself; on these records it cannot); (2) none of the fifteen recorded runs had a parallel run with no failure at
 all, so the clean batch is the one whose only failure was green alone. The script that computed this close's side
@@ -34,13 +45,13 @@ ran from the engineer's sandbox scratch (`s9.py`, 50 lines: it reads the three `
 | Line | What was built | Unit tests (`tests/unit/close/test_w2_115_*.py`) |
 |---|---|---|
 | S1 the switch | `command.close_mode`: no file → strict (the strict code path untouched, reached first), `scoped`/`strict`, anything else `CLOSE_MODE_INVALID`; both `close.yaml` files read `close: scoped` | `select.py`: 5 |
-| S2 scoped selection | `select.scoped`: own suite, couplings, test files, other tickets' paths, the import graph (and a module named as text); records → `record_reading`; `governance/project/` nothing; unmapped → `SELECTION_REFUSED`; never `tests/` whole | `select.py`: 10; `close.py`: 2 |
+| S2 scoped selection | `select.scoped`: own suite, couplings, test files, other tickets' paths, the import graph (and a module named as text); records alone → `record_reading` and nothing else (not even the own suite); `governance/project/` alone → nothing; unmapped → `SELECTION_REFUSED`; never `tests/` whole | `select.py`: 11; `close.py`: 2 |
 | S3 `--select` | prints `{"ticket","suites","pytest_options"}`, exit 0; refused: stderr, exit 2; the close record's `selection` is the same object | `select.py`: 2; `close.py`: 1 |
 | S4 attribution | `attribution.attribute`/`judge`: every failing test alone; one run each way, 3 for `@pytest.mark.load_sensitive`; timeout/unknown/absent never match; the nightly read first, standing for the run without the change only when that night ran the full suite on that very commit; no baseline clone | `attribution.py`: 14 |
 | S5 unowned red | `tool.open_red_repair`: a repair ticket in `.tickets/`, `assignee: orchestrator`, node id and type in its text, reused while open; no list read or written (`ratchet` and its gate untouched by the scoped close) | `close.py`: 1 (with every `ratchet` reader made to fail) |
 | S6 batches | `batch.isolate` (`python3 -m gov.close.batch isolate`): fresh merges without each candidate; culprits back, the rest run green again and landed; `BATCH_UNEXPLAINED`, `CANDIDATE_NOT_ISOLATED`; landing only after every candidate is judged | `batch.py`: 6 |
 | S7 close record | front matter keys `close, commit, selection, runs, review, reds, culprits, clone, nightly` (and `base`, `changed`) | `close.py`: 1 |
-| S8 nightly | `nightly.rebuild_stores`: `gov rebuild --no-embeddings` of the night's worktree with `GOV_SECRETS_FULL_SCAN=1` whatever the caller's, before the run; the record's `secrets_full_scan` and `rebuild` | `nightly.py`: 3 |
+| S8 nightly | `nightly.rebuild_stores`: `gov rebuild` (its own code, in-process, `--no-embeddings`) of the night's worktree with `GOV_SECRETS_FULL_SCAN=1` set for the rebuild whatever the caller's (and put back after), before the run; the record's `secrets_full_scan` and `rebuild` | `nightly.py`: 3 |
 | S9 measured | above | — |
 | S10 warm clone | `attribution.prepare`: `.gov-runtime/close/clone/`, fetched, reset, cleaned with `.gov-runtime/` kept; replaced with the reason when it cannot be reset | `attribution.py`: 2; `close.py`: 1 |
 | S11 READY computed | `command.review_verdict`: the newest committed probe record's last ```verdict block; writer judged by the commit that last changed the block (`Role: independent-auditor` alone); `VERDICT_MALFORMED` (no block on FULL, not the form, a KPI line S1..Sn/F1..Fn missing, a bad value), `VERDICT_NOT_REVIEWER`, `FINDING_BLOCKS` (a line marked fail, or in/yes/fails open or loses work) | `verdict.py`: 9; `close.py`: 1 |
