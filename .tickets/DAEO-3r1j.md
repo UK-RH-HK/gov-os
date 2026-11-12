@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
-- tests/acceptance/W2-105/  # the roster in its fixture only (the CTO, P-W2-110-5 (a), 2026-11-12)
 - template/governance/kernel/hooks/pretooluse.py
 - src/gov/guard/install.py
 - tests/unit/guard/test_w2_110*
@@ -34,6 +33,8 @@ kpis:
   - 'sudo, the research exception or the freeze changed.'
 profile: FULL
 sources:
+- DEC-980
+- DEC-968
 - DEC-971
 - DEC-957
 - DEC-966
@@ -62,3 +63,4 @@ From the owner's DEC-971 item 4 (P1-MORNING-2026-10-31 item 4, W2-105's P-W2-105
   gives W2-105's fixture a roster with `coordination_ticket: DAEO-zz91` (`Rewrite-Reason: DEC-971 item 4, DEC-980`), the
   revision DEC-980 made to the older cases; nothing else lowered, the other roles' cases stay refused. `tests/acceptance/W2-105/`
   added to the paths above for it (DEC-957 P2: another ticket's tests revised under an existing decision).
+  The W2-105 batch done (eaa68fa97379); `tests/acceptance/W2-105/` dropped from the paths again (the CTO, 2026-11-12 01:35, for the close's mutation check); DEC-980 and DEC-968 added to the sources.
