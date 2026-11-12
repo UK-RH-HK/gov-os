@@ -1,6 +1,6 @@
 ---
 id: DAEO-g29a
-status: open
+status: in_progress
 deps: [DAEO-3r1j, DAEO-siiz]
 links: [DAEO-3r1j]
 created: 2026-10-31T23:05:58Z
@@ -24,6 +24,7 @@ allowed_paths:
 - template/governance/kernel/roles/orchestrator.md
 - template/.rulesync/subagents/orchestrator.md
 - tests/unit/adopt/test_w2_113*
+- docs/probes/DAEO-g29a/**  # the probe record (the CTO, 2026-11-12)
 kpis:
   success:
   - 'Adoption writes the project''s `coordination_ticket` key from the coordination ticket it creates, so in a freshly adopted planted repository the orchestrator on that ticket is asked for an install and every other session is refused, with no hand edit Verify: a planted repository is adopted with no hand edit: the project''s config then holds `coordination_ticket` equal to the id of the coordination ticket adoption created; the guard decision for an install by the session on that ticket is ask, and for any other session is refuse. [DEC-971 item 4, DEC-982]'

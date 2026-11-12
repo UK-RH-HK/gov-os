@@ -1,6 +1,6 @@
 ---
 id: DAEO-lrre
-status: open
+status: in_progress
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -21,6 +21,7 @@ allowed_paths:
 - template/governance/kernel/schemas/handoff*
 - template/governance/kernel/templates/handoff.md
 # .claude/agents/** out of the paths: generated from the kernel role files by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
+- docs/probes/DAEO-lrre/**  # the probe record (the CTO, 2026-11-12)
 kpis:
   success:
   - 'The ticket lead''s own role file (today a section of orchestrator.md). Verify: the kernel roles folder holds a role file of its own for the ticket lead that names its reads, writes and handover, and `orchestrator.md` no longer carries the ticket lead''s section (a grep for the section''s heading in `orchestrator.md` finds 0 lines) [DEC-954, DEC-236] (folds W2-21 S2)'
