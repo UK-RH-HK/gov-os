@@ -13,7 +13,7 @@ the engineer's branch was read; the code read is `w2/integrate`'s (`src/gov/cli/
       PYTHONPATH=<worktree>/src bash <heavy_slot.sh> python3 -m pytest tests/acceptance/W2-159 -q -p no:cacheprovider \
       -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"
 
-About 10 s for the 84 cases (a child process per run of a check, no sleeps, no model, no network). The filter leaves out
+About 10 s for the 85 cases (a child process per run of a check, no sleeps, no model, no network). The filter leaves out
 nothing: no case is named with `real`, `green_here` or `time_limit` and none is marked `local_only`. On the mode-000 case:
 `test_s1_a_session_file_with_mode_000_says_nothing` is skipped when the tests run as root.
 
@@ -64,7 +64,7 @@ instead. The ticket's Interface should say which.
 
 ## KPI lines, tests, and the outcome on `w2/integrate` (today: no `gov session-watch`)
 
-Run as above on the integrated code: **84 collected, 84 red**, none skipped. Every red fails for the reason in the last
+Run as above on the integrated code (batch 1; F4's case is batch 2, below): **84 collected, 84 red**, none skipped. Every red fails for the reason in the last
 column; none fails on a premise or an error in the test. Against a throwaway model of the command (kept out of the
 repository, not the engineer's) all 84 pass, and three mutations of it (a stale pid counted as running; no once-a-turn
 bound; the stand-by note always honoured) each turn the cases that name them red.
@@ -79,12 +79,12 @@ bound; the stand-by note always honoured) each turn the cases that name them red
 | F1 | S3's planted-turn cases (a second and a third call in the same turn say nothing): `test_s3_once_a_turn.py::test_s3_a_planted_turn_blocks_once_then_never_again_until_a_new_turn[waiter]`, `test_s3_once_a_turn.py::test_s3_a_planted_turn_blocks_once_then_never_again_until_a_new_turn[idle]`, `test_s3_once_a_turn.py::test_s3_stop_hook_active_never_blocks[waiter]`, `test_s3_once_a_turn.py::test_s3_stop_hook_active_never_blocks[idle]`, `test_s3_once_a_turn.py::test_s3_the_two_checks_share_one_state_file_and_each_keeps_its_own_bound`; and S2's one case per legitimate wait: `test_s2_idle.py::test_s2_gate_shut_lets_the_turn_end_and_names_the_gate`, `test_s2_idle.py::test_s2_disk_gate_shut_lets_the_turn_end_and_names_the_disk`, `test_s2_idle.py::test_s2_machine_full_lets_the_turn_end_and_names_it`, `test_s2_idle.py::test_s2_every_remaining_item_waiting_on_the_owner_lets_the_turn_end_and_names_the_owner`, `test_s2_idle.py::test_s2_a_live_pid_file_under_three_hours_is_a_running_job` | listed under S2 and S3 (not duplicated) |
 | F2 | S4's planted unreadable state file, both checks: `test_s4_errors.py::test_s4_an_unreadable_state_file_ends_the_turn_names_the_error_and_logs_it[garbage-waiter]`, `test_s4_errors.py::test_s4_an_unreadable_state_file_ends_the_turn_names_the_error_and_logs_it[garbage-idle]`, `test_s4_errors.py::test_s4_an_unreadable_state_file_ends_the_turn_names_the_error_and_logs_it[folder-waiter]`, `test_s4_errors.py::test_s4_an_unreadable_state_file_ends_the_turn_names_the_error_and_logs_it[folder-idle]`, and the two cases that take "any error" as written: `test_s4_errors.py::test_s4_an_unusable_gov_program_is_named_and_does_not_block`, `test_s4_errors.py::test_s4_a_missing_item_file_is_named_and_does_not_block` | listed under S4 |
 | F3 | S5's search of `src/gov/session_watch` for this repository's names: `test_s5_sources.py::test_s5_the_code_names_nothing_of_this_repository` | listed under S5 |
-| F4 | not a test: the lead's check (`git diff --name-only` of the ticket's branch against its base lists only paths matched by `allowed_paths`) | none |
+| F4 | `test_f4_scope.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths` | none of the 84 above: this case reads the branch, not the command, so it is green on the built branch when it changes only the ticket's `allowed_paths` (and this folder); red naming the path for a change outside them, and red naming the gap for a missing `w2/integrate`, a failing git call or an empty `allowed_paths` |
 
 Not a KPI line of its own: the hyphenated route (P-W2-159-1 (a)): `test_route.py::test_route_gov_session_watch_help_exits_0`
 (red: `invalid choice: 'session-watch'`, exit 2).
 
-Counts by KPI line: S1 15, S2 29, S3 19, S4 11, S5 9, route 1 (84 in all; F1, F2 and F3 are the S2, S3, S4 and S5 cases above).
+Counts by KPI line: S1 15, S2 29, S3 19, S4 11, S5 9, F4 1, route 1 (85 in all; F1, F2 and F3 are the S2, S3, S4 and S5 cases above).
 
 ## Not tested, by design
 
