@@ -384,6 +384,24 @@ def test_a_write_tracing_run_lists_only_the_scratch_state_file(root, transcripts
     assert _snapshot(transcripts) == before_t
 
 
+def test_a_leads_reminder_leaves_no_bytecode_beside_the_hooks(tmp_path, transcripts):
+    """The lead's wording imports precompact.checkpoint_rel; without PYTHONDONTWRITEBYTECODE no __pycache__ appears."""
+    hooks = tmp_path / "hooks"
+    hooks.mkdir()
+    for name in ("context_watch.py", "precompact.py"):
+        (hooks / name).write_bytes((HOOKS / name).read_bytes())
+    root = tmp_path / "lead"
+    root.mkdir()
+    (root / ".git").write_text("gitdir: /nowhere\n")
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 190_000))
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(tmp_path / "home"),
+           "CLAUDE_PROJECT_DIR": str(root), "GOV_ROLE": "orchestrator", "GOV_TICKET": "DAEO-lead"}
+    done = subprocess.run([sys.executable, str(hooks / "context_watch.py")], input=json.dumps(_event(t)),
+                          capture_output=True, text=True, cwd=str(root), env=env, timeout=30, check=False)
+    assert str(root / ".gov-runtime/scratch/lead/CHECKPOINT.md") in _context(done)
+    assert sorted(p.name for p in hooks.iterdir()) == ["context_watch.py", "precompact.py"]
+
+
 @pytest.mark.parametrize("name", ["context_watch.py", "precompact.py"])
 def test_neither_source_sets_or_reads_a_compaction_threshold(name):
     text = (HOOKS / name).read_text().lower()

@@ -51,12 +51,20 @@ def checkpoint_rel(project_root: str) -> str:
 
 
 def newest(folder: str) -> str:
-    """The newest file in the folder, else the folder."""
+    """The newest file in the folder, else the folder. A file gone between the listing and its stat is skipped."""
+    best, best_ns = folder, -1
     try:
-        files = [entry for entry in os.scandir(folder) if entry.is_file()]
+        entries = list(os.scandir(folder))
     except OSError:
         return folder
-    return max(files, key=lambda entry: entry.stat().st_mtime_ns).path if files else folder
+    for entry in entries:
+        try:
+            ns = entry.stat().st_mtime_ns if entry.is_file() else -1
+        except OSError:
+            continue
+        if ns > best_ns:
+            best, best_ns = entry.path, ns
+    return best
 
 
 def read_first(project_root: str, ticket: str) -> str:

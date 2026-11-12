@@ -250,8 +250,8 @@ def test_a_brief_deleted_before_its_stat_gives_the_next_newest(worker_tree, monk
     folder = worker_tree / BRIEFS
     real = os.scandir
 
-    def listing(path):
-        return [_Gone(folder / "gone.md"), *real(path)]
+    def listing(path):  # only the brief folder's listing is planted; os.scandir is global
+        return [_Gone(folder / "gone.md"), *real(path)] if str(path) == str(folder) else real(path)
 
     monkeypatch.setattr(precompact.os, "scandir", listing)
     assert precompact.newest(str(folder)) == str(folder / "eng-1.md")
@@ -261,7 +261,9 @@ def test_when_every_brief_is_gone_the_folder_is_named_and_the_line_is_printed(tm
     precompact = _module()
     folder = tmp_path / BRIEFS
     folder.mkdir(parents=True)
-    monkeypatch.setattr(precompact.os, "scandir", lambda path: [_Gone(folder / "a.md"), _Gone(folder / "b.md")])
+    real = os.scandir
+    monkeypatch.setattr(precompact.os, "scandir", lambda path: [_Gone(folder / "a.md"), _Gone(folder / "b.md")]
+                        if str(path) == str(folder) else real(path))
     assert precompact.newest(str(folder)) == str(folder)
     monkeypatch.setenv("GOV_ROLE", "engineer")
     monkeypatch.delenv("GOV_TICKET", raising=False)
