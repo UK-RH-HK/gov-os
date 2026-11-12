@@ -1378,14 +1378,17 @@ class Project:
         return tmpdir, workdir, command, watched
 
     def _popen(self, command, workdir, tmpdir, ignore=()):
-        """``ignore``: signals set to "ignore" in the started process before ``gov`` runs, as ``nohup`` does for
-        SIGHUP (run 2, R11); an ignored signal stays ignored across ``exec``."""
-        def ignoring():
-            for signum in ignore:
-                signal.signal(signum, signal.SIG_IGN)
+        """The started process owns its signal start state: each of SIGINT, SIGTERM and SIGHUP is set before ``gov``
+        runs, to "ignore" when it is named in ``ignore`` (as ``nohup`` does for SIGHUP, run 2, R11), otherwise to
+        its default. An ignored signal stays ignored across ``exec``, so without the reset a test process that
+        was itself started as a background job (SIGINT ignored: ``lead_verify.sh``, the cron nightly) would pass
+        the ignore on to ``gov`` (W2-177, cause (B))."""
+        def starting():
+            for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+                signal.signal(signum, signal.SIG_IGN if signum in ignore else signal.SIG_DFL)
         return subprocess.Popen(command, cwd=workdir, env=self.env(tmpdir), stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                                errors="replace", start_new_session=True, preexec_fn=ignoring if ignore else None)
+                                errors="replace", start_new_session=True, preexec_fn=starting)
 
     def run(self, *args, json_mode=True, cwd=None, timeout=RUN_TIMEOUT_S):
         """``gov accept <args>`` (``--json`` unless ``json_mode`` is false), from the root or ``cwd``."""
