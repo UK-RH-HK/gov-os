@@ -8,7 +8,8 @@ import yaml
 
 from .conftest import TK, Repo
 
-TICKET, WBS = "T-1", "W-1"
+TICKET, WBS = "T-0001", "W-1"  # the kernel's ticket id grammar (the checkpoint reads it)
+OTHER = "T-0002"
 OWN_SUITE = f"tests/acceptance/{WBS}/"
 OWN_TEST = f"{OWN_SUITE}test_w_1.py"
 
@@ -40,7 +41,7 @@ def files(mode: str | None = "scoped", **ticket) -> dict:
     out = {
         ".gitignore": ".gov-runtime/\n__pycache__/\n*.pyc\n",
         "governance/project/test-map.yaml": yaml.safe_dump(map_data(), sort_keys=False),
-        ".tickets/T-1.md": ticket_text(**ticket),
+        f".tickets/{TICKET}.md": ticket_text(**ticket),
         "src/pkg/__init__.py": "",
         "src/pkg/core.py": "def add(a, b):\n    return a + b\n",
         "src/pkg/feature.py": "from pkg.core import add\n\n\ndef twice(x):\n    return add(x, x)\n",
