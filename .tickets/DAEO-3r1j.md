@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- tests/acceptance/W2-105/  # the roster in its fixture only (the CTO, P-W2-110-5 (a), 2026-11-12)
 - template/governance/kernel/hooks/pretooluse.py
 - src/gov/guard/install.py
 - tests/unit/guard/test_w2_110*
@@ -55,3 +56,9 @@ From the owner's DEC-971 item 4 (P1-MORNING-2026-10-31 item 4, W2-105's P-W2-105
 - **FULL:** it is the guard. An independent review probes for any session other than the CTO's that is asked or let through.
 
 **DEC-980 (P-W2-110-1 (a)):** a test-design batch (`Rewrite-Reason: DEC-957, DEC-971 item 4`) gives each fixture of the older cases that still assert "any orchestrator is asked" (about 420 in W1-04, W1-47, W1-50, W1-03, W1-46 and W1-05's live-hook case) a roster whose `coordination_ticket` names its orchestrator ticket, which keeps their asks; the cases of an orchestrator subagent in a worker's session flip to refused; nothing else lowered. `tests/unit/install/test_install.py` (five cases) is in this ticket's paths for the engineer's same revision.
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-12), the resume's P-W2-110-5 (a):** W2-105's two CTO-asked cases go red
+  under this ticket's fail-closed rule because their generated project has no roster. A fresh independent test designer
+  gives W2-105's fixture a roster with `coordination_ticket: DAEO-zz91` (`Rewrite-Reason: DEC-971 item 4, DEC-980`), the
+  revision DEC-980 made to the older cases; nothing else lowered, the other roles' cases stay refused. `tests/acceptance/W2-105/`
+  added to the paths above for it (DEC-957 P2: another ticket's tests revised under an existing decision).
