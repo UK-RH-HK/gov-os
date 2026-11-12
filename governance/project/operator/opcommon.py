@@ -25,8 +25,16 @@ SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 CLASSES = ("a", "b", "O")
 RANK = {"a": 0, "b": 1, "O": 2}
 LIVE_REPO = "/home/usain/Dynamic-Agentic-Engineering-OS"
-QUIET = ((2, 0), (7, 30))           # the quiet hours, 02:00 to 07:30 (DEC-1104 (2), G9)
-DEFAULT_NIGHTLY = "03:50-08:00"     # the nightly (04:00 to about 07:00) and its wake (03:50): ACT-NIGHTLY-0400
+# G9 holds only while the night hold is on (DEC-1141 (6), ACT-OPERATOR-HOURS-2; it replaces the fixed quiet hours 02:00 to 07:30
+# and the nightly's fixed window 03:50 to 08:00 of DEC-1104 (2)): the same rule and the same fail-closed reading as the
+# crontab's guard (ACT-OPERATOR-HOURS-1). From 02:10 to 03:09 it holds (a session started now could run into the hold);
+# from 03:10 to 07:59 it holds unless the night hold's state file (the CTO's night_hold.py) is under NIGHT_HOLD_MAX_AGE_S
+# old and its "holding" is exactly false; at every other hour the file is not read and there is no time hold.
+HOLD_FROM = (2, 10)
+HOLD_READ_FROM = (3, 10)
+HOLD_END = (8, 0)
+NIGHT_HOLD_MAX_AGE_S = 300
+DEFAULT_NIGHTLY = None              # no fixed nightly window by default; the NIGHTLY-RUNNING flag and the night hold say when
 AFTER_G7 = ("G7", "G8", "G9", "recompute", "apply", "checks", "unlisted", "staged", "commit", "after-check")
 FREEZE_NAME = "act-in-progress.txt"  # the commit freeze, <operator root>/install/act-in-progress.txt (DEC-1106 (3))
 
@@ -90,7 +98,11 @@ def load_settings(config_path=None):
     s["replay_stale_h"] = float(conf.get("replay_stale_h") if conf.get("replay_stale_h") is not None else 12)
     s["close_flag"] = os.path.abspath(os.path.expanduser(
         conf.get("close_flag") or os.path.join(s["scratch"], "CLOSE-RUNNING")))
-    s["nightly_window"] = conf.get("nightly_window") or DEFAULT_NIGHTLY
+    s["nightly_window"] = conf.get("nightly_window") or DEFAULT_NIGHTLY       # an explicit window still holds
+    # DEC-1141 (6): the night hold's state file (night_hold.py writes it every 60 s: pid, at, holding, in_window, nightly)
+    s["night_hold_state"] = os.path.abspath(os.path.expanduser(
+        conf.get("night_hold_state") or os.path.join(s["scratch"], "log/night-hold.state.json")))
+    s["night_hold_max_age_s"] = float(conf.get("night_hold_max_age_s") or NIGHT_HOLD_MAX_AGE_S)
     # F12: the flag the nightly writes while it runs (nightly.sh: $ORCH/NIGHTLY-RUNNING, ORCH the CTO's scratch), so a
     # nightly that overruns its window still holds; older than nightly.sh's own 6 hours it is a dead run's leftover
     s["nightly_flag"] = os.path.abspath(os.path.expanduser(
@@ -161,6 +173,25 @@ def in_window(d, window):
     return a <= t < b if a <= b else (t >= a or t < b)
 
 
+def night_hold_reasons(s):
+    """Why the night hold is on (DEC-1141 (6)): [] only when its state file was written less than night_hold_max_age_s ago
+    and says "holding" exactly false. Fails closed: a missing, empty, malformed, stale or odd file (a directory, no
+    "holding", null, 0, "false") is a hold. When night_hold.py is not running the file keeps its last content, so its age
+    is read as well; the crontab's guard reads it the same way (ACT-OPERATOR-HOURS-1)."""
+    path = s["night_hold_state"]
+    try:
+        age = time.time() - os.stat(path).st_mtime
+        with open(path, encoding="utf-8") as f:
+            holding = json.load(f)["holding"]
+    except Exception as exc:     # fail closed: any error is a hold
+        return [f"the night hold's state cannot be read ({exc.__class__.__name__})"]
+    if not age < s["night_hold_max_age_s"]:
+        return [f"the night hold's state is stale ({int(age)} s old)"]
+    if holding is not False:
+        return ["the night hold is on"]
+    return []
+
+
 def holds(s):
     """G9's holds now, as a list of reasons (empty: no hold). Fails closed: a clock it cannot read is a hold."""
     out = []
@@ -168,11 +199,13 @@ def holds(s):
         d = now(s)
     except (OSError, ValueError, IndexError) as exc:
         return [f"the clock cannot be read ({exc})"]
-    (qa, qb) = QUIET
-    if in_window(d, f"{qa[0]:02d}:{qa[1]:02d}-{qb[0]:02d}:{qb[1]:02d}"):
-        out.append("the quiet hours (02:00 to 07:30)")
+    t = d.hour * 60 + d.minute
+    if HOLD_FROM[0] * 60 + HOLD_FROM[1] <= t < HOLD_READ_FROM[0] * 60 + HOLD_READ_FROM[1]:
+        out.append("before the night hold (02:10 to 03:09: no session starts that could run into it)")
+    elif HOLD_READ_FROM[0] * 60 + HOLD_READ_FROM[1] <= t < HOLD_END[0] * 60 + HOLD_END[1]:
+        out.extend(night_hold_reasons(s))
     try:
-        if in_window(d, s["nightly_window"]):
+        if s["nightly_window"] and in_window(d, s["nightly_window"]):
             out.append(f"the nightly's window ({s['nightly_window']})")
     except ValueError as exc:
         out.append(str(exc))

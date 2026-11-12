@@ -1,6 +1,6 @@
 ---
 id: DAEO-nqa2
-status: in_progress
+status: closed
 deps: [DAEO-0mtg]
 links: [DAEO-8lmb]
 created: 2026-10-31T13:15:13Z

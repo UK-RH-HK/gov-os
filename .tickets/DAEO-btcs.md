@@ -1,6 +1,6 @@
 ---
 id: DAEO-btcs
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-c1uz, DAEO-zuiy]
 created: 2026-11-09T01:45:43Z

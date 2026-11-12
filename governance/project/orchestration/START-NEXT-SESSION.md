@@ -4,7 +4,11 @@ You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
 the register and the owner's word hold over both. **Next free id: DEC-1135.**
 
-## 00000. NOW (16:55 UTC 11-11, session b40cba91): read CHECKPOINT's RESUME HERE (16:55) first
+## 000000. NOW (21:40 UTC 11-11, session b40cba91 hands over): read CHECKPOINT's RESUME HERE (21:40, then 21:00) first
+- Five closes tonight; W2-90b, W2-40, W2-05 landing; W2-175 waits on the owner's template approval; W2-11 restore running;
+  DEC-1135 to DEC-1138 recorded (next free DEC-1139). Re-arm the watchers and the digest crons first.
+
+## 00000. (history) NOW (16:55 UTC 11-11, session b40cba91): read CHECKPOINT's RESUME HERE (16:55) first
 - Six ACTs in the owner's queue or in review (EXAMIN-SETS-1 and MEMORY-AUDIT-INSTALL-1 READY with yes lines;
   ACCEPTED-REDS-1, OPERATOR-ROUNDS-1 r2, NIGHTLY-RESTART-1 rebuild in flight; LOAD-BALANCER-A after its companion tests).
   The start-check pin in §7 is now `pin-797495bdfc70`. Session crons (the digests) die with the session: re-arm them.
@@ -70,7 +74,7 @@ the register and the owner's word hold over both. **Next free id: DEC-1135.**
   `packages/LIFT-1/D10-REDS.md` §6, `P1-PLAN.md`'s D-10 row.
 - **Usage: 58 % of the week at 13:56** (reset 11-15 09:00). **DEC-1115 (4): past 80 % before the lift, only the lift's
   critical path runs.** USAGE-1 (`packages/USAGE-1.md`): one meter point ≈ $27.5 at list price; most cost is long Opus
-  contexts re-read. Keep your own context short; brief helpers to hand over past ~200k.
+  contexts re-read. Keep your own context short; no session has a token cap (DEC-1141 (3)).
 - **Nothing is running** but the session watchers (§6).
 
 ## 0c. YOUR FIRST TASK (DEC-1119), before the lift's other steps
@@ -132,7 +136,7 @@ physical steps go to the owner, every other P2 is the CTO's (DEC-1112 (3)).
 **Learned 11-09/10 (memory files hold them):** never leave a merge staged in the shared tree (merge in one command
 with the ticket's trailer); before a brief edits a committed tool, check `class-rules.yaml`: (b)/(O) paths go by ACT;
 give each round's spend projection in its brief (`launch_worker.sh --projection-usd`).
-**Rule 11 (DEC-1118):** helpers hand over past ~200k context; the CTO checkpoints and clears at ~200k and before any
+**Rule 11 (DEC-1118, DEC-1141):** no token cap for any session; full window and compaction, the hook writing the checkpoint and before any
 planned idle over an hour; ACT-preparation helpers on Sonnet (`model: "sonnet"` in the Agent call), reviews, test
 design and engineering on Opus; every session's list-price cost logged.
 

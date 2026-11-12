@@ -138,7 +138,8 @@ class World:
         procfile.write_text(json.dumps(self.procs))
         env = dict(os.environ, GOV_STOPIDLE_ORCH=str(self.orch), GOV_STOPIDLE_DND=str(self.dnd),
                    GOV_STOPIDLE_TASKS=str(self.tasks), GOV_STOPIDLE_SUBAGENTS=str(self.sub),
-                   GOV_STOPIDLE_PROC=str(procfile), GOV_STOPIDLE_PIDGLOBS=":".join(self.pidglobs))
+                   GOV_STOPIDLE_PROC=str(procfile), GOV_STOPIDLE_PIDGLOBS=":".join(self.pidglobs),
+                   GOV_STOPIDLE_REPO=str(self.tmp / "repo"))  # ACT-IDLE-GUARD-2: a planted repository (or none: unreadable)
         data = {"session_id": session, "stop_hook_active": active, "transcript_path": str(self.transcript),
                 "hook_event_name": "Stop", **(extra or {})}
         out = subprocess.run([sys.executable, "-E", str(HOOK)], input=raw if raw is not None else json.dumps(data),
@@ -466,3 +467,375 @@ def test_f2_the_open_words_are_the_upper_case_states_not_prose(tmp_path):
     w = World(tmp_path)
     w.dnd.write_text(ALL_WAIT + '| 12 | K9 | **DONE 11-08**: status_block.py reads the lists; K9 now "in progress" |\n')
     assert "decision" not in w.run()
+
+
+# ---- ACT-IDLE-GUARD-1 (11-11: no lead ran from 13:31 to 17:54 while W2-170 and batch 1 were ready)
+USED = "already started for W2-170-A5-tests.json"
+RETURNED = "W2-170-A5-tests.json already holds a return"
+HELPER = "python3 /x/tools/helper_watch.py --every 300 --max 86400"
+
+
+def set_cap(w, n):
+    (w.orch / "dispatch/config.json").write_text(json.dumps({"max_leads": n}))
+
+
+def stale_line(**over):
+    """The dispatcher's tick of 11-11 15:20 to 17:53: one lead's line, skipped for its used log; the gate open."""
+    return status(ready_count=1, ready_waits={"W2-170 DAEO-61vm": USED}, **over)
+
+
+def stub_gov(tmp, lines, exit_code=1):
+    """A `gov` that writes `gov plan --ready <file>`'s form to the file named after --ready (the real one exits 1 on
+    the plan's own findings)."""
+    g = tmp / "gov"
+    g.write_text("#!/bin/sh\nout=''\nwhile [ $# -gt 0 ]; do [ \"$1\" = --ready ] && out=\"$2\"; shift; done\n"
+                 f"cat > \"$out\" <<'EOT'\n{lines}\nEOT\nexit {exit_code}\n")
+    g.chmod(0o755)
+    return str(g)
+
+
+def test_the_standing_watchers_of_section_6_are_not_work(tmp_path):
+    """helper_watch.py ran 24 h and let every idle turn through; every watcher START-NEXT-SESSION names is listed."""
+    w = World(tmp_path)
+    for i, cmd in enumerate(("bash /x/tools/inbox_wait.sh", "bash /x/tools/inbox_wait_quiet.sh", HELPER,
+                             "bash /x/tools/sentinel_check.sh", "bash /x/tools/bare_watch.sh",
+                             "bash /x/tools/store_refresh_daily.sh", "bash /x/tools/usage_log.sh",
+                             "python3 /x/tools/mem_guard.py", "bash /x/tools/oom_watch.sh")):
+        w.task(f"bw{i:05d}", cmd, 400 + i)
+    assert w.run()["decision"] == "block"
+    assert "helper_watch" not in w.log()
+
+
+def test_helper_watch_beside_a_real_job_still_counts_only_the_job(tmp_path):
+    w = World(tmp_path)
+    w.task("bwatch01", HELPER, 410)
+    w.task("bjob0001", "python3 -m pytest tests/unit -q", 411)
+    assert w.run() is None
+    assert "running: 1\ttask bjob0001" in w.log() and "helper_watch" not in w.log()
+
+
+def test_a_used_log_ready_line_with_an_open_gate_blocks_whatever_runs(tmp_path):
+    """The 17:06-17:49 case: one lead running (W2-170 relaunch pending), a watcher, a job; the old hook let it through."""
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line(lead_count=1, leads=["W2-9"]))
+    w.task("bwatch01", HELPER, 420)
+    w.task("bjob0001", "python3 -m pytest tests/unit -q", 421)
+    w.worker("W2-129-d6", "W2-129-engineer-d6", 422)
+    ans = w.run()
+    assert ans["decision"] == "block"
+    r = ans["reason"]
+    assert "ACT-IDLE-GUARD-1" in r and "IDLE-REASON" in r
+    assert "1 launchable: W2-170 DAEO-61vm (already started for W2-170-A5-tests.json)" in r
+    assert "skipped for a used or returned log" in r and "leads 1 of 3" in r
+    assert "\tblock\tlaunchable: 1\t" in w.log()
+
+
+def test_a_returned_log_line_blocks_too_and_every_such_line_is_named(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(ready_count=3, ready_waits={"W2-170 DAEO-61vm": RETURNED, "W2-105 DAEO-zpdj": USED,
+                                                    "W2-04 DAEO-u4oz": "no brief W2-04.md"}))
+    r = w.run()["reason"]
+    assert "2 launchable" in r and "W2-170 DAEO-61vm (W2-170-A5-tests.json already holds a return)" in r
+    assert "W2-105 DAEO-zpdj (already started for" in r and "W2-04" not in r
+
+
+def test_no_block_at_the_cap_or_with_the_gate_shut_or_the_machine_full(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
+    assert w.run() is None                                  # at the cap: the dispatcher's lead runs, nothing launchable
+    w2 = World(tmp_path / "second")
+    set_cap(w2, 3)
+    w2.set_status(stale_line(lead_count=2, leads=["a"], pending_launches=["x", "y"]))
+    assert w2.run() is None                                 # two running and two launching: at the cap
+    w3 = World(tmp_path / "third")
+    set_cap(w3, 3)
+    w3.set_status(stale_line(gate_open=False, gate="SHUT load 19.5"))
+    assert "the gate shut" in w3.run()["systemMessage"]
+    w4 = World(tmp_path / "fourth")
+    set_cap(w4, 3)
+    w4.set_status(stale_line(forecast={"lead": {"ok": False, "reason": "REFUSES, binding CPU"}}))
+    assert "the machine full" in w4.run()["systemMessage"]
+
+
+def test_the_cap_is_read_from_the_config_not_fixed(tmp_path):
+    w = World(tmp_path)
+    w.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
+    set_cap(w, 5)
+    assert w.run()["decision"] == "block"                   # three of five run: room
+    w2 = World(tmp_path / "second")
+    w2.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
+    assert w2.run()["decision"] == "block"                  # no cap set: the forecast alone admits, and it does
+    (w2.orch / "dispatch/config.json").write_text("{not json")
+    w2.new_turn("turn-2")
+    assert w2.run()["decision"] == "block"                  # an unreadable config is no cap, never a crash
+
+
+def test_a_stale_tick_is_not_relied_on_for_a_launchable_ticket(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line(lead_count=1, leads=["a"]), age=900)
+    w.task("bjob0001", "python3 -m pytest tests/unit -q", 430)
+    assert w.run() is None
+    assert "dispatcher status unusable" in w.log()
+
+
+def test_an_idle_reason_while_a_ticket_is_launchable_is_shown_as_such(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line())
+    w.say("IDLE-REASON: the owner's yes comes first")
+    ans = w.run()
+    assert "decision" not in ans
+    assert "NOTE for the owner: a ticket was launchable (1 launchable: W2-170 DAEO-61vm" in ans["systemMessage"]
+    assert "the CTO's stated reason WHILE a ticket was launchable\tthe owner's yes comes first" in w.log()
+    assert "W2-170 DAEO-61vm" in w.log()
+
+
+def test_the_launchable_block_is_once_a_turn(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line())
+    assert w.run()["decision"] == "block"
+    again = w.run()
+    assert "decision" not in again and "second stop this turn" in again["systemMessage"]
+    assert "a ticket was launchable: 1 launchable: W2-170 DAEO-61vm" in again["systemMessage"]
+    w.new_turn("turn-2")
+    assert w.run()["decision"] == "block"
+    assert "decision" not in w.run(active=True)
+
+
+def test_no_ready_count_in_the_tick_or_only_other_waits_is_not_launchable(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_waits={"W2-170 DAEO-61vm": USED}))   # an older dispatcher's tick
+    assert w.run()["decision"] == "block"   # the used-log line is named whatever the count key says
+    w2 = World(tmp_path / "second")
+    set_cap(w2, 3)
+    w2.set_status(status(lead_count=1, leads=["a"], ready_count=2,
+                         ready_waits={"W2-1 T-1": "no brief X.md", "W2-2 T-2": "claim not committed on w2/integrate"}))
+    assert w2.run() is None                 # lines wait for the CTO's own prep: the dispatcher's item covers them
+    w3 = World(tmp_path / "third")
+    w3.set_status(status(lead_count=1, leads=["a"]))
+    assert w3.run() is None                 # no ready_count, no ready_waits: nothing known launchable
+
+
+PLAN = "# batch 1\nW2-105 DAEO-zpdj W2-105-A5-run1.md W2-105-A5-run1.json\nW2-00 DAEO-sdxk W2-00-A5-run1.md W2-00-A5-run1.json\n" \
+       "W2-04 DAEO-u4oz W2-04-A5-run1.md W2-04-A5-run1.json\n# batch 2\nW2-133 DAEO-k4wm W2-133-A5-run1.md x.json"
+
+
+def test_an_empty_ready_list_with_plan_tickets_ready_blocks_naming_the_first_batch(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, PLAN))
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["W2-04"], ready_count=0, ready_waits={}))
+    w.task("bwatch01", HELPER, 440)
+    r = w.run()["reason"]
+    assert "1 launchable: W2-105 (DAEO-zpdj) (ready.txt is empty; these are gov plan's first batch" in r
+    assert "W2-00" not in r and "W2-04" not in r and "W2-133" not in r      # the CTO's own, a running lead, batch 2
+    assert not list((w.orch / "log").glob("plan-ready-*"))                   # no temp file left
+
+
+def test_an_empty_ready_list_with_no_usable_plan_does_not_block_and_says_so(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", str(tmp_path / "no-such-gov"))
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    assert w.run() is None
+    assert "gov plan unusable" in w.log() or "gov plan not run" in w.log()
+    (tmp_path / "x").mkdir()
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path / "x", "# no batches", exit_code=0))
+    w2 = World(tmp_path / "second")
+    w2.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    assert w2.run() is None and "no batch in its ready form" in w2.log()
+
+
+# ---- ACT-IDLE-GUARD-2 (the review's F1 to F3 of ACT-IDLE-GUARD-1)
+def plant_repo(tmp, merged=(), unmerged=(), fresh=(), moved_on=False):
+    """A planted repository: w2/integrate and ticket branches as the hook reads them (`git for-each-ref --merged
+    w2/integrate`, then w2/integrate's first-parent line). `merged`: a branch with a commit of its own, merged into
+    w2/integrate by a merge commit (its tip is a merge's second parent); `unmerged`: a commit of its own, not merged;
+    `fresh`: a branch made at the claim, no commit of its own (tip = w2/integrate's head then); `moved_on`: w2/integrate
+    gets a further commit after the fresh branches were made, so their tip is an older commit of the first-parent line."""
+    repo = tmp / "repo"
+    repo.mkdir(parents=True, exist_ok=True)
+
+    def git(*a):
+        subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t", *a], capture_output=True,
+                       text=True, check=True)
+    git("init", "-q", "-b", "w2/integrate")
+    (repo / "f.txt").write_text("x\n")
+    git("add", "-A")
+    git("commit", "-q", "-m", "base")
+    for b in fresh:
+        git("branch", f"w2/{b}")
+    for b in merged:
+        git("checkout", "-q", "-b", f"w2/{b}")
+        (repo / f"{b}.txt").write_text("y\n")
+        git("add", "-A")
+        git("commit", "-q", "-m", b)
+        git("checkout", "-q", "w2/integrate")
+        git("merge", "-q", "--no-ff", "-m", f"merge {b}", f"w2/{b}")
+    for b in unmerged:
+        git("checkout", "-q", "-b", f"w2/{b}")
+        (repo / f"{b}.txt").write_text("y\n")
+        git("add", "-A")
+        git("commit", "-q", "-m", b)
+        git("checkout", "-q", "w2/integrate")
+    if moved_on:
+        (repo / "g.txt").write_text("z\n")
+        git("add", "-A")
+        git("commit", "-q", "-m", "integrate moves on")
+    return repo
+
+
+def unread(w, w2, name=None):
+    """An unread dispatcher inbox item for a returned lead (the `W2: <id>` line the dispatcher writes)."""
+    d = w.orch / "dispatch/inbox"
+    d.mkdir(exist_ok=True)
+    (d / (name or f"20261111-180000-{w2}-return.txt")).write_text(f"log: x\nW2: {w2}\nstatus: PACKAGES\n")
+
+
+def test_f1_a_used_log_line_whose_lead_returned_unread_is_left_out_and_named_in_the_log(tmp_path):
+    """The review's F1: a finished lead's line read 'launchable' while its return waited unread for the CTO."""
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["W2-9"], ready_count=1, ready_waits={"W2-170 DAEO-61vm": USED}))
+    unread(w, "W2-170")
+    assert w.run() is None
+    assert "left out, a return waits unread in the dispatcher's inbox: W2-170 DAEO-61vm" in w.log()
+
+
+def test_f1_only_the_line_with_the_unread_return_is_left_out_and_a_read_return_names_it_again(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["W2-9"], ready_count=2,
+                        ready_waits={"W2-170 DAEO-61vm": USED, "W2-105 DAEO-zpdj": USED}))
+    unread(w, "W2-170")
+    r = w.run()["reason"]
+    assert "1 launchable: W2-105 DAEO-zpdj (already started for" in r and "W2-170 DAEO-61vm" not in r
+    w.new_turn("turn-2")
+    (w.orch / "dispatch/inbox/20261111-180000-W2-170-return.txt").unlink()  # the CTO read it
+    r = w.run()["reason"]
+    assert "2 launchable" in r and "W2-170 DAEO-61vm" in r and "W2-105 DAEO-zpdj" in r
+
+
+def test_f1_the_blocks_text_says_to_comment_out_a_line_whose_ticket_needs_no_new_run(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line())
+    r = w.run()["reason"]
+    assert "comment a line out of ready.txt when its ticket needs no new run" in r and "IDLE-REASON" in r
+
+
+def test_f1_a_return_item_with_no_w2_line_leaves_nothing_out(tmp_path):
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(stale_line())
+    (w.orch / "dispatch/inbox").mkdir()
+    (w.orch / "dispatch/inbox/20261111-1-idle-headroom.txt").write_text("log: x\nIdle: headroom\nstatus: x\n")
+    assert w.run()["decision"] == "block"
+
+
+def test_f2_a_plan_ticket_already_merged_into_integrate_is_left_out_and_named_in_the_log(tmp_path, monkeypatch):
+    """The review's F2: W2-131 and W2-139 were merged and waiting for their close, and the plan arm named them."""
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-131 DAEO-a1 x.md x.json\nW2-139 DAEO-b2 y.md y.json\n"
+                                                    "W2-94 DAEO-c3 z.md z.json\nW2-00 DAEO-sdxk w.md w.json\n# batch 2\nW2-5 DAEO-d4 q.md q.json"))
+    plant_repo(tmp_path, merged=["W2-131", "W2-139"])  # W2-94 has no branch yet: it needs a brief and a claim, still named
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    r = w.run()["reason"]
+    assert "1 launchable: W2-94 (DAEO-c3)" in r and "W2-131" not in r and "W2-139" not in r
+    assert "merged into w2/integrate, to close (not launchable): W2-131, W2-139" in w.log()
+
+
+def test_f2_a_branch_with_commits_of_its_own_is_launchable_and_the_integration_branch_is_never_a_ticket(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-7 DAEO-e5 a.md a.json\nW2-8 DAEO-f6 b.md b.json"))
+    plant_repo(tmp_path, merged=["W2-8"], unmerged=["W2-7"])
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    r = w.run()["reason"]
+    assert "1 launchable: W2-7 (DAEO-e5)" in r and "W2-8" not in r
+
+
+def test_f2_when_every_plan_ticket_is_merged_nothing_is_launchable_and_the_close_work_is_named(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-131 DAEO-a1 x.md x.json\nW2-139 DAEO-b2 y.md y.json"))
+    plant_repo(tmp_path, merged=["W2-131", "W2-139"])
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    ans = w.run()
+    assert ans is None or "launchable" not in json.dumps(ans)
+    assert "merged into w2/integrate, to close (not launchable): W2-131, W2-139" in w.log()
+
+
+def test_f2_an_unreadable_repository_names_every_plan_ticket_and_says_so(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-131 DAEO-a1 x.md x.json"))
+    w = World(tmp_path)  # no planted repository: git fails
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    r = w.run()["reason"]
+    assert "1 launchable: W2-131 (DAEO-a1)" in r
+    assert "merged branches not read (git failed): the plan's tickets are all named" in w.log()
+
+
+def test_f3_a_plan_that_hangs_is_cut_inside_the_hooks_own_10_second_timeout_and_named(tmp_path, monkeypatch):
+    """The review's F3: the plan's 30 s ran past the hook entry's `timeout: 10`, so Claude Code killed the hook silently."""
+    g = tmp_path / "gov"
+    g.write_text("#!/bin/sh\nsleep 30\n")
+    g.chmod(0o755)
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", str(g))
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    t0 = time.time()
+    assert w.run() is None
+    assert time.time() - t0 < 9
+    assert "gov plan unusable (TimeoutExpired, at most 5 s)" in w.log()
+    assert not list((w.orch / "log").glob("plan-ready-*"))
+
+
+def test_f3_the_two_timeouts_together_stay_inside_the_hook_entrys_10_seconds():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("stop_idle_under_test", HOOK)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    assert m.PLAN_TIMEOUT_S == 5 and m.MERGED_TIMEOUT_S == 3 and m.PLAN_TIMEOUT_S + m.MERGED_TIMEOUT_S < 10
+
+
+def test_f1_r2_a_claimed_ticket_with_a_fresh_branch_at_integrates_head_stays_named(tmp_path, monkeypatch):
+    """Round 2, the review's F1: `tk start` makes w2/<id> at w2/integrate's head with no commit of its own, and
+    `git for-each-ref --merged` lists it. W2-115 was in this state: the round-1 hook stopped naming it."""
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-115 DAEO-emq1 a.md a.json\nW2-131 DAEO-a1 x.md x.json"))
+    plant_repo(tmp_path, fresh=["W2-115"], merged=["W2-131"])
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    r = w.run()["reason"]
+    assert "1 launchable: W2-115 (DAEO-emq1)" in r and "W2-131" not in r
+    assert "merged into w2/integrate, to close (not launchable): W2-131" in w.log() and "W2-115" not in w.log().split("to close")[-1]
+
+
+def test_f1_r2_a_fresh_branch_stays_named_when_integrate_has_moved_on_and_when_it_is_the_only_ticket(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-115 DAEO-emq1 a.md a.json"))
+    plant_repo(tmp_path, fresh=["W2-115"], moved_on=True)  # its tip is an older commit of the first-parent line
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    assert "1 launchable: W2-115 (DAEO-emq1)" in w.run()["reason"]
+    assert "to close" not in w.log()
+
+
+def test_f1_r2_a_truly_merged_ticket_is_left_out_and_named_in_the_log(tmp_path, monkeypatch):
+    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, "# batch 1\nW2-131 DAEO-a1 x.md x.json"))
+    plant_repo(tmp_path, merged=["W2-131"], moved_on=True)  # merged by a merge commit, integrate moved on after it
+    w = World(tmp_path)
+    set_cap(w, 3)
+    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
+    ans = w.run()
+    assert ans is None or "launchable" not in json.dumps(ans)
+    assert "merged into w2/integrate, to close (not launchable): W2-131" in w.log()

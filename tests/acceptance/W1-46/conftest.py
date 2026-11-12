@@ -98,11 +98,19 @@ import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 @pytest.fixture(scope="session")
 def kernel_base(tmp_path_factory):
-    """The temporary project on a generated project, built once. Never run a command in it."""
+    """The temporary project on a generated project, built once. Never run a command in it.
+
+    Its roster names the orchestrator's ticket ``DAEO-zz91`` as the top-level ``coordination_ticket``, before the
+    roster's ``roles:`` block: the orchestrator on it is the CTO (DEC-957, DEC-971 item 4; DEC-980).
+    """
     try:
-        return kernel_wiring.w1_46_project(tmp_path_factory.mktemp("w2-90-w1-46-kernel"))
+        project = kernel_wiring.w1_46_project(tmp_path_factory.mktemp("w2-90-w1-46-kernel"))
     except kernel_wiring.GenerationFailed as exc:
         pytest.fail(str(exc), pytrace=False)
+    roster = project / support.ROSTER_REL
+    roles = roster.read_text(encoding="utf-8") if roster.is_file() else ""
+    key = f"coordination_ticket: {support.check_support.ORCHESTRATOR_TICKET_ID}\n"
+    return kernel_wiring.plant(project, {support.ROSTER_REL: key + roles}, "the project's coordination ticket (DEC-980)")
 
 
 @pytest.fixture(scope="session")

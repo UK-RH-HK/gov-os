@@ -1,6 +1,6 @@
 ---
 id: DAEO-emq1
-status: open
+status: in_progress
 deps: [DAEO-arrl]
 links: []
 created: 2026-10-31T23:52:57Z
@@ -17,7 +17,15 @@ role: engineer
 depends_on:
 - DAEO-arrl
 allowed_paths:
+- tests/acceptance/W1-39/test_w1_39_copy.py  # PK-1 (a), the owner DEC-1142 (3): the overlay case names close.yaml; a test designer's revision only (dropped after the land)
+- tests/acceptance/W1-39/README.md  # the same
+- tests/acceptance/W2-77/w2_77_support.py  # PK-2 (a), the CTO: the nightly record's key set allows secrets_full_scan; a test designer's revision only (dropped after the land)
+- tests/acceptance/W2-77/test_w2_77_unchanged.py  # the same
+- tests/acceptance/W2-77/test_w2_77_failed_removal.py  # the same
+- tests/acceptance/W2-77/README.md  # the same
 - src/gov/close/command.py
+- governance/project/close.yaml
+- template/governance/project/close.yaml
 - src/gov/close/select.py
 - src/gov/close/batch.py
 - src/gov/close/nightly.py
@@ -41,21 +49,13 @@ kpis:
   - 'Measured, in docs/research/W2-115-smart-close.md: the CTO''s `close_build.py` and this close give the same verdict on three of this repository''s recorded batches (one clean, one with a caused red, one with an unowned red) Verify: the document holds, for three recorded batches (one clean, one with a caused red, one with an unowned red), the verdict of `close_build.py` and of this close side by side, and the two verdicts are equal on all three. [DEC-983, DEC-982]'
   - 'The close''s clean clone is a warm one kept between closes (reset, stores kept), replaced by a fresh one when it cannot be reset Verify: two planted closes in a row: the second reuses the first''s clone (same folder, reset, stores kept); a planted clone that cannot be reset is replaced by a fresh one and the record says so. [DEC-1001 (b), SMART-WORK-2]'
   - 'READY is computed, not declared: each reviewer''s probe record carries a structured verdict per KPI line (pass or fail, each finding''s scope in or out, ordinary work yes or no, consequence fails open, loses work or other); the close refuses only on a finding that is in scope, reachable in ordinary work and fails open or loses work; a malformed or incomplete verdict refuses (fail closed); a verdict written by the ticket''s lead over a reviewer''s is refused Verify: planted probe records: a complete structured verdict per KPI line with only out-of-scope or non-ordinary findings gives READY; one in-scope, reachable, fails-open finding refuses; a malformed or incomplete verdict refuses; a verdict written by the ticket''s lead over a reviewer''s is refused. [DEC-1010 item 1, SMART-WORK-3] (folds W2-117 S7)'
-  - '`gov queue` gives W2-97''s queue in the product: the commit tested is the commit landed; one run per batch on the merged result, in a heavy-job slot (W2-20); a run skipped when the merged code is identical to what the lead tested, with its reason; a red batch''s culprit ejected and the rest advanced (W2-115''s attribution) Verify: a planted queue of two batches, one green and one red with a culprit: the commit landed equals the commit tested (the same hash in both records), one run per batch on the merged result in a heavy-job slot, a run on identical merged code skipped with its reason, the red batch''s culprit ejected and the rest advanced. [DEC-959 item 1, DEC-983, DEC-982] [moved from W2-117 S1, DEC-1083]'
-  - 'Each green run lands and closes in one step: the ticket merges, its close record (the run, its counts, every red with its verdict, the baseline traced against) is written and the ticket closed on that run, the close citing the queue''s record instead of running its own tests on the same code; no ticket sits merged but not closed Verify: a planted green run: the ticket''s merge, its close record (run, counts, each red with its verdict, the baseline traced against) and its `closed` status all come from that run, the close cites the queue''s record and runs no tests of its own; after the run no planted ticket is merged and not closed. [DEC-989, DEC-959 item 1, DEC-983, DEC-982, DEC-1003, SMART-WORK-2] [moved from W2-117 S2, DEC-1083]'
-  - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired Verify: grep of the close and queue code for this repository''s branch names, paths and ticket ids finds 0 lines; a planted second repository''s queue runs with the same code; this repository''s queue runs on it and W2-97''s tool is no longer called. [DEC-983, DEC-982] [moved from W2-117 S3, DEC-1083]'
-  - 'After each landing, the queue starts the integration store''s refresh (W2-116) and seeds its own warm clones from it Verify: a planted landing: the integration store''s refresh (W2-116) is started once afterwards and the queue''s own warm clones are seeded from that store, both visible in the queue''s record. [DEC-1014 items 4 and 6, SMART-WORK-5 E, DEC-1015 item 3] [moved from W2-117 S4, DEC-1083]'
-  - 'When the integration branch moved during a run only by record or governance files (the record places and the governance overlay), the queue merges onto the new head and re-runs only the record-reading suites (named in the test map), then advances; any other file in the move re-runs the whole selection; a record-reading set that cannot be read re-runs the whole selection Verify: planted moves: only record or governance files changed: the queue merges onto the new head and re-runs only the record-reading suites, then advances; any other file in the move: the whole selection re-runs; an unreadable record-reading set: the whole selection re-runs. [DEC-1001 (a), DEC-1003, SMART-WORK-2] [moved from W2-117 S5, DEC-1083]'
   - 'The trailers switch: the check family `product-traceability-trailers` counts as a warning, not a hard block. Its declaration (`template/governance/kernel/checks/product-traceability-trailers.yaml`, a kernel file: the change goes by this ticket''s CIT-P, independent review and the owner''s approval first) reads `severity: warning`; `gov close` names a missing trailer as a notice and never refuses on it; `src/gov/close/traceability.py` stays an on-demand report that lists each commit without its trailers. Verify: a planted history with commits that carry no trailers: `gov check` reports the family YELLOW with the finding count and never RED; `gov close` exits 0 and names no `TRAILER_MISSING` refusal; `python3 -m gov.close.traceability` lists each such commit [DEC-1123 (3), CAP-33, LIFT-1 P1-PLAN Q-8] [added, DEC-1123 (3)]'
   - '`gov close --verify <ticket>` runs a lead''s whole verify: the scoped selection, the parallel phase and then the serial phase (W2-154''s), each in a heavy-job slot; it writes `select.json`, one JUnit file per phase and one summary line, and writes its exit file last; exit 0 green, 1 a red, 2 the selection refused, 3 a run that did not complete. Verify: a planted tree with one red and one serial entry: exit 1, both JUnit files and the summary line; a refused selection: exit 2; a killed run: exit 3 [DEC-1052, DEC-1079, DEC-1050] [added, DEC-1125 (3)]'
-  - 'The queue keeps its work clones between runs (reset to the head, untracked files removed, the stores kept, so a rebuild is incremental); a clone that cannot be reset is replaced by a fresh one; measured: the rebuild''s seconds per run, warm against fresh Verify: two planted runs: the second finds its clone reset to the head, untracked files removed, stores kept and the rebuild incremental; an unresettable clone is replaced by a fresh one; the record holds the rebuild''s seconds per run, warm against fresh. [DEC-1001 (b), DEC-1003, SMART-WORK-2] [moved from W2-117 S6, DEC-1083]'
   failure:
   - 'A scoped close refused by a red its change did not cause, or closed with a red its change caused. Verify: a planted unowned red in a scoped close: the close does not refuse on it; a planted red the change caused: the close does not close.'
   - 'A scoped close that runs the full suite, or reads or writes an accepted-reds or load-sensitive list. Verify: a scoped close of a planted ticket: the test runner''s call list holds no full-suite run, and the accepted-reds and load-sensitive lists are neither opened nor written (file access or file times show none).'
   - 'A batch that closes a culprit, or closes the rest when a red is unexplained. Verify: a planted batch with one culprit, and one with a red no candidate explains: the culprit is not closed, and the unexplained batch closes nothing.'
   - 'The strict close changed in any verdict. Verify: the strict-mode close run on the recorded planted cases from before the change: every verdict and every refusal is the same as the recorded one.'
-  - 'A branch advanced to a commit that was not the one tested, or after a red. Verify: a planted queue run where the branch head moves after the test, and one where the run is red: the branch is not advanced in either; the advanced hash always equals the tested hash. [moved from W2-117 F1, DEC-1083]'
-  - 'A second run on identical code, or a skip without its reason. Verify: a planted queue with two batches whose merged code is identical: only one test run is recorded, and the skip carries its reason. [moved from W2-117 F2, DEC-1083]'
   lifted:
   - 'A round whose in-scope blocking findings are not fewer than the previous round''s is reported as not converging, at once [DEC-1014 item 2, SMART-WORK-4 line 5] [lifted (was S12), DEC-1083: re-scoped by D9-FATES (INVESTIGATION-1 §5)]'
   - 'A test revision shows case and assertion counts before and after; a deleted case, a new skip or xfail, or a loosened comparison blocks unless the owner named it [DEC-1014 item 2, SMART-WORK-4 line 7] [lifted (was S13), DEC-1083: re-scoped by D9-FATES (INVESTIGATION-1 §5)]'
@@ -101,3 +101,31 @@ The owner's SMART-WORK-1 decision 1 (DEC-983): the smart close becomes the produ
 - **Kept:** DEC-953 deletes nothing: the strict close (`close: strict`) stays built and tested by its own tests, switched off by default.
 - **Order:** after W2-55 (its "supersession propagates" check runs first, the owner's order). W2-12 and W2-38 change the same files and follow it, one chain. Before EXAMIN's copy (W2-27).
 - **FULL:** it is the judge. The QA engineer probes above all for a caused red that closes.
+
+## Interface (DEC-1052; the CTO's delegated decision, DEC-1112 (3), 2026-11-11: run 1's P2 (a) and P3 (a))
+
+- The switch: `governance/project/close.yaml` with `close: scoped|strict`; the template's copy
+  `template/governance/project/close.yaml` holds `close: scoped`, and so does this repository's; a project with no file
+  runs strict (F4 holds; no W1-30/W2-07 fixture changes).
+- Refusal codes: `SELECTION_REFUSED` (S2, S18), `BATCH_UNEXPLAINED` and `CANDIDATE_NOT_ISOLATED` (S6),
+  `VERDICT_MALFORMED`, `VERDICT_NOT_REVIEWER` and `FINDING_BLOCKS` (S11).
+- The close record at the existing `_close_record_rel` path; the warm clone at `.gov-runtime/close/clone/` (S10).
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-11), run 1's packages:** P1 (b): the queue lines (former S12 to S16, S19,
+  F5, F6) moved to W2-115b (DAEO-j9z6), which runs after this ticket; P2 (a) and P3 (a): the Interface above; P4: the
+  trailers switch (S17, a kernel check file) waits for its CIT-P (`docs/changes/W2-115-CIT-P.md`), its independent review
+  and the owner's approval (CAP-33), as a later round; this run builds every other line; P5 (a): S18 builds on today's
+  serial phase (`serial.py`, W2-57's); W2-154 extends it later in the command.py chain.
+
+## PK-1 and PK-2 (2026-11-12 ~09:55)
+
+- **PK-1 (a) and (c), the owner (DEC-1142 (3)):** W1-39's `test_copy_creates_the_overlay` revised by the test designer (Rewrite-Reason: DEC-1142 (3), DEC-866) to accept the template's `governance/project/close.yaml` in the overlay; DEC-903's overlay list names it (changed by DEC-1142 (3)).
+- **PK-2 (a), the CTO (delegated P2):** W2-77's four key-set cases revised by the test designer to allow the nightly record's `secrets_full_scan` (Rewrite-Reason: DEC-966 item 4, S8).
+- One test-design batch for both, then verify, the FULL review and the probe record. The acceptance paths above are for that revision only and are dropped after the land.
+
+## Review round 1's packages (2026-11-12 ~11:25)
+
+- **PK-3 (a), the CTO (delegated P2):** F-1's fix: reds are judged against the green base when it is an ancestor of HEAD, else the parent of the oldest own commit (DEC-988 item 3, DEC-989); F-3 (a culprit whose red is its own new test is blamed once confirmed alone) and F-7 (the research doc states its method, or its script is committed beside it) folded into the same fix round; then review round 2, the last (DEC-1010).
+- **PK-4:** a row (who commits the probe record): the CTO's launch tool, not this ticket; it does not block this land.
+- **PK-5:** the owner's (DEC-974, DEC-1142 (8)): the green base in a scoped project while the nightly is red; option (a) needs `governance/project/test-map.yaml`, outside this ticket's paths. It blocks this repository's own scoped close, not this land.
+- Residuals F-2, F-6, F-8, F-9 as the lead triaged (W2-115b is parked, so they wait with it).

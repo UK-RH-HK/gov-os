@@ -45,11 +45,12 @@ Keys: `operator_root` (default: the install's parent), `repo`, `home` (the live 
 the control files under it), `scratch` (the CTO's scratch: bundles at `<scratch>/acts/<ACT>/`, the session id in
 `<scratch>/log/cto-session.txt`, the CTO's hold `<scratch>/log/act-in-progress.txt`), `transcripts` (the folder holding
 `<session id>.jsonl`), `clock` (a file holding one ISO-8601 time with its offset, read each time the code needs the
-time; default the system clock; the quiet hours and the nightly window compare against that time's own wall clock),
+time; default the system clock; the night hold's hours (02:10 to 07:59) and an explicit nightly window compare against that time's own wall clock),
 `pings_log`, `push_cmd`, `calls` (the CTO's call set for the replay, DEC-1108 (2)), `guard_calls` (the guard's call
 log, a folder; default `<home>/.gov-os/guard-calls`, DEC-1108 (2)), `replay_stale_h` (how old the set's `until` may
 be, hours; default 12, DEC-1108 (2)), `close_flag` (exists while a close queue runs), `nightly_window`
-(`HH:MM-HH:MM`), `poll_s` (a hold's poll interval, seconds), `freeze` (the commit freeze's file; default
+(`HH:MM-HH:MM`; none by default since DEC-1141 (6)), `night_hold_state` (the night hold's state file; default
+`<scratch>/log/night-hold.state.json`), `night_hold_max_age_s` (default 300), `poll_s` (a hold's poll interval, seconds), `freeze` (the commit freeze's file; default
 `<operator_root>/install/act-in-progress.txt`, DEC-1106 (3)).
 
 **Commands:**
@@ -253,7 +254,7 @@ integrate; the cases marked "guard" are green once the code is built and fail an
 | S12 | `test_w2_148_restore_freeze.py::test_s12_f15_a_concurrent_commit_during_the_dry_run_is_left_untouched_refused_and_held` | red | no code; DEC-1106 (1): a CTO commit at `in-G8` (the path map's new hidden glob; a new `.claude/skills/` file; the touched file at third bytes): left as committed, HEAD the CTO's, tree clean, refused at G8, lock held, P1 naming the file |
 | S12 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | no code; DEC-1106 (1): the live touched file at the after-copy at `in-G8`: restored, live state as before the run, refused at G8, P1 "live files changed" naming it |
 | S12 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | no code; DEC-1106 (1): its own file restored, the pin re-written in HOME left, lock held, P1 naming the pin |
-| S13 | `test_w2_148_gates.py::test_s13_g9_a_hold_waits_then_proceeds_once_cleared` | red | no code; quiet hours (02:00, cleared at 07:30), the nightly window, a close queue, the CTO's `act-in-progress.txt` |
+| S13 | `test_w2_148_gates.py::test_s13_g9_a_hold_waits_then_proceeds_once_cleared` | red | no code; before the night hold (02:30, cleared at 08:00), the night hold on (05:30 with a fresh `holding: true`, cleared by `false`), the nightly window, a close queue, the CTO's `act-in-progress.txt` (DEC-1141 (6): the fixed quiet hours 02:00 to 07:30 are gone) |
 | S14 | `test_w2_148_apply.py::test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers` | red | no code; files, trailers, the freeze in `install/` (in neither `log/`) during the apply and gone after (DEC-1106 (3)), no push, tag or sudo |
 | S14 | `test_w2_148_apply.py::test_s14_an_extra_staged_file_refuses_and_undoes` | red | no code; `git diff --cached` differs: no commit, undone, P1 |
 | S14 | `test_w2_148_apply.py::test_s14_a_check_whose_count_differs_from_the_rehearsal_is_red_and_undone` | red | no code; count 3 against 2: undone, P1 |
