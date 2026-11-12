@@ -572,7 +572,7 @@ def proof_said(error):
 BEGIN, END = "<!-- gov:generated begin -->", "<!-- gov:generated end -->"   # Interface item 5
 RULE_PHRASE_1, RULE_PHRASE_2 = "The heron ledger rule is generated.", "The egret ledger rule is generated."
 GENERATED_HOOK_MARK = "governance/kernel/hooks/pretooluse.py"   # the template hooks source's PreToolUse command
-AUTO_COMPACT = re.compile(r"AUTO_?COMPACT", re.I)
+AUTO_COMPACT = re.compile(r"AUTO_?COMPACT", re.I)   # a key that must NOT appear in the merged env (DEC-838: no threshold)
 
 
 def rulesync_sources(phrase):

@@ -78,7 +78,7 @@ They ask the codebase-memory daemon: the lead may list them as `serial: daemon` 
 | The resume | `gov adopt --lite --stage A6` again; the A6 record at HEAD with `status: failed`, `failed_batch: <n>`, `batches` (each with `batch`, `commit`, `artefacts` with a `disposition` for a deleted file); refs `refs/gov/adoption/rollback/<run-id>/batch-<n>`; refusal `ADOPT_BATCH_FAILED` | 2 |
 | The set-up | A0's record commit adds `.gitleaks.toml` (the bytes of `template/.gitleaks.toml`) and `.gov-runtime/` to `.gitignore`; an existing `.gitleaks.toml` untouched | 3 |
 | The unheld target | refusal `ADOPT_TARGET_UNHELD` naming each target, from A3 before its record and from A6 before any batch | 4 |
-| Adapter generation | `gov adapters generate`; one block `<!-- gov:generated begin -->` ... `<!-- gov:generated end -->` after the programme's lines; settings merged key by key, programme first; an `env` key matching `AUTO_?COMPACT` | 5 |
+| Adapter generation | `gov adapters generate`; one block `<!-- gov:generated begin -->` ... `<!-- gov:generated end -->` after the programme's lines; settings merged key by key, programme first; the programme's `env` entry first and **no** `env` key matching `AUTO_?COMPACT` (DEC-838; P-W2-23-4 (b)) | 5 |
 | The citation forms | bootstrap.md 2362's list; found = named by the A8 refusal's message or its `citers` | 6 |
 | A path with a space | every `COMMANDS` name and discovered command module with `--help`; status, doctor, adopt A0 (retrieve, context: `local_only`); the hooks of `template/.rulesync/hooks.jsonc` run by `/bin/sh -c` with `CLAUDE_PROJECT_DIR` holding the space | 7 |
 
@@ -89,8 +89,8 @@ S3's planted forms (`w2_23_support.LISTED_FORMS`): `rule-LEG-001` (a `-` before 
 record DEC-401 (an id in a record's prose). **The unlisted form, the test designer's choice: the store's path written
 in base64** (`.rulesync/rules/cite-base64.md`): it must be the only one not found.
 
-Untested and named (Interface gaps, in the return's `proposed_decisions`): the value and exact key of the
-auto-compact entry (DEC-838 sets no compaction threshold anywhere); whether S3's "folder or glob" means both forms
+Untested and named (Interface gaps, in the return's `proposed_decisions`): (the auto-compact entry gap is closed:
+P-W2-23-4 (b), no compaction threshold, DEC-838); whether S3's "folder or glob" means both forms
 (both are planted); what an S4 resume record says once done.
 
 ## The map
