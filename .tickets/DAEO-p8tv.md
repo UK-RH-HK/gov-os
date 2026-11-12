@@ -222,3 +222,9 @@ OWNER none | OWNER stopped after USED at <step> exit <code>: the set is not run 
 | 4 | usage, as W2-170 |
 
 Nothing `run` writes lies outside `<R>`. The children write what their own Interfaces say. The driver writes nothing to the path map, the guard, `.claude/`, the walls' template or the crontab (F4).
+
+## PKG-W2-172-TESTS-1 (the CTO's delegated decision, DEC-1112 (3), 2026-11-12)
+
+- **GATE-1 (a):** the driver splits `--gate-cmd`'s value with `shlex.split` and runs the words as given, so the default `gov resources --check` works; the Interface's "called with no arguments" reads "run as its words".
+- **TD-1 (b):** the 12-line digest does not record `--force`; item 1's "and the digest" is corrected to the counts only.
+- **TD-2 (b):** RN-NAME is judged by `STARTS.log` (an audit started), not by a refusal's `COUNTS.json`, so a refused run can be retried the same day.

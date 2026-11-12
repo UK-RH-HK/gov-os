@@ -28,6 +28,7 @@ allowed_paths:
 - tests/unit/dispatch/test_w2_121b*
 - src/gov/resources/slots.py  # with the slot line from W2-121c (DEC-1144 (5)), only as that line needs
 - docs/probes/DAEO-ifgf/**  # the probe record (P-W2-121b-1, the CTO, 2026-11-12)
+- src/gov/resources/config.py  # the template default working_size_bytes only (DEC-1149 (2); P-W2-121b-2 (a), the CTO, 2026-11-12)
 est_loc: 500
 kpis:
   success:
@@ -99,3 +100,6 @@ the status as `land: <reason>`.
 
 One KPI line (the last success line): the template's default `working_size_bytes` becomes 805,306,368 B, as ACT-P95-1 set on this machine; `src/gov/resources/**` is already in this ticket's paths. A one-line change with one unit case, riding a short resume before the land (DEC-802), no new review round.
 
+## P-W2-121b-2 (a) (the CTO, 2026-11-12)
+
+`src/gov/resources/config.py` added to allowed_paths for the default's one line (the widened section had wrongly said `src/gov/resources/**` was in its paths; it is in its reads). The unit case goes in `tests/unit/dispatch/test_w2_121b_config_default.py`.
