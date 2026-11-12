@@ -14768,6 +14768,28 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     approval line or none.
 - **Basis:** the owner's message of 2026-11-12 ~15:00 answering P1-H.
 
+### DEC-1148 — Five kernel files approved by their bytes; the adoption's facts file by W2-174 with the CTO filling a project's commands (a1); the kernel gate in the CTO's tools; W2-45 widened for two revisions
+- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~16:00-16:30; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`) · **Under:** CAP-33, DEC-1147 (2), DEC-974, DEC-105, DEC-1045, DEC-715, DEC-996 (2), DECIDED-NOT-DONE row 173
+- **Decision:**
+  - (1) **"kernel bytes approved: adopt/SKILL.md 641a347b, pretooluse.py c2c8f0af, settings.json 3aaa82e5, secrets-indexing.yaml 8dae63e8,
+    test-map.schema.json 0e4105ef"** (full sha256: `641a347b9b14101dde711f3550f087e714e404575f780be2a3cd91ff2925102d`,
+    `c2c8f0af783a7e605113e0154dcf143eca63a34221293a325e5553904aa9e3a6`, `3aaa82e5b53aa4809fdfd38d442f4f00320bde2d133b022849c35c30a14ddf9a`,
+    `8dae63e8188b6b5498c1ce7fe36e2565dc38129ad0ff551ee16820ddb5567f83`, `0e4105ef08727a8598feabcb929627d598cac4e2e74bcde0e0e81355b9bdf384`),
+    after reading the diffs: W2-52's adopt-skill text (landed 11-12 03:07 without approval, against DEC-996 (2); `d71113b6` before it was
+    W1-41's text, W2-83a never built its clause, nothing lost); W2-110's guard hook; W2-56's settings rule (the `Bash(gov launch:*)` allow
+    approved knowingly, DEC-715); the scan switch's check line (DEC-1045 (4)); the test map's description (DEC-1050 (2)). The scan stays
+    off on this repository only (`governance/project/secrets.yaml`, DEC-1045); EXAMIN's adoption keeps it on (W2-27's line, (2)).
+  - (2) **Item 4 (a1):** W2-174 gains the facts-file KPI line and `src/gov/adopt/facts.py` (product defaults, named placeholders for a
+    command with no product form), its S3 fixture carries its own filled facts file; W2-27 gains one line (the copy's facts file holds
+    EXAMIN's commands, every role's brief builds there, the secrets scan stays on); W2-160 (`gov wait`) moves onto EXAMIN's path after
+    W2-159 lands; a row for the three commands (`lead_verify`, `launch_worker`, `wait_for`) the kernel facts schema requires.
+  - (3) **Item 5 (a):** the kernel gate in the CTO's own tools (`kernel_gate.py`, the approved list `kernel-approved.txt`, called by
+    `land.py` before any enqueue and by `hand_merge_check.sh` before any merge) today, with its one review; the product queue
+    (`merge_queue.py`) by ACT later.
+  - (4) **Item 6 (a), P1-J:** W2-45 widened by `tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py` and
+    `tests/unit/ci/test_ci_command.py` for one revision each, each with its Rewrite-Reason (P-W2-45-1 items 2 and 5).
+- **Basis:** the owner's messages of 2026-11-12 ~16:00 and ~16:30.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14851,3 +14873,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.527 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1144 (P1-A W2-11 merged by hand; P1-B W2-157 reopened for the backstop hang; P1-C W2-146's lines read first; P1-D a narrow third check of the path-map chain; P1-E K9 by W2-121 a and b with part c's slot line; P1-F `--sets-root` in W2-93; P1-G reviewers' read-only probes in the quiet hours; two P2s read). Next free id: DEC-1145. |
 | 0.528 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1145 (W2-146's kernel path-map schema approved at ebdbabd2e0d3; a non-compiling id form refused at use, the config check a row), DEC-1146 (a resource gate's refusal is a wait, not a two-refusal refusal; standing). Next free id: DEC-1147. |
 | 0.529 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1147 (W2-152's kernel facts schema approved after the fact at 09fc68645c0c; its CIT-P record to be written; the adoption's facts file, row 173's route and the kernel scan to the owner). Next free id: DEC-1148. |
+| 0.530 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1148 (five kernel files approved by their bytes; the adoption's facts file (a1), W2-27's line, W2-160 onto the path; the kernel gate in the CTO's tools; W2-45 widened for two revisions). Next free id: DEC-1149. |
