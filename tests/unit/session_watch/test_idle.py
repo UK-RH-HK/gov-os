@@ -183,3 +183,32 @@ def test_a_plan_that_times_out_is_an_error(hook, monkeypatch):
     hook.plan(hook.ready_of("T-1"), sleep=5)
     out = hook.run("idle")
     assert "decision" not in out and "plan" in out["systemMessage"] and "timed out" in out["systemMessage"]
+
+
+# -- a reused pid is not running work (the process must have started no later than the slack after the file) -----------
+
+DAY = 24 * HOUR
+
+
+def test_a_pid_file_left_two_days_ago_whose_number_now_belongs_to_a_newer_process_is_not_running_work(hook):
+    unblocked(hook)
+    hook.touch(hook.root / ".gov-runtime" / "jobs" / "left-over.pid", 2 * DAY, "5001\n")
+    hook.procs({**ALIVE, "cmdline": "bash something-unrelated", "start": NOW - 600})
+    out = hook.run("idle")
+    assert out["decision"] == "block" and "T-1" in out["reason"] and "T-2" in out["reason"]
+    assert "5001" not in out["reason"] and "left-over" not in out["reason"]  # not named as running, nor as stale
+    assert "5001" not in hook.log()
+
+
+def test_the_start_slack_after_the_pid_file_is_fifteen_minutes(hook):
+    from gov.session_watch import running
+
+    assert running.START_SLACK_S == 900
+    unblocked(hook)
+    written = NOW - 2 * HOUR
+    hook.touch(hook.root / ".gov-runtime" / "jobs" / "job.pid", 2 * HOUR, "5001\n")
+    for start, counts in ((written - 600, True), (written, True), (written + 899, True), (written + 901, False)):
+        hook.procs({**ALIVE, "start": start})
+        hook.new_turn()
+        out = hook.run("idle")
+        assert ("decision" not in out) is counts, (start - written, out)

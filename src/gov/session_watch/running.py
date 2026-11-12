@@ -17,6 +17,7 @@ from gov.session_watch.state import now
 
 RUN_BOUND_S = 3 * 3600
 AGENT_STALE_S = 1800
+START_SLACK_S = 900  # a pid file's process counts only if it started no later than this after the file was written
 BARE_SLEEP = re.compile(r"^\s*sleep\s+[0-9.]+[smhd]?\s*$")
 
 
@@ -123,7 +124,10 @@ def tasks(folder: Path | None, procs: dict, standing: tuple, stale: list) -> lis
 
 
 def pid_files(root: Path, globs, procs: dict, stale: list) -> list:
-    """Pid files under ``globs`` whose process is alive, started under 3 hours ago, with no ``<name>.exit`` beside."""
+    """Pid files under ``globs`` whose process is alive, started under 3 hours ago, with no ``<name>.exit`` beside.
+
+    A process that started more than ``START_SLACK_S`` after the file's mtime is a reused pid, not the work the file
+    named: it is neither counted nor named (as a dead pid is not); the slack absorbs clock steps."""
     found = []
     for pattern in globs:
         for file in sorted(glob.glob(str(Path(root) / pattern), recursive=True, include_hidden=True)):
@@ -132,6 +136,12 @@ def pid_files(root: Path, globs, procs: dict, stale: list) -> list:
             except (OSError, ValueError, IndexError):
                 continue
             if not alive(procs, pid) or os.path.exists(os.path.splitext(file)[0] + ".exit"):
+                continue
+            try:
+                written = os.stat(file).st_mtime
+            except OSError:
+                continue
+            if procs[pid]["start"] > written + START_SLACK_S:  # a reused pid: the process the file named is gone
                 continue
             name = f"pid {pid} ({os.path.relpath(file, root)})"
             age = now() - procs[pid]["start"]

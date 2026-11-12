@@ -8,6 +8,11 @@ import os
 import time
 from pathlib import Path
 
+try:
+    import fcntl
+except ImportError:  # no file locks on this platform: the atomic replace alone keeps the file whole
+    fcntl = None
+
 FOLDER = Path(".gov-runtime") / "session-watch"
 
 
@@ -60,6 +65,31 @@ def write_state(root: Path, state: dict) -> None:
         os.replace(temporary, folder / "state.json")
     except OSError as error:
         raise CheckError(f"{FOLDER / 'state.json'} cannot be written: {error}") from None
+
+
+def record(root: Path, state: dict, check: str, entry: dict) -> None:
+    """Record ``entry`` as ``check``'s record in the shared state file without dropping the other check's.
+
+    The two checks run side by side, so the file is re-read under a lock just before it is written and only this
+    check's key is set: whichever check writes last, the file holds both. ``state`` (the caller's copy) is updated too.
+    A file that cannot be read, parsed or written is a ``CheckError``."""
+    folder = Path(root) / FOLDER
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+        lock = open(folder / ".state.lock", "a", encoding="utf-8")
+    except OSError as error:
+        raise CheckError(f"{FOLDER / 'state.json'} cannot be written: {error}") from None
+    with lock:
+        if fcntl is not None:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX)
+            except OSError as error:
+                raise CheckError(f"{FOLDER / 'state.json'} cannot be locked: {error}") from None
+        merged = read_state(root)  # the lock is held until the ``with`` ends
+        merged[check] = entry
+        write_state(root, merged)
+    state.clear()
+    state.update(merged)
 
 
 def log(root: Path, session_id: str, check: str, decision: str, case: str, detail: str = "") -> None:

@@ -14,7 +14,7 @@ from typing import NamedTuple
 from gov.session_watch import items as items_mod
 from gov.session_watch import running, status
 from gov.session_watch.config import Config
-from gov.session_watch.state import now, standby_age, write_state
+from gov.session_watch.state import now, record, standby_age
 
 SHOW_MAX = 50
 
@@ -45,8 +45,7 @@ def bounded(ctx: Context, check: str) -> bool:
 
 
 def block(ctx: Context, check: str, reason: str, case: str, detail: str = "") -> Verdict:
-    ctx.state[check] = {"session": ctx.session, "turn": ctx.turn, "at": now()}
-    write_state(ctx.root, ctx.state)
+    record(ctx.root, ctx.state, check, {"session": ctx.session, "turn": ctx.turn, "at": now()})
     return Verdict("block", case, detail, {"decision": "block", "reason": reason})
 
 

@@ -113,3 +113,62 @@ def test_the_package_names_nothing_of_this_repository():
     found = [f"{f.name}:{n}: {line.strip()}" for f in folder.glob("*.py")
              for n, line in enumerate(f.read_text().splitlines(), 1) if bad.search(line)]
     assert folder.is_dir() and found == []
+
+
+# -- the two checks keep each other's record, whichever one writes last --------------------------------------------
+
+def test_the_idle_checks_write_does_not_drop_the_waiters_record_made_while_it_ran(hook, monkeypatch):
+    from gov.session_watch import items
+
+    hook.config(WAITER_CONFIG)
+    hook.plan(hook.ready_of("T-1"))
+    real, between = items.load, []
+
+    def load_then_the_waiter_blocks(*args, **kwargs):  # the waiter's whole run falls between the idle check's read and write
+        found = real(*args, **kwargs)
+        between.append(hook.run("waiter"))
+        return found
+
+    monkeypatch.setattr(items, "load", load_then_the_waiter_blocks)
+    assert hook.run("idle")["decision"] == "block"
+    assert between[0]["decision"] == "block"
+    assert set(json.loads((hook.folder / "state.json").read_text())) == {"waiter", "idle"}
+    monkeypatch.setattr(items, "load", real)
+    assert hook.run("waiter") is None  # a third call in the same turn
+    assert hook.run("idle") is None
+
+
+def test_the_waiters_write_does_not_drop_the_idle_checks_record_made_while_it_ran(hook, monkeypatch):
+    from gov.session_watch import running
+
+    hook.config(WAITER_CONFIG)
+    hook.plan(hook.ready_of("T-1"))
+    real, between = running.waiter_alive, []
+
+    def idle_blocks_then_no_waiter(*args, **kwargs):
+        between.append(hook.run("idle"))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(running, "waiter_alive", idle_blocks_then_no_waiter)
+    assert hook.run("waiter")["decision"] == "block"
+    assert between[0]["decision"] == "block"
+    assert set(json.loads((hook.folder / "state.json").read_text())) == {"waiter", "idle"}
+    monkeypatch.setattr(running, "waiter_alive", real)
+    assert hook.run("idle") is None and hook.run("waiter") is None
+
+
+def test_a_state_file_that_goes_bad_before_the_write_is_still_an_error_named_and_logged(hook, monkeypatch):
+    from gov.session_watch import items
+
+    hook.plan(hook.ready_of("T-1"))
+    real = items.load
+
+    def load_then_the_state_breaks(*args, **kwargs):
+        found = real(*args, **kwargs)
+        (hook.folder / "state.json").write_text("{not json")
+        return found
+
+    monkeypatch.setattr(items, "load", load_then_the_state_breaks)
+    out = hook.run("idle")
+    assert "decision" not in out and "state.json" in out["systemMessage"]
+    assert "error" in hook.log().splitlines()[-1].split("\t")
