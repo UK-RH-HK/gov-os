@@ -54,13 +54,15 @@ def _event(transcript, session="s-176", cwd=None, name="PostToolUse"):
             "tool_response": {"stdout": ""}, "tool_use_id": "tu-1", "duration_ms": 3}
 
 
-def _run(root, stdin, role="engineer", windows=None, project_dir=True):
+def _run(root, stdin, role="engineer", windows=None, project_dir=True, ticket=None):
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "PYTHONDONTWRITEBYTECODE": "1",
            "HOME": str(root.parent / "home")}
     if project_dir:
         env["CLAUDE_PROJECT_DIR"] = str(root)
     if role is not None:
         env["GOV_ROLE"] = role
+    if ticket is not None:
+        env["GOV_TICKET"] = ticket
     if windows is None:
         command = [sys.executable, str(HOOK)]
     else:
@@ -83,6 +85,21 @@ def _context(done):
 def _snapshot(root):
     return {str(p.relative_to(root)): (p.stat().st_size, p.stat().st_mtime_ns)
             for p in root.rglob("*") if p.is_file()}
+
+
+CTO_TICKET = "DAEO-sdxk"
+
+
+def _ticket(root, ticket=CTO_TICKET, front="class: coordination\n", body=""):
+    """A planted .tickets/<ticket>.md; the CTO's session is the orchestrator on a coordination ticket (DEC-1140 (4))."""
+    path = root / ".tickets" / f"{ticket}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"---\nid: {ticket}\n{front}status: in_progress\n---\n# planted\n{body}")
+    return ticket
+
+
+def _cto(root, stdin, **kwargs):
+    return _run(root, stdin, role="orchestrator", ticket=_ticket(root), **kwargs)
 
 
 @pytest.fixture()
@@ -133,9 +150,17 @@ def test_the_wording_holds_the_three_duties_and_the_not_a_stop_sentence(root, tr
 
 def test_the_cto_is_given_resume_here_decided_not_done_and_report_state(root, transcripts):
     t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
-    text = _context(_run(root, _event(t), role="orchestrator", windows=PLANTED))
+    text = _context(_cto(root, _event(t), windows=PLANTED))
     assert "RESUME HERE" in text and "DECIDED-NOT-DONE" in text and "report-state" in text, text
     assert str(root / ".gov-runtime/scratch/orchestrator/CHECKPOINT.md") in text, text
+
+
+def test_the_ctos_report_state_is_the_one_under_its_scratch_log(root, transcripts):
+    """P2 (a): the CTO's file is <root>/.gov-runtime/scratch/orchestrator/log/report-state.json."""
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    text = _context(_cto(root, _event(t), windows=PLANTED))
+    assert str(root / ".gov-runtime/scratch/orchestrator/log/report-state.json") in text, text
+    assert str(root / "log/report-state.json") not in text, text
 
 
 def test_a_lead_is_given_its_checkpoint(root, transcripts):
@@ -143,6 +168,16 @@ def test_a_lead_is_given_its_checkpoint(root, transcripts):
     t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
     text = _context(_run(root, _event(t), role="orchestrator", windows=PLANTED))
     assert str(root / ".gov-runtime/scratch/lead/CHECKPOINT.md") in text, text
+    assert "DECIDED-NOT-DONE" not in text and "report-state" not in text, text
+
+
+@pytest.mark.parametrize("front", ["class: implementation\n", None])
+def test_an_orchestrator_on_another_ticket_is_a_lead_given_its_checkpoint(root, transcripts, front):
+    """Not the coordination ticket, or no such ticket file: its CHECKPOINT via checkpoint_rel (main tree here)."""
+    ticket = _ticket(root, "DAEO-lead", front) if front else "DAEO-none"
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    text = _context(_run(root, _event(t), role="orchestrator", ticket=ticket, windows=PLANTED))
+    assert str(root / ".gov-runtime/scratch/orchestrator/CHECKPOINT.md") in text, text
     assert "DECIDED-NOT-DONE" not in text and "report-state" not in text, text
 
 
@@ -157,18 +192,85 @@ def test_a_worker_is_given_its_record(root, transcripts):
 
 @pytest.mark.parametrize("model", ["claude-opus-5-5", "claude-opus-5-5[1m]", "claude-opus-5-5-20261001",
                                    "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-2"])
-def test_a_1m_model_uses_1_000_000(root, transcripts, model):
+def test_a_1m_model_uses_1_000_000_for_the_ctos_session(root, transcripts, model):
+    """DEC-1140 (4): the CTO's own session is reminded against its model's window."""
     low = _transcript(transcripts / "low.jsonl", _assistant(model, 840_000))
-    assert _run(root, _event(low, session="low")).stdout == ""
+    assert _cto(root, _event(low, session="low")).stdout == ""
     high = _transcript(transcripts / "high.jsonl", _assistant(model, 850_000))
-    assert "READ FIRST:" in _context(_run(root, _event(high, session="high")))
+    assert "READ FIRST:" in _context(_cto(root, _event(high, session="high")))
 
 
-def test_an_unknown_model_uses_200_000(root, transcripts):
+@pytest.mark.parametrize("who", ["cto", "engineer"])
+def test_an_unknown_model_uses_200_000(root, transcripts, who):
+    run = _cto if who == "cto" else _run
     low = _transcript(transcripts / "low.jsonl", _assistant("some-other-model", 169_000))
-    assert _run(root, _event(low, session="low")).stdout == ""
+    assert run(root, _event(low, session="low")).stdout == ""
     high = _transcript(transcripts / "high.jsonl", _assistant("some-other-model", 170_000))
-    assert "READ FIRST:" in _context(_run(root, _event(high, session="high")))
+    assert "READ FIRST:" in _context(run(root, _event(high, session="high")))
+
+
+# P4: leads and workers against min(model window, 200,000) (DEC-1118 (A)); the CTO against the model's (DEC-1140 (4))
+
+
+def test_an_opus_transcript_at_180k_is_silent_for_the_cto_and_reminds_a_lead_and_an_engineer(tmp_path, transcripts):
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 180_000))
+    cto, lead, engineer = (tmp_path / name for name in ("cto", "lead", "engineer"))
+    for folder in (cto, lead, engineer):
+        folder.mkdir()
+    (lead / ".git").write_text("gitdir: /nowhere\n")
+    done = _cto(cto, _event(t))
+    assert done.returncode == 0 and done.stdout == "", done.stdout
+    assert not (cto / STATE).exists()
+    lead_text = _context(_run(lead, _event(t), role="orchestrator", ticket=_ticket(lead, "DAEO-lead", "")))
+    assert str(lead / ".gov-runtime/scratch/lead/CHECKPOINT.md") in lead_text, lead_text
+    assert "your record" in _context(_run(engineer, _event(t), role="engineer", ticket="DAEO-ktiw"))
+
+
+@pytest.mark.parametrize("case", ["other_class", "class_in_the_body", "past_4_kib", "bad_ticket_name", "engineer"])
+def test_only_the_orchestrator_on_a_coordination_ticket_is_the_cto(root, transcripts, case):
+    """Everything else is capped at 200,000: an Opus 5.5 transcript at 180k reminds it."""
+    role, ticket = "orchestrator", CTO_TICKET
+    if case == "other_class":
+        _ticket(root, front="class: implementation\n")
+    elif case == "class_in_the_body":
+        _ticket(root, front="", body="class: coordination\n")
+    elif case == "past_4_kib":
+        _ticket(root, front=f"notes: {'x' * 4200}\nclass: coordination\n")
+    elif case == "bad_ticket_name":
+        _ticket(root)
+        ticket = f"../.tickets/{CTO_TICKET}"
+    else:
+        _ticket(root)
+        role = "engineer"
+    t = _transcript(transcripts / "t.jsonl", _assistant("claude-opus-5-5", 180_000))
+    text = _context(_run(root, _event(t), role=role, ticket=ticket))
+    assert "DECIDED-NOT-DONE" not in text, text
+
+
+# P3: subagent events skipped (R2); re-armed below 50 % (R1)
+
+
+def test_a_subagents_event_says_nothing_and_writes_nothing(root, transcripts):
+    t = _transcript(transcripts / "t.jsonl", _assistant(PLANTED_MODEL, 900))
+    done = _run(root, {**_event(t), "agent_id": "a1", "agent_type": "explore"}, windows=PLANTED)
+    assert done.returncode == 0 and done.stdout == "", done.stdout
+    assert not (root / STATE).exists()
+    assert "READ FIRST:" in _context(_run(root, {**_event(t), "agent_id": ""}, windows=PLANTED))
+
+
+def test_the_reminder_fires_once_per_context_window_and_re_arms_below_50_percent(root, transcripts):
+    def at(used):
+        t = _transcript(transcripts / f"t-{used}.jsonl", _user(), _assistant(PLANTED_MODEL, used))
+        done = _run(root, _event(t), windows=PLANTED)
+        assert done.returncode == 0, done.stderr
+        return done
+
+    assert "READ FIRST:" in _context(at(900))
+    assert at(900).stdout == ""
+    assert at(600).stdout == "" and len(list((root / STATE).iterdir())) == 1, "re-armed between 50 % and 85 %"
+    assert at(40).stdout == "" and not list((root / STATE).iterdir()), "not re-armed below 50 %"
+    assert "READ FIRST:" in _context(at(920))
+    assert len(list((root / STATE).iterdir())) == 1
 
 
 def test_the_last_main_line_counts_and_a_subagents_line_is_skipped(root, transcripts):

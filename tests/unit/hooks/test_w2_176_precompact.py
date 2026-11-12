@@ -215,10 +215,58 @@ def test_the_source_sets_and_reads_no_compaction_threshold():
     assert "claude_code_auto_compact_window" not in text and "autocompact" not in text
 
 
-def test_the_names_sessionstart_imports_are_kept():
+def _module():
     sys.path.insert(0, str(HOOKS))
     try:
         import precompact
     finally:
         sys.path.remove(str(HOOKS))
+    return precompact
+
+
+def test_the_names_sessionstart_imports_are_kept():
+    precompact = _module()
     assert precompact.STAMP and callable(precompact.checkpoint_rel) and callable(precompact.split)
+
+
+# R7: a file deleted between the listing and the stat
+
+
+class _Gone:
+    """A directory entry whose file was deleted after the listing: its stat raises."""
+
+    def __init__(self, path):
+        self.path = str(path)
+
+    def is_file(self):
+        return True
+
+    def stat(self):
+        raise FileNotFoundError(2, "No such file or directory", self.path)
+
+
+def test_a_brief_deleted_before_its_stat_gives_the_next_newest(worker_tree, monkeypatch):
+    precompact = _module()
+    folder = worker_tree / BRIEFS
+    real = os.scandir
+
+    def listing(path):
+        return [_Gone(folder / "gone.md"), *real(path)]
+
+    monkeypatch.setattr(precompact.os, "scandir", listing)
+    assert precompact.newest(str(folder)) == str(folder / "eng-1.md")
+
+
+def test_when_every_brief_is_gone_the_folder_is_named_and_the_line_is_printed(tmp_path, monkeypatch, capsys):
+    precompact = _module()
+    folder = tmp_path / BRIEFS
+    folder.mkdir(parents=True)
+    monkeypatch.setattr(precompact.os, "scandir", lambda path: [_Gone(folder / "a.md"), _Gone(folder / "b.md")])
+    assert precompact.newest(str(folder)) == str(folder)
+    monkeypatch.setenv("GOV_ROLE", "engineer")
+    monkeypatch.delenv("GOV_TICKET", raising=False)
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    precompact.main()
+    lines = capsys.readouterr().out.splitlines()
+    assert len(lines) == 1 and lines[0].startswith(INSTRUCTION), lines
+    assert f"READ FIRST: your brief and your record, {folder} and " in lines[0], lines
