@@ -27,7 +27,8 @@ batches: no test was run for this table, and no clone was built. It was **comput
    this close and could be unowned by close_build; these records cannot show it.
 
 The script (the whole of it; it was first run from the engineer's sandbox scratch and not committed, so it is given
-here to be re-run; `-I` keeps the records' folder out of the import path):
+here to be re-run; run it without `-I`, which ignores `PYTHONPATH` so `gov` cannot be imported (review round 2's
+R2-5), and keep it outside the records' folder so that folder is not on the import path):
 
 ```python
 """S9: close_build.py's recorded verdict beside this close's judgement of the same records (W2-115, F-7).
@@ -173,7 +174,7 @@ S12 (the trailers switch) is not built in this run (P4: its CIT-P, review and th
 
 - **F-1 (S4, F1): the head a red is judged against.** `select.head_without_change`: the green base the change is
   counted from (`green_base`) when it is an ancestor of `HEAD`, else the first parent of the ticket's oldest own
-  commit, else none (DEC-988 item 3, DEC-989). `select.scoped`'s `base` is that head; `gov close` uses it (its
+  commit, else none (DEC-988 item 3, DEC-989; the middle fallback is dropped in run 5, below). `select.scoped`'s `base` is that head; `gov close` uses it (its
   `--base` still overrides). The selection (suites, options, changed paths) is unchanged. An untrailered commit between
   the green base and the first trailered one is now outside the head without the change, so its red is caused:
   `RED_CAUSED`, no record, no repair ticket. Unit tests: `test_w2_115_select.py::test_f1_*` (3: an ancestor; not an
@@ -204,3 +205,17 @@ S12 (the trailers switch) is not built in this run (P4: its CIT-P, review and th
   commit does not hold (`git cat-file -e <land>:<path>`), and refuses `RUN_INCOMPLETE` if none is left (never a run on
   nothing). The batch's recorded selection is unchanged. Unit test:
   `test_w2_115_batch.py::test_f3_the_run_on_the_rest_leaves_out_a_culprits_own_new_test_file` (red before the fix).
+
+## Run 5 (eng-7): the owner's P1-K (a) on review round 2's R2-1 (DEC-1150 (2))
+
+- **R2-1 (S4, F1): no green base on HEAD's line, no head without the change.** `select.head_without_change(root,
+  green)` returns the green base when it is an ancestor of `HEAD`, and None otherwise; the parent of the ticket's
+  oldest own commit is no longer a fallback. With None, `attribution.attribute` judges every red as the change's (the
+  run without is ABSENT) and says so in the reason ("no green base on HEAD's line is known, so the red is the
+  change's"): the scoped close refuses `RED_CAUSED` (fails closed). `--base` still overrides. The selection is
+  unchanged. Unit tests: `test_w2_115_select.py::test_f1_*` (revised: not an ancestor gives None; no green base gives
+  None), `test_w2_115_attribution.py` (no base: a red the parent also has is caused), `test_w2_115_close.py` (no green
+  record: `RED_CAUSED`, no record, no repair ticket). Consequence the owner weighed: a project with no green base yet
+  (a newly adopted one, EXAMIN's copy at its first closes) refuses every red until its first green nightly or full
+  close.
+- **R2-5 (S9):** the script's run line drops `-I` (above).
