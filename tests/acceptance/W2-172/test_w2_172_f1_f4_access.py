@@ -41,9 +41,9 @@ def test_f1_the_driver_opens_lists_and_names_nothing_under_the_sets_root(ran):
         for arg in e["arg"]:
             assert root + "/" not in arg, e["arg"]  # no path under the sets root on any command it starts
         if C.classify(e["arg"]):  # the launch and subcommand lines (a `git show` names the repository's own walls' template)
-            for arg in e["arg"]:
-                for word in W.FORBIDDEN:
-                    assert word not in arg, (word, e["arg"])
+            # Rewrite-Reason: the merge queue's clone path (21:19 ejection): the argv's first element is `sys.executable`
+            # (the interpreter's own path may hold a word); `W.forbidden_in_argv` skips that exact element and no other.
+            assert W.forbidden_in_argv(e["arg"]) == [], e["arg"]
 
 
 def test_f1_the_spy_does_see_what_the_launch_script_writes_into_the_sets_root(ran):
@@ -144,10 +144,13 @@ def test_s1_the_runs_folder_is_never_a_flag_and_the_sets_root_is_required(make_w
 
 
 def test_s1_run_prints_through_say_only_never_a_path_under_the_sets_root(make_world):
-    """A refusal names the sets root nowhere in the folder form; every printed line is one of the forms of the Interface."""
+    """A refusal names the sets root nowhere in the folder form; every printed line is one of the forms of the Interface.
+
+    Rewrite-Reason: the merge queue's clone path (21:19 ejection). The word grep goes through ``W.forbidden_in_text``: a
+    whitespace-delimited token equal to ``sys.executable`` alone is skipped, a word anywhere else still fails."""
     world = make_world()
     world.audits_log.unlink()
     run = world.go()
     assert run.code == 1, run
     for line in (run.out + run.err).splitlines():
-        assert str(world.sets) + "/" not in line and not any(w in line for w in W.FORBIDDEN), line
+        assert str(world.sets) + "/" not in line and W.forbidden_in_text(line) == [], line

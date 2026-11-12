@@ -13,6 +13,10 @@ another tree's ``src/``: used to show the suite sound against a prototype outsid
 
 **Path hygiene (S1, F1):** a path that can appear on a printed command line holds none of ``fixtures/``, ``runs/``,
 ``indep-walls/`` or ``hidden`` (the last is ``say``'s own refusal word). The planted runs folder is ``launch-log``.
+The rule judges the paths this world builds (``conftest.clean_paths``), never where the repository itself or the
+interpreter lives: a clone under ``gov-os-runs/`` is legal. A grep over printed lines or child argv (``forbidden_in_text``,
+``forbidden_in_argv``) lets the exact ``sys.executable`` token pass and nothing else.
+Rewrite-Reason: the merge queue's clone path (21:19 ejection)
 """
 
 from __future__ import annotations
@@ -21,6 +25,7 @@ import fcntl
 import json
 import os
 import re
+import shlex
 import shutil
 import site
 import subprocess
@@ -51,6 +56,30 @@ STEPS = ["writer-1", "preflight", "checker-1", "writer-2", "checker-2", "void", 
 GLOBS = ["src/gov/retrieval/**", "src/gov/retrieve/**", "src/gov/store/**", "src/gov/codeintel/**",
          "governance/project/retrieval.yaml", "governance/project/path-map.yaml"]
 FORBIDDEN = ("fixtures/", "runs/", "indep-walls/", "hidden")
+
+
+def forbidden_in_text(text: str) -> list[str]:
+    """The sets-root words (``FORBIDDEN``) held by printed ``text``, the interpreter's own token aside.
+
+    Rewrite-Reason: the merge queue's clone path (21:19 ejection). Item 2 of the ticket's Interface fixes the first word
+    of a step line as ``<py>`` (``sys.executable``), and where that interpreter lives is not the test's to choose (a
+    venv or a clone under ``gov-os-runs/`` holds ``runs/``). So exactly that token is removed before the grep: a
+    whitespace-delimited token equal to ``sys.executable`` (bare or ``shlex.quote``d), nothing looser; a word in any
+    other token, or in a path that merely begins with the interpreter's path, still counts.
+    """
+    for spelling in {sys.executable, shlex.quote(sys.executable)}:
+        text = re.sub(r"(?<!\S)" + re.escape(spelling) + r"(?!\S)", " ", text)
+    return [w for w in FORBIDDEN if w in text]
+
+
+def forbidden_in_argv(argv: list[str]) -> list[str]:
+    """The ``FORBIDDEN`` words held by a child's argv, an element equal to ``sys.executable`` aside (its first element).
+
+    Rewrite-Reason: the merge queue's clone path (21:19 ejection). Whole-element comparison, as ``forbidden_in_text``.
+    """
+    return [w for arg in argv if arg != sys.executable for w in FORBIDDEN if w in arg]
+
+
 CLASSES = ("gold_wrong", "question_ambiguous", "out_of_scope", "retrieval_miss", "answer_wrong")
 STDERR_WORD = "stubstderrmarker"
 
