@@ -1,18 +1,36 @@
 # ACT-OPERATOR-HOURS-2: the operator agent's gate G9 holds only while the night hold is on (DEC-1141 (6))
 
 - **For:** the owner, by hand, as the message in section 0 (the operator's own install, class (O), like ACT-OPERATOR-1, -2 and
-  ACT-OPERATOR-ROUNDS-1). About one minute. Nothing is committed by the script; the owner commits four repository paths.
+  ACT-OPERATOR-ROUNDS-1). About three minutes. Nothing is committed by the script; the owner makes **two commits**: the four repository
+  paths, then the path map's exemption entry for the first commit (DEC-1136 (2), round 2).
 - **By:** an ACT-preparation helper of the CTO (Sonnet, high; RUBRIC-2, class C1), 2026-11-12 from about 02:50 to 03:40 UTC.
   **Nothing live was changed or started:** no write under `~/gov-os-operator`, no crontab write, no commit, no stage, nothing in the
-  main tree. Built and rehearsed in planted folders and a clone (section 6). **Reviewed READY** (`reviews/ACT-OPERATOR-HOURS-2-review.md`).
+  main tree. Built and rehearsed in planted folders and a clone (section 6). Round 1 was **reviewed READY** (`reviews/ACT-OPERATOR-HOURS-2-review.md`, manifest `d3d29237`) and **missed DEC-1136 (2)**;
+  **round 2** (manifest `7acf0243`, the second commit and part 7 of the rehearsal) **is not yet independently reviewed** (section 9).
 - **Under:** DEC-1141 (6) (the owner, 2026-11-12: "the operator agent sleeps only while the nightly runs (the night hold, from 03:00
   until the nightly ends)... a skip while the night hold is on, so it never applies an ACT during the nightly"); it replaces the
   fixed quiet hours of DEC-1104 (2) in the operator's G9. DEC-1138 (3) is the night hold's own rule. DEC-1104 (4): the operator's own
-  install is the owner's, by hand. The manifest's `dec` names DEC-1141, DEC-1104, DEC-1138.
+  install is the owner's, by hand. The manifest's `dec` names DEC-1141, DEC-1136 (round 2), DEC-1104, DEC-1138.
+- **Round 2 by:** an ACT-preparation helper of the CTO (Sonnet; RUBRIC-2, class C1), 2026-11-12 from about 05:40 UTC; again nothing live changed
+  (clones and a planted HOME only; no write under `~/gov-os-operator`, no crontab write, no commit in the main tree). Round 1 is kept:
+  `acts/ACT-OPERATOR-HOURS-2.r1-d3d29237/` and `acts/ACT-OPERATOR-HOURS-2.r1-d3d29237.package.md`.
 - **Companion:** ACT-OPERATOR-HOURS-1 (its package `drafts/operator-hours-1/ACT-OPERATOR-HOURS-1.md`):
   the crontab line, the CTO's to apply. Its section 7 is this ACT's reason (section 1 below).
-- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/operator-hours-2/` (`build_act.py`: build, rehearse, finalize, gates; `code/`:
-  the after files). The bundle: `.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2/`.
+- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/operator-hours-2/` (`build_act.py`: build, rehearse, finalize, gates; `part7.py`: round 2's
+  rehearsal; `fill_package.py`; `code/`: the after files). The bundle: `.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2/`.
+
+### Round 2 (2026-11-12): the gap round 1 left, and its review did not see
+DEC-1136 (2) is standing: **every ACT whose commit changes a file under `tests/acceptance/` carries its own `acceptance_exemptions` entry in the same
+owner apply**, by a second `Role: owner` commit straight after the first, listing the first's full id (a commit cannot name its own id; the owner confirmed
+the two-commit form, chat 2026-11-11 ~19:10 UTC). Round 1's first commit changes two files under `tests/acceptance/W2-148/` (`test_w2_148_gates.py`, `README.md`) as
+`Role: owner`, and it had no second commit: **as built, it would turn W1-01 red for every merge after it** (W1-01's history case names an unlisted commit that touches
+`tests/acceptance/` without the test designer's role; the control in section 6 shows it red), as ACT-OPERATOR-ROUNDS-1's commit `6fbe73b1adde` did and
+ACT-W1-01-EXEMPT-3 repaired after the fact. **Round 1's independent review (`d3d29237`, READY) did not name it**: its F4 named the acceptance edit as a one-off the owner commits, but not that W1-01 judges that
+commit and lists it nowhere; the rehearsal ran W2-148's own tests on a clone, never W1-01. **What round 2 adds:** `apply.sh` gains a second
+stage (`exempt`, `exempt-verify`, `exempt-undo`; section 2b); section 0 gives the second commit and its order; section 5 the undo of both commits (round 1's undo,
+a commit of the same four paths, would itself have needed an exemption); section 6 a part 7 that runs both commits on clones and **W1-01 green with the entry and red without it** for both
+maps the entry may be added to. The bundle's other files (`before/`, `after/`, `list.txt`, `keep.txt`) are byte for byte round 1's; `apply.sh`, `rehearsal.log` and `manifest.json` change,
+so **the sha8 changes from `d3d29237` to `7acf0243`**: a yes line for the old one no longer matches.
 
 ## 0. The short version, your line, and the steps for your operator
 1. **One gate changes.** G9 (the holds, in `opcommon.py`'s `holds()`) no longer holds for the fixed quiet hours 02:00 to 07:30 or for
@@ -22,13 +40,20 @@
    stale or odd file is a hold (fail closed). This is the same rule and the same reading as ACT-OPERATOR-HOURS-1's crontab guard.
 2. **Every other gate stays**, and so does every other G9 hold: the NIGHTLY-RUNNING flag (a nightly that overruns the hold still
    holds), the close queue, the CTO's `log/act-in-progress.txt`, the operator's commit freeze, an unreadable clock.
-3. **Two install files change, and four repository paths** (the source the install is copied from and its tests): the install's
-   `opcommon.py` and `APPROVED` (one line, `opcommon.py`'s hash); in the main tree the same `opcommon.py`, the acceptance test for G9's
-   holds (one case replaced by two), its README (three lines) and one new unit test file (86 cases).
+3. **Two install files change, four repository paths, and then two lines of the path map.** The install's `opcommon.py` and `APPROVED` (one line, `opcommon.py`'s
+   hash); in the main tree the same `opcommon.py`, the acceptance test for G9's holds (one case replaced by two), its README (three lines) and one new unit test file
+   (86 cases) in the first commit; then, in the second commit (DEC-1136 (2)), `governance/project/path-map.yaml`: one entry added at the end of `acceptance_exemptions`
+   (`commit:` the first commit's full id, `decision: DEC-1141`).
 4. **Safe with or without ACT-OPERATOR-HOURS-1, in either order** (section 4).
+5. **Order with the path-map ACTs: apply ACT-EXAMIN-SETS-1, then ACT-ACCEPTED-REDS-1, then ACT-PATHMAP-EXP-1 BEFORE this ACT, or rebuild them after it.** The second commit changes
+   `governance/project/path-map.yaml`; each of those three ACTs decides by the map's fixed before hash (`f4029cfb4942`, `0ec1d20da86a`, `5654eca4c139`), so once this ACT's
+   entry is in the map they all refuse (state other, nothing touched). This ACT's `exempt` step takes either map as its before: the live one (`f4029cfb4942`, when the chain is not applied yet: the chain is then rebuilt on the new map, or not applied)
+   or the one the three leave (`d50884e3633e`, the chain applied first); a half-applied chain (`0ec1d20da86a`, `5654eca4c139`) or any other map it refuses.
 
-**Your line: `yes ACT-OPERATOR-HOURS-2 d3d29237`** (the first 8 digits of the manifest's sha256 in section 8). Your operator then does,
-in the main tree, not at a :x0 minute (the cron's launch) and best after 08:00 UTC, with nothing queued:
+**Round 2's review** (`reviews/ACT-OPERATOR-HOURS-2-review-r2.md`): FAIL on F1 (the undo's reset by `HEAD~N`), the forward path verified; the reviewer's recommended option (a), applied by the CTO as text only (you may still choose (b) or (c), section 9): section 5's resets are by id with checks before and after, and the CTO holds during the apply (F2) and any undo. The package is not in the manifest: the line below still matches.
+
+**Your line: `yes ACT-OPERATOR-HOURS-2 7acf0243`** (the first 8 digits of the manifest's sha256 in section 8; round 1's `d3d29237` no longer matches). Your operator then does,
+in the main tree, not at a :x0 minute (the cron's launch) and best after 08:00 UTC, with nothing queued. **Step 1, the install and the first commit** (round 1's block; its commit now names its four paths, so nothing else staged goes into it):
 ```
 cd /home/usain/Dynamic-Agentic-Engineering-OS
 G=.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2
@@ -38,10 +63,23 @@ bash $G/apply.sh verify    # exit 0: "verify: every listed file is the after ...
 sha256sum ~/gov-os-operator/install/APPROVED    # expect 1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc
 git status --short         # 3 M and 1 ?? (opcommon.py, test_w2_148_gates.py, its README.md; the new test_act_operator_hours_2.py)
 git add governance/project/operator/opcommon.py tests/acceptance/W2-148/test_w2_148_gates.py tests/acceptance/W2-148/README.md tests/unit/operator/test_act_operator_hours_2.py
-git commit -m "ACT-OPERATOR-HOURS-2: G9 holds only while the night hold is on (DEC-1141 (6)); the fixed quiet hours and the nightly window gone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141" --trailer "Role: owner"
+git commit -m "ACT-OPERATOR-HOURS-2: G9 holds only while the night hold is on (DEC-1141 (6)); the fixed quiet hours and the nightly window gone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1141" --trailer "Role: owner" -- governance/project/operator/opcommon.py tests/acceptance/W2-148/test_w2_148_gates.py tests/acceptance/W2-148/README.md tests/unit/operator/test_act_operator_hours_2.py
 ```
+**Step 2, straight after step 1: the second commit, the path map's exemption entry for the first commit (DEC-1136 (2)).** Nothing else is committed between the two:
+```
+cd /home/usain/Dynamic-Agentic-Engineering-OS
+G=.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2
+bash $G/apply.sh exempt           # exit 0: "exempt: added the entry for <12 digits>", then "exempt-verify: the map is the allowed before (sha256 f4029cfb4942 or d50884e3633e) plus exactly the entry for <12 digits> ..."
+git diff --numstat -- governance/project/path-map.yaml   # expect: 2  0  governance/project/path-map.yaml
+H=$(git rev-parse HEAD)           # the first commit's full id (exempt wrote it into the map)
+git add governance/project/path-map.yaml
+git commit -m "ACT-OPERATOR-HOURS-2: acceptance_exemptions lists its own commit ${H:0:12} (DEC-1136 (2))" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1136, DEC-1141" --trailer "Role: owner" -- governance/project/path-map.yaml
+bash $G/apply.sh exempt-verify    # exit 0: the committed map is the allowed before plus exactly the entry
+```
+**The CTO holds from step 1 to step 2** (round 2 review F2): before step 1, tell the CTO "starting HOURS-2"; the CTO writes `log/act-in-progress.txt`, adds no land line and makes no commit on `w2/integrate` until you send both ids, so nothing can land between the two commits (a commit between them makes `exempt` refuse for good, W1-01 red). Tell the CTO both commit ids (12 digits) and the last line. W1-01 is green again with the second commit (section 6, part 7); **between the two commits it is red** (the control), so do not stop or merge in between.
 If `check` stops (exit 3: a file moved; exit 4: a frozen copy altered; exit 6: the operator is busy), send its line to the CTO and
-apply nothing: exit 6 means wait and run it again. If `apply` stops part way (a full disk, a kill), run `apply` again: it finishes
+apply nothing: exit 6 means wait and run it again. If `exempt` refuses (exit 3: HEAD is not the ACT's commit, the map is neither allowed before, or it has uncommitted changes; exit 5: it could not write),
+nothing is touched: send its line to the CTO. If `apply` stops part way (a full disk, a kill), run `apply` again: it finishes
 (a file already after is left; a file that is neither before nor after refuses, nothing touched). **Undo:** section 5.
 
 ## 1. Why: ACT-OPERATOR-HOURS-1's finding
@@ -108,6 +146,34 @@ re-hashed, the owner's operator applies by hand. This is that ACT, with the same
 (`operator-settings.json` too: the state file's path defaults from the `scratch` setting, `<scratch>/log/night-hold.state.json`, the very file
 the crontab guard reads; the new settings `night_hold_state` and `night_hold_max_age_s` exist for tests and are left out of the live file).
 
+### 2b. Round 2: the second stage of `apply.sh`, the path map's entry (DEC-1136 (2))
+**Why code and not a frozen after copy.** The entry holds the first commit's full id, which exists only once the owner has committed, so the map's after bytes cannot be frozen.
+`apply.sh exempt` therefore holds a **rule written as hashes**: it refuses unless the map hashes as one of two allowed befores, and `exempt-verify` checks the result is that before plus
+exactly the two lines, at the place the code puts them. Both allowed befores are full sha256, written in `apply.sh` and cross-checked by `build_act.py` against the live map and the last chain bundle's after copy:
+
+| Allowed before | sha256 | What it is |
+|---|---|---|
+| live map | `f4029cfb49428708a7c7f9ca754bcd50a1c610ccc22966d09c4c581f1abbd971` | the map today (with ACT-W1-01-EXEMPT-3's entry); this ACT before the chain, or the chain never applied |
+| the chain's map | `d50884e3633e6e778626a17a0cae62f37778ff7f1903b2a557ad7920e9bbbb4d` | what ACT-EXAMIN-SETS-1 (`e8020292`), then ACT-ACCEPTED-REDS-1 (`b8df21d8`), then ACT-PATHMAP-EXP-1 (`9a945c99`) leave, applied before this ACT |
+
+(`0ec1d20da86a` and `5654eca4c139`, the maps after the first and the second of the chain, are **not** allowed: a half-applied chain is refused, with this ACT's commit untouched.)
+**The three subcommands** (the header of `apply.sh` has them in full; each refuses with exit 3 and touches nothing, exit 5 when it cannot write):
+- `exempt`: HEAD must be the ACT's own commit (one parent; subject starts `ACT-OPERATOR-HOURS-2:`; the single trailer `Role: owner`; exactly the four repository paths of `list.txt` changed; each blob the listed after).
+  The map must be unmodified at HEAD and hash as an allowed before. It adds, after the last entry of `acceptance_exemptions` (before the comment line that opens the next block, `# gov close of this project`):
+  ```
+    - commit: "<HEAD's full id>"
+      decision: DEC-1141  # ACT-OPERATOR-HOURS-2's commit (DEC-1136 (2))
+  ```
+  (indented two and four spaces), through a `mktemp` file in the map's folder and a rename, the mode kept; then runs `exempt-verify`. **Run twice:** the second run is a **no-op** (exit 0, "already in place"); after the
+  second commit it is the same no-op (exit 0). It is not a refusal: the state is the wanted one.
+- `exempt-verify` (read only): removing the entry's two lines gives an allowed before, and putting them back at the end of the list gives the map byte for byte; after the second commit also the committed map.
+- `exempt-undo` (before the second commit only): takes the two lines out; the map is then the allowed before again (a no-op when it is already).
+
+Nothing else changes in the map: the rehearsal parses it and finds the old `acceptance_exemptions` plus the one entry, every other key equal (2 lines added, 0 removed).
+**Why DEC-1141** (the decision the entry cites, as the CTO's brief gives it): the decision that asks for this ACT. A note on that reading, information and not a gate: the close's gate (h) reader (`gates.owner_listed`) counts an `acceptance_exemptions` entry only when its decision's text in the
+register names the commit by an id of eight or more digits; DEC-1141 cannot name an id that did not exist when it was written, so that reader does **not** list this commit (the rehearsal prints its answer). W1-01 reads the list by full id and decision shape only, which is what turns it green. The
+two commits carry `Task: DAEO-sdxk`, so a `gov close` of a ticket would not read them as work without a task; if you want gate (h) to count them too, a decision that names the id after the fact does it (the CTO's to draft).
+
 ### The choices (M: read here; E: my estimate)
 | Choice | Reason |
 |---|---|
@@ -119,6 +185,8 @@ the crontab guard reads; the new settings `night_hold_state` and `night_hold_max
 | **G9 reads the file at every poll** | `holds()` is the gate's one function, called by the launcher once and by the run's G9 loop at each poll (60 s): a hold that releases at 05:00 lets a waiting run through at its next poll. |
 
 ## 3. Class and route
+**Round 2's second commit (the path map's entry) is class (O) as well:** `class-rules.yaml`'s `path-map` row lists `acceptance_exemptions` among the ratchet lists (`ratchet_class: O`), records read only from the owner's commits, as ACT-W1-01-EXEMPT-3 read it. It is the owner's by-hand
+route with the rest of the ACT, not a queue request. The bundle's manifest cannot list the map (its after bytes hold the commit id), so `act_class.classify` on the bundle still votes O from the files it names; the map is covered by `apply.sh`'s rule, section 2b.
 - **Class (O).** M: `class-rules.yaml`'s `operator-own` row (`governance/project/operator/**` and `gov-os-operator/**`): control, the owner's;
   `act_class.classify` on this bundle (`build_act.py gates`, read only): **class O**, hits `[]`; the two `opcommon.py` rows and `APPROVED` are
   `operator-own`, the three tests are the catch-all `unknown` row (also O). The operator agent cannot apply it: rule 2d and `APPROVED` keep its own install out of its reach
@@ -136,7 +204,15 @@ the crontab guard reads; the new settings `night_hold_state` and `night_hold_max
 | **HOURS-2 alone** (the cron line `*/10 0,8-23`; G9 new) | The cron calls the launcher only at 00:00 to 00:50 and 08:00 to 23:50. At those times the new G9 holds nothing the old did not (no time hold at 00:00-02:09 or from 08:00; the old held nothing there either), so the operator's behaviour does not change until HOURS-1 is applied. | M: the rehearsal's table of 247 (time, state) cases, old against new: the only cases that turn are 02:00-02:09 (now free) and, with a fresh `holding: false`, 03:10 to 07:59 (now free); none turns from free to held. The cron does not fire in either. A launcher run by hand at 05:10 with the hold off would go on (intended). |
 | **Both** (either order, or together) | The launcher at every hour; G9 and the guard agree: no session from 02:10 to 03:09; from 03:10 to 07:59 only with the hold off; every other hour as usual. The gate is also a second line behind the guard: if the crontab line is ever put back or changed, G9 still holds in the hold. | Recommended: HOURS-2 first or together; then HOURS-1 (the CTO applies it from 08:00). |
 
-If one of the two is changed later (a different margin, a different file), the other must be changed with it; both name their boundaries
+**Order with the path-map chain (round 2).** The second commit changes the path map, so the order among the four ACTs that touch it matters:
+
+| Order | Result |
+|---|---|
+| ACT-EXAMIN-SETS-1, ACT-ACCEPTED-REDS-1, ACT-PATHMAP-EXP-1, **then this ACT** | Works: the map is `d50884e3633e` when `exempt` runs (allowed before 2). Rehearsed on a clone (part 7, chain map). |
+| **This ACT first** (the chain not yet applied) | `exempt` works on `f4029cfb4942`; the map becomes `f4029cfb` plus the entry, which is **none of the three chain ACTs' before hashes**: each refuses (state other, nothing touched). The CTO rebuilds the three on the new map (byte-identical entries, only line numbers move by 2, as for ACT-W1-01-EXEMPT-3). |
+| the chain half applied (`0ec1d20da86a` or `5654eca4c139`) | `exempt` **refuses** (neither allowed before); finish the chain first. |
+
+**Apply the chain first** unless you decide to have it rebuilt. If one of the two is changed later (a different margin, a different file), the other must be changed with it; both name their boundaries
 (`02:10`, `03:10`, `08:00`, `300`).
 
 ## 5. The check line, and the undo
@@ -149,15 +225,40 @@ carries `"approved_sha256": "1e557c49be58..."` and `"result": "idle"` (the file 
 
 **Undo:** `bash $G/apply.sh undo` (the same busy and moved refusals), then `bash $G/apply.sh check` exits 0 again: every listed file is back
 byte for byte from the frozen `before/` copies (the new test file removed), `APPROVED` `97c9a3a5bd22` again, the install's own check ok.
-After the commit, `undo` leaves a working-tree diff: `git add` the same four paths and commit "ACT-OPERATOR-HOURS-2 undone" with the same three
-trailers. **By hand** (only if `apply.sh` cannot run), the restore is `before/home/gov-os-operator/install/opcommon.py` and `.../APPROVED` copied over the
+**Round 2: the undo of both commits.** Round 1's undo after the commit (`undo`, then a new commit of the same four paths) would itself have changed `tests/acceptance/`
+as a `Role: owner` commit with no entry, so it would have turned W1-01 red; DEC-1136 (2) covers it too. So:
+- **Before step 1's commit:** `bash $G/apply.sh undo` as above.
+- **After the first commit, before the second** (the map not yet changed, or changed and not committed: `bash $G/apply.sh exempt-undo` first). With `A` the first commit's full id as you noted it (step 1's `git rev-parse HEAD`), and only while the CTO holds (below):
+```
+test "$(git rev-parse HEAD)" = "$A" || { echo "STOP: HEAD is not the ACT's commit; tell the CTO"; false; }
+git reset --keep "$A~1"
+test "$(git rev-parse ORIG_HEAD)" = "$A" || { git reset --keep ORIG_HEAD; echo "STOP: restored; tell the CTO"; }
+bash $G/apply.sh undo
+```
+`A` below is the first commit's full id: step 2's `H`, as you noted it.
+- **After both commits, while HEAD is still the second one** (nothing else committed on top; `exempt-verify` is the guard, it exits 0 only then): drop both commits from the branch (no history left, so nothing for W1-01 to judge):
+```
+cd /home/usain/Dynamic-Agentic-Engineering-OS
+G=.gov-runtime/scratch/orchestrator/acts/ACT-OPERATOR-HOURS-2
+bash $G/apply.sh exempt-verify    # exit 0: HEAD is the exemption commit, directly on the ACT's commit (otherwise stop: below)
+test "$(git rev-parse HEAD~1)" = "$A" || { echo "STOP: HEAD~1 is not the ACT's commit; tell the CTO"; false; }
+B=$(git rev-parse HEAD)           # the exemption commit
+git reset --keep "$A~1"            # both commits out of the branch, to the ACT commit's parent by id
+test "$(git rev-parse ORIG_HEAD)" = "$B" || { git reset --keep ORIG_HEAD; echo "STOP: restored; tell the CTO"; }
+bash $G/apply.sh undo             # puts the install's two files back (the repository files are already the before)
+bash $G/apply.sh check            # exit 0: ready to apply again
+```
+- **After other commits landed on top:** do not revert and do not `undo` and commit: either changes `tests/acceptance/W2-148/` as an unlisted owner commit (W1-01 red). Tell the CTO: an undo is itself an ACT with its own exemption entry (DEC-1136 (2)), built the same two-commit way.
+**The CTO holds during any undo** (round 2 review F1): before you start an undo, tell the CTO "undo"; the CTO writes `log/act-in-progress.txt`, adds no land line and makes no commit on `w2/integrate` until you say "undone". Each reset is by the commit's id, checked before and after (`ORIG_HEAD`), so a commit that landed on top is never dropped.
+Not rehearsed: `git reset --keep` under the main tree's hooks (the `reference-transaction` freeze gate) and on a branch others have fetched; the clones have git's default hooks.
+**By hand** (only if `apply.sh` cannot run), the restore is `before/home/gov-os-operator/install/opcommon.py` and `.../APPROVED` copied over the
 install's two files (opcommon.py first, `APPROVED` last, nothing queued and no launch running) and `before/repo/...` over the tree's three files, the new test file deleted.
 
-## 6. The rehearsal (DEC-1057): `rehearsal.log`, 103 cases, ends `failures: 0`
+## 6. The rehearsal (DEC-1057): `rehearsal.log`, 189 cases, ends `failures: 0`
 `python3 -B drafts/operator-hours-2/build_act.py rehearse` (no date, pid or head in the log, so a rebuild gives the same manifest). Planted: a
 planted HOME holding a copy of the live install, a planted main tree (the three before files and the new test's folder), the bundle copied in at the same relative
 path, a clock file (the operator's own `clock` setting) and a state file planted at each case. The live install, crontab and main tree are
-hashed before and after: unchanged (cases 101 to 103).
+hashed before and after: unchanged (cases 187 to 189).
 - **Part 1, apply.sh (cases 1 to 41):** check, verify (exit 3 before), undo when already before (untouched), an unknown step (exit 2), apply (the install's own `APPROVED` check ok), every file
   byte-equal to the frozen after, both install files 0444, no temporary file, no `__pycache__`, the thirteen other install files unchanged, `APPROVED`
   differs in the one line; verify; apply again (untouched); check (exit 3 "already applied"); undo; every file and the whole tree (hash, mode,
@@ -183,12 +284,26 @@ hashed before and after: unchanged (cases 101 to 103).
   mutant at least 2): the old quiet hours back (30), the state never read (7 and 84), `== True` for `is not False` (21), no age test (7), an
   unreadable file as no hold (42), the pre-hold margin from 02:20 (13) or 02:00 (26), the state read from 03:00 (2), to 07:30 (36) or to 08:30 (24), the old
   window as the default (5), the age limit 3000 s (7), the NIGHTLY-RUNNING hold dropped (2). Each is caught.
-- **Part 6, the operator's own tests (cases 96 to 100):** a `git clone --no-hardlinks` of the committed head (`448e9faf493d`) with the ACT's four
+- **Part 6, the operator's own tests (cases 96 to 100):** a `git clone --no-hardlinks` of the committed head (`448e9faf493d` in round 1; `4500e87e40bd` in round 2) with the ACT's four
   repository files (hashed against the frozen after copies): **`pytest tests/unit/operator tests/acceptance/W2-148`: 507 passed** (the same suites on
   the unchanged head exited 0 before the change); the new file alone 86 passed; **the same 86 on the OLD `opcommon.py`: 42 failed, 44 passed**
   (the rest are cases the old code also meets: the free hours and the other holds).
+- **Part 7, round 2: the second commit (cases 101 to 186).** Two clones of `w2/integrate` (`git clone --no-hardlinks`, under `/home/usain/gov-os-runs/W2-00/operator-hours-2-r2/`), a planted HOME (a copy of the live install and the git identity), the bundle copied in at its own path.
+  One clone per allowed before: **the live map** (`f4029cfb4942`), and **the chain's map** (ACT-EXAMIN-SETS-1, ACT-ACCEPTED-REDS-1, ACT-PATHMAP-EXP-1 applied by their own bundles' `apply.sh`, each committed; the map is `d50884e3633e`).
+  In each: W1-01 (`tests/acceptance/W1-01`, the whole folder, through `heavy_slot.sh`, `TMPDIR` outside the repository, `PYTHONUSERBASE=/home/usain/.local`, `-p no:cacheprovider -o tmp_path_retention_policy=failed`) **green before the ACT** (54 passed, 12 deselected);
+  `exempt` before the first commit refuses; **section 0's first block run as printed** (the text is cut from this file, the repository root substituted); the first commit has one parent, `Role: owner`, exactly the four paths;
+  **the control: W1-01 red after the first commit and before the entry (1 failed, 53 passed, 12 deselected; the one failure names the first commit and no other)**; `exempt-verify` refuses (no entry yet); **section 0's second block run as printed**;
+  the second commit (subject with the first's 12 digits, the three trailers, one parent, the map only, 2 lines added); mode 644 kept, no temporary file, the tree clean; the map parses and `acceptance_exemptions` is the old list plus the one entry at the end, every other key equal;
+  **W1-01 green again (54 passed, 12 deselected, as before the ACT)**; the gate (h) reader's answer printed (information); `exempt` again: a no-op; `exempt-verify`: 0; `exempt-undo` after the second commit: refused; **section 5's undo block run as printed:** HEAD is the head before the ACT,
+  the map the allowed before, the tree clean, `APPROVED` the old one, `check` ready again; `reset --keep HEAD~1` then `undo` after the first commit alone.
+  **Planted, in each clone:** `exempt` **run twice** before the second commit (the second run is a no-op, exit 0, the map byte for byte the same), then `exempt-undo` (the map the allowed before again; a second `exempt-undo` a no-op) and `exempt` again;
+  **refusals that touch nothing (exit 3):** another HEAD (an unrelated commit on top of the ACT's), the ACT's commit with `Role: operator`, with a subject that does not start `ACT-OPERATOR-HOURS-2:`, with a fifth path, with one of the four files altered, a merge commit as HEAD;
+  **a map that is neither before** (a changed line, uncommitted; the other allowed before sitting uncommitted in the working tree; a half-applied chain committed: EXAMIN's map in the live clone, the chain without PATHMAP-EXP-1 in the chain clone; a link); the map's folder not writable (exit 5, nothing changed);
+  `exempt-verify` on an entry moved up one place, on an entry whose decision was changed, on a map with another changed line (each exit 3), and the good map again (exit 0); stage 1 after both commits (`check`: already applied; `verify`: 0).
 - **Read only on the live system, not in the log:** the new `holds()` on the real clock and the real state file (03:22 UTC: `holding: true`) said
   `["the night hold is on"]`; `apply.sh check` against the live install and tree exits 0 ("ready to apply"), `verify` exits 3 ("not applied").
+- Not rehearsed in part 7: the owner's real commits under the main tree's hooks (the `reference-transaction` freeze gate, the landing and trailer checks; the clones have git's defaults), the apply with the chain applied by the operator agent as `Role: operator` commits (the clone commits the
+  chain with a `Role: operator` trailer only), and a `git reset --keep` on a branch others have fetched.
 - Not rehearsed: a real `claude` session started by the launcher (the stub stands in; the canary and the walls are not what this changes); a real
   cron firing; the owner's by-hand typing (the lines of section 0 were run by the rehearsal's `apply.sh` calls, not by `bash -c` of the text).
 
@@ -217,18 +332,21 @@ waited, takes the commit freeze and applies. **G9 is not checked again before th
 | `after/repo/tests/unit/operator/test_act_operator_hours_2.py` (new, 86 cases) | `b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760` |
 | `before/repo/tests/acceptance/W2-148/test_w2_148_gates.py` to `after/...` | `1c9c44c33abc` to `0f05dbcefa09` (first 12) |
 | `before/repo/tests/acceptance/W2-148/README.md` to `after/...` | `a9e4dc8833e4` to `625e078ba23d` (first 12) |
-| `apply.sh` | `f4eaf481a22ca106944d33a73b4afd1bc62f6ce899c54fe3f57e5c6322714988` |
+| `apply.sh` (round 2; round 1's was `f4eaf481a22c`) | `ec074e05ed46884804223e434bfecc5ddbbf7f9877ced81c8f486226c9da81bf` |
 | `list.txt` (root, path, before, after; the order of the apply) | `34010112c71059f6fe46459794e038d83f7c315aa8999e78766febe67884e578` |
 | `keep.txt` (the thirteen install files this ACT leaves, sha256sum's form) | `851ee3394cde348686421bd4dd9c0edf1c2c71ef122905e2834eefa08189e0a1` |
-| `rehearsal.log` | `a4a04d9dc85f1e914c5a127a416189eede88415ed63e927337a1ee2da8534b16` |
-| **`manifest.json`** | **`d3d292378b7bda8c4339fcbcaa77025a53dd40b91aefad0eef8a686f3ad8e6f2`** |
+| `rehearsal.log` (round 2; round 1's was `a4a04d9dc85f`) | `f9c2ee135d23605bc914634b6c9a7206d1e080b10bc23eb7ed89ec4edbd61fb2` |
+| **`manifest.json`** (round 2; round 1's was `d3d292378b7b`) | **`7acf024359d6cdbd87c1d487e5d0dc5b64236a45c1ca4e7ce427bcf9db696697`** |
+
+Round 1's bundle is kept whole in `acts/ACT-OPERATOR-HOURS-2.r1-d3d29237/` (manifest `d3d292378b7bda8c4339fcbcaa77025a53dd40b91aefad0eef8a686f3ad8e6f2`); its `before/`, `after/`, `list.txt` and `keep.txt` are the same bytes as this bundle's (checked by `diff -r`).
+The manifest's `dec` now also names DEC-1136. `review.md` is not in this bundle: round 1's review is kept with round 1's and judged round 1's bytes.
 
 The operator's own code on the bundle (`build_act.py gates`, read only): `validate_manifest` pass; 15 files hash as the manifest says; the path
 rule passes on `apply.sh` and every check; `act_class.classify`: class O. The bundle depends on the live install and the committed files as they
-are today (head `448e9faf493d`): if any of them moves before you apply, `check` says "moved: ..." and the CTO rebuilds (`build_act.py all`).
+are today (round 2 built on head `4500e87e40bd`; the repository files and the install are unchanged since round 1's `448e9faf493d`): if any of them moves before you apply, `check` says "moved: ..." and the CTO rebuilds (`build_act.py all`).
 
 ## 9. Risks, and what I did not do
-1. **Not independently reviewed.** The CTO's ordinary round (an independent auditor on the bundle and this package before your yes) is not done. The rehearsal is mine, and the
+1. **Round 2 not independently reviewed.** Round 1's review (READY) is of round 1's bytes and missed the gap; the CTO's ordinary round (an independent auditor on the bundle and this package before your yes) is not done for round 2. The rehearsal is mine, and the
    rule's wording in the tests was written from the owner's sentence by the same helper; the table in the rehearsal states the rule separately from the code, but not from another mind.
 2. **A dead night hold stops the operator from 03:10 to 07:59** (fail closed): after a reboot nothing restarts `night_hold.py` by itself that I could find (M, HOURS-1 risk 2). The operator then
    sleeps those hours as before this ACT; elsewhere it runs. The hold's absence shows as a state file whose `at` stops moving.
@@ -242,9 +360,14 @@ are today (head `448e9faf493d`): if any of them moves before you apply, `check` 
 7. **Local time.** The gate takes the clock's own wall time (`now()`: the system's offset), the guard the machine's local time, the hold `datetime.now()`: Europe/London, equal to UTC now. They move together
    at the clocks' change; no UTC is assumed.
 8. **The unit tests read the repository's `opcommon.py`**: the commit of the four paths is what keeps the tree and the install the same bytes (the check in the tree's tests that the install is the tree's is not there; `apply.sh verify` and your commit are).
-9. **`apply.sh` writes the main tree's working files** (three modified, one new) on whatever branch is checked out; it needs no clean tree but you should commit the four paths and nothing else with them (ACT-OPERATOR-ROUNDS-1's note).
+9. **`apply.sh` writes the main tree's working files** (three modified, one new; and, at step 2, the path map) on whatever branch is checked out; `apply` needs no clean tree but you should commit the four paths and nothing else with them (ACT-OPERATOR-ROUNDS-1's note); `exempt` needs the path map unmodified at HEAD.
 10. **The launcher does not wait on the lock.** A launch in the instant between the two install files and `APPROVED` refuses "APPROVED mismatch" once (the swap holds `log/launch.lock`; the launcher checks `APPROVED` before it takes the lock):
     hence "not at a :x0 minute" (ACT-OPERATOR-2 section 8 item 4).
+11. **(Round 2) The map's after bytes are code, not a frozen file.** `exempt` is checked by hashes of the before and a byte-for-byte rebuild of the after (`exempt-verify`), and the rehearsal parses the result; but there is no frozen after copy to `cmp`, so a reviewer reads the awk of `ex_insert` and `ex_remove`.
+12. **(Round 2) Between the two commits W1-01 is red** (the control): a merge of `w2/integrate` or a landing check made in that window judges the first commit unlisted. The window is the seconds between two commands; do not leave it open.
+13. **(Round 2) The chain order is the owner's** (section 4): applied after this ACT, the three path-map ACTs refuse and are rebuilt; `exempt` accepts either map so the CTO is not asked to choose for you.
+14. **(Round 2) `git reset --keep` rewrites the branch tip** in the main tree, which other sessions and the CTO also use: use it only while HEAD is the second commit (`exempt-verify` says so) and nothing is fetched; otherwise the undo is an ACT of its own (section 5).
+15. **(Round 2) The gate (h) reader does not list the commit** (section 2b): not a W1-01 matter; named so it is not found later by surprise.
 
 ## 10. Placeholder scan
 `python3 .gov-runtime/scratch/orchestrator/tools/placeholder_scan.py drafts/operator-hours-2/ACT-OPERATOR-HOURS-2.md` is run at the end of the helper's work; its result is in the helper's report.
