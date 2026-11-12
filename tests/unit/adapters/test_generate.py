@@ -1,12 +1,13 @@
 """Builder tests for ``gov adapters generate`` (W2-23 S2). Regression evidence only.
 
-The planted programme is ``fixtures/adopt/programme`` copied into ``tmp_path`` (its settings placed at
+The planted programme is ``tests/unit/adapters/fixtures/programme`` copied into ``tmp_path`` (its settings placed at
 ``.claude/settings.json`` there). ``rulesync generate`` is replaced by a stand-in that returns fixed generated files
 (``merge.generate_into``); the merge, the writing and the command are the code's own.
 """
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from gov.adapters import command, merge
 from gov.cli import main as cli
 from gov.cli.errors import GovError
 
-FIXTURE = Path(__file__).resolve().parents[3] / "fixtures" / "adopt" / "programme"
+FIXTURE = Path(__file__).resolve().parent / "fixtures" / "programme"
 GENERATED = {
     "CLAUDE.md": b"# Governance\n\nGenerated line one.\n",
     "AGENTS.md": b"# Governance\n\nGenerated agents line.\n",
@@ -72,7 +73,9 @@ def test_s2_each_file_keeps_every_programme_line_in_order_and_gains_the_generate
     assert settings["permissions"]["deny"] == ["Read(./secrets/**)", "Read(./.env)"]
     assert settings["hooks"]["PreToolUse"][0] == own_settings["hooks"]["PreToolUse"][0]
     assert settings["hooks"]["PreToolUse"][1]["matcher"] == "Edit" and "Stop" in settings["hooks"]
-    assert list(settings["env"]) == ["PROGRAMME_FLAG", *merge.AUTO_COMPACT]
+    assert list(settings["env"]) == ["PROGRAMME_FLAG"]  # the programme's own entries; no threshold added (DEC-838)
+    assert not [key for key in settings["env"] if re.search("AUTO_?COMPACT", key)]
+    assert not re.search("AUTO_?COMPACT", json.dumps(settings))
     assert (root / "notes.txt").read_text() == "an untracked file of the programme\n"
 
 
@@ -107,7 +110,7 @@ def test_s2_a_project_without_its_own_files_gets_the_generated_ones_in_the_block
         (root / rel).unlink()
     merge.generate(root)
     assert lines(root / "CLAUDE.md")[0] == merge.BEGIN
-    assert json.loads((root / ".claude/settings.json").read_text())["env"] == merge.AUTO_COMPACT
+    assert "env" not in json.loads((root / ".claude/settings.json").read_text())  # an empty block carries nothing
 
 
 def test_s2_a_broken_block_or_unreadable_settings_refuse_and_nothing_is_written(programme):
@@ -130,6 +133,13 @@ def test_s2_merge_value_keeps_the_programmes_scalars_and_order():
     assert merge.merge_value(own, {"c": "gen", "a": {"x": [2, 3], "y": 0}, "d": 4}) == {
         "b": 1, "a": {"x": [1, 2, 3], "y": 0}, "c": "own", "d": 4}
     assert list(merge.merge_value(own, {"d": 4, "b": 9})) == ["b", "a", "c", "d"]
+
+
+def test_s2_the_env_block_is_merged_programme_first_and_never_added_empty():
+    merged = merge.merge_settings({"env": {"B": "1", "A": "2"}}, {"env": {"C": "3", "A": "9"}})
+    assert list(merged["env"]) == ["B", "A", "C"] and merged["env"]["A"] == "2"
+    assert "env" not in merge.merge_settings({"model": "m"}, {"hooks": {}})
+    assert "env" not in merge.merge_settings(None, {})
 
 
 def test_s2_the_command_is_found_by_folder_and_runs(programme, capsys):

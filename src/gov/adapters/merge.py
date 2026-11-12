@@ -8,7 +8,8 @@ its settings as the adapter check applies it (DEC-635); then:
   stands in one marked block after them (``<!-- gov:generated begin -->`` ... ``<!-- gov:generated end -->``), which
   the next run replaces where it stands;
 - ``.claude/settings.json``: merged key by key, the programme's keys and list entries first and in their order, the
-  generated keys and entries (hooks among them) after, and an ``env`` block that carries the auto-compact entry;
+  generated keys and entries (hooks among them) after, and an ``env`` block merged the same way (no ``env`` key is
+  added when neither side holds one);
 - every other generated file is written where the project has none; one that differs from the project's own is
   kept as it is and named (``kept``).
 """
@@ -25,9 +26,8 @@ from gov.cli.errors import GovError
 BEGIN, END = "<!-- gov:generated begin -->", "<!-- gov:generated end -->"
 TEXTS = ("CLAUDE.md", "AGENTS.md")
 SETTINGS = ".claude/settings.json"
-# W2-M229 (DEC-636): rulesync writes no env block, so the entry is set here. The value is DEC-636's; DEC-838 (standing)
-# says no compaction threshold is set anywhere: the clash is the package P-W2-23-4 of this ticket's engineer return.
-AUTO_COMPACT = {"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000"}
+# DEC-838: every session uses its model's full window; no launch sets a compaction threshold, so nothing is forced in.
+AUTO_COMPACT = {}
 
 
 def _refuse(code: str, message: str, **details) -> GovError:
@@ -87,7 +87,9 @@ def merge_value(own, generated):
 def merge_settings(own: dict | None, generated: dict) -> dict:
     merged = merge_value(own or {}, generated)
     env = merged.get("env") if isinstance(merged.get("env"), dict) else {}
-    merged["env"] = {**env, **{key: value for key, value in AUTO_COMPACT.items() if key not in env}}
+    extra = {key: value for key, value in AUTO_COMPACT.items() if key not in env}
+    if extra:  # an empty block carries nothing: no env key is added for it
+        merged["env"] = {**env, **extra}
     return merged
 
 

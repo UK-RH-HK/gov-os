@@ -288,7 +288,7 @@ def test_s3_the_a8_proof_prints_a_rule_files_url_encoded_citation(root):
 # ---------------------------------------------------------------- F1: instruction and untracked files survive
 
 def test_f1_instruction_files_and_untracked_files_survive_an_adoption_and_its_rollback(root, monkeypatch):
-    fixture = Path(__file__).resolve().parents[3] / "fixtures/adopt/programme"
+    fixture = Path(__file__).resolve().parents[3] / "tests/unit/adapters/fixtures/programme"
     for rel in ("CLAUDE.md", "AGENTS.md"):
         write(root, rel, (fixture / rel).read_text(encoding="utf-8"))
     write(root, ".claude/settings.json", (fixture / "claude-settings.json").read_text(encoding="utf-8"))
