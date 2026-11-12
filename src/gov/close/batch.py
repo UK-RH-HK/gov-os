@@ -583,6 +583,7 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
     land, landed = whole, candidates
     if reds:
         explains: dict[str, list[str]] = {r: [] for r in reds}
+        absent: list[tuple[str, dict]] = []
         for cand in candidates:
             others = [c for c in candidates if c is not cand]
             without = _build(clone, base_sha, others)
@@ -590,9 +591,21 @@ def isolate(root: Path, base: str, given: list[str], targets: list[str] | None =
                 refuse(CANDIDATE_NOT_ISOLATED, f"the merged result without {cand['name']} cannot be built (the "
                        "others do not merge without it)", candidate=cand["name"])
             for red in reds:
-                if _attribution.run_alone(clone, red, options, folder / "alone", timeout,
-                                          f"without-{cand['name']}") is None:
+                seen = _attribution.run_alone(clone, red, options, folder / "alone", timeout,
+                                              f"without-{cand['name']}")
+                if seen is None:
                     explains[red].append(cand["name"])
+                elif seen == _attribution.ABSENT:
+                    absent.append((red, cand))
+        # a red that cannot run without a candidate (its own new test) is that candidate's only once it is red again
+        # on the base with that candidate alone (a real failure: no timeout, no unknown); else it stays unexplained
+        for red, cand in absent:
+            alone = _build(clone, base_sha, [cand])
+            if alone is None:
+                continue
+            seen = _attribution.run_alone(clone, red, options, folder / "alone", timeout, f"alone-{cand['name']}")
+            if seen is not None and seen not in _attribution.NEVER_MATCH:
+                explains[red].append(cand["name"])
         result["explains"] = explains
         unexplained = [r for r, names in explains.items() if not names]
         if unexplained:

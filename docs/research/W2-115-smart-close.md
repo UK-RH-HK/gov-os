@@ -168,3 +168,20 @@ S12 (the trailers switch) is not built in this run (P4: its CIT-P, review and th
   narrow: another ticket's file or record, and any other record place, still selects `record_reading`. Bookkeeping
   alone (no governance file) still selects `record_reading` (records alone), and code beside it is unchanged (own
   suite, `record_reading`, `every_close`). Unit test: `test_w2_115_select.py::test_s2_governance_alone_beside_the_tickets_bookkeeping_selects_nothing`.
+
+## Fix round 1 (eng-5): review round 1's F-1, F-3 and F-7 (PK-3 (a))
+
+- **F-1 (S4, F1): the head a red is judged against.** `select.head_without_change`: the green base the change is
+  counted from (`green_base`) when it is an ancestor of `HEAD`, else the first parent of the ticket's oldest own
+  commit, else none (DEC-988 item 3, DEC-989). `select.scoped`'s `base` is that head; `gov close` uses it (its
+  `--base` still overrides). The selection (suites, options, changed paths) is unchanged. An untrailered commit between
+  the green base and the first trailered one is now outside the head without the change, so its red is caused:
+  `RED_CAUSED`, no record, no repair ticket. Unit tests: `test_w2_115_select.py::test_f1_*` (3: an ancestor; not an
+  ancestor; no green base), `test_w2_115_close.py::test_f1_an_untrailered_slip_after_the_green_base_is_caused_and_never_closes`.
+- **F-3 (S6, F3): a culprit's own new test.** `batch.isolate`: a red absent in the build without candidate X is run
+  once alone on the base with X alone merged; red there with a real failure type (not a timeout, unknown or absent)
+  blames X, and the rest land on the same run; not red there, it stays unexplained and the batch refuses
+  `BATCH_UNEXPLAINED` as before. Every confirmation runs before anything lands. Unit tests:
+  `test_w2_115_batch.py::test_f3_a_culprits_own_new_red_test_is_blamed_once_confirmed_alone`,
+  `test_w2_115_batch.py::test_f3_an_absent_red_not_red_with_its_candidate_alone_refuses_and_nothing_lands`.
+- **F-7 (S9):** the method above, stated exactly; the script inline and re-run at `ce6a2addf362`.

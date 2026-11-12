@@ -205,3 +205,52 @@ def test_f4_run_in_a_strict_project_is_todays(tmp_path, monkeypatch):
     with pytest.raises(GovError) as raised:
         batch.run(repo.root, ["T-0001"])
     assert raised.value.code == "STOP" and called == [["T-0001"]]
+
+
+# --- F-3 (S6, F3): a culprit whose red is its own new test -----------------------------------------------------
+
+NEW_RED = f"{OWN_SUITE}test_a_new.py"
+
+
+def test_f3_a_culprits_own_new_red_test_is_blamed_once_confirmed_alone(tmp_path, monkeypatch):
+    """a adds a test that is red; b and c are clean. Without a the test is absent, so no build without a candidate
+    turns it green; it is red again on the base with a alone, so a goes back and b and c land on the same run."""
+    repo = project(tmp_path)
+    base = repo.git("rev-parse", "HEAD").strip()
+    _branch(repo, "a", {NEW_RED: "def test_new():\n    assert 1 == 2\n"})
+    _branch(repo, "b", {"src/pkg/other.py": "def other():\n    return 1  # b\n"})
+    _branch(repo, "c", {"docs/c.md": "# c\n"})
+    events = []
+    real_alone, real_git = attribution.run_alone, batch._git
+    monkeypatch.setattr(attribution, "run_alone", lambda c, t, o, f, to, tag: events.append(("run", tag)) or
+                        real_alone(c, t, o, f, to, tag))
+    monkeypatch.setattr(batch, "_git", lambda root, *a, **k: events.append(("git", a[0])) or real_git(root, *a, **k))
+    result, code = batch.isolate(repo.root, base, ["a", "b", "c"], targets=[OWN_SUITE, "tests/unit/"], onto="main",
+                                 timeout=120)
+    assert code == batch.EXIT_CULPRITS
+    assert result["culprits"] == ["a"] and result["landed"] == ["b", "c"]
+    assert result["explains"] == {f"{NEW_RED}::test_new": ["a"]}
+    assert repo.git("rev-parse", "main").strip() == result["land_commit"]
+    assert "# b" in repo.git("show", "main:src/pkg/other.py") and repo.git("show", "main:docs/c.md") == "# c\n"
+    assert "test_a_new.py" not in repo.git("ls-tree", "-r", "--name-only", "main")  # the culprit did not land
+    confirms = [n for n, e in enumerate(events) if e == ("run", "alone-a")]
+    lands = [n for n, e in enumerate(events) if e in (("git", "merge"), ("git", "update-ref"))]
+    assert confirms and lands and min(lands) > max(confirms)  # nothing landed before the culprit was confirmed
+
+
+def test_f3_an_absent_red_not_red_with_its_candidate_alone_refuses_and_nothing_lands(tmp_path):
+    """a adds a test that is red only beside b or c: absent without a, red without b, red without c, green with a
+    alone: no single candidate explains it, so the batch refuses as before and nothing lands."""
+    repo = project(tmp_path)
+    base = repo.git("rev-parse", "HEAD").strip()
+    _branch(repo, "a", {NEW_RED: "import importlib.util\n\n\ndef test_new():\n"
+                                 "    assert importlib.util.find_spec('pkg.bmod') is None\n"
+                                 "    assert importlib.util.find_spec('pkg.cmod') is None\n"})
+    _branch(repo, "b", {"src/pkg/bmod.py": "B = 1\n"})
+    _branch(repo, "c", {"src/pkg/cmod.py": "C = 1\n"})
+    with pytest.raises(GovError) as raised:
+        batch.isolate(repo.root, base, ["a", "b", "c"], targets=[OWN_SUITE], onto="main", timeout=120)
+    assert raised.value.code == batch.BATCH_UNEXPLAINED
+    assert raised.value.details["unexplained"] == [f"{NEW_RED}::test_new"]
+    assert raised.value.details["explains"] == {f"{NEW_RED}::test_new": []}
+    assert repo.git("rev-parse", "main").strip() == base
