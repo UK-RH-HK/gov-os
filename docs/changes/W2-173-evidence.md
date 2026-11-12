@@ -97,6 +97,39 @@ to their owners: the acceptance cases' planted `GOOD_DELIVERY`/`GOOD_RESULT` for
 fixed form and `effort` in `COUNTS_KEYS` (test designer, `tests/acceptance/W2-149/w2_149_support.py`), and the two unit
 cases (an engineer on W2-149's paths).
 
+## Run 2: the CTO's P-1 (a) (DEC-1112 (3), DEC-105 apply now, DEC-866), 2026-11-12
+
+S5 now reads "W2-149's cases pass, with the 8 cases' planted products in the fixed form" (the ticket's last paragraph).
+Test designer td-2 (Opus, high, C3) changed only `tests/acceptance/W2-149/w2_149_support.py` (`009642705`, trailer
+`Rewrite-Reason: DEC-866, W2-173's S3 and S4`; merged `05abbd36f`): `COUNTS_KEYS` gains `effort`; the checker's planted
+notes are `CHECKER_NOTES` in checker.md §6's form (q01, q02, q03 of the staged set; accept, revise, accept; the result's
+3/2/1/0 unchanged); the auditor's planted classes are `AUDITOR_CLASSES` in auditor.md §6's form (m1, m2, m3 of the planted
+misses.jsonl), and the auditor's result counts are derived from them. No assertion and no case changed; the script was not
+touched in run 2.
+
+| Check (head `05abbd36f`) | Result |
+|---|---|
+| `gov accept W2-173` | pass: 79 passed, 0 failed, 0 skipped (S1 25, S2 23, S3 15, S4 13, S5 1, F1 6, F2 24, F3 1, F4 1) |
+| `gov accept W2-149` | 174 passed, 0 failed, 35 skipped; every line passes but success-26, whose only 2 cases are live (skipped without the CTO's `GOV_W2_149_LIVE=1`), as at run 1; run 1 was 168/6/35 |
+| `tests/acceptance/W2-149`, td-2, whole-folder form from a writable copy | 173 passed, 35 skipped, the same as base `2f98aecbc` in the same form |
+| `lead_verify` (whole suite, parallel) | 4065 tests, 8 failed, 41 skipped: W2-149's two unit cases below and six W2-96 signal cases |
+| `git diff --name-only` against the merge-base with `w2/integrate` (`70e5840d9`) | only the ticket's allowed paths and `tests/acceptance/W2-173/**` (F3, F4) |
+
+The six W2-96 signal cases (`tests/unit/accept/test_w2_96_review3.py`, `_review4.py`, `_run2.py`) are not this ticket's:
+the branch changes neither `src/` nor `tests/unit/accept/` against its merge-base with `w2/integrate`. They are red again
+when run alone with the empty HOME (13 failed, 7 passed over all their parameters); run 1 found them green alone with the real
+HOME.
+
+W2-149's two unit cases are in `tests/unit/orchestration/test_w2_149_indep_launch.py`, outside this ticket's paths, so they
+are not edited here. Each needs its planted product in the fixed form (td-2's proposal, checked on a copy: both pass, and the
+whole file passes, 49 passed):
+- `test_checker_delivers_its_notes`: plant `out/notes.md` in §6's form for the unit set (q01, `sub/q02`), with
+  `q01 | accept | - | also: none | ...` and `q02 | revise | R6-SPAN-MISSES | also: none | ...`, `## The set` and its five
+  lines. The result (2/1/1/0) stays; the two asserts read that text and its sha256 instead of `"notes\n"`.
+- `test_auditor_delivers_its_classes_and_the_audit_is_logged`: give `misses.jsonl` string ids (`{"id": "m1", ...}`,
+  `{"id": "m2", ...}`), and set `classes.json` to `{"m1": {"class": "retrieval_miss", "reason": ...}, "m2": {...}}`. The
+  result `{"misses": {"retrieval_miss": 2}}` and the counts assert stay; the `miss-classes.json` assert reads the new text.
+
 ## Risks
 - `--counts-only` on a counts.json written before this change refuses 17 (its object lacks the now-required `effort`).
   The set-up A runs already on disk are such files; `round1_files` reads them without the schema and is unaffected.
