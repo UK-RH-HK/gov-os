@@ -35,6 +35,7 @@ kpis:
   - 'A landing never waits for a close it does not conflict with: a running close blocks a landing only when a ticket it closes is among the landing''s, or while it is committing its records; otherwise the landing goes ahead, and two record commits never collide (retried) Verify: planted closes: a running close with a ticket in the landing''s set blocks the landing, as does one committing its records; a running close with no shared ticket does not block it; two record commits at the same time both land (one retried). [DEC-1014 item 5]'
   - 'The project''s nightly is never kept from starting by a landing: from a configured time before its start until it has started (its running marker), or a configured latest time, the dispatcher claims no landing; one already running is finalised; the status names the hold Verify: a planted configured hold time before the nightly: from then until its running marker (or the latest time) no landing is claimed, a landing already running is finalised, and the status names the hold. [DEC-1018 item 1]'
   - 'Every heavy step takes a heavy-job slot (W2-20: test runs, rebuilds, full checks, retrieval measures), so peaks stay capped whenever they come; a heavy step found running outside a slot is named in the status as a finding Verify: a planted heavy step (test run, rebuild, full check, retrieval measure) is shown holding a slot; a planted one running with no slot is named in the status as a finding. [DEC-1008, DEC-979 D1]'
+  - 'The template''s default `working_size_bytes` (a new machine''s `gate.json`, `src/gov/resources/config.py`) is 805,306,368 B (0.75 GiB per live session), dated 2026-11-12 with its source DEC-1149, as this machine''s gate now holds (ACT-P95-1) Verify: a unit case reads `config.template()` and finds working_size_bytes 805306368 with the date and the source naming DEC-1149 [DEC-1149 (2)]'
   failure: []
 non_goals:
 - the dispatcher core (W2-121, part a) and the other parts
@@ -93,3 +94,8 @@ All generic: nothing names this repository; every new key in `governance/project
 
 Exit codes: a landing held (busy, unclean tree, wrong branch, conflicting close, nightly) is exit 0, its reason in
 the status as `land: <reason>`.
+
+## Widened (DEC-1149 (2), the owner's 'by widening an open ticket in src/gov/resources', 2026-11-12)
+
+One KPI line (the last success line): the template's default `working_size_bytes` becomes 805,306,368 B, as ACT-P95-1 set on this machine; `src/gov/resources/**` is already in this ticket's paths. A one-line change with one unit case, riding a short resume before the land (DEC-802), no new review round.
+

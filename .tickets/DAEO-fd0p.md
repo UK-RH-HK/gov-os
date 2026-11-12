@@ -1,6 +1,6 @@
 ---
 id: DAEO-fd0p
-status: open
+status: in_progress
 deps: []
 links: [DAEO-wnnz, DAEO-t8mp, DAEO-6lid]
 created: 2026-11-11T01:20:19Z
