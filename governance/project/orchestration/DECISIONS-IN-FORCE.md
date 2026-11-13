@@ -150,7 +150,7 @@ the machine and the governance):
 ## Records and commits
 - DEC-861, R-10 (kept by DEC-1057 (6)): the CTO commits the owner's decisions (`Task: decision-record`, `Role: orchestrator`, `Decided-by`),
   one commit per batch (hourly or at handover); `record/w2` synced hourly and at session end; `--main` lifted.
-- R-12 (DEC-1057, lifting DEC-896 item 2 and DEC-927 item 2): `Task:` and `Role:` on every commit; `Implements:` optional; a decision and its ticket files in one commit.
+- R-12 (DEC-1057): `Task:` and `Role:` on every commit; `Implements:` optional; a decision and its ticket files in one commit. DEC-1057 lifted item 2 of DEC-896 (now done) and item 2 of DEC-927.
 - R-6 (DEC-1057, lifting DEC-511): no committed `gov checkpoint` record per round; the prose checkpoint, PreCompact and SessionStart stay.
 - R1-21: `tools/structural_pass.py` after each landing and record commit, a notice only.
 
