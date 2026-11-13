@@ -85,11 +85,12 @@ FIELD_FAULTS = {
     "question": lambda q: q.pop("question"),
     "gold_answer": lambda q: q.pop("gold_answer"),
     "sources": lambda q: q.pop("sources"),
-    "forbidden": lambda q: q.pop("forbidden"),
     "source-path": lambda q: q["sources"][0].pop("path"),
     "source-holds": lambda q: q["sources"][0].pop("holds"),
     "sources-empty": lambda q: q.__setitem__("sources", []),
     "forbidden-not-a-list": lambda q: q.__setitem__("forbidden", "a-single-string"),
+    "forbidden-holds-a-non-string": lambda q: q.__setitem__("forbidden", list(q.get("forbidden") or []) + [7]),
+    "forbidden-holds-an-empty-string": lambda q: q.__setitem__("forbidden", list(q.get("forbidden") or []) + [""]),
     "gold_answer-blank": lambda q: q.__setitem__("gold_answer", ""),
     "category-not-a-string": lambda q: q.__setitem__("category", 7),
 }
@@ -97,13 +98,30 @@ FIELD_FAULTS = {
 
 @pytest.mark.parametrize("fault", list(FIELD_FAULTS))
 def test_s1_a_question_missing_a_field_or_of_a_wrong_type_is_refused_naming_its_id(tmp_path, valid, fault):
-    """S1: a question missing a README field (category, question, gold_answer, sources, forbidden; a source without
-    path or holds), or a field of the wrong type: exit 2, naming the question's id and not its text."""
+    """S1: a question missing a README field (category, question, gold_answer, sources; a source without path or
+    holds), or a field of the wrong type (`forbidden`, when present, a list of non-empty strings): exit 2, naming the
+    question's id and not its text. `forbidden` itself is optional: see the next case."""
     run = broken(valid, tmp_path, lambda root: s.edit_questions(
         root, RUST, lambda data: FIELD_FAULTS[fault](data["questions"][2])))
     assert_refused(run)
     assert run.names(QID), f"no refusal names {QID}: {run.refusals}"
     assert not [line for line in run.refusals if QID not in line], "a refusal that does not concern the question"
+
+
+def test_s1_questions_without_a_forbidden_key_are_valid(tmp_path, valid):
+    """S1 (the lead's decision of batch 2): `forbidden` is optional, absent meaning no forbidden citation, as in W2-81's
+    own visible half. A stand-in whose questions in one repository carry no `forbidden` key at all exits 0, with the
+    count line and the total unchanged."""
+    def drop(data):
+        for question in data["questions"]:
+            question.pop("forbidden", None)
+
+    run = broken(valid, tmp_path, lambda root: s.edit_questions(root, RUST, drop))
+    assert run.code == 0, run.out[:400]
+    assert "Traceback" not in run.out and not run.refusals, run.refusals
+    assert s.WORD not in run.out and s.VWORD not in run.out, "a stand-in question, answer or variant reached the output"
+    assert f"{RUST}: 10 hidden questions" in run.lines
+    assert re.search(r"^valid: 60 hidden questions in 6 repositories, \d+ hidden variants \(seed \d+\)$", run.out, re.M)
 
 
 def test_s1_a_question_missing_its_id_is_refused(tmp_path, valid):
