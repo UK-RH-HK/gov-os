@@ -18,6 +18,26 @@ Standard library and `pytest` only. No network, no dev tiers, no `local_only` te
 run.** Each is text in the hook's input; the test reads the guard's decision. Nothing is installed and nothing in the
 repository is written. The run takes about 90 seconds.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 69 in the full run, 267 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Install commands (package managers, curl\|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role the... | `test_w1_04_install_rule.py::test_an_install_by_any_other_role_is_denied` (3 of 15), `test_w1_04_install_rule.py::test_an_install_in_a_session_without_a_role_is_denied` (3 of 25), `test_w1_04_probe_findings.py::test_an_install_through_another_package_manager_is_asked_about_or_denied` (2 of 10) | part A's row, by its words |
+| S2: The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b] | `test_w1_04_auto_mode.py::test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too` (2 of 2), `test_w1_04_auto_mode.py::test_an_install_by_the_orchestrator_is_asked_about_in_every_permission_mode` (2 of 30) | part A's row, by its words |
+| S3: The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id [CAP-25.a] | `test_w1_04_registry_schema.py::test_the_schema_is_the_one_tool_registry_file_of_the_kernel_schemas`, `test_w1_04_registry_schema.py::test_the_schema_is_a_json_schema_of_draft_2020_12` | part A's row, by its words |
+| F1: Any install executes without an owner approval in chat | `test_w1_04_install_rule.py::test_an_install_in_a_session_without_a_role_is_denied` (3 of 25), `test_w1_04_probe_findings.py::test_while_frozen_an_install_is_denied_to_every_role_the_orchestrator_included` (1 of 5), `test_w1_04_probe_findings.py::test_while_frozen_an_install_by_the_orchestrator_is_denied_in_every_permission_mode` (1 of 6) | part A's row, by its words |
+| F2: sudo is ever allowed to an agent role | `test_w1_04_probe_findings.py::test_sudo_in_a_later_part_of_the_command_is_denied_to_every_role` (2 of 10), `test_w1_04_sudo.py::test_sudo_is_denied_to_every_role` (3 of 30), `test_w1_04_sudo.py::test_sudo_is_denied_in_a_session_without_a_role` (3 of 6) | part A's row, by its words |
+| F3: A matcher result ever allows a command that the harness would otherwise ask about (matching only escalates to ask or deny) | `test_w1_04_only_escalates.py::test_the_hook_never_gives_an_explicit_allow`, `test_w1_04_only_escalates.py::test_a_command_that_installs_nothing_gets_no_decision_from_the_rule` (1 of 5) | part A's row, by its words |
+
 ## KPI → tests → red reason today
 
 Run on `w1/integrate` at `5e14561`, after implementation: **329 passed, 7 failed** (336 cases, 35 test functions).
@@ -37,7 +57,7 @@ functions). Two reasons, R1 and R2 in the table below:
 |---|---|---|---|
 | **Success 1.** Install commands (package managers, curl\|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role they are denied [CAP-25.b] | `test_w1_04_install_rule.py` | `test_an_install_by_the_orchestrator_is_asked_about` (25 commands) · `test_the_ask_is_one_the_harness_shows_to_the_owner` · `test_an_install_by_the_engineer_is_denied` (25 commands) · `test_an_install_by_any_other_role_is_denied` · `test_an_install_in_a_session_without_a_role_is_denied` · `test_an_install_by_a_role_without_a_ticket_is_denied` · `test_inside_a_subagent_the_acting_role_decides` | R1 |
 | | `test_w1_04_probe_findings.py` | `test_an_install_in_a_later_part_of_the_command_is_treated_like_the_install_alone` (20 cases) · `test_an_option_before_the_subcommand_does_not_hide_an_install` (17) · `test_a_program_name_with_a_version_suffix_is_the_same_program` (7) · `test_an_install_through_another_package_manager_is_asked_about_or_denied` (10) · `test_every_ordinary_spelling_of_the_output_option_into_path_is_an_install` (30) · `test_a_download_that_does_not_go_into_path_gets_no_decision_from_the_rule` (22) · `test_while_frozen_an_install_is_denied_to_every_role_the_orchestrator_included` (5) · `test_while_frozen_an_install_by_the_orchestrator_is_denied_in_every_permission_mode` (6) · `test_while_frozen_an_orchestrator_subagent_and_sudo_are_denied_too` | Written after implementation. 7 cases red: D-1, D-2, D-3 |
-| **Success 2.** The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b] — *tested by driving the hook; the live headless attempt of DEC-120 is not a pytest case* | `test_w1_04_auto_mode.py` | `test_an_install_by_the_orchestrator_is_asked_about_in_every_permission_mode` (6 modes × 5 commands) · `test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts` · `test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too` | R1 |
+| **Success 2.** The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b] — *tested by driving the hook; the live headless attempt of DEC-120 is not a pytest case* | `test_w1_04_auto_mode.py` | `test_an_install_by_the_orchestrator_is_asked_about_in_every_permission_mode` (6 modes × 5 commands) · `test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts` · `test_an_orchestrator_subagent_in_a_worker_s_session_is_refused_in_auto_mode_too` (was `…_is_asked_about_in_auto_mode_too`; DEC-980) | R1 |
 | **Success 3.** The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id [CAP-25.a] | `test_w1_04_registry_schema.py` | `test_the_schema_is_the_one_tool_registry_file_of_the_kernel_schemas` · `test_the_schema_is_a_json_schema_of_draft_2020_12` · `test_a_complete_registry_is_accepted` · `test_an_entry_without_a_required_fact_is_refused` (7 keys) · `test_a_registry_without_a_tools_list_is_refused` · `test_the_kernel_template_ships_no_registry_file` | R2 |
 | **Failure 1.** Any install executes without an owner approval in chat — *tested as: no session gets an install through the guard without `ask` or `deny`* | `test_w1_04_install_rule.py`, `test_w1_04_auto_mode.py` | Every Success 1 and Success 2 test. Sharpest: `test_an_install_in_a_session_without_a_role_is_denied` · `test_inside_a_subagent_the_acting_role_decides` · `test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts` | R1 |
 | **Failure 2.** sudo is ever allowed to an agent role | `test_w1_04_sudo.py` | `test_sudo_is_denied_to_every_role` (5 roles × 6 commands) · `test_sudo_is_denied_in_a_session_without_a_role` · `test_sudo_by_the_orchestrator_is_denied_in_every_permission_mode` · `test_sudo_by_an_orchestrator_subagent_is_denied` | R1 |
@@ -164,6 +184,9 @@ For the DEC-106 metric. Each revision is a rewrite after implementation with rea
 |---|---|---|
 | `DENIED_BY_THE_GUARD["write-outside-the-ticket-paths"]` in `test_w1_04_only_escalates.py` | Replaced `"pip install requests && touch src/app/main.py"` with `"pip install requests && touch .gov-runtime/findings.jsonl"`; case renamed to `"write-into-gov-runtime"`. Under DEC-156 the orchestrator is no longer denied `src/app/main.py`; under DEC-176 `.gov-runtime/findings.jsonl` stays denied | owner correction, DEC-156 |
 | `DENIED_BY_THE_GUARD["redirect-outside-the-ticket-paths"]` in `test_w1_04_only_escalates.py` | Replaced `"npm install -g ccusage > README.md"` with `"npm install -g ccusage > .gov-runtime/records.jsonl"`; case renamed to `"redirect-into-gov-runtime"`. Under DEC-156 the orchestrator is no longer denied `README.md`; under DEC-176 `.gov-runtime/records.jsonl` stays denied | owner correction, DEC-156 |
+| `PROJECT_FILES` in `w1_04_support.py` (every fixture project, the `install_rule` fixture's included) | Added `governance/project/roster.yaml` with `coordination_ticket: DAEO-zz91`, so the orchestrator on `DAEO-zz91` is the CTO and keeps every ask | DEC-957, DEC-971 item 4 (DEC-980) |
+| `SUBAGENTS["orchestrator-subagent-in-engineer-session"]`, `SUBAGENTS["orchestrator-subagent-in-designer-session"]` in `test_w1_04_install_rule.py` | `ask` → `deny`, and the refusal tells the session to raise a P1 escalation to the CTO (`support.tells_to_escalate`, as W2-110 reads it) | DEC-957, DEC-971 item 4 (DEC-980) |
+| `test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too` in `test_w1_04_auto_mode.py` | Renamed `test_an_orchestrator_subagent_in_a_worker_s_session_is_refused_in_auto_mode_too`; `ask` → `deny` with the escalation words (same 2 modes, same call) | DEC-957, DEC-971 item 4 (DEC-980) |
 
 ## Choices the implementer should know
 
@@ -174,8 +197,10 @@ For the DEC-106 metric. Each revision is a rewrite after implementation with rea
   harness shows that reason in the prompt.
 - **Every other role: `deny`,** with or without a ticket. No role, an empty role and an unknown role (`developer`,
   `owner`): `deny`.
-- **Subagents.** An orchestrator subagent in a session with a declared role gets `ask`, also in an engineer's or a test
-  designer's session (DEC-117). Any other role subagent, a subagent that is not a role (`general-purpose`, `Explore`),
+- **Since DEC-980 (DEC-957, DEC-971 item 4), "the orchestrator" is the CTO:** the orchestrator on the coordination
+  ticket the fixture project's `governance/project/roster.yaml` names (`DAEO-zz91`). Every other session is refused.
+- **Subagents.** An orchestrator subagent in the orchestrator's session gets `ask`; in an engineer's or a test
+  designer's session it gets `deny`, told to raise a P1 escalation to the CTO (DEC-980; was DEC-117's `ask`). Any other role subagent, a subagent that is not a role (`general-purpose`, `Explore`),
   and an orchestrator subagent in a session with no or an unknown role (DEC-125) get `deny`.
 - **`sudo` is `deny` for everyone, the orchestrator included,** in every mode, with or without an install behind it
   (`sudo ls /root`). An `ask` that the owner approves would still be `sudo` run by an agent.
@@ -239,3 +264,5 @@ Left open on purpose; the tests take no side:
 - **Limits on the values of an entry:** an empty string, the shape of `sha256`, `date` or `approved_by`, and keys
   beyond the seven. The KPI says "requires".
 - **A record of an ask or a denial** in `.gov-runtime/findings.jsonl`. No KPI asks for one.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_04_support.hook_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

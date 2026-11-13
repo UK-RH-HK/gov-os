@@ -1,7 +1,7 @@
 ---
 id: DAEO-dy7j
-status: open
-deps: []
+status: closed
+deps: [DAEO-0uhh]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task
@@ -77,3 +77,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-83a), from the owner's decision of 2026-
 - **Paths shared:** `src/gov/check/schema.py` for the schema map's entry only (after W2-64). `template/governance/kernel/schemas/**` is held as a glob by W2-64 and W2-78; this ticket adds only `playbook.schema.json` (split by file, DEC-942). No open ticket holds the adopt skill. If the product-spec role cannot write `schema.py`, the lead returns a package naming the one line.
 - **Place:** priority 5 of the owner's standing priorities (DEC-946).
 - **The test designer's files:** `tests/acceptance/W2-83a/`: planted playbooks, one per missing part; a product made from `template/` with Copier at a temporary path, with one playbook and one faulty playbook.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C; it leaves K9.

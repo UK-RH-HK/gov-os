@@ -1,10 +1,18 @@
 """KPI 4 and failure 4: the backfill is a proposal, ``docs/research/W2-55-backfill.md`` (S6).
 
-These cases read the tree they run in: the proposal file, and the register at the ticket's base (the merge base of
-``HEAD`` with ``w2/integrate``). The proposal has one row per entry of that register, in its order, each with a domain
-of the closed list, a scope, a lands-in, a status note and a reason; every Amends and Refines relation the register's
-status lines record (the about 120 DEC-825 item 4 left for W2-55); a sample for the owner that can be drawn again.
-Nothing is written to the register: the branch changes nothing in ``docs/DECISION_REGISTER.md`` against its base.
+These cases read the tree they run in: the proposal file, and the register **as of the commit that last wrote the
+proposal file** (``git log -1 --format=%H -- docs/research/W2-55-backfill.md``; DEC-1028 (2), option (i)). On W2-55's
+branch that is the register the proposal was made from; once merged, ``w2/integrate``'s register grows with every
+decision, and a fixed proposal compared with it went red for entries recorded after it (D-6, DEC-1109 (2)). No such
+commit, or no register in it, fails the case. The proposal has one row per entry of that register, in its order, each
+with a domain of the closed list, a scope, a lands-in, a status note and a reason; every Amends and Refines relation
+the register's status lines record (the about 120 DEC-825 item 4 left for W2-55); a sample for the owner that can be
+drawn again.
+
+Nothing is written to the register: no commit that wrote the proposal changes ``docs/DECISION_REGISTER.md``; the merge
+that brought it onto ``HEAD``'s first-parent line changes nothing in it against that merge's first parent; and the tree
+(committed and working) changes nothing in it against its merge base with ``w2/integrate`` (on a branch, the branch's
+own changes; on ``w2/integrate`` itself, the working tree's).
 """
 
 from __future__ import annotations
@@ -16,7 +24,8 @@ import pytest
 
 import w2_55_support as s
 
-PROPOSAL = s.REPO_ROOT / "docs" / "research" / "W2-55-backfill.md"
+PROPOSAL_REL = "docs/research/W2-55-backfill.md"
+PROPOSAL = s.REPO_ROOT / PROPOSAL_REL
 INTEGRATION = "w2/integrate"
 COLUMNS = ["id", "domain", "scope", "lands in", "status", "reason"]
 HEADINGS = {"tags": "Proposed tags", "relations": "Amends and refines", "sample": "Sample for the owner's review"}
@@ -29,16 +38,23 @@ def repo_git(*args):
 
 
 @pytest.fixture(scope="module")
-def base():
-    """The merge base of HEAD with the integration branch, and the register it holds."""
-    if repo_git("rev-parse", "--verify", "--quiet", f"{INTEGRATION}^{{commit}}").returncode != 0:
-        pytest.skip(f"this clone has no branch {INTEGRATION}: the ticket's base cannot be found")
-    done = repo_git("merge-base", "HEAD", INTEGRATION)
-    assert done.returncode == 0, f"git merge-base failed:\n{done.stderr}"
-    commit = done.stdout.strip()
-    shown = repo_git("show", f"{commit}:{s.REGISTER}")
-    assert shown.returncode == 0, f"the base does not hold {s.REGISTER}:\n{shown.stderr}"
-    return commit, shown.stdout
+def written():
+    """``() -> (commit, register text)``: the commit that last wrote the proposal file and the register it holds
+    (DEC-1028 (2) (i)), read in the case, so a missing commit or register fails the case."""
+    held = {}
+
+    def read():
+        if not held:
+            done = repo_git("log", "-1", "--format=%H", "--", PROPOSAL_REL)
+            assert done.returncode == 0, f"git log failed:\n{done.stderr}"
+            commit = done.stdout.strip()
+            assert commit, f"no commit wrote {PROPOSAL_REL}: the register it was proposed from cannot be found"
+            shown = repo_git("show", f"{commit}:{s.REGISTER}")
+            assert shown.returncode == 0, \
+                f"the proposal's commit {commit[:12]} does not hold {s.REGISTER}:\n{shown.stderr}"
+            held["value"] = (commit, shown.stdout)
+        return held["value"]
+    return read
 
 
 @pytest.fixture(scope="module")
@@ -106,15 +122,61 @@ def recorded_relations(register_text):
     return pairs
 
 
+def merge_that_brought(commit):
+    """The commit of ``HEAD``'s first-parent line that brought ``commit`` onto it, or None when ``commit`` is on that
+    line itself (the branch that wrote it, or a fast-forward)."""
+    line = repo_git("rev-list", "--first-parent", "HEAD")
+    assert line.returncode == 0, line.stderr
+    line = line.stdout.split()
+    if commit in line:
+        return None
+    after = repo_git("rev-list", "--ancestry-path", f"{commit}..HEAD")
+    assert after.returncode == 0, after.stderr
+    after = set(after.stdout.split())
+    brought = [c for c in line if c in after]
+    assert brought, f"{commit[:12]} is not reachable from HEAD's first-parent line"
+    return brought[-1]
+
+
 # --------------------------------------------------------------------------
 # Failure 4: nothing is applied to the register
 # --------------------------------------------------------------------------
 
-def test_the_branch_changes_nothing_in_the_register_against_its_base(base):
-    commit, _ = base
-    done = repo_git("diff", "--stat", commit, "--", s.REGISTER)
+def test_the_branch_changes_nothing_in_the_register_against_its_base():
+    # The commits that wrote the proposal: none of them writes the register.
+    writers = repo_git("log", "--no-merges", "--format=%H", "--", PROPOSAL_REL)
+    assert writers.returncode == 0, writers.stderr
+    writers = writers.stdout.split()
+    assert writers, f"no commit wrote {PROPOSAL_REL}"
+    for commit in writers:
+        names = repo_git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit)
+        assert names.returncode == 0, names.stderr
+        assert s.REGISTER not in names.stdout.split("\n"), (
+            f"{commit[:12]} wrote the proposal and {s.REGISTER} together: the backfill is a proposal until the owner "
+            f"accepts it")
+    # The merge that brought each of them onto HEAD's first-parent line (w2/integrate's merge of the branch) changes
+    # nothing in the register against its first parent: the branch, merged, wrote nothing there. Decisions recorded
+    # on w2/integrate before or after that merge are in its first parent or after it, so they are not counted.
+    for commit in writers:
+        merge = merge_that_brought(commit)
+        if merge is None:
+            continue
+        done = repo_git("diff", "--stat", f"{merge}^1", merge, "--", s.REGISTER)
+        assert done.returncode == 0, done.stderr
+        assert done.stdout.strip() == "", (
+            f"the merge {merge[:12]} that brought the proposal's commit {commit[:12]} changed {s.REGISTER} against "
+            f"its first parent: the branch wrote the register\n{done.stdout}")
+    # The tree against its merge base with the integration branch: the branch's own changes, committed or not (on
+    # w2/integrate itself, the working tree's).
+    if repo_git("rev-parse", "--verify", "--quiet", f"{INTEGRATION}^{{commit}}").returncode != 0:
+        pytest.skip(f"the proposal's commits and their merge write nothing; this clone has no branch {INTEGRATION}, "
+                    f"so the branch's own changes against its base cannot be found")
+    done = repo_git("merge-base", "HEAD", INTEGRATION)
+    assert done.returncode == 0, f"git merge-base failed:\n{done.stderr}"
+    base = done.stdout.strip()
+    done = repo_git("diff", "--stat", base, "--", s.REGISTER)
     assert done.returncode == 0, done.stderr
-    assert done.stdout.strip() == "", (f"{s.REGISTER} differs from the ticket's base {commit[:12]}: the backfill is a "
+    assert done.stdout.strip() == "", (f"{s.REGISTER} differs from the ticket's base {base[:12]}: the backfill is a "
                                        f"proposal until the owner accepts it\n{done.stdout}")
 
 
@@ -128,21 +190,22 @@ def test_the_proposal_has_its_three_sections(proposal):
     assert not missing, f"the proposal lacks the sections {missing}; it has {list(found)}"
 
 
-def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, base):
-    _, register_text = base
+def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, written):
+    commit, register_text = written()
     expected = s.heading_ids(register_text)
     got = [row["id"] for row in table(proposal())]
     missing = [i for i in expected if i not in got]
     extra = [i for i in got if i not in expected]
     twice = sorted({i for i in got if got.count(i) > 1})
     assert not missing and not extra and not twice, (
-        f"the table's rows are not the register's {len(expected)} entries: {len(missing)} missing "
-        f"({missing[:10]}), {len(extra)} not in the register ({extra[:10]}), twice: {twice[:10]}")
+        f"the table's rows are not the {len(expected)} entries of the register at the proposal's commit "
+        f"{commit[:12]}: {len(missing)} missing ({missing[:10]}), {len(extra)} not in the register ({extra[:10]}), "
+        f"twice: {twice[:10]}")
     assert got == expected, "the rows are not in the register's order"
 
 
-def test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason(proposal, base):
-    _, register_text = base
+def test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason(proposal, written):
+    _, register_text = written()
     ids = set(s.heading_ids(register_text))
     held = set(repo_git("ls-tree", "-r", "--name-only", "HEAD").stdout.split("\n"))
     wrong = []
@@ -170,8 +233,8 @@ def test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason(proposa
     assert not wrong, f"{len(wrong)} rows are not complete:\n" + "\n".join(wrong[:25])
 
 
-def test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_successor(proposal, base):
-    _, register_text = base
+def test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_successor(proposal, written):
+    _, register_text = written()
     rows = {row["id"]: row for row in table(proposal())}
     wrong = []
     for entry_id in s.heading_ids(register_text):
@@ -181,8 +244,8 @@ def test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_su
     assert not wrong, f"entries the register marks SUPERSEDED, not proposed `SUPERSEDED by DEC-<n>`: {wrong}"
 
 
-def test_every_amends_and_refines_relation_is_listed_with_the_old_entrys_status_note(proposal, base):
-    _, register_text = base
+def test_every_amends_and_refines_relation_is_listed_with_the_old_entrys_status_note(proposal, written):
+    _, register_text = written()
     ids = set(s.heading_ids(register_text))
     listed, wrong = set(), []
     for line in section(proposal(), "relations"):
@@ -204,8 +267,8 @@ def test_every_amends_and_refines_relation_is_listed_with_the_old_entrys_status_
                          f"(DEC-825 item 4): {missing[:15]}")
 
 
-def test_the_sample_can_be_drawn_again_and_says_what_the_owner_checks(proposal, base):
-    _, register_text = base
+def test_the_sample_can_be_drawn_again_and_says_what_the_owner_checks(proposal, written):
+    _, register_text = written()
     ids = set(s.heading_ids(register_text))
     text = "\n".join(section(proposal(), "sample"))
     drawn = set(re.findall(r"DEC-[0-9]+", text))

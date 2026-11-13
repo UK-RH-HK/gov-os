@@ -1,9 +1,9 @@
 # Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
 id: CONTRACT-v4
 status: ACCEPTED
-version: '4.2'
+version: '4.3'
 date: '2026-09-30'
-revised: '2026-10-17'
+revised: '2026-11-09'
 change_log:
 - version: '4.0'
   date: '2026-09-30'
@@ -27,6 +27,14 @@ change_log:
     release''s manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release
     tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343;
     DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items.'
+- version: '4.3'
+  date: '2026-11-09'
+  change: 'W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093).
+    Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and
+    CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated
+    source is the release''s manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part
+    of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers
+    items (W2 20 → 19, W3 38 → 39).'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -2723,11 +2731,12 @@ capabilities:
   outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
   acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
     files unchanged and `gov doctor` green.'
-  wave: W2
-  wave_note: 'first real `copier update` in W2; the pending-update report of `gov doctor` is W3 (DEC-165)'
+  wave: W3
+  wave_note: 'gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of
+    `gov doctor` is W3 (DEC-165)'
   provider:
   - Copier 9.18.2
-  - 'W2: gov update --check'
+  - 'W3: gov update --check'
   - 'W3: gov doctor pending-update report'
   sources:
   - Contract v3 Gate S5
@@ -2735,6 +2744,7 @@ capabilities:
   - Distribution Protocol v1.2 §12
   - DEC-023
   - DEC-165
+  - DEC-1090
   scenarios:
     dev:
     - CHAOS-A-10
@@ -2745,11 +2755,11 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-45.a
-    item: 'gov update: check/impact, authenticated source (the signed tag in W3, CAP-02.c), compatibility/migration, overlay
-      preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance; in Wave 2 the authenticated
-      source is the release''s manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3), DEC-722'
-    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722
-    wave: W2
+    item: 'gov update: check/impact, authenticated source (the signed tag, CAP-02.c, and the release''s manifest and file
+      hashes, CAP-43.b), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify,
+      rollback, ledger/provenance'
+    source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
+    wave: W3
   - id: CAP-45.b
     item: 'In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update`'
     source: 'DEC-165'

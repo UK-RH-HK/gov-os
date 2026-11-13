@@ -92,7 +92,7 @@ DECISIONS = "docs/governing/decisions.md"
 ARCHIVE_CODE = "src/app/archive.py"
 MEASURED_ROLES = ("engineer", "research")
 MEASURED_TICKET = "DAEO-zz61"                    # measured by its ticket id
-MEASURED_WBS_TICKET = "DAEO-zz65"                # measured by its WBS id (W2-195)
+MEASURED_WBS_TICKET = "DAEO-zz65"                # measured by its WBS id (MEASURED_WBS)
 MEASURED_WBS = "W2-195"
 OTHER_TICKET = "DAEO-zz60"                       # measured by nothing
 
@@ -441,6 +441,7 @@ class World:
             "PATH": path, "HOME": str(self.home), "TMPDIR": str(self.tmp), "LANG": "C.UTF-8",
             "LC_ALL": "C.UTF-8", "TZ": "UTC", "PYTHONPATH": python_path(), "PYTHONDONTWRITEBYTECODE": "1",
             "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
+            **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
         }
         if role is not None:
             env["GOV_ROLE"] = role

@@ -26,12 +26,15 @@ def warm_answers(driver, root, steps, warm_up, **run):
     values = driver.run(root, [*warm_up, *steps, *steps], **run).values()
     first, second = values[len(warm_up):len(warm_up) + len(steps)], values[len(warm_up) + len(steps):]
     for number, (one, two) in enumerate(zip(first, second)):
-        assert one == two, f"step {number}: two calls in one process answered differently\n{one}\n{two}"
+        assert S.answer_of(one) == S.answer_of(two), \
+            f"step {number}: two calls in one process answered differently\n{one}\n{two}"
     return second
 
 
 def assert_same(steps, fresh, warm):
+    # Rewrite-Reason: DEC-1061 (R-1): compared without W2-126's vector-cache counters (S.answer_of).
     for step, alone, later in zip(steps, fresh, warm):
+        alone, later = S.answer_of(alone), S.answer_of(later)
         what = f"{step['module']}.{step['function']}{tuple(step['args'][1:])}"
         if isinstance(alone, dict) and "stopping_reason" in alone:
             assert later["stopping_reason"] == alone["stopping_reason"], what

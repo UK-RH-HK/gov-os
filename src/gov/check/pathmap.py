@@ -2,7 +2,8 @@
 
 A Gov OS project (one with ``governance/project/``) whose path map is missing, unreadable, unparsable or of a form
 the schema does not state is a finding naming the cause, as is a repository git cannot list: never green (W2-95,
-DEC-959 item 9).
+DEC-959 item 9). A namespace's ``lexical_policy`` is ``indexed`` or ``not indexed``, or absent; any other value, or
+``not indexed`` with ``embedding_policy: embedded``, is such a finding (W2-13 S6, DEC-1066 (3)).
 """
 from __future__ import annotations
 
@@ -13,9 +14,10 @@ from pathlib import Path
 
 import yaml
 
+from gov.config.loader import LEXICAL_POLICY, lexical_policy_fault
 from gov.util.gitenv import git_env
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 PROJECT_REL = "governance/project"
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -63,6 +65,9 @@ def _namespaces(data) -> list[tuple[str, list[str]]] | str:
         if not (isinstance(name, str) and name and isinstance(paths, list) and paths
                 and all(isinstance(p, str) and p for p in paths)):
             return f"namespace {name!r} is not a named entry whose paths are a non-empty list of patterns"
+        fault = lexical_policy_fault(entry)
+        if fault:
+            return f"namespace {name!r} states {LEXICAL_POLICY} {entry[LEXICAL_POLICY]!r}: {fault}"
         result.append((name, paths))
     return result
 

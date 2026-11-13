@@ -1,0 +1,24 @@
+# Lens B's Q13 (Table 2): "retrieve.py 218–230, 33, 107–113; DEC-419". My reading: two pieces. (1) Where it is
+# enforced: the expansion loop, retrieve.py 218–230. (2) What the budget is and bounds: retrieve.py 33 (the constant),
+# 107–113 (the limit taken) or DEC-419 (DP-3: the budget bounds parent expansion), alternatives of one entry.
+id: Q13
+category: code location
+commit: 23079f92a6fa
+question: Where is the bundle budget enforced?
+gold_answer: >-
+  In retrieve (src/gov/retrieval/retrieve.py): a candidate is expanded to its parent only when the bundle's tokens plus
+  the expansion's cost stay within the limit, which is --bundle-budget or BUNDLE_BUDGET (6000); by DEC-419 the
+  budget bounds parent expansion only.
+sources:
+  - path: src/gov/retrieval/retrieve.py
+    heading: '    used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)'
+    lines: [218, 230]
+  - - path: src/gov/retrieval/retrieve.py
+      heading: "BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)"
+      lines: [33, 33]
+    - path: src/gov/retrieval/retrieve.py
+      heading: "def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bundle_budget=None, continuation=None,"
+      lines: [107, 113]
+    - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-419 — W1-21: the command's path, the public interface, the bundle budget, the order of stopping reasons, facets as routes, one rerank over the merged set"
+      lines: [4501, 4527]

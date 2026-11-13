@@ -30,6 +30,13 @@ EXACT_VERSION = re.compile(r"v?\d+(\.\d+)+([-+.][0-9A-Za-z.-]+)?")
 DECISION_ID = re.compile(r"DEC-\d{3,}")
 ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
+# An owner acceptance at the start of a status line.
+OWNER_ACCEPTED = re.compile(r"ACCEPTED \(owner\b")
+# The owner's DONE ruling written first, the old line kept after "it was" (DEC-1098 (3), W2-130's sitting):
+# "DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, …". The ruling holds no ";", so the
+# match stops at the first "; it was"; what follows must itself be an owner acceptance.
+DONE_THEN_ACCEPTED = re.compile(r"DONE \(owner\b[^;]*\); it was (?=ACCEPTED \(owner\b)")
+
 
 class Missing(AssertionError):
     """A file the tests read is not there, or cannot be read."""
@@ -120,13 +127,23 @@ class Decision:
     body: str
 
     @property
+    def acceptance(self):
+        """The status line from its owner acceptance on: the whole line, or, on a line the owner later ruled
+        DONE (``DONE (owner, …); it was ACCEPTED (owner, …``), the old line kept after "it was"."""
+        done = DONE_THEN_ACCEPTED.match(self.status)
+        return self.status[done.end():] if done else self.status
+
+    @property
     def accepted_by_owner(self):
-        return re.match(r"ACCEPTED \(owner\b", self.status) is not None
+        """``ACCEPTED (owner…)``, or the owner's DONE ruling over such a line (DEC-1098 (3)). A DONE line whose
+        old line is not ``ACCEPTED (owner`` does not count, nor does SUPERSEDED, WITHDRAWN, DEFERRED or PROPOSED."""
+        return OWNER_ACCEPTED.match(self.acceptance) is not None
 
     @property
     def date(self):
-        """The ISO date of the acceptance: from the status line, else from the heading; None when neither has one."""
-        for text in (self.status.split("·")[0], self.title):
+        """The ISO date of the acceptance: from the status line (after "it was" on a DONE ruling, so the
+        acceptance's date, not the ruling's), else from the heading; None when neither has one."""
+        for text in (self.acceptance.split("·")[0], self.title):
             found = ISO_DATE.search(text)
             if found:
                 return found.group(0)

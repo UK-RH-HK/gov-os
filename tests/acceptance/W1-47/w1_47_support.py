@@ -40,6 +40,7 @@ the real path: the wired copy leaves the committed absolute ``Read`` rules out.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -306,14 +307,51 @@ def every_hook_command(settings):
 # The commands of a settings file, run in a project that has the kernel installed
 # --------------------------------------------------------------------------
 
+PINNED_GOV_REL = ".local/bin/gov"                  # under HOME: where the hook lines look first (W2-106)
+PINNED_GOV_PTH = "gov-of-this-worktree.pth"         # W2-90's and W1-38's name: one file, the same line
+
+
+def plant_pinned_gov(home):
+    """Give the stand-in ``home`` a pinned ``gov`` that runs this tree's code, as the hook lines find the owner's.
+
+    Rewrite-Reason: DEC-866, W2-106. The hook lines take the pinned form (DEC-822): ``$HOME/.local/bin/gov``, else
+    ``gov`` on ``PATH``; they read the interpreter its first line names and start the hook program with it and
+    ``-E`` (which drops ``PYTHONPATH`` and keeps the user site folder). A stand-in HOME without ``.local/bin/gov``
+    made a case depend on the runner's ``PATH``: with the owner's pin there it judged that pin's installed package,
+    not this tree (DEC-732); with ``PATH=/usr/bin:/bin`` every call was refused (``gov hook: no pinned gov``).
+    Planted as W2-106, W2-65 and W1-38 plant it: the editable install's ``gov`` script, its first line naming this
+    interpreter, and a path file naming this tree's ``src`` in that interpreter's user site folder under ``home``.
+    Never the real HOME. A second call plants nothing more. Shared: W1-46's ``ask_guard`` and W2-90's
+    ``install_gov_for`` call it."""
+    home = Path(home)
+    assert home.resolve() != Path.home().resolve(), f"refusing to plant a pinned gov in the real HOME {home}"
+    script = home / PINNED_GOV_REL
+    if script.is_file():
+        return script
+    interpreter = os.path.realpath(sys.executable)
+    site = subprocess.run([interpreter, "-E", "-c", "import site; print(site.getusersitepackages())"],
+                          capture_output=True, text=True, check=True,
+                          env={"HOME": str(home), "PATH": "/usr/bin:/bin", "LC_ALL": "C.UTF-8"}).stdout.strip()
+    assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
+    Path(site).mkdir(parents=True, exist_ok=True)
+    (Path(site) / PINNED_GOV_PTH).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(f"#!{interpreter}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
+                      encoding="utf-8")
+    script.chmod(0o755)
+    return script
+
+
 def installed_environment(project, sandbox, role=None, ticket=None):
     """The environment of a hook command in a product repository.
 
     The kernel hooks are at ``governance/kernel/hooks/`` of the project and
     the ``gov`` package is installed. Nothing is installed by a test, so the
     package is put on Python's path instead; a command that sets its own
-    ``PYTHONPATH`` (this repository's ``src``) finds no ``gov`` there.
+    ``PYTHONPATH`` (this repository's ``src``) finds no ``gov`` there. The
+    pinned lines find the stand-in home's pinned ``gov`` (``plant_pinned_gov``).
     """
+    plant_pinned_gov(sandbox.home)
     env = live_support.command_environment(project, sandbox, role, ticket)
     env["PYTHONPATH"] = str(REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL)
     return env

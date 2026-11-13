@@ -8,6 +8,7 @@ started from. All of these cases move files, so they need the code graph (README
 from __future__ import annotations
 
 import os
+import re
 
 import pytest
 
@@ -96,7 +97,20 @@ def test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay(a
     finally:
         locked.chmod(mode)
     support.assert_refused(run, interface, any_of=(support.MOVED_RECORD, support.MOVED_RECORD_TARGET))
-    point = {item["batch"]: item["rollback_point"] for item in adoption.stages["A4"].front["batches"]}[2]
+    # Rewrite-Reason: P-W2-23-5 (a), DEC-866, Interface item 2 of W2-23 (W2-M219: rollback refs are unique). A failed
+    # batch commits the A6 record (status: failed, failed_batch, the batches) and the refs are per run, so batch 2's
+    # rollback point is read from that record, in the per-run form, not from the A4 plan's refs/.../batch-2.
+    a6 = os.path.join(os.path.dirname(adoption.stages["A4"].record), "A6-controlled-migration.md")
+    data = support.at_head(project, a6)
+    assert data is not None, f"no A6 record ({a6}) is committed after the failed batch\n{run.describe()}"
+    record = support.frontmatter(data.decode("utf-8"), a6)
+    assert record.get("status") == "failed" and record.get("failed_batch") == 2, \
+        f"{a6}: status {record.get('status')!r}, failed_batch {record.get('failed_batch')!r}; wanted failed and 2"
+    entry = {item.get("batch"): item for item in record.get("batches") or [] if isinstance(item, dict)}.get(2)
+    assert entry, f"{a6} does not name batch 2: {record.get('batches')}"
+    point = entry.get("rollback_point") or ""
+    assert re.match(r"^refs/gov/adoption/rollback/[^/]+/batch-2$", point), \
+        f"batch 2's rollback point {point!r} is not of the per-run form refs/gov/adoption/rollback/<run-id>/batch-2"
     commit = support.resolve(project, point)
     assert commit, f"batch 2's rollback point {point} does not resolve after the failure"
     at_point, now = support.tree(project, commit), support.tree(project)

@@ -1,0 +1,30 @@
+# Lens B's Q04 (Table 2): "CAP-15 (Contract 255–262), CAP-15.md, CAP-15.g.md, DEC-004, context/__init__.py 19–23,
+# retrieve.py:33". My reading: each place states the same ceiling (about 6k tokens), so all are alternatives of one
+# entry. CAP-15.g states the summary's ~2.5k beside it; kept because lens B names it.
+id: Q04
+category: decision
+commit: 23079f92a6fa
+question: What is the token ceiling of a context packet?
+gold_answer: >-
+  About 6,000 tokens: CAP-15 holds the packet under the configured ceiling (default ~6k tokens, after DEC-004's
+  target of at most ~6k), delivered as a file path plus a summary of at most ~2.5k tokens; the code's default is
+  DEFAULT_BUDGET = 6000.
+sources:
+  - - path: docs/contract/CONTRACT_v4.md
+      heading: "### CAP-15 — Context packet compilation"
+      lines: [255, 272]
+    - path: docs/contract/capabilities/CAP-15.md
+      heading: "# CAP-15: Context packet compilation"
+      lines: [11, 19]
+    - path: docs/contract/capabilities/CAP-15.g.md
+      heading: "# CAP-15.g: File path + summary ≤ ~2.5k tokens (harness output caps)"
+      lines: [11, 16]
+    - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-004 — Governance overhead budget (hard SLO)"
+      lines: [61, 65]
+    - path: src/gov/context/__init__.py
+      heading: "DEFAULT_BUDGET = 6000"
+      lines: [21, 21]
+    - path: src/gov/retrieval/retrieve.py
+      heading: "BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)"
+      lines: [33, 33]

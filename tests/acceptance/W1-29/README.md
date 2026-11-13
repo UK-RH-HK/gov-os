@@ -387,3 +387,24 @@ identical so a divergence is caught immediately.
 
 Source S0a-G-09 is listed among the ticket's sources and its text is not in
 the tree.  No test is derived from unread text.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 42 in the full run, 3 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_a... | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestStop::test_respects_stop_hook_active`, `test_session_hooks.py::TestSessionStart::test_reinjects_on_compact_clear_resume` (3 of 3) | the ticket's words |
+| S2: SubagentStop enforces the 12-field return contract of Framework §61 (task, status, work_completed, files_changed, evidence, tests, discoveries,... | `test_session_hooks.py::TestSubagentStop::test_accepts_all_twelve_fields`, `test_session_hooks.py::TestSubagentStop::test_blocks_missing_fields`, `test_session_hooks.py::TestSubagentStop::test_text_labels_without_content_do_not_satisfy_contract` | the ticket's words |
+| S3: A checkpoint is written when the session's context utilisation passes the configured threshold, not only at PreCompact [CAP-37.c] | `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation` | the ticket's words |
+| S4: A compaction preserves the open decisions, the active ticket and the loop counts; PreCompact writes the checkpoint, and SessionStart (on compac... | `test_session_hooks.py::TestCompactionPreservesState::test_auto_compact_threshold`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts` | the ticket's words |
+| F1: A Stop hook loops | `test_session_hooks.py::TestStop::test_respects_stop_hook_active` | the ticket's words |
+| F2: SessionStart injects more than the cap | `test_session_hooks.py::TestSessionStart::test_injects_context_brief_on_startup`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_ticket`, `test_session_hooks.py::TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions` | the ticket's words |
+| F3: A handoff or ticket close proceeds while the latest checkpoint is stale for its policy (watchdog, Contract v3 N3) | `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_watchdog_marks_stale_on_context_utilisation`, `test_session_hooks.py::TestWatchdogBlocksStale::test_stale_on_ticket_transition`, `test_session_hooks.py::TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | the ticket's words |

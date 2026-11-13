@@ -98,3 +98,23 @@ no line range. The other 11 tests are `local_only` and were deselected. W1-29 gi
 | `test_w2_62_prompt_in_force.py` | Item 7 (success 4) |
 | `test_w2_62_documents.py` | Items 10, 11 (success 5; success 2, first half) |
 | `test_w2_62_live_resume.py` | Item 12, `local_only` (success 2, second half; failure line) |
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 43 in the full run, 15 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The whole RESUME HERE section reaches the resumed session, however long: never a cut of its first 9,000 characters, and no "[truncated]" line i... | `test_w2_62_resume_in_full.py::test_a_section_that_fits_is_injected_whole_with_the_instruction` (4 of 4) | the ticket's words |
+| S2: Research first, recorded in docs/changes/W2-62-CIT-P.md: whether Claude Code 2.1.292 caps or moves a SessionStart hook's additionalContext abov... | `test_w2_62_documents.py::test_the_research_record_exists_and_names_the_measured_harness` | the ticket's words |
+| S3: The overall cap never cuts the RESUME HERE section or the instruction to read it; the optional parts (context packet, ready list, checkpoint br... | `test_w2_62_resume_in_full.py::test_a_long_ready_list_is_trimmed_not_the_section_or_the_warning` | the ticket's words |
+| S4: The hook names the prompt of the wave in progress, read from the project's configuration, not a constant; with no such setting it names none ra... | `test_w2_62_prompt_in_force.py::test_the_main_tree_names_the_rosters_prompt` (3 of 3), `test_w2_62_prompt_in_force.py::test_two_projects_with_two_prompts_get_two_paths`, `test_w2_62_prompt_in_force.py::test_with_no_setting_the_main_tree_names_no_prompt` (1 of 4) | the ticket's words |
+| S5: The checkpoint skill states the resume rule: RESUME HERE holds the full session state (what is happening, what was decided, what is next, where... | `test_w2_62_documents.py::test_the_skill_says_resume_here_holds_the_full_session_state`, `test_w2_62_documents.py::test_the_skill_says_a_checkpoint_is_written_at_every_handover`, `test_w2_62_documents.py::test_the_skill_says_repository_knowledge_comes_from_retrieval_and_the_context_packets` | the ticket's words |
+| F1: A RESUME HERE section of 50,000 characters reaches the resumed session with no character lost; a checkpoint with no such section still says so;... | `test_w2_62_resume_in_full.py::test_another_role_gets_no_resume_here_injection` (6 of 6), `test_w2_62_resume_in_full.py::test_unreadable_input_exits_0` (1 of 8), `test_w2_62_resume_in_full.py::test_no_section_still_says_so` (1 of 5) | the ticket's words |

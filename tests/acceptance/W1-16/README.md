@@ -699,3 +699,24 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 - **DP-5** (third batch) The 16-character floor when a body begins with `_` or `-`: does the first character count?
 - **DP-6** (third batch) Who removes a repository's daemon directory, and what the suite's own `CBM_RUNTIME_DIR`
   still means.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 44 in the full run, 31 in `breadth`, 92 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The index lives in a per-repository home under .gov-runtime/; list_projects in one repository shows only its own project [CAP-12.b] | `test_w1_16_home.py::test_list_projects_in_one_repository_shows_only_its_own_project`, `test_w1_16_home.py::test_the_home_is_under_the_repositorys_gov_runtime`, `test_w1_16_home.py::test_indexing_again_keeps_one_project` | the ticket's words |
+| S2: A secret-exclusion test proves no planted secret enters the codebase-memory index [CAP-03.e, CAP-12.b] | `test_w1_16_secret_exclusion.py::test_the_tool_alone_would_index_a_planted_secret`, `test_w1_16_secret_exclusion.py::test_no_planted_secret_is_in_any_file_under_gov_runtime`, `test_w1_16_secret_exclusion.py::test_no_planted_secret_is_left_outside_the_repository` | the ticket's words |
+| S3: Definitions, references, callers, impact and dead code are answered across Rust, Python and TypeScript on the dev tiers, before and after a ren... | `test_w1_16_code_answers.py::test_callers_and_impact_hit_at_five_is_at_least_sixty_percent` (2 of 2), `test_w1_16_code_answers.py::test_callers_and_impact_are_answered_in_every_language` (1 of 4), `test_w1_16_code_answers.py::test_a_renamed_symbol_is_answered_under_its_new_name_only` (1 of 2) | the ticket's words |
+| S4: The gov-token rule of template/.gitleaks.toml and .gitleaks.toml flags a prefixed string (sk, pk, rk or tok, then _ or -) only when its body ho... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_16_token_rule`, `test_the_token_rule_carries_no_allowlist` \| README (lifted) | lifted |
+| F1: A file whose only match is an ordinary identifier with a token prefix is kept out of an index | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_16_token_rule`, `test_a_file_whose_only_match_is_an_ordinary_identifier_is_indexable` \| READ... | lifted |
+| F2: An index file of this repository exists outside .gov-runtime/ after a run | `test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run` | the ticket's words |
+| F3: A planted secret is found in the code graph | `test_w1_16_secret_exclusion.py::test_no_planted_secret_comes_back_from_the_code_graph` | the ticket's words |

@@ -117,7 +117,8 @@ def test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id(guard,
 
 
 def test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written(guard, sandbox):
-    """``external-ref: W2-99a`` -> ``~/gov-os-runs/W2-99a/`` (as for worktrees, e.g. W2-15a)."""
+    """``external-ref:`` the planted suffixed id of ``support.SUFFIXED`` -> ``~/gov-os-runs/<that id>/`` (as for
+    worktrees, e.g. W2-15a)."""
     target = support.open_own_folder(sandbox, support.SUFFIXED) / "notes.txt"     # DEC-751
     assert target.parent == sandbox.root / support.SUFFIXED.wbs
     support.assert_allowed(guard("Write", target, support.ENGINEER, support.SUFFIXED.tk),

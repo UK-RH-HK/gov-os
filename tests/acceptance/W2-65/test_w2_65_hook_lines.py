@@ -14,6 +14,13 @@ containment lines and its preToolUse line runs its own five-rule hook. The case 
 and the containment lines now asks the kernel's two: the template's source, and the hook source of a project generated
 from the template (``.rulesync/hooks.jsonc`` as Copier puts it there), read and filtered as ``guarded_lines`` reads
 this repository's (``tests/acceptance/W2-90/README.md``).
+
+Rewrite-Reason: DEC-953 item 2 (W2-90b, DEC-965 item 4). ACT 1 took this repository's postToolUse and
+postToolUseFailure lines out of its source, and with them four ids (``repo-postToolUse[0]`` and
+``repo-postToolUseFailure[0]`` of the two cases below) disappeared without a red. They exist again, on the template's
+post-tool lines as a product's settings carry them: ``template/governance/kernel/settings.json``, the kernel's shipped
+settings (the ``template-`` ids judge the template's rulesync source). A post-tool event this repository's source
+holds again (W2-08) is judged on its own line once more (``tests/acceptance/W2-90b/README.md``).
 """
 
 from __future__ import annotations
@@ -31,6 +38,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
 import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 LINES = support.guarded_lines()
+# W2-90b: the post-tool events this repository's source no longer holds keep their ``repo-`` ids, on the kernel's
+# shipped settings' lines.
+_REPO_EVENTS = {line.event for line in LINES if line.source == "repo"}
+LINES += [support.Line("repo", event, index, command)
+          for event, index, command in kernel_wiring.template_settings_commands(("postToolUse", "postToolUseFailure"))
+          if event not in _REPO_EVENTS and support.CONTAINMENT_PROGRAM in command]
 IDS = [line.id for line in LINES]
 MISSING_INTERPRETER = "/nonexistent/w265/python3"
 

@@ -12,6 +12,8 @@ from pathlib import Path
 
 from gov.guard import runs
 from gov.util.gitenv import GIT_DIRS, git_binary
+from gov.util.patterns import _has_glob, _match_pattern
+from gov.util.tickets import _parse_frontmatter
 
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
@@ -58,49 +60,7 @@ _UNRESOLVABLE = "/<guard-unresolvable>"
 _MOST_LANDED = 10000
 
 
-# -- frontmatter --------------------------------------------------------------
-
-def _parse_frontmatter(text: str) -> dict | None:
-    if not text.startswith("---"):
-        return None
-    end = text.find("\n---", 3)
-    if end < 0:
-        return None
-    result: dict = {}
-    paths: list[str] = []
-    in_paths = False
-    for line in text[4:end].splitlines():
-        s = line.strip()
-        if not s or s.startswith("#"):
-            continue
-        if re.match(r"^[a-zA-Z_][\w-]*:", line) and not line[0].isspace():
-            in_paths = False
-            key, _, val = line.partition(":")
-            if key.strip() == "allowed_paths":
-                in_paths = True
-                continue
-            result[key.strip()] = val.strip()
-        elif in_paths and s.startswith("- "):
-            e = s[2:].strip()
-            if len(e) >= 2 and e[0] == e[-1] and e[0] in ("'", '"'):
-                e = e[1:-1]
-            paths.append(e)
-        elif in_paths and not s.startswith("-"):
-            in_paths = False
-    result["allowed_paths"] = paths
-    return result
-
-
-# -- pattern matching ----------------------------------------------------------
-
-def _match_pattern(relpath: str, pattern: str) -> bool:
-    parts = pattern.split("**")
-    segs = [re.escape(p).replace(r"\*", "[^/]*") for p in parts]
-    rx = "^" + ".*".join(segs)
-    if pattern.endswith("**"):
-        rx += ".*"
-    return bool(re.match(rx + "$", relpath))
-
+# -- frontmatter and pattern matching: gov.util.tickets and gov.util.patterns (W2-150) --
 
 # -- ticket loading ------------------------------------------------------------
 
@@ -288,11 +248,6 @@ def _expand_token(token: str) -> str | None:
     return ''.join(parts)
 
 
-def _has_glob(s: str) -> bool:
-    """True when *s* contains shell glob characters."""
-    return '*' in s or '?' in s or '[' in s
-
-
 # -- Bash write analysis -------------------------------------------------------
 
 def _is_punct(tok: str) -> bool:
@@ -431,14 +386,55 @@ def _copy_args(name: str, args: list[str]) -> tuple[
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     """Return absolute write-target paths, or None when the command is read-only.
 
+    W2-42a (DEC-1028 item 4, ACT-GUARD-FIX-3 §7): the command is read through ``gov.guard.bash_writes``, which
+    hands ``_line_write_targets`` shell text only: a heredoc's body is judged by what reads it (a data body is no
+    write, a shell's body is commands), the command's own variables and a literal ``for`` loop's words are
+    expanded, substitutions inside double quotes, ``sh -c`` strings and ``eval`` words are commands of their own,
+    shell keywords and prefixes are not the command's name, a backslash-newline is removed, and git checkout,
+    restore, rm and mv on paths, dd, truncate, sort -o and rsync are writes (git apply, git am and patch to unknown
+    targets). What the scan cannot read for certain is read as before, on both spellings of a continued line.
+    """
+    from gov.guard import bash_writes
+    if bash_writes.SENT != _UNRESOLVABLE:
+        return [_UNRESOLVABLE]
+    literal = not _GLOB_OPTIONS_RE.search(command)
+
+    def parse(text: str, where: str) -> list[str] | None:
+        # The whole command's glob options hold in its substitutions and sh -c strings too.
+        return _line_write_targets(text, where, literal)
+    try:
+        judged = bash_writes.judge(command, cwd, parse, _expand_token)
+    except bash_writes.Unreadable:
+        found = parse(command, cwd)
+        if "\\\n" in command:
+            more = parse(command.replace("\\\n", ""), cwd)
+            if found is not None or more is not None:
+                found = list(found or []) + list(more or [])
+        return found
+    except RecursionError:
+        return [_UNRESOLVABLE]
+    return judged.targets() or None
+
+
+# Commands that change how bash expands a glob (W2-42a): with one of them in the command, an unmatched glob is not
+# known to be the literal word.
+_GLOB_OPTIONS_RE = re.compile(r"\bshopt\b|\bGLOBIGNORE\b|\bset\b[^\n;|&]*\s[-+]\w*f|\bset\s+[-+]o\b")
+
+
+def _line_write_targets(command: str, cwd: str, literal_globs: bool = True) -> list[str] | None:
+    """Return absolute write-target paths of one shell line, or None when it is read-only (the parser before
+    W2-42a, which ``_extract_bash_write_targets`` hands shell text only).
+
     Tokenises with shlex (newline as punctuation, ``#`` not a comment),
     splits on non-redirect punctuation, then inspects each simple command
     for redirects and the plain write commands (DEC-111).  Each write target
     is resolved first (DEC-115): ``~``, ``~user`` and environment variables
     are expanded from the hook's own environment; globs are matched against
     the file system; anything still unresolvable maps to a sentinel that
-    fails every allow-list check.
+    fails every allow-list check. An unmatched glob is the literal word bash passes (no nullglob, W2-42a), unless
+    the command may change how bash expands one (shopt, GLOBIGNORE, set -f) or it holds ``**``.
     """
+    literal_globs = literal_globs and not _GLOB_OPTIONS_RE.search(command)
     try:
         lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n")
         lex.whitespace_split = True
@@ -473,7 +469,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             return None
         p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
         if _has_glob(exp):
-            return glob.glob(p) or None
+            return glob.glob(p) or ([p] if literal_globs and "**" not in exp else None)
         return [p]
 
     def _resolve(raw: str, targets: list[str] = targets) -> None:

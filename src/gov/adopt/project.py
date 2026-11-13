@@ -6,7 +6,7 @@ ref that does not resolve each end in a refusal that names the thing (DEC-449, D
 
 from __future__ import annotations
 
-import hashlib
+import os
 import sqlite3
 import subprocess
 from pathlib import Path
@@ -14,6 +14,8 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
+from gov.util import frontmatter as fm
+from gov.util.digest import sha256
 from gov.util.gitenv import git_env
 
 FOLDER = "governance/adoption"  # the tool's own records: no artefact of the project, so not in its inventory
@@ -22,14 +24,13 @@ TITLES = {"A0": "safety baseline", "A1": "inventory", "A2": "classification", "A
           "A4": "batched plan", "A5": "independent review of the path map", "A6": "controlled migration",
           "A8": "legacy import and retirement"}
 MOVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT")  # the actions that take an artefact to another path
+# The files A0 sets up (W2-23 S5): held by the template's namespace when the project's own path map names neither,
+# so that no later stage refuses them as unknown.
+SET_UP = {".gitleaks.toml": "repository", ".gitignore": "repository"}
 
 
 def refuse(code: str, message: str, **details) -> GovError:
     return GovError("ADOPT_" + code, message, details)
-
-
-def sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
 
 
 def record_path(stage: str) -> str:
@@ -93,19 +94,40 @@ def require_repository(root: Path) -> None:
         raise refuse("NO_COMMIT", f"{root} has no commit: there is no baseline to adopt from")
     paths = dirty(root)
     if paths:
+        from gov.adopt import safety
+        if safety.recover(root, paths):  # a killed A6 batch, its own moves staged and nothing else: unstaged
+            paths = dirty(root)
+    if paths:
         raise refuse("TREE_NOT_CLEAN", "the tree is not clean: " + ", ".join(paths), paths=paths)
 
 
-def restore(root: Path, commit: str) -> None:
-    """Back to ``commit``, which the stage found with a clean tree: what the stage staged or created is undone."""
+def restore(root: Path, commit: str, written=()) -> None:
+    """Back to ``commit``, which the stage found with a clean tree: what the stage staged is undone, and of the
+    untracked paths only those in ``written`` (what the caller wrote) are deleted. Every other untracked file or
+    folder stays as it is, byte for byte (W2-23 S1)."""
     git(root, "reset", "-q", "--hard", commit)
-    for rel in dirty(root):
-        (root / rel).unlink(missing_ok=True)
+    written = list(written)
+    # what ``commit`` tracks is put back by the reset, never deleted
+    kept = set(git(root, "--literal-pathspecs", "ls-files", "-z", "--", *written).split("\0")) if written else set()
+    for rel in written:
+        path = root / rel
+        if rel in kept:
+            continue
+        if path.is_file() or path.is_symlink():
+            path.unlink()
+        elif path.is_dir() and not path.is_symlink() and not any(path.iterdir()):
+            path.rmdir()
 
 
 def commit(root: Path, message: str, files: dict[str, str]) -> None:
-    """Write ``files`` (path -> text) and commit them with what is staged; undone as a whole when that fails."""
+    """Write ``files`` (path -> text) and commit them with what is staged; undone as a whole when that fails. An
+    untracked file at one of the paths is not overwritten: refused, naming it."""
     head = resolve(root, "HEAD")
+    tracked = set(git(root, "--literal-pathspecs", "ls-files", "-z", "--", *files).split("\0")) if files else set()
+    taken = [rel for rel in files if rel not in tracked and os.path.lexists(root / rel)]
+    if taken:
+        raise refuse("WOULD_OVERWRITE", "an untracked file stands at " + ", ".join(taken) + ": the tool writes "
+                     "nothing over a file it did not write", paths=taken)
     try:
         for rel, text in files.items():
             (root / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -114,24 +136,20 @@ def commit(root: Path, message: str, files: dict[str, str]) -> None:
         if _run(root, ("diff", "--cached", "--quiet"), (0, 1))[0] == 1:  # run again with nothing new: no commit
             git(root, "commit", "-q", "-m", message)
     except (OSError, GovError):
-        restore(root, head)
+        restore(root, head, [rel for rel in files if rel not in tracked])
         raise
 
 
 def frontmatter(text: str) -> dict | None:
     """The frontmatter of ``text``, None when it has none; ``ValueError`` when it cannot be read."""
-    lines = [line.rstrip() for line in text.split("\n")]
-    if lines[0] != "---":
-        return None
-    if "---" not in lines[1:]:
-        raise ValueError("the frontmatter is not closed")
     try:
-        data = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)]))
-    except yaml.YAMLError as exc:
-        raise ValueError("the frontmatter is not valid YAML: " + " ".join(str(exc).split())) from None
-    if not isinstance(data, dict):
-        raise ValueError("the frontmatter is not a mapping")
-    return data
+        return fm.parse(text, rstrip=True)
+    except fm.FrontmatterError as error:
+        if error.kind == fm.UNCLOSED:
+            raise ValueError("the frontmatter is not closed") from None
+        if error.kind == fm.NOT_YAML:
+            raise ValueError("the frontmatter is not valid YAML: " + " ".join(str(error.error).split())) from None
+        raise ValueError("the frontmatter is not a mapping") from None
 
 
 def read_record(root: Path, tracked: dict, rel: str) -> tuple[dict, bytes]:
@@ -189,7 +207,7 @@ def classify(config: dict, paths) -> dict[str, str | None]:
     spaces = {name: [p for p in (space.get("paths") or []) if isinstance(p, str)]
               for name, space in path_map["namespaces"].items() if isinstance(space, dict)}
     return {rel: next((name for name, patterns in spaces.items()
-                       if any(_match_pattern(rel, pattern) for pattern in patterns)), None)
+                       if any(_match_pattern(rel, pattern) for pattern in patterns)), SET_UP.get(rel))
             for rel in paths if not rel.startswith(FOLDER + "/")}
 
 

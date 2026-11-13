@@ -1,6 +1,6 @@
 ---
 id: DAEO-wudw
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-u4oz]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -54,3 +54,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-39), as approved (DEC-729). The list row
 
 - **Allowed paths:** `src/gov/context/**` (the model-independence part), `src/gov/checkpoint/**` (resume inputs only), `tests/unit/context/**`, `tests/unit/checkpoint/**`.
 - **KPIs:** a ticket's context, checkpoint resume and handoff record, built for two different models, give the same input hash [CAP-37.e].
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

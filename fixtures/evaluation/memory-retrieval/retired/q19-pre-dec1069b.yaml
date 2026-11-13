@@ -1,0 +1,40 @@
+# Q19, re-labelled blind by the owner's DEC-1067 (c) (2026-11-04), by a session independent of the retrieval work: the
+# sources decided from the question, the gold answer and the repository at the commit, never from a retrieval run or
+# a measure record. Lens B's label is kept unchanged in ../retired/ (q19-pre-dec1067.yaml, README.md), which the
+# measure never reads. The question and the gold answer are kept: both hold at the commit (MR-3; the guard's rule
+# "an implementer never writes acceptance tests", DEC-953 item 2; G-14, DEC-1056 and DEC-1059, refuses an engineer
+# even the reading of its own ticket's acceptance tests).
+# What changed: the label left out the Contract, which carries MR-3's acceptance ("An implementer write to
+# tests/acceptance/** is refused by the guard ... every role but the Independent Test Designer"), as fully as the role
+# files state it. A search that answered from the Contract was scored as missing, as Q09's was (DEC-1066 (4)). Added as
+# alternatives of the one entry: MR-3 in contract.yaml (the authority), in CONTRACT_v4.md's table (its same content)
+# and in its generated record master-rules/MR-3.md. The Charter's span now runs to line 97, which states that the
+# acceptance-test paths are outside the implementer's allowed paths; its first four lines did not. Lens B's three
+# sources are kept: the Charter's MR-3 (the governing text), the engineer's and the test designer's allowed paths.
+# Left out: DEC-953 item 2 (it states the "no" alone), CLAUDE.md and AGENTS.md (generated summaries).
+id: Q19
+category: policy
+commit: 03df21248e36
+question: May an engineer write acceptance tests?
+gold_answer: >-
+  No. By MR-3 the builder never writes its own acceptance tests: a separate, freshly spawned independent test designer
+  writes them from the KPIs before implementation, and the guard refuses an engineer tests/acceptance/**.
+sources:
+  - - path: docs/charter/CHARTER_v5.md
+      heading: "- **MR-3 Every task carries KPIs, and the builder never writes its own acceptance tests.** Each task states"
+      lines: [93, 97]
+    - path: template/governance/kernel/roles/engineer.md
+      heading: "- **Allowed paths:** the `allowed_paths` of its own `in_progress` ticket, plus `.gov-runtime/scratch/**` (DEC-108)."
+      lines: [8, 10]
+    - path: template/governance/kernel/roles/independent-test-designer.md
+      heading: "- **Allowed paths:** `tests/acceptance/**`, whatever the ticket's own `allowed_paths` name, while its ticket is"
+      lines: [8, 10]
+    - path: docs/contract/contract.yaml
+      heading: "- id: MR-3"
+      lines: [136, 142]
+    - path: docs/contract/CONTRACT_v4.md
+      heading: "| MR-3 | KPIs; the builder never writes its own acceptance tests | An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome. The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to every role but the Independent Test Designer (DEC-156). | W1-02, W1-03, W1-09, W1-30, W1-33, W1-05, W1-26, W1-35, W1-42, W1-45 | MR-A-01, MR-B-01 | DEC-065, DEC-069, DEC-076, DEC-084, DEC-150, DEC-156 |"
+      lines: [57, 57]
+    - path: docs/contract/master-rules/MR-3.md
+      heading: "# MR-3: KPIs; the builder never writes its own acceptance tests"
+      lines: [11, 16]

@@ -10,15 +10,18 @@ references and consumers are flagged in the plan.
 from __future__ import annotations
 
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 import yaml
 
-from gov.adopt import project
+from gov.adopt import lite_gates, project, safety
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
+from gov.guard import install
 from gov.retrieval.semantic import EMBEDDED
+from gov.tasks import tickets
 
 ACTIONS = ("KEEP", *MOVING, "RETIRE", "DELETE_FROM_ACTIVE_TREE")  # CAP-06.b
 EXECUTED = ("MOVE", "RENAME", "DELETE_FROM_ACTIVE_TREE")  # what an A6 batch does; none changes a file's content
@@ -27,6 +30,7 @@ AUDITOR = "independent-auditor"
 # A native package layout: a package manifest, and what lies under the ``src/`` folder beside it (CAP-44.j).
 MANIFESTS = ("pyproject.toml", "setup.py", "setup.cfg", "package.json", "Cargo.toml", "pom.xml", "build.gradle")
 REFS = "refs/gov/adoption"
+SEMANTIC_NOT_RECREATED = "SEMANTIC_NOT_RECREATED"  # the finding of a semantic store asked for and not recreated (W2-124)
 POLICIES = (EMBEDDED, "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
 
 
@@ -53,18 +57,72 @@ class Run:
 def run(root: Path, args, config: dict) -> dict:
     project.require_repository(root)
     tracked = project.tree(root)
+    if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
+        return STAGE[args.stage](Run(root, args, config, args.stage, tracked, {}, {}))
     records, hashes = project.chain(root, tracked, args.stage)
     stage = STAGE[args.stage]
     return stage(Run(root, args, config, args.stage, tracked, records, hashes))
+
+
+def _coordination(root: Path) -> tuple[dict, dict]:
+    """A0's coordination ticket and roster key (W2-113, DEC-971 item 4, DEC-1052): the files to commit (path -> text)
+    and the record's new entries. The roster's key that names a ticket is kept; a roster without the key gets one
+    line, the rest as it was; no ``tk`` or a roster that cannot take the key creates and writes nothing, and the
+    record says so (the guard stays closed). Nothing is written here: the ticket's file is read back and committed."""
+    key, rel = install.COORDINATION_KEY, install.ROSTER
+    path, text, roster = root / rel, None, {}
+    if os.path.lexists(path):
+        try:
+            text = path.read_text(encoding="utf-8")
+            roster = yaml.safe_load(text) or {}
+        except (OSError, UnicodeDecodeError, yaml.YAMLError):
+            roster = None
+    nothing = {key: None, "roster": None}
+    if not isinstance(roster, dict):
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {rel} is not "
+                                               "a readable mapping; it is left as it is"}
+    if key in roster:
+        found, why = install.coordination_ticket(root)
+        if found is None:
+            return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {why}; "
+                                                   f"the key is left as it is"}
+        return {}, {key: str(roster[key]).strip(), "roster": rel,
+                    "coordination": f"kept the coordination ticket {rel} names; no ticket was created"}
+    if not (root / tickets.TK_REL).is_file():
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written because tk "
+                                               f"({tickets.TK_REL}) is missing"}
+    base = (text or "") + ("" if not text or text.endswith("\n") else "\n")
+    try:
+        ok = yaml.safe_load(f"{base}{key}: t-0000\n") == {**roster, key: "t-0000"}
+    except yaml.YAMLError:
+        ok = False
+    if not ok:
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {rel} cannot "
+                                               "take the key as one added line; it is left as it is"}
+    try:
+        ticket = tickets.create(root, f"{root.name} coordination")
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise refuse("COORDINATION_TICKET_FAILED", f"tk could not create the coordination ticket: {exc}") from None
+    file = root / tickets.TICKETS_REL / f"{ticket}.md"
+    lines = file.read_text(encoding="utf-8").split("\n")
+    file.unlink()  # committed with the stage's files, which the tool writes itself
+    lines.insert(lines.index("---", 1), "class: coordination")
+    return ({f"{tickets.TICKETS_REL}/{ticket}.md": "\n".join(lines), rel: f"{base}{key}: {ticket}\n"},
+            {key: ticket, "roster": rel,
+             "coordination": f"created the coordination ticket {ticket} and wrote the key {key} in {rel}"})
 
 
 def a0(run: Run) -> dict:
     head = resolve(run.root, "HEAD")
     ref = f"{REFS}/backup/{head[:12]}"
     existed = resolve(run.root, ref)
+    setup = safety.setup(run.root)  # W2-23 S5: .gitleaks.toml and the .gov-runtime/ ignore line, in this commit
+    coordination, entries = _coordination(run.root)  # W2-113: the coordination ticket and the roster's key, in it too
     git(run.root, "update-ref", ref, head)
     try:
-        return run.finish({"baseline_commit": head, "backup_ref": ref, "tree": "clean"}, backup_ref=ref)
+        return run.finish({"baseline_commit": head, "backup_ref": ref, "tree": "clean", "set_up": sorted(setup),
+                           **entries}, {**setup, **coordination}, backup_ref=ref, set_up=sorted(setup),
+                          coordination_ticket=entries[install.COORDINATION_KEY], roster=entries["roster"])
     except (OSError, GovError):
         if existed is None:
             git(run.root, "update-ref", "-d", ref)
@@ -264,6 +322,7 @@ def a3(run: Run) -> dict:
     if problems:
         raise refuse("PROPOSAL_REFUSED", "the proposal is refused as a whole: "
                      + "; ".join(f"{item['path']}: {item['reason']}" for item in problems), problems=problems)
+    safety.refuse_unheld(run.config, entries.values())  # W2-23 S7: before the record is written
     moving = [entry for entry in entries.values() if entry["action"] in MOVING]
     if moving and not project.code_intelligence(run.config):
         paths = [entry["path"] for entry in moving]
@@ -362,17 +421,54 @@ def guard(run: Run) -> None:
 
 
 def rebuild(run: Run, result: dict) -> dict:
-    """The index refresh that follows the moves and the retirement: ``gov rebuild``, after the record's commit."""
+    """The index refresh that follows the moves and the retirement: ``gov rebuild``. A semantic store asked for and not
+    recreated (``REBUILD_FAILED``, store ``semantic``) never fails adoption: ``result`` then carries the finding
+    ``SEMANTIC_NOT_RECREATED`` with its reason and the command that recreates it, and the stores from the error's
+    details (W2-124, DEC-1027 C). Any other failure of the refresh is ``INDEX_REFRESH_FAILED``."""
     from gov.rebuild import command
 
+    findings: list = []
     try:
         stores = command.run(run.root, run.args, run.config)["stores"]
-        if stores["lexical"]["status"] != "recreated":
-            raise refuse("INDEX_NOT_REFRESHED", str(stores["lexical"]))
     except GovError as exc:
-        raise refuse("INDEX_REFRESH_FAILED", f"stage {run.stage} is done and committed ({result['record']}), but the "
-                     f"index refresh that follows it (gov rebuild) failed: {exc.message}") from None
-    return {**result, "rebuild": stores}
+        details = exc.details if isinstance(exc.details, dict) else {}
+        if exc.code != "REBUILD_FAILED" or details.get("store") != "semantic":
+            raise _refresh_failed(run, result, exc.message) from None
+        stores = details.get("stores") or {}
+        findings = [{"code": SEMANTIC_NOT_RECREATED, "store": "semantic", "reason": details.get("reason", exc.message),
+                     "command": "gov rebuild"}]
+    if (stores.get("lexical") or {}).get("status") != "recreated":
+        raise _refresh_failed(run, result, str(stores.get("lexical")))
+    return {**result, "rebuild": stores, **({"findings": findings} if findings else {})}
+
+
+def _refresh_failed(run: Run, result: dict, message: str) -> GovError:
+    return refuse("INDEX_REFRESH_FAILED", f"stage {run.stage} is done and committed ({result['record']}), but the "
+                  f"index refresh that follows it (gov rebuild) failed: {message}")
+
+
+class _RefreshFirst:
+    """A6's run, whose record's commit (the batches done) runs ``rebuild`` first, so that the committed record holds
+    the finding of a semantic store not recreated; a failed batch's record is committed as it was. A refresh that
+    fails is raised after the record's commit (``failed``), as it always was."""
+
+    def __init__(self, run: Run):
+        self._run, self.failed = run, None
+
+    def __getattr__(self, name: str):
+        return getattr(self._run, name)
+
+    def finish(self, data: dict, extra: dict | None = None, **result) -> dict:
+        if data.get("status") != "done":
+            return self._run.finish(data, extra, **result)
+        refreshed = {}
+        try:
+            refreshed = rebuild(self._run, {"record": project.record_path(self._run.stage)})
+        except Exception as exc:  # whatever stops the refresh: the record is committed first, then it is raised
+            self.failed = exc
+        found = refreshed.get("findings")
+        done = self._run.finish({**data, **({"findings": found} if found else {})}, extra, **result)
+        return {**done, **{key: value for key, value in refreshed.items() if key != "record"}}
 
 
 # --------------------------------------------------------------------------
@@ -400,7 +496,7 @@ def _batch(root: Path, batch: dict, before: list[int]) -> dict:
         if project.tree(root) != expected:  # read from the commit itself: a commit hook is held to it as well
             raise refuse("CONTENT_CHANGED", "the batch's commit is not the planned moves and nothing else")
     except (OSError, GovError) as exc:
-        project.restore(root, start)
+        project.restore(root, start, [item["target"] for item in batch["artefacts"] if "target" in item])  # S1
         for folder in reversed(made):
             if folder.is_dir() and not any(folder.iterdir()):
                 folder.rmdir()
@@ -423,7 +519,9 @@ def a6(run: Run) -> dict:
                                    f"{baseline['baseline_commit']} that A0 recorded: nothing is moved without it")
     if project._run(run.root, ("merge-base", "--is-ancestor", baseline["baseline_commit"], "HEAD"), (0, 1))[0]:
         raise refuse("BACKUP_REF", f"the baseline commit {baseline['baseline_commit']} is no ancestor of HEAD")
-    artefacts = [item for batch in plan for item in batch["artefacts"]]
+    state = safety.resume(run)  # W2-23 S4: the batches a failed or killed run did are done, not "not at origin"
+    artefacts = [item for batch in plan if batch["batch"] not in state.done for item in batch["artefacts"]]
+    safety.refuse_unheld(run.config, artefacts)  # W2-23 S7: before any batch
     for item in artefacts:  # everything is examined before anything moves
         if item["action"] not in EXECUTED:
             problems.append(f"{item['path']}: {item['action']} is not what a batch executes")
@@ -435,11 +533,13 @@ def a6(run: Run) -> dict:
         problems.append("code intelligence is off in the path map: importers are not established, nothing is moved")
     if problems:
         raise refuse("PLAN_NOT_EXECUTABLE", "; ".join(problems) + ": run the stages again from A1", problems=problems)
-    done = []
-    for batch in plan:
-        done.append(_batch(run.root, batch, [item["batch"] for item in done]))
-    return rebuild(run, run.finish({"path_map_hash": run.hashes["A3"], "backup_ref": baseline["backup_ref"],
-                                    "batches": done, "index_refresh": "gov rebuild, run after this record's commit"}))
+    refreshing = _RefreshFirst(run)
+    result = safety.migrate(refreshing, plan, state, _batch, {
+        "path_map_hash": run.hashes["A3"], "backup_ref": baseline["backup_ref"],
+        "index_refresh": "gov rebuild, run as this record is committed: a semantic store not recreated is its finding"})
+    if refreshing.failed is not None:
+        raise refreshing.failed
+    return result
 
 
 def a8(run: Run) -> dict:
@@ -447,4 +547,5 @@ def a8(run: Run) -> dict:
     return legacy.retire(run)
 
 
-STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A8": a8}
+STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
+         "A10": lite_gates.gate}

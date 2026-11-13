@@ -50,11 +50,13 @@ def project(tmp_path, monkeypatch):
 
 
 def test_the_chunking_is_the_carried_one():
-    """The same spans and text as ``cli/govbridge/core/chunking.py``, and every line is in a chunk."""
-    carried = pytest.importorskip("govbridge.core.chunking")
+    """Every line is in a chunk, no chunk passes the size bound, and empty text gives no chunk.
+
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R5: the comparison with the carried
+    ``govbridge.core.chunking`` is dropped (the carried code is retired, DEC-017, so the case always skipped there);
+    its own property asserts, which never ran behind the skip, now run."""
     text = "".join(f"line {number} of the file, with some words on it\n" for number in range(1, 400)) + "no newline"
     ported = chunking.chunk_text(text)
-    assert ported == [(chunk.start_line, chunk.end_line, chunk.text) for chunk in carried.chunk_text(text)]
     assert len(ported) > 1 and all(len(chunk) <= chunking.MAX_CHARS for _, _, chunk in ported)
     assert {line for start, end, _ in ported for line in range(start, end + 1)} == set(range(1, 401))
     assert chunking.chunk_text("") == []

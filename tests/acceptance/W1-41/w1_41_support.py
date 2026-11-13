@@ -418,7 +418,7 @@ def environment(sandbox, without=()):
     dead = dead_endpoint()
     return {
         "OLLAMA_HOST": dead,
-        "GOV_QUERY_OLLAMA_HOST": dead,  # W2-54, DEC-798: the CPU-only embedder's address is dead too
+        "GOV_QUERY_OLLAMA_HOST": dead,  # W2-54, DEC-1033: the query embedder's address is dead too
         "GOV_OLLAMA_BIN": str(Path(sandbox.elsewhere) / "no-embedding-program" / "ollama"),
         "PATH": path,
         "HOME": str(sandbox.home),

@@ -3,6 +3,8 @@ name: retrieval
 description: >-
   Method for running gov retrieve — facet retrieval in disposable subagents with
   validated bundle return
+metadata:
+  version: 1.1.0
 ---
 # Retrieval
 
@@ -19,8 +21,11 @@ A method for gathering evidence with `gov retrieve`. The guard and the role file
 4. **Stopping reasons.** Every bundle carries exactly one stopping reason from the fixed list: `CLOSURE_COMPLETE`, `SATURATED`, `DEPTH_LIMIT_REACHED`, `BUDGET_EXHAUSTED_WITH_GAPS`, `FACET_UNAVAILABLE` or `UNRESOLVED_IDS`. A batch-size limit is never reported as completeness (DEC-034).
 
 5. **Validate the bundle.** Before using evidence, check that the bundle has a stopping reason, that each citation has an `id` and `sha256`, and that no citation references a superseded record (CAP-16, DEC-032).
+   Before relying on an evidence item, compare its `sha256` with the sha256 of the same lines (`start_line` to `end_line`) in your own tree; if they differ, your tree is behind or ahead of the store at `result.store.commit`: read the store's text with `git show <commit>:<path>`, and never cite the store's line numbers as your tree's (DEC-1090 (3)).
 
 6. **Handle continuation.** If the bundle carries a continuation token and the stopping reason is not `CLOSURE_COMPLETE` or `SATURATED`, pass the token back with `--continue` to gather more evidence within the spend budget.
+
+7. **Search again once (DEC-1092 (1)).** If the bundle does not answer the question, or you can tell your answer may be incomplete, run `gov retrieve` once more in your own, different words (the ids, names and paths the first bundle showed, or the repository's own term). Then answer from both bundles and the files you read, citing path and lines, or say "not found" and what is missing. The bundle does not answer when no item states the fact asked (only its neighbourhood), when an item names the thing but not the part asked, when the question asks for all of something and the bundle cannot show it holds all, or when your draft needs "probably" or "may be incomplete". A continuation (step 6) is the same search, not the second; `FACET_UNAVAILABLE` is a fault to report, not a miss. Two searches in all by default; a third only when your brief asks. Never answer beyond what the bundles and the files you read show.
 
 ## Key constraints
 

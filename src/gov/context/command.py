@@ -19,5 +19,6 @@ def run(root, args, config):
         from gov.decisions.register import in_force
         return in_force(root)
     from gov.context import context
+    # W2-13 S5 (DEC-1065 (2)): a --role given adds its role-paths filter to the supplementary block beside GOV_ROLE's
     return context(root, args.ticket, brief=args.brief, budget=args.budget,
-                   dry_run=getattr(args, "dry_run", False))
+                   dry_run=getattr(args, "dry_run", False), role=getattr(args, "role", None))

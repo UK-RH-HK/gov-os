@@ -19,6 +19,29 @@ written, and no hook is run against it.
 After the switch-over, nine cases time the hook. The case that ran the acceptance suites of W1-02, W1-03 and W1-04 in
 a child process is retired (see [Retired](#retired)).
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 30 in the full run, 51 in `breadth`, 17 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The Gov OS repository runs W1-02, W1-03 and W1-04 as live hooks for every later ticket | `test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool` (2 of 14), `test_w1_05_live_hooks.py::test_a_hook_runs_after_every_bash_call` (2 of 2), `test_w1_05_live_hooks.py::test_hooks_are_not_switched_off`, `test_w1_05_live_hooks.py::test_ordinary_reads_stay_open` | part A's row, by its words; partly lifted (part A's row): `test_a_hook_runs_before_every_tool` (2), `test_a_hook_runs_after_every_bash_call` (2), `test_hooks_are_not_switched_... |
+| S2: The interim operator diff check is retired and recorded as such | `test_w1_05_switch_over_record.py::test_the_operator_diff_check_is_recorded_as_retired` | part A's row, by its words |
+| S3: A minimal subagent definition for the orchestrator role exists under .claude/agents/, with the subagent type name orchestrator (DEC-119) [CAP-2... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S4: A minimal subagent definition for the engineer role exists under .claude/agents/, with the subagent type name engineer (DEC-119) [CAP-22.a] | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S5: A minimal subagent definition for the product-spec role exists under .claude/agents/, with the subagent type name product-spec (DEC-119) [CAP-2... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S6: A minimal subagent definition for the independent-test-designer role exists under .claude/agents/, with the subagent type name independent-test... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S7: A minimal subagent definition for the independent-auditor role exists under .claude/agents/, with the subagent type name independent-auditor (D... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| F1: A later ticket runs without the guard active | `test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool` (2 of 14), `test_w1_05_live_hooks.py::test_a_hook_runs_after_every_bash_call` (2 of 2), `test_w1_05_live_hooks.py::test_hooks_are_not_switched_off`, `test_w1_05_live_hooks.py::test_ordinary_reads_stay_open` | part A's row, by its words; partly lifted (part A's row): `test_a_hook_runs_before_every_tool` (2), `test_a_hook_runs_after_every_bash_call` (2), `test_hooks_are_not_switched_... |
+| F2: The switch-over happens before W1-02..04 acceptance tests pass | `test_w1_05_live_hooks.py::test_the_test_designer_writes_only_acceptance_tests` | the ticket's words |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `2b4b91f`, with the tests of this revision: 22 failed, 77 errors, 0 passed (99 cases, 27
@@ -193,6 +216,12 @@ afterwards.
 
 The case and its line in `serial-only.txt` are retired since 2026-10-23 (see [Retired](#retired)).
 
+**The CTO-only install rule (DEC-980; `Rewrite-Reason: DEC-957, DEC-971 item 4`).** The kernel's generated project
+(`kernel_base`) now also holds the orchestrator's ticket `DAEO-zz91` and `governance/project/roster.yaml` with
+`coordination_ticket: DAEO-zz91`, and `test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring`
+has its orchestrator declare `DAEO-zz91` (the CTO), so its `ask` is kept. It stays red until ACT 2's re-pin, because
+the hook runs under the owner's pinned, installed `gov`, which has no CTO install rule.
+
 ## Retired
 
 `test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` (failure 2) is retired by the owner's decision
@@ -210,3 +239,84 @@ not changed and still run in every close. The other case of `test_w1_05_switch_o
 - **`governance/project/roster.yaml`.** It is in the ticket's `allowed_paths`; no KPI names it.
 - **`.claude/settings.local.json`.** Git ignores it, and it belongs to the operator.
 - **What a role definition says** beyond its name and description. W1-33 replaces the minimal definitions (DEC-119).
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_05_support.command_environment` (also W1-38's, W1-46's and W1-47's hook runs) carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+## W2-111: the hook-latency case(s) judge the hook's own work against a reference hook timed beside them (DAEO-qvff; `Rewrite-Reason: DEC-979`)
+
+`Rewrite-Reason: DEC-979` (the owner's D2 (a) on CAPACITY-1, P-LATENCY-1; DEC-906, DEC-968). Revised twice by fresh
+independent test designers (round 1 and round 2, 2026-11-13); the case ids, their parameters, the 100 ms bound at p95,
+the 3 warm-up calls, the 40 samples, the nearest-rank p95 and the three-round repeat are the same as before the
+revision; nothing is skipped, marked or removed.
+
+**What it measures.** `test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook` (9 parameters: `Edit-engineer`, `Glob-engineer`, `Glob-no-role`, `Grep-engineer`, `Grep-no-role`, `NotebookEdit-engineer`, `Read-engineer`, `Read-no-role`, `Write-engineer`): the CPU time of one call's PreToolUse hooks (every command registered for the tool, started together as the harness starts them, and what each waited for: the `RUSAGE_CHILDREN` difference before and after the call, so the sum of their work, stricter than the wall time of commands that run side by side), less the median CPU time of one reference hook called just before each of the 40 timed calls, in the same round (one reference hook per call, whatever the number of commands). The bound is 100 ms at p95. The measure is the owner's decision DEC-1163 (3) (P-W2-111-MEASURE-1 (a)).
+
+**What it counts, and what it does not.** It counts the CPU time (user and system) of the hook's process and of every
+process it waited for (its forked decision process, the git it runs), less one reference hook's. It leaves out, once per
+call, what any hook costs before it does anything of its own: a fresh interpreter's start and the read of the event
+(the reference hook's CPU time: about 15 ms on a quiet machine, about 21 ms with every CPU busy). **This lowers what is
+judged by that much** (accepted by the owner under DEC-906: DEC-1163 (3)): a hook that spends 100 ms of CPU in all, 85 ms of it its own, is judged at 85 ms and passes; the
+ceiling on a hook's total CPU time is about 115 ms quiet and 121 ms loaded. It was chosen over a form that leaves
+nothing out because no such form held its verdict under load (below). It does not see a hook that is slow only by
+waiting (a sleep, a lock, a network wait): that spends no CPU. It does not remove the effect of load on CPU time: with
+every CPU busy the same work costs about 1.4 times the CPU time (a busy sibling thread on the same core), so the judged
+figure of a case rises under load (a hook case of 25 ms quiet is judged at 45 to 57 ms at load 25 to 58); the verdict
+holds by its margin: the highest judged figure of the 15 cases at load 52 to 59 was 91 ms (the designer's read,
+W2-57), against the 100 ms bound, and a hook doing 150 ms of CPU of its own is judged at 173 to 326 ms at every load
+measured.
+
+**Why wall time under load is not the measure, and why CPU time alone was not.** A wall clock under load times the
+scheduler's queue, not the hook. On 2026-10-31 the 11 cases (then) were traced in three rounds, with W2-106 and without
+it: red 8, 0, 1 of 11 with it and 0, 0, 5 without, at loads of 15 to 30, with run times of 34 to 152 s, whatever the
+change; they pass alone on a quiet machine. Under load the p95 wall time of one call is 120 to 350 ms at load 25 to 58
+for a hook that takes 40 to 60 ms alone. Round 1 judged the CPU time alone (`RUSAGE_CHILDREN`); the CTO's benchmark
+(2026-11-13 06:36 to 07:20, load 20 and 50 and more) found it is not load-independent on this machine (an i7-12700F,
+20 logical CPUs, two threads per core): 3 of the 15 cases were red at both loads (CPU p95 100 to 186 ms, against 40 to
+60 ms quiet), because a CPU time counts time on a CPU, not work done, and the same work takes about 1.4 times as long on
+a core whose sibling thread is busy. The reference hook is timed in the same round, in the same CPU share (the same
+process, the call before the real one), so what load adds to a trivial hook's CPU time is taken off the real hook's.
+(A reference minimum or low percentile as a quiet baseline for a ratio form was measured and does not work: with every
+CPU busy the fastest of 60 reference calls is 1.35 to 1.8 times its quiet CPU time, so no quiet figure exists in a run
+that is loaded throughout.)
+
+**The reference hook.** A fresh interpreter (`sys.executable -c`) that reads the event on standard input and prints the
+"allow" answer, started as the hook is (a child process of the test), its CPU time read from `RUSAGE_CHILDREN` before
+and after. It is called once before each timed call and once after each warm-up call, so the 40 calls of a round have
+40 reference calls beside them. The round's figure is `p95(40 CPU times) - median(40 reference CPU times)`; the failure
+message prints the figure, the raw CPU p95, the reference median and the wall p95 of each round.
+
+**Measured figures.** Cells are the judged figure of the first round in ms (bold), then, in brackets, the raw CPU p95
+less the reference median that made it; a case that needed more rounds shows each, separated by semicolons. Judged
+figures under 100 pass. Provenance: the quiet, load 23 to 28 and load 52 to 59 columns come from an instrumented run
+of the same 15 cases (a scratch plugin outside the repository, `-p td_plugin2`, that times the reference hook before each
+call and applies the committed arithmetic; the three shards run together through the heavy slot, `taskset` to the slot's
+CPUs): quiet 2026-11-13 07:42, load 1.8 to 2.5; the load windows below. The committed code itself ran, through the heavy
+slot, at ambient load about 9 to 11 (2026-11-13 07:57, 15 passed in 43 s; judged 26 to 50 ms) and planted at ambient
+load about 5 to 9 (the "planted" column). The committed code was not run at load 23 to 28 or at
+52 and more (the four load windows were used on the measures above): the lead's driver (`-p td_plugin`, `TD_FIGURES`,
+`TD_PLANT_S`) is the run of the committed code at those loads. The load windows (the lead's `load_window.sh`, unpinned busy loops at nice 0;
+a window's loops end by themselves): window 1, N=22, 07:27 (the loops died with the Bash call that started them: no
+load was seen, no measure was made); window 2, N=56, 07:32 to 07:37 (experiments outside pytest); window 3, N=24, 07:44
+(load 20 at +72 s, shards of the real cases at `/proc/loadavg` 20.2 to 27.7); window 4, N=56, 07:49 (load 50.6 at
++121 s, real shards at 50.6 to 58.6, planted shards at 58.6 to 59.7).
+
+| case (parameter) | quiet (load 1.8 to 2.5) | load 23 to 28 | load 52 to 59 | planted 150 ms hook, committed code, ambient load 5 to 9, 3 rounds | planted 150 ms hook, load 52 to 59, 1 round of 8 calls |
+|---|---|---|---|---|---|
+| `Edit-engineer` | **27** (41 - 15) | **58** (83 - 25) | **42** (63 - 21) | 187 (204 - 17); 190 (206 - 16); 193 (210 - 18) | 189 (209 - 20) |
+| `Glob-engineer` | **39** (54 - 15) | **78** (99 - 22) | **57** (77 - 21) | 202 (219 - 17); 202 (219 - 16); 202 (219 - 17) | 202 (223 - 21) |
+| `Glob-no-role` | **27** (42 - 15) | **63** (85 - 22) | **46** (67 - 21) | 188 (204 - 16); 181 (197 - 15); 178 (194 - 15) | 202 (222 - 21) |
+| `Grep-engineer` | **43** (59 - 16) | **78** (100 - 22); **77** (102 - 25); **75** (96 - 21) | **58** (78 - 21) | 189 (204 - 15); 190 (206 - 15); 189 (205 - 16) | 326 (347 - 21) |
+| `Grep-no-role` | **32** (48 - 16) | **59** (80 - 21) | **41** (61 - 20) | 182 (197 - 15); 179 (195 - 15); 181 (196 - 15) | 200 (221 - 21) |
+| `NotebookEdit-engineer` | **28** (43 - 15) | **50** (71 - 22) | **50** (79 - 29) | 179 (194 - 15); 177 (192 - 15); 180 (195 - 15) | 209 (230 - 21) |
+| `Read-engineer` | **39** (54 - 15) | **55** (76 - 21) | **76** (97 - 21) | 191 (206 - 15); 190 (206 - 15); 190 (205 - 15) | 229 (250 - 21) |
+| `Read-no-role` | **27** (42 - 15) | **44** (66 - 22) | **59** (81 - 22) | 181 (197 - 16); 188 (203 - 15); 184 (200 - 16) | 285 (311 - 26) |
+| `Write-engineer` | **30** (45 - 15) | **48** (68 - 21) | **54** (81 - 27) | 188 (203 - 15); 179 (194 - 15); 182 (198 - 16) | 205 (235 - 30) |
+
+**The planted hook.** A scratch harness (a pytest plugin outside the repository, passed with `-p`; nothing in a committed
+test carries a switch, an environment variable or a hook) ran the installed PreToolUse hook behind a launcher that
+busy-loops until its own `time.process_time()` reaches 0.150 s and then `exec`s the real hook, so the decision is the
+real one and only the latency changes. Every case FAILED on the latency assertion (`AssertionError: p95 CPU time ...`),
+never on a decision assertion or a setup error: 9 of 9 at ambient load (judged figures 177 to 202 ms in every round), 9 of 9 at load 52 to 59 (judged 189 to 326 ms). A plant that is itself a CPU time is not divided by the load
+factor here (the reference is subtracted, not divided into it); a fixed-work plant (a loop calibrated to 150 ms of CPU
+quiet, 2.1 million iterations) costs 270 to 285 ms of CPU with every CPU busy, so it fails by more. Logs:
+`.gov-runtime/scratch/td/final-planted-amb.log` and `real2-w4-pl-{a,b,c}.log` (the figures beside them, `.figs`).

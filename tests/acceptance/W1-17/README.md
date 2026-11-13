@@ -167,3 +167,24 @@ Returned in full in the designer's final message. Every one is encoded in the te
 | **DP-5** | The check with no index, and what it prints | `test_the_check_is_not_green_when_there_is_no_index`; the `…names_the_file[3]` cases |
 | **DP-6** | Function-level parents for Python through the standard library | `test_a_chunk_inside_a_python_function_has_that_function_as_parent`, `test_python_code_outside_any_function_has_the_module_as_parent` |
 | **DP-7** | The corpus is the tracked files as they stand in the working tree, not `HEAD` | `test_an_uncommitted_edit_to_a_tracked_file_is_re_indexed_too` |
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 47 in the full run, 18 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Carried FTS5 and chunking ported into src/gov; blob-hash incremental index in the shared store; every chunk record carries parent_id (section f... | `test_w1_17_parents.py::test_a_chunk_of_code_has_a_function_or_a_module_as_parent`, `test_w1_17_incremental.py::test_the_index_is_in_the_shared_store_beside_the_record_graph`, `test_w1_17_parents.py::test_every_chunk_record_carries_a_parent_that_contains_it` | the ticket's words |
+| S2: Changed blobs re-index before the next retrieval (2.8 s scale on a-dev); an empty or stale index is reported, never returned as absent [CAP-17.a] | `test_w1_17_dev_tier.py::test_one_changed_file_is_re_indexed_by_the_next_retrieval_within_the_bound`, `test_w1_17_freshness.py::test_a_stale_index_is_reported_by_a_retrieval_that_may_not_write`, `test_w1_17_freshness.py::test_an_edited_file_is_re_indexed_before_the_next_retrieval` | the ticket's words |
+| S3: Registers the index-freshness family check: the index digest matches the tracked blobs, and a stale index is reported [CAP-38.b] | `test_w1_17_family_check.py::test_the_check_is_green_on_an_index_that_matches_the_tracked_blobs`, `test_w1_17_digest.py::test_the_digest_of_the_index_is_the_one_the_refresh_reported`, `test_w1_17_family_check.py::test_the_check_is_not_green_on_a_stale_index_and_names_the_file` (1 of 3) | the ticket's words |
+| S4: The corpus is the whole tracked repository minus what the secret filter and the path map exclude; there is no hand-kept include list [CAP-03.d] | `test_w1_17_corpus.py::test_the_secret_filter_lets_the_fixture_corpus_through_and_nothing_else`, `test_w1_17_corpus.py::test_the_path_map_decides_what_is_product_data`, `test_w1_17_corpus.py::test_every_tracked_governance_file_is_indexed_whatever_its_folder_or_extension` | the ticket's words |
+| S5: An exact string, identifier or error-message query returns every occurrence with file path and line [CAP-11.a] | `test_w1_17_exact_query.py::test_an_error_message_query_returns_every_occurrence_with_path_and_line`, `test_w1_17_exact_query.py::test_an_identifier_query_returns_every_occurrence_with_path_and_line` (3 of 3) | the ticket's words |
+| F1: A retrieval returns pre-edit text as current | `test_w1_17_freshness.py::test_the_text_from_before_an_edit_is_not_returned_as_current` | the ticket's words |
+| F2: Rebuild digest differs between two runs | `test_w1_17_dev_tier.py::test_a_rebuild_of_the_tier_gives_the_same_digest`, `test_w1_17_digest.py::test_a_rebuild_after_the_derived_state_is_deleted_gives_the_same_digest`, `test_w1_17_digest.py::test_a_build_elsewhere_gives_the_same_digest` | the ticket's words |

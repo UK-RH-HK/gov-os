@@ -153,3 +153,24 @@ reverse order and a table pass; swapped pairs, two separate lists and the values
 - **Exact permitted next actions:** The implementer may build the template now: the Success 4 test passes under (a)
   or (b). On the answer, the test designer adds the assertion that pins the state values (and the CIT key name) as
   a later batch. W1-11's test design waits for the answer.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 8 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The template has the ten fields of Framework §52 / Contract v3 L2 (question, why now, current state, options, impact, reversibility, cost of re... | `test_w1_34_decision_package.py::test_the_template_has_the_ten_fields_and_a_rank` | the ticket's words |
+| S2: Batching allows at most five open packages at a time, and a P1 package may bypass the cap (DEC-093) [CAP-34.c] | `test_w1_34_decision_package.py::test_batching_allows_at_most_five_open_packages_and_p1_may_bypass` | the ticket's words |
+| S3: An answer maps to a decision record appended with ACCEPTED (owner, date) | `test_w1_34_decision_package.py::test_an_answer_maps_to_a_decision_record_with_accepted_and_who` | the ticket's words |
+| S4: The gate record carries a state (open, answered, declined, revoked, stale) and the CIT it belongs to [CAP-34.d] | `test_w1_34_decision_package.py::test_the_gate_record_carries_a_state_and_its_cit`, `test_w1_34_decision_package.py::test_the_gate_state_lives_in_status_alone_and_the_cit_key_is_cit` | the ticket's words |
+| S5: The template's routing rule classes a contradiction as agent-resolvable (settled by precedence and recorded) or human-resolvable (raised as a p... | `test_w1_34_decision_package.py::test_the_routing_rule_classes_a_contradiction` | the ticket's words |
+| F1: A package can be rendered without a recommendation or confidence | `test_w1_34_decision_package.py::test_a_package_cannot_be_rendered_without_a_recommendation_or_confidence` | the ticket's words |
+| F2: An answer can be recorded without a date | `test_w1_34_decision_package.py::test_an_answer_cannot_be_recorded_without_a_date` | the ticket's words |

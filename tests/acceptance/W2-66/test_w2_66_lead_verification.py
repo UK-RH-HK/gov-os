@@ -21,13 +21,22 @@ OWN_FOLDER = "tests/acceptance/W2-66/"
 CONFIGURATION = ("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg", support.SERIAL_ONLY_REL)
 
 
+TASK = "DAEO-c1uz"   # W2-66's own ticket
+
+
 def test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes():
+    """Rewrite-Reason: DEC-1061 (D-4's cut): "the ticket" is W2-66's own commits (``Task: DAEO-c1uz``) on this branch,
+    no longer every change since the base, so a later ticket that is meant to change the root conftest (D-4's
+    opt-in suite, DEC-1061) is not judged by W2-66's line."""
     known = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--verify", "--quiet", BASE_BRANCH],
                            capture_output=True, text=True)
     if known.returncode != 0:
         pytest.skip(f"no {BASE_BRANCH} in this clone to compare with")
-    changed = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", f"{BASE_BRANCH}...HEAD"],
-                             capture_output=True, text=True, check=True).stdout.split()
+    commits = subprocess.run(["git", "-C", str(ROOT), "log", "--format=%H", f"--grep=^Task: {TASK}$",
+                              f"{BASE_BRANCH}..HEAD"], capture_output=True, text=True, check=True).stdout.split()
+    changed = sorted({path for commit in commits for path in subprocess.run(
+        ["git", "-C", str(ROOT), "diff-tree", "--no-commit-id", "--name-only", "-r", "-m", commit],
+        capture_output=True, text=True, check=True).stdout.split()})
     touched = [p for p in changed if p in CONFIGURATION or
                (p.endswith("conftest.py") and not p.startswith(OWN_FOLDER))]
     assert not touched, f"the ticket changes what a plain pytest run reads: {touched}"

@@ -117,3 +117,21 @@ The full packages are in the test designer's return for this ticket.
 - Whether `role` is checked against a roster, and whether the ticket also records its task number or its change
   folder: the bridge's own business.
 - A `gov` command: none is in the ticket's paths or KPIs.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 46 in the full run, 17 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Tickets derived from an OpenSpec change tasks.md carry kpis, role, allowed_paths, profile and a back-reference to the change [CAP-31.a] | `test_w1_14_derive.py::test_a_derived_ticket_carries_the_task_contract_of_its_task` | the ticket's words |
+| S2: Derived tickets pass the ticket schema and the DAG is acyclic | `test_w1_14_schema_and_dag.py::test_derived_tickets_pass_the_ticket_schema` | the ticket's words |
+| F1: A derived ticket lacks KPIs or allowed_paths | `test_w1_14_refusals.py::test_a_task_that_lacks_kpis_allowed_paths_or_role_gives_no_ticket` (11 of 11) | the ticket's words |
+| F2: An implementer ticket allowed_paths covers tests/acceptance/** | `test_w1_14_acceptance_paths.py::test_an_engineer_task_whose_paths_cover_the_acceptance_tests_gives_no_ticket` (11 of 11) | the ticket's words |

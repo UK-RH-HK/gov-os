@@ -28,7 +28,7 @@ ENGINEER = check_support.ENGINEER
 ORCHESTRATOR = check_support.ORCHESTRATOR
 DESIGNER = check_support.TEST_DESIGNER
 
-TICKET = check_support.TICKET_ID                            # engineer ticket DAEO-zz90, W1-90, in progress
+TICKET = check_support.TICKET_ID                            # engineer ticket DAEO-zz90 (WBS below), in progress
 ORCHESTRATOR_TICKET = check_support.ORCHESTRATOR_TICKET_ID  # orchestrator ticket DAEO-zz91, in progress
 DOCS_TICKET = check_support.DOCS_TICKET_ID                  # engineer ticket DAEO-zz95: docs/**
 SPEC_TICKET = check_support.PRODUCT_SPEC_TICKET_ID          # product-spec ticket DAEO-zz92: docs/spec/**
@@ -302,7 +302,7 @@ def run(project, sandbox, command):
 
 
 def ticket_branch(project, sandbox, *steps, main_moves_on=True):
-    """A branch ``w1/W1-90`` with one commit per step. With ``main_moves_on``, ``main`` gets a commit too."""
+    """A branch ``TICKET_BRANCH`` (``w1/<WBS>``) with one commit per step. With ``main_moves_on``, ``main`` gets a commit too."""
     check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
     run(project, sandbox, commits(*steps))
     check_support.git(project, "checkout", "-q", "main")
@@ -341,7 +341,7 @@ def commit_changes(paths, trailer_lines=(), subject="work"):
 
 
 def ticket_branch_of(project, sandbox, *commands, main_moves_on=True):
-    """A branch ``w1/W1-90`` built by ``commands``, one after the other. With ``main_moves_on``, ``main`` gets a
+    """A branch ``TICKET_BRANCH`` (``w1/<WBS>``) built by ``commands``, one after the other. With ``main_moves_on``, ``main`` gets a
     commit too."""
     check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
     for command in commands:

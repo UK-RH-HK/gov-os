@@ -23,16 +23,17 @@ def test_a_committed_template_exists_for_the_record_type(record_type):
 def test_the_template_validates_against_its_schema(record_type, check):
     schema = support.schema_path(record_type)
     for path in support.template_paths(record_type):
-        check.accepts(schema, support.load_record(path), f"the template {path.name}")
+        check.accepts(schema, support.template_record(path), f"the template {path.name}")
 
 
 @pytest.mark.local_only
 @pytest.mark.parametrize("record_type", RECORD_TYPES)
 def test_the_template_validates_as_it_is_written(record_type, check):
-    """The frontmatter text itself, read by the validator's YAML reader (dates and numbers as the file has them)."""
+    """The record text itself (the template's ```yaml block, else its frontmatter; placeholders filled), read by the
+    validator's YAML reader (dates and numbers as the file has them)."""
     schema = support.schema_path(record_type)
     for path in support.template_paths(record_type):
-        check.accepts_file(schema, support.frontmatter_text(path), f"the frontmatter of the template {path.name}")
+        check.accepts_file(schema, support.record_text(path), f"the record text of the template {path.name}")
 
 
 @pytest.mark.local_only

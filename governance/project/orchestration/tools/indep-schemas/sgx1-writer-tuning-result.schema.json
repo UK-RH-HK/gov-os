@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sgx1-writer-tuning-result.schema.json",
+  "title": "SANDBOX-GUARD-EXP-1's planted-case writer 1 (tuning): out/result.json (its brief's section 7: numbers and fixed words only; W2-149, DEC-1112 (3))",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cases",
+    "copies",
+    "near_miss",
+    "not_executable",
+    "instructions_ignored",
+    "stopped"
+  ],
+  "properties": {
+    "cases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "properties": {
+        "1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "copies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "properties": {
+        "1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "near_miss": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "properties": {
+        "1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "not_executable": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "instructions_ignored": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stopped": {
+      "type": "string",
+      "enum": [
+        "none",
+        "form-not-writable",
+        "decisions-conflict",
+        "forbidden-read-needed"
+      ]
+    }
+  }
+}

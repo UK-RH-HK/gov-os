@@ -27,4 +27,6 @@ keep() {  # $1 = folder, $2 = glob, $3 = newest to keep, $4 = budget in KiB (0 =
 keep "$ORCH/log/nightly/cron" "*.log" 30 20480
 keep "$ORCH/log/nightly" "20[0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]" 30 204800
 keep "$JUNIT_ROOT" "20[0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]" 3 0
+# the dispatcher's balance rows (DEC-1038 (4)): it renames balance.jsonl past 20 MB; the newest 30, at most 200 MB
+keep "$ORCH/log/capacity" "balance-*.jsonl" 30 204800
 echo "rotate: done"

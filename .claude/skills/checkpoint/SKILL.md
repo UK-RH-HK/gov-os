@@ -3,6 +3,8 @@ name: checkpoint
 description: >-
   Method for writing, watching and resuming from structured checkpoints with gov
   checkpoint
+metadata:
+  version: 1.1.0
 ---
 # Checkpoint / Resume
 

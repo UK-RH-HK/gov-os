@@ -12,6 +12,26 @@ python3 -m pytest tests/acceptance/W1-01 -q
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. The tests read
 `.claude/settings.json`, `governance/project/bootstrap.md`, `.tickets/` and git history; they write nothing.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 54 in the full run, 12 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Implementer sessions deny Edit/Write on tests/acceptance/** and on .env*, *.pem, *.key, config/secrets* (verified by one denied attempt each) | `test_w1_01_bootstrap_record.py::test_a_denied_attempt_is_recorded_for_each_path_class` (5 of 5), `test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied` (4 of 16) | part A's row, by its words |
+| S2: The operator diff procedure (git diff --name-only vs allowed_paths at each ticket close) is written and used from the first implementation ticket | `test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths`, `test_w1_01_bootstrap_record.py::test_operator_diff_procedure_is_written` | part A's row, by its words |
+| S3: Interim install rule recorded and in force until W1-05: install commands are denied in every session settings file; no tool is installed before... | `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded`, `test_w1_01_bootstrap_record.py::test_install_rule_lists_every_agent_session_settings_file`, `test_w1_01_bootstrap_record.py::test_a_denied_install_attempt_is_recorded` | part A's row, by its words |
+| F1: Any implementer commit touching tests/acceptance/** before W1-05 lands | `test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests`, `test_w1_01_integration_merges.py::test_a_merge_that_changes_an_acceptance_test_itself_fails`, `test_w1_01_integration_merges.py::test_a_merge_that_adds_an_acceptance_test_itself_fails` | part A's row, by its words |
+| F2: An existing docs/source deny rule is lost | `test_w1_01_bootstrap_record.py::test_a_denied_attempt_is_recorded_for_each_path_class` (5 of 5), `test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied` (4 of 16), `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded` | the ticket's words |
+| F3: Any install runs before W1-05 | `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded` | the ticket's words |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `b4d7ede`: 49 failed, 10 errors, 0 passed (59 cases, 16 test functions).
@@ -129,6 +149,10 @@ closed: such a merge is made by a test designer, or the owner decides.
 | Every merge on this repository's history that touches `tests/acceptance/**` | `test_the_integration_merges_of_this_repository_pass` | passes |
 
 These tests build their repositories under pytest's temporary directory. They write nothing in this repository.
+
+### A merge listed for its own changes (DEC-1031 item 3, 2026-11-03)
+
+`merge_offences` exempts a merge whose own full id is in the path map's `acceptance_exemptions` for the changes the merge commit makes itself; the commits it brings are judged as before. The owner listed `0568d91baf56` (2026-10-31, `w2/integrate` into `w2/W2-67`, `Role: orchestrator`): its resolution of one conflict in `tests/acceptance/W1-30/test_w1_30_close.py` was a test designer's (td-9), committed by the lead (P1-NIGHTLY-2026-11-02 (a)). Standing since: such a merge carries the test designer's role. Cases: `test_a_listed_merge_is_exempt_for_its_own_conflict_resolution_only_by_its_full_id` (full id, abbreviated ids, unlisted) and `test_a_listed_merge_still_answers_for_an_unlisted_commit_it_brings`; with them `test_only_the_test_designer_commits_to_acceptance_tests` and `test_the_integration_merges_of_this_repository_pass` are green again.
 
 ## Retired cases (DEC-925 item 1, 2026-10-27)
 

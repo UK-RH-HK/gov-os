@@ -58,11 +58,9 @@ def test_the_packet_carries_its_own_hash(api, project):
         f"the hash is not a sha256: {packet[S.K_HASH]!r}"
 
 
-def test_the_hash_is_stable_across_two_runs(api, project):
-    """Two calls with the same ticket and the same commit produce the same packet hash (CAP-38.b)."""
-    h1 = api.context(project, S.TK_NORMAL)[S.K_HASH]
-    h2 = api.context(project, S.TK_NORMAL)[S.K_HASH]
-    assert h1 == h2, f"the packet hash changed across two runs: {h1} vs {h2}"
+# Rewrite-Reason: DEC-1061 (D-4's cut, inventory row D3, approved by DEC-1040 (1)): the case "the hash is stable
+# across two runs" is deleted; it repeated test_w1_24_family_check.py::
+# test_the_same_ticket_and_commit_give_the_same_packet_hash, which keeps CAP-38.b in the full run.
 
 
 def test_the_supplementary_block_is_separate_from_the_authority_block(api, project):

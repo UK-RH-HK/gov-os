@@ -8,7 +8,7 @@ assessment report of the same match. The tests use only public interfaces:
   child process with this worktree's ``src/`` on ``PYTHONPATH`` (DEC-732);
 - ``gov.retrieval.lexical.refresh``, ``gov.store.load`` to build what a retrieval reads (never ``gov rebuild``,
   never this repository's store), and ``gov.retrieval.lexical.search`` with ``gov.retrieval.fusion.rrf`` for the
-  plain fused order the bundle is compared with.
+  plain fused order the bundle is compared with (``fused_order``: the route's ``ranked`` list, since W2-13's S2).
 
 Every project is a temporary git repository built from nothing, with its own path map and gitleaks rules. No vector
 is built, so the semantic route is unavailable and gives no hit; no reranker is loaded unless a stub is passed.
@@ -127,7 +127,10 @@ def corpus(register_text=REGISTER_TEXT):
         NOTES: f"# Notes\n\nA note on the {PHRASE}.\n",
         CAPABILITY: _record("CAP-0010", "capability", "ACTIVE", f"The {PHRASE} is a capability of the harbour."),
         TEST: f'"""The {PHRASE} is tested here ({FAVOURED})."""\n\n\ndef test_beacon():\n    assert True\n',
-        CUT_SPEC: f"# Gate specification\n\nThe {CUT_PHRASE} is specified here.\n",
+        # No word of the cut phrase in its title and a longer text than the reports': BM25 ranks it below the six
+        # reports, so it is seventh in the fused order as it was by path before W2-13 (DEC-1055)
+        CUT_SPEC: f"# Specification\n\nThe {CUT_PHRASE} is specified here, beside the other figures the harbour "
+                  f"office keeps for the eastern approach through the summer season.\n",
     }
     for number, rel in enumerate(CUT_REPORTS, 1):
         files[rel] = f"# Cut report {number}\n\nThe {CUT_PHRASE} was counted at gate {number}.\n"
@@ -334,6 +337,17 @@ class Api:
         assert out[0]["error"] is None, out[0]["error"]
         hits = out[0]["value"]["hits"]
         fused = self.run([("gov.retrieval.fusion", "rrf", [{"lexical": hits}], {})])[0]["value"]
+        return [(hit["chunk_id"], hit["path"]) for hit in fused]
+
+    def fused_order(self, root, query):
+        """``(chunk_id, path)`` of the plain fused order of the list the lexical route gives the fusion: its
+        ``ranked`` list where it gives one (W2-13's S2: the exact string's chunks first, then BM25's), else its
+        ``hits``, as ``retrieve`` takes it. No block applies; this is the order the block lifts from."""
+        root_arg = {"$path": str(root)}
+        out = self.run([("gov.retrieval.lexical", "search", [root_arg, query], {"refresh": False})])
+        assert out[0]["error"] is None, out[0]["error"]
+        listed = out[0]["value"].get("ranked", out[0]["value"]["hits"])
+        fused = self.run([("gov.retrieval.fusion", "rrf", [{"lexical": listed}], {})])[0]["value"]
         return [(hit["chunk_id"], hit["path"]) for hit in fused]
 
     def command(self, root, *args):

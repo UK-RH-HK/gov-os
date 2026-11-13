@@ -83,10 +83,25 @@ def test_the_orchestrator_definition_states_its_write_scope():
     assert not faults, f"{support.agent_rel(support.ORCHESTRATOR)}: {faults}"
 
 
+# Rewrite-Reason: DEC-1156 (3), (7): the kernel roles grow from six to nine (the five of ROLES, research, and the
+# ticket lead, the QA engineer and the senior engineer; no independent-reviewer, DEC-959 item 3), so the roster the
+# definitions are held to is nine, not six.
+_ADDED_ROLES = ("ticket-lead", "qa-engineer", "senior-engineer")
+_NOT_A_ROLE = "independent-reviewer"
+
+
 def test_there_is_one_definition_per_role_and_the_research_one():
+    """Rewritten (DEC-1156 (3), (7)): one definition per kernel role, nine in all, none for ``independent-reviewer``,
+    each defined once. Red until the copies ACT generates the three new agents under ``.claude/agents/`` (a launched
+    session cannot write there, DEC-315)."""
     found = support.live_support.agent_definitions()
-    wanted = set(support.ROLES + (support.RESEARCH,))
-    assert set(found) == wanted, f"the definitions under .claude/agents/ are {sorted(found)}"
+    wanted = set(support.ROLES + (support.RESEARCH,) + _ADDED_ROLES)
+    assert len(wanted) == 9, f"the wanted roster is not nine: {sorted(wanted)}"
+    assert _NOT_A_ROLE not in found, f"{_NOT_A_ROLE} is defined under .claude/agents/ though the kernel has no such role"
+    assert set(found) == wanted, (
+        f"the definitions under .claude/agents/ are {sorted(found)}: missing {sorted(wanted - set(found))}, "
+        f"extra {sorted(set(found) - wanted)}"
+    )
     assert all(len(paths) == 1 for paths in found.values()), f"a subagent type name is defined twice: {found}"
 
 

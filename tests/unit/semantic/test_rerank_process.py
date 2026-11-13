@@ -1,12 +1,12 @@
-"""Builder tests for how the default reranker's process is started and spoken to (W1-19; DEC-397, DEC-374).
+"""Builder tests for the default reranker's processes (W1-19; DEC-397, DEC-374; W2-145, DEC-1048 (5)).
 
 Regression evidence only (DEC-136). No model is loaded: a fake interpreter stands in a temporary ``HOME`` at the
-path of the reranker environment's. It records its arguments and ``HF_HUB_OFFLINE``, then answers as the worker
-does, scoring a text by its length.
+path of the reranker environment's. It records every start (its arguments and ``HF_HUB_OFFLINE``) and would answer
+as the old private worker did, scoring a text by its length. DEC-1048 (5): with the shared service not answering,
+it is never started; the search keeps the order given, named.
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -29,13 +29,17 @@ if {loads}:
 CANDIDATES = [{"chunk_id": "short", "text": "ab"}, {"chunk_id": "long", "text": "abcdef"}]
 
 
+def _no_service(*_args):
+    raise ConnectionError("the shared service is not under test here")
+
+
 @pytest.fixture
 def home(tmp_path, monkeypatch):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("HF_HUB_OFFLINE", "0")
-    rerank._started.cache_clear()
+    # W2-112: every search asks the shared service first; here it does not answer (W2-145: no private fallback).
+    monkeypatch.setattr(rerank, "_ask", _no_service)
     yield tmp_path
-    rerank._started.cache_clear()
 
 
 def _interpreter(home, loads):
@@ -46,22 +50,18 @@ def _interpreter(home, loads):
     return path
 
 
-def test_the_process_is_started_once_offline_and_scores_every_text(home):
-    _interpreter(home, loads=True)
-    first = rerank.rerank("a question", CANDIDATES)
-    second = rerank.rerank("another", CANDIDATES)
-    assert [(entry["chunk_id"], entry["rerank_score"]) for entry in first] == [("long", 6.0), ("short", 2.0)]
-    assert second == first
-    started = [json.loads(line) for line in (home / "started").read_text().splitlines()]
-    worker = str(Path(rerank.__file__).with_name("rerank_worker.py"))
-    assert started == [[["-I", worker, rerank.MODEL, rerank.REVISION], "1"]]
-
-
-def test_a_process_that_ends_without_the_model_leaves_the_order_given(home):
-    _interpreter(home, loads=False)
-    assert rerank.rerank("a question", CANDIDATES) == CANDIDATES
-    assert rerank.rerank("another", CANDIDATES) == CANDIDATES
-    assert len((home / "started").read_text().splitlines()) == 1  # it is not started again for each question
+@pytest.mark.parametrize("loads", [True, False], ids=["a worker that would load", "a worker that would end"])
+def test_without_the_service_no_private_process_is_ever_started(home, loads):
+    # DEC-1048 (5): formerly "the process is started once offline and scores every text" and "a process that ends
+    # without the model leaves the order given"; now no process is started, whatever it would do
+    _interpreter(home, loads=loads)
+    for question in ("a question", "another"):
+        ranked = rerank.rerank(question, CANDIDATES)
+        assert ranked == CANDIDATES and not any("rerank_score" in entry for entry in ranked)
+        outcome = rerank.last_outcome()
+        assert outcome["by"] == "unavailable" and "the shared service is not under test here" in outcome["reason"]
+    assert not (home / "started").exists()  # never started
+    assert not hasattr(rerank, "_started")
 
 
 def test_with_no_environment_nothing_is_started(home):

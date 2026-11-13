@@ -98,3 +98,21 @@ test stops in the `copy` fixture with the same reason:
 6. **The tests read the working tree**, not `HEAD`, so they can go green before the commit. W1-06's suite already
    asserts that the vendor folder equals its committed state.
 7. **Not asserted** (DEC-245, DEC-247): a version in any `SKILL.md` frontmatter, either way; the figures 8,089 and 795.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 4 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: test-driven-development, systematic-debugging and verification-before-completion copied from v6.4.2, namespaced, with source hash recorded | `test_w1_37_skills.py::test_the_three_skills_are_copied_from_v6_4_2_into_the_namespace_with_the_source_hash_recorded` | the ticket's words |
+| S2: Token sizes measured and within the I-09 figures; no plugin, no SessionStart hook, no subagent-driven-development | `test_w1_37_skills.py::test_the_token_sizes_are_measured_and_within_the_figures_and_no_plugin_hook_or_excluded_skill_is_there` | the ticket's words |
+| F1: Any other Superpowers skill or hook is present | `test_w1_37_skills.py::test_no_other_superpowers_skill_or_hook_is_present` | the ticket's words |
+| F2: A vendored file differs from its recorded hash | `test_w1_37_skills.py::test_no_vendored_file_differs_from_its_recorded_hash` | the ticket's words |

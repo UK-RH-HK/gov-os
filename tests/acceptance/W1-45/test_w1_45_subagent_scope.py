@@ -52,7 +52,7 @@ PRODUCT_SPEC_TICKET = guard_support.PRODUCT_SPEC_TICKET_ID  # DAEO-zz92
 
 SCRATCH = f"{guard_support.SCRATCH_REL}/note.txt"           # .gov-runtime/scratch/note.txt
 SOURCE = "src/gov/guard/decide.py"
-ACCEPTANCE_FILE = check_support.ACCEPTANCE_FILE              # tests/acceptance/W1-90/test_fixture.py
+ACCEPTANCE_FILE = check_support.ACCEPTANCE_FILE              # the planted ticket's test_fixture.py
 
 FILE_TOOLS = ["Edit", "Write"]
 

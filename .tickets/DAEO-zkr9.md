@@ -1,6 +1,6 @@
 ---
 id: DAEO-zkr9
-status: open
+status: closed
 deps: [DAEO-wq2b, DAEO-emq1, DAEO-r30l]
 links: []
 created: 2026-10-31T23:52:57Z
@@ -52,3 +52,5 @@ The owner's SMART-WORK-1 decision 3 (DEC-983); moved before EXAMIN's copy by DEC
 
 - **Why:** W2-97 builds this repository's queue as its own tool (`governance/project/orchestration/tools/`), which is right for now; an adopted product with streams needs it as a `gov` command. EXAMIN's copy runs one LITE ticket, which needs no queue.
 - **Order:** after W2-97 (measured in use here first), W2-115 (its attribution), W2-20 (its slots) and W2-27 (EXAMIN's copy).
+
+**D9-FATES (DEC-1083):** Merged into W2-115 by DEC-1083. S1 to S6, F1 and F2 moved to W2-115 as lines; S7 (review rounds counted) folds into W2-115's S11 (W-2); its `after-examin` tag is resolved with the merge.

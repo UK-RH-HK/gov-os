@@ -1,0 +1,24 @@
+# Lens B's Q11 (Table 2): "fusion.py 53–70 (search); retrieve.py 130–140": two callers, each its own entry. My
+# reading: the source is the calling line in each (fusion.py 62, inside search; retrieve.py 135, inside retrieve).
+# Entry 1 re-anchored (the CTO's decision, 2026-11-03, P2), decided from the code: W2-13's 44993791 (2026-11-01)
+# changed search's calling line, so its old heading was found nowhere and the measure fell back to lines 62, no longer
+# the call (D-4b measure 1 judged Q11 against that stale anchor). The fact is unchanged: search calls rrf, now at
+# fusion.py line 63. The question, the gold answer and the question's commit are kept; the answer's line numbers and
+# routes are as of that commit (at f1a01dfe2f38: fusion.py 63, retrieve.py 195, and W2-92's code route fused too when
+# the question names a symbol).
+id: Q11
+category: callers
+commit: 23079f92a6fa
+ids: [rrf]
+question: Who calls rrf?
+gold_answer: >-
+  Two callers: search in src/gov/retrieval/fusion.py (line 62) and retrieve in src/gov/retrieval/retrieve.py
+  (line 135), which fuses the lexical, semantic and closure routes.
+sources:
+  - path: src/gov/retrieval/fusion.py
+    heading: '    fused = rrf({name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()})'
+    lines: [63, 63]
+    commit: f1a01dfe2f38
+  - path: src/gov/retrieval/retrieve.py
+    heading: "    fused = rrf(routes)"
+    lines: [135, 135]

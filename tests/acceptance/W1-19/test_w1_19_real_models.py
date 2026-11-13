@@ -7,7 +7,8 @@ the reason, when one is absent; nothing is installed or downloaded by a test (th
 offline). The calls run in this machine's own environment, so ``gov`` starts the real ``ollama serve`` and, as
 DEC-261 decides, leaves it running.
 
-The default reranker is a process of its own, started from ``~/.local/share/gov-os/reranker-venv`` (DEC-397). One
+The default reranker is a process of its own, started from ``~/.local/share/gov-os/reranker-venv`` (DEC-397): since
+DEC-982 (W2-112) that process is the one shared reranker service, listening at ``~/.cache/gov-os/rerank.sock``. One
 case holds that with the real reranker and no index; it needs neither Ollama nor ``sqlite_vec``.
 
 **Run this file alone**, never beside another suite: the ticket is heavy, and the timed case is a latency case
@@ -27,6 +28,9 @@ summary whether the case passes or fails.
 """
 
 from __future__ import annotations
+
+import os
+from pathlib import Path
 
 import pytest
 
@@ -68,13 +72,66 @@ RERANK_CANDIDATES = [
                        ("tides", "The harbour pilot reads the tide tables at dawn."))
 ]
 
+# The shared reranker service's socket, under the home folder (docs/research/W2-112-shared-reranker.md §1, "Socket";
+# W2-112's README, "The service's socket").
+SERVICE_SOCKET_REL = Path(".cache/gov-os/rerank.sock")
+_LISTENS = 0x00010000  # __SO_ACCEPTCON in /proc/net/unix's Flags column: the socket listens (accepted ones do not)
+
+
+def _service_processes(socket_path):
+    """``{pid: argv}`` of every process holding the socket that listens at ``socket_path``; empty when none does.
+
+    The service as W2-112's README says it is seen from outside: the socket listening at its path in
+    ``/proc/net/unix`` (its inode), then the processes that hold that inode among their open files (``/proc/<pid>/fd``).
+    Nothing is sent on the socket. The launch sandbox's own network and process namespaces hide both, so outside it
+    only (the CTO's run)."""
+    wanted = os.path.normpath(str(socket_path))
+    inodes = set()
+    try:
+        with open("/proc/net/unix", encoding="utf-8", errors="replace") as handle:
+            next(handle, None)
+            for line in handle:
+                fields = line.split(None, 7)  # Num RefCount Protocol Flags Type St Inode Path
+                if len(fields) == 8 and fields[7].strip() == wanted and int(fields[3], 16) & _LISTENS:
+                    inodes.add(f"socket:[{fields[6]}]")
+    except (OSError, ValueError):
+        return {}
+    found = {}
+    for entry in os.listdir("/proc") if inodes else ():
+        if not entry.isdigit():
+            continue
+        try:
+            fds = os.listdir(f"/proc/{entry}/fd")
+        except OSError:
+            continue
+        for fd in fds:
+            try:
+                held = os.readlink(f"/proc/{entry}/fd/{fd}") in inodes
+            except OSError:
+                continue
+            if held:
+                try:
+                    with open(f"/proc/{entry}/cmdline", "rb") as handle:
+                        argv = [part.decode("utf-8", "replace") for part in handle.read().split(b"\0") if part]
+                except OSError:
+                    break
+                found[int(entry)] = argv
+                break
+    return found
+
 
 @pytest.mark.needs("reranker")
 def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment(api):
-    # DEC-397 and ADR-0002 §2. No `reranker` is given, in this machine's own environment: the default scores the
-    # candidates in a process started with the interpreter of ~/.local/share/gov-os/reranker-venv, never one of the
-    # workbench, and the calling process loads none of the reranker's libraries. How the two processes talk to each
-    # other is not looked at.
+    # DEC-397 and ADR-0002 §2, as DEC-982 (W2-112) and W2-145 have them today. No `reranker` is given, in this
+    # machine's own environment: the default scores the candidates in a process of its own started with the
+    # interpreter of ~/.local/share/gov-os/reranker-venv, never one of the workbench, and that process is the one
+    # shared reranker service, whether this call started it or it was already running; the calling process loads
+    # none of the reranker's libraries. The service is found by its socket (`_service_processes`); what is said on
+    # the socket is not looked at.
+    #
+    # Rewrite-Reason: DEC-982: one shared reranker service serves every session (W2-112; W2-145 removes the private
+    # one), so a call made while it runs starts no process under the caller. Before, the case asked for a process
+    # started from the reranker environment *under the calling process*, which is red whenever the service is up.
     outcome = api.run([(support.RERANK, "rerank", (RERANK_QUERY, RERANK_CANDIDATES), {})], env=api.real_env(),
                       watch=True, timeout=support.MEASURE_TIMEOUT_S)
     call = outcome.calls[0]
@@ -93,12 +150,24 @@ def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_
         "process of its own (ADR-0002 §2)"
     started = [peak["argv"] for peak in outcome.peaks if not peak["self"]]
     interpreter = support.reranker_python()
-    assert any(support.started_from(peak, interpreter) for peak in outcome.peaks if not peak["self"]), \
-        f"no process started with {interpreter} was seen under the calling process (DEC-397): {started}"
+    socket_path = Path.home() / SERVICE_SOCKET_REL
+    service = _service_processes(socket_path)
+    assert service, \
+        f"no process listens at the shared reranker's socket {socket_path} after a default rerank (DEC-982): the " \
+        f"default reranker is the shared service; processes seen under the calling process: {started}"
+    for pid, argv in service.items():
+        assert support.started_from({"argv": argv}, interpreter), \
+            f"the shared reranker service (pid {pid}) was not started with {interpreter} (DEC-397): {argv}"
+        assert not any(support.WORKBENCH_NAME in part for part in argv[:1]), \
+            f"the shared reranker service (pid {pid}) runs from the workbench (DEC-397): {argv}"
+    service_argv = {tuple(argv[:4]) for argv in service.values()}  # a peak keeps its process's first four arguments
     for peak in outcome.peaks:
         if not peak["self"] and support.is_python(peak):
             assert support.started_from(peak, interpreter), \
                 f"a Python process was started from another interpreter than {interpreter}: {peak['argv']}"
+            assert tuple(peak["argv"]) in service_argv, \
+                f"a reranker process other than the shared service was started under the calling process " \
+                f"(DEC-982, W2-145): {peak['argv']}; the service: {service}"
         assert not any(support.WORKBENCH_NAME in part for part in peak["argv"][:1]), \
             f"a process was started from the workbench, where the S0b2 environment lives (DEC-397): {peak['argv']}"
 

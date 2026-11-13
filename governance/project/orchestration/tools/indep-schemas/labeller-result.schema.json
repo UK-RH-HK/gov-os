@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "labeller-result.schema.json",
+  "title": "The independent labeller's out/result.json (first version, W2-149; a brief may revise it with its own approval)",
+  "type": "object",
+  "required": ["labelled", "allow", "refuse"],
+  "properties": {
+    "labelled": {"type": "integer", "minimum": 0},
+    "allow": {"type": "integer", "minimum": 0},
+    "refuse": {"type": "integer", "minimum": 0},
+    "agree": {"type": "integer", "minimum": 0},
+    "disagree": {"type": "integer", "minimum": 0}
+  }
+}

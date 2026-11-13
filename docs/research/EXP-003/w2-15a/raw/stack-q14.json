@@ -1,0 +1,358 @@
+{
+ "question": "Q14",
+ "batch_tokens": 8000,
+ "stack_tokens": 24000,
+ "calls": [
+  {
+   "items": 20,
+   "tokens": 7892,
+   "rerank": "service",
+   "stopping": "BUDGET_EXHAUSTED_WITH_GAPS"
+  },
+  {
+   "items": 20,
+   "tokens": 6196,
+   "rerank": "service",
+   "stopping": "BUDGET_EXHAUSTED_WITH_GAPS"
+  },
+  {
+   "items": 20,
+   "tokens": 7925,
+   "rerank": "service",
+   "stopping": "BUDGET_EXHAUSTED_WITH_GAPS"
+  },
+  {
+   "items": 20,
+   "tokens": 7465,
+   "rerank": "service",
+   "stopping": "BUDGET_EXHAUSTED_WITH_GAPS"
+  }
+ ],
+ "batches": [
+  {
+   "items": 20,
+   "tokens": 7892
+  },
+  {
+   "items": 25,
+   "tokens": 7908
+  },
+  {
+   "items": 16,
+   "tokens": 7513
+  }
+ ],
+ "items": 61,
+ "tokens": 23313,
+ "complete": true,
+ "duplicate_hashes": 3,
+ "overlapping_spans": 25,
+ "gold_pieces": "1 of 9",
+ "spans": [
+  [
+   ".tickets/DAEO-0mab.md",
+   1,
+   45
+  ],
+  [
+   ".tickets/DAEO-0mab.md",
+   1,
+   69
+  ],
+  [
+   ".tickets/DAEO-0mab.md",
+   70,
+   86
+  ],
+  [
+   ".tickets/DAEO-0mab.md",
+   79,
+   86
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   1,
+   37
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   1,
+   91
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   34,
+   42
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   42,
+   42
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   43,
+   43
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   44,
+   45
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   45,
+   46
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   46,
+   47
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   47,
+   48
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   48,
+   50
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   50,
+   51
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   51,
+   52
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   52,
+   55
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   54,
+   60
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   60,
+   87
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   92,
+   98
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   96,
+   104
+  ],
+  [
+   ".tickets/DAEO-2bdu.md",
+   113,
+   122
+  ],
+  [
+   ".tickets/DAEO-arrl.md",
+   57,
+   62
+  ],
+  [
+   ".tickets/DAEO-arrl.md",
+   57,
+   65
+  ],
+  [
+   ".tickets/DAEO-s9qc.md",
+   63,
+   84
+  ],
+  [
+   ".tickets/DAEO-ym8a.md",
+   1,
+   36
+  ],
+  [
+   ".tickets/DAEO-ym8a.md",
+   1,
+   59
+  ],
+  [
+   ".tickets/DAEO-ym8a.md",
+   60,
+   72
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   8246,
+   8268
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   8251,
+   8256
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   8256,
+   8266
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   8266,
+   8268
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   9172,
+   9179
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   9627,
+   9642
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   12326,
+   12329
+  ],
+  [
+   "docs/assessment/2026-10/B-memory-retrieval.md",
+   172,
+   211
+  ],
+  [
+   "docs/assessment/2026-10/B-memory-retrieval.md",
+   196,
+   198
+  ],
+  [
+   "docs/changes/W2-49-CIT-P.md",
+   209,
+   225
+  ],
+  [
+   "docs/changes/W2-49-CIT-P.md",
+   209,
+   225
+  ],
+  [
+   "docs/close/DAEO-0rfi/CL-DAEO-0rfi.md",
+   2703,
+   2717
+  ],
+  [
+   "docs/close/DAEO-0rfi/CL-DAEO-0rfi.md",
+   2768,
+   2782
+  ],
+  [
+   "docs/close/DAEO-0rfi/CL-DAEO-0rfi.md",
+   2781,
+   2796
+  ],
+  [
+   "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+   2759,
+   2773
+  ],
+  [
+   "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+   2824,
+   2838
+  ],
+  [
+   "docs/close/DAEO-e82f/CL-DAEO-e82f.md",
+   2837,
+   2851
+  ],
+  [
+   "docs/close/DAEO-kl5e/CL-DAEO-kl5e.md",
+   2533,
+   2547
+  ],
+  [
+   "docs/close/DAEO-kl5e/CL-DAEO-kl5e.md",
+   2598,
+   2612
+  ],
+  [
+   "docs/close/DAEO-zflj/CL-DAEO-zflj.md",
+   2758,
+   2772
+  ],
+  [
+   "docs/close/DAEO-zflj/CL-DAEO-zflj.md",
+   2823,
+   2837
+  ],
+  [
+   "docs/plan/WAVE_2_REVISED_PLAN.md",
+   14,
+   50
+  ],
+  [
+   "docs/plan/WAVE_2_TRIAGE.md",
+   16,
+   31
+  ],
+  [
+   "docs/plan/WAVE_2_WBS.md",
+   150,
+   155
+  ],
+  [
+   "docs/plan/WAVE_2_WBS.md",
+   237,
+   267
+  ],
+  [
+   "docs/plan/WAVE_2_WBS.md",
+   322,
+   330
+  ],
+  [
+   "docs/plan/WAVE_2_WBS.md",
+   798,
+   817
+  ],
+  [
+   "docs/plan/tools/validate_w2.py",
+   162,
+   166
+  ],
+  [
+   "governance/project/orchestration/closes/W2-03-DAEO-ym8a.md",
+   1,
+   5
+  ],
+  [
+   "governance/project/orchestration/closes/W2-03-DAEO-ym8a.md",
+   4,
+   5
+  ],
+  [
+   "governance/project/orchestration/packages/INVESTIGATION-1-parts/D.md",
+   31,
+   31
+  ],
+  [
+   "governance/project/orchestration/packages/P1-ORCH-APPROVALS-1.md",
+   50,
+   53
+  ],
+  [
+   "governance/project/orchestration/packages/PLAN-GROWTH-1.md",
+   23,
+   39
+  ]
+ ]
+}

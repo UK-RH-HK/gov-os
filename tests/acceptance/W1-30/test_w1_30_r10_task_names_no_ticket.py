@@ -8,8 +8,8 @@ The cases are those of ``test_w1_30_r8_commits.py`` ("Commits that name no task"
 commit carries a ``Task:`` trailer, and what it names is no ticket file of the project. Two such names:
 
 - a mistyped id (``PROJ-cmtz`` for ``PROJ-cmts``), on a commit with the engineer's other trailers;
-- the id of a record that exists and is no ticket (``DEC-000``, the decision every fixture ticket names as
-  its source).
+- the id of a record that exists and is no ticket (``support.BASE_SOURCE``, the planted decision every fixture
+  ticket names as its source).
 
 Each commit changes one kind of path and nothing else:
 

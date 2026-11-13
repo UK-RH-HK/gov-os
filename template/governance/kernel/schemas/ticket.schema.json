@@ -1,9 +1,42 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "ticket",
-  "description": "Frontmatter of a ticket: the task contract (CAP-31.a) beside the fields tk writes. `type` and `status` are tk's own fields.",
+  "description": "Frontmatter of a ticket: the task contract (CAP-31.a) beside the fields tk writes. `type` and `status` are tk's own fields. A KPI line is a string or `{line, verify}` (DEC-1050 TPL-5); `non_goals`, `reads`, `needs` and `waits_on` are optional here, so every older ticket stays valid; the ready check requires the dependency fields on new tickets (DEC-1088).",
   "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
   "required": ["role", "allowed_paths", "kpis"],
+  "$defs": {
+    "kpi_line": {
+      "description": "A KPI line: the plain string, or the line with its observable check (`verify`: a command and its expected result, or a file and what it shows).",
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "required": ["line", "verify"],
+          "additionalProperties": false,
+          "properties": {
+            "line": { "type": "string", "minLength": 1 },
+            "verify": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "wait": {
+      "description": "What the ticket waits on: an id or record path as a string, or `{ref, reason}` with a one-line reason (the key is `ref`, never `on`, which YAML 1.1 reads as true).",
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "required": ["ref", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "ref": { "type": "string", "minLength": 1 },
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  },
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/ticket_id" },
     "deps": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/ticket_id" } },
@@ -24,10 +57,14 @@
       "type": "object",
       "required": ["success", "failure"],
       "properties": {
-        "success": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-        "failure": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        "success": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/kpi_line" } },
+        "failure": { "type": "array", "items": { "$ref": "#/$defs/kpi_line" } }
       }
     },
+    "non_goals": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "reads": { "$ref": "#/$defs/paths" },
+    "needs": { "$ref": "#/$defs/paths" },
+    "waits_on": { "type": "array", "items": { "$ref": "#/$defs/wait" } },
     "profile": { "enum": ["LITE", "STANDARD", "FULL"] },
     "sources": { "type": "array", "items": { "type": "string", "minLength": 1 } },
     "est_loc": { "type": "integer", "minimum": 0 },

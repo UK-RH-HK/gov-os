@@ -54,6 +54,15 @@ def test_status_is_one_of_the_wave_1_operations(empty_project, sandbox):
 # excused; once the lists record it, the excuse changes nothing.
 EXCUSED_UNTIL_RECORDED = ("release",)
 
+# DEC-1163 (6) B (W2-182, DAEO-5y8d; DEC-1156 (7)): four approved ``gov`` commands that ``gov --help`` offers and that
+# W1-07's support (outside this ticket's paths) does not list. Recorded here, one line each, in the form of DEC-542:
+#   adapters   (W2-23: its ticket's command; approved with the others by DEC-1163 (6) B),
+#   dispatch   (W2-121: DEC-1008 item 2, P1-DISPATCH-1 (a); DEC-1163 (6) B),
+#   session-watch (W2-159: DEC-1110; DEC-1163 (6) B),
+#   wait       (W2-160: DEC-1079; DEC-1163 (6) B).
+# Once W1-07's lines record them too, the overlap changes nothing.
+RECORDED_HERE = ("adapters", "dispatch", "session-watch", "wait")
+
 
 def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
     """Rewritten (DEC-542) from ``test_this_ticket_adds_no_command``, which pinned the three as found. Every
@@ -71,17 +80,43 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     so the recorded ``gov`` commands are four, not the three of the case's name, which W1-32's README map names
     and so stays as it is.
 
+<<<<<<< HEAD
     Revised for DEC-747 (W2-104): ``skilleval`` is recorded, so the recorded ``gov`` commands are five.
     """
     assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "skilleval", "telemetry"}, \
         RECORDED
+=======
+    Revised for W2-20 (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20's KPI adds ``resources`` to the
+    recorded ``gov`` commands; the set is still exact, and ``release`` is still excused until recorded (DEC-753).
+
+    Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite by a fresh test designer, DEC-491):
+    ``gov --help`` offers ``brief`` (W2-152, DEC-1088 (3)), ``links`` (W2-129, DEC-1074 (7)) and ``plan``
+    (W2-136, DEC-1088), approved commands the lists did not record, so the case failed on them. W1-07's lines
+    record them; the pinned set is still exact, any other unrecorded command still fails, a recorded command
+    gone from ``gov --help`` still fails, the module command is still none of ``gov``'s, and ``release`` alone
+    is still excused until recorded (DEC-753).
+
+    Revised for DEC-1163 (6) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; routed by
+    DEC-1156 (7)): the nightly of 2026-11-13 found ``gov --help`` offering ``adapters`` (W2-23), ``dispatch`` (W2-121,
+    the first, merge 787b097ac) and ``session-watch`` (W2-159) and ``wait`` (W2-160), four approved commands that
+    ``src/gov/check/commands.py`` records and W1-07's lines (outside this ticket's paths) do not, so the case failed on
+    ``['adapters', 'dispatch', 'session-watch', 'wait']``. They are recorded in this file's ``RECORDED_HERE`` and counted
+    as recorded in the ``gone`` and ``extra`` checks; the first assert still pins W1-07's own list exactly. The point is
+    kept: any other command ``gov`` offers that no list records still fails the case, a recorded command (the four
+    included) gone from ``gov --help`` still fails it, the module command is still none of ``gov``'s, and ``release``
+    alone is still excused until recorded (DEC-753).
+    """
+    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) - set(RECORDED_HERE) == {
+        "accept", "brief", "ci", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
+>>>>>>> w2/integrate
     assert tuple(NO_GOV_COMMAND) == ("lock",)
+    recorded = set(RECORDED) | set(RECORDED_HERE)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)
     assert set(cli_support.RESERVED_COMMANDS) <= set(commands), f"a Wave 1 operation is gone\n{run.describe()}"
-    gone = sorted(set(RECORDED) - set(commands))
+    gone = sorted(recorded - set(commands))
     assert not gone, f"a recorded command is gone from gov --help: {gone}\n{run.describe()}"
-    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(RECORDED) - set(EXCUSED_UNTIL_RECORDED))
+    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - recorded - set(EXCUSED_UNTIL_RECORDED))
     assert not extra, f"gov has commands the command list does not record: {extra}"
     assert not set(NO_GOV_COMMAND) & set(commands), f"the module command is offered by gov\n{run.describe()}"
 

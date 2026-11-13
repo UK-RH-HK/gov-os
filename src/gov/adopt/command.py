@@ -1,6 +1,6 @@
 """``gov adopt --lite`` as a command module (W1-41, DEC-090, DEC-517). The convention is in ``gov.cli.main``.
 
-``gov adopt --lite --stage <A0|A1|A2|A3|A4|A5|A6|A8> [--map <file>] [--verdict <path>]`` runs one stage of the
+``gov adopt --lite --stage <A0|A1|A2|A3|A4|A5|A6|A7|A8|A10> [--map <file>] [--verdict <path>]`` runs one stage of the
 adoption of the project, which commits its evidence record under ``governance/adoption/`` and refuses without the
 record of the stage before it. ``gov adopt`` without ``--lite`` stays reserved: the full transaction is Wave 3.
 """
@@ -10,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 ACT_PATHS = ("**",)  # A6 moves and A8 retires what the audited path map names, wherever it lies in the project
-STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
+STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A10")
 _parser = None  # the command's own parser, kept for the usage error of --lite without --stage
 
 

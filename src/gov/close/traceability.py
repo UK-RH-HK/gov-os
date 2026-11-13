@@ -10,27 +10,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-import yaml
-
 from gov.close.history import BASE_KEY  # DEC-482: with a base, only the commits after it are judged
+from gov.util.frontmatter import of_file as _frontmatter
 from gov.util.gitenv import git_env
-
-
-def _frontmatter(path: Path) -> dict | None:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    if not text.startswith("---"):
-        return None
-    end = text.find("---", 3)
-    if end < 0:
-        return None
-    try:
-        front = yaml.safe_load(text[3:end])
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
 
 
 def _closed_tickets(root: Path) -> list[dict]:

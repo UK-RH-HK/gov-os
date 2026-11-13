@@ -21,7 +21,7 @@ Written by the independent test designer (MR-3) before the implementation, from 
 |---|---|
 | 1 `test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | success 1 (the files' selection; the vector counts from the clone's store belong to the lead's measure record); success 2; success 3 (every tracked path under `template/` in exactly one namespace); failure 1; failure 3 (no namespace or two) |
 | 2 `test_every_namespace_states_one_of_the_two_values` | success 3 (the two values only; `semantic.EMBEDDED` is still the one exact value); failure 3 (another value); failure 4 (a free-text exception that stays in the map fails here) |
-| 3 `test_guard_outside_template_every_verdict_as_at_the_base` | success 4 (each file outside `template/` keeps its verdict); failure 2 |
+| 3 `test_guard_outside_template_every_verdict_as_at_the_base` | success 4 (each file outside `template/` keeps its verdict, except D-7's decided cut, below); failure 2 |
 
 These tests leave four things out:
 - the unchanged indexer code in success 3 and failure 4, which the close's diff shows (the ticket's
@@ -50,3 +50,58 @@ so it cannot pass with an empty set.
 - **Case 3 is a guard.** It passes at the base and must still pass after the change. It compares the selection's
   verdict for every tracked path outside `template/` under the repository's path map with the verdict under the
   base's path map, which it reads with `git show 9dc5288161c4:governance/project/path-map.yaml` into a temporary root.
+
+## Case 3 after D-7 (DEC-1052 M-4, DEC-1055 (3), DEC-1066 (3))
+
+D-7's path map (`9c080788`) takes 1,763 tracked files outside `template/` out of the vectors on purpose: `tests/**`
+(1,322), `docs/close/**` (18), `docs/checkpoints/**` (363), `docs/probes/**` (59) and lens B's report
+`docs/assessment/2026-10/B-memory-retrieval.md` (1). Case 3 turned red on them. It is revised so that D-7's cut is
+the only exception, written in the test (`D7_NOT_EMBEDDED`) as the decisions word it, never read from the path map.
+The cut is those five patterns, plus `fixtures/evaluation/**` (already not embedded at the base) and the overlay's four
+record folders (under `governance/`, which DEC-957's sets already leave out of the comparison).
+
+- Every file of the cut must be **not embedded** at the head (only that direction).
+- Every other compared file keeps its base verdict, in both directions, as before.
+- The case fails if the cut holds no tracked file.
+
+The case is red when the path map takes anything more out than D-7 decided, or when it puts a file of the cut back.
+Each of these was planted in a clone of `emg/d7` and turned the case red:
+- `docs` not embedded: 482 files moved;
+- `docs/adr/**` moved into `doc-records`: 3 files moved;
+- `gov-source` not embedded: 145 files moved;
+- `tests` embedded again: 1,322 files of the cut still embedded.
+
+**Added with the D-7 review's F5** (the CTO's `e44d6732`, under DEC-1066 (3)): W2-15a's raw measure output,
+`docs/research/EXP-003/w2-15a/raw/**` (19 tracked files), is in `evaluation-sources`, which is not embedded and not
+indexed, as lens B's report is. The cut names it, in the same direction only. Without it the case was red on
+`e44d6732`. A plant that moves another `docs/research/` folder out, here `docs/research/EXP-003/examin/**` put into
+`evaluation-sources`, stays red.
+
+**Added when G4 was extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's
+`363c1459`): `docs/research/memory-measure-audit/**` (3 tracked files) is in `evaluation-sources`, because its
+`VISIBLE.md` quotes the visible questions. The cut names it, in the same direction only. Without it the case was red on
+`363c1459`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 3 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: After a rebuild with the embedder, the kernel's own files under template/ have vectors: every role file (template/governance/kernel/roles/*.md)... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S2: Vendored code has no vector: template/governance/kernel/vendor/**, the kernel's copies of the vendored skills (template/governance/kernel/skill... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S3: The path map states it in its two valid values only: kernel-template says embedded, each new namespace says not embedded, and no namespace stat... | `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values`, `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S4: Nothing else moves: for every tracked path outside template/ the indexer's embedding verdict is the same at the head as at the ticket's base; b... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | the ticket's words |
+| S5: W2-61's measure is re-run after the change on the visible half, on a clone at the branch head with stores built by the pinned gov, and on a clo... | none: the measure's research record line (docs/research/W2-86-memory-measure.md) | designer |
+| F1: A vendored file, or a generated adapter copy, embedded. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| F2: A file outside template/ gains or loses its embedding. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | the ticket's words |
+| F3: A namespace states a value other than embedded or not embedded, or a tracked path under template/ falls in no namespace or in two. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | the ticket's words |
+| F4: The indexer changed to honour a free-text exception (DEC-694's two values stay). | `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | the ticket's words |
+| F5: A figure of the measure reported without the other, or the hidden half read or run. | none: the measure's research record line | designer |

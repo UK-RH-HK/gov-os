@@ -252,6 +252,40 @@ def test_a_message_that_names_the_root_and_a_route_is_not_a_copy(tmp_path):
     assert reported == [], f"a message that names the repository root was read as a whole-tree copy: {reported}"
 
 
+_WORKTREE_FORMS = '''
+import subprocess
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def worktrees():
+    """W2-61h's helper (w2_61h_support.worktrees, 15592622): a listing of git's worktree paths."""
+    done = subprocess.run(["git", "-C", str(REPO_ROOT), "worktree", "list", "--porcelain"], capture_output=True,
+                          text=True)
+    return [line[9:] for line in done.stdout.splitlines() if line.startswith("worktree ")]
+
+
+def test_a_shell_worktree_list(tmp_path):
+    subprocess.run("git worktree list --porcelain", shell=True, cwd=REPO_ROOT, check=True)
+
+
+def test_an_argv_worktree_add(tmp_path):
+    subprocess.run(["git", "-C", str(REPO_ROOT), "worktree", "add", "--detach", str(tmp_path / "copy")], check=True)
+
+
+def test_a_shell_worktree_add(tmp_path):
+    subprocess.run("git worktree add --detach " + str(tmp_path / "copy"), shell=True, cwd=REPO_ROOT, check=True)
+'''
+
+
+def test_git_worktree_is_a_copy_only_as_worktree_add(tmp_path):
+    """D-4's cut (DEC-1061): `git worktree add` of the root makes a checkout and is reported; `git worktree list`
+    (W2-61h's ``worktrees()``) reads git's records and copies nothing, in an argv list or a shell string."""
+    reported = sorted(function.name for function in check.whole_tree_copiers(_planted(tmp_path, _WORKTREE_FORMS)))
+    assert reported == ["test_a_shell_worktree_add", "test_an_argv_worktree_add"], reported
+
+
 def test_cp_r_and_tar_c_given_as_separate_argv_items_are_reported(tmp_path):
     """A widening (README, part B): the shell routes given as an argv list's separate items."""
     reported = sorted(function.name for function in check.whole_tree_copiers(_planted(tmp_path, _ARGV_ITEMS)))

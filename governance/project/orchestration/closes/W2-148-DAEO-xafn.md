@@ -1,0 +1,10 @@
+# W2-148 (DAEO-xafn) closed: merged, S15 passes after ACT-W2-148-S15-1 (39 of 39 lines), closed by DEC-953's practices (DEC-1132 (1)) as the owner asked (2026-11-13: close each merged ticket as the check finds it ready)
+
+- Merged into w2/integrate: w2/W2-148 with its tests, -f21, -f21-tests, -replay and -replay-tests branches
+- The FULL probe `docs/probes/DAEO-xafn/PR-DAEO-xafn.md`: 38 of 39 lines pass, S15 fail (FR-1: an (a) ACT could add a deny rule to the home settings, which the (a) after-check did not read)
+- The owner's DEC-1142 (4) (option 2) and `yes ACT-W2-148-S15-1 a3df8ff6` (DEC-1163 (5)): applied by the owner's operator, 4be656e70 (`Role: owner`): the home `~/.claude/settings*.json` a fixed class (b), `control: true`, in the operator's rule table; the install's `APPROVED` 3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815 (after ACT-OPERATOR-HOURS-3 Part B, 44a290a49 and d2431568a)
+- The narrow S15 re-judge (a fresh read-only independent auditor, on w2/integrate 02873772c7db): `docs/probes/DAEO-xafn/PR-DAEO-xafn-S15-rejudge.md`, S15 **pass**: the FR-1 plant (an ACT claimed and reviewed (a) adding `Read(**)` to the home deny list) refused at G6 from row `home-settings`, the home file unchanged; the installed `class-rules.yaml` equals the repository's (38ac2f2decce); `tests/acceptance/W2-148` + `tests/unit/operator` 654 passed, 0 failed; the FR-1 probe 2 passed. The other 38 lines carried from the FULL probe, not re-probed
+- The record is committed by the orchestrator (the auditor is read-only), so the scoped `gov close` would refuse it VERDICT_NOT_REVIEWER; the close is by DEC-953's practice
+- Rows: R-1 (the ACT review's F3: the home settings not among the (a) after-check's control files; only an unlisted (a) script write could reach them, which the dry run S12 refuses; out of scope); FR-2 to FR-5 and DECIDED-NOT-DONE row 87 (F6, F7) as the FULL probe recorded them
+- Waited on by: none
+- Closed: 2026-11-13, by the orchestrator under DEC-953 items 1 and 5, DEC-1132 (1)

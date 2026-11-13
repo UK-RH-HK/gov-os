@@ -1,0 +1,19 @@
+category: contract
+commit: cc9c94d42a54
+question: "A finding contradicts a closed specification: what do I put to the owner?"
+gold_answer: >-
+  A CIT-P whose impact assessment gives three costed options, apply now, defer or re-baseline; the owner chooses,
+  CIT-E records what was done, and every version of the specification is kept (CAP-33.e, DEC-105).
+sources:
+  - - path: docs/contract/CONTRACT_v4.md
+      heading: "  - `CAP-33.e` [W1] An experiment or finding that contradicts a closed specification opens a CIT-P whose impact assessment gives three costed options (apply now, defer, re-baseline); the owner chooses; CIT-E records what was done; every version of the specification is kept — DEC-105 · delivered by W1-35"
+      lines: [527, 527]
+    - path: docs/contract/contract.yaml
+      heading: "  - id: CAP-33.e"
+      lines: [1956, 1959]
+    - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-105 — Evidence-triggered change"
+      lines: [953, 962]
+    - path: template/governance/kernel/skills/change/SKILL.md
+      heading: "## Three costed options on contradiction"
+      lines: [34, 43]

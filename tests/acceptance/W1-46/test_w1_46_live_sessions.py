@@ -127,6 +127,9 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
               for rel in ("README.md", "experiments/spikes/exp-900/data.txt", *watch)}
     env = inherited(os.environ)
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
+    # The session runs under the real HOME (the CLI's login), so the gate reads this machine's own gate.json; the
+    # readings are planted with room to spare, so the machine's load does not shut it (W2-20 S19, DEC-1088 (5)(b)).
+    env.update(support.plant_open_gate(sandbox))
     run = support.run_gov(project, sandbox, "launch", role, support.TICKET_OF[role], "--",
                           "-p", prompt.replace("@OUTSIDE@", str(outside)).replace("@ROOT@", str(project)),
                           "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "8",

@@ -267,7 +267,8 @@ STORE = "legacy/memory/index.md"
 @pytest.mark.parametrize("kept,cited,record", [
     (".windsurfrules", STORE, None), (".cursorrules", f"./{STORE}", None), (".cursor/rules/vote.mdc", f"x/{STORE}", None),
     (".windsurfrules", f"[m](/{STORE})", None), (".cursorrules", f"../{STORE}", None),
-    (".windsurfrules", f"old{STORE}", "ACCEPTED"), (".windsurfrules", f"old{STORE}", "LINGERING")])
+    # W2-23 S3: a word character before the path is a citation now, so the rule of the record cases cites nothing
+    (".windsurfrules", "the minutes", "ACCEPTED"), (".windsurfrules", "the minutes", "LINGERING")])
 def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept, cited, record):
     write(root, STORE, "# Legacy memory\n")
     write(root, kept, f"Before a vote, read {cited}.\n")
@@ -285,22 +286,26 @@ def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept,
     tree = project.tree(root)
     error = refused("STORE_STILL_CITED", root, "A8", conf=conf)
     citer = {"record": "DEC-9", "path": "docs/dec-9.md", "cites": [STORE]} if record else {"rule": kept, "cites": [STORE]}
-    assert kept in error.details["rules_read"] and error.details["citers"] == [citer]
+    assert kept in error.details["rules_read"]
+    assert [{key: value for key, value in item.items() if key != "found"} for item in error.details["citers"]] == [citer]
     assert project.tree(root) == tree and project.dirty(root) == [] and (root / STORE).is_file()
 
 
 def test_a_batch_that_fails_is_rolled_back_and_the_batches_after_it_do_not_run(root):
-    planned(root, {"path": "lib/other.py", "action": "MOVE", "target": "pkg", "batch": 1},
-            {"path": "lib/util.py", "action": "MOVE", "target": "pkg/util.py", "batch": 2},
+    # batch 2's target lies under the file batch 1 makes (W2-23 S7: both targets are held by pkg/**)
+    planned(root, {"path": "lib/other.py", "action": "MOVE", "target": "pkg/other.py", "batch": 1},
+            {"path": "lib/util.py", "action": "MOVE", "target": "pkg/other.py/util.py", "batch": 2},
             {"path": "docs/old.md", "action": "DELETE_FROM_ACTIVE_TREE", "batch": 3})
     verdict(root)
     stage(root, "A5", verdict=VERDICT)
     error = refused("BATCH_FAILED", root, "A6")
     assert error.details["batch"] == 2 and error.details["done"] == [1]
-    assert sh(root, "log", "-1", "--format=%s") == "gov adopt --lite A6: batch 1"
-    assert sh(root, "rev-parse", "refs/gov/adoption/rollback/batch-2") == sh(root, "rev-parse", "HEAD")
+    # W2-23 S4: the A6 record (status: failed) is committed on batch 1, and the rollback ref is the run's own
+    assert sh(root, "log", "-2", "--format=%s").split("\n")[1] == "gov adopt --lite A6: batch 1"
+    point = f"refs/gov/adoption/rollback/{error.details['run_id']}/batch-2"
+    assert error.details["rollback_point"] == point and sh(root, "rev-parse", point) == sh(root, "rev-parse", "HEAD^")
     assert project.dirty(root) == [] and (root / "lib/util.py").is_file() and (root / "docs/old.md").is_file()
-    assert not (root / project.record_path("A6")).exists()
+    assert record(root, "A6")["status"] == "failed" and record(root, "A6")["failed_batch"] == 2
 
 
 def test_a_backup_ref_that_no_longer_resolves_stops_the_migration(root):

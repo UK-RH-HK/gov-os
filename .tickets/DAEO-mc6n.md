@@ -1,7 +1,7 @@
 ---
 id: DAEO-mc6n
-status: open
-deps: []
+status: closed
+deps: [DAEO-dy7j]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task
@@ -61,3 +61,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-83b), from the owner's decision of 2026-
 - **Files:** `docs/playbooks/K1-pinned-judge.md`, `K2-close-queue.md`, `K3-agents-know-what-to-do.md`, `K4-memory.md`, `K5-decision-pipeline.md`, `K6-sandbox-per-role.md`, `K7-releases-and-pins.md`, `K8-hooks-and-ci.md`, `K9-gate-run-audit-examin.md`. The `docs` namespace already holds the folder; no path map line is needed.
 - **Sources:** each keystone's purpose from `docs/plan/WAVE_2_REVISED_PLAN.md` §4.1 to §4.9; its tickets and block from `governance/project/orchestration/packages/REPLAN-W2.md` and the prompt's §3; its practices from annex D of STATE-OF-GOV-OS (committed with re-pin 3, DEC-940).
 - **Kept current:** once they exist, the orchestrator updates a playbook in the same commit as each new standing rule of its stream, beside the register, the prompt and the briefs (DEC-944 item 3).
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C.

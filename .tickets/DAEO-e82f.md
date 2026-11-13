@@ -1,7 +1,7 @@
 ---
 id: DAEO-e82f
 status: closed
-deps: []
+deps: [DAEO-kh9l]
 links: []
 created: 2026-10-21T07:33:34Z
 type: task

@@ -1,0 +1,20 @@
+# Re-anchored at c9742b08910a (D-10 run 2, DEC-1122 (3)): W2-20 S7 added a lock paragraph to watch.py's docstring, so
+# the watchdog's lines moved (16-17 -> 19-20, 41 -> 45, 46 -> 50). The facts (1800, 30 s) are unchanged.
+category: code-paraphrase
+commit: c9742b08910a
+question: "By default, how long may a store rebuild run before it counts as slow, and how often is its record rewritten after that?"
+gold_answer: >-
+  1800 seconds by default (slow_after_s, which the tree's governance/project/rebuild.yaml may set); past it the
+  watchdog flags the rebuild slow and writes its record at once, then at least every 30 seconds
+  (src/gov/rebuild/watch.py: SLOW_AFTER_S = 1800, EVERY_S = 30.0).
+sources:
+  - - path: src/gov/rebuild/watch.py
+      lines: [3, 4]
+    - path: src/gov/rebuild/watch.py
+      heading: "SLOW_AFTER_S = 1800"
+      lines: [45, 45]
+  - - path: src/gov/rebuild/watch.py
+      lines: [19, 20]
+    - path: src/gov/rebuild/watch.py
+      heading: "EVERY_S = 30.0  # the longest gap between two writes of a slow rebuild's record"
+      lines: [50, 50]

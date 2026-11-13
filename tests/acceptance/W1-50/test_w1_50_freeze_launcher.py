@@ -253,6 +253,8 @@ def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(kernel_free
                                                     stop), daemon=True)
     env = inherited(os.environ)
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
+    # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
+    env.update(launch_support.plant_open_gate(sandbox))
     watcher.start()
     try:
         run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER], "--",

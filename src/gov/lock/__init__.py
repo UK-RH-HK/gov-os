@@ -22,6 +22,8 @@ from pathlib import Path
 
 import yaml
 
+from gov.util.digest import sha256_file
+
 LOCK_REL = "governance/framework.lock"
 KERNEL_REL = "governance/kernel"
 ANSWERS_REL = ".copier-answers.yml"
@@ -112,13 +114,6 @@ def _is_shipped(rel: str) -> bool:
     return any(rel == path or rel.startswith(path + "/") for path in SHIPPED_PATHS)
 
 
-def _sha256(path: Path) -> str | None:
-    try:
-        return hashlib.sha256(path.read_bytes()).hexdigest()
-    except OSError:
-        return None
-
-
 def _executable(path: Path) -> bool | None:
     try:
         return bool(os.stat(path).st_mode & stat.S_IXUSR)
@@ -203,7 +198,7 @@ def compare(root: Path) -> Comparison:
     drifted = set()
     for rel, recorded in manifest.items():
         rel = str(rel)
-        actual = _sha256(root / rel)
+        actual = sha256_file(root / rel)
         if actual is None or actual != recorded or _executable(root / rel) != (rel in executable):
             drifted.add(rel)
         if released is not None and _is_shipped(rel) and released.get(rel) != recorded:
@@ -243,7 +238,7 @@ def write(root: Path, release: tuple[str, bytes] | None = None) -> Path:
         lock["release"] = {"version": version, "manifest_sha256": hashlib.sha256(data).hexdigest(),
                            "manifest": base64.b64encode(data).decode("ascii")}
     lock["shipped_paths"] = list(SHIPPED_PATHS)
-    lock["manifest"] = {rel: _sha256(root / rel) for rel in installed_files}
+    lock["manifest"] = {rel: sha256_file(root / rel) for rel in installed_files}
     unreadable = sorted(rel for rel, digest in lock["manifest"].items() if digest is None)
     if unreadable or not any(rel.startswith(KERNEL_REL + "/") for rel in installed_files):
         raise LockError(f"cannot hash the kernel files {unreadable}" if unreadable else f"no file under {KERNEL_REL}/")

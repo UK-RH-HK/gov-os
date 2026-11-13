@@ -42,10 +42,13 @@ def _rebuild(root, monkeypatch):
 
 
 def test_without_the_variable_the_machine_default_is_used(tmp_path, monkeypatch):
+    """The machine's default is each tree's own lock (W2-20 S7, DEC-1001 (d))."""
     monkeypatch.delenv(watch.ENV_LOCK, raising=False)
-    assert watch.settings(tmp_path) == (1800, MACHINE, "default")
+    own = watch.tree_lock(tmp_path)
+    assert own != MACHINE and own.startswith(MACHINE[:-len(".lock")] + "-")
+    assert watch.settings(tmp_path) == (1800, own, "default")
     _settings(tmp_path, "slow_after_s: 60\n")
-    assert watch.settings(tmp_path) == (60, MACHINE, "default")
+    assert watch.settings(tmp_path) == (60, own, "default")
 
 
 def test_the_variable_replaces_the_machine_default(tmp_path, monkeypatch):
@@ -99,7 +102,8 @@ def test_the_default_source_is_named_in_the_result(tmp_path, monkeypatch):
     monkeypatch.delenv(watch.ENV_LOCK, raising=False)
     monkeypatch.setattr(watch, "LOCK", str(tmp_path / "machine.lock"))  # never the machine's own lock
     result = _rebuild(tmp_path, monkeypatch)
-    assert result["lock"]["path"] == str(tmp_path / "machine.lock") and result["lock"]["source"] == "default"
+    assert result["lock"]["path"] == watch.tree_lock(tmp_path) and result["lock"]["source"] == "default"
+    assert result["lock"]["path"].startswith(str(tmp_path / "machine-"))  # the tree's own, under the patched base
 
 
 def test_a_lock_named_by_the_variable_that_cannot_be_opened_refuses(tmp_path, monkeypatch):

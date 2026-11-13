@@ -33,6 +33,24 @@ kpis:
 profile: LITE
 sources:
 - DEC-729
+- DEC-1032
+- DEC-1033
+- DEC-1037
+- DEC-1038
+- DEC-1039
+- DEC-1040
+- DEC-1045
+- DEC-1050
+- DEC-1052
+- DEC-1055
+- DEC-1061
+- DEC-1063
+- DEC-1066
+- DEC-1067
+- DEC-1069
+- DEC-1073
+- DEC-953
+- DEC-968
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files (the exit report)'

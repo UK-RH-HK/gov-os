@@ -65,13 +65,17 @@ class Actor:
     subagent: str | None = None   # agent_type; None on the main thread
     agent_id: str | None = None
     session_id: str = support.SESSION_ID
+    ticket: str = TICKET          # GOV_TICKET of the session
 
     def hook(self):
-        return {"role": self.role, "ticket": TICKET, "subagent": self.subagent, "agent_id": self.agent_id,
+        return {"role": self.role, "ticket": self.ticket, "subagent": self.subagent, "agent_id": self.agent_id,
                 "session_id": self.session_id}
 
 
 ORCHESTRATOR_MAIN = Actor(ORCHESTRATOR)
+# The CTO (DEC-957, DEC-971 item 4): the orchestrator on the coordination ticket the fixture's roster names. Only its
+# install is asked of the owner, so only its declined prompt leaves an install call behind (DEC-980).
+CTO_MAIN = Actor(ORCHESTRATOR, ticket=support.ORCHESTRATOR_TICKET_ID)
 ENGINEER_MAIN = Actor(ENGINEER)
 ENGINEER_SUBAGENT = Actor(ORCHESTRATOR, ENGINEER, ENGINEER_AGENT)
 
@@ -156,7 +160,7 @@ LEFT_BEHIND = {
     "orchestrator-main-thread-then-an-engineer-subagent": (
         ORCHESTRATOR_MAIN, "ls -la", "allow", False, ENGINEER_SUBAGENT),
     "install-ask-the-owner-declined-then-an-engineer-subagent": (
-        ORCHESTRATOR_MAIN, "pip install requests", "ask", True, ENGINEER_SUBAGENT),
+        CTO_MAIN, "pip install requests", "ask", True, ENGINEER_SUBAGENT),
     "designer-subagent-that-has-ended-then-the-engineer-s-main-thread": (
         Actor(ENGINEER, DESIGNER, DESIGNER_AGENT), "ls -la", "allow", False, ENGINEER_MAIN),
     "engineer-subagent-then-the-engineer-s-main-thread": (

@@ -216,9 +216,24 @@ def base_yaml_model() -> ContractModel:
     return yaml_model(read_base(CONTRACT_YAML))
 
 
+def version_key(version: str) -> tuple[int, ...] | None:
+    """``"4.3"`` as ``(4, 3)``, compared as numbers (so 4.10 is after 4.9); None for anything else."""
+    if not re.fullmatch(r"\d+(?:\.\d+)*", str(version or "").strip()):
+        return None
+    return tuple(int(part) for part in str(version).strip().split("."))
+
+
+def is_v42_or_later(version: str) -> bool:
+    key = version_key(version)
+    return key is not None and key >= (4, 2)
+
+
 def require_v42(model: ContractModel) -> None:
-    assert model.version == "4.2", (
-        f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+    """The Contract is version 4.2 or later: 4.2's text, kept in every later version, is what these tests read."""
+    # Rewrite-Reason: DEC-1093 (1) — Contract 4.3 (V (i)): "version 4.2" becomes "4.2 or later", by a numeric
+    # comparison (4.3 and a later 4.4 pass, 4.1 fails), for all 32 callers in one place; each caller keeps its check.
+    assert is_v42_or_later(model.version), (
+        f"the Contract's {model.source} file is version {model.version!r}, not 4.2 or later: "
         "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
     )
 
@@ -455,3 +470,29 @@ def record_shape(body: str, cap_id: str, item: str, parent: str, parent_title: s
 
 def capability_record_paths() -> list[Path]:
     return sorted((ROOT / CAPABILITIES).glob("*.md"))
+
+
+# --------------------------------------------------------------------------
+# Added for Contract 4.3 (W2-140; DEC-1093 (1), the approved W2-27-CIT-P §5)
+
+# A fixed commit holding Contract 4.2 as W2-49 applied it (W2-49's apply commit), never a branch: the
+# reference for "the 4.0, 4.1 and 4.2 entries and rows are kept unchanged" in every later version (CAP-33.e).
+V42_COMMIT = "90c4d20ac687"
+
+# What DEC-1093 (1) moves (V (i), A (i)): the covers item CAP-45.a and the capability CAP-45, W2 -> W3.
+COVERS_MOVED_BY_DEC_1093 = {"CAP-45.a": ("W2", "W3")}
+CAPABILITIES_MOVED_BY_DEC_1093 = {"CAP-45": ("W2", "W3")}
+
+# The 4.3 change-log entry and change-table row cite the note, the owner's approval and the two decisions
+# it carries (the note's §5.1 and §5.2, with DEC-OWNER = DEC-1093).
+V43_CITES = {"W2-27-CIT-P": r"W2-27-CIT-P", "DEC-1093": r"DEC-1093(?!\d)", "DEC-1089": r"DEC-1089(?!\d)",
+             "DEC-1090": r"DEC-1090(?!\d)"}
+
+# APPLY_DATE is not known before the apply; a case asks no more than a date on or after the approval.
+APPROVED_ON = "2026-11-07"
+
+
+def iso_date_on_or_after(value, day: str = APPROVED_ON) -> bool:
+    """A ``YYYY-MM-DD`` (as text, or as the date YAML reads it) on or after ``day``."""
+    text = str(value or "").strip().strip("'\"")
+    return re.fullmatch(r"\d{4}-\d{2}-\d{2}", text) is not None and text >= day

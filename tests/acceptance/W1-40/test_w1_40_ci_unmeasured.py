@@ -43,11 +43,11 @@ def test_the_tests_step_says_unmeasured_and_fails_where_pytest_is_not_on_the_run
 
 def test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner(
         project, pushed, machine, ci):
-    """``gov check`` itself reports the absent tool as YELLOW and ends with exit 0 (W1-26). The job does not
-    take that for green (DEC-494: never green; DEC-497 replaces "take the yellow")."""
+    """``gov check`` itself reports the absent tool as RED and ends with a non-zero exit (P-W2-45-1 item 5). The job
+    does not take that for green (DEC-494: never green; DEC-497 replaces "take the yellow")."""
     done, statuses = _statuses(project, machine(openspec=False))
-    assert done.returncode == 0 and statuses.get(OPENSPEC_CHECK) == "YELLOW", (
-        f"the fixture does not hold: gov check without openspec is not exit 0 with {OPENSPEC_CHECK} YELLOW: "
+    assert done.returncode != 0 and statuses.get(OPENSPEC_CHECK) == "RED", (
+        f"the fixture does not hold: gov check without openspec is not a non-zero exit with {OPENSPEC_CHECK} RED: "
         f"{statuses}\n{support.said(done)}")
     assert ci().green, "the fixture is not green on a runner that has openspec"
     result = ci(openspec=False)

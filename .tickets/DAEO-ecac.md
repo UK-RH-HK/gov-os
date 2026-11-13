@@ -1,7 +1,7 @@
 ---
 id: DAEO-ecac
 status: open
-deps: []
+deps: [DAEO-cv58, DAEO-r9ss]
 links: []
 created: 2026-10-29T15:55:51Z
 type: task
@@ -25,20 +25,22 @@ allowed_paths:
 - src/gov/guard/decide.py
 kpis:
   success:
-  - 'When a launched session ends, whatever its exit (DEC-392''s signals included), the launcher writes one record keyed by its session id: model (the main session''s and each subagent''s), effort, window, tokens (input, output, cache creation, cache read), cost, minutes, turns, subagents (count and model) and every rate-limit event; role, ticket and task class come from W2-60a''s launch record [CAP-36.a lite, DEC-838 item 3, lens F R6]'
-  - 'Each value comes from the harness''s own record of that session (its session log, through W1-31''s reader, and the result line when the session ran with --output-format json), with its source named; a value those forms do not give is not measured, with the reason, never zero or a guess [DEC-655, DEC-495]'
-  - 'Counts only, never content: no text of the session''s log reaches the record, the Claude Code version excepted [DEC-495]'
-  - 'The window recorded is the one the session ran with, as its log states it (1M for Opus 5.5), and each compaction is counted [DEC-838 items 1 and 2]'
-  - 'A record that cannot be written leaves the session''s exit code as it is, with one line on stderr naming it; a record is written whole or not at all [DEC-392]'
-  - 'W2-07''s close can join it: the record''s path and keys are stated in the CIT-E, and a test reads a record back by ticket and session id; pass or fail and the repair count stay the close''s [CAP-36.a lite, lens F R6]'
-  - 'The launcher''s set of launchable roles (today the fixed WORKER_ROLES and OWN_TICKET_ROLES tuples in launcher.py) is read from the kernel''s role files, so a new role is a file, not a code change; a role file that is missing or unreadable refuses the launch; the five roles launch exactly as before [DEC-946 (W3-P09), DEC-826 Q1]'
-  - 'A role named in a ticket but with no role file is refused at launch, naming the role [DEC-946 (W3-P09)]'
-  - '`qa-engineer` is a known role: it is in the guard''s KNOWN_ROLES (`src/gov/guard/decide.py`, that set only) and in the reviewer set the session record and launcher read, so a QA engineer is held to rule 5 (it writes only its findings report); this repository''s own hook''s reviewer line is prepared beside it as an owner ACT, not changed here [DEC-959 item 3, DEC-953 item 2]'
-  - '`gov launch` refuses a second writing session in a worktree that has one live (read from the session records), naming it; a reviewer or the QA engineer, which write only their reports, are not counted; `gov launch --tests-worktree` makes a ticket''s tests worktree on its own branch from the ticket''s head [DEC-847, DEC-963, DEC-983, DEC-982]'
+  - 'When a launched session ends, whatever its exit (DEC-392''s signals included), the launcher writes one record keyed by its session id: model (the main session''s and each subagent''s), effort, window, tokens (input, output, cache creation, cache read), cost, minutes, turns, subagents (count and model) and every rate-limit event; role, ticket and task class come from W2-60a''s launch record Verify: planted launches that end by exit 0, by a non-zero exit and by DEC-392''s signal: each leaves one record keyed by its session id holding every listed key (a planted rate-limit event included), with role, ticket and task class taken from W2-60a''s launch record [CAP-36.a lite, DEC-838 item 3, lens F R6]'
+  - 'Each value comes from the harness''s own record of that session (its session log, through W1-31''s reader, and the result line when the session ran with --output-format json), with its source named; a value those forms do not give is not measured, with the reason, never zero or a guess Verify: a planted session log: each value in the record names its source; a value the log does not give is "not measured" with its reason and is never 0 [DEC-655, DEC-495]'
+  - 'Counts only, never content: no text of the session''s log reaches the record, the Claude Code version excepted Verify: a planted log holding one unique sentence: a grep of the record for it finds 0 hits; the Claude Code version is present [DEC-495]'
+  - 'The window recorded is the one the session ran with, as its log states it (1M for Opus 5.5), and each compaction is counted Verify: a planted log of a 1M-window session with three compactions: the record states the 1M window and 3 compactions [DEC-838 items 1 and 2]'
+  - 'A record that cannot be written leaves the session''s exit code as it is, with one line on stderr naming it; a record is written whole or not at all Verify: a planted unwritable record path: the session''s exit code is unchanged, stderr holds one line naming the record, and no part of a record is left on disk [DEC-392]'
+  - 'W2-07''s close can join it: the record''s path and keys are stated in the CIT-E, and a test reads a record back by ticket and session id; pass or fail and the repair count stay the close''s Verify: the CIT-E states the record''s path and keys; a unit test writes a record and reads it back by ticket and session id through them [CAP-36.a lite, lens F R6]'
+  - 'The launcher''s set of launchable roles (today the fixed WORKER_ROLES and OWN_TICKET_ROLES tuples in launcher.py) is read from the kernel''s role files, so a new role is a file, not a code change; a role file that is missing or unreadable refuses the launch; the five roles launch exactly as before Verify: a planted kernel role file for a sixth role launches with no code change; a planted missing or unreadable role file refuses the launch; the five roles launch as before (the existing launcher tests pass unchanged) [DEC-946 (W3-P09), DEC-826 Q1]'
+  - 'A role named in a ticket but with no role file is refused at launch, naming the role Verify: a planted ticket naming a role with no role file: `gov launch` refuses and its message names the role [DEC-946 (W3-P09)]'
+  - '`qa-engineer` is a known role: it is in the guard''s KNOWN_ROLES (`src/gov/guard/decide.py`, that set only) and in the reviewer set the session record and launcher read, so a QA engineer is held to rule 5 (it writes only its findings report); this repository''s own hook''s reviewer line is prepared beside it as an owner ACT, not changed here Verify: a unit test: `qa-engineer` is in KNOWN_ROLES and in the reviewer set, and its planted write outside its findings report is refused; `git diff` shows only that set changed in `decide.py` and this repository''s own hook unchanged [DEC-959 item 3, DEC-953 item 2]'
+  - '`gov launch` refuses a second writing session in a worktree that has one live (read from the session records), naming it; a reviewer or the QA engineer, which write only their reports, are not counted; `gov launch --tests-worktree` makes a ticket''s tests worktree on its own branch from the ticket''s head Verify: a planted live writing session record in a worktree: a second writing launch is refused naming it; a planted reviewer or QA engineer session is not counted; `gov launch --tests-worktree` makes a worktree on its own branch at the ticket''s head [DEC-847, DEC-963, DEC-983, DEC-982]'
+  - 'The session record carries RUBRIC-2''s three keys: the tier (opus, sonnet, haiku or other, derived from the model''s name), the ticket''s criticality class (C0 to C3) and any promotion reason, the last two read from W2-60a''s launch record; each is null when it is not given, never a guess. Verify: a planted launch with a promotion: the record holds all three; a planted launch without one: the three keys are present and null [DEC-1120 (3)] [added, DEC-1120 (5)]'
+  - 'Routed from W2-33 (its S5, DEC-1156 (3)): the launcher refuses to start a second writing session in a worktree where a writing session is live, naming the worktree; read-only sessions are not refused. Verify: a planted live writing session record in a worktree, then a launch of another writing role into it: refused, the message names the worktree; the same launch of a read-only reviewer starts [DEC-847, DEC-963, DEC-983, DEC-1156 (3)]'
   failure:
-  - A fixed list of launchable roles left in code.
-  - A value the log does not hold reported as measured; a zero for not measured; log text in a record.
-  - A changed exit code; a session that started with no record.
+  - 'A fixed list of launchable roles left in code. Verify: a search of `launcher.py` finds no fixed WORKER_ROLES or OWN_TICKET_ROLES tuple; the S7 planted sixth role launches with no code change'
+  - 'A value the log does not hold reported as measured; a zero for not measured; log text in a record. Verify: planted logs with no cost value and with a log sentence: the record shows not measured (no 0 for it) and holds 0 hits of the sentence'
+  - 'A changed exit code; a session that started with no record. Verify: a planted record-write failure leaves the session''s exit code as it was; after each planted launch (one ended early included) a record exists for its session id'
 profile: STANDARD
 sources:
 - DEC-946
@@ -54,12 +56,19 @@ sources:
 - DEC-957
 - DEC-959
 - DEC-983
+- CAP-36.a
+- DEC-847
+- DEC-953
+- DEC-963
+- DEC-982
+- DEC-1120
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/
   author: independent-test-designer (MR-3); written before implementation
 track: A
-list_rows: []
+list_rows:
+- W3-P09
 ---
 # W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents
 
