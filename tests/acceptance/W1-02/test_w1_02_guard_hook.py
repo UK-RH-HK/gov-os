@@ -48,10 +48,15 @@ def test_guard_decides_before_the_tool_runs(project, call):
 
 @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
 def test_decision_p95_is_under_100_ms(project, write, name):
-    """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
 
-    p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
-    up to three rounds, so a single stall of the machine does not fail the KPI.
+    Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+    under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+    cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+    ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+    decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+    (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+    beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
     """
     role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
     if frozen:
@@ -59,18 +64,25 @@ def test_decision_p95_is_under_100_ms(project, write, name):
     for _ in range(LATENCY_WARM_UP):
         write(project, relpath, role, ticket)
     rounds = []
+    wall_rounds = []
     for _ in range(LATENCY_ROUNDS):
         samples = []
+        wall_samples = []
         for _ in range(LATENCY_SAMPLES):
             result = write(project, relpath, role, ticket)
             assert result.decision == expected, (
                 f"the timed call was not decided as expected ({expected}): {result.describe()}"
             )
-            samples.append(result.seconds)
+            assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+            samples.append(result.cpu_seconds)
+            wall_samples.append(result.seconds)
         rounds.append(support.p95(samples))
+        wall_rounds.append(support.p95(wall_samples))
         if rounds[-1] < LATENCY_BOUND_S:
             break
     assert min(rounds) < LATENCY_BOUND_S, (
-        "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
-        + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        "p95 CPU time of the hook and its children per call, per round (ms): "
+        + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+        + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+        + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
     )
