@@ -2,6 +2,9 @@
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
+- **Purpose:** implement one ticket to fulfil the spec and its KPIs, with builder tests as regression evidence. A
+  session runs as `GOV_ROLE=engineer`, started with `gov launch engineer <ticket>` on an `in_progress` ticket whose
+  `role` is engineer.
 - **Version:** 1.1.0
 - **Launch default:** model claude-sonnet-5-5, effort high
 - **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
@@ -9,9 +12,6 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 - **Model tier:** see Launch default
 - **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
 - **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
-- **Purpose:** implement one ticket to fulfil the spec and its KPIs, with builder tests as regression evidence. A
-  session runs as `GOV_ROLE=engineer`, started with `gov launch engineer <ticket>` on an `in_progress` ticket whose
-  `role` is engineer.
 - **Allowed paths:** the `allowed_paths` of its own `in_progress` ticket, plus `.gov-runtime/scratch/**` (DEC-108).
   Never `tests/acceptance/**`: the guard refuses it also when a ticket names it (MR-3, DEC-069). In a launched
   session the `Edit` deny rules also close `.tickets/**`, `.claude/**` (DEC-315) and `.gov-runtime/**` other than
