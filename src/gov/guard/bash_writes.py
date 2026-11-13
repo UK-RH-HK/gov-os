@@ -113,7 +113,9 @@ def heredocs(command, comments=None):
     anything the scan cannot read for certain."""
     out, bodies, pending = [], [], []
     # The shell's contexts: "top"; '"' (double quotes); "$(" (a command substitution, whose quoting starts
-    # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic).
+    # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic); "${" (a
+    # parameter expansion, quoted or not: a # in it starts no comment, the first plain } closes it, a nested ${
+    # nests, quotes pair as outside it, and a << in it is text; APOS-3, DEC-1174 (1)).
     stack = [["top", 0]]
     i, n = 0, len(command)
     while i < n:
@@ -131,6 +133,11 @@ def heredocs(command, comments=None):
         if ctx[0] == '"':
             if c == '"':
                 stack.pop()
+            elif command.startswith("${", i):
+                stack.append(["${", 0])
+                out.append("${")
+                i += 2
+                continue
             elif command.startswith("$((", i):
                 stack.append(["((", 0])
                 out.append("$((")
@@ -185,6 +192,11 @@ def heredocs(command, comments=None):
             out.append("$(")
             i += 2
             continue
+        if command.startswith("${", i):
+            stack.append(["${", 0])
+            out.append("${")
+            i += 2
+            continue
         if c == "`":
             if ctx[0] == "`":
                 stack.pop()
@@ -203,6 +215,19 @@ def heredocs(command, comments=None):
             out.append(c)
             i += 1
             continue
+        if ctx[0] == "${":
+            if c == "}":
+                stack.pop()
+            elif c == "\n" and pending:
+                raise Unreadable("a heredoc's body after a line ending inside ${...}")
+            out.append(c)  # a #, a parenthesis or << here is text to bash
+            i += 1
+            continue
+        if command.startswith("<<<", i):
+            # A here-string (APOS-4, DEC-1174 (1)): its word is read as any word, not taken for a heredoc's delimiter.
+            out.append("<<<")
+            i += 3
+            continue
         if c == "#" and (not out or (out[-1][-1:] in " \t\n;&|(" and out[-1][:1] != "\\")):
             # A comment: the # starts a word (after a blank or an operator that is not escaped: "x\ #y" and "a\;#b"
             # are one word to bash). Its text is dropped; a quote in it is no quote (DEC-1174 (1)).
@@ -212,7 +237,7 @@ def heredocs(command, comments=None):
                 comments.append((i, end))
             i = end
             continue
-        if command.startswith("<<", i) and not command.startswith("<<<", i):
+        if command.startswith("<<", i):
             line = "".join(out).rsplit("\n", 1)[-1]
             if "((" in line or "$[" in line:
                 raise Unreadable("<< in arithmetic")
@@ -264,11 +289,27 @@ def heredocs(command, comments=None):
             continue
         out.append(c)
         i += 1
-    if any(ctx[0] in ('"', "`") for ctx in stack):
-        raise UnclosedQuote("an unclosed double quote or backtick")
+    if any(ctx[0] in ('"', "`", "${") for ctx in stack):
+        # An unclosed ${ too: bash runs nothing of a line it cannot close (APOS-3).
+        raise UnclosedQuote("an unclosed double quote, backtick or ${")
     if len(stack) > 1 or pending:
         raise Unreadable("unbalanced quotes or a heredoc with no body")
     return "".join(out), bodies
+
+
+def _check_here_strings(cmds):
+    """Raises Unreadable when a here-string's text reaches, by its own command or through a pipe, a command that
+    may run it (``bash <<< ...``, ``cat <<< ... | sh``, an unknown program): such a call is read as it was before
+    here-strings were read (APOS-4, DEC-1174 (1)); a here-string only data readers take is read."""
+    stage, at = [], None
+    for words, reds, sep in cmds:
+        stage.append(_kind(words))
+        if at is None and any(op == "<<<" for op, _ in reds):
+            at = len(stage) - 1
+        if sep not in ("|", "|&"):
+            if at is not None and any(kind != "data" for kind in stage[at:]):
+                raise Unreadable("a here-string a command may run")
+            stage, at = [], None
 
 
 def comment_spans(command, depth=0):
@@ -278,6 +319,8 @@ def comment_spans(command, depth=0):
     for anything the scan cannot read for certain."""
     found = []
     text, bodies = heredocs(command, found)
+    if "<<<" in text:
+        _check_here_strings(simples(tokens(lift(text)[0])))
     if not bodies or depth >= MOST_DEPTH:
         return found  # a body deeper than the guard reads keeps its text: read as before (fail closed)
     lifted, _ = lift(text)
@@ -1249,6 +1292,8 @@ class Judgement:
         # already numbered so).
         text = re.sub(r"__gov_hdl_(\d+)__", lambda m: f"__gov_heredoc_{base + int(m.group(1))}__", text)
         text, subs = lift(text)
+        if "<<<" in text:
+            _check_here_strings(simples(tokens(text)))
 
         def expand(value, env):
             with environ(env, ()):
