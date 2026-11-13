@@ -21,7 +21,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import w2_94_cases as c  # noqa: E402
 import w2_94_support as s  # noqa: E402
 
-TABLES = {"s1-form": c.S1_FORM, "s1-draw": c.S1_DRAW, "s1-release": c.S1_RELEASE, "s4": c.S4_BREAKS,
+TABLES = {"s1-form": c.S1_FORM, "s1-draw": c.S1_DRAW, "s1-draw-literal": c.S1_DRAW_LITERAL,
+          "s1-draw-forms": c.S1_DRAW_FORMS, "s1-release": c.S1_RELEASE, "s4": c.S4_BREAKS, "s4-holds": c.S4_HOLDS,
           "s4-nonexistent": c.NONEXISTENT_BREAKS, "fail-closed": c.FAIL_CLOSED}
 CASES = sorted((table, name) for table, entries in TABLES.items() for name in entries)
 
