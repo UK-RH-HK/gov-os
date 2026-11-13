@@ -75,7 +75,8 @@ There is no `independent-reviewer.md`, before or after.
 - **Generated copies (W2-153, the copies ACT):** `.claude/agents/**`, the root `.rulesync/**` and the five other
   `template/.rulesync/subagents/*` sources are not changed here. Their composition (`portability.compose`) changes
   with the kernel bodies. Until the copies ACT rewrites them, these cases stay red on this branch (the lead's
-  full-suite run on `3b3a90d74c3e`: 5590 tests, 50 failed, all listed here; the review's R1):
+  full-suite run on `3b3a90d74c3e`: 5590 tests, 50 failed: the 46 that wait on the copies are listed in this bullet, and the other 4 in the next two;
+  on the final head `1221ee0e4`, 47 failed, the 3 W2-128 cases being green after the fix; the review's R1):
   - W2-153: 23 cases in `tests/acceptance/W2-153/test_w2_153_sources.py`: the S3 body and fields cases for the
     sources in `.rulesync/` and `template/.rulesync/` (all but the template's orchestrator source), and
     `test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository`;
