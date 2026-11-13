@@ -15,8 +15,10 @@ as an error for the whole run, so a mapped case cannot drop out unseen.
 
 ## The ticket's KPI lines
 
-Each row maps one KPI line (B is Success 1 ... F is Success 6, in the ticket's order) to the full node ids of its
+Each row maps one KPI line (B is Success 1 ... F is Success 5, in the ticket's order) to the full node ids of its
 cases, and gives the planted break the ticket's `Verify` names (the reviewer's check; a run of the map does not plant).
+Line E (W2-23 S6, the template's hook line) moved to W2-185 (`DAEO-qyt2`) by DEC-1167 (4), so the ticket's success
+lines are B, C, R, D, F and the map runs those and the failure line (9 cases).
 
 | KPI line | Tests | What the line says | Planted break (the ticket's verify column) |
 |---|---|---|---|
@@ -24,15 +26,24 @@ cases, and gives the planted break the ticket's `Verify` names (the reviewer's c
 | Success 2 (C) | `tests/acceptance/W1-18/test_w1_18_on_demand_start.py::test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_starts_nothing`, `tests/acceptance/W2-123/test_w2_123_retry.py::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built` | W1-18's and W2-123's cases expect `REBUILD_FAILED` where the asked-for semantic store is not recreated | W1-18: a retrieval that starts the server; W2-123: a retry record that is not written |
 | Success 3 (R) | `tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_runs_no_pass_and_writes_nothing` | W2-121 S1 takes its second snapshot only after the job's `.exit` file exists | a stand-in `status` that writes a file |
 | Success 4 (D) | `tests/acceptance/W2-136/test_w2_136_never_a_gate.py::test_s10_no_module_of_gov_outside_plan_and_launch_imports_or_calls_gov_plan` | W2-136 S10 allows `src/gov/session_watch` to call gov plan | a module outside `plan/`, `launch/` and `session_watch/` calling gov plan |
-| Success 5 (E) | `tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir` | W2-23 S6 expects the seven kernel hooks | a planted eighth hook script with no wiring |
-| Success 6 (F) | `tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-lead]`, `tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-cto]` | W2-128 row 8 records that the `until W2-56` line is gone from both kernel templates | the line planted back into `template/governance/kernel/templates/role-lead.md` (and the role-cto template) |
+| Success 5 (F) | `tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-lead]`, `tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line[role-cto]` | W2-128 row 8 records that the `until W2-56` line is gone from both kernel templates | the line planted back into `template/governance/kernel/templates/role-lead.md` (and the role-cto template) |
 | Failure 1 | `tests/acceptance/W2-182/test_w2_182_no_lowering.py::test_no_revised_case_is_lowered_skipped_or_marked` | a revised case no longer catching what it guards, or any case lowered, skipped or marked | a skip, xfail, flaky or rerun mark added to a mapped case or to its file |
 
-Failure 1's case is the one this folder holds: it reads the seven mapped functions' source (and each file's module-level
-marks) and fails on any skip, skipif, xfail, flaky, rerun or importorskip beyond the baseline of before run 1 (W1-18's
+Failure 1's case is the one this folder holds: it reads the seven revised functions' source (the six mapped ones and the
+one under "Revised, not run here" below; and each file's module-level marks) and fails on any skip, skipif, xfail, flaky, rerun or importorskip beyond the baseline of before run 1 (W1-18's
 case has always held one `pytest.skip` where `sqlite_vec` cannot be imported, commit `2a2738881`, in the file's
 `BASELINE`). Planted, each of an added mark, a second skip and a module-level xfail makes it fail. That each case still fails on a planted break
 of what it guards (the planted-break column) is the reviewer's check, as in W2-90; a run does not plant.
+
+## Revised, not run here
+
+Run 1 revised this function (commit `6e3697785`) and it stays in the branch's diff, so Failure 1's case still scans it
+for a skip, xfail, flaky or rerun mark; a run of this folder does not run it (`conftest.py` reads only the rows above
+this heading).
+
+| Revised case | What it records | Why it is not run here |
+|---|---|---|
+| `tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir` | W2-23 S6 expects the seven kernel hooks | line E moved to W2-185 (`DAEO-qyt2`), DEC-1167 (4) |
 
 ## What each case judges, in short
 
@@ -43,15 +54,13 @@ of what it guards (the planted-break column) is the reviewer's check, as in W2-9
 - R: `gov dispatch status` is judged on what it writes, after the fake launched job's `.exit` file exists (a race fixed).
 - D: S10's scan allows `src/gov/session_watch` to call gov plan (W2-159 S5); every other module outside `plan/` and
   `launch/` is refused (DEC-1163 (6) D (a)).
-- E: the seven kernel hooks, each exiting alike with a space in the project directory.
 - F: row 8 of W2-128 records that the `gov accept` ... `until W2-56` line is gone (W2-56 closed; DEC-1163 (1)).
 
 ## Known reds
 
-- **Line E (W2-23 S6) is red on a head without the template's hook line.** The seventh kernel hook, `context_watch.py`
-  (W2-176), is wired in this repository's `.rulesync/hooks.jsonc` but not yet in `template/.rulesync/hooks.jsonc`; a
-  product-spec worker adds that line in the ticket's own tree (the ticket's `template/.rulesync/hooks.jsonc` path). The
-  case goes green with it. Until then `gov accept W2-182` fails line E and nothing else.
+- **A base red outside this map:** `tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir`
+  (revised to seven hooks by run 1) stays red until W2-185 (`DAEO-qyt2`) lands the template's hook line; it was red on
+  `w2/integrate` before W2-182, so it is not this ticket's, and `gov accept W2-182` does not run it.
 - Nothing else of the map is known red.
 
 ## The run's code
