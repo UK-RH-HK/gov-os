@@ -27,6 +27,8 @@ from gov.guard.heldout import load_yaml_unique
 
 ROLES_REL = "template/governance/kernel/roles"
 ADOPTED_ROLES_REL = "governance/kernel/roles"  # P-W2-60a-4 (a): an adopted repository's kernel, read when no template/
+VENDORED_REL = "template/governance/kernel/skills/superpowers/vendored.yaml"  # P-7 (a): vendored skills' version
+ADOPTED_VENDORED_REL = "governance/kernel/skills/superpowers/vendored.yaml"
 SKILLS_REL = ".claude/skills"
 COMMANDS_REL = ".claude/commands"  # each Markdown file loads as a skill too
 USER_SETTINGS_REL = ".claude/settings.json"  # under the caller's home; --setting-sources project,local drops it
@@ -104,11 +106,36 @@ def _folder_sha256(folder: Path, rel: str) -> str:
     return sha256("".join(f"{sha}  {path}\n" for path, sha in sorted(entries)).encode())
 
 
+def _adopted(root: Path) -> bool:
+    """A tree with no ``template/`` is an adopted repository: its kernel is ``governance/kernel/``."""
+    return not os.path.lexists(root / ROLES_REL.split("/")[0])
+
+
+def _vendored(root: Path) -> tuple[str, str, set[str]] | None:
+    """The vendored manifest's path, top-level ``version`` and listed skills (the keys of ``token_sizes``), P-7 (a);
+    ``None`` when it is absent, cannot be read or parsed as a map, has no non-empty string version or lists nothing."""
+    rel = ADOPTED_VENDORED_REL if _adopted(root) else VENDORED_REL
+    try:
+        data = load_yaml_unique((root / rel).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    version, listed = data.get("version"), data.get("token_sizes")
+    if not isinstance(version, str) or not version or not isinstance(listed, dict) or not listed:
+        return None
+    return rel, version, {str(name) for name in listed}
+
+
 def _skills(root: Path) -> dict[str, dict]:
-    """Every skill the session can load, by name: each folder directly under ``.claude/skills/`` with a ``SKILL.md``."""
+    """Every skill the session can load, by name: each folder directly under ``.claude/skills/`` with a ``SKILL.md``.
+
+    A copy with no version whose name the vendored manifest lists takes the manifest's version, and its entry names
+    the manifest in ``version_source`` (P-7 (a)); every other entry is described from its copy alone."""
     base = root / SKILLS_REL
     if not os.path.lexists(base):
         return {}
+    vendored = _vendored(root)
     if base.is_symlink() or not base.is_dir():
         raise _refuse(f"{SKILLS_REL} is a link or not a folder")
     skills: dict[str, dict] = {}
@@ -128,6 +155,9 @@ def _skills(root: Path) -> dict[str, dict]:
             skills[skill_name] = {"name": skill_name, "path": f"{rel}/SKILL.md", "version": _version(front),
                                   "sha256": sha256(data), "folder_sha256": folder_hash,
                                   "named": False, "text": data}
+            if skills[skill_name]["version"] == NO_VERSION and vendored and skill_name in vendored[2]:
+                skills[skill_name]["version"] = vendored[1]
+                skills[skill_name]["version_source"] = vendored[0]
     except (OSError, UnicodeDecodeError):
         raise _refuse(f"the skills under {SKILLS_REL} cannot be read, so the record could not say what the session "
                       f"may load") from None
@@ -192,7 +222,7 @@ def user_rules(home: Path) -> dict[str, list[str]]:
 
 def _role_file(root: Path, role: str) -> tuple[str, bytes, list[str]]:
     """The role file's path (relative to ``root``), bytes and lines; refused when it cannot be read."""
-    roles_rel = ROLES_REL if os.path.lexists(root / ROLES_REL.split("/")[0]) else ADOPTED_ROLES_REL
+    roles_rel = ADOPTED_ROLES_REL if _adopted(root) else ROLES_REL
     rel = f"{roles_rel}/{role}.md"
     try:
         data = (root / rel).read_bytes()

@@ -326,3 +326,92 @@ def test_the_arguments_given_are_read(args, expected):
 def test_a_form_the_launcher_cannot_name_refuses(args):
     with pytest.raises(GovError):
         launcher._check_own_args(args)
+
+
+# P-7 (a): a vendored skill whose copy carries no version takes the vendored manifest's.
+MANIFEST = ('version: "v6.4.2"\nsha256: "x"\ntoken_sizes:\n  test-driven-development: 2389\n'
+            '  systematic-debugging: 2360\n')
+UNVERSIONED = "---\nname: {0}\ndescription: >-\n  Use it\n---\n# {0}\n"
+
+
+def _vendored(tmp_path, *named, manifest=MANIFEST, skills=None, adopted=False):
+    roles_rel, rel = ((role.ADOPTED_ROLES_REL, role.ADOPTED_VENDORED_REL) if adopted
+                      else (role.ROLES_REL, role.VENDORED_REL))
+    lines = [VERSION, DEFAULT] + ([f"- **Skills:** {', '.join(named)}"] if named else [])
+    tree = _tree(tmp_path, *lines, roles_rel=roles_rel,
+                 skills=skills or {name: UNVERSIONED.format(name) for name in
+                                   ("test-driven-development", "systematic-debugging", "other")})
+    if manifest is not None:
+        (tree / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tree / rel).write_text(manifest, encoding="utf-8")
+    return tree
+
+
+def _described(tree):
+    return {skill["name"]: skill for skill in role.read_role(tree, "engineer")["skills"]}
+
+
+def test_a_listed_skill_with_no_version_takes_the_manifest_s_and_names_it(tmp_path):
+    tree = _vendored(tmp_path, "test-driven-development")
+    described = _described(tree)
+    tdd, debugging = described["test-driven-development"], described["systematic-debugging"]
+    assert (tdd["version"], tdd["version_source"], tdd["named"]) == ("v6.4.2", role.VENDORED_REL, True)
+    assert (debugging["version"], debugging["version_source"], debugging["named"]) == ("v6.4.2", role.VENDORED_REL,
+                                                                                      False)
+    text = UNVERSIONED.format("test-driven-development").encode()
+    assert tdd["sha256"] == role.sha256(text)
+    assert tdd["folder_sha256"] == role.sha256(f"{role.sha256(text)}  SKILL.md\n".encode())
+    assert described["other"]["version"] == role.NO_VERSION and "version_source" not in described["other"]
+
+
+def test_a_listed_skill_with_its_own_version_keeps_it_and_no_source(tmp_path):
+    skills = {"test-driven-development": "---\nname: test-driven-development\nversion: 1.0.0\n---\n",
+              "systematic-debugging": "---\nname: systematic-debugging\nmetadata:\n  version: 2.0.0\n---\n"}
+    described = _described(_vendored(tmp_path, "test-driven-development", skills=skills))
+    for name, version in (("test-driven-development", "1.0.0"), ("systematic-debugging", "2.0.0")):
+        assert set(described[name]) == {"name", "path", "version", "sha256", "folder_sha256", "named"}
+        assert described[name]["version"] == version
+
+
+def test_an_unlisted_named_skill_with_no_version_still_refuses(tmp_path):
+    with pytest.raises(GovError, match="the skill 'other' that .* carries no version in its front matter"):
+        role.read_role(_vendored(tmp_path, "test-driven-development", "other"), "engineer")
+
+
+@pytest.mark.parametrize("manifest", (
+    None,                                                                   # no manifest
+    "version: [v6.4.2\n",                                                   # not YAML
+    "- version: v6.4.2\n",                                                  # not a mapping
+    "version: v1\nversion: v2\ntoken_sizes:\n  test-driven-development: 1\n",  # a key twice
+    "token_sizes:\n  test-driven-development: 1\n",                         # no version
+    'version: ""\ntoken_sizes:\n  test-driven-development: 1\n',            # an empty version
+    "version: 6.4\ntoken_sizes:\n  test-driven-development: 1\n",           # a version not a string
+    'version: "v6.4.2"\ntoken_sizes: [test-driven-development]\n',          # token_sizes not a mapping
+    'version: "v6.4.2"\n',                                                  # nothing listed
+    "\xff",                                                                 # not UTF-8 (written below)
+))
+def test_a_missing_or_malformed_manifest_leaves_no_version_and_a_named_skill_refused(tmp_path, manifest):
+    tree = _vendored(tmp_path, manifest=None if manifest == "\xff" else manifest)
+    if manifest == "\xff":
+        (tree / role.VENDORED_REL).parent.mkdir(parents=True)
+        (tree / role.VENDORED_REL).write_bytes(b"\xff\xfe")
+    described = _described(tree)
+    assert described["test-driven-development"]["version"] == role.NO_VERSION
+    assert "version_source" not in described["test-driven-development"]
+    (tree / role.ROLES_REL / "engineer.md").write_text(f"{VERSION}\n{DEFAULT}\n- **Skills:** test-driven-development\n",
+                                                       encoding="utf-8")
+    with pytest.raises(GovError, match="carries no version in its front matter"):
+        role.read_role(tree, "engineer")
+
+
+def test_an_adopted_tree_reads_its_kernel_s_manifest(tmp_path):
+    tree = _vendored(tmp_path, "systematic-debugging", adopted=True)
+    debugging = _described(tree)["systematic-debugging"]
+    assert (debugging["version"], debugging["version_source"]) == ("v6.4.2", role.ADOPTED_VENDORED_REL)
+
+
+def test_where_template_exists_the_adopted_manifest_is_not_read(tmp_path):
+    tree = _vendored(tmp_path, manifest=None)
+    (tree / role.ADOPTED_VENDORED_REL).parent.mkdir(parents=True)
+    (tree / role.ADOPTED_VENDORED_REL).write_text(MANIFEST, encoding="utf-8")
+    assert _described(tree)["systematic-debugging"]["version"] == role.NO_VERSION
