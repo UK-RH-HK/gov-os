@@ -18,7 +18,7 @@ as an error for the whole run, so a mapped case cannot drop out unseen.
 Each row maps one KPI line (B is Success 1 ... F is Success 5, in the ticket's order) to the full node ids of its
 cases, and gives the planted break the ticket's `Verify` names (the reviewer's check; a run of the map does not plant).
 Line E (W2-23 S6, the template's hook line) moved to W2-185 (`DAEO-qyt2`) by DEC-1167 (4), so the ticket's success
-lines are B, C, R, D, F and the map runs those and the failure line (9 cases).
+lines are B, C, R, D, F and the map runs those and the failure line (8 cases).
 
 | KPI line | Tests | What the line says | Planted break (the ticket's verify column) |
 |---|---|---|---|
