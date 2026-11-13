@@ -2,13 +2,15 @@
 
 ``gov adopt --lite --stage MA --out <folder>`` on a planted repository: the memory-assessment record, outside the
 project, every field I1 names, each planted item under its category, the secret by rule id only, the repository byte
-identical before and after; A3 refuses without the assessment and cites its sha256 with it.
+identical before and after; A3 refuses ``--assessment`` holding none for HEAD (a bare A3 runs and says ``assessment: none``,
+R1 (b)) and cites the assessment's sha256 with it.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 
 import pytest
 
@@ -170,16 +172,33 @@ def to_a2(project, box, host):
 
 
 def test_i2_a3_without_an_assessment_for_head_refuses(box, host):
+    """I2 as decided (P-W2-88-TD-1, R1 (b), DEC-1157 (3), a decided-behaviour revision, DEC-1156 (7)): A3 refuses with
+    ``ASSESSMENT_MISSING`` only when ``--assessment`` is given and holds no ``memory-assessment.json`` for HEAD's commit
+    (an empty folder; a folder whose assessment is of an earlier commit is the next case). The decided other half, a bare A3,
+    is the case after this one."""
     project = W.plant_adoption(box)
     adoption, proposal = to_a2(project, box, host)
     empty = box.base / "no-assessment"
     empty.mkdir()
     W.settle(project)
     before = W.repo_state(project)
-    for label, extra in (("an empty folder", ("--assessment", str(empty))), ("no --assessment at all", ())):
-        run = adoption.run("A3", "--map", str(proposal), *extra)
-        W.assert_refused(run, "ASSESSMENT_MISSING", f"A3 with {label}", "A3")
+    run = adoption.run("A3", "--map", str(proposal), "--assessment", str(empty))
+    W.assert_refused(run, "ASSESSMENT_MISSING", "A3 with --assessment holding no assessment for HEAD", "A3")
     W.assert_state_equal(before, W.repo_state(project), "the refused A3")
+
+
+def test_i2_a_bare_a3_is_no_refusal_and_its_record_says_assessment_none(box, host):
+    """R1 (b), the decided other half: no ``--assessment`` at all is no refusal (``ASSESSMENT_MISSING`` is only for an
+    ``--assessment`` that holds none for HEAD): A3 runs as it does today and its committed record says ``assessment: none``.
+    (Green for the run, red for the line: on the base A3 runs ok and its record has no such line.)"""
+    project = W.plant_adoption(box)
+    adoption, proposal = to_a2(project, box, host)
+    bare = adoption.run("A3", "--map", str(proposal))
+    W.assert_ok(bare, "a bare A3 (no --assessment)")
+    rel = bare.result.get("record") or "governance/adoption/A3-target-path-map.md"
+    text = W.git(project, "show", f"HEAD:{rel}")
+    assert re.search(r"^[ \t]*assessment:[ \t]*none[ \t]*$", text, re.MULTILINE), \
+        f"a bare A3's record ({rel}) does not say `assessment: none`"
 
 
 def test_i2_an_assessment_of_an_earlier_commit_is_not_one_for_head(box, host):
