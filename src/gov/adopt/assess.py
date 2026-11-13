@@ -225,7 +225,7 @@ def _free_memory() -> int | None:
     return None
 
 
-def _session_figure() -> tuple[int | None, str]:
+def _per_session_limit() -> tuple[int | None, str]:
     """The resource gate's per-session figure (``working_size_bytes``), read from ``gov.resources.config``; never
     restated. None, with the reason, where the machine's gate file does not give it."""
     from gov.resources import config
@@ -308,7 +308,7 @@ def assess(root: Path, out: Path) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     free_disk = shutil.disk_usage(out).free
     disk = int(code_files * DISK_PER_CODE_FILE + 2 * total)
-    figure, source = _session_figure()
+    figure, source = _per_session_limit()
     peak = _peak()
     assessment = {
         "commit": head, "tracked_files": files, "tracked_bytes": total, "languages": dict(sorted(languages.items())),
@@ -329,10 +329,9 @@ def assess(root: Path, out: Path) -> dict:
         "peak_rss_bytes": peak, "session_figure_bytes": figure, "session_figure_source": source,
         "under_session_figure": None if figure is None else peak < figure,
         "seconds": round(time.monotonic() - started, 2),
+        "paths": sorted(tracked),  # the plan judges the namespaces from these (a path is no secret)
     }
     (out / FILE).write_text(json.dumps(assessment, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (out / "tracked-paths.txt").write_text("".join(f"{rel}\n" for rel in sorted(tracked)), encoding="utf-8",
-                                           errors="surrogateescape")
     return assessment
 
 

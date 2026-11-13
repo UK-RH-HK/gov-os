@@ -22,7 +22,6 @@ KINDS = ("vendored-no-folder", "generated-no-folder", "namespace-policy", "over-
          "two-namespaces")
 POLICIES = ("embedded", "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
 PATH_MAP = "governance/project/path-map.yaml"
-TRACKED = "tracked-paths.txt"  # beside the assessment: the paths of HEAD, one a line (a path is no secret)
 PROFILE = "STANDARD"
 
 
@@ -35,13 +34,9 @@ def _patterns(space: dict) -> list[str]:
     return [item for item in (space.get("paths") or []) if isinstance(item, str)]
 
 
-def _tracked(assessment: dict, out: Path) -> list[str]:
-    if isinstance(assessment.get("paths"), list):
-        return [item for item in assessment["paths"] if isinstance(item, str)]
-    try:
-        return [row for row in (Path(out) / TRACKED).read_text(encoding="utf-8").split("\n") if row]
-    except OSError:
-        return []
+def _tracked(assessment: dict) -> list[str]:
+    paths = assessment.get("paths")
+    return [item for item in paths if isinstance(item, str)] if isinstance(paths, list) else []
 
 
 def _digest(assessment: dict, out: Path) -> str:
@@ -60,11 +55,9 @@ def _blockers(assessment: dict, path_map: dict | None, out: Path) -> dict[str, d
     """Kind -> ``{paths, why}``, only the kinds that have a blocker."""
     spaces, found = _namespaces(path_map), {}
     for kind, key in (("vendored-no-folder", "vendored"), ("generated-no-folder", "generated")):
-        held = [item["path"] for item in assessment.get(key, [])
-                if item.get("by") != "folder" or not _kept_out(item["path"], spaces)]
+        held = [item["path"] for item in assessment.get(key, []) if item.get("by") != "folder"]  # a folder is its own
         if held:
-            found[kind] = {"paths": sorted(held), "why": f"{key} code with no folder of its own that the path map "
-                           "keeps out of the embedded namespaces"}
+            found[kind] = {"paths": sorted(held), "why": f"{key} code with no folder of its own"}
     faulty = {name: space.get("embedding_policy") for name, space in spaces.items()
               if space.get("embedding_policy") not in POLICIES}
     if faulty:
@@ -78,20 +71,14 @@ def _blockers(assessment: dict, path_map: dict | None, out: Path) -> dict[str, d
         found["secret"] = {"paths": secret, "why": "a secret in a tracked file (by rule id, never the value)"}
     if spaces:
         none, two = [], []
-        for rel in _tracked(assessment, out):
+        for rel in _tracked(assessment):
             held = [name for name, space in spaces.items() if any(_match_pattern(rel, p) for p in _patterns(space))]
             (none if not held else two if len(held) > 1 else []).append(rel)
         if none:
-            found["no-namespace"] = {"paths": [PATH_MAP], "files": sorted(none), "why": "paths that fall in no namespace"}
+            found["no-namespace"] = {"paths": [PATH_MAP, *sorted(none)], "why": "paths that fall in no namespace"}
         if two:
-            found["two-namespaces"] = {"paths": [PATH_MAP], "files": sorted(two), "why": "paths that fall in two namespaces"}
+            found["two-namespaces"] = {"paths": [PATH_MAP, *sorted(two)], "why": "paths that fall in two namespaces"}
     return found
-
-
-def _kept_out(rel: str, spaces: dict) -> bool:
-    """Whether a namespace that says ``embedding_policy: not embedded`` holds ``rel``."""
-    return any(space.get("embedding_policy") == "not embedded" and any(_match_pattern(rel, p) for p in _patterns(space))
-               for space in spaces.values())
 
 
 TITLES = {

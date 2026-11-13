@@ -142,10 +142,14 @@ def check_coverage(record: dict, tracked) -> None:
     and the code graph judge theirs, and name their own lists (a store whose ``judged`` is more than its two lists hold
     leaves files unnamed)."""
     stores = record.get("stores") if isinstance(record.get("stores"), dict) else {}
-    tracked, missing, short = set(tracked), set(), []
+    tracked, missing, short, not_built = set(tracked), set(), [], []
     for name in JUDGING:
         store = stores.get(name)
-        if not isinstance(store, dict) or store.get("requested") is False:
+        if isinstance(store, dict) and store.get("requested") is False:
+            continue  # the path map did not call for it
+        if not isinstance(store, dict) or store.get("built") is False \
+                or store.get("status") in ("not_recreated", "not_built"):
+            not_built.append(name)  # a store the path map calls for, absent or not built
             continue
         named = set(store.get("indexed") or []) | {item.get("path") for item in store.get("refused") or []
                                                   if isinstance(item, dict)}
@@ -155,10 +159,12 @@ def check_coverage(record: dict, tracked) -> None:
             gap = (store.get("judged") or 0) - len(named)
             if gap > 0:
                 short.append(f"{name}: {gap} file(s) judged and in neither list")
-    if missing or short:
+    if missing or short or not_built:
         said = ([f"{len(missing)} tracked file(s) are in neither the indexed list nor the refused list of the store "
-                 "that judges them"] if missing else []) + short
-        raise GovError("FABRIC_INCOMPLETE", "; ".join(said), {"missing": sorted(missing), "short": short})
+                 "that judges them"] if missing else []) + short \
+            + ([f"a store the path map calls for was not built: {', '.join(not_built)}"] if not_built else [])
+        raise GovError("FABRIC_INCOMPLETE", "; ".join(said),
+                       {"missing": sorted(missing), "short": short, "not_built": not_built})
 
 
 # ---- the stores' lists, read from the stores the rebuild built
@@ -178,6 +184,25 @@ def _policy(config: dict, space: str | None) -> str | None:
     spaces = (config.get("path-map.yaml") or {}).get("namespaces") if isinstance(config.get("path-map.yaml"), dict) else {}
     value = spaces.get(space) if isinstance(spaces, dict) else None
     return value.get("embedding_policy") if isinstance(value, dict) else None
+
+
+def _binary(run, paths: list[str]) -> set[str]:
+    """The files of ``paths`` whose first 8,000 bytes hold a zero byte (git's own test), read by one ``cat-file``."""
+    found, blobs = set(), assess._Blobs(run.root)
+    try:
+        for rel in paths:
+            head, _size = blobs.read(run.tracked[rel], 8000)
+            if b"\0" in head:
+                found.add(rel)
+    finally:
+        blobs.close()
+    return found
+
+
+def _memory_class(config: dict, space: str | None) -> str | None:
+    spaces = (config.get("path-map.yaml") or {}).get("namespaces") if isinstance(config.get("path-map.yaml"), dict) else {}
+    value = spaces.get(space) if isinstance(spaces, dict) else None
+    return value.get("memory_class") if isinstance(value, dict) else None
 
 
 def _stores(run, result: dict) -> dict:
@@ -203,16 +228,24 @@ def _stores(run, result: dict) -> dict:
                                              "ON v.chunk_id = c.chunk_id")}
         records = {path for (path,) in rows("SELECT DISTINCT path FROM records")}
         n_chunks, n_vectors = sum(chunked.values()), (rows("SELECT count(*) FROM semantic_vector") or [(0,)])[0][0]
+        n_records = (rows("SELECT count(*) FROM records") or [(0,)])[0][0]
+        n_edges = (rows("SELECT count(*) FROM edges") or [(0,)])[0][0]
     finally:
         db.close()
     lexical_i, lexical_r = [], []
+    binary_files = _binary(run, [rel for rel in paths if verdicts.get(rel) == 1])
     for rel in paths:
         state = verdicts.get(rel)
         if state is None:
             continue  # the keyword index holds no verdict on it: it is in neither list, and check_coverage says so
-        if state == 1:
+        if state == 1 and rel in binary_files:  # the index chunked its bytes as text: no memory can use them
+            lexical_r.append({"path": rel, "reason": "binary"})
+        elif state == 1:
             lexical_i.append(rel)
         elif state == 2:
+            lexical_r.append({"path": rel, "reason": "not-indexed"})
+        elif _memory_class(run.config, namespaces[rel]) != "governance":
+            # ``gov.secrets.indexable`` lets through only a namespace whose memory_class is governance
             lexical_r.append({"path": rel, "reason": "not-indexed"})
         else:
             try:
@@ -241,8 +274,10 @@ def _stores(run, result: dict) -> dict:
         except Exception:  # noqa: BLE001 - the tool is not here: nodes and edges are asked of it, never invented
             nodes = edges = 0
     markdown = [rel for rel in paths if rel.endswith(".md")]
+    held = sorted(records & set(markdown))
     return {
-        "record": {**base, "judged": len(markdown), "indexed": sorted(records & set(markdown)), "refused": [],
+        "record": {**base, "judged": len(markdown), "indexed": held, "nodes": n_records, "edges": n_edges,
+                   "refused": [{"path": rel, "reason": "not-indexed"} for rel in markdown if rel not in records],
                    "seconds": timing.get("record_s", 0.0)},
         "lexical": {**base, "judged": len(paths), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
                     "seconds": timing.get("lexical_s", 0.0)},
@@ -401,8 +436,8 @@ def a9(run) -> dict:
     try:
         check_coverage(record, tracked)
     except GovError as exc:
-        raise GovError("FABRIC_INCOMPLETE", exc.message + (f"; stores not built: {not_built}" if not_built else ""),
-                       {**exc.details, "not_built": not_built}) from None
+        raise GovError("FABRIC_INCOMPLETE", exc.message + (f"; the rebuild says not built: {not_built}" if not_built else ""),
+                       {**exc.details, "not_built": sorted({*exc.details["not_built"], *not_built})}) from None
     if not_built:
         raise GovError("FABRIC_INCOMPLETE", "a store the path map calls for was not built: " + ", ".join(not_built),
                        {"missing": [], "not_built": not_built, "reasons": built.get("not_built")})

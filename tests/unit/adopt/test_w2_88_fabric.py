@@ -20,7 +20,8 @@ from gov.store import STORE_REL
 ENV = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
        "GIT_COMMITTER_EMAIL": "t@t"}
 SHIPPED = (Path(fabric.__file__).resolve().parents[3] / "governance/project/retrieval.yaml").read_text()
-CONFIG = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded"}}}}
+CONFIG = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": "embedded",
+                                                   "memory_class": "governance"}}}}
 
 
 def git(root, *args):
@@ -137,11 +138,16 @@ def test_a_tracked_file_in_neither_list_makes_the_stage_not_ok(tmp_path, stand_i
 
 
 def test_check_coverage_names_the_missing_file_and_digests_are_checked():
-    record = {"stores": {"lexical": {"indexed": ["a"], "refused": [{"path": "b", "reason": "binary"}]}}}
+    off = {"requested": False}
+    record = {"stores": {"lexical": {"indexed": ["a"], "refused": [{"path": "b", "reason": "binary"}]},
+                         "vectors": off, "codegraph": off}}
     fabric.check_coverage(record, ["a", "b"])
     with pytest.raises(GovError) as raised:
         fabric.check_coverage(record, ["a", "b", "c"])
     assert raised.value.code == "FABRIC_INCOMPLETE" and raised.value.details["missing"] == ["c"]
+    with pytest.raises(GovError) as unbuilt:  # a store the path map calls for, absent from the record
+        fabric.check_coverage({"stores": {"lexical": record["stores"]["lexical"], "codegraph": off}}, ["a", "b"])
+    assert unbuilt.value.code == "FABRIC_INCOMPLETE" and unbuilt.value.details["not_built"] == ["vectors"]
     with pytest.raises(GovError) as only:
         fabric.check_digests({"digest": "abc"})
     assert only.value.code == "DIGESTS_INCOMPLETE"
