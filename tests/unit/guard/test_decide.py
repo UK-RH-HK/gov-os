@@ -1271,11 +1271,19 @@ class TestTargetResolutionDecide:
         )
         assert d == "allow"
 
-    def test_glob_matching_nothing_denied(self, tmp_path, monkeypatch):
+    def test_glob_matching_nothing_is_its_literal_path(self, tmp_path, monkeypatch):
+        # W2-42a (KPI 4, DEC-1044): an unmatched glob is the literal word bash passes (no nullglob), judged by
+        # its path: inside the ticket's paths it is allowed, in a protected folder it is refused.
         project = self._project(tmp_path, monkeypatch)
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "rm src/gov/guard/*.nomatch"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "rm docs/*.nomatch"},
             project_root=project, role=E, ticket_id=TID, cwd=project,
         )
         assert d == "deny"
@@ -1403,10 +1411,20 @@ class TestProbe3SymlinkGlobBrace:
     expansion, cd-no-arg and pushd."""
 
     def test_bracket_glob_through_symlink_denied(self, tmp_path, monkeypatch):
+        # W2-42a (KPI 4, DEC-1044): a bracket glob that matches through the link is judged at the file it
+        # reaches; one that matches nothing is the literal word, judged at its own path (bash makes no file
+        # through the link then: the literal folder docs_lin[k] does not exist).
         project = _probe3_project(tmp_path, monkeypatch)
+        Path(os.path.join(project, "docs/x.md")).write_text("x")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "touch src/gov/guard/docs_lin[k]/x.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch docs/nonexisten[t].md"},
             project_root=project, role=E, ticket_id=TID, cwd=project,
         )
         assert d == "deny"
@@ -1457,14 +1475,22 @@ class TestBracketGlob:
         )
         assert d == "allow"
 
-    def test_bracket_glob_matching_nothing_denied(self, tmp_path, monkeypatch):
+    def test_bracket_glob_matching_nothing_is_its_literal_path(self, tmp_path, monkeypatch):
+        # W2-42a (KPI 4, DEC-1044): the literal word, judged by its path.
         tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
         project = _make_project(tmp_path, tickets)
         os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        os.makedirs(os.path.join(project, "tests/acceptance/W1-90"), exist_ok=True)
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "touch src/gov/guard/nonexisten[t].py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch tests/acceptance/W1-90/nonexisten[t].py"},
             project_root=project, role=E, ticket_id=TID, cwd=project,
         )
         assert d == "deny"
