@@ -7,11 +7,15 @@ and the hook's subprocess is given the same ``PYTHONPATH``, as the pinned judge 
 from __future__ import annotations
 
 import contextlib
+import fcntl
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+
+import pytest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
@@ -84,6 +88,106 @@ def run_hook(tool, tool_input, cwd, root, role, agent_type=None, tmpdir=None, ti
         return "allow", "", 0
     out = json.loads(p.stdout)["hookSpecificOutput"]
     return out["permissionDecision"], out["permissionDecisionReason"], 0
+
+
+# -- a stand-in for a logged worktree that is gone -------------------------------------------------------------------
+
+_NAME_CHAR = r"[\w.@+~%-]"  # a character a folder name may continue with: "W2-95" is not a prefix of "W2-95-tests"
+WHOLE = rf"(?!{_NAME_CHAR})"  # the path and anything under it: ".../W2-90", ".../W2-90/src"
+ITSELF = rf"(?!/?{_NAME_CHAR})"  # the folder itself, not a path under it: ".../gov-os-worktrees", not ".../W2-42a"
+PLACEHOLDER = "stand-in.txt"  # the stand-in's own file in each hidden folder; never the hidden half's contents
+
+
+def moved(value, old, new, tail=WHOLE):
+    """``value`` with the folder path ``old`` replaced by ``new`` wherever ``tail`` allows (``WHOLE``: followed by
+    ``/``, the end, or a character no folder name continues with), in every string of a dict or list."""
+    if isinstance(value, str):
+        return re.sub(re.escape(old) + tail, lambda m: new, value)
+    if isinstance(value, dict):
+        return {k: moved(v, old, new, tail) for k, v in value.items()}
+    if isinstance(value, list):
+        return [moved(v, old, new, tail) for v in value]
+    return value
+
+
+def _placeholders(tree):
+    """A placeholder file in the folder of each evaluation set's hidden globs in ``tree``'s path map: a worktree of
+    the logged time held the hidden parts on disk (line 74's logged rule is a read of one through the worktrees
+    folder); today none does (DEC-1070 moved them out of the trees), and rule 2 judges a listing by what it reaches."""
+    import yaml
+    with open(os.path.join(tree, "governance", "project", "path-map.yaml"), encoding="utf-8") as f:
+        sets = (yaml.safe_load(f) or {}).get("evaluation_sets") or {}
+    for spec in sets.values():
+        for glob in (spec or {}).get("hidden") or []:
+            head = re.split(r"[*?\[]", glob, maxsplit=1)[0]
+            folder = os.path.join(tree, head if head.endswith("/") else os.path.dirname(head))
+            os.makedirs(folder, exist_ok=True)
+            with open(os.path.join(folder, PLACEHOLDER), "w", encoding="utf-8") as f:
+                f.write("a W2-42a acceptance stand-in's placeholder\n")
+
+
+def _git(*args):
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    return subprocess.run(["git", *args], capture_output=True, text=True, env=env, check=True,
+                          timeout=300).stdout.strip()
+
+
+@pytest.fixture(scope="session")
+def replayable(tmp_path_factory):
+    """A function giving a logged refusal as the hook would have judged it in its own worktree. A row whose project
+    folder exists is returned as it is. A row whose worktree is gone (its ticket landed and the folder was removed)
+    gets a stand-in: a shared clone of the tree under test, checked out detached at its HEAD, named as the vanished
+    folder (``<tmp>/w2-42a-stand-ins-<head>/W2-90``), with the tree under test as its ``origin``; the vanished path is
+    replaced by the stand-in's in the row's ``cwd``, ``root``, ``tmpdir`` and every string of its ``input``, the
+    worktrees folder that held it (named as itself) by the stand-ins' folder, and the logged ``cwd`` is made inside
+    it; each stand-in holds a placeholder in every hidden folder of its path map (``_placeholders``). Role, agent
+    type, verdict and rule stay the row's. One stand-in per vanished
+    folder serves every worker of the run (made once, by an atomic rename); the last worker to finish removes them."""
+    base = tmp_path_factory.getbasetemp()
+    if os.environ.get("PYTEST_XDIST_WORKER"):
+        base = base.parent  # this run's root, shared by its workers
+    head = _git("-C", REPO, "rev-parse", "HEAD")
+    home = base / f"w2-42a-stand-ins-{head[:12]}"
+    lock = open(base / f"{home.name}.lock", "a")
+    fcntl.flock(lock, fcntl.LOCK_SH)  # held while this worker replays: no stand-in is removed under it
+
+    def stand_in(root):
+        path = home / os.path.basename(root.rstrip("/"))
+        if not (path / ".git").is_dir():
+            home.mkdir(parents=True, exist_ok=True)
+            part = home / f".{path.name}.{os.getpid()}"
+            shutil.rmtree(part, ignore_errors=True)
+            _git("clone", "-q", "--shared", "--no-checkout", REPO, str(part))
+            _git("-C", str(part), "checkout", "-q", "--detach", head)
+            _placeholders(str(part))
+            try:
+                os.rename(part, path)
+            except OSError:  # another worker made it first
+                shutil.rmtree(part, ignore_errors=True)
+        return str(path)
+
+    def replay(row):
+        old = row["root"].rstrip("/")
+        if os.path.isdir(old):
+            return row
+        new = stand_in(old)
+
+        def move(value):  # the tree's path, then the worktrees folder that held it (named as itself)
+            return moved(moved(value, old, new), os.path.dirname(old), str(home), ITSELF)
+        out = dict(row, root=new, cwd=move(row["cwd"]), tmpdir=move(row["tmpdir"]), input=move(row["input"]))
+        if out["cwd"].startswith(new + "/"):
+            os.makedirs(out["cwd"], exist_ok=True)  # the logged session ran there, so the folder existed
+        return out
+
+    yield replay
+    fcntl.flock(lock, fcntl.LOCK_UN)
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        pass  # another worker still replays; the last one removes the stand-ins
+    else:
+        shutil.rmtree(home, ignore_errors=True)
+    lock.close()
 
 
 def write_rule_reasons(role):
