@@ -1439,7 +1439,7 @@ in `docs/changes/S2-CIT-E.md`.
   chat. Worker roles never install system-wide.
 
 ### DEC-158 — P-2: network profiles per role
-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-2 (the owner's own answer)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-2 (the owner's own answer) · **Changed by DEC-1168 (1):** workers' network allowlist holds one loopback `127.0.0.1:<port>` entry for the shared reranker (W2-186), never a bare host
 - **Decision:**
   - The orchestrator is unrestricted, being unsandboxed.
   - Research and experiment work (discovery spikes, bake-offs, and product-spec when it runs experiments) gets a
@@ -12963,7 +12963,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.427 | 2026-11-02 | Orchestrator (delegated): DEC-1044. Next free id: DEC-1045. |
 
 ### DEC-1045 — Gitleaks scanning lifted on this repository (switched off by configuration; the feature stays built); its real-gitleaks tests in the nightly only; a full scan weekly only on the owner's approval
-- **Status:** ACCEPTED (owner, 2026-11-02 ~20:57, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-953 (the lifted gates), DEC-968, DEC-1039, DEC-1041 · **Changes:** DEC-893 and DEC-953 §5 practices 6 and 10 (gitleaks on staged content and on close outputs), DEC-966 item 4's nightly full scan, the landing's gitleaks pre-check (DEC-989's `land.py`), `sync_context.py`'s scan, the rebuild's memory-indexing scan (W1-15, DEC-285 to DEC-290) and the secrets-indexing family check, for this repository only
+- **Status:** ACCEPTED (owner, 2026-11-02 ~20:57, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-953 (the lifted gates), DEC-968, DEC-1039, DEC-1041 · **Changes:** DEC-893 and DEC-953 §5 practices 6 and 10 (gitleaks on staged content and on close outputs), DEC-966 item 4's nightly full scan, the landing's gitleaks pre-check (DEC-989's `land.py`), `sync_context.py`'s scan, the rebuild's memory-indexing scan (W1-15, DEC-285 to DEC-290) and the secrets-indexing family check, for this repository only · **Made standing by DEC-1170:** the scan stays off on this repository (private, local, nothing public)
 - **Decision:** (1) All gitleaks scanning is lifted on this repository: the memory-indexing scan in rebuilds, the landing's pre-check, the scans in the closes, the nightly's scan (and, the orchestrator's reading, the CTO's own staged-content scans before record commits and the record branch's sync). Reason: the repository and its GitHub remote are private and will never be shared, so the scanning costs far more than it protects here. A full scan runs once a week only when the owner approves it. (2) The tests that run the real gitleaks run only in the nightly full suite; between tickets only the scoped tests and the acceptance tests, as decided (DEC-968). (3) The feature stays built in the Gov OS and switched off on this repository by configuration, as DEC-953 did for the other lifted gates: every other repository keeps it on by default; the switch is named wherever it acts (`gov check`, `gov doctor`, a rebuild's report), never silent. (4) Applied now in the CTO's tools and the committed orchestration scripts; in the pinned `gov` from re-pin window 2 (the product's configuration switch is an emergency patch with its tests and one review).
 
 | Version | Date | Change |
@@ -14967,6 +14967,25 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (7) **SANDBOX-1 (b):** the sandbox stays (DEC-1128 (4)); B1 (briefs, facts and the pytest line name the session's `$TMPDIR`; workers' search through their lead, R4), B2 (DEC-1163 (9)'s cache ACT **withdrawn**, and the one-line fix so the reranker's log names the true cause, the socket's EPERM), B3 (probe R1, a loopback route) now; B4 only on B3's evidence (then a ticket and an amendment of DEC-158 for the owner); B5 (W3-P29's premise re-stated, the stale `.git/config.lock` sweep). The correction of CLAUDE.md's guard sentence comes by its route.
 - **Basis:** the owner's message of 2026-11-13 (~14:45).
 
+### DEC-1168 — SANDBOX-1 B4 (a): W2-186 filed, built after the copy starts, DEC-158 and DEC-1114 S9 amended for one loopback port; W2-94's physical step recorded
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~15:35; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1167 (7), DEC-158, DEC-1114, DEC-1128 (4), DEC-974
+- **Decision:**
+  - (1) **SANDBOX-1-B4 (a):** W2-186 (`DAEO-sq3a`) is filed: the shared reranker also listens on one fixed `127.0.0.1:<port>` with a token; the worker sandbox gets exactly that one `allowedDomains` entry and `sandbox.faults` refuses any other. **DEC-158 is amended:** workers' network allowlist is empty except that one loopback `host:port`, never a bare host. **DEC-1114 S9 is amended** the same way. Built after EXAMIN's copy starts; semantic search in the sandbox (a proxy-aware Ollama client) stays parked.
+  - (2) **W2-94's physical step (its S2), by the owner's operator, read only:** the workbench copy is clean at `0a82082495f52df068c3c6b518969b419f02fe95`; `EXAMIN APP` is at `a7cf346c28d7ba7b9edf8a18e1bb6e20ab1b19ca` with the same 6 modified and 40 untracked files as before (46 lines with `-uall`); nothing was changed.
+- **Basis:** the owner's message of 2026-11-13 (~15:35).
+
+### DEC-1169 — W2-32 closes on its own review, S11 re-worded to the measured trade; every status block names each ticket added and the decision that approved it
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~16:10; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-105, DEC-1010, DEC-948, DEC-878, DEC-949
+- **Decision:**
+  - (1) **P-W2-32-CLOSE Q1 (a), Q2 (a):** W2-32 closes on its own fresh review (READY, 0 blocking; `gov accept W2-32` 266/0/2), no longer together with W2-15a; W2-15a records its own baseline as its own evidence. S11's speed clause is re-worded to the measured trade (+0.23 s at the median with the pool on, PAT-1 §3 1.44 s to 1.68 s, for 4.5 to 1.0 overlapping items an answer). W2-137, W2-145 and W2-155 close in their order after it.
+  - (2) **Standing: in each status block, beside the ticket total, every ticket added since the last report is named with the owner's decision that approved it** (DEC-974: new tickets are the owner's).
+- **Basis:** the owner's message of 2026-11-13 (~16:10).
+
+### DEC-1170 — The gitleaks scan stays off on this repository: a private, local development repository, nothing public
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~16:00; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`); standing · **Under:** DEC-1045, DEC-1158
+- **Decision:** the gitleaks scan stays off by configuration on this repository (`governance/project/secrets.yaml`, DEC-1045), as a standing decision, not an emergency measure: **this is a private, local development repository; nothing in it is public.** It is not raised again as an open item (the lands, the record sync and the landing check keep printing "off by configuration", which is the record of it). The scan stays built and tested in the product, where an adopted repository chooses for itself; secrets are still never printed or written (DEC-820 (a)), and a key found in ordinary work is still an emergency (the rubric).
+- **Basis:** the owner's message of 2026-11-13 (~16:00): "The gitleaks scan stays off: this is a private, local development repository, nothing public. Record it as my decision and its reason, so it is not raised again."
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15068,3 +15087,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.545 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1165 (gov context's ceiling: the close's packet at a project setting and the supplementary cap; W2-183 filed). DEC-1164 held (PROPOSED, the owner reading). Next free id: DEC-1166. |
 | 0.546 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1166 (three ACT yeses; W2-37's CIT-P at 1.1.0; message 5). Next free id: DEC-1167. |
 | 0.547 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1167 (W2-88 RV2-1 (a); W2-60a P-5 (B), W2-184; the cuts; W2-182 E (1), W2-185; 7cc654e49 accepted; W2-111 (a)+(c); SANDBOX-1 (b)). Next free id: DEC-1168. |
+| 0.548 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1168 (SANDBOX-1 B4 (a), W2-186, DEC-158 and DEC-1114 S9 amended; W2-94's physical step). Next free id: DEC-1169. |
+| 0.549 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1169 (W2-32 closes on its own review, S11 re-worded; the status block names each ticket added and its approving decision). Next free id: DEC-1170. |
+| 0.550 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1170 (the gitleaks scan stays off: a private, local development repository). Next free id: DEC-1171. |

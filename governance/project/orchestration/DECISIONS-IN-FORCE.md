@@ -714,3 +714,6 @@ other restart is an ACT.
   option 1 (`MAX_REQUEST_CHARS` from 24,000 to about 48,000 after one GPU-window reading of the per-request peak; option
   5, the warm p95 a named red, the fallback; DEC-1067 (f) changed); **standing: no worker sends the live shared reranker
   requests above its limit outside a GPU window.** Basis: the owner's answers (no question named).
+- DEC-1168 (2026-11-13, (1) standing): **a launched worker's sandbox allows exactly one network entry, `127.0.0.1:<port>` for the shared reranker's token-guarded TCP route (W2-186, built after EXAMIN's copy starts); never a bare host; `sandbox.faults` refuses any other** (changes DEC-158 and DEC-1114 S9). Basis: SANDBOX-1-B4 (a), B3's probe.
+- DEC-1169 (2026-11-13, (2) standing): **in each status block, beside the ticket total, every ticket added since the last report is named with the owner's decision that approved it.** Basis: the owner's words.
+- DEC-1170 (2026-11-13, standing): **the gitleaks scan stays off on this repository: a private, local development repository, nothing public**; not raised again; it stays built and tested in the product (changes DEC-1045 from a measure to a standing decision). Basis: the owner's words.

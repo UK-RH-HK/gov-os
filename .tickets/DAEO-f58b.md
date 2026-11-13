@@ -1,7 +1,7 @@
 ---
 id: DAEO-f58b
 status: in_progress
-deps: [DAEO-ecac, DAEO-lrre]
+deps: [DAEO-lrre]
 links: []
 created: 2026-10-31T23:52:57Z
 type: task
@@ -18,6 +18,8 @@ depends_on:
 - DAEO-ecac
 - DAEO-lrre
 allowed_paths:
+- src/gov/status/**  # S2: the store's head and age in gov status (CTO, DEC-1157 (12))
+- docs/probes/DAEO-f58b/**  # the probe record
 - src/gov/rebuild/integration.py
 - src/gov/rebuild/command.py
 - src/gov/launch/store.py
@@ -115,3 +117,4 @@ riding along (DEC-802):
 - **F3,** a stale `index.lock` after a refresh killed during its checkout, is a row (not ordinary work).
 
 [DEC-1087]
+- **W2-60b dropped from deps (CTO, 2026-11-13 16:00, a plan-order P2, DEC-957):** S2 needs no W2-60b code (the session record, the role set, KNOWN_ROLES); with DEC-1167 (3) moving W2-60b after the copy starts, the dependency made a cycle W2-27 -> W2-116 -> W2-60b -> after W2-27's start. W2-33's rule text is delivered (closed). `src/gov/status/**` added for S2's `gov status` line.

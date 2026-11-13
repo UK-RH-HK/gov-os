@@ -1,6 +1,6 @@
 ---
 id: DAEO-5ce2
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-ongl, DAEO-h4rh]
 created: 2026-11-07T18:26:34Z

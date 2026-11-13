@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- docs/probes/DAEO-drhj/**  # the probe record (run 3's narrow check)
 - src/gov/skilleval/**
 - tests/unit/skilleval/test_w2_104*
 - governance/project/skill-imports.yaml
@@ -46,3 +47,4 @@ list_rows: []
 Card: ROLES-RESEARCH-1 §5.3 item 13, approved (DEC-959 items 5 and 8): with or just after W2-11 r1, so the template's scenarios have a runner.
 
 - **Paths:** a new command module `src/gov/skilleval/` (`gov skilleval`), and the import record `governance/project/skill-imports.yaml` (new). No overlap.
+- **Re-listed (CTO, 2026-11-13):** run 3 parked by the emergency's freeze on 11-02 and never re-listed; now run 3 merges integrate (W1-07, W1-32 and commands.py conflicts), builds the two gitleaks literals from parts, a narrow check, the land.
