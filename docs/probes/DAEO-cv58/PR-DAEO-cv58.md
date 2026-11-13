@@ -75,6 +75,22 @@ Review 3 passed at 0e11b5db743d (record: `PR-DAEO-cv58-round-3.md`, beside this 
   would refuse the role file on another line. This follows DEC-1167 (2) ("the default line alone"), and the plan
   starts nothing.
 
+## Addendum: f3a4461c1ece, the deny list's order (checked after this record's head)
+- **What it fixed.** The scoped run found `tests/acceptance/W2-56/test_w2_56_sandbox_block.py:105` red. It is W2-60a's
+  own code: the worker's deny list placed `Edit(<P>/.gov-runtime/launches)` differently before and after the record
+  folder existed. A fresh engineer (session b21) fixed it in f3a4461c1ece, about 25 lines, with `_worker_deny`.
+- **The check.** A fresh independent auditor checked that one commit, read-only (session
+  ad5e193e-3dc2-49b3-b59a-0bcf5000b4d0, Opus 5.5 at high). It wrote nothing.
+- **Verdict: pass, no findings.** It built settings before and after the folder exists, in four layouts (a plain
+  folder, one with an existing `.gov-runtime`, a worktree, and the main checkout after a worktree's launch), with and
+  without overlapping user rules:
+  - the list is identical in both states and holds no duplicates;
+  - no rule is lost;
+  - the record folder keeps its two literal rules, once each (S8);
+  - nothing else in the settings changes.
+- **Not probed (a deliberate construction).** A main checkout whose `.git` is a link, where the listing and the record
+  rules could spell the folder differently.
+
 ## Process notes
 - The reviewer's Write of a scratch script under its own `$TMPDIR` was refused by the harness's permission prompt.
   It then ran its probes as Python fed on standard input, under `$TMPDIR` only. Nothing was written in the
