@@ -25,8 +25,20 @@ allowed_paths:
 - tests/acceptance/W2-136/README.md
 - tests/acceptance/W2-23/test_w2_23_space.py
 - tests/acceptance/W2-23/README.md
+- tests/acceptance/W2-128/test_w2_128_rows.py  # row 8: the 'until W2-56' line deleted (DEC-1163 (1)), widened by the CTO (DEC-1157 (12))
+- tests/acceptance/W2-128/README.md
 - docs/probes/DAEO-5y8d/**  # the probe record
+- tests/acceptance/W2-182/**  # the revision's own folder: its README maps the revised case ids so gov accept W2-182 runs them (DEC-892; the W2-90 form); CTO, DEC-1157 (12)
 - template/.rulesync/hooks.jsonc  # E (a): the template's hooks source gains context_watch.py (a product-spec worker's line, not a test designer's)
+reads:
+- .gov-runtime/scratch/orchestrator/drafts/nightly-20261113-analysis.md
+- src/gov/check/commands.py
+- src/gov/rebuild/**
+- src/gov/session_watch/items.py
+- .rulesync/hooks.jsonc
+- template/governance/kernel/hooks/**
+needs: []
+waits_on: []
 kpis:
   success:
   - 'B: W1-32''s recorded command list holds the four approved commands gov --help shows (dispatch W2-121, adapters W2-23, session-watch W2-159, wait W2-160), and nothing else changes in it [DEC-1163 (6), DEC-1156 (7)] Verify: tests/acceptance/W1-32/test_w1_32_command_set.py passes on w2/integrate; a planted unrecorded command name added to gov --help in a stand-in makes it fail'
@@ -34,11 +46,12 @@ kpis:
   - 'R: W2-121 S1 takes its second snapshot only after the fake launched job''s .exit file exists, so `gov dispatch status` is judged on what it writes, not on the job''s late write [DEC-1163 (6)] Verify: the case passes 20 runs in a row under the nightly''s load (beside a busy loop of 20 workers); it still fails when a stand-in status writes a file'
   - 'D: W2-136 S10''s scan allows `src/gov/session_watch` to call gov plan (W2-159''s S5: session-watch reads the dispatcher''s ready list by `gov plan --ready`); every other module outside plan/ and launch/ is still refused [DEC-1163 (6) D (a), DEC-105] Verify: the case passes on w2/integrate; a planted module outside plan/, launch/ and session_watch/ calling gov plan fails it'
   - 'E: the template''s hooks source `template/.rulesync/hooks.jsonc` wires `context_watch.py` as the root `.rulesync/hooks.jsonc` does (ACT-CONTEXT-WATCH-1), and W2-23 S6 expects the seven kernel hooks [DEC-1163 (6) E (a)] Verify: W2-23 S6 passes on w2/integrate; a planted eighth hook script with no wiring fails it; `python3 -m gov.adapters.portability` exits 0 on the template'
+  - 'F: W2-128''s row 8 records that the line "Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56" is gone from both kernel templates (W2-56 closed; the owner''s DEC-1163 (1), b88a76172), so W2-128 and W2-152 S10 (which runs gov accept W2-128) are green [DEC-1163 (1), DEC-1156 (7)] Verify: tests/acceptance/W2-128/test_w2_128_rows.py passes on w2/integrate; the row-8 case fails when the line is planted back into template/governance/kernel/templates/role-lead.md'
   failure:
   - 'A revised case that no longer catches what it guards, or any case lowered, skipped or marked. Verify: each revised case fails on a planted break of what it guards (the S lines above); `git diff` adds no skip, xfail or flaky mark'
 non_goals:
 - no product code changes (src/gov/**); the behaviours these cases record were decided and landed by W2-45, W2-121, W2-23, W2-159, W2-160, W2-124 and W2-176
-- not the 2 timing cases that pass alone under the nightly beside the leads (W2-112, W2-145 S4): environment, DEC-1159 (1)
+- 'not the 2 timing cases that pass alone under the nightly beside the leads (W2-112, W2-145 S4): environment, DEC-1159 (1)'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
 sources: [DEC-1163, DEC-1156, DEC-1150, DEC-1159, DEC-105, DEC-781]
 acceptance_tests: {path: tests/acceptance/W2-182/}

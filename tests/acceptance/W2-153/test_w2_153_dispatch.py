@@ -47,11 +47,26 @@ def test_f1_the_lead_line_refuses_when_role_lead_md_is_missing(bed):
     assert run["calls"] == [], f"a lead session was started ({len(run['calls'])} call(s))"
 
 
+def _without_add_dirs(argv: list[str]) -> list[str]:
+    """``argv`` with each ``--add-dir <value>`` pair taken out: the lead's own tests worktree and the runs root, added
+    to the lead line after W2-153 by ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)); W2-153's comparison is of everything else."""
+    out, skip = [], False
+    for arg in argv:
+        if skip:
+            skip = False
+            continue
+        if arg == "--add-dir":
+            skip = True
+            continue
+        out.append(arg)
+    return out
+
+
 def test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag(bed):
     ours = _started(bed.run(support.current_dispatch_script()))
     theirs = _started(bed.run(support.baseline_dispatch_script()))
     assert ours["cwd"] == theirs["cwd"], f"the lead starts in {ours['cwd']}, integrate's in {theirs['cwd']}"
-    mine = support.without_flag(ours["argv"])
+    mine = support.without_flag(_without_add_dirs(ours["argv"]))
     assert mine == theirs["argv"], f"the lead line changed beyond the one flag\nthis tree: {mine}\nintegrate: {theirs['argv']}"
 
 

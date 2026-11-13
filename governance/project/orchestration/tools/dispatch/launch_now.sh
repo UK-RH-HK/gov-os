@@ -6,6 +6,10 @@
 # is entered in the machine registry (gov resources --register) under its own process id before it starts, so the gate
 # and the sample day see every lead the dispatcher starts. Exit 2: the disk gate, the folder or the template; exit 3: the
 # resource gate is shut or cannot be read (nothing starts); exit 4: the lead could not be registered (nothing starts).
+# DEC-1161 (2) (ACT-LEADS-ADD-DIR-1): the lead gets its own tests worktree and the runs root by --add-dir on its own
+# line, not from the main checkout's .claude/settings.local.json (whose additionalDirectories the owner's operator
+# removes at the handover: W2-60a's launcher refuses a worker launch while it is set, DEC-313). Only this lead line
+# carries them; a worker starts through gov launch, which refuses --add-dir, so workers stay walled.
 W2=$1; ID=$2; BRIEF=$3; LOGF=$4
 ORCH=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
 echo "$(date '+%F %T') admitted by the dispatcher; launching $W2" >&2
@@ -30,9 +34,17 @@ if ! /home/usain/.local/bin/gov resources --register "$$" --ticket "$ID" --sessi
   echo "$(date '+%F %T') LAUNCH_NOT_REGISTERED: gov resources --register $$ failed; $W2 is not launched (DEC-1133 (3))" >&2
   exit 4
 fi
+# DEC-1161 (2): the CLI drops a --add-dir whose folder is missing, without a word, and a lead makes its tests worktree
+# after it starts (git worktree add takes an empty folder), so that folder is made here, empty, when nothing is there.
+# The runs root is passed as it is and nothing is made in it here (DEC-751: an own folder is made and marked by gov
+# launch alone); what a lead may write there stays the guard's (DEC-728, DEC-743).
+TESTS="/home/usain/gov-os-worktrees/$W2-tests"
+RUNS="/home/usain/gov-os-runs"
+[ -e "$TESTS" ] || mkdir "$TESTS" || echo "$(date '+%F %T') LAUNCH_NO_TESTS_DIR: $TESTS could not be made; $W2 starts without it" >&2
 echo "$(date '+%F %T') gate open; $ID registered as pid $$; starting $W2" >&2
 exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json --permission-mode acceptEdits \
   --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \
   --settings "{\"env\":{\"GOV_ROLE\":\"orchestrator\",\"GOV_TICKET\":\"$ID\",\"CLAUDE_CODE_SUBAGENT_MODEL\":\"claude-opus-5-5\"}}" \
+  --add-dir "$TESTS" --add-dir "$RUNS" \
   --append-system-prompt-file "$TEMPLATE" \
   < "$ORCH/briefs/$BRIEF" > "$ORCH/log/$LOGF"
