@@ -246,3 +246,154 @@ def test_no_skills_folder_and_a_named_skill_refuses_the_launch(project, launch):
     shutil.rmtree(project / s.SKILLS_REL)
     s.write_role(project, s.ENGINEER, skills=(s.BACKEND.folder,))
     s.assert_refused(launch(s.ENGINEER), s.BACKEND.folder)
+
+
+# --------------------------------------------------------------------------
+# A vendored skill's version from its manifest (P-7 (a), the CTO, recorded in the ticket)
+# --------------------------------------------------------------------------
+# The vendored Superpowers copies (``.claude/skills/<name>/SKILL.md``) carry no version; it is in the manifest
+# ``template/governance/kernel/skills/superpowers/vendored.yaml`` (``governance/kernel/skills/...`` in the adopted
+# layout): a top-level ``version`` and the skills as the keys of ``token_sizes``. A loadable copy with no version (no
+# top-level ``version``, no ``metadata.version``) whose name is a key of ``token_sizes`` is recorded with the manifest's
+# version and ``version_source``, the manifest's repository-relative path; its ``sha256`` stays the copy's, and a named
+# one launches. A copy with its own version keeps it, with no ``version_source``. Not listed, no manifest, or a
+# manifest not a YAML mapping: ``no version`` as today, and a named one refuses ("carries no version").
+
+MANIFEST_REL = f"{s.KERNEL_SKILLS_REL}/superpowers/vendored.yaml"
+ADOPTED_MANIFEST_REL = "governance/kernel/skills/superpowers/vendored.yaml"
+VENDORED = s.Skill("w260a-vendored", "w260a-vendored", None)
+VENDORED_VERSION = "v6.4.2"
+
+
+def _manifest_text(names, version=VENDORED_VERSION):
+    """The manifest in this repository's form (template/governance/kernel/skills/superpowers/vendored.yaml)."""
+    sizes = "".join(f"  {name}: {100 + index}\n" for index, name in enumerate(names))
+    return (f"# W2-60a fixture vendored-skills manifest.\nversion: \"{version}\"\n"
+            f"source_sha256: \"{'a' * 64}\"\nsha256: \"{'b' * 64}\"\ntoken_sizes:\n{sizes}")
+
+
+def _plant_vendored(project, names=(VENDORED.folder, "w260a-other-vendored"), manifest_rel=MANIFEST_REL, text=None):
+    """``VENDORED``'s unversioned copy under ``.claude/skills/``, and the manifest listing ``names`` (or ``text``)."""
+    copy = s.write(project / s.SKILLS_REL / VENDORED.folder / "SKILL.md", VENDORED.text())
+    if manifest_rel is not None:
+        s.write(project / manifest_rel, _manifest_text(names) if text is None else text)
+    return copy
+
+
+def _assert_from_manifest(entry, copy, named, manifest_rel=MANIFEST_REL):
+    assert entry is not None, f"the vendored skill {VENDORED.folder} is not in the launch record"
+    assert entry.get("version") == VENDORED_VERSION, (
+        f"{VENDORED.folder}: version {entry.get('version')!r}, not the manifest's {VENDORED_VERSION!r}")
+    assert entry.get("version_source") == manifest_rel, (
+        f"{VENDORED.folder}: version_source {entry.get('version_source')!r}, not the manifest's path {manifest_rel!r}")
+    assert entry.get("sha256") == s.sha256_file(copy), f"{VENDORED.folder}: sha256 is not the loaded copy's"
+    assert entry.get("named") is named, f"{VENDORED.folder}: named is {entry.get('named')!r}, not {named}"
+
+
+def test_p7_a_named_listed_unversioned_skill_launches_with_the_manifest_s_version(project, launch):
+    copy = _plant_vendored(project)
+    s.write_role(project, s.ENGINEER, skills=(VENDORED.folder,))
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    assert VENDORED.word in result.appended()["text"], f"the named skill {VENDORED.folder}'s text is not appended"
+    _assert_from_manifest(_by_name(result.record()).get(VENDORED.name), copy, named=True)
+
+
+def test_p7_an_unnamed_listed_unversioned_skill_is_recorded_with_the_manifest_s_version(project, launch):
+    """The same skill, unnamed: recorded the same way. The others keep their own: the versioned ones (from their
+    copy) and the unlisted unversioned one (``no version``) carry no ``version_source``."""
+    copy = _plant_vendored(project)
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    found = _by_name(result.record())
+    _assert_from_manifest(found.get(VENDORED.name), copy, named=False)
+    for skill in s.SKILLS:
+        entry = found[skill.recorded_name]
+        assert entry.get("version") == skill.recorded_version, (
+            f"{skill.folder}: version {entry.get('version')!r}, not {skill.recorded_version!r}")
+        assert "version_source" not in entry, f"{skill.folder} carries a version_source: {entry!r}"
+
+
+@pytest.mark.parametrize("form", ("top-level", "metadata"))
+def test_p7_a_listed_skill_whose_copy_has_its_own_version_keeps_the_copy_s(project, launch, form):
+    folder = "w260a-versioned-vendored"
+    if form == "top-level":
+        text = s.Skill(folder, folder, "1.2.3").text()
+    else:
+        text = _metadata_skill_text(folder, "1.2.3")
+    copy = s.write(project / s.SKILLS_REL / folder / "SKILL.md", text)
+    s.write(project / MANIFEST_REL, _manifest_text((folder, VENDORED.folder)))
+    s.write_role(project, s.ENGINEER, skills=(folder,))
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    entry = _by_name(result.record()).get(folder)
+    assert entry is not None, f"the named skill {folder} is not in the launch record"
+    assert entry.get("version") == "1.2.3", f"{folder}: version {entry.get('version')!r}, not the copy's '1.2.3'"
+    assert "version_source" not in entry, f"{folder}'s version is its copy's, but it carries a version_source: {entry!r}"
+    assert entry.get("sha256") == s.sha256_file(copy), f"{folder}: sha256 is not the loaded copy's"
+
+
+NOT_FROM_THE_MANIFEST = {
+    "not-listed": dict(names=("w260a-other-vendored",)),
+    "no-manifest": dict(manifest_rel=None),
+    "manifest-a-list": dict(text=f"- {VENDORED.folder}\n- w260a-other-vendored\n"),
+    "manifest-a-string": dict(text=f"version {VENDORED_VERSION}, token_sizes {VENDORED.folder}\n"),
+}
+
+
+@pytest.mark.parametrize("case", sorted(NOT_FROM_THE_MANIFEST))
+def test_p7_a_named_unversioned_skill_the_manifest_does_not_version_still_refuses(project, launch, case):
+    _plant_vendored(project, **NOT_FROM_THE_MANIFEST[case])
+    s.write_role(project, s.ENGINEER, skills=(VENDORED.folder,))
+    s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", VENDORED.folder, "carries no version")
+
+
+@pytest.mark.parametrize("case", sorted(NOT_FROM_THE_MANIFEST))
+def test_p7_an_unnamed_unversioned_skill_the_manifest_does_not_version_is_no_version(project, launch, case):
+    _plant_vendored(project, **NOT_FROM_THE_MANIFEST[case])
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    entry = _by_name(result.record()).get(VENDORED.name)
+    assert entry is not None and entry.get("version") == "no version", (
+        f"{VENDORED.folder} ({case}): recorded {entry!r}, not version 'no version'")
+    assert "version_source" not in entry, f"{VENDORED.folder} ({case}) carries a version_source: {entry!r}"
+
+
+def test_p7_this_repository_s_vendored_copies_are_recorded_with_its_manifest_s_version(sandbox, project, launch):
+    """This repository's own manifest and its own vendored copies (``.claude/skills/<name>/SKILL.md``, no version),
+    planted byte for byte: each listed skill launches named and is recorded with the manifest's version."""
+    source = s.REPO_ROOT / MANIFEST_REL
+    s.write(project / MANIFEST_REL, source.read_text(encoding="utf-8"))
+    names = ("test-driven-development", "systematic-debugging", "verification-before-completion")
+    copies = {}
+    for name in names:
+        copies[name] = s.write(project / s.SKILLS_REL / name / "SKILL.md",
+                               (s.REPO_ROOT / s.SKILLS_REL / name / "SKILL.md").read_text(encoding="utf-8"))
+    s.write_role(project, s.ENGINEER, skills=names)
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    found = _by_name(result.record())
+    for name in names:
+        entry = found.get(name)
+        assert entry is not None, f"the vendored skill {name} is not in the launch record"
+        got = {key: entry.get(key) for key in ("version", "version_source", "sha256", "named")}
+        assert got == {"version": VENDORED_VERSION, "version_source": MANIFEST_REL,
+                       "sha256": s.sha256_file(copies[name]), "named": True}, f"{name}: {got}"
+
+
+def test_p7_an_adopted_tree_s_manifest_versions_its_vendored_copy(sandbox, cli):
+    """The adopted layout (no ``template/``): the manifest at ``governance/kernel/skills/superpowers/vendored.yaml``,
+    and ``version_source`` names that path."""
+    project = s.make_project(sandbox, roles=(), kernel_skills=False, commit=False)
+    shutil.move(project / "template/governance/kernel/launch", project / "governance/kernel/launch")
+    shutil.rmtree(project / "template")
+    s.write(project / "governance/kernel/roles" / f"{s.ENGINEER}.md",
+            s.role_text(s.ENGINEER, skills=(VENDORED.folder,)))
+    copy = _plant_vendored(project, manifest_rel=ADOPTED_MANIFEST_REL)
+    s.git(project, "init", "-q", "-b", "main")
+    s.git(project, "add", "-A")
+    s.git(project, "commit", "-q", "-m", "W2-60a adopted fixture project")
+    result = s.launch(sandbox, cli, s.ENGINEER, s.T)
+    s.assert_launched(result)
+    _assert_from_manifest(_by_name(result.record()).get(VENDORED.name), copy, named=True,
+                          manifest_rel=ADOPTED_MANIFEST_REL)

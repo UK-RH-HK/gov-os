@@ -261,7 +261,7 @@ def test_a_resumed_launch_forks_under_a_new_id_with_a_record_of_its_own(sandbox,
     new_id = resumed.session_id()
     assert new_id != original_id, "the resumed launch was not given an id of its own"
     assert s.occurrences(resumed.args, "--fork-session") == 1, f"the line does not fork once: {resumed.args}"
-    assert tuple(resumed.args[-len(passed):]) == passed, "the resume arguments did not reach the CLI unchanged"
+    s.assert_passed_through(resumed, passed, "the resume arguments did not reach the CLI unchanged")
     record = resumed.record()
     assert record.get("resumes") == original_id, f"resumes is {record.get('resumes')!r}, not {original_id}"
     assert record.get("role_text") == original.get("role_text"), (

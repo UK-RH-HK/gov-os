@@ -48,7 +48,7 @@ def test_an_effort_after_the_double_dash_is_applied_and_recorded_as_the_launch_s
     arguments = ("-p", "Write the tests.", *passed)
     result = launch(s.TEST_DESIGNER, None, *arguments)
     s.assert_launched(result)
-    assert tuple(result.args[-len(arguments):]) == arguments, "the arguments after -- did not reach the CLI unchanged"
+    s.assert_passed_through(result, arguments)
     assert s.occurrences(result.args, "--effort") == 1, f"--effort is passed more than once: {result.args}"
     record = result.record()
     assert (record.get("effort"), record.get("effort_source")) == ("xhigh", "after --"), (
@@ -61,7 +61,7 @@ def test_the_role_s_own_model_after_the_double_dash_is_passed_once(launch, passe
     arguments = ("-p", "Do the ticket's work.", *passed)
     result = launch(s.ENGINEER, None, *arguments)
     s.assert_launched(result)
-    assert tuple(result.args[-len(arguments):]) == arguments, "the arguments after -- did not reach the CLI unchanged"
+    s.assert_passed_through(result, arguments)
     assert s.occurrences(result.args, "--model") == 1, f"--model is passed more than once: {result.args}"
     record = result.record()
     assert (record.get("model"), record.get("model_source")) == (s.OPUS, "after --"), (
