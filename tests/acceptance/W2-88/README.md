@@ -1,6 +1,7 @@
 # W2-88 acceptance tests: memory for any repository (the assessment, the plan, A9 lite, the store layout)
 
-Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2. **Run 4 (td-3, one narrow revision, 2026-11-13)** on the base `b1fe858ac` (the ticket
+Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2. **Run 5 (review round 2's RV2-1 and RV2-2, P1-W2-88-RV2-1 (a))** on the base `a15de913e8c4`: the cases are in
+"Run 5 revisions" below (`test_w2_88_rv2_undo.py`, `standin_rv2/`, two cases in `test_w2_88_s2_plan.py`); every other case stands as run 4 wrote it. **Run 4 (td-3, one narrow revision, 2026-11-13)** on the base `b1fe858ac` (the ticket
 branch's head with P-W2-88-B-1 decided, DEC-1157 (3), (12), after review round 1 failed): B-1.1 + B-1.3 (A9's copy step, S16), B-1.2 (the reranker
 and the bundle are the pin's constants, S11/F7), B-1.4 (the pool is the whole shipped block), B-1.5 (the secrets scan not run, S2), RV1-2 (a vector scan
 that did not run, S5), RV1-4 (binaries a store holds, S3), RV1-5 (the code graph, unit seam), RV1-6 (a load does not make a stale store current, S10),
@@ -225,6 +226,55 @@ The two edge cases hold their at-or-under-the-limit halves as part of the same c
 no other new case is green on the base. Each binary size is planted in its own repository (alike but for that file's size), so the repositories of
 `estimate.chunks` differ in that file only (2 MiB against 4 KiB: the interface's lower bound on the difference is `2 * 1048576 / 1200`). The suite's S1 and S2
 modules with the bite checks (`test_w2_88_bites.py`): **58 cases, 5 failed (the five above), 53 passed**.
+
+## Run 5 revisions (P1-W2-88-RV2-1 (a); base `a15de913e8c4`)
+
+Review round 2 (the last) failed on RV2-1 (a blocker: a refused or interrupted A9 throws away work done in the repository while it ran) and RV2-2
+(minor); the owner decided P1-W2-88-RV2-1 (a): fix both in this ticket. The cases are written from the behaviours the lead stated (DEC-1052, DEC-136),
+before the fix, never from the engineer's code (DEC-820). The interface (binding; "the start commit" is the commit HEAD named when A9 began, before its copy step):
+
+- **RV2-1, A9's undo.** When A9 refuses or is interrupted (any exception, Ctrl-C included) **after** its copy step (the kernel files written and staged), the
+  undo touches only what A9 did. (1) The index: only the paths A9 staged, and only where the entry is still the blob A9 staged (a path someone else staged
+  during the run, a new file or a re-staged edit, stays staged). (2) The tree: only the files A9 wrote whose bytes are still A9's, then the folders A9 made when
+  empty; a file A9 wrote whose bytes changed is left as it is; a copy that replaced a file the start commit tracks (bytes still A9's) gets that file's content at
+  the start commit back, never deleted. (3) Nothing else: no `git reset --hard`, no checkout of another path; a tracked file edited during the run keeps its
+  edit, an untracked file made during the run stays, the branch is never moved by the undo. (4) HEAD moved: A9 is refused `HEAD_MOVED`, the message naming the
+  start commit and the new one and saying nothing was reset, `details {started, now, cause}` (`cause`: the original refusal's code, or the exception's class
+  name); the branch stays at the new commit; 1 to 3 still run, judged against the new HEAD (a copy the new HEAD tracks is left in the index and the tree).
+  (5) HEAD did not move: the refusal keeps its own code (an interrupt stays an interrupt). (6) W2-23's `project.restore` is unchanged; only A9's undo changes.
+- **RV2-2.** When the secrets scan skipped some paths (not all), `refactor-plan/PLAN.md` holds the line `Unscanned paths:` alone, and the paths follow as a
+  list starting on the next line, each `` - `path` `` at the start of its own line; `Unscanned paths: all <n> tracked files` (no scan at all) stays one line.
+
+**The plant (RV2-1).** A9 runs in a child process on a fork of the planted adoption at A8 (the suite's A9 cases), with `standin_rv2/sitecustomize.py` first on the
+child's `PYTHONPATH` (set through the adoption's `extra_env`): it replaces `gov.rebuild.command.run` (I3: A9 runs it in full) by a function that reads
+`W2_88_RV2_ACTION`, acts on the repository, and raises `W2_88_RV2_RAISE` (a `GovError` code, default `REBUILD_FAILED`, or `KeyboardInterrupt`). It builds no store, so a
+case ends the moment A9's undo has run (each case about 1 s after the shared A8 world). It reports on stderr what it saw (HEAD, which of A9's copies were in the
+tree and in the index when it acted) and the HEAD after it acted; every case first asserts that all four copies were written **and staged** when the stand-in ran
+(so an undo judged on copies that were never there fails as a plant error, not as a pass). The actions: `edit-and-stage` (rewrites the tracked `docs/notes.txt`,
+unstaged; stages a new `staged-during-run.md`), `commit-notes` (`git commit -- notes.md`), `commit-all` (commits the whole index, A9's copies with it),
+`edit-copy` / `edit-copy-restaged` (appends a line to A9's `.claude/skills/retrieval/SKILL.md`, unstaged / staged), `untracked-and-restaged` (an untracked
+`scratch-untracked.txt`; an edit of the tracked `lib/util.py`, staged), `none` (case D's tracked-file plant). The retrieval skill's path is the case's choice of copy.
+
+| KPI id / item | tests | red reason on the base `a15de913e8c4` |
+|---|---|---|
+| success-16, success-3 / RV2-1 items 1, 2, 3, 5 (the undo is reached through success-3's refusals too: any refusal after the copy step) | `test_w2_88_rv2_undo.py::test_s16_rv2_1_a_refused_or_interrupted_a9_keeps_a_tracked_edit_and_a_staged_new_file_and_takes_back_only_its_copies[REBUILD_FAILED]`, `test_w2_88_rv2_undo.py::test_s16_rv2_1_a_refused_or_interrupted_a9_keeps_a_tracked_edit_and_a_staged_new_file_and_takes_back_only_its_copies[KeyboardInterrupt]` (Case A: the stand-in edits a tracked file, stages a new file, raises; afterwards the refusal is the stand-in's own code or the interrupt, HEAD is the start commit, the edit is in the tree, the new file is still staged, none of A9's copies is in the tree or the index, `git status --porcelain` shows exactly the edit and the staged file) | the undo resets the tree: the edit is gone (`docs/notes.txt` holds its content at the start commit) and the staged new file with it. The refusal code and HEAD already hold on the base (the first assertions pass); both parameters fail at the edit |
+| success-16 / RV2-1 item 4 | `test_w2_88_rv2_undo.py::test_s16_rv2_1_b_a_commit_made_during_the_run_is_refused_head_moved_naming_both_commits_and_nothing_is_reset` (Case B: the stand-in commits `notes.md` alone; `HEAD_MOVED`, the message names both commits and says nothing was reset, `details {started, now, cause: "REBUILD_FAILED"}`, the branch at the new commit, `notes.md` in the tree, A9's copies in neither tree nor index, the newest reflog entry the stand-in's commit and no `reset` since the run began) | the refusal is the stand-in's `REBUILD_FAILED`, no `HEAD_MOVED`; the branch is reset to the start commit (the commit made during the run is off the branch) |
+| success-16 / RV2-1 item 4, the last sentence | `test_w2_88_rv2_undo.py::test_s16_rv2_1_b_a_copy_the_new_head_tracks_is_left_in_the_index_and_the_tree` (Case B2: the stand-in commits the whole index, A9's copies included; `HEAD_MOVED`, `cause` `REBUILD_FAILED`; every copy the new HEAD tracks stays in the tree with A9's bytes and in the index, the tree is clean, no `reset` in the reflog) | no `HEAD_MOVED` (the refusal is `REBUILD_FAILED`); the branch is reset to the start commit and the copies are deleted from the tree |
+| success-16 / RV2-1 items 1, 2 | `test_w2_88_rv2_undo.py::test_s16_rv2_1_c_a_copy_edited_during_the_run_is_left_in_the_tree_and_the_other_copies_are_taken_back` (Case C: the stand-in edits A9's own copy, unstaged: the file stays with its edit, leaves the index, the other copies go, `git status --porcelain` shows that one untracked file), `test_w2_88_rv2_undo.py::test_s16_rv2_1_c_a_copy_edited_and_restaged_during_the_run_stays_staged_with_its_edit` (the edit staged: file and index entry stay, the other copies go, status `A  <copy>`) | the copy A9 wrote and that was edited is deleted from the tree (the tree is reset) |
+| success-16 / RV2-1 item 2 | `test_w2_88_rv2_undo.py::test_s16_rv2_1_d_a_copy_that_replaced_a_tracked_file_gets_the_start_commits_content_back_and_is_never_deleted` (Case D: the repository tracks its own `.claude/skills/retrieval/SKILL.md`, A9's copy replaces it, the stand-in only raises; the file holds its start-commit content, the other copies are gone, the tree and the index are clean) | **GUARD (green on the base: the reset restores the tracked file):** it fails an undo that deletes every file A9 wrote, instead of putting a replaced file's content back |
+| success-16 / RV2-1 items 1, 3 | `test_w2_88_rv2_undo.py::test_s16_rv2_1_e_an_untracked_file_stays_and_a_restaged_edit_stays_staged` (Case E: the stand-in makes an untracked file and stages an edit of the tracked `lib/util.py`; the untracked file stays, the edit stays staged, A9's copies go, status shows exactly the two) | the staged edit of `lib/util.py` is thrown away (the untracked file stays on the base: a reset does not touch it) |
+| success-2 / RV2-2 | `test_w2_88_s2_plan.py::test_s2_rv2_2_unscanned_paths_are_a_list_after_a_line_that_says_only_unscanned_paths` (MA with gitleaks on `PATH` and two tracked text blobs over `assess.SCAN_LIMIT_BYTES`: `PLAN.md` holds one line that is exactly `Unscanned paths:`, and both paths follow as `` - `path` `` lines starting on the next line, no other item; `SECRETS_UNSCANNED` still names both) | the first path sits on the header's line (`Unscanned paths: - `data/huge-a.log``) |
+| success-2 / RV2-2 the form that stays | `test_w2_88_s2_plan.py::test_s2_rv2_2_no_scan_at_all_keeps_the_one_line_form` (MA with no `gitleaks` on `PATH`: the line `Unscanned paths: all <n> tracked files`, nothing listed after it) | **GUARD (green on the base):** the one-line form is the base's and must stay |
+
+Readings this run makes, named: (a) in Case A the interrupt is judged on what the child ends with (non-zero exit, `KeyboardInterrupt` in stderr, no `HEAD_MOVED`), since the
+CLI emits no envelope for an interrupt; (b) `details.started` / `details.now` and the hashes in the message may be full or abbreviated (at least 7 digits, a prefix of the commit);
+(c) "says nothing was reset" is read as the word `reset` in the message; (d) Case C reads items 1 and 2 literally: an unstaged edit of A9's copy leaves the index entry as the blob A9 staged, so it
+leaves the index and the file stays (untracked); (e) Case D assumes A9's copy step replaces a tracked file of the copy plan (it does on the base: the plant took); (f) no case reads the engineer's code, and
+the cases do not name how the undo is built.
+
+**Red run on the base** (`heavy_slot.sh`, the sandbox's TMPDIR, an empty HOME in it; 2026-11-13): `test_w2_88_rv2_undo.py` **8 cases, 7 failed (each for the reason in the table), 1 passed (Case D, GUARD)**;
+the two `rv2_2` cases: **2 cases, 1 failed (the list), 1 passed (the one-line form, GUARD)**. None is red by an import, collection or plant error: every case asserts first that the stand-in ran and that A9's four
+copies were written and staged when it did.
 
 ## Run 4 on the base (`b1fe858ac`)
 
