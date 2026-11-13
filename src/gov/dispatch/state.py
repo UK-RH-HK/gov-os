@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 FOLDER = Path(".gov-runtime") / "dispatch"
-ITEM_SUFFIXES = (".return.txt", ".never-ran.txt", ".owner.txt")  # the inbox items a pass writes
+ITEM_SUFFIXES = (".return.txt", ".never-ran.txt", ".owner.txt", ".land.txt")  # the inbox items a pass writes
 WRITTEN = "items-written.txt"  # one line per inbox item ever written: ``<item name> <time>``
 SAFE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._=+-]*$")
 

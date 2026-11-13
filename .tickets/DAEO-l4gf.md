@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/close/command.py  # the serial-afterwards run's line only
 - governance/project/orchestration/nightly/nightly.sh
 - tests/unit/close/test_serial*
+- tests/acceptance/serial-only.txt  # S4 only: W1-16's ui_off line restored by a test designer with its Rewrite-Reason (the owner, DEC-1157 (12) route, 2026-11-13: S4 (a))
 kpis:
   success:
   - 'S1 An entry of tests/acceptance/serial-only.txt whose every case an opt-in list (tests/optin-lifted*.txt) leaves out of the run is "not in this run": the close''s serial plugin neither stops the serial phase on it (today exit 4, "no case is named by the entry") nor runs its cases elsewhere, and the run''s record names each such entry; an entry that names no case at all (no opt-in list explains it) still stops the phase, as today. Verify: a planted serial-only.txt with one entry whose every case an opt-in list leaves out, one entry that names no case and has no opt-in list, and the run''s record: the first run does not stop the serial phase and the record names the first entry; the second exits 4 with "no case is named by the entry" [DEC-1112 (3), DEC-1061, DEC-549]'

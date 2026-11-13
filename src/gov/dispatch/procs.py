@@ -45,7 +45,7 @@ def lead_marker(arguments: list[str]) -> str | None:
     return None
 
 
-def _arguments(pid: int) -> list[str]:
+def arguments(pid: int) -> list[str]:
     try:
         raw = (machine.proc_root() / str(pid) / "cmdline").read_bytes()
     except OSError:
@@ -61,7 +61,7 @@ def find(table: dict[int, dict], job_markers: dict[str, str]) -> Running:
     for pid, info in sorted(table.items()):
         if pid == own or "--settings" not in info["cmdline"]:
             continue
-        ticket = lead_marker(_arguments(pid))
+        ticket = lead_marker(arguments(pid))
         if ticket is not None:
             leads.add(pid)
             found.leads.append({"ticket": ticket, "pid": pid, "held_bytes": machine.tree_memory(table, pid)})

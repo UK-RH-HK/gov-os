@@ -1,6 +1,6 @@
 ---
 id: DAEO-ifgf
-status: in_progress
+status: closed
 deps: [DAEO-cb2b]
 links: [DAEO-cb2b]
 created: 2026-11-12T01:50:00Z

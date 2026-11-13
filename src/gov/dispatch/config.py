@@ -43,6 +43,7 @@ class Config:
     nightly_hold: dict | None = None
     landing_command: list | None = None
     notify_retry_s: float = 600
+    close_record_paths: list = field(default_factory=list)
 
 
 def _bad(key: str, why: str) -> ConfigError:
@@ -89,10 +90,21 @@ def _hold(values: dict):
     value = values.get("nightly_hold")
     if value is None:
         return None
-    if not isinstance(value, dict) or set(value) != {"from", "until"} \
-            or not all(isinstance(v, str) and CLOCK.match(v) for v in value.values()):
-        raise _bad("nightly_hold", f'{{from: "HH:MM", until: "HH:MM"}} is needed, not {value!r}')
-    return {"from": value["from"], "until": value["until"]}
+    if not isinstance(value, dict) or not {"from", "until"} <= set(value) <= {"from", "until", "marker"} \
+            or not all(isinstance(value[k], str) and CLOCK.match(value[k]) for k in ("from", "until")) \
+            or ("marker" in value and (not isinstance(value["marker"], str) or not value["marker"].strip())):
+        raise _bad("nightly_hold", f'{{from: "HH:MM", until: "HH:MM", marker: <path, optional>}} is needed, '
+                                   f'not {value!r}')
+    return {k: value[k] for k in ("from", "until", "marker") if k in value}
+
+
+def _paths(values: dict, key: str) -> list:
+    value = values.get(key)
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(p, str) and p for p in value):
+        raise _bad(key, f"a list of path prefixes is needed, not {value!r}")
+    return list(value)
 
 
 def _markers(values: dict) -> dict:
@@ -137,4 +149,5 @@ def load(root: Path) -> Config:
         nightly_hold=_hold(values),
         landing_command=_argv(values, "landing_command", None),
         notify_retry_s=_number(values, "notify_retry_s", 600),
+        close_record_paths=_paths(values, "close_record_paths"),
     )

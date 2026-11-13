@@ -38,5 +38,6 @@ Every new idea, the owner's or the orchestrator's, comes here unless it blocks E
 | W3-P32 | W2-115b: `gov queue`, the product's merge queue (W2-115's six queue lines and two failure lines, split 11-11 23:57); this repository lands through the reference queue meanwhile | the owner's ticket table, DEC-1142 (8) (DAEO-j9z6) | 2026-11-12 |
 | W3-P33 | W2-121c: gov dispatch part c, health (heavy-job slots, embedders' and GPU state, the busy-core band; `src/gov/resources/slots.py`) | the owner's ticket table, DEC-1142 (8) (DAEO-5rgj) | 2026-11-12 |
 | W3-P34 | W2-121d: gov dispatch part d, watch and launch lead (`src/gov/watch/**`, `src/gov/launch/**`) | the owner's ticket table, DEC-1142 (8) (DAEO-6w5n) | 2026-11-12 |
+| W3-P35 | gov launch's plan check (`src/gov/launch/plan_check.py`) reads a dependency merged into w2/integrate as met for starting (closing still waits for it closed); in Wave 2 the per-ticket `plan_override: DEC-1157` serves | the owner, 2026-11-13 (DEC-1157 (9)): no new ticket; parked | 2026-11-13 |
 
 Not parked: the mutation-testing trial after W2-11 is already decided (DEC-941 item 6) and stays in Wave 2.

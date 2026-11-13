@@ -14,15 +14,20 @@ from pathlib import Path
 
 HELP = "the orchestrator's Stop checks: stop-check waiter (the inbox waiter armed) or idle (no unblocked work left idle)"
 CLASS = "act"
-ACT_PATHS = (".gov-runtime/session-watch/**",)  # state.json and stop-check.log; the item plan's temporary list
+ACT_PATHS = (".gov-runtime/session-watch/**", ".gov-runtime/dispatch/inbox/**")  # + helper-watch's inbox items
 CHILD_EXIT_CODE = True
 CHECKS = ("waiter", "idle")
 
 
 def add_arguments(parser) -> None:
-    parser.usage = "gov session-watch stop-check {waiter,idle} [--root <project>]  (the Stop hook's JSON on stdin)"
-    parser.add_argument("action", choices=("stop-check",), metavar="stop-check", help="the Stop hook's check")
-    parser.add_argument("check", choices=CHECKS, metavar="{waiter,idle}", help="which check")
+    parser.usage = ("gov session-watch stop-check {waiter,idle} [--root <project>]  (the Stop hook's JSON on stdin)\n"
+                    "       gov session-watch helper-watch [--every 300] [--max 86400] [--stale-min 30] [--window-h 24] [--once]")
+    parser.add_argument("action", choices=("stop-check", "helper-watch"), metavar="{stop-check,helper-watch}",
+                        help="the Stop hook's check, or the helper watch")
+    parser.add_argument("check", nargs="?", choices=CHECKS, metavar="{waiter,idle}", help="which check (stop-check)")
+    for option, default in (("every", 300), ("max", 86400), ("stale-min", 30), ("window-h", 24)):
+        parser.add_argument(f"--{option}", type=float, default=default, help=f"helper-watch: {option} (default {default})")
+    parser.add_argument("--once", action="store_true", help="helper-watch: one look")
 
 
 def _decide(root: Path, check: str, data: dict, session: str):
@@ -39,6 +44,12 @@ def _decide(root: Path, check: str, data: dict, session: str):
 def run(root: Path, args, config: dict) -> int:
     from gov.session_watch import checks, state
 
+    if args.action == "helper-watch":
+        from gov.session_watch import helper_watch
+        return helper_watch.run(Path(root), args)
+    if args.check is None:  # stop-check's check is required, as it was when the parser said so
+        print("gov session-watch: stop-check needs a check: waiter or idle", file=sys.stderr)
+        return 2
     root, check, session = Path(root), args.check, ""
     try:
         data = json.load(sys.stdin)
