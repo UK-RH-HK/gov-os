@@ -47,7 +47,9 @@ LABELS = {**{name: name for name in SPREAD if name != "plan-ticket-path-map"},
           "plan": "plan-ticket-path-map", "ticket": "plan-ticket-path-map", "path-map": "plan-ticket-path-map"}
 
 # DEC-1069 (5): S3's quotas amended to fit R5, for a 40-question half (RUBRIC.md, version 2, R5 item 6's table):
-# each `category` value and its "at least"; the twelve sum to 40, and the hidden half is judged by them in full.
+# each `category` value and its "at least"; the twelve sum to 40. Less h10's retired place (R5_RETIRED below) the
+# half's minimums sum to 39, as HIDDEN_COUNT does; the floors S3 applies are lower still by the accepted shortfall
+# (R5_SHORT below).
 R5_QUOTAS = {
     "decision": 6, "contract": 4, "plan": 4, "ticket": 4, "exact-string": 4, "callers": 4, "code-paraphrase": 3,
     "kernel-template": 3, "multi-file": 3, "failure-memory": 3, "history": 1, "nonexistent-id": 1,
@@ -55,6 +57,12 @@ R5_QUOTAS = {
 # The owner's accepted shortfall (DEC-1069; the operator's note on ACT-HNEW-1): the hidden 40 end one short in these
 # three categories. No other category may fall short, and none of these by more than one.
 R5_SHORT = {"decision": 1, "callers": 1, "code-paraphrase": 1}
+# DEC-1171 (2), the owner's option (b) (DEC-1175, to be recorded): h10 is retired from the hidden half, and its R5
+# category is callers (given by the owner's operator from h10's retirement reason line). The callers floor drops by
+# one more with the count: it is two short of R5's minimum (R5_SHORT's one and this one). Floors: callers 4 - 1 - 1
+# = 2, decision 6 - 1 = 5, code-paraphrase 3 - 1 = 2, every other category at its full minimum (the floors sum to
+# 40 - 3 - 1 = 36, within the half's 39 files).
+R5_RETIRED = {"callers": 1}
 
 
 def real_home() -> Path:
