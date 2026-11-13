@@ -132,3 +132,17 @@ def test_arithmetic_is_no_substitution():
     assert subs == ["(cd a) && (cat b)"]
     command = "$((1+2))"
     assert _arithmetic(command, 2, len(command) - 1)
+
+
+# -- review round 1, F1: a shell given options reads its heredoc as commands, on the read side too ----------------
+
+@pytest.mark.parametrize("reader", ["bash -euo pipefail", "bash -e -u -o pipefail", "sh -o errexit",
+                                    "bash -O extglob", "bash +o posix", "bash --rcfile f", "bash /dev/stdin",
+                                    "sh /dev/fd/0"])
+def test_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(project, reader):
+    assert why(project, f"{reader} <<'EOF'\ncat eval/hidden/a.yaml\nEOF") == HIDDEN_REFUSAL
+    assert why(project, f"cat <<'EOF' | {reader}\ncat eval/hidden/a.yaml\nEOF") == HIDDEN_REFUSAL
+
+
+def test_f1_a_script_run_with_options_reads_the_heredoc_as_data(project):
+    assert why(project, "bash -euo pipefail tool.sh <<'EOF'\nfor f in $(ls); do :; done\nEOF") == ""

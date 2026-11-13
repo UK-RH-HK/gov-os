@@ -256,3 +256,47 @@ def test_the_hooks_parser_text_reads_the_same(root, monkeypatch):
     text = "B=/tmp/w242a ; mkdir '$B/r' < __gov_heredoc_0__ ; echo '`__gov_sub_0__`' ; touch '`__gov_sub_3__`'"
     t = _extract_bash_write_targets(text, root)
     assert "/tmp/w242a/r" in t and SENT in t
+
+
+# -- review round 1, F1: a shell given options (one with a value) reads its heredoc as commands ------------------
+
+SHELL_READERS = ["bash -euo pipefail", "bash -e -u -o pipefail", "bash -eu -o pipefail", "sh -o errexit",
+                 "bash -O extglob", "bash +o posix", "bash +O extglob", "bash --rcfile f", "bash --init-file f",
+                 "bash --norc --noprofile -o pipefail", "bash -oe pipefail", "bash -s", "bash -es x y",
+                 "bash /dev/stdin", "sh /dev/fd/0", "bash /proc/self/fd/0", "bash -- /dev/stdin", "bash -",
+                 "bash -o", "bash --frobnicate x", "zsh -Z x", "bash -euo pipefail -s x"]
+
+
+@pytest.mark.parametrize("reader", SHELL_READERS)
+def test_f1_a_shell_with_options_reads_its_heredoc_as_commands(reader):
+    assert bash_writes._kind(reader.split()) == "shell"
+
+
+@pytest.mark.parametrize("reader", ["bash x.sh", "bash -euo pipefail x.sh", "bash -o pipefail -- x.sh",
+                                    "bash --rcfile f x.sh", "bash -O extglob x.sh", "sh -e x.sh",
+                                    "bash -euo pipefail -c 'cat'", "bash -c 'cat'", "sh -ec x"])
+def test_f1_a_shell_running_a_script_or_a_c_string_takes_the_heredoc_as_data(reader):
+    assert bash_writes._kind(reader.split()) == "data"
+
+
+@pytest.mark.parametrize("command", [
+    "bash -euo pipefail <<'EOF'\nsed -i s/a/b/ {A}/W1/test_a.py; cp x.py src/m.py\nEOF",
+    "bash -eu -o pipefail <<EOF\nsed -i s/a/b/ {A}/W1/test_a.py; cp x.py src/m.py\nEOF",
+    "cat <<'EOF' | bash -o pipefail\nsed -i s/a/b/ {A}/W1/test_a.py; cp x.py src/m.py\nEOF",
+    "bash --rcfile f <<'EOF'\nsed -i s/a/b/ {A}/W1/test_a.py; cp x.py src/m.py\nEOF",
+    "bash /dev/stdin <<'EOF'\nsed -i s/a/b/ {A}/W1/test_a.py; cp x.py src/m.py\nEOF",
+])
+def test_f1_a_shell_with_options_body_writes_are_caught(root, command):
+    t = got(command.replace("{A}", A), root)
+    assert f"R/{A}/W1/test_a.py" in t and "R/src/m.py" in t
+
+
+def test_f1_a_script_run_with_combined_options_is_judged_as_its_code(root):
+    command = f"cat > /tmp/w242a-f1.sh <<'EOF'\ntouch {A}/W1/n\nEOF\nbash -euo pipefail /tmp/w242a-f1.sh"
+    assert f"R/{A}/W1/n" in got(command, root)
+
+
+def test_f1_no_form_that_gave_a_target_gives_none_now(root):
+    """Fail closed: each reader that the earlier _kind read as shell is read as shell still."""
+    for reader in ["bash", "sh", "bash -s", "bash -e", "bash -x -s a", "dash", "zsh", "ksh -s"]:
+        assert bash_writes._kind(reader.split()) == "shell", reader

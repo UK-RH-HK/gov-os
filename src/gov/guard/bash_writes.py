@@ -1028,7 +1028,9 @@ def _script_words(head, reds):
             if _short(args[i], "c"):
                 code += args[i + 1:i + 2]
                 return out, code
-            i += 2 if args[i] in ("-o", "+o", "-O", "+O", "--rcfile", "--init-file") else 1
+            a = args[i]  # -o, -O, +o, +O take a value, once for each in a cluster (-euo pipefail; round 1, F1)
+            i += 2 if a in ("--rcfile", "--init-file") else 1 if a.startswith("--") else \
+                1 + sum(ch in "oO" for ch in a[1:])
         i += i < len(args) and args[i] in ("-", "--")
         out += [(args[i], "shell")] if i < len(args) else [(t, "shell") for t in inputs]
     elif _PY.match(name) or name in _PY_RUNNERS:
@@ -1115,11 +1117,51 @@ def _kind(words):
         return "python" if i >= len(args) or args[i] == "-" else "data"
     if name in _SHELLS:
         opts = [a for a in args if a.startswith("-")]
-        operands = [a for a in args if not a.startswith("-")]
         if any("c" in o.lstrip("-") for o in opts if not o.startswith("--")):
             return "data"
-        return "shell" if not operands or "-s" in opts else "data"
+        if "-s" in opts:
+            return "shell"
+        script = _shell_script(args)
+        # No script, a script that is standard input, or an option the guard does not know: the shell reads the
+        # body as commands (review round 1, F1: an option's value is no script name).
+        return "shell" if script is None or script in _STDIN else "data"
     return "data" if name in _DATA else "code"
+
+
+_STDIN = ("/dev/stdin", "/dev/fd/0", "/proc/self/fd/0")
+_SHELL_LETTERS = frozenset("abefhiklmnprstuvxBCDEHIPTV")  # bash's and dash's one-letter options, o, O and c apart
+_SHELL_LONG = frozenset(("--debug", "--debugger", "--dump-po-strings", "--dump-strings", "--help", "--login",
+                         "--noediting", "--noprofile", "--norc", "--posix", "--pretty-print", "--restricted",
+                         "--verbose", "--version"))
+
+
+def _shell_script(args):
+    """The script word a shell is given after its options (review round 1, F1), or None when it reads its commands
+    from standard input: no script word, ``-s`` in a cluster, or an option it does not know (fail closed). ``-o``,
+    ``+o``, ``-O`` and ``+O`` take the next word as their value, once for each such letter in a cluster
+    (``-euo pipefail``); ``--rcfile`` and ``--init-file`` take the next word."""
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a in ("-", "--"):
+            i += 1
+            break
+        if a.startswith("--"):
+            if a in ("--rcfile", "--init-file"):
+                i += 2
+            elif a in _SHELL_LONG or a.startswith(("--rcfile=", "--init-file=")):
+                i += 1
+            else:
+                return None
+            continue
+        if len(a) > 1 and a[0] in "-+":
+            letters = a[1:]
+            if "s" in letters or any(ch not in _SHELL_LETTERS and ch not in "oO" for ch in letters):
+                return None
+            i += 1 + sum(ch in "oO" for ch in letters)
+            continue
+        break
+    return args[i] if i < len(args) else None
 
 
 class Judgement:
