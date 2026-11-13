@@ -7,6 +7,7 @@ a clean repository yields ``NOTHING-TO-REFACTOR.md``.
 
 from __future__ import annotations
 
+import json
 import re
 
 import pytest
@@ -93,6 +94,96 @@ def test_s2_no_proposal_holds_the_secrets_value(planned):
     W.assert_no_secret(got["orchard"].secret, W.all_text(got["out"], runs=(got["run"],)), "the plan's outputs")
     rps = P.plan_files(got["out"])
     assert rps, "no proposal was written, so none could be searched"
+
+
+# ---- B-1.5 (RV1-3): the secrets scan did not run -----------------------------------------------------------------------
+#
+# When the secrets scan did not run (no ``gitleaks`` on PATH) or skipped files (a blob over ``assess.SCAN_LIMIT_BYTES``, 16 MiB), MA
+# still writes ``memory-assessment.json`` and the ``RP-*.md`` proposals it finds; it writes no ``NOTHING-TO-REFACTOR.md``; it writes
+# ``refactor-plan/PLAN.md`` holding the line ``secrets: not scanned (<reason>)`` and the unscanned paths (or ``all <n> tracked files``
+# when the scanner did not run); its result is not ok, error ``SECRETS_UNSCANNED``, ``details`` ``{reason, unscanned}`` (exit non-zero).
+# The repository is still byte-identical before and after (F1), and the secret's value is in no output (F5).
+
+NOT_SCANNED = re.compile(r"secrets: not scanned \(([^)\n]+)\)")
+
+
+def assess_unscanned(box, host, root, name, *, environment=None):
+    """MA on ``root`` (settled, its state taken) with no gitleaks on PATH (or with ``environment``); returns ``(run, out, before)``."""
+    W.settle(root)
+    before = W.repo_state(root)
+    out = box.base / name
+    run = W.run_adopt(root, environment if environment is not None else W.env_without_gitleaks(box, host), "MA", "--out", str(out))
+    W.assert_offered(run, "MA")
+    return run, out, before
+
+
+def assert_unscanned_refusal(run, what):
+    W.assert_refused(run, "SECRETS_UNSCANNED", what, "MA")
+    details = run.error.get("details") or {}
+    assert isinstance(details, dict) and {"reason", "unscanned"} <= set(details), f"details is {details!r}, not {{reason, unscanned}}"
+    assert str(details["reason"]).strip(), "details['reason'] is empty"
+    return details
+
+
+def test_s2_ma_with_no_gitleaks_writes_what_it_found_names_the_scan_not_run_and_is_not_ok(box, host):
+    """B-1.5: no ``gitleaks`` on PATH, on a repository with one secret line (and the other blockers): the assessment and the
+    proposals it finds (the over-limit one) are written; no ``NOTHING-TO-REFACTOR.md``; ``PLAN.md`` holds ``secrets: not scanned
+    (<reason>)`` and ``all <n> tracked files``; the result is not ok with ``SECRETS_UNSCANNED``; the repository is byte-identical
+    before and after; the secret's value is in no output."""
+    orchard = P.plant_blockers(box.base)
+    run, out, before = assess_unscanned(box, host, orchard.root, "no-scanner-out")
+    details = assert_unscanned_refusal(run, "MA with no gitleaks on PATH")
+    record = out / W.ASSESSMENT
+    assert record.is_file(), f"MA wrote no {W.ASSESSMENT} when the scan did not run (it still writes what it found)"
+    tracked = len(W.git(orchard.root, "ls-files").splitlines())
+    assert W.read_json(record)["tracked_files"] == tracked
+    assert "over-limit" in P.plan_files(out), f"the proposals MA finds are not written: {sorted(P.plan_files(out))}"
+    folder = out / W.PLAN_DIR
+    assert not (folder / "NOTHING-TO-REFACTOR.md").exists(), "NOTHING-TO-REFACTOR.md is written though the secrets scan did not run"
+    plan = (folder / "PLAN.md").read_text(encoding="utf-8")
+    found = NOT_SCANNED.search(plan)
+    assert found, "PLAN.md does not hold the line `secrets: not scanned (<reason>)`"
+    assert f"all {tracked} tracked files" in plan, f"PLAN.md does not say `all {tracked} tracked files` (the scanner did not run)"
+    W.assert_state_equal(before, W.repo_state(orchard.root), "MA with no gitleaks")
+    W.assert_no_secret(orchard.secret, W.all_text(out, runs=(run,)), "MA's outputs with no gitleaks")
+    assert details["reason"] and found.group(1), "the reason is not named"
+
+
+def test_s2_a_clean_repository_is_not_called_clean_when_the_secrets_scan_did_not_run(box, host):
+    """B-1.5: nothing to refactor is a claim about secrets too. With no gitleaks, a repository with no other blocker gets no
+    ``NOTHING-TO-REFACTOR.md``: ``PLAN.md`` says the scan was not run, and the result is not ok."""
+    root = P.plant_clean(box.base)
+    run, out, before = assess_unscanned(box, host, root, "clean-no-scanner-out")
+    assert_unscanned_refusal(run, "MA on a clean repository with no gitleaks on PATH")
+    folder = out / W.PLAN_DIR
+    assert (out / W.ASSESSMENT).is_file(), "no assessment was written"
+    assert not (folder / "NOTHING-TO-REFACTOR.md").exists(), "a clean repository whose secrets were not scanned is said to have nothing to refactor"
+    assert not list(folder.glob("RP-*")), f"proposals for a clean repository: {[p.name for p in folder.glob('RP-*')]}"
+    assert NOT_SCANNED.search((folder / "PLAN.md").read_text(encoding="utf-8")), "PLAN.md does not hold `secrets: not scanned (<reason>)`"
+    W.assert_state_equal(before, W.repo_state(root), "MA on a clean repository with no gitleaks")
+
+
+def test_s2_a_blob_over_the_scan_limit_is_named_unscanned_and_the_run_is_not_ok(box, host):
+    """B-1.5: the scan ran (gitleaks on PATH) but skipped a blob over ``assess.SCAN_LIMIT_BYTES`` (16 MiB): the result is not ok
+    (``SECRETS_UNSCANNED``, ``details.unscanned`` naming the file and not a scanned one), ``PLAN.md`` names the file under
+    ``secrets: not scanned (<reason>)``, no ``NOTHING-TO-REFACTOR.md``, the assessment is written, the repository unchanged."""
+    try:
+        from gov.adopt import assess
+        limit = int(getattr(assess, "SCAN_LIMIT_BYTES", W.SCAN_LIMIT_FALLBACK))
+    except ImportError:
+        limit = W.SCAN_LIMIT_FALLBACK
+    root = P.plant_clean(box.base, "huge")
+    W.write(root, "data/huge.log", "row of the long table\n" * ((limit // 22) + 400))
+    W.commit_all(root, "a blob over the scan limit")
+    run, out, before = assess_unscanned(box, host, root, "huge-out", environment=W.env(box, host))
+    details = assert_unscanned_refusal(run, "MA with a blob over the scan limit")
+    assert "data/huge.log" in json.dumps(details["unscanned"]), f"details['unscanned'] does not name the skipped blob: {details['unscanned']!r}"
+    assert "README.md" not in json.dumps(details["unscanned"]), f"a scanned file is named unscanned: {details['unscanned']!r}"
+    folder = out / W.PLAN_DIR
+    assert (out / W.ASSESSMENT).is_file() and not (folder / "NOTHING-TO-REFACTOR.md").exists()
+    plan = (folder / "PLAN.md").read_text(encoding="utf-8")
+    assert NOT_SCANNED.search(plan) and "data/huge.log" in plan, "PLAN.md does not name the secrets not scanned and the skipped path"
+    W.assert_state_equal(before, W.repo_state(root), "MA with a blob over the scan limit")
 
 
 def test_s2_a_clean_repository_says_there_is_nothing_to_refactor(box, host):

@@ -52,8 +52,35 @@ STORE_FIELDS = ("judged", "indexed", "refused", "chunks", "vectors", "nodes", "e
 DIGESTS = ("record", "lexical", "vectors", "codegraph_bytes")
 REFUSE_REASONS = ("secrets", "binary", "not-embedded", "unsupported-language", "over-limit")
 CHAIN = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
-RETRIEVAL_SRC = REPO_ROOT / "governance/project/retrieval.yaml"   # "as Gov OS ships it": a planted adoption holds a copy
+RETRIEVAL_REL = "governance/project/retrieval.yaml"
+RETRIEVAL_SRC = REPO_ROOT / RETRIEVAL_REL   # "as Gov OS ships it": a planted adoption holds a copy
 EVIDENCE_REL = "docs/changes/W2-88-evidence.md"
+SCAN_LIMIT_FALLBACK = 16 * 1024 * 1024   # B-1.5: the secrets scan skips a blob over assess.SCAN_LIMIT_BYTES (16 MiB)
+KERNEL_REL = "template/governance/kernel"
+
+
+def copy_plan() -> list:
+    """B-1.1 + B-1.3: ``(path in the adopted repository, path in Gov OS)`` for each file A9's copy step installs byte for
+    byte: every file of the kernel's retrieval and discovery skills (same relative names, under ``.claude/skills/<skill>/``)
+    and T-0 and T-8 (``governance/kernel/templates/brief.md`` and ``role-cto.md``). ``retrieval.yaml`` is the copy's other
+    file, installed only where the repository tracks none (``RETRIEVAL_REL``)."""
+    pairs = []
+    for skill in ("retrieval", "discovery"):
+        base = REPO_ROOT / KERNEL_REL / "skills" / skill
+        for path in sorted(p for p in base.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
+            rel = path.relative_to(base).as_posix()
+            pairs.append((f".claude/skills/{skill}/{rel}", path.relative_to(REPO_ROOT).as_posix()))
+    for name in ("brief.md", "role-cto.md"):
+        pairs.append((f"governance/kernel/templates/{name}", f"{KERNEL_REL}/templates/{name}"))
+    return pairs
+
+
+def env_without_gitleaks(box, host: str, **extra) -> dict:
+    """The suite's environment with no ``gitleaks`` on ``PATH`` (B-1.5): the program folder of the python and the system's
+    ``/usr/bin`` and ``/bin`` only (the box's tools folder holds the link to the real scanner)."""
+    folders = [str(Path(sys.executable).parent), "/usr/bin", "/bin"]
+    assert not any((Path(f) / "gitleaks").exists() for f in folders), "a gitleaks sits in a system folder: the plant cannot take it off PATH"
+    return env(box, host, PATH=os.pathsep.join(folders), **extra)
 
 
 # ------------------------------------------------------------------------------------------------------------
@@ -383,10 +410,10 @@ def adoption_namespaces(not_embedded: bool = True) -> dict:
 
 
 def plant_adoption(box, name: str = "harbour", *, retrieval: str | None = None, code_intelligence: bool = False,
-                   extra: dict | None = None) -> Path:
+                   extra: dict | None = None, no_retrieval: bool = False) -> Path:
     """S124's legacy repository, with what A9's record judges: a tracked binary and a tracked secret (refused), a note in
-    a namespace that is not embedded, the repository's ``retrieval.yaml`` as Gov OS ships it, and a path map with the
-    namespaces of ``adoption_namespaces``."""
+    a namespace that is not embedded, the repository's ``retrieval.yaml`` as Gov OS ships it (``no_retrieval``: tracked
+    none, so A9's copy step installs Gov OS's, B-1.3), and a path map with the namespaces of ``adoption_namespaces``."""
     project = Path(box.base) / name
     project.mkdir(parents=True)
     write(project, ".gitignore", ".gov-runtime/\n__pycache__/\n*.pyc\n")
@@ -395,8 +422,9 @@ def plant_adoption(box, name: str = "harbour", *, retrieval: str | None = None, 
     if code_intelligence:
         document["capabilities"]["code_intelligence"] = {"enabled": True, "languages": ["python"]}
     write(project, S124.PATH_MAP_REL, yaml.safe_dump(document, sort_keys=False))
-    write(project, "governance/project/retrieval.yaml",
-          retrieval if retrieval is not None else RETRIEVAL_SRC.read_text(encoding="utf-8"))
+    if not no_retrieval:
+        write(project, RETRIEVAL_REL,
+              retrieval if retrieval is not None else RETRIEVAL_SRC.read_text(encoding="utf-8"))
     write(project, "README.md", "# Harbour\n\nA programme's own repository, planted by the W2-88 tests.\n")
     write(project, "docs/guide.md", "# Guide\n\nHow the harbour is run.\n")
     write(project, "docs/notes.txt", "Tide tables are kept by the harbour master.\n")
@@ -503,16 +531,44 @@ def fork(nine, name: str, retrieval: str | None = None) -> "Adoption":
                     extra_env=nine.adoption.extra_env)
 
 
+def run_a9_child(adoption, out, *extra, scan: str | None = None, watch=(), timeout: int = 900):
+    """``gov adopt --lite --stage A9 --out <out> <extra>`` through ``a9_hash_stores.py``: the store hashed the moment
+    ``gov.rebuild.command.run`` returns (stderr line ``store-hash-after-build:``), the files of ``watch`` (relative to the
+    project) seen at its entry (``copies-at-build:``), and, with ``scan``, ``gov.adopt.fabric.vector_scan`` (the semantic
+    route's reply, the seam a test replaces in-process, RV1-2) replaced by a stand-in: ``unavailable`` (answers
+    ``{"available": False, "reason": "FACET_UNAVAILABLE: planted"}``), ``raises`` (a ``RuntimeError``) or ``slow`` (answers
+    ``available: True`` after 0.05 s). Returns ``(run, process)``."""
+    environment = adoption.env()
+    if scan:
+        environment["W2_88_SCAN"] = scan
+    if watch:
+        environment["W2_88_WATCH"] = json.dumps(list(watch))
+    arguments = ["adopt", "--lite", "--stage", "A9", "--out", str(out), *extra, "--json", "--session", SESSION]
+    done = subprocess.run([sys.executable, str(HERE / "a9_hash_stores.py"), *arguments], cwd=str(adoption.project),
+                          env=environment, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
+    run = S124.Run(("adopt", "--lite", "--stage", "A9", *extra), done.returncode, done.stdout, done.stderr, 0.0)
+    return run, done
+
+
+def stderr_json(done, prefix: str):
+    """The JSON after the last stderr line that starts with ``prefix`` (None where there is none)."""
+    lines = [line for line in done.stderr.splitlines() if line.startswith(prefix)]
+    return json.loads(lines[-1].split(":", 1)[1]) if lines else None
+
+
 def retrieval_variant(kind: str) -> str:
-    """The repository's ``retrieval.yaml`` (as Gov OS ships it) with one setting changed: ``pool-off``,
-    ``second-reranker`` or ``bundle-budget``, in the keys the engineer named for each ``fabric.STANDARD`` setting (P-10,
-    P-W2-88-TD-1): pool off is ``pool: {meaning_uncut: false, ...}`` (the shipped block's other keys kept); a second
-    reranker is ``rerank: {service: private}`` (``rerank.service`` absent: ``shared``); another bundle budget is
-    ``bundle: {tokens: 4000}`` (``bundle.tokens`` absent: 6000). ``gov.config.loader`` refuses a top-level ``rerank`` or
-    ``bundle`` key today (``CONFIG_INVALID``): package P-W2-88-B-1; the plant is the one the seam states."""
+    """The repository's ``retrieval.yaml`` (as Gov OS ships it) with one change: ``pool-off`` (``pool: {meaning_uncut:
+    false, ...}``, the shipped block's other keys kept), ``pool-depth`` (``pool.route_depth: 5``, B-1.4: the whole block is
+    the standard, any key that differs departs), and the two keys the pin owns (B-1.2, P-W2-88-B-1: the reranker and the
+    bundle are ``rerank.MODEL`` / ``retrieve.BUNDLE_BUDGET``, never ``retrieval.yaml``'s): ``second-reranker``
+    (``rerank: {service: private}``) and ``bundle-budget`` (``bundle: {tokens: 4000}``). A ``retrieval.yaml`` in force that
+    holds a top-level ``rerank`` or ``bundle`` key is refused ``CONFIG_INVALID`` naming it (by ``gov.config.loader`` or
+    by A9: either is the decided behaviour), a ``--decision`` never makes it ok."""
     document = yaml.safe_load(RETRIEVAL_SRC.read_text(encoding="utf-8"))
     if kind == "pool-off":
         document["pool"] = {**document["pool"], "meaning_uncut": False}
+    elif kind == "pool-depth":
+        document["pool"] = {**document["pool"], "route_depth": 5}
     elif kind == "second-reranker":
         document["rerank"] = {"service": "private"}
     elif kind == "bundle-budget":

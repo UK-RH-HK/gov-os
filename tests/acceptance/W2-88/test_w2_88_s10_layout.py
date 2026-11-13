@@ -131,6 +131,24 @@ def test_s10_an_unstamped_store_whose_tables_are_complete_opens_as_current(box, 
     assert seen["outcome"] == "opened", f"an unstamped store with complete tables was refused: {seen}"
 
 
+@pytest.mark.parametrize("state,found", [("unstamped-lexical-no-parent", 0), ("stamped-1", 1)])
+def test_s10_f3_a_load_does_not_make_a_stale_store_current(box, host, state, found):
+    """RV1-6: ``gov.store.loader.load`` stamps a store only when ``layout.check`` finds it current (or the store is new). After a
+    load on a stale store (unstamped with ``lexical_chunk`` lacking ``parent_id``: ``found`` 0; or stamped 1), ``loader.connect`` still
+    raises ``STORE_LAYOUT_STALE`` with the same ``details['found']`` (never opens it as current)."""
+    project = W.S124.plant(box, f"load-stale-{state}", files=2)
+    done = child(box, host, "load_then_open.py", project, state)
+    assert done.returncode == 0 and done.stdout.strip(), f"load_then_open.py failed (no gov.store.layout on this head?): {done.stderr[-800:]}"
+    seen = json.loads(done.stdout.strip().splitlines()[-1])
+    before, after = seen["before"], seen["after"]
+    assert before.get("outcome") == "error" and before.get("code") == "STORE_LAYOUT_STALE" and before["details"].get("found") == found, \
+        f"the plant did not take: the {state} store opens as {before}"
+    assert seen["load"] in (None, "STORE_LAYOUT_STALE"), f"the load of a stale store failed: {seen['load']}"
+    assert after.get("outcome") == "error", f"after a load the stale store ({state}) opens as current: the load stamped it ({after})"
+    assert after["code"] == "STORE_LAYOUT_STALE", f"after a load the refusal is {after['code']}, not STORE_LAYOUT_STALE"
+    assert after["details"].get("found") == found, f"after a load found is {after['details'].get('found')!r}, not {found} (the stamp was rewritten)"
+
+
 def test_s10_no_store_at_all_is_still_store_missing(box, host):
     """GUARD (green on the base): ``connect`` checks the layout after its STORE_MISSING check, so no store stays missing."""
     project = W.S124.plant(box, "nostore", files=1)

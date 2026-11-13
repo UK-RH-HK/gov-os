@@ -62,15 +62,76 @@ def test_s3_every_store_judges_what_it_indexed_or_refused_with_a_reason(worlds):
 
 
 def test_s3_the_planted_refusals_carry_their_reasons(worlds):
+    """The tracked secret is refused ``secrets`` and the note of a namespace that is not embedded ``not-embedded`` by the vectors. The
+    tracked binary (RV1-4, revised: DEC-1157 (12)) is either refused ``binary`` by a store that did not take it, or held (indexed and
+    named in ``binary_held``) by a store that did: never both for one store (the next cases)."""
     stores = stores_of(worlds.a9("default").record())
     refused = [(n, i["path"], i["reason"]) for n, b in stores.items() for i in b["refused"]]
     assert any(p == "config/settings.env" and r == "secrets" for _, p, r in refused), f"the tracked secret is not refused as secrets: {refused}"
-    assert any(p == "assets/logo.bin" and r == "binary" for _, p, r in refused), f"the tracked binary is not refused as binary: {refused}"
     assert any(n == "vectors" and p == "archive/old.md" and r == "not-embedded" for n, p, r in refused), \
         f"a note of a namespace that is not embedded is not refused by the vectors as not-embedded: {refused}"
+    seen = False
+    for name, block in stores.items():
+        held = "assets/logo.bin" in (block.get("binary_held") or [])
+        refused_binary = any(i["path"] == "assets/logo.bin" and i["reason"] == "binary" for i in block["refused"])
+        assert not (held and refused_binary), f"stores.{name}: the tracked binary is both held and refused as binary"
+        seen = seen or held or refused_binary
+    assert seen, "no store names the tracked binary, held (binary_held) or refused as binary"
     indexed = stores["vectors"]["indexed"]
     if isinstance(indexed, list):
         assert any("docs/guide.md" in str(item) for item in indexed), "docs/guide.md is not in the vectors' indexed list"
+
+
+def chunked_paths(project, query) -> set:
+    """Paths the store the stage built holds rows for (``query`` selects one column of paths), read from the planted
+    adoption's own ``.gov-runtime/store.db`` (a file the child wrote; read only here)."""
+    import sqlite3
+    conn = sqlite3.connect(f"file:{project / '.gov-runtime/store.db'}?mode=ro", uri=True)
+    try:
+        return {row[0] for row in conn.execute(query)}
+    finally:
+        conn.close()
+
+
+def test_s3_a_tracked_binary_the_lexical_index_chunked_is_indexed_and_named_held_never_refused(worlds):
+    """RV1-4: a file is never in a store's ``refused`` while that store holds it. The lexical index chunks a tracked binary
+    (the planted ``assets/logo.bin``: it reads every file the secrets filter lets through): it is in ``stores.lexical.indexed``, named
+    in the block's ``binary_held: [paths]``, and in no ``refused`` list; ``binary`` stays only for a binary the store did not take."""
+    nine = worlds.a9("default")
+    record = nine.record()
+    stores = stores_of(record)
+    path = "assets/logo.bin"
+    held = chunked_paths(nine.project, "SELECT DISTINCT path FROM lexical_chunk")
+    assert path in held, f"the plant did not take: the lexical index holds no chunk of {path} (chunked: {sorted(held)[:6]}...)"
+    lexical = stores["lexical"]
+    assert path in lexical["indexed"], f"stores.lexical.indexed does not hold {path}, which the lexical store chunked"
+    assert path in (lexical.get("binary_held") or []), f"stores.lexical.binary_held does not name {path}: {lexical.get('binary_held')!r}"
+    for name, block in stores.items():
+        assert not [i for i in block["refused"] if i["path"] == path and path in (block["indexed"] if isinstance(block["indexed"], list) else [])], \
+            f"stores.{name} names {path} both indexed and refused"
+    assert not [i for i in lexical["refused"] if i["path"] == path], f"stores.lexical.refused holds {path} while the store holds it"
+
+
+def test_s3_no_store_names_a_file_in_refused_while_the_store_holds_it(worlds):
+    """RV1-4 as a rule, judged on the stores themselves: every path the lexical store holds chunks for is in ``lexical.indexed`` and
+    in no ``lexical.refused`` item; every path that has a vector (a chunk with a stored vector) is in ``vectors.indexed`` and not in
+    ``vectors.refused``; a path named in ``binary_held`` is in that store's ``indexed`` list, never its ``refused`` list."""
+    nine = worlds.a9("default")
+    stores = stores_of(nine.record())
+    in_lexical = chunked_paths(nine.project, "SELECT DISTINCT path FROM lexical_chunk")
+    in_vectors = chunked_paths(nine.project, "SELECT DISTINCT c.path FROM lexical_chunk c JOIN semantic_vector v ON v.chunk_id = c.chunk_id")
+    assert in_lexical, "the lexical store holds no chunk: the plant did not take"
+    for name, held in (("lexical", in_lexical), ("vectors", in_vectors)):
+        block = stores[name]
+        indexed = set(block["indexed"]) if isinstance(block["indexed"], list) else set()
+        refused = {i["path"] for i in block["refused"]}
+        assert not held & refused, f"stores.{name}.refused names files the store holds: {sorted(held & refused)}"
+        if isinstance(block["indexed"], list):
+            assert held <= indexed, f"stores.{name}.indexed lacks files the store holds: {sorted(held - indexed)}"
+    for name, block in stores.items():
+        named = set(block.get("binary_held") or [])
+        indexed = set(block["indexed"]) if isinstance(block["indexed"], list) else named
+        assert named <= indexed and not named & {i["path"] for i in block["refused"]}, f"stores.{name}.binary_held {sorted(named)} is not held"
 
 
 def test_s3_a_store_the_path_map_calls_for_and_not_built_is_never_ok(worlds):
@@ -169,6 +230,23 @@ def test_s3_f2_check_coverage_raises_for_a_store_that_was_not_built():
     with pytest.raises(GovError) as raised:
         fabric.check_coverage(absent, TRACKED)
     assert raised.value.code == "FABRIC_INCOMPLETE", f"a record with no lexical store: {raised.value.code}"
+
+
+def test_s3_f2_check_coverage_raises_for_a_code_graph_that_could_not_be_read_naming_codegraph():
+    """RV1-5 (the unit seam): a code graph that cannot be read makes ``stores.codegraph`` ``{"built": false, "error": "<reason>"}``;
+    ``check_coverage`` raises ``FABRIC_INCOMPLETE`` with ``codegraph`` in ``details["not_built"]`` (never nodes 0 and edges 0 with ok).
+    The same record with the graph built passes."""
+    from gov.adopt import fabric
+    from gov.cli.errors import GovError
+    unread = coverage_record()
+    unread["stores"]["codegraph"] = {**unread["stores"]["codegraph"], "built": False, "error": "x"}
+    with pytest.raises(GovError) as raised:
+        fabric.check_coverage(unread, TRACKED)
+    assert raised.value.code == "FABRIC_INCOMPLETE", f"{raised.value.code} for a code graph that could not be read"
+    assert "codegraph" in (raised.value.details.get("not_built") or []), f"details['not_built'] is {raised.value.details.get('not_built')!r}"
+    built = coverage_record()
+    built["stores"]["codegraph"] = {**built["stores"]["codegraph"], "built": True}
+    assert fabric.check_coverage(built, TRACKED) is None, "a built code graph with its files listed is refused"
 
 
 def test_s3_a_second_rebuild_waits_for_the_first_under_w2_76s_lock(worlds):
