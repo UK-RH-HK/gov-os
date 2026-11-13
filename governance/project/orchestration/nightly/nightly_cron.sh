@@ -18,7 +18,7 @@ LOGDIR=$ORCH/log/nightly/cron
 PING=$HERE/ping_gate.sh
 export HOME=/home/usain
 export LANG=C.UTF-8
-export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
 mkdir -p "$LOGDIR"
 exec >> "$LOGDIR/$(date +%F).log" 2>&1
 echo "== $(date '+%F %T') nightly_cron: start"

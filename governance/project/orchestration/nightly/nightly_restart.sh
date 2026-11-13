@@ -34,7 +34,7 @@ ORCH=${NR_ORCH:-$REPO/.gov-runtime/scratch/orchestrator}
 REL=governance/project/orchestration/nightly
 export HOME=/home/usain
 export LANG=C.UTF-8
-export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
 # cron has neither: the user manager's bus is reached by its path
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}
