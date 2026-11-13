@@ -1,6 +1,6 @@
 ---
 id: DAEO-zi7s
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-p3ln]
 created: 2026-11-09T01:21:41Z
