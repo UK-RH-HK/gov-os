@@ -94,6 +94,38 @@ def test_s1_each_planted_item_is_under_its_category(assessed):
         "a plain source file is listed as vendored, generated, minified or binary"
 
 
+OTHER_CODE = ("src/ui/App.vue", "scripts/deploy.ps1", "proto/api.proto")      # code in languages the graph does not read (RV1-8)
+OTHER_CODE_SUFFIXES = (".vue", ".ps1", ".proto", ".svelte", ".cob")
+
+
+def test_s1_the_no_route_rule_names_the_code_languages_the_graph_does_not_read():
+    """RV1-8 (S1), the rule stated once in ``assess.py``: a file whose suffix is in ``assess.OTHER_CODE_SUFFIXES`` (a code language
+    the code graph does not read) is ``no_route: unsupported-language``; that list holds at least ``.vue``, ``.ps1``, ``.proto``,
+    ``.svelte`` and ``.cob``, and none of them is a suffix of ``assess.CODE_GRAPH_SUFFIXES`` (RV1-5's languages)."""
+    from gov.adopt import assess as module
+    other = {str(s).lower() for s in module.OTHER_CODE_SUFFIXES}
+    graph = {str(s).lower() for s in module.CODE_GRAPH_SUFFIXES}
+    assert set(OTHER_CODE_SUFFIXES) <= other, f"OTHER_CODE_SUFFIXES lacks {sorted(set(OTHER_CODE_SUFFIXES) - other)}"
+    assert not other & graph, f"a suffix is both a graph language and an other-code language: {sorted(other & graph)}"
+
+
+def test_s1_a_vue_a_ps1_and_a_proto_file_are_no_route_as_unsupported_language(box, host):
+    """RV1-8: MA on a planted repository with a ``.vue``, a ``.ps1`` and a ``.proto`` file: each is in the assessment's ``no_route``
+    list as ``{path, reason: "unsupported-language"}`` (like the planted ``.cob``), and a plain source file is not."""
+    orchard = W.plant_orchard(box.base, "polyglot", files={
+        OTHER_CODE[0]: "<template><div>orchard</div></template>\n<script>export default {}</script>\n",
+        OTHER_CODE[1]: "Write-Host 'deploy the orchard'\n",
+        OTHER_CODE[2]: 'syntax = "proto3";\nmessage Row { int32 id = 1; }\n'})
+    run, out = assess(orchard, box, host, name="polyglot-out")
+    W.assert_ok(run, "MA on a repository with .vue, .ps1 and .proto files")
+    no_route = W.read_json(out / W.ASSESSMENT)["no_route"]
+    for rel in OTHER_CODE:
+        entries = [i for i in no_route if isinstance(i, dict) and i.get("path") == rel]
+        assert entries and all(i.get("reason") == "unsupported-language" for i in entries), \
+            f"{rel} is not in no_route as {{path, reason: unsupported-language}}: {no_route}"
+    assert not W.holds(no_route, "src/app/main.py"), "a plain python file is in no_route"
+
+
 def test_s1_the_secret_is_named_by_rule_id_only(assessed):
     orchard, run, out, record = assessed()
     secrets = record["secrets"]
