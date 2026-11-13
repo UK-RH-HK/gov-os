@@ -12,7 +12,9 @@ neither.
 
 ``--integration <branch>`` (W2-116) keeps the integration store at the branch's head, double-buffered: the halves, the
 seed from the ready half and the switch are ``gov.rebuild.integration``'s. It takes neither ``--seed`` nor
-``--no-embeddings``: it seeds itself, and a build without its semantic store is never switched to.
+``--no-embeddings``: it seeds itself, and a build without its semantic store is never switched to. With
+``--when-due`` (W2-116 S2) it refreshes only when ``integration_refresh`` of ``rebuild.yaml`` says one is due, and
+writes ``<link>.refresh.json``; otherwise it builds nothing and says ``not_due`` (``gov.rebuild.integration``).
 
 Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
 ``gov.rebuild.watch``).
@@ -166,6 +168,10 @@ def add_arguments(parser) -> None:
                         help="keep the integration store (integration_store in governance/project/rebuild.yaml) at "
                              "BRANCH's head: build the half not in use, seeded from the ready one, and switch the "
                              "link to it only when the build succeeded; nothing at an unchanged head")
+    parser.add_argument("--when-due", dest="when_due", action="store_true",
+                        help="with --integration: refresh only when one is due by integration_refresh in "
+                             "governance/project/rebuild.yaml (after the nightly's verdict, or at its latest time; "
+                             "once the second time has passed); otherwise build nothing and say not_due")
 
 
 def run(root: Path, args, config: dict) -> dict:
@@ -177,6 +183,12 @@ def run(root: Path, args, config: dict) -> dict:
     from gov.rebuild.watch import Watch, settings, take
 
     branch = getattr(args, "integration", None)
+    when_due = getattr(args, "when_due", False)
+    if when_due and branch is None:
+        from gov.cli.errors import GovError
+
+        raise GovError("REBUILD_FAILED", "--when-due is only valid with --integration <branch>: nothing is built",
+                       {"flags": ["--when-due"]})
     if branch is not None:
         from gov.cli.errors import GovError
         from gov.rebuild import integration
@@ -189,7 +201,7 @@ def run(root: Path, args, config: dict) -> dict:
                                              f"to; nothing is built", {"flags": given})
         if not branch:
             raise GovError("REBUILD_FAILED", "--integration names no branch: nothing is built", {"branch": branch})
-        return integration.refresh(Path(root), branch)
+        return (integration.refresh_when_due if when_due else integration.refresh)(Path(root), branch)
 
     slow_after_s, lock_path, source = settings(root)
     fd, lock = take(lock_path, source)
