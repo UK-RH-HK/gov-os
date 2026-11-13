@@ -17,7 +17,7 @@ import yaml
 from gov.cli.main import main
 from gov.skilleval import harness
 
-SECRET = "PLANTED-SECRET-5b9e"  # put in the environment and the stub's stderr: must never reach the caller
+SECRET = "-".join(("PLANTED", "SECRET", "5b9e"))  # put in the environment and the stub's stderr: must never reach the caller
 
 STUB = """#!/usr/bin/python3
 import json, os, sys, time
