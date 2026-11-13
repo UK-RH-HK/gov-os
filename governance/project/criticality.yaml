@@ -1,0 +1,32 @@
+# Criticality rules (W2-184, DEC-1120 (1), DEC-1167 (2)): a ticket's class is the highest of the rules that match.
+# Read at launch by gov.launch.criticality. A glob matches an allowed path as an fnmatch pattern ('*' crosses '/').
+version: 1
+default: C2                    # the class when no rule matches
+opus: claude-opus-5-5          # the Opus model a promotion and a FULL ticket's probe use
+rules:
+  # C3: the guard, permissions, the path map, hidden sets, the operator agent, the kernel and the Contract
+  - class: C3
+    paths:
+      - "src/gov/guard/*"
+      - ".claude/hooks/*"
+      - ".claude/settings.json"
+      - "governance/project/path-map.yaml"
+      - "governance/project/held-out.yaml"
+      - "governance/project/operator/*"
+      - "template/governance/kernel/*"
+      - "governance/kernel/*"
+      - "docs/contract/*"
+  # C2: product code, launch, gate and plan, test maps, schemas
+  - class: C2
+    paths:
+      - "src/*"
+      - "governance/project/test-map.yaml"
+      - "*/schemas/*"
+  # C1: records and docs
+  - class: C1
+    paths:
+      - "docs/*"
+      - "governance/project/orchestration/*"
+  # a FULL ticket is at least C2
+  - class: C2
+    profile: FULL
