@@ -155,9 +155,15 @@ Every path:line is of this branch after run 4's first commit.
   - Gov OS's `governance/project/retrieval.yaml` to `governance/project/retrieval.yaml` **only where the repository
     tracks none**; a tracked one is kept as it is and judged (B-1.4).
   - The files are in place before the build and the scale and measure queries, and join the stage's judged files (the
-    stores' lists name them). On any refusal after the copies, `fabric.undo` takes them out (a hard reset to the commit
-    the stage found, the copies and the folders made for them removed): a refusal writes nothing in the tree. An
-    untracked file at a destination is never overwritten (`ADOPT_WOULD_OVERWRITE`).
+    stores' lists name them). On any refusal or interrupt after the copies, `fabric.undo` takes back only what A9 did,
+    never a reset or a checkout (run 5, RV2-1; run 6, NC-1 and NC-2, the owner's P1-W2-88-NC-1 (a)): it unstages a copy
+    only while its index entry is still the blob A9 staged (hashed before A9's `git add`), deletes a copy only while
+    its bytes are still A9's (a replaced tracked file gets its start-commit content back), then the folders A9 made
+    when empty; an edit, a staged file or a commit made during the run stays, and where HEAD moved the refusal is
+    `HEAD_MOVED`. A9 commits its copies and its record through its own step (`fabric.commit`, not W2-23's
+    `project.commit`): a refused record commit (a hook, signing) is `ADOPT_GIT_FAILED` with `exit_code`, and the record
+    is undone with the copies. An untracked file at a destination or at the record's path is never overwritten
+    (`ADOPT_WOULD_OVERWRITE`).
   - The record, and the stage's result, hold `installed: [{path, sha256, from}]` (`path` relative to the adopted
     repository, `from` relative to Gov OS) and `kept: [{path, sha256}]` (the repository's own `retrieval.yaml`; `[]`
     when none).
