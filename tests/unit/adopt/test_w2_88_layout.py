@@ -83,3 +83,33 @@ def test_an_unstamped_whole_store_is_read_as_current_and_an_absent_one_is_missin
     with pytest.raises(GovError) as raised:
         connect(tmp_path / "nothing")
     assert raised.value.code == "STORE_MISSING"
+
+
+def test_a_load_does_not_make_a_stale_store_current(tmp_path):
+    for found in ("unstamped", 1):
+        (tmp_path / str(found)).mkdir()
+        root = repo_with_record(tmp_path / str(found))
+        load(root)
+        db = sqlite3.connect(root / STORE_REL)
+        db.executescript("CREATE TABLE lexical_chunk (id INTEGER PRIMARY KEY, chunk_id TEXT NOT NULL, path TEXT NOT NULL, "
+                         "start_line INTEGER, end_line INTEGER);")  # no parent_id: the lexical store is an older form
+        if found == 1:
+            db.execute("UPDATE store_layout SET version = 1")
+        else:
+            db.execute("DROP TABLE store_layout")
+        db.commit()
+        db.close()
+        with pytest.raises(GovError) as before:
+            connect(root)
+        load(root)
+        with pytest.raises(GovError) as after:
+            connect(root)
+        assert after.value.code == "STORE_LAYOUT_STALE" and after.value.details == before.value.details
+        assert after.value.details["found"] == (0 if found == "unstamped" else 1)
+
+
+def test_a_load_into_a_new_or_current_store_stamps_it(tmp_path):
+    root = repo_with_record(tmp_path)
+    load(root)
+    load(root)  # a current store stays current
+    connect(root).close()

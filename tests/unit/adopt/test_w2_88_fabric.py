@@ -154,11 +154,14 @@ def test_check_coverage_names_the_missing_file_and_digests_are_checked():
     fabric.check_digests({"digests": {"record": "r", "lexical": "l", "vectors": "v", "codegraph_bytes": 0}})
 
 
-def test_a_setting_other_than_the_standard_is_named_and_not_ok_without_a_decision(tmp_path, stand_ins):
+def test_a_setting_other_than_the_standard_is_named_and_not_ok_without_a_decision(tmp_path, stand_ins, monkeypatch):
+    from gov.retrieval import rerank, retrieve
+
     pool_off = yaml.safe_load(SHIPPED)
     pool_off["pool"]["meaning_uncut"] = False
-    bad = yaml.safe_dump({**pool_off, "rerank": {"service": "private"}, "bundle": {"tokens": 8000}})
-    root = planted(tmp_path, retrieval=bad)
+    root = planted(tmp_path, retrieval=yaml.safe_dump(pool_off))
+    monkeypatch.setattr(rerank, "SOCKET", "private.sock")  # a second reranker: the pin's constants (B-1.2)
+    monkeypatch.setattr(retrieve, "BUNDLE_BUDGET", 8000)
     with pytest.raises(GovError) as raised:
         run_a9(root, tmp_path / "out")
     assert raised.value.code == "STANDARD_DEPARTURE"
@@ -172,11 +175,11 @@ def test_a_setting_other_than_the_standard_is_named_and_not_ok_without_a_decisio
 def test_a_figure_over_the_budget_writes_a_proposal_and_changes_no_store_file(tmp_path, stand_ins, monkeypatch):
     root, out = planted(tmp_path), tmp_path / "out"
 
-    def slow(where, question, refresh=False, top_k=None):
+    def slow(where, question):
         time.sleep(0.02)
-        return {}
+        return {"available": True, "reason": None}
 
-    monkeypatch.setattr("gov.retrieval.semantic.search", slow)
+    monkeypatch.setattr(fabric, "vector_scan", slow)
     done = run_a9(root, out, budget_ms=1)
     assert (out / "SCALE-PROPOSAL.md").is_file() and done["over"]
     before = (root / STORE_REL).read_bytes()

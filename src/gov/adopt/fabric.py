@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import resource
 import shutil
@@ -39,6 +40,13 @@ JUDGING = ("lexical", "vectors", "codegraph")  # the stores whose lists cover th
 REASONS = ("secrets", "binary", "not-embedded", "unsupported-language", "over-limit")
 DECISION = re.compile(r"DEC-[0-9]+(?::[a-z_]+)?")
 SETTINGS = ("reranker", "reranker_service", "pool", "bundle_tokens", "widen")
+RETRIEVAL = "governance/project/retrieval.yaml"
+# The kernel files A9 copies, byte for byte, as Gov OS ships them (S15, S10; B-1.1, B-1.3): (Gov OS folder or file,
+# the adopted repository's). Nothing is re-worded per repository.
+KERNEL_FOLDERS = (("template/governance/kernel/skills/retrieval", ".claude/skills/retrieval"),
+                  ("template/governance/kernel/skills/discovery", ".claude/skills/discovery"))
+KERNEL_FILES = (("template/governance/kernel/templates/brief.md", "governance/kernel/templates/brief.md"),
+                ("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md"))
 
 
 def _shipped_pool() -> dict:
@@ -58,37 +66,48 @@ STANDARD = {"reranker": "Qwen3-Reranker-0.6B", "reranker_service": "shared", "po
 
 # ---- the standard (S10, F7)
 
+SHARED_SERVICE = (".cache/gov-os", "rerank.sock")  # the machine's one shared reranker service (``rerank.CACHE_REL``, ``SOCKET``)
+PIN_ONLY_KEYS = ("rerank", "bundle")  # keys a retrieval.yaml may never carry: the reranker and the bundle are the pin's
+
+
 def _code_settings() -> dict:
-    """What the pinned gov's own code says: the reranker's model and the bundle's budget."""
+    """What the pinned gov's own code says (B-1.2): the reranker's model, the service it is reached by (``shared`` for
+    the machine's one service, else its folder and socket) and the bundle's budget."""
     from gov.retrieval import rerank, retrieve
 
-    return {"reranker": str(rerank.MODEL).rsplit("/", 1)[-1], "bundle_tokens": retrieve.BUNDLE_BUDGET}
+    shared = (rerank.CACHE_REL, rerank.SOCKET) == SHARED_SERVICE
+    return {"reranker": str(rerank.MODEL).rsplit("/", 1)[-1],
+            "reranker_service": STANDARD["reranker_service"] if shared else f"{rerank.CACHE_REL}/{rerank.SOCKET}",
+            "bundle_tokens": retrieve.BUNDLE_BUDGET}
 
 
 def settings_of(doc: dict | None) -> dict:
-    """The five settings in force: the file's keys where it names them (``rerank.model``, ``rerank.service``,
-    ``bundle.tokens``, ``bundle.widen``, ``pool``), else the pin's code. The pool is its ``pool_on`` word and block."""
+    """The five settings in force. The reranker, its service and the bundle's budget are the pin's constants
+    (``rerank.MODEL``, ``rerank.CACHE_REL`` and ``SOCKET``, ``retrieve.BUNDLE_BUDGET``); a ``retrieval.yaml`` may not
+    carry them (``check_keys``). Only the pool departs through the file: its whole block when the pool is on
+    (``meaning_uncut: true``), else False. ``widen`` has no constant to depart from."""
     code = _code_settings()
     doc = doc if isinstance(doc, dict) else {}
-    rerank = doc.get("rerank") if isinstance(doc.get("rerank"), dict) else {}
-    bundle = doc.get("bundle") if isinstance(doc.get("bundle"), dict) else {}
-    pool = doc.get("pool") if declare.pool_on(doc) else False
-    return {"reranker": str(rerank.get("model", code["reranker"])).rsplit("/", 1)[-1],
-            "reranker_service": rerank.get("service", STANDARD["reranker_service"]),
-            "pool": pool if pool is not False else False,
-            "bundle_tokens": bundle.get("tokens", code["bundle_tokens"]),
-            "widen": bundle.get("widen", STANDARD["widen"])}
+    return {"reranker": code["reranker"], "reranker_service": code["reranker_service"],
+            "pool": doc.get("pool") if declare.pool_on(doc) else False,
+            "bundle_tokens": code["bundle_tokens"], "widen": STANDARD["widen"]}
 
 
 def departures(doc: dict | None) -> list[dict]:
-    """Every setting that differs from ``STANDARD``: ``[{setting, value}]``. The pool differs only when it is off."""
+    """Every setting that differs from ``STANDARD``: ``[{setting, value}]``. The standard's pool is the whole ``pool:``
+    block as Gov OS ships it: a block that differs in any key (a value, a missing or an added key), or none, departs."""
     held = settings_of(doc)
-    out = []
-    for name in SETTINGS:
-        standard, value = STANDARD[name], held[name]
-        if (name == "pool" and value is False) or (name != "pool" and value != standard):
-            out.append({"setting": name, "value": value})
-    return out
+    return [{"setting": name, "value": held[name]} for name in SETTINGS if held[name] != STANDARD[name]]
+
+
+def check_keys(doc: dict | None) -> None:
+    """``CONFIG_INVALID`` (``details["keys"]``) for a ``retrieval.yaml`` that carries ``rerank`` or ``bundle`` (B-1.2:
+    the reranker and the bundle are the pin's constants). A ``--decision`` does not make it ok."""
+    keys = [key for key in PIN_ONLY_KEYS if isinstance(doc, dict) and key in doc]
+    if keys:
+        raise GovError("CONFIG_INVALID", "governance/project/retrieval.yaml: the key(s) " + ", ".join(keys) + " are not "
+                       "allowed: the reranker and the bundle are the pin's constants (rerank.MODEL, "
+                       "retrieve.BUNDLE_BUDGET), never a repository's setting", {"keys": keys})
 
 
 def _covered(found: list[dict], decisions: list[str]) -> list[dict]:
@@ -108,6 +127,10 @@ def read_standard(root: Path, decisions: list[str]) -> dict:
             raise project.refuse("BAD_DECISION", f"--decision {each!r} is not a decision id (DEC-n or DEC-n:setting)")
     head = project.resolve(root, "HEAD")
     raw, doc = declare.retrieval(root, head)
+    if raw is None:  # none tracked: the copy A9 installs (Gov OS's, as shipped) is the file in force (B-1.3)
+        raw = (GOV_OS / RETRIEVAL).read_bytes()
+        doc = yaml.safe_load(raw.decode("utf-8"))
+    check_keys(doc)
     found = _covered(departures(doc), decisions)
     unnamed = [item["setting"] for item in found if item["decision"] is None]
     if unnamed:
@@ -123,6 +146,84 @@ def read_standard(root: Path, decisions: list[str]) -> dict:
         embedder = None
     return {**settings_of(doc), "gov_pin": pin, "embedder": embedder,
             "retrieval_yaml_sha256": hashlib.sha256(raw).hexdigest() if raw else None, "departures": found}
+
+
+# ---- the copy step (S15, S10; B-1.1, B-1.3)
+
+def _sources() -> list[tuple[str, str]]:
+    """``(from, to)`` for every kernel file A9 installs: the files of the two skill folders (same relative names) and
+    the two templates. A source Gov OS does not ship is a refusal, never a skipped file."""
+    found = []
+    for source, target in KERNEL_FOLDERS:
+        base = GOV_OS / source
+        files = sorted(path for path in base.rglob("*") if path.is_file()) if base.is_dir() else []
+        if not files:
+            raise GovError("KERNEL_SOURCE_MISSING", f"{source}: Gov OS ships no file there: nothing is installed",
+                           {"source": source})
+        found += [(path.relative_to(GOV_OS).as_posix(), f"{target}/{path.relative_to(base).as_posix()}") for path in files]
+    for source, target in KERNEL_FILES:
+        if not (GOV_OS / source).is_file():
+            raise GovError("KERNEL_SOURCE_MISSING", f"{source}: Gov OS ships no such file: nothing is installed",
+                           {"source": source})
+        found.append((source, target))
+    return found
+
+
+def install(run, head: str) -> dict:
+    """Write, byte for byte, the kernel files Gov OS ships into the adopted repository and stage them (the stage's one
+    commit takes them with its record): the retrieval and discovery skills to ``.claude/skills/``, T-0 and T-8 to
+    ``governance/kernel/templates/``, and Gov OS's ``retrieval.yaml`` only where the repository tracks none (its own is
+    kept, and judged). ``{installed: [{path, sha256, from}], kept: [{path, sha256}], written, dirs}``: the last two are
+    what ``undo`` removes. The copies join ``run.tracked`` (the stores judge them like any file). An untracked file at a
+    destination is never overwritten (refused, naming it)."""
+    root, tracked = run.root, run.tracked
+    wanted, kept = _sources(), []
+    if RETRIEVAL in tracked:
+        kept.append({"path": RETRIEVAL, "sha256": hashlib.sha256(project.blob(root, tracked[RETRIEVAL])).hexdigest()})
+    elif (GOV_OS / RETRIEVAL).is_file():
+        wanted.append((RETRIEVAL, RETRIEVAL))
+    else:
+        raise GovError("KERNEL_SOURCE_MISSING", f"{RETRIEVAL}: Gov OS ships no such file", {"source": RETRIEVAL})
+    taken = [target for _, target in wanted if os.path.lexists(root / target) and target not in tracked]
+    if taken:
+        raise project.refuse("WOULD_OVERWRITE", "an untracked file stands at " + ", ".join(taken) + ": the tool writes "
+                             "nothing over a file it did not write", paths=taken)
+    copies = {"installed": [], "kept": kept, "written": [], "dirs": []}
+    try:
+        for source, target in wanted:
+            data, place = (GOV_OS / source).read_bytes(), root / target
+            walk = place.parent
+            while not walk.exists():
+                copies["dirs"].append(walk)
+                walk = walk.parent
+            place.parent.mkdir(parents=True, exist_ok=True)
+            real = place.parent.resolve()
+            if place.is_symlink() or not (real == root.resolve() or root.resolve() in real.parents):
+                raise project.refuse("INSTALL_PATH_UNSAFE", f"{target} would be written through a link or outside the "
+                                                            "project: nothing is installed", path=target)
+            place.write_bytes(data)
+            copies["written"].append(target)
+            copies["installed"].append({"path": target, "sha256": hashlib.sha256(data).hexdigest(), "from": source})
+        project.git(root, "--literal-pathspecs", "add", "--", *copies["written"])
+        for entry in project.git(root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", *copies["written"]).split("\0"):
+            meta, _, rel = entry.partition("\t")
+            if rel:  # the copies are tracked files of the project from here on: judged like every other
+                run.tracked[rel] = meta.split()[1]
+    except BaseException:
+        undo(root, head, copies)
+        raise
+    return copies
+
+
+def undo(root: Path, head: str, copies: dict) -> None:
+    """Back to ``head`` as the stage found it (a clean tree): what was staged is undone and the copies and the folders
+    made for them are removed; a refusal of A9 writes nothing in the repository's tree."""
+    project.restore(root, head, copies["written"])
+    for folder in sorted(copies["dirs"], key=lambda each: len(each.parts), reverse=True):
+        try:
+            folder.rmdir()
+        except OSError:
+            pass
 
 
 # ---- the checks that refuse (F2, F3)
@@ -142,7 +243,7 @@ def check_coverage(record: dict, tracked) -> None:
     and the code graph judge theirs, and name their own lists (a store whose ``judged`` is more than its two lists hold
     leaves files unnamed)."""
     stores = record.get("stores") if isinstance(record.get("stores"), dict) else {}
-    tracked, missing, short, not_built = set(tracked), set(), [], []
+    tracked, missing, short, not_built, errors = set(tracked), set(), [], [], []
     for name in JUDGING:
         store = stores.get(name)
         if isinstance(store, dict) and store.get("requested") is False:
@@ -150,6 +251,8 @@ def check_coverage(record: dict, tracked) -> None:
         if not isinstance(store, dict) or store.get("built") is False \
                 or store.get("status") in ("not_recreated", "not_built"):
             not_built.append(name)  # a store the path map calls for, absent or not built
+            if isinstance(store, dict) and store.get("error"):
+                errors.append(f"{name}: {store['error']}")
             continue
         named = set(store.get("indexed") or []) | {item.get("path") for item in store.get("refused") or []
                                                   if isinstance(item, dict)}
@@ -162,7 +265,8 @@ def check_coverage(record: dict, tracked) -> None:
     if missing or short or not_built:
         said = ([f"{len(missing)} tracked file(s) are in neither the indexed list nor the refused list of the store "
                  "that judges them"] if missing else []) + short \
-            + ([f"a store the path map calls for was not built: {', '.join(not_built)}"] if not_built else [])
+            + ([f"a store the path map calls for was not built: {', '.join(not_built)}"
+                + (f" ({'; '.join(errors)})" if errors else "")] if not_built else [])
         raise GovError("FABRIC_INCOMPLETE", "; ".join(said),
                        {"missing": sorted(missing), "short": short, "not_built": not_built})
 
@@ -239,9 +343,7 @@ def _stores(run, result: dict) -> dict:
         state = verdicts.get(rel)
         if state is None:
             continue  # the keyword index holds no verdict on it: it is in neither list, and check_coverage says so
-        if state == 1 and rel in binary_files:  # the index chunked its bytes as text: no memory can use them
-            lexical_r.append({"path": rel, "reason": "binary"})
-        elif state == 1:
+        if state == 1:  # a binary the index chunked is held by the store: indexed, and named in ``binary_held`` (RV1-4)
             lexical_i.append(rel)
         elif state == 2:
             lexical_r.append({"path": rel, "reason": "not-embedded"})
@@ -253,7 +355,7 @@ def _stores(run, result: dict) -> dict:
                 binary = b"\0" in project.blob(run.root, run.tracked[rel])[:8000]
             except GovError:
                 binary = False
-            lexical_r.append({"path": rel, "reason": "binary" if binary else "secrets"})
+            lexical_r.append({"path": rel, "reason": "binary" if binary else "secrets"})  # a binary the store did not take
     vec_i = [rel for rel in lexical_i if rel in vectored]
     vec_r = [{"path": rel, "reason": "not-embedded"} for rel in lexical_i
              if rel in chunked and rel not in vectored and _policy(run.config, namespaces[rel]) != "embedded"]
@@ -261,30 +363,33 @@ def _stores(run, result: dict) -> dict:
     called_for = project.code_intelligence(run.config)
     code_i, code_r = [], []
     for rel in code if called_for else ():
-        if (run.root / codeintel.BASE_REL / "files" / rel).is_file():
+        if Path(rel).suffix.lower() not in assess.CODE_GRAPH_SUFFIXES:
+            code_r.append({"path": rel, "reason": "unsupported-language"})  # never indexed by the graph (RV1-5)
+        elif (run.root / codeintel.BASE_REL / "files" / rel).is_file():
             code_i.append(rel)
-        elif Path(rel).suffix.lower() in assess.OTHER_CODE_SUFFIXES:
-            code_r.append({"path": rel, "reason": "unsupported-language"})
         else:
             code_r.append({"path": rel, "reason": "secrets" if verdicts.get(rel) == 0 else "not-embedded"})
     nodes = edges = 0
-    if called_for and (code_i or code_r):
+    unreadable = None
+    if called_for and code_i:
         try:
             graph, users = codeintel._graph(run.root)
             nodes, edges = len(graph), sum(len(each) for each in users.values())
-        except Exception:  # noqa: BLE001 - the tool is not here: nodes and edges are asked of it, never invented
-            nodes = edges = 0
+        except Exception as exc:  # noqa: BLE001 - a graph that cannot be read is named, never shown as 0 nodes and edges
+            unreadable = f"{type(exc).__name__}: {' '.join(str(exc).split())}"
     held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)
     return {
         "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],
                    "seconds": timing.get("record_s", 0.0)},
         "lexical": {**base, "judged": len(paths), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
-                    "seconds": timing.get("lexical_s", 0.0)},
-        "vectors": {**base, "judged": len([rel for rel in lexical_i if rel in chunked]), "indexed": vec_i, "refused": vec_r, "chunks": n_chunks,
-                    "vectors": n_vectors, "seconds": timing.get("semantic_s", 0.0)},
+                    "binary_held": [rel for rel in lexical_i if rel in binary_files], "seconds": timing.get("lexical_s", 0.0)},
+        "vectors": {**base, "judged": len([rel for rel in lexical_i if rel in chunked]), "indexed": vec_i, "refused": vec_r,
+                    "chunks": n_chunks, "vectors": n_vectors, "binary_held": [rel for rel in vec_i if rel in binary_files],
+                    "seconds": timing.get("semantic_s", 0.0)},
         "codegraph": {**base, "judged": len(code_i) + len(code_r), "indexed": code_i, "refused": code_r, "nodes": nodes,
                       "edges": edges, "seconds": timing.get("codeintel_s", 0.0),
-                      **({} if called_for else {"requested": False})},
+                      **({} if called_for else {"requested": False}),
+                      **({"built": False, "error": unreadable} if unreadable else {})},
     }
 
 
@@ -296,6 +401,13 @@ def search(root: Path, question: str) -> dict:  # the seam a test replaces with 
     return retrieve.retrieve(root, question)
 
 
+def vector_scan(root: Path, question: str) -> dict:  # the seam a test replaces with a stand-in (RV1-2)
+    """The semantic route's reply: ``available`` (a scan ran) and ``reason`` (why not)."""
+    from gov.retrieval import semantic
+
+    return semantic.search(root, question, refresh=False)
+
+
 def _timed(call) -> float | None:
     start = time.perf_counter()
     try:
@@ -305,14 +417,31 @@ def _timed(call) -> float | None:
     return round((time.perf_counter() - start) * 1000, 1)
 
 
-def scale(root: Path, nodes: int, edges: int, budget_ms: int) -> dict:
-    """The query time of one plain question on each route and the vector scan's time against the budget."""
-    from gov.retrieval import lexical, semantic
+def _scan(root: Path) -> tuple[float | None, float | None, str | None]:
+    """``(route time, vector scan ms, reason)``. The scan is a figure only where the semantic route answered
+    ``available: true``; an unavailable answer or an error gives None and the reason (the route's, or the error's name):
+    a reply that scanned nothing is never a scan time, and is never compared with the budget (RV1-2)."""
+    start = time.perf_counter()
+    try:
+        reply = vector_scan(root, PLAIN_QUESTION)
+    except Exception as exc:  # noqa: BLE001 - a route that raised was not measured: the record names the error
+        return None, None, type(exc).__name__
+    took = round((time.perf_counter() - start) * 1000, 1)
+    if isinstance(reply, dict) and reply.get("available") is True:
+        return took, took, None
+    why = reply.get("reason") or reply.get("error") if isinstance(reply, dict) else None
+    return took, None, str(why or "the semantic route answered unavailable")
 
+
+def scale(root: Path, nodes: int, edges: int, budget_ms: int) -> dict:
+    """The query time of one plain question on each route, and the vector scan's time against the budget (``None``
+    with ``vector_scan_reason`` where the scan did not run). Only the vector scan is compared with the budget."""
+    from gov.retrieval import lexical
+
+    semantic_ms, scan_ms, why = _scan(root)
     routes = {"lexical": _timed(lambda: lexical.search(root, PLAIN_QUESTION, refresh=False)),
-              "semantic": _timed(lambda: semantic.search(root, PLAIN_QUESTION, refresh=False)),
-              "retrieve": _timed(lambda: search(root, PLAIN_QUESTION))}
-    return {"routes": routes, "vector_scan_ms": routes["semantic"], "budget_ms": budget_ms,
+              "semantic": semantic_ms, "retrieve": _timed(lambda: search(root, PLAIN_QUESTION))}
+    return {"routes": routes, "vector_scan_ms": scan_ms, "vector_scan_reason": why, "budget_ms": budget_ms,
             "envelope": {**assess.ENVELOPE, "nodes_found": nodes, "edges_found": edges, "peak_rss_bytes_found": _peak()}}
 
 
@@ -418,14 +547,27 @@ def _domains(config: dict) -> tuple[dict[str, str], list[str]]:
 
 
 def a9(run) -> dict:
-    """Stage A9 lite (see the module's text). ``run`` is ``gov.adopt.stages.Run``."""
-    from gov.rebuild import command as rebuild
-
+    """Stage A9 lite (see the module's text). ``run`` is ``gov.adopt.stages.Run``. The standard is judged first (a
+    refusal there writes nothing); then the kernel files are installed and staged, the stores built and the record
+    committed with them in one commit; a refusal after the copies undoes them (nothing is left in the tree)."""
     root, args = run.root, run.args
     out = _out(args, root)
     decisions = list(getattr(args, "decision", None) or [])
+    standard = read_standard(root, decisions)  # CONFIG_INVALID, STANDARD_DEPARTURE: before any copy and any store
+    head = project.resolve(root, "HEAD")
+    copies = install(run, head)
+    try:
+        return _stage(run, out, standard, copies)
+    except BaseException:
+        undo(root, head, copies)
+        raise
+
+
+def _stage(run, out: Path, standard: dict, copies: dict) -> dict:
+    from gov.rebuild import command as rebuild
+
+    root, args = run.root, run.args
     budget = getattr(args, "budget_ms", None) or RETRIEVE_BUDGET_MS
-    standard = read_standard(root, decisions)  # STANDARD_DEPARTURE refuses before any store is built
     built = rebuild.run(root, argparse.Namespace(no_embeddings=False, seed=None, integration=None), run.config)
     check_digests(built)
     stores = _stores(run, built)
@@ -457,7 +599,8 @@ def a9(run) -> dict:
     (out / "memory-audit" / "briefs").mkdir(exist_ok=True)
     for kind, item in made.items():
         (out / "memory-audit" / "briefs" / f"{kind}.md").write_text(item["text"], encoding="utf-8")
-    data = {"commit": project.resolve(root, "HEAD"), "stores": stores, "digests": built["digests"], "standard": standard,
+    data = {"commit": project.resolve(root, "HEAD"), "installed": copies["installed"], "kept": copies["kept"],
+            "stores": stores, "digests": built["digests"], "standard": standard,
             "scale": found_scale, "measure": measure(root, questions, cause),
             "refresh": {"command": memory_sets.REFRESH, "hook": "installed by the owner's operator through "
                                                                  "memory-audit/ACT-WALLS, never by this tool"},
@@ -465,4 +608,5 @@ def a9(run) -> dict:
                       "dropped_categories": dropped}, "cost": price}
     if built.get("layout"):
         data["layout"] = built["layout"]
-    return run.finish(data, None, ok=True, digests=built["digests"], over=said, out=str(out))
+    return run.finish(data, None, ok=True, digests=built["digests"], over=said, out=str(out),
+                      installed=copies["installed"], kept=copies["kept"])

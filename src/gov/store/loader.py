@@ -676,6 +676,20 @@ def of_commit(root: Path, commit: str = "HEAD") -> dict | None:
             "records": _print_of(tree[path] for path in records)}
 
 
+def _current_or_new(path: Path) -> bool:
+    """Whether the store at ``path`` is new (no file) or current by ``layout.found_of``: the only stores a load stamps."""
+    if not path.is_file():
+        return True
+    try:
+        peek = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        try:
+            return layout.found_of(peek) is None
+        finally:
+            peek.close()
+    except sqlite3.Error:
+        return False
+
+
 def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict, dict | None]:
     """Write the record graph of ``HEAD`` and the fingerprints row of the load, in one transaction: the load's
     result and ``HEAD``'s fingerprints (None where they cannot be computed). Without ``records_fingerprint`` the
@@ -687,6 +701,7 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
     rows = {"records": records, "edges": edges, "commits": commits, "trailers": trailers, "commit_paths": paths,
             REGISTER_TABLE: headings, TITLES_TABLE: titles, LINKS_TABLE: links}  # by name, never by position
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
+    current = _current_or_new(root / STORE_REL)  # judged before this load rewrites the record tables (RV1-6)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
     try:
         connection.execute("BEGIN")
@@ -700,7 +715,8 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
         connection.execute(f"INSERT INTO {FINGERPRINTS_TABLE} VALUES (?, ?, ?, ?)",
                            (head, prints["code"] if prints else None,
                             prints["records"] if prints and records_fingerprint else None, kind))
-        layout.stamp(connection, commit=False)  # W2-88: the layout this load wrote, with the load's own transaction
+        if current:  # a load rebuilds the record tables only: it never makes a stale store (the other stores') current
+            layout.stamp(connection, commit=False)  # W2-88: the layout this load wrote, with the load's own transaction
         connection.execute("COMMIT")
         return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}, prints
     finally:

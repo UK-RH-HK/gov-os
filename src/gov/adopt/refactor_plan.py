@@ -2,7 +2,9 @@
 
 ``plan(assessment, path_map, out)`` writes, under ``<out>/refactor-plan/``, one ``RP-<nn>-<kind>.md`` per kind of
 blocker found (the files of that kind are its ``allowed_paths``), in the kernel's ticket form; ``PLAN.md`` lists them;
-a repository with nothing to refactor gets ``NOTHING-TO-REFACTOR.md`` instead. It runs no ``tk``, applies nothing and
+a repository with nothing to refactor gets ``NOTHING-TO-REFACTOR.md`` instead, unless the secrets scan did not run or
+skipped files: then ``PLAN.md`` states ``secrets: not scanned (<reason>)`` and the unscanned paths, and no file says
+there is nothing to refactor (B-1.5). It runs no ``tk``, applies nothing and
 commits nothing: the proposals are files for the owner, and the A5 human gate is the only route to them. It reads the
 assessment and the path map it is given, and writes nowhere else.
 """
@@ -129,8 +131,22 @@ def _kpis(kind: str, paths: list[str]) -> dict:
                         f"names only the proposal's paths and a grep of the change for the secret's value finds 0 hits."]}
 
 
+def unscanned(assessment: dict) -> dict | None:
+    """``{reason, unscanned, all}`` where the secrets scan did not run or skipped files, else None. ``unscanned`` holds the
+    skipped paths; where the scanner did not run, ``all`` is the count of tracked files and none is named singly."""
+    skipped = [item for item in assessment.get("secrets_unscanned") or [] if isinstance(item, str)]
+    if assessment.get("secrets_scanned") is False:
+        return {"reason": assessment.get("secrets_unscanned_reason") or "the secrets scan did not run", "unscanned": skipped,
+                "all": len(_tracked(assessment))}
+    if skipped:
+        return {"reason": assessment.get("secrets_unscanned_reason") or "blobs over the scan limit were not scanned",
+                "unscanned": skipped, "all": None}
+    return None
+
+
 def plan(assessment: dict, path_map: dict | None, out: Path) -> dict:
-    """The proposals for ``assessment`` under ``<out>/refactor-plan/``; ``{count, proposals, nothing, assessment_sha256}``."""
+    """The proposals for ``assessment`` under ``<out>/refactor-plan/``; ``{count, proposals, nothing, secrets_unscanned,
+    assessment_sha256}`` (``nothing`` is False wherever the secrets scan did not cover the repository)."""
     out = Path(out)
     folder = out / FOLDER
     folder.mkdir(parents=True, exist_ok=True)
@@ -151,7 +167,16 @@ def plan(assessment: dict, path_map: dict | None, out: Path) -> dict:
         (folder / name).write_text("---\n" + yaml.safe_dump(head, sort_keys=False, allow_unicode=True, width=120)
                                    + "---\n" + body, encoding="utf-8")
         proposals.append({"file": f"{FOLDER}/{name}", "kind": kind, "title": head["title"]})
-    if proposals:
+    blind = unscanned(assessment)
+    if blind:  # never "no secret" for a scan that did not run (B-1.5): PLAN.md says so, with the proposals found
+        where = (f"all {blind['all']} tracked files" if blind["all"] is not None
+                 else "\n".join(f"- `{path}`" for path in blind["unscanned"]))
+        lines = [f"- `{item['file'].rsplit('/', 1)[-1]}`: {item['kind']}: {item['title']}" for item in proposals]
+        (folder / "PLAN.md").write_text(
+            "# Refactoring plan\n\nSources: memory-assessment sha256:" + digest + "\n\n"
+            f"secrets: not scanned ({blind['reason']})\n\nUnscanned paths: {where}\n\n"
+            + ("\n".join(lines) + "\n" if lines else "No other blocker was found.\n"), encoding="utf-8")
+    elif proposals:
         lines = [f"- `{item['file'].rsplit('/', 1)[-1]}`: {item['kind']}: {item['title']}" for item in proposals]
         (folder / "PLAN.md").write_text("# Refactoring plan\n\nSources: memory-assessment sha256:" + digest + "\n\n"
                                         + "\n".join(lines) + "\n", encoding="utf-8")
@@ -161,4 +186,5 @@ def plan(assessment: dict, path_map: dict | None, out: Path) -> dict:
             "indexing: no vendored or generated code without a folder, no namespace policy to state, no file over "
             "the chunker's limit, no secret in a tracked file and no path in no namespace or in two.\n",
             encoding="utf-8")
-    return {"count": len(proposals), "proposals": proposals, "nothing": not proposals, "assessment_sha256": digest}
+    return {"count": len(proposals), "proposals": proposals, "nothing": not proposals and not blind,
+            "secrets_unscanned": blind, "assessment_sha256": digest}

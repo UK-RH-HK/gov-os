@@ -33,6 +33,7 @@ MANIFESTS = ("pyproject.toml", "setup.py", "setup.cfg", "package.json", "Cargo.t
 REFS = "refs/gov/adoption"
 SEMANTIC_NOT_RECREATED = "SEMANTIC_NOT_RECREATED"  # the finding of a semantic store asked for and not recreated (W2-124)
 POLICIES = (EMBEDDED, "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
+SCAN_LIST_LIMIT = 1000  # paths named in SECRETS_UNSCANNED's details (the full list is the assessment's ``paths``)
 
 
 @dataclass
@@ -80,6 +81,16 @@ def ma(run: Run) -> dict:
     assessment = assess.assess(run.root, out)
     path_map = run.config.get("path-map.yaml")
     made = refactor_plan.plan(assessment, path_map if isinstance(path_map, dict) else None, out)
+    blind = made["secrets_unscanned"]
+    if blind:  # the files are written (the assessment, the proposals found, PLAN.md); the result is not ok (B-1.5)
+        listed = blind["unscanned"] or sorted(assessment.get("paths") or [])
+        raise GovError("SECRETS_UNSCANNED", f"the secrets scan did not cover the repository ({blind['reason']}): "
+                       "the plan cannot say there is no secret in a tracked file; the assessment and the proposals found "
+                       f"are written under {out}", {"reason": blind["reason"], "unscanned": listed[:SCAN_LIST_LIMIT],
+                                                    "unscanned_count": blind["all"] or len(blind["unscanned"]),
+                                                    "proposals": made["count"],
+                                                    "kinds": [item["kind"] for item in made["proposals"]],
+                                                    "assessment": str(out / assess.FILE)})
     return {"stage": "MA", "assessment": str(out / assess.FILE), "assessment_sha256": assess.sha256_of(out),
             "plan": str(out / refactor_plan.FOLDER), "proposals": made["count"],
             "kinds": [item["kind"] for item in made["proposals"]], "peak_rss_bytes": assessment["peak_rss_bytes"]}
