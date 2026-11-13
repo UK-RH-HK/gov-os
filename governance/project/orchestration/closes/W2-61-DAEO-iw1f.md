@@ -13,3 +13,4 @@
 - gitleaks on the merge's change: clean
 - Times: rebuild 2370 s, tests 4842 s, wall 32682 s
 - Closed: 2026-10-31 11:02:56 GMT, by the orchestrator under DEC-953 items 1 and 5
+- KPI 6 ("the same split for EXAMIN's set") moved to W2-94 (`DAEO-g87r`, its S5); added 2026-11-13 by the orchestrator for W2-94's close (DEC-1167 (3))

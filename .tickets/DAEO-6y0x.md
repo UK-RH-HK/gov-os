@@ -1,6 +1,6 @@
 ---
 id: DAEO-6y0x
-status: open
+status: in_progress
 deps: [DAEO-l78m, DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -16,6 +16,8 @@ state_class: AUTHORITATIVE
 role: independent-test-designer
 depends_on: [DAEO-l78m, DAEO-m1u3]
 allowed_paths:
+- tests/acceptance/W2-93/**  # its acceptance tests, form only (CTO, DEC-1167 (3): the close)
+- docs/probes/DAEO-6y0x/**  # the probe record
 - fixtures/evaluation/adoption-proving-ground/validate_hidden.py
 - fixtures/evaluation/adoption-proving-ground/hidden/**
 - tests/acceptance/W2-81/w2_81_run.py  # the runner's --sets-root, by the independent test designer only (DEC-1144 (6))
@@ -24,9 +26,9 @@ kpis:
   success:
   - 'At least 10 hidden questions per synthetic repository, each with its gold answer, gold sources and forbidden citations, in the form W2-81''s README states Verify: `validate_hidden.py` on a planted stand-in hidden folder prints, for each repository, a question count of 10 or more and exits 0; a planted folder with 9 for one repository is refused; each planted question holds the fields the README states [DEC-957, DEC-941, DEC-828]'
   - 'At least one hidden planted-problem variant per kind that the visible builders do not produce, so an adoption tuned to the visible generator is caught Verify: `validate_hidden.py` on a planted stand-in set prints, for each kind of planted problem the visible builders do not produce, the number of hidden variants per repository; a planted set missing one kind is refused [DEC-941]'
-  - 'Written by a session independent of the sessions it measures; nothing hidden written outside the hidden folder; no question or answer quoted in a commit message, a return, a log or a ticket note Verify: the commits of the hidden half carry the independent session''s role; `git diff --stat` shows hidden files only under the hidden folder; a grep of commit messages, return, log and ticket notes for a planted unique question word finds 0 hits [DEC-820 (d), DEC-845, DEC-873]'
+  - 'Written by a session independent of the sessions it measures; nothing hidden written outside the hidden folder; no question or answer quoted in a commit message, a return, a log or a ticket note Verify: the delivery''s run record names the walled writer''s run (`20261112T185824Z-adoption-proving-ground-r1`) and its launch log the approved brief''s sha256 (the sets root is outside git, so no commit carries it); `validate_hidden.py --sets-root` finds the hidden files only under the hidden folder; a grep of commit messages, return, log and ticket notes for a planted unique question word finds 0 hits [DEC-820 (d), DEC-845, DEC-873]'
   - 'Every gold answer is held by the repository the builder builds, checked on a built copy Verify: `validate_hidden.py` on a built copy of a planted stand-in repository: every gold answer is found in it; a planted answer the built copy does not hold is refused naming its id [DEC-828]'
-  - 'The hidden half proves its own data valid with an automatic check, `validate_hidden.py`, written by the ticket''s independent test designer (never the walled writer), run by the CTO on the delivered hidden half before it is used, printing counts and ids only, and recorded: every forbidden ("must not cite") file names a file of the repository the builder builds, checked on a built copy; every kind of planted problem the visible generator does not produce has at least one hidden variant per repository; anything it cannot read refuses (fail closed); W2-81''s files are not touched Verify: planted stand-in cases: a must-not-cite file absent from the built copy refuses, a kind with no variant refuses, an unreadable file refuses (non-zero exit); `git diff` shows W2-81''s files untouched; each commit of the hidden half has a recorded run [DEC-1010 item 4]'
+  - 'The hidden half proves its own data valid with an automatic check, `validate_hidden.py`, written by the ticket''s independent test designer (never the walled writer), run by the CTO on the delivered hidden half before it is used, printing counts and ids only, and recorded: every forbidden ("must not cite") file names a file of the repository the builder builds, checked on a built copy; every kind of planted problem the visible generator does not produce has at least one hidden variant per repository; anything it cannot read refuses (fail closed); W2-81''s files are not touched Verify: planted stand-in cases: a must-not-cite file absent from the built copy refuses, a kind with no variant refuses, an unreadable file refuses (non-zero exit); `git diff` shows W2-81''s files untouched except the two paths DEC-1144 (6) gives this ticket (`--sets-root`); the delivered hidden half has a recorded run of the check (counts and ids only) [DEC-1010 item 4]'
   - 'The W2-81 runner (`tests/acceptance/W2-81/w2_81_run.py`) and `validate_hidden.py` each take `--sets-root <root>` and find the hidden half under it, so neither the CTO nor a session names the hidden folder on a command line; the runner''s `--hidden <folder>` stays for a direct call; both written by the independent test designer Verify: a planted stand-in sets root holding a stand-in hidden half: the runner and `validate_hidden.py` given only `--sets-root` find and read it, and a root without one exits non-zero naming the missing folder [DEC-1144 (6), DEC-1143 (4)]'
   failure:
   - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work. Verify: a planted stand-in hidden file: a read, a grep and a `git log` from a measured session''s sandbox (the guard''s path map) are refused or find it 0 times'
@@ -58,3 +60,4 @@ Card: the WBS's proposed companion "W2-81's held-out half" (§2), filed as MEMOR
 ## Widened by the owner (DEC-1144 (6), P1-F (a), 2026-11-12)
 
 The W2-81 runner's `--sets-root <root>` goes here, not in a new ticket: two paths in `tests/acceptance/W2-81/` for the independent test designer who writes `validate_hidden.py`, and one KPI line (the last success line). W2-81 is closed; nothing else in its folder changes. If W1-01's acceptance-author check or the guard refuses a W2-93 commit there, it comes back to the CTO as a package; no other route.
+- **Verify re-worded (CTO, 2026-11-13, DEC-1157 (12), DEC-1167 (3)):** S3 and S5 fitted to the walled route (the sets root is outside git; DEC-1144 (6)'s two W2-81 paths exempt from "untouched"); the KPI text before each Verify unchanged.

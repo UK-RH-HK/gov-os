@@ -3,7 +3,10 @@
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`. The emergency
 of 2026-11-02 is lifted (DEC-1158): normal working, under DEC-1157's practices (§2). This file maps everything you
 need, in order. Where it and an older note differ, this file holds; DECISIONS-IN-FORCE, the register and the owner's
-word hold over both. **Next free id: DEC-1166** (DEC-1164 held: drafted, PROPOSED, the owner reading).
+word hold over both. **Next free id: DEC-1172** (DEC-1164 recorded: drafted, PROPOSED, the owner reading).
+
+## 0a. THE COMPACTION TRIAL (DEC-1171 (6), from the 2026-11-14 morning handover, 3 days)
+The CTO's launch line gains `--settings '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"300000"}}'` (the CTO's session only). Each morning digest reports the day's stale facts, the owner's corrections, missed items and the CTO's cost, against 11-13's baseline (missed 5, corrections ~3, stale ~2).
 
 ## 0. NOW: read CHECKPOINT's RESUME HERE first, then the 09:00 digest's items
 - **The current state** (leads running, the queue, what is in flight, what to record next) is in
