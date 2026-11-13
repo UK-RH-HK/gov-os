@@ -13,8 +13,9 @@ the case's folder. The JSON is plain data so the live hook's own fix can be chec
   project; under a shell it is refused with the hidden-part refusal, as data it is not refused.
 - **Hook fixture** (``run_hook``, not in the must-pass set): an engineer's shell-with-options heredoc writing the
   acceptance folder is refused by rule 1. The fixture (``fixtures/hook/``, not changed here) has its own reading of
-  the command (``bash_writes.py``) with the same gap, so these cases are ``xfail`` (not strict): they judge the hook
-  fixture, not the product.
+  the command (``bash_writes.py``) with the same gap, so these cases are ``xfail(strict=True)``: they judge the hook
+  fixture, not the product, and fail loudly (XPASS) the moment the hook is fixed (ACT-GUARD-FIX-5,
+  P1-GUARD-HEREDOC-OPTS-1); the mark is removed with that ACT's companion.
 """
 import json
 import os
@@ -115,8 +116,10 @@ HOOK_CASES = [
 ]
 
 
-@pytest.mark.xfail(strict=False, reason="judges the hook fixture (fixtures/hook/bash_writes.py has the F1 gap "
-                                        "itself and is not changed here), not the product")
+@pytest.mark.xfail(strict=True, reason="judges the hook fixture (fixtures/hook/bash_writes.py has the F1 gap itself "
+                                       "and is not changed here), not the product; the live hook's own fix is "
+                                       "ACT-GUARD-FIX-5 (P1-GUARD-HEREDOC-OPTS-1): strict, so an XPASS fails loudly "
+                                       "once the fix lands, and the mark is removed with that ACT's companion")
 @pytest.mark.parametrize("command", HOOK_CASES, ids=["bash-euo-pipefail", "cat-pipe-bash-o-pipefail"])
 def test_review_f1_hook_an_engineer_s_shell_with_options_writing_the_tests_is_refused_by_rule_1(command):
     got, why, code = s.run_hook("Bash", {"command": command}, s.REPO, s.REPO, "engineer")

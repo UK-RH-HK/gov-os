@@ -85,8 +85,9 @@ hook lists every worktree for rules 2 and 5), so run with `-n auto`.
   to check the live hook's own fix. `test_w2_42a_f1_shell_options.py` drives it through the product: the write parser
   (each target or the unresolvable target; a control gives its own targets only) and the read judge (the same head
   with a body naming the case project's hidden file is refused under a shell, not refused as data). Its two hook-level
-  cases judge the hook fixture, which has the same gap and is not changed here: they are `xfail` (not strict) and in no
-  KPI row. **Red on `e9e4f7bac`: 24 failed, 15 passed, 2 xfailed**: 12 spellings fail on both sides (no write, no
+  cases judge the hook fixture, which has the same gap and is not changed here: they are `xfail(strict=True)` and in
+  no KPI row; strict so that they fail loudly (XPASS) the moment the hook is fixed by ACT-GUARD-FIX-5
+  (P1-GUARD-HEREDOC-OPTS-1), whose companion removes the marks (td-3, the CTO's request of 2026-11-13). **Red on `e9e4f7bac`: 24 failed, 15 passed, 2 xfailed**: 12 spellings fail on both sides (no write, no
   read); `--noprofile --norc`, `-s` and the unknown flag, the 4 controls on both sides and the data-file check pass.
 
 ## The KPI map (read by `gov close`)
@@ -126,7 +127,7 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 | S11 replay and planted, through the hook | replay: `test_kpi11_*` (76 + 1 + 155) | see "The replay" (5 red) |
 | F1 no write the base catches is missed | measured: `test_failure1_*` (53) | green by construction on the base (each is a case the base catches) |
 | F2 unknown forms fail closed | parser: `test_failure2_*` (6); read judge: `test_failure2_*` (1); and the planted unknown forms in S9 and S11 | `eval "$X"`, `sh -c "$X"` and `bash -c` with unbalanced quotes give no write on the base (3 red); the unbalanced quotes, the unterminated heredoc, the shift in arithmetic and the unparseable secret read are green |
-| review F1 (td-2): a shell with options reading a heredoc | f1: `test_review_f1_*` (1 + 15 + 4 + 15 + 4; 2 hook cases xfail, in no row) | the head reads `bash -euo pipefail <<'EOF'` and the other 11 red spellings as data: no write and no read from the body (24 red). Green: `--noprofile --norc`, `-s`, the unknown flag, the 4 controls on both sides, the data-file check |
+| review F1 (td-2): a shell with options reading a heredoc | f1: `test_review_f1_*` (1 + 15 + 4 + 15 + 4; 2 hook cases xfail strict until ACT-GUARD-FIX-5, in no row) | the head reads `bash -euo pipefail <<'EOF'` and the other 11 red spellings as data: no write and no read from the body (24 red). Green: `--noprofile --norc`, `-s`, the unknown flag, the 4 controls on both sides, the data-file check |
 
 **The red run on the base** (`a58ba344`, through the gate, `-n auto`): **94 failed, 358 passed**, no errors, each
 failure for the reason above: S1 4, S2 4, S3 14, S4 2, S5 13, S6 4, S7 5, S8 3, S9 32, S10 5, S11 5, F2 3.
