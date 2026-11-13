@@ -207,7 +207,25 @@ Every path:line is of this branch after run 4's first commit.
   language the graph does not read (`unsupported-language`; the list holds at least `.vue .ps1 .proto .svelte .cob`, and
   `.psm1 .graphql .gql .tf .hcl .sol .bat .cmd .coffee .fs .fsx` besides the older ones). A file of any other suffix is
   no code and is not `no_route` for that reason. This replaces item 6's former sentence, which described a rule the
-  code did not apply.
+  code did not apply. (L-1a below refines "over the chunker's limit" for a binary.)
+- **L-1, what the stores will take: a binary over the limit, and the chunks of the estimate** (the lead's finding from
+  proof (a) with the real embedder, DEC-1052; `assess.py`: `FILE_LIMIT_BYTES`, `CHUNK_STEP`, `EMBED_S_PER_CHUNK`,
+  `assess`). On W2-81's legacy documents (two tracked binaries of 48 MiB) the first assessment listed the binaries only
+  under `binary`, left them out of `no_route` and out of the time estimate (17 s), and the plan wrote
+  `NOTHING-TO-REFACTOR.md`; but the keyword index chunks a binary's bytes as text (94,222 chunks), A9 lists them indexed
+  (`binary_held`, RV1-4) and the real embedder had not finished those chunks after 3,720 s. (a) **The rule (L-1a):** a
+  tracked file that is not a link and is larger than `FILE_LIMIT_BYTES` (1,048,576) is in `no_route` as
+  `{path, reason: "over-limit"}`, text or binary; a binary over the limit is listed in `binary` and in `no_route`, and
+  the plan proposes its `over-limit` ticket for it exactly as for a text file (so a repository whose only finding is such
+  a binary gets no `NOTHING-TO-REFACTOR.md`). A binary at or under the limit stays only in `binary`, no proposal. A text
+  file with a line over `LINE_LIMIT` stays `over-limit`. (b) **The estimate (L-1b):** `estimate.chunks` is the sum over
+  the tracked files (links excluded) of `ceil(size / CHUNK_STEP)`, with `CHUNK_STEP` =
+  `chunking.MAX_CHARS - chunking.OVERLAP_CHARS` = 1,080 characters a chunk, binaries included; `estimate.index_seconds` =
+  `round(estimate.chunks * EMBED_S_PER_CHUNK + code_files * GRAPH_S_PER_FILE)`. **`EMBED_S_PER_CHUNK = 0.04` s**, a
+  **lower bound**: its source is the lead's proof run of 2026-11-13 (legacy documents' 94,222 chunks had not finished
+  after 3,720 s with the real embedder), and it is consistent with the ticket's 2,521 files in 7 to 45 minutes.
+  `EMBED_S_PER_FILE` (1.07 s a file) is removed: the estimate no longer counts files. `estimate.disk_bytes`
+  and the peak-RSS estimate are unchanged. Unit tests: `tests/unit/adopt/test_w2_88_l1.py`.
 - **Accepted seams, unchanged:** `fabric.RETRIEVE_BUDGET_MS = 2000` (provisional, for the owner's reading) with
   `--budget-ms <N>`; A9's question set only by `--questions <file>`. **The sixth refused reason `not-indexed` is not in
   the code:** run 3's batch 2c added it and batch 3b withdrew it (`77299906`), so the refused reasons are the
@@ -239,64 +257,74 @@ gold path stacked, no forbidden path in the first five). The lead re-runs the pr
 embedder, the code graph and the reranker. The figures are data and set no bar (DEC-954 Q9e).
 
 **The largest proof repository** is the legacy documents (18 files, 100,670,630 bytes).
-Its assessment's **peak RSS** is 41,357,312 bytes, against the resource gate's
+Its assessment's **peak RSS** is 41,353,216 bytes, against the resource gate's
 **per-session figure** of 805,306,368 bytes (`working_size_bytes`, read from
 `gov.resources.config` by the assessment itself): under it. The A9 stage's own high-water mark on that repository is
-1,046,798,336 bytes: it is the rebuild's, which the gate bounds by `rebuild_peak_bytes`
+1,068,199,936 bytes: it is the rebuild's, which the gate bounds by `rebuild_peak_bytes`
 (7,582,199,808 B on this machine), not by the session figure.
+
+**L-1 on that repository.** Its 2 tracked binaries are over the chunker's limit
+(`FILE_LIMIT_BYTES`): the assessment lists them under `binary` and under no route (2 files,
+reasons: over-limit), the plan holds 1 proposal(s)
+(over-limit), and the estimate counts 93,228 chunks
+(`estimate.chunks`) for 3,729 s at `EMBED_S_PER_CHUNK` = 0.04 s; A9's
+keyword index made 94,222 chunks (the stand-in run: the estimate counts the file's bytes
+at 1,080 a chunk, the chunker's own count may differ a little).
+
+A section's figures are the stand-in's. The section the lead adds for the real embedder follows this one.
 
 ### Python with drifted specs (python-app)
 
-- **commit:** built at `86e627a6e04b`; assessed at `5dd16bdece4d` (after A2); A9's record committed at `86d92ad85f72`.
+- **commit:** built at `7b8383e5fd74`; assessed at `656c8cc5da84` (after A2); A9's record committed at `90f71419c0c2`.
 - **size:** 22 files, 8,443 bytes, 12 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 24 s to index, 76,682,730 B estimated peak RSS, 1,942,256 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,613,440 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take (none); the estimate: 25 chunks, 2 s to index, 76,682,730 B estimated peak RSS, 1,942,256 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,609,344 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 33, 33, 0 (reasons: none), 83 chunks, 2.9 s; vectors 32, 32, 0, 83 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 40.5 s of the rebuild's stage. The A9 stage's high-water mark 64,532,480 B. Digests: record `b7189fa38199`, lexical `67c4553157bc`, vectors `9f5b9271be54`, code graph 41,433 bytes (reported, not compared).
-- **scale:** lexical 1.6 ms, semantic route's reply 5.1 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 14.2 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 33, 33, 0 (reasons: none), 83 chunks, 2.4 s; vectors 32, 32, 0, 83 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 38.2 s of the rebuild's stage. The A9 stage's high-water mark 65,810,432 B. Digests: record `29a40b2e9dbe`, lexical `29cffd473a97`, vectors `45829613b4f9`, code graph 41,433 bytes (reported, not compared).
+- **scale:** lexical 1.7 ms, semantic route's reply 4.4 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 13.1 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
 - **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (11 questions): right end to end 54.5 %, wrong claims 4, hit@5 54.5 %; 6 residuals named with their cause (4 forbidden path in the first five, 1 no gold path among the first five items, 1 the standing reader residual).
 
 ### Rust workspace (rust-workspace)
 
-- **commit:** built at `414745550024`; assessed at `153ba013a8b9` (after A2); A9's record committed at `e8659c40995d`.
+- **commit:** built at `31e1f447d2ef`; assessed at `561bc3c84447` (after A2); A9's record committed at `caf4bc2f3392`.
 - **size:** 21 files, 8,101 bytes, 11 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 23 s to index, 67,934,850 B estimated peak RSS, 1,085,852 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,670,784 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take (none); the estimate: 25 chunks, 1 s to index, 67,934,850 B estimated peak RSS, 1,085,852 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,703,552 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 32, 32, 0 (reasons: none), 76 chunks, 2.7 s; vectors 32, 32, 0, 76 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 40.1 s of the rebuild's stage. The A9 stage's high-water mark 65,458,176 B. Digests: record `0912af087c4d`, lexical `dc87816367c9`, vectors `8cece3e41857`, code graph 41,044 bytes (reported, not compared).
-- **scale:** lexical 1.7 ms, semantic route's reply 5.5 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 15.0 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 32, 32, 0 (reasons: none), 76 chunks, 2.4 s; vectors 32, 32, 0, 76 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 39.2 s of the rebuild's stage. The A9 stage's high-water mark 64,303,104 B. Digests: record `3579f735e3a3`, lexical `c6b5d1550474`, vectors `ddaf36d7d0d3`, code graph 41,044 bytes (reported, not compared).
+- **scale:** lexical 1.8 ms, semantic route's reply 5.9 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 19.7 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
 - **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 80.0 %, wrong claims 2, hit@5 80.0 %; 3 residuals named with their cause (2 forbidden path in the first five, 1 the standing reader residual).
 
 ### TypeScript monorepo (typescript-monorepo)
 
-- **commit:** built at `c6bec53a994d`; assessed at `0cf75dfa2eef` (after A2); A9's record committed at `1d2cbc7b2313`.
+- **commit:** built at `899f899f89e8`; assessed at `1f13e079b04d` (after A2); A9's record committed at `5b990e3a931d`.
 - **size:** 24 files, 8,824 bytes, 13 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 26 s to index, 74,495,760 B estimated peak RSS, 1,729,088 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,568,384 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take (none); the estimate: 28 chunks, 2 s to index, 74,495,760 B estimated peak RSS, 1,729,088 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,609,344 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 35, 35, 0 (reasons: none), 78 chunks, 2.6 s; vectors 35, 35, 0, 78 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 41.3 s of the rebuild's stage. The A9 stage's high-water mark 63,844,352 B. Digests: record `e0202932a09b`, lexical `66fdb4c6b7b2`, vectors `88b30508a3ea`, code graph 41,960 bytes (reported, not compared).
-- **scale:** lexical 1.6 ms, semantic route's reply 4.7 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 14.0 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 35, 35, 0 (reasons: none), 78 chunks, 2.4 s; vectors 35, 35, 0, 78 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 39.9 s of the rebuild's stage. The A9 stage's high-water mark 63,746,048 B. Digests: record `58cba11afcb1`, lexical `47f80e412f76`, vectors `92d0b37bd22e`, code graph 41,960 bytes (reported, not compared).
+- **scale:** lexical 1.5 ms, semantic route's reply 4.4 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 12.5 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
 - **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 60.0 %, wrong claims 3, hit@5 50.0 %; 6 residuals named with their cause (3 forbidden path in the first five, 2 no gold path among the first five items, 1 the standing reader residual).
 
 ### Legacy documents with large files (legacy-docs)
 
-- **commit:** built at `7e5dad9e1980`; assessed at `1b52224380fd` (after A2); A9's record committed at `4f9b6921c38a`.
+- **commit:** built at `1bfca6544fb7`; assessed at `6abae9d9d796` (after A2); A9's record committed at `06c49ac59ccd`.
 - **size:** 18 files, 100,670,630 bytes, 10 commits.
-- **assessment:** 2 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 17 s to index, 61,373,940 B estimated peak RSS, 201,769,120 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 41,357,312 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
-- **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 29, 29, 0 (reasons: none), 94,222 chunks, 4.2 s; vectors 29, 29, 0, 94,222 vectors (stand-in), 0.2 s; code graph not asked for (the sandbox cannot run the tool), 58.7 s of the rebuild's stage. The A9 stage's high-water mark 1,046,798,336 B. Digests: record `44b1ec0cd784`, lexical `656ec68f5d61`, vectors `d0efdcfd9a6b`, code graph 100,703,483 bytes (reported, not compared).
-- **scale:** lexical 77.9 ms, semantic route's reply 166.1 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 5464.1 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **assessment:** 2 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 2 files no route can take (over-limit); the estimate: 93,228 chunks, 3,729 s to index, 61,373,940 B estimated peak RSS, 201,769,120 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 41,353,216 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **plan's proposals (count and kinds):** 1; over-limit.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 29, 29, 0 (reasons: none), 94,222 chunks, 4.0 s; vectors 29, 29, 0, 94,222 vectors (stand-in), 0.2 s; code graph not asked for (the sandbox cannot run the tool), 57.2 s of the rebuild's stage. The A9 stage's high-water mark 1,068,199,936 B. Digests: record `511c3cba242e`, lexical `3376b6fb0944`, vectors `65cc48ff9345`, code graph 100,703,483 bytes (reported, not compared).
+- **scale:** lexical 76.9 ms, semantic route's reply 162.3 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 5339.5 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
 - **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 80.0 %, wrong claims 2, hit@5 60.0 %; 5 residuals named with their cause (2 forbidden path in the first five, 2 no gold path among the first five items, 1 the standing reader residual).
 
 ### A secret in history (secret-history)
 
-- **commit:** built at `f64991761045`; assessed at `6bdb745eadc0` (after A2); A9's record committed at `661a7f22251c`.
+- **commit:** built at `75b0074e0b75`; assessed at `0b4fc61b67d1` (after A2); A9's record committed at `a625cb7ada97`.
 - **size:** 16 files, 6,852 bytes, 10 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 17 s to index, 67,934,850 B estimated peak RSS, 1,083,354 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,568,384 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take (none); the estimate: 19 chunks, 1 s to index, 67,934,850 B estimated peak RSS, 1,083,354 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,592,960 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 27, 27, 0 (reasons: none), 66 chunks, 2.4 s; vectors 27, 27, 0, 66 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 32.5 s of the rebuild's stage. The A9 stage's high-water mark 65,982,464 B. Digests: record `a72d8f822178`, lexical `ebd7d91e090e`, vectors `bb72fd2ec13e`, code graph 39,518 bytes (reported, not compared).
-- **scale:** lexical 1.7 ms, semantic route's reply 4.7 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 12.9 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 27, 27, 0 (reasons: none), 66 chunks, 2.4 s; vectors 27, 27, 0, 66 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 32.3 s of the rebuild's stage. The A9 stage's high-water mark 65,089,536 B. Digests: record `899f2be301ed`, lexical `4a244cc99d20`, vectors `50d2b37129a4`, code graph 39,518 bytes (reported, not compared).
+- **scale:** lexical 1.5 ms, semantic route's reply 4.4 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 12.7 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
 - **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 100.0 %, wrong claims 0, hit@5 90.0 %; 2 residuals named with their cause (1 no gold path among the first five items, 1 the standing reader residual).
 
