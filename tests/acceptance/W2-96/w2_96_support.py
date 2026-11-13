@@ -1378,14 +1378,17 @@ class Project:
         return tmpdir, workdir, command, watched
 
     def _popen(self, command, workdir, tmpdir, ignore=()):
-        """``ignore``: signals set to "ignore" in the started process before ``gov`` runs, as ``nohup`` does for
-        SIGHUP (run 2, R11); an ignored signal stays ignored across ``exec``."""
-        def ignoring():
-            for signum in ignore:
-                signal.signal(signum, signal.SIG_IGN)
+        """The started process owns its signal start state: each of SIGINT, SIGTERM and SIGHUP is set before ``gov``
+        runs, to "ignore" when it is named in ``ignore`` (as ``nohup`` does for SIGHUP, run 2, R11), otherwise to
+        its default. An ignored signal stays ignored across ``exec``, so without the reset a test process that
+        was itself started as a background job (SIGINT ignored: ``lead_verify.sh``, the cron nightly) would pass
+        the ignore on to ``gov`` (W2-177, cause (B))."""
+        def starting():
+            for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+                signal.signal(signum, signal.SIG_IGN if signum in ignore else signal.SIG_DFL)
         return subprocess.Popen(command, cwd=workdir, env=self.env(tmpdir), stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                                errors="replace", start_new_session=True, preexec_fn=ignoring if ignore else None)
+                                errors="replace", start_new_session=True, preexec_fn=starting)
 
     def run(self, *args, json_mode=True, cwd=None, timeout=RUN_TIMEOUT_S):
         """``gov accept <args>`` (``--json`` unless ``json_mode`` is false), from the root or ``cwd``."""
@@ -1680,3 +1683,245 @@ def markdown_tables(text):
         else:
             index += 1
     return tables
+
+
+# --------------------------------------------------------------------------------------------------------------
+# D-10's planted projects (DEC-1112 (3)): S-D10a, the opt-in groups; S-D10b, every line a map cell lists.
+# --------------------------------------------------------------------------------------------------------------
+
+# S-D10a: the planted project's own ``tests/conftest.py``, holding this repository's opt-in rules as its
+# ``tests/conftest.py`` states them (DEC-1061, T-10): every ``tests/optin-lifted*.txt`` lists cases a run leaves out
+# unless it opts in to the list's group, by ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (comma-separated, or
+# the option given twice); a list whose file name holds ``breadth`` is the group ``breadth``, every other one
+# ``lifted``; ``rep: <path or file::name>`` keeps a parametrised function's first row only; a case the run names by
+# its node id on the command line is always run; an opted-in list's cases are collected whole. Each process records
+# the groups it saw opted in (kind ``optin``), for the cases' messages only.
+OPTIN_CONFTEST = {"tests/conftest.py": '''"""qzv96leak planted conftest: the opt-in groups, as the real tests/conftest.py reads them."""
+import json
+import os
+import uuid
+from pathlib import Path
+
+QZV96LEAK_PROBE = @PROBE@
+_TESTS = Path(__file__).resolve().parent
+_ROOT = _TESTS.parent
+
+
+def pytest_addoption(parser):
+    parser.addoption("--optin", action="append", default=[], metavar="NAME[,NAME]",
+                     help="qzv96leak: run the opt-in group(s) NAME too (lifted, breadth)")
+
+
+def optin_name(listing):
+    return "breadth" if "breadth" in Path(listing).name else "lifted"
+
+
+def optin_entries(skip=()):
+    entries = []
+    for listing in sorted(_TESTS.glob("optin-lifted*.txt")):
+        if optin_name(listing) in skip:
+            continue
+        for raw in listing.read_text(encoding="utf-8").splitlines():
+            line = raw.split("#", 1)[0].strip()
+            if not line:
+                continue
+            kind = "case"
+            if line.startswith("rep:"):
+                kind, line = "rep", line[len("rep:"):].strip()
+            if line:
+                entries.append((kind, line, listing.name))
+    return entries
+
+
+def _target(entry):
+    path, _, rest = entry.partition("::")
+    return (_ROOT / path.rstrip("/")).resolve(), rest
+
+
+class _Targets:
+    def __init__(self, targets):
+        self.paths, self.parts = set(), {}
+        for path, rest in targets:
+            if rest:
+                self.parts.setdefault(path, []).append(rest)
+            else:
+                self.paths.add(path)
+
+    def names(self, here, part):
+        if here in self.paths or not self.paths.isdisjoint(here.parents):
+            return True
+        return any(part == rest or part.startswith(rest + "[") or part.startswith(rest + "::")
+                   for rest in self.parts.get(here, ()))
+
+
+def optin_left_out(items, entries):
+    cases = _Targets(_target(target) for kind, target, _ in entries if kind == "case")
+    reps = _Targets(_target(target) for kind, target, _ in entries if kind == "rep")
+    seen, out = set(), []
+    for item in items:
+        here = Path(str(item.path)).resolve()
+        part = item.nodeid.partition("::")[2]
+        if cases.names(here, part):
+            out.append(item)
+            continue
+        if getattr(item, "callspec", None) is not None and reps.names(here, part):
+            function = (str(here), part.partition("[")[0])
+            if function in seen:
+                out.append(item)
+            else:
+                seen.add(function)
+    return out
+
+
+def _opted_in(config):
+    given = [*(config.getoption("optin") or []), os.environ.get("GOV_TESTS_OPTIN", "")]
+    return {name.strip() for value in given for name in value.split(",") if name.strip()}
+
+
+def _record(**fields):
+    path = os.path.join(QZV96LEAK_PROBE, uuid.uuid4().hex)
+    with open(path + ".part", "w", encoding="utf-8") as handle:
+        json.dump(dict(pid=os.getpid(), **fields), handle)
+    os.replace(path + ".part", path + ".json")
+
+
+def pytest_collection_modifyitems(config, items):
+    opted = _opted_in(config)
+    _record(kind="optin", opted=sorted(opted))
+    entries = optin_entries(skip=opted)
+    if not entries:
+        return
+    left = optin_left_out(items, entries)
+    asked = [arg.split(" ")[0] for arg in config.args if "::" in arg]
+    if left and asked:
+        here = Path(str(config.invocation_params.dir))
+        targets = [("case", str((here / arg.partition("::")[0]).resolve().relative_to(_ROOT)) + "::"
+                    + arg.partition("::")[2], "") for arg in asked
+                   if (here / arg.partition("::")[0]).resolve().is_relative_to(_ROOT)]
+        kept = {id(item) for item in optin_left_out(left, targets)}
+        left = [item for item in left if id(item) not in kept]
+    if left and opted:
+        named = [(kind, target, name) for kind, target, name in optin_entries()
+                 if kind == "case" and optin_name(Path(name)) in opted]
+        if named:
+            kept = {id(item) for item in optin_left_out(left, named)}
+            left = [item for item in left if id(item) not in kept]
+    if left:
+        gone = {id(item) for item in left}
+        items[:] = [item for item in items if id(item) not in gone]
+        config.hook.pytest_deselected(items=left)
+'''}
+
+OPTIN_GROUPS = ("breadth", "lifted")
+OPTIN_FILE = "test_qzv96leak_optin.py"
+
+_CASES.update({
+    # S-D10a: a parametrised function whose first row passes and whose second fails (a ``rep:`` entry keeps only
+    # the first in a run that does not opt in).
+    "rows_second_fails": '''
+
+@pytest.mark.parametrize("qzv96leak_row", ["qzv96leak-row-a", "qzv96leak-row-b"],
+                         ids=["qzv96leak-row-a", "qzv96leak-row-b"])
+def @NAME@(tmp_path, qzv96leak_row):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    assert qzv96leak_row == "qzv96leak-row-a", "qzv96leak-row-message"
+''',
+})
+
+
+def optin_list(*entries):
+    """An opt-in list's text: a comment, then one entry a line, each followed by ``# qzv96leak …`` as the real lists
+    carry a reason; ``entries`` are paths from the root, node ids, or ``rep: …``."""
+    lines = ["# qzv96leak planted opt-in list (DEC-1061's form): one entry a line, then # and why", ""]
+    lines += [f"{entry}  # qzv96leak cap" for entry in entries]
+    return "\n".join(lines) + "\n"
+
+
+def optin_entry(name=None, file=OPTIN_FILE, folder=FOLDER):
+    """A node id (``name`` given) or a file path, from the planted root, as the lists write them."""
+    return f"{folder}/{file}" + (f"::{name}" if name else "")
+
+
+def groups_named(found):
+    """The opt-in groups (``breadth``, ``lifted``) a result names: a key or a string value, or a word of one, split
+    at spaces and punctuation but not at ``-`` or ``.``, so a list's file name (``optin-lifted-breadth.txt``) names
+    no group by itself (S-D10a: the report names which groups it enabled)."""
+    words = set()
+
+    def walk(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                walk(key)
+                walk(item)
+        elif isinstance(value, (list, tuple)):
+            for item in value:
+                walk(item)
+        elif isinstance(value, str):
+            words.update(word.lower() for word in re.split(r"[\s,;:=()\[\]{}'\"`/|]+", value) if word)
+
+    walk(found)
+    return {group for group in OPTIN_GROUPS if group in words}
+
+
+# S-D10b: the cells of a row-form map. The planted file whose one case every cell's row maps.
+CELLS_FILE = "test_qzv96leak_cells.py"
+CELLS_CASE = "test_qzv96leak_cells_case"
+
+
+def cells_files(kind):
+    """``ALPHA`` and ``CELLS_FILE`` holding one case of ``kind`` (``pass`` or ``fail``)."""
+    return {**ALPHA, CELLS_FILE: planted_file((kind, CELLS_CASE))}
+
+
+def cell_readme(cell):
+    """A row-form map: ``Success 1`` maps ``ALPHA``; the row under KPI cell ``cell`` maps ``CELLS_FILE``."""
+    return rows_readme(("Success 1: qzv96leak", "`test_qzv96leak_alpha.py`"), (cell, f"`{CELLS_FILE}`"))
+
+
+def heading_cell_readme(heading):
+    """A heading-form map: ``## Success 1`` over ``ALPHA``'s table; ``### <heading>`` over ``CELLS_FILE``'s."""
+    return ("# qzv96leak planted suite\n\nProse of the qzv96leak planted README.\n\n## Success 1: qzv96leak\n\n"
+            "| Test |\n|---|\n| `test_qzv96leak_alpha.py` |\n\n"
+            f"### {heading}\n\n| Test | Notes |\n|---|---|\n| `{CELLS_FILE}` | qzv96leak |\n")
+
+
+def line_order(name):
+    """The order of the result's lines: success lines by number, then failure lines (``success-9`` before
+    ``success-10``)."""
+    word, number = name.split("-")
+    return (word != "success", int(number))
+
+
+def cells_expected(names, kind):
+    """The result for ``cell_readme``: success 1 with ALPHA's three passing cases, and each line of ``names`` with
+    the one case of ``kind``."""
+    each = {"pass": dict(passed=1), "fail": dict(failed=1)}[kind]
+    lines = [line("success-1", "pass", 3)] + [line(name, kind, **each) for name in names]
+    lines.sort(key=lambda item: line_order(item["kpi"]))
+    return result("pass" if kind == "pass" else "fail", lines,
+                  totals=counts(4) if kind == "pass" else counts(3, 1))
+
+
+def strings_of(value):
+    """Every string of ``value`` (keys and values), joined by new lines."""
+    out = []
+
+    def walk(item):
+        if isinstance(item, dict):
+            for key, inner in item.items():
+                walk(key)
+                walk(inner)
+        elif isinstance(item, (list, tuple)):
+            for inner in item:
+                walk(inner)
+        elif isinstance(item, str):
+            out.append(item)
+
+    walk(value)
+    return "\n".join(out)
+
+
+def names_cell(text, cell):
+    """True when ``text`` quotes ``cell`` (white space runs taken as one space)."""
+    squash = lambda value: re.sub(r"\s+", " ", value).strip()  # noqa: E731
+    return squash(cell) in squash(text)

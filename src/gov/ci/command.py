@@ -5,7 +5,8 @@ DEC-186) and refuses when a hard-block check among them is RED. ``gov ci staged-
 is staged, twice: with the project's ``.gitleaks.toml`` as it stands, then with the project's rules alone
 (DEC-347, DEC-369). A result is measured or it is refused: a named tier with no declared check, a name that is no
 tier, a gitleaks that cannot run or does not decide, rules that cannot be read and an inherited ``GIT_INDEX_FILE``
-that is not git's own index of the project (``gov.util.gitenv.foreign_index``) all refuse.
+that is not git's own index of the project (``gov.util.gitenv.foreign_index``) all refuse. With ``scan: off`` in
+``governance/project/secrets.yaml`` (DEC-1045) nothing is scanned: it exits 0 and says so.
 
 ``gov ci job`` is the gate of the CI job (DEC-087, DEC-489): every check ``gov check`` runs but the declared
 checks of a tier above G2, so the checks of ``gov check`` that carry no tier (openspec, skill version, readiness,
@@ -25,6 +26,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -95,9 +97,12 @@ def _checks(root: Path, tiers: list[str], job: bool = False) -> dict:
 
 
 def _staged_secrets(root: Path) -> dict:
-    from gov.secrets import CONFIG_REL, _rules
+    from gov.secrets import CONFIG_REL, SCAN_OFF, _rules, scan_on
 
-    scan = ["gitleaks", "git", "--pre-commit", "--staged", "--no-banner", "--redact", "--verbose",
+    if not scan_on(root):  # DEC-1045: nothing is given to gitleaks; the line says so, the envelope too
+        print(SCAN_OFF, file=sys.stderr)
+        return {"scans": 0, "scan": "off", "reason": SCAN_OFF}
+    scan =["gitleaks", "git", "--pre-commit", "--staged", "--no-banner", "--redact", "--verbose",
             "--log-level", "error", "--exit-code", str(_LEAKS)]
     # gitleaks reads the index git gave this commit (``index.lock`` of ``commit -a``). An inherited index that is not
     # git's own is the commit's all the same: the default index is never scanned in its place (review F1).

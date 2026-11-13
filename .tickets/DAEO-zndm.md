@@ -1,6 +1,6 @@
 ---
 id: DAEO-zndm
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-1ahb]
 links: []
 created: 2026-10-16T16:35:12Z
@@ -68,3 +68,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-44), as approved (DEC-729). The list row
 - **KPIs:**
   - A commit's `Role:` and `Task:` are checked against the launch record of the session that made it (W2-21's `Session:` trailer), and a forged role is refused [W2-H019, W2-M156, W2-M222, W2-L078].
   - A worker's commit is attributed to the worker, not to its waiting lead [W2-M038, W2-L135, W2-M037].
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

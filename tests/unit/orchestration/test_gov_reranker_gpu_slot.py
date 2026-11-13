@@ -37,6 +37,10 @@ sys.stdin.read()
 FAKE_TORCH = """import os
 if os.environ.get("MARKS"):
     open(os.path.join(os.environ["MARKS"], "torch-%d" % os.getpid()), "w").close()
+class cuda:  # a GPU is there (W2-112: the real worker ends named without one); its free memory cannot be read,
+    @staticmethod  # so the shared service, which needs that reading, does not start here and the worker is used
+    def is_available():
+        return True
 """
 # The real rerank_worker.py imports this; it scores a text by its length.
 FAKE_SENTENCE_TRANSFORMERS = """import os
@@ -79,8 +83,38 @@ def setup(home, tmp_path):
     worker.write_text(WORKER)
     env = {k: v for k, v in os.environ.items()
            if k != "CUDA_VISIBLE_DEVICES" and not k.startswith(("GOV_RERANK_", "PYTHON"))}
-    env.update(GOV_RERANK_GPU_LOCK_DIR=str(locks), MARKS=str(marks), HOME=str(home))
+    env.update(GOV_RERANK_GPU_LOCK_DIR=str(locks), MARKS=str(marks), HOME=str(home),
+               GOV_RERANK_GPU_LIMITS=str(tmp_path / "limits.json"))  # none planted: the default of 2 (DEC-1039)
     return str(home / rerank.PYTHON_REL), worker, env, marks
+
+
+@pytest.mark.parametrize("planted, slots", [(3, 3), (0, 2), ("three", 2), (None, 2)])
+def test_the_slot_count_follows_the_dispatchers_derived_number(setup, tmp_path, planted, slots):
+    """DEC-1037 (4), DEC-1039 (1b): with GOV_RERANK_GPU_SLOTS unset, the count is the dispatcher's `rerank_gpu_slots`
+    (limits.json); 0 (no GPU), a non-number or no file: 2. Each worker past the count waits, then ends named."""
+    python, worker, env, _ = setup
+    if planted is not None:
+        (tmp_path / "limits.json").write_text(json.dumps({"rerank_gpu_slots": planted}))
+    started = [start(python, worker, env) for _ in range(slots)]
+    try:
+        assert sorted(first_line(p)["slot"] for p in started) == [str(i) for i in range(slots)]
+        extra = start(python, worker, env, GOV_RERANK_GPU_WAIT_S="0")
+        out, err = extra.communicate(timeout=15)
+        assert extra.returncode == 75 and out == ""
+    finally:
+        stop(*started)
+
+
+def test_the_environment_wins_over_the_derived_number(setup, tmp_path):
+    python, worker, env, _ = setup
+    (tmp_path / "limits.json").write_text(json.dumps({"rerank_gpu_slots": 3}))
+    started = [start(python, worker, env, GOV_RERANK_GPU_SLOTS="1")]
+    try:
+        assert first_line(started[0])["slot"] == "0"
+        extra = start(python, worker, env, GOV_RERANK_GPU_SLOTS="1", GOV_RERANK_GPU_WAIT_S="0")
+        assert extra.wait(timeout=15) == 75
+    finally:
+        stop(*started)
 
 
 def start(python, script, env, *args, **extra):
@@ -249,7 +283,9 @@ def test_an_internal_error_ends_named(setup, bad):
     assert not list(marks.iterdir())  # neither the script nor torch
 
 
-# The real caller: gov.retrieval.rerank starting the real rerank_worker.py with the environment's interpreter.
+# The real caller: gov.retrieval.rerank with the environment's interpreter. DEC-1048 (5) (W2-145): it starts no
+# private rerank_worker.py any more; the shared service, which here cannot read the GPU's free memory, refuses (or a
+# sandbox refuses its socket), and the search goes on unranked and named.
 CANDIDATES = [{"chunk_id": "short", "text": "ab"}, {"chunk_id": "long", "text": "abcdef"}]
 
 
@@ -261,19 +297,21 @@ def caller(setup, monkeypatch):
             monkeypatch.delenv(key)
     for key in ("HOME", "GOV_RERANK_GPU_LOCK_DIR", "MARKS"):
         monkeypatch.setenv(key, env[key])
-    rerank._started.cache_clear()
-    yield marks
-    rerank._started.cache_clear()
+    yield marks  # DEC-1048 (5): no private reranker's cache to clear (rerank._started is gone)
 
 
-def test_the_search_reranks_on_a_free_slot(caller):
+def test_the_search_starts_no_private_reranker_on_a_free_slot(caller):
+    # DEC-1048 (5): formerly "the search reranks on a free slot" through the private worker
     ranked = rerank.rerank("a question", CANDIDATES)
-    assert [(entry["chunk_id"], entry["rerank_score"]) for entry in ranked] == [("long", 6.0), ("short", 2.0)]
+    assert ranked == CANDIDATES and not any("rerank_score" in entry for entry in ranked)
+    assert rerank.last_outcome()["by"] == "unavailable"
+    assert not [path for path in caller.iterdir() if path.name.startswith(("worker-", "model-"))]
 
 
 def test_the_search_goes_on_unranked_when_no_slot_frees(caller, holders, monkeypatch, capfd):
     monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
     ranked = rerank.rerank("a question", CANDIDATES)
     assert ranked == CANDIDATES and not any("rerank_score" in entry for entry in ranked)  # merge.reranked: false
-    assert NAMED.format(1) in capfd.readouterr().err  # the caller's standard error names why
+    # DEC-1048 (5): named in the outcome (the service's failure), no longer by a private worker's standard error
+    assert rerank.last_outcome()["by"] == "unavailable" and NAMED.format(1) not in capfd.readouterr().err
     assert not [path for path in caller.iterdir() if path.name.startswith("model-")]  # no model was loaded

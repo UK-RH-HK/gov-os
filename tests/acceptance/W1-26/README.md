@@ -507,13 +507,14 @@ file) and `field`. Only one case holds the codes; the others hold the file and t
 
 40 red, 3 green.
 
-### The four recorded commands in the checks (DEC-542; `test_w1_26_recorded_commands.py`, 10 cases)
+### The four recorded commands in the checks (DEC-542; `test_w1_26_recorded_commands.py`, 14 cases), with `accept` (DEC-970) and W2-20's `resources` in their form: six recorded
 
 DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list". The lines and what
 "recorded" means for `lock` are in W1-07's README, section "The four commands of DEC-542". Two checks read the
 command list, and both hold the twelve only today.
 
-- **`core-commands`** holds for each of the four what it holds for the twelve: where the project holds no
+- **`core-commands`** holds for each of the six (DEC-542's four, `accept` and W2-20's `resources`; the cases read
+  them from W1-07's support lines, `173e8e97` ported for DEC-1097 (8)) what it holds for the twelve: where the project holds no
   module for the command, a finding carries the command's name under `command` (the code is the check's own,
   `COMMAND_NO_MODULE`; the cases do not fix it). For `ci`, `launch` and `telemetry` the module is the command's
   module file, as for the twelve. For `lock`, recorded as the module command `python3 -m gov.lock`, it is the
@@ -524,13 +525,15 @@ command list, and both hold the twelve only today.
 
 | Case | Holds | Today |
 |---|---|---|
-| `test_a_recorded_command_without_its_module_is_a_finding_that_names_it` (4: `ci`, `launch`, `telemetry`, `lock`) | the module removed in the temporary project's copy: a finding with `command` the name, the family red, no finding about a command whose module is present | red, all four: the check has no finding |
-| `test_with_every_module_present_the_check_has_no_finding` | the twelve and the four each with their module: no finding, the family green | green; it holds that recording `lock` does not make the check report it for the form it has |
-| `test_a_skill_may_name_a_recorded_gov_command` (3) | a skill whose code names `gov ci`, `gov launch`, `gov telemetry`: no `SKILL_UNKNOWN_COMMAND`, exit code 0 | red, all three: "unknown gov command" |
+| `test_a_recorded_command_without_its_module_is_a_finding_that_names_it` (6: `ci`, `launch`, `telemetry`, `accept`, `lock`, and W2-20's `resources`) | the module removed in the temporary project's copy: a finding with `command` the name, the family red, no finding about a command whose module is present | red, all four when written: the check had no finding; on `w2/integrate` (2026-11-09) the five green, `resources` red ("the project holds no module of 'resources'") until W2-20 builds it |
+| `test_with_every_module_present_the_check_has_no_finding` | the twelve and the six each with their module: no finding, the family green | green when written; on `w2/integrate` (2026-11-09) red until W2-20 builds `resources` (no module of it) |
+| `test_a_skill_may_name_a_recorded_gov_command` (5: and `accept`, and W2-20's `resources`) | a skill whose code names `gov ci`, `gov launch`, `gov telemetry`, `gov accept`, `gov resources`: no `SKILL_UNKNOWN_COMMAND`, exit code 0 | red, all three when written: "unknown gov command"; on `w2/integrate` (2026-11-09) the four green, `resources` red ("unknown gov command 'resources'") |
 | `test_gov_lock_in_a_skill_stays_an_unknown_command` | `gov lock` in a skill is flagged | green; holds that no command is added |
 | `test_the_module_command_of_lock_in_a_skill_is_not_flagged` | `python3 -m gov.lock` in a skill | green; holds what stays |
 
-7 red, 3 green. The suite's two earlier cases on this check (`test_w1_26_planted_defects.py`) are unchanged.
+7 red, 3 green when written with the four; on `w2/integrate` (2026-11-09), with `accept` and `resources`: 3 red
+(`resources`'s two cases and the every-module case, all on `resources` alone), 11 green. The suite's two earlier
+cases on this check (`test_w1_26_planted_defects.py`) are unchanged.
 
 ### The skill checks in both layouts (DEC-521; `test_w1_26_skill_checks_layouts.py`, 33 cases)
 
@@ -666,3 +669,30 @@ W2-67's test designer (round 1, batch 2) gave the planted-defect cases a base pr
 check's own entry and finding, each shown red against a planted fault and green on the head, with a
 `Rewrite-Reason:` trailer. The base, the plants, each case's red and green, and the cases left:
 `README-W2-67.md`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 75 in the full run, 212 in `breadth`, 132 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acyclicity and f... | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | designer |
+| S2: Every policy key maps to a check or is declared informational (D-0003); each family is reported RED/YELLOW/GREEN [CAP-39.d] | `test_w1_26_dec436.py::test_family_only_red_check_not_green`, `test_w1_26_installed_kernel.py::test_the_declared_command_of_an_installed_check_is_started_and_its_result_reported` (1 of 2), `test_w1_26_dec438.py::test_family_green_requires_at_least_one_check` | the ticket's words |
+| S3: Fails a specification with a required open readiness row that has no linked gap ticket (DEC-089) [CAP-30.b] | `test_w1_26_gap_tickets.py::test_required_missing_row_no_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_unlinked_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_valid_gap_ticket_passes` | the ticket's words |
+| S4: Fails a change to the capability taxonomy or to readiness-dimensions.yaml that has no linked CIT-E record (DEC-309) [CAP-30.e] | `test_w1_26_taxonomy.py::test_dimensions_changed_without_cite_is_red`, `test_w1_26_taxonomy.py::test_dimensions_changed_with_cite_passes` | the ticket's words |
+| S5: Each check declares hard-block or warning, and every result records its provenance (commit, check version, inputs hash) [CAP-39.d] | `test_w1_26_command.py::test_each_check_result_declares_severity`, `test_w1_26_provenance.py::test_each_check_result_has_provenance` | the ticket's words |
+| S6: Fails a skill file whose content changed without a version change and a linked decision [CAP-24.c] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_26_skill` \| README (lifted) | lifted |
+| S7: The check registry names all 17 governance test families of Contract v3 O2 (schema/invariants, graph integrity, index freshness, retrieval regr... | `test_w1_26_dec436.py::test_family_only_unmeasured_check_not_green`, `test_w1_26_planted_defects.py::test_commands_check_green_when_every_reserved_command_has_a_module`, `test_w1_26_dec438.py::test_no_check_family_reason` | the ticket's words |
+| S8: Fails a record that changes authority class without a decision: a research or lesson record cited as a decision or policy, or a superseded reco... | `test_w1_26_authority.py::test_superseded_record_satisfying_current_requirement_is_red` | the ticket's words |
+| S9: Flags a commit that cites a decision id missing from the decision register at that commit: a decision is recorded before the change it authoris... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_26_decision_citations`, `test_w1_26_decision_register_and_base` \| README (lifted) | lifted |
+| F1: A planted defect of any listed family passes | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | the ticket's words |
+| F2: The scope of a check is a hand-maintained list [CAP-58.a] | `test_w1_26_command.py::test_gov_check_list_still_works`, `test_w1_26_dec436.py::test_unknown_family_declaration_in_check_list`, `test_w1_26_dec436.py::test_record_in_new_directory_discovered_by_schema_check` | the ticket's words |
+
+**D-10's red fix, the recorded commands (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** W1-07's lines record `brief`, `links` and `plan`, so `test_w1_26_recorded_commands.py` holds nine (20 cases). `test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it` gains `[brief]`, `[links]`, `[plan]` (module `src/gov/<name>/command.py`); `test_w1_26_recorded_commands.py::test_a_skill_may_name_a_recorded_gov_command` gains the same three; `test_w1_26_recorded_commands.py::test_with_every_module_present_the_check_has_no_finding` holds the nine. On this branch alone the six new rows are red ("no finding of the check on the command list names 'brief'"; "unknown gov command 'brief'"): `src/gov/check/commands.py::RECORDED_GOV_COMMANDS` lacks the three until the engineer's line on `w2/W2-20-d10c`; green only with both branches merged.

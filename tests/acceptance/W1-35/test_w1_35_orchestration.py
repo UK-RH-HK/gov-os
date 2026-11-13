@@ -9,7 +9,7 @@ Covers the ticket's two last success lines:
   orchestration skill states the route.
 
 The cases read delivered text and say what a reader must be able to find in it. They fix no heading and no
-sentence but the three standing sentences of a brief. See the README for the reading rules and the red reasons.
+sentence but the standing sentences of a brief. See the README for the reading rules and the red reasons.
 """
 
 from __future__ import annotations
@@ -199,18 +199,43 @@ class TestWave2Items:
 
 
 # ============================================================================
-# S14: the ticket lead is a section of the orchestrator role file, not a seventh role
+# S14: the ticket lead has a role file of its own
 # ============================================================================
 
-class TestTicketLeadSection:
-    """covers: S14"""
+# Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the ticket lead has its own role file, ``roles/ticket-lead.md``
+# (ROLES-SPEC-1 §3.3), and ``orchestrator.md`` loses its ``## The ticket lead`` section; the cases of this class keep
+# their intent (what a lead is, does, never does, returns, cites) and read that file in place of the section.
+TICKET_LEAD_REL = f"{support.ROLES_REL}/ticket-lead.md"
+
+# Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the kernel roles folder grows from six to nine files: the six, the ticket
+# lead, the QA engineer and the senior engineer (DEC-1087 (13)); no independent-reviewer.md. Defined here: the support
+# module's ROLE_FILES (the six) is not part of this revision.
+NINE_ROLE_FILES = (*support.ROLE_FILES, "ticket-lead.md", "qa-engineer.md", "senior-engineer.md")
+
+# The machine-readable defaults lines every role file carries (the ticket's Interface, ROLES-SPEC-1 §5.1): they hold
+# a version number and a model id by the owner's decision, so the wording checks leave them out.
+DEFAULTS_LINE_PREFIXES = ("- **Version:**", "- **Launch default:**", "- **Launch by criticality:**",
+                          "- **Model tier:**")
+
+
+def _ticket_lead_text():
+    """The body of the ticket lead's own role file (its frontmatter left out), read as the lead section was."""
+    path = support.path(TICKET_LEAD_REL)
+    assert path.is_file(), f"{TICKET_LEAD_REL} does not exist: the ticket lead has a role file of its own"
+    body = support.split_frontmatter(support.read(TICKET_LEAD_REL))[1]
+    assert body.strip(), f"{TICKET_LEAD_REL} has no text"
+    return body
+
+
+class TestTicketLeadRoleFile:
+    """covers: S14
+
+    Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: formerly ``TestTicketLeadSection``, which read a section of the
+    orchestrator role file. The ticket lead is now a role file of its own; each case below keeps its old intent.
+    """
 
     def _section(self):
-        section = support.lead_section(support.read(support.ROLE_REL))
-        assert section is not None and section.strip(), (
-            f"{support.ROLE_REL} has no section whose heading names the ticket lead"
-        )
-        return section
+        return _ticket_lead_text()
 
     def _found(self, ideas):
         return [s for _n, s in support.statements(self._section()) if support.carries(s, ideas)]
@@ -237,7 +262,8 @@ class TestTicketLeadSection:
 
     def test_the_section_says_what_a_lead_returns(self):
         section = self._section()
-        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION", "LEAD_CHECKPOINT")
+        # DEC-838 item 2: LEAD_CHECKPOINT is no longer a lead's status (W2-11, DEC-866).
+        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION")
                    if not re.search(rf"\b{form}\b", section)]
         assert not missing, f"the ticket lead section does not name the return forms {missing}"
 
@@ -246,25 +272,35 @@ class TestTicketLeadSection:
             "the ticket lead section cites no CAP, DEC or MR id"
         )
 
-    def test_the_section_adds_no_labelled_field_to_the_role(self):
-        """W1-33 and W1-38 read every list item that starts with a bold label as a field of the role and
-        compare the fields with the generated definition. The lead is text of the role, not a ninth field."""
-        labelled = [line.strip()[:80] for line in self._section().splitlines()
-                    if re.match(r"^[-*]\s+\*\*[^*]+?:?\*\*", line)]
-        assert not labelled, (
-            f"the ticket lead section holds list items that start with a bold label: {labelled}"
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: this case asserted the lead was text of the orchestrator role, not a
+    # field of it (no bold-labelled list item in the section). The lead is now a role file with fields of its own, so
+    # the case asserts the other half of the decision: ``orchestrator.md`` holds no section whose heading names the
+    # ticket lead, and it names ``ticket-lead.md`` as the lead's file.
+    def test_the_orchestrator_role_holds_no_ticket_lead_section(self):
+        """W1-33 and W1-38 read every list item that starts with a bold label as a field of the role. The lead's
+        fields are now those of ``ticket-lead.md``; the orchestrator role (the CTO's file) holds no lead section
+        and points at the lead's file."""
+        text = support.read(support.ROLE_REL)
+        section = support.lead_section(text)
+        assert section is None, (
+            f"{support.ROLE_REL} still has a section whose heading names the ticket lead "
+            f"(its first line: {section.strip().splitlines()[:1] if section.strip() else 'empty'}): the lead has "
+            f"a role file of its own"
         )
+        assert "ticket-lead.md" in text, f"{support.ROLE_REL} does not name ticket-lead.md, the lead's role file"
 
-    def test_the_roster_stays_at_the_same_roles(self):
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the kernel roles folder grows from six to nine files (the six, plus
+    # ticket-lead.md, qa-engineer.md and senior-engineer.md) and holds no independent-reviewer.md. The second half of
+    # the old assertion (the rulesync subagent sources in template/.rulesync/subagents/ stay at six) is dropped: those
+    # sources are W2-153's and their generated copies are an ACT's, outside ticket W2-33; their count is not asserted.
+    def test_the_roles_folder_holds_the_nine_role_files(self):
         roles = sorted(p.name for p in support.path(support.ROLES_REL).glob("*.md"))
-        assert roles == sorted(support.ROLE_FILES), (
-            f"{support.ROLES_REL}/ holds {roles}: the lead is a section of the orchestrator role, not a role"
+        assert roles == sorted(NINE_ROLE_FILES), (
+            f"{support.ROLES_REL}/ holds {roles}: it holds exactly the nine role files {sorted(NINE_ROLE_FILES)} "
+            f"(the lead, the QA engineer and the senior engineer each have a file; no independent-reviewer.md)"
         )
-        sources = sorted(p.name for p in support.path(support.SOURCE_SUBAGENTS_REL).glob("*.md"))
-        assert sources == sorted(support.ROLE_FILES), (
-            f"{support.SOURCE_SUBAGENTS_REL}/ holds {sources}: no new rulesync subagent"
-        )
-        self._section()   # and the section is there: the lead is stated somewhere
+        assert "independent-reviewer.md" not in roles, f"{support.ROLES_REL}/ holds independent-reviewer.md"
+        self._section()   # and the lead's file is there with text
 
 
 # ============================================================================
@@ -276,15 +312,29 @@ class TestBriefTemplates:
 
     @pytest.mark.parametrize("kind", sorted(support.BRIEFS))
     def test_the_brief_has_a_placeholder_for_each_thing_it_is_filled_in_with(self, kind):
-        found = support.placeholders(support.read(support.brief_rel(kind)))
+        """Revised for W2-128 TPL-1 S4 (DEC-1050, DEC-1052): a retired brief is read as its replacement template
+        and the envelope; there the decisions may come as the sources placeholder sent to the decision register
+        (R3-TEMPLATES.md's T-0: "Sources: {SOURCES} (read each in .../DECISION_REGISTER.md, by id ...)")."""
+        texts = support.brief_texts(kind)
+        found = [inner for text in texts.values() for inner in support.placeholders(text)]
         missing = [what for what, pattern in support.PLACEHOLDER_KINDS.items()
                    if not any(re.search(pattern, inner, re.IGNORECASE) for inner in found)]
+        if "decisions" in missing and support.is_retired(support.BRIEFS[kind]):
+            if any(re.search(r"decision", statement, re.IGNORECASE)
+                   and any(re.search(r"source", inner, re.IGNORECASE) for inner in support.placeholders(statement))
+                   for text in texts.values() for _section, statement in support.statements(text)):
+                missing.remove("decisions")
         assert not missing, (
-            f"{support.brief_rel(kind)} has no placeholder for {missing} (its placeholders: {found})"
+            f"{sorted(texts)} have no placeholder for {missing} (their placeholders: {found})"
         )
 
     @pytest.mark.parametrize("kind", sorted(support.BRIEFS))
     def test_the_brief_carries_the_standing_sentences_word_for_word(self, kind):
+        """Revised for W2-128 TPL-1 S4: held while the brief stands in full; once it is removed or a pointer,
+        DEC-1050's templates replace the word-for-word rule and the case holds that the replacement exists."""
+        if support.is_retired(support.BRIEFS[kind]):
+            support.brief_texts(kind)   # the replacement template and the envelope exist
+            return
         text = support.collapse(support.read(support.brief_rel(kind)))
         missing = [sentence for sentence in support.STANDING_SENTENCES if sentence not in text]
         assert not missing, (
@@ -293,23 +343,36 @@ class TestBriefTemplates:
         )
 
     def test_the_test_designers_brief_states_behaviour_and_sources_only(self):
-        rel = f"{support.TEMPLATES_REL}/{support.TEST_DESIGNER_BRIEF}"
-        text = support.read(rel)
-        assert support.statements_with(text, [r"behaviou?r", r"source", r"\b(only|never|no|nothing)\b"]), (
-            f"{rel} does not say that the brief states behaviour and sources only"
+        """Revised for W2-128 TPL-1 S4: DEC-462 stands. Once the brief is retired, the rule is looked for in the
+        templates a test designer's brief is made of and written from: its replacement, the envelope, and the
+        lead's template (the lead fills the brief's free text)."""
+        texts = support.brief_texts("test designer")
+        if support.is_retired(support.TEST_DESIGNER_BRIEF):
+            lead = f"{support.TEMPLATES_REL}/{support.replacement_of(support.BRIEFS['lead'])}"
+            if support.path(lead).is_file():
+                texts[lead] = support.read(lead)
+        rels = sorted(texts)
+        assert any(support.statements_with(text, [r"behaviou?r", r"source", r"\b(only|never|no|nothing)\b"])
+                   for text in texts.values()), (
+            f"{rels}: no statement says that a test designer's brief states behaviour and sources only"
         )
-        assert "DEC-462" in text, f"{rel} does not cite DEC-462"
+        assert any("DEC-462" in text for text in texts.values()), f"{rels} do not cite DEC-462"
 
     def test_no_brief_is_named_like_a_record_template(self):
         """W1-08 validates a templates file as a record when its name holds one of these words."""
         taken = {name: [word for word in support.RECORD_TEMPLATE_WORDS if word in name.lower()]
                  for name in support.BRIEFS.values()}
         assert not any(taken.values()), f"brief names that W1-08 reads as record templates: {taken}"
+        # W2-L258 (DEC-729, DEC-866): a brief carries record frontmatter of its own type; it never declares itself
+        # one of the record kinds W1-08 validates.
         for kind in support.BRIEFS:
             front, _ = support.split_frontmatter(support.read(support.brief_rel(kind)))
-            assert not (front or {}).get("type"), (
-                f"{support.brief_rel(kind)} has a record frontmatter (type: {front.get('type')}); a brief is "
-                f"not a record"
+            declared = str((front or {}).get("type") or "")
+            words = set(re.split(r"[^a-z0-9]+", declared.lower()))
+            kinds = [word for word in support.RECORD_TEMPLATE_WORDS if word in words]
+            assert not kinds, (
+                f"{support.brief_rel(kind)} declares itself a record kind W1-08 validates (type: {declared}); a "
+                f"brief has a record type of its own"
             )
 
 
@@ -320,11 +383,16 @@ class TestBriefTemplates:
 class TestWording:
     """covers: S14 (language-neutral where tests are named, DEC-534; a project's own values, DEC-539)"""
 
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the ticket lead's text is its own role file, ``roles/ticket-lead.md``,
+    # in place of a section of ``orchestrator.md``. The machine-readable defaults lines every role file carries
+    # (``- **Version:**``, ``- **Launch default:**``, ``- **Launch by criticality:**``, ``- **Model tier:**``) are left
+    # out: they hold a version number and a model id by the owner's decision (the ticket's Interface). The wording
+    # checks hold for the rest of the file unchanged.
     def _texts(self):
-        """The delivered text: the skill's body, the ticket lead section, the five briefs."""
-        lead = support.lead_section(support.read(support.ROLE_REL))
-        assert lead is not None, f"{support.ROLE_REL} has no ticket lead section"
-        texts = {support.SKILL_REL: _skill()[1], f"{support.ROLE_REL} (ticket lead section)": lead}
+        """The delivered text: the skill's body, the ticket lead's role file, the five briefs."""
+        lead = "\n".join(line for line in _ticket_lead_text().splitlines()
+                         if not line.lstrip().startswith(DEFAULTS_LINE_PREFIXES))
+        texts = {support.SKILL_REL: _skill()[1], TICKET_LEAD_REL: lead}
         for kind in sorted(support.BRIEFS):
             texts[support.brief_rel(kind)] = support.read(support.brief_rel(kind))
         return texts

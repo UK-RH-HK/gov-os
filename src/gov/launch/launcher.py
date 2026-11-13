@@ -3,10 +3,28 @@
 Starts the CLI at ``~/.local/bin/claude`` (DEC-205) in the repository root with
 one ``--settings`` value built here: the strict sandbox block, the role's network
 profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
-``GOV_TICKET`` and a per-session temp directory, removed when the session ends
+``GOV_TICKET``, ``GOV_STORE`` where the project configures its integration store
+(W2-116, ``gov.launch.store``) and a per-session temp directory, removed when the session ends
 (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
 (DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
 shape refuses the launch.
+
+A lead (``gov launch orchestrator|lead <ticket>``, W2-136 S9) is started only when
+the plan's check admits its ticket, with ``GOV_ROLE=orchestrator``, its
+``GOV_TICKET``, the launcher's own ``GOV_STORE`` as a worker's (W2-56 R5) and no
+sandbox block, as the dispatcher starts a lead (``build_lead_settings``); a worker
+launch never consults the plan.
+
+Every launch, lead or worker, passes the machine-wide resource gate (W2-20 S19,
+DEC-1088 (5)(b)): while it is shut on any reading, the launch is refused naming
+each limit and its reading, unless ``--gate-override DEC-NNN`` starts it anyway;
+that override, and a lead's plan override, are written to
+``~/.gov-os/machine/launch.log`` and to stderr (P-1, P-8). A started session is
+in the machine-wide registry while it runs.
+
+Every session, lead or worker, gets its role's template as the appended system prompt
+(``--append-system-prompt-file <root>/.claude/templates/<stem>.md``, after the caller's arguments); a launch whose
+template is missing is refused (W2-153, DEC-1050).
 
 No message of this module carries a held-out path.
 """
@@ -22,7 +40,9 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
+from subprocess import SubprocessError
 
 import yaml
 
@@ -32,12 +52,33 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
+from gov.launch import environ, sandbox
+from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
+from gov.launch.store import main_root as main_store_root
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
 # Open package DP-8: these roles need a ticket whose ``role`` is their own; the
 # two independent roles may be launched on any ``in_progress`` ticket.
 OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
+# W2-136 S9: a lead is a session of GOV_ROLE orchestrator with a GOV_TICKET, launched as ``orchestrator`` or ``lead``
+# (W2-121's name for it). Only the launched role and ticket are checked against the plan, never the caller's own
+# environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
+LEAD_ROLES = ("lead", "orchestrator")
+LEAD_GOV_ROLE = "orchestrator"
+# W2-153 (DEC-1050, W2-128 TPL-4): the role -> template map. The template is the session's appended system prompt;
+# gov.adapters.portability reuses the map for the subagent sources and the template copies.
+ROLE_TEMPLATES = {
+    "engineer": "role-engineer",
+    "independent-test-designer": "role-test-designer",
+    "independent-auditor": "role-reviewer",
+    "product-spec": "role-product-spec",
+    "research": "role-research",
+    "lead": "role-lead",
+    "orchestrator": "role-lead",
+}
+TEMPLATES_REL = ".claude/templates"  # the generated copies, written only by an ACT (DEC-315)
+TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
@@ -52,6 +93,13 @@ EXPERIMENTS_ROOT = "experiments"
 # DEC-313: arguments that take the permission checks away or add a writable directory.
 BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
 BYPASS_MODE = "bypassPermissions"
+# W2-56 S6 (DEC-826 Q5): arguments that drop the guard or add context, beside DEC-313's; refused alone, with a spaced
+# value and in the ``=`` form, wherever they stand after ``--``.
+GUARD_FLAGS = ("--restricted", "--safe-mode", "--agents", "--plugin-dir", "--plugin-url", "--mcp-config",
+               "--system-prompt")
+# W2-56 D-12: a worker's temp folder, short enough that its code-graph daemon folders fit the tool's socket (107
+# bytes, DEC-338); the prefix is what the weekly sweep (DEC-902) and the code index (``gov.codeintel``) look for.
+TEMP_PREFIX = "gov-launch-"
 # Open package DP-9: both files hold a list of host names under this key; the
 # project's file extends the kernel default, and may be absent (DEC-241).
 ALLOWLIST_KEY = "hosts"
@@ -61,6 +109,7 @@ PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 INTERRUPT_EXIT = 130
 END_WAIT_S = 5  # whole seconds a session that was asked to end may still run before it is killed
+REAP_WAIT_S = 3.0  # seconds the launcher waits, after the kill, for the session's group to be gone (W2-56 S12)
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 
 
@@ -156,32 +205,45 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
         check_sets(str(root))
     except PolicyError as error:
         raise _refuse(f"{error} (DEC-820)") from None
+    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, **_store_env(root)}
     return {
-        "env": {"GOV_ROLE": role, "GOV_TICKET": ticket_id},
+        "env": env,
         "permissions": {"deny": deny},
         "sandbox": {
             "enabled": True,
             "failIfUnavailable": True,
             "allowUnsandboxedCommands": False,
-            "network": {"strictAllowlist": True, "allowedDomains": domains},
+            # W2-56 S8 (DEC-1035 (2)): the reranker's one socket, from the service's own setting (gov.launch.sandbox)
+            "network": sandbox.network(domains),
         },
     }
 
 
+def _store_env(root: Path) -> dict:
+    """``GOV_STORE`` for a launched session, or nothing where the project configures no integration store. W2-116 S3
+    (DEC-963, DEC-1087 (3)): a session's plain `gov retrieve` answers from the integration store, the configured link
+    itself as written (followed at each search), never from the worktree the session runs in. The place is the main
+    repository's (review F4): a worktree branched before the line was added still gets it. A setting that cannot be
+    used refuses the launch before anything starts; the parent's ``GOV_STORE`` never counts (W2-56 S5)."""
+    try:
+        store = configured_store(main_store_root(root))
+    except StoreSettingError as error:
+        raise _refuse(f"{error}: the session's retrieval would have no store to answer from (W2-116)") from None
+    return {} if store is None else {STORE_ENV: store}
+
+
+def build_lead_settings(root: Path, ticket_id: str) -> dict:
+    """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator``, its ``GOV_TICKET`` and the
+    launcher's own ``GOV_STORE`` as a worker's (W2-56 R5, ``_store_env``), no sandbox block, as the dispatcher starts
+    a lead. Kept apart from ``build_settings`` so that a worker's settings never lose their sandbox block or deny
+    rules on a lead's account. ``root`` is a real path."""
+    return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id, **_store_env(root)}}
+
+
 def sandbox_faults(settings: dict) -> list[str]:
-    """Why the settings are not on, strict and fail-closed (CAP-61.a); empty when they are."""
-    block = settings.get("sandbox")
-    block = block if isinstance(block, dict) else {}
-    network = block.get("network")
-    checks = {
-        "sandbox.enabled is not true": block.get("enabled") is True,
-        "sandbox.failIfUnavailable is not true": block.get("failIfUnavailable") is True,
-        "sandbox.allowUnsandboxedCommands is not false": block.get("allowUnsandboxedCommands") is False,
-        "sandbox.network.strictAllowlist is not true":
-            isinstance(network, dict) and network.get("strictAllowlist") is True,
-        "sandbox.excludedCommands is set (DEC-164)": "excludedCommands" not in block,
-    }
-    return [fault for fault, holds in checks.items() if not holds]
+    """Why the settings are not on, strict and fail-closed, or wider than the launcher's (CAP-61.a, DEC-1035); empty
+    when they are. The reranker's socket is read from this process's HOME (``gov.launch.sandbox.faults``)."""
+    return sandbox.faults(settings)
 
 
 def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
@@ -261,6 +323,26 @@ def _check_cli_args(cli_args: list[str]) -> None:
         if arg == "--setting-sources" or arg.startswith("--setting-sources="):
             raise _refuse("the CLI arguments carry --setting-sources: without the project's settings the session "
                           "would have no guard hook")
+        name = arg.split("=", 1)[0]
+        if name in GUARD_FLAGS:
+            raise _refuse(f"the CLI arguments carry {name}: it drops the guard or adds context to a worker session "
+                          f"(DEC-826 Q5)")
+
+
+def template_args(root: Path, role: str) -> list[str]:
+    """The flag that gives the session its role template, by absolute path; refused when the file is missing, so no
+    session starts without its template (W2-153 S1, F1)."""
+    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES[role]}.md"
+    if not path.is_file():
+        raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {path} is missing: no '{role}' session starts "
+                                             f"without it (DEC-1050)")
+    return [TEMPLATE_FLAG, str(path)]
+
+
+def check_lead(root: Path, ticket_id: str):
+    """The plan's check of a lead (W2-136 S9): ``gov.launch.plan_check.check_lead``, looked up when called."""
+    from gov.launch import plan_check
+    return plan_check.check_lead(root, ticket_id)
 
 
 def _say(line: str) -> None:
@@ -281,74 +363,213 @@ def _say(line: str) -> None:
         pass
 
 
-def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
-    """Start one worker session and return the CLI's exit code; raise ``GovError`` to refuse."""
-    root = Path(os.path.realpath(root))
-    if role not in WORKER_ROLES:
-        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)})")
-    _check_cli_args(cli_args)
-    _check_ticket(root, role, ticket_id)
-    _check_repository_settings(root)
+def _admit_lead(root: Path, ticket_id: str) -> tuple[str, str] | None:
+    """W2-136 S9 (DEC-1088 (5)(a)): a lead only for a planned ticket whose waits are met. A plan override's
+    ``(decision, reason)`` is returned, for ``_record_plan_override`` once the gate admits the launch too (review F8):
+    a lead the gate refuses leaves no override line."""
+    verdict = check_lead(root, ticket_id)
+    if isinstance(verdict, tuple) and len(verdict) == 3:
+        verdict = dict(zip(("admitted", "reason", "override"), verdict))
+    field = verdict.get if isinstance(verdict, dict) else lambda name: getattr(verdict, name, None)
+    if not field("admitted"):
+        raise _refuse(f"no lead for ticket '{ticket_id}': {field('reason')} (DEC-1088 (5))")
+    return (field("override"), field("reason")) if field("override") else None
+
+
+def _record_plan_override(ticket_id: str, override: tuple[str, str] | None) -> None:
+    """A plan override that admitted a lead: one line in the machine-wide launch log and one on standard error
+    (W2-20 S21, W2-136 review F4, P-8)."""
+    from gov.launch.gate import record
+
+    if override is None:
+        return
+    decision, reason = override
+    record(f"gov launch: OVERRIDE plan_override: {decision}: ticket {ticket_id}: {reason} (DEC-899)")
+    _say(f"gov launch: OVERRIDE {decision}: {reason} (DEC-899)\n")
+
+
+def _admit_start(root: Path, role: str, ticket_id: str, gate_override: str | None, gpu_need_mib: int | None) -> None:
+    """W2-20 S19 (DEC-1088 (5)(b)): no session, lead or worker, while the resource gate is shut on any reading; one
+    recorded override (``--gate-override DEC-NNN``) starts it anyway, written to the launch log and standard error."""
+    from gov.launch.gate import GATE_SHUT, check_start, override_decision, record, shut_text
+
+    decision = override_decision(gate_override)
+    if gpu_need_mib is not None and (isinstance(gpu_need_mib, bool) or not isinstance(gpu_need_mib, int)
+                                     or gpu_need_mib < 1):
+        raise _refuse(f"--gpu-need-mib takes a positive number of MiB, not {gpu_need_mib!r}")
+    try:
+        check_start(gpu_need_mib=gpu_need_mib)
+    except GovError as shut:
+        if shut.code != GATE_SHUT:
+            raise _refuse(f"the resource gate cannot be read: {shut.message} (DEC-1088 (5))") from None
+        text = shut_text(shut.details)
+        if decision is None:
+            raise GovError("LAUNCH_REFUSED", f"the resource gate is shut: {text} (DEC-1088 (5))",
+                           shut.details) from None
+        line = (f"gov launch: OVERRIDE gate_override: {decision}: {role} {ticket_id} started with the resource gate "
+                f"shut: {text} (DEC-899)")
+        record(line)
+        _say(line + "\n")
+
+
+def _cli() -> Path:
     cli = Path.home() / CLI_REL
     if not cli.is_file():
         raise _refuse(f"the CLI is not at ~/{CLI_REL} (DEC-205)")
+    return cli
+
+
+def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
+           gpu_need_mib: int | None = None) -> int:
+    """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
+
+    Only a lead (``role`` in ``LEAD_ROLES``) is checked against the plan; a worker launch never is, whoever calls.
+    Every launch, lead or worker, passes the resource gate (W2-20 S19), unless ``gate_override`` (a decision id)
+    starts it anyway; ``gpu_need_mib`` is the session's declared GPU need. The started session is entered in the
+    machine-wide registry while it runs (W2-20 S1).
+
+    The machine-wide start lock is held from the gate's check until the session is registered (review F1): launches
+    that start together are judged one after another, each with the sessions started before it counted, and one that
+    ends before registering leaves no entry.
+    """
+    from gov.launch.gate import StartLock
+
+    root = Path(os.path.realpath(root))
+    if role in LEAD_ROLES:
+        plan_override = _admit_lead(root, ticket_id)
+        _check_cli_args(cli_args)
+        _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
+        template = template_args(root, role)
+        cli = _cli()
+        settings = build_lead_settings(root, ticket_id)  # an unusable store setting refuses here, before the gate
+        lock = StartLock()
+        try:
+            _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+            _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
+            # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
+            return _run(root, cli, settings, [*cli_args, *template], entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
+        finally:
+            lock.release()
+    if role not in WORKER_ROLES:
+        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
+                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+    _check_cli_args(cli_args)
+    _check_ticket(root, role, ticket_id)
+    _check_repository_settings(root)
+    template = template_args(root, role)
+    cli = _cli()
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
-    # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
-    # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
-    # folder made here is marked as this repository's; a folder that is there without this repository's marker,
-    # or that cannot be named, made or marked, is not opened: the session then has none.
-    name = runs.folder(str(root), ticket_id, role)
-    if name is not None and not os.path.lexists(name):
-        runs.make(name, str(root))
-    own = runs.own_folder(str(root), ticket_id, role)
-    state = {"session": None, "ended": False, "asked": False}
+    # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
+    # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
+    try:
+        sandbox.exclude_placeholders(root, settings["permissions"]["deny"])
+    except OSError as error:
+        raise _refuse(f"the sandbox's placeholder names cannot be kept out of the repository's commits "
+                      f"({error.strerror or error}) (DEC-402)") from None
+    lock = StartLock()
+    try:
+        _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+        # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
+        # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
+        # folder made here is marked as this repository's; a folder that is there without this repository's marker,
+        # or that cannot be named, made or marked, is not opened: the session then has none.
+        name = runs.folder(str(root), ticket_id, role)
+        if name is not None and not os.path.lexists(name):
+            runs.make(name, str(root))
+        own = runs.own_folder(str(root), ticket_id, role)
+        return _run(root, cli, settings, [*cli_args, *template], temp_prefix=TEMP_PREFIX, own=own,
+                    entry=(ticket_id, role), lock=lock)
+    finally:
+        lock.release()
+
+
+def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_prefix: str | None = None,
+         own: str | None = None, entry: tuple[str, str] | None = None, lock=None) -> int:
+    """Start the session and wait for it. With ``temp_prefix`` (a worker), the session gets a temp folder of its
+    own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386). With
+    ``entry`` (its ticket and role), the session is in the machine-wide registry while it runs (W2-20 S1): one that
+    cannot be entered is stopped, so the gate never runs blind to a session. ``lock`` (the machine-wide start lock,
+    review F1) is given back once the session is registered, or when the launch ends without one."""
+    from gov.resources import registry
+
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None}
 
     def end(signum=None, frame=None):
-        """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session. It is asked first, and killed when a second
-        signal arrives or it still runs END_WAIT_S later. Nothing is raised here, so no clean-up is cut short."""
+        """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session's whole process group (W2-56 S12). It is asked
+        first, and killed when a second signal arrives or it still runs END_WAIT_S later. Nothing is raised here, so
+        no clean-up is cut short."""
         session, asked = state["session"], state["asked"]
         state["ended"] = True
-        if session is not None and session.poll() is None:
+        if session is not None and (session.poll() is None or _group_alive(session)):
             state["asked"] = True
             if asked:
-                session.kill()
+                _signal_session(session, signal.SIGKILL)
             else:
-                session.terminate()
+                _signal_session(session, signal.SIGTERM)
+                state["deadline"] = time.monotonic() + END_WAIT_S
                 signal.alarm(END_WAIT_S)
 
     previous = {number: signal.signal(number, end) for number in END_SIGNALS
                 if signal.getsignal(number) is not signal.SIG_IGN}  # a signal the caller ignores stays ignored
-    alarm, tmpdir, code = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT
+    alarm, tmpdir, code, terminal = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT, None
     try:
-        # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
-        tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
-        settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-        settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
-        env = {**os.environ, **settings["env"]}
+        own_env = dict(settings["env"])
+        if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
+            tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
+            own_env.update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+            # W2-56 S2, S11: the temp folder, the run folder and the reranker's log, nothing else
+            settings["sandbox"]["filesystem"] = sandbox.filesystem(tmpdir, own)
+            faults = sandbox_faults(settings)
+            if faults:
+                raise _refuse("the built settings are not strict: " + "; ".join(faults))
+        # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
+        # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
+        settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
+        env = environ.session_env(os.environ, own_env)
         if not state["ended"]:  # a signal that came first: no session is started
-            try:
-                state["session"] = subprocess.Popen([str(cli), "--settings", json.dumps(settings), *cli_args],
-                                                    cwd=root, env=env)
-            except OSError:
+            terminal = _terminal()
+            try:  # W2-56 S12: the session leads a process group of its own, which the ending signals reach
+                state["session"] = _start([str(cli), "--settings", json.dumps(settings), *cli_args], root, env,
+                                          terminal)
+            except (OSError, SubprocessError):
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            pid = getattr(state["session"], "pid", None)  # a started process always has one
+            if entry is not None and isinstance(pid, int) and pid > 0:
+                try:
+                    registry.register(pid, root, *entry)
+                    state["registered"] = pid
+                except (OSError, GovError) as error:
+                    raise _refuse(f"the session cannot be entered in the machine-wide registry "
+                                  f"({getattr(error, 'message', error)}): it is stopped (W2-20)") from None
+            if lock is not None:  # registered: the next launch's check counts this session (review F1)
+                lock.release()
             if state["ended"]:  # a signal that came while the session was started
                 end()
             code = state["session"].wait()
+            _end_group(state)  # W2-56 S12: what the session left in its group ends with it
             if state["ended"]:
                 code = INTERRUPT_EXIT
         return code
     finally:
         session = state["session"]
         if session is not None and session.poll() is None:  # only an error on the way here: no session is left
-            session.kill()
+            _signal_session(session, signal.SIGKILL)
             session.wait()
-        # DEC-386: the folder goes when the session ends, whole; a link in it is removed as a link.
+        if session is not None and _group_alive(session):
+            _signal_session(session, signal.SIGKILL)
+        if terminal is not None:
+            _take_terminal(terminal)
+        if state["registered"] is not None:
+            registry.unregister(state["registered"])
+        if lock is not None:
+            lock.release()
+        # DEC-386, W2-56 S15: the folder goes when the session ends, whole; a link in it is removed as a link.
         try:
             if tmpdir is not None:
-                shutil.rmtree(tmpdir)
+                _remove(tmpdir)
         except OSError as error:  # DEC-392: the session's exit code is kept, and one line names what stayed
             _say(f"gov launch: the temp folder {tmpdir} could not be removed and stays: "
                  f"{' '.join(str(error).split())}\n")
@@ -356,3 +577,119 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
             signal.signal(number, handler or signal.SIG_DFL)
         signal.alarm(0)
         signal.signal(signal.SIGALRM, alarm or signal.SIG_DFL)
+
+
+def _terminal() -> int | None:
+    """Standard input's descriptor when it is a terminal whose foreground group is the launcher's, else None."""
+    try:
+        if os.isatty(0) and os.tcgetpgrp(0) == os.getpgrp():
+            return 0
+    except OSError:
+        pass
+    return None
+
+
+def _group_options(terminal: int | None) -> dict:
+    """``Popen`` options that make the session the leader of a process group of its own (W2-56 S12). On a terminal
+    the session's group is also made the terminal's foreground group, so that an interactive session can read it."""
+    if terminal is None:
+        return {"process_group": 0}
+
+    def foreground() -> None:  # in the child, before the CLI is started
+        os.setpgid(0, 0)
+        signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+        os.tcsetpgrp(terminal, os.getpgrp())
+        signal.signal(signal.SIGTTOU, signal.SIG_DFL)
+
+    return {"preexec_fn": foreground}
+
+
+def _start(argv: list[str], root: Path, env: dict, terminal: int | None):
+    """The session, started as the leader of its own process group. A ``Popen`` put in the real one's place that
+    takes no process options (the suites' in-process stand-ins) is called without them: it starts no process."""
+    try:
+        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal))
+    except TypeError as error:
+        if "unexpected keyword argument" not in str(error):
+            raise
+        return subprocess.Popen(argv, cwd=root, env=env)
+
+
+def _take_terminal(terminal: int) -> None:
+    """The terminal back to the launcher's group once the session has ended."""
+    former = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+    try:
+        os.tcsetpgrp(terminal, os.getpgrp())
+    except OSError:
+        pass
+    finally:
+        signal.signal(signal.SIGTTOU, former)
+
+
+def _pgid(session) -> int | None:
+    pid = getattr(session, "pid", None)
+    return pid if isinstance(pid, int) and not isinstance(pid, bool) and pid > 0 else None
+
+
+def _group_alive(session) -> bool:
+    """True while a process of the session's group runs (its leader, or one it left behind)."""
+    pgid = _pgid(session)
+    if pgid is None:
+        return False
+    try:
+        os.killpg(pgid, 0)
+    except (ProcessLookupError, PermissionError):
+        return False
+    return True
+
+
+def _signal_session(session, number: int) -> None:
+    """``number`` to the session's whole process group; to the session alone when it leads no group."""
+    pgid = _pgid(session)
+    if pgid is not None:
+        try:
+            os.killpg(pgid, number)
+            return
+        except (ProcessLookupError, PermissionError):
+            pass
+    if session.poll() is None:
+        session.kill() if number == signal.SIGKILL else session.terminate()
+
+
+def _end_group(state: dict) -> None:
+    """After the session's leader has ended: the rest of its group is asked to end, and killed when it still runs
+    END_WAIT_S after the first ask (D-5: the kill reaches the group, not only a leader that has ended)."""
+    session = state["session"]
+    if not _group_alive(session):
+        return
+    if not state["asked"]:
+        state["asked"] = True
+        _signal_session(session, signal.SIGTERM)
+        state["deadline"] = time.monotonic() + END_WAIT_S
+    deadline = state["deadline"] if state["deadline"] is not None else time.monotonic()
+    while _group_alive(session) and time.monotonic() < deadline:
+        time.sleep(0.05)
+    if _group_alive(session):
+        _signal_session(session, signal.SIGKILL)
+        reaped = time.monotonic() + REAP_WAIT_S  # a killed orphan stays in the group until its new parent reaps it
+        while _group_alive(session) and time.monotonic() < reaped:
+            time.sleep(0.05)
+
+
+def _remove(folder: str) -> None:
+    """The session's temp folder, whole (W2-56 S15): also when it holds folders its owner may not write or list (mode
+    0500 or 0000, as a module cache leaves them), a fifo, or a link (removed as a link; its target is untouched)."""
+    try:
+        if not os.path.islink(folder):
+            os.chmod(folder, 0o700)
+    except OSError:
+        pass
+    for here, folders, _files in os.walk(folder):  # links are not followed
+        for name in folders:
+            path = os.path.join(here, name)
+            if not os.path.islink(path):
+                try:
+                    os.chmod(path, 0o700)
+                except OSError:
+                    pass
+    shutil.rmtree(folder)

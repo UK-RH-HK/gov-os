@@ -210,6 +210,78 @@ def test_a_record_only_commit_selects_nothing_by_itself(repo):
         "tests/acceptance/W1-own/", "tests/unit", "tests/acceptance/W1-rr/test_rr.py::test_reads"}
 
 
+def _code_only(repo: Repo, monkeypatch, test_map: dict = MAP) -> None:
+    """A project whose change since its base is code alone: the base is the green record's own commit."""
+    _green(repo, _project(repo, test_map))
+    after_record = repo.git("rev-parse", "HEAD").strip()
+    monkeypatch.setattr(select, "base", lambda root: after_record)
+
+
+def test_a_code_only_change_leaves_every_close_out_and_keeps_the_record_reading_set(repo, monkeypatch):
+    """DEC-1050 (T-4): with no record-only path in the change, every_close does not join the selection; the
+    record-reading set (this repository's quick checks of its own records) still does."""
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.commit("work", files={"src/a/x.py": "x = 2\n"})
+    plan = select.plan(repo.root, "W1-own")
+    assert plan["scope"] == "scoped" and plan["changed"] == ["src/a/x.py"]
+    assert _targets(plan) == {"tests/acceptance/W1-own/": ["OWN"], "tests/unit": ["UNIT"],
+                              "tests/acceptance/W1-aa/": ["OVERLAP"],
+                              "tests/acceptance/W1-rr/test_rr.py::test_reads": ["RECORD_READING"]}
+    assert "tests/acceptance/W1-zz/" in plan["ignore"]
+
+
+def test_a_change_whose_record_paths_a_caller_strips_keeps_the_record_reading_set(repo, monkeypatch):
+    """A caller that strips record-only paths from the change before the selection runs (the orchestration's one
+    selection tool, DEC-953 item 4a) still gets the record-reading set; every_close then does not join."""
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.commit("work", files={"src/a/x.py": "x = 2\n", ".tickets/P-W1-aa.md": _ticket("W1-aa", "src/a/**", "x/**")})
+    changed = select.changed
+    monkeypatch.setattr(select, "changed", lambda root, since: [
+        p for p in changed(root, since) if not any(select.match(p, r) for r in MAP["record_only"])])
+    targets = _targets(select.plan(repo.root, "W1-own"))
+    assert targets["tests/acceptance/W1-rr/test_rr.py::test_reads"] == ["RECORD_READING"]
+    assert not [t for t in targets if t.startswith("tests/acceptance/W1-zz")], targets
+
+
+def test_a_record_only_path_in_the_change_brings_every_close_back(repo, monkeypatch):
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.commit("work", files={"src/a/x.py": "x = 2\n", ".tickets/P-W1-aa.md": _ticket("W1-aa", "src/a/**", "x/**")})
+    targets = _targets(select.plan(repo.root, "W1-own"))
+    assert targets["tests/acceptance/W1-rr/test_rr.py::test_reads"] == ["RECORD_READING"]
+    assert targets["tests/acceptance/W1-zz/test_zz.py"] == ["EVERY_CLOSE"]
+
+
+def test_an_every_close_target_the_head_does_not_hold_still_widens_when_it_is_not_selected(repo, monkeypatch):
+    """The map's own defect is still seen: a gone every-close target widens the run whatever the change."""
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.git("rm", "-q", "tests/acceptance/W1-zz/test_zz.py")
+    repo.commit("gone", files={"src/a/x.py": "x = 2\n"})
+    plan = select.plan(repo.root, "W1-own")
+    assert plan["scope"] == "full" and plan["why_full"] == [
+        {"reason": "UNRESOLVED_TARGET", "target": "tests/acceptance/W1-zz/test_zz.py", "detail": "FILE_GONE"}]
+
+
+def test_the_live_map_s_lists_name_no_w2_54_case_that_starts_a_whole_gov_check():
+    """DEC-1050 (T-4): W2-54's green-here cases that take the ``gov_check_here`` fixture run a whole ``gov check``;
+    the always-added lists name its other cases one by one and none of those."""
+    import ast
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[3]
+    rel = "tests/acceptance/W2-54/test_w2_54_green_here.py"
+    test_map, why = select.load_map(root)
+    assert why is None
+    tree = ast.parse((root / rel).read_text(encoding="utf-8"))
+    heavy = {n.name for n in tree.body if isinstance(n, ast.FunctionDef)
+             and "gov_check_here" in [a.arg for a in n.args.args]}
+    light = {n.name for n in tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith("test")} - heavy
+    assert heavy, "the file holds no case taking gov_check_here: re-read this test"
+    targets = [t for key in ("record_reading", "every_close") for t in test_map.get(key) or []]
+    assert not [t for t in targets if select._norm(t) in (rel, "tests/acceptance/W2-54", "tests/acceptance")], targets
+    named = {t.partition("::")[2] for t in targets if t.startswith(rel + "::")}
+    assert not named & heavy and named == light, (named, heavy, light)
+
+
 def test_a_serial_case_runs_only_where_the_run_reaches_it():
     ignore, deselect = ["tests/acceptance/W1-zz/"], ["tests/acceptance/W1-rr/test_rr.py::test_other"]
     assert not select.runs("tests/acceptance/W1-zz/test_zz.py::test_zz", ignore, deselect)

@@ -1173,7 +1173,8 @@ class EmbedderStandIn:
                     stand_in.embedded += len(texts)
                     reply = {"model": EMBED_MODEL, "embeddings": [stand_in.vector(text) for text in texts]}
                 elif path == "/api/ps":
-                    reply = {"models": [{"name": EMBED_MODEL, "model": EMBED_MODEL, "size": 1, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{"name": EMBED_MODEL, "model": EMBED_MODEL, "size": 1, "size_vram": 1}]}
                 else:
                     reply = {}
                 payload = json.dumps(reply).encode()

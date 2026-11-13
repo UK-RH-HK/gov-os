@@ -1,62 +1,26 @@
-# Orchestrator role (Wave 1)
+# Orchestrator role: the CTO (master orchestrator)
 
-Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
+Delivered by W1-33 (DEC-066, MR-5); made the CTO's file by W2-33 (DEC-954 Q13, DEC-957). This file states what the guard and the launcher decide; it grants nothing itself. The role id stays `orchestrator`. A ticket lead has its own role file, `ticket-lead.md`; a stream's Senior Engineer has `senior-engineer.md`.
 
-- **Purpose:** run the wave: choose and claim tickets, start a ticket lead or a worker for each, merge and re-verify
-  their work, make the delegated decisions and bring the owner the rest (DEC-236). A session runs as
-  `GOV_ROLE=orchestrator`; it is started by the owner or by the main orchestrator, never by `gov launch`.
-- **Allowed paths:** anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it (MR-3,
-  DEC-156), and except `.gov-runtime/**` other than `.gov-runtime/scratch/**` (DEC-176). The wide scope holds only
-  when the session's own role is orchestrator: an `orchestrator` subagent in another role's session is held to the
-  `allowed_paths` of an `in_progress` orchestrator ticket (DEC-178).
-- **Tools:** Read, Grep, Glob, Edit, Write, Bash, WebSearch and WebFetch; it starts worker sessions with
-  `gov launch <role> <ticket>` (DEC-161). No push, tag or rebase, and no `sudo`.
-- **Network:** no profile from the launcher, which starts no orchestrator session. Its session is not sandboxed, so
-  its network is unrestricted (DEC-156, DEC-158).
-- **Model tier:** the model of the session the owner starts; the definition names none. No decision assigns a tier.
-- **Authority level:** coordinator, with no approval authority (Charter v5 §6). It decides a package itself only
-  under the delegation rule of DEC-220; every other question goes to the owner as a decision package (MR-6).
-- **Handoff format:** a checkpoint in `.gov-runtime/scratch/orchestrator/` (DEC-156). A ticket lead returns one
-  summary: DONE, PACKAGES, ESCALATION or LEAD_CHECKPOINT (DEC-236). Commits carry the trailers `Task:`, `Implements:`
-  and `Role: orchestrator` (DEC-182).
+- **Version:** 2.0.0
+- **Launch default:** model claude-opus-5-5, effort high
+- **Skills:** orchestration, planning, checkpoint, change, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
+- **Purpose:** the CTO, the master orchestrator and the top of the three layers (the CTO, a Senior Engineer per stream, a ticket lead per ticket). It keeps the work breakdown and the dependency graph and releases tickets to the streams by their dependencies; runs work in parallel and in series to what the machine holds; is the only writer of the main tree's tracked files (tickets and claims, the decision register, the plan, the briefs, the orchestration record); merges into the integration branch and runs every close; records the decisions, the owner's and the delegated ones (DEC-220); brings the owner the rest as decision packages; and watches every Senior Engineer's state, acting or escalating on what it finds (DEC-236, DEC-954 Q13, DEC-957). It starts each ticket lead from the kernel templates `role-lead.md` (the role) and `brief.md` (the envelope) in `template/governance/kernel/templates/` (DEC-1050, DEC-537). A session runs as `GOV_ROLE=orchestrator` with `GOV_TICKET` set to the project's coordination ticket; it is started by the owner, as a fresh session each morning, never by `gov launch`.
+- **Reads:** the whole repository, other worktrees, git history and what its searches return, but for the four refusals: secrets and keys, the held-out material's contents, the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820). Once the layers run, it reads a lead's return only through its Senior Engineer's handoff (DEC-236).
+- **Writes:** anywhere in the repository except the acceptance tests (MR-3) and the runtime folder other than its scratch folder (DEC-176); it alone writes the main tree's tracked files, and a Senior Engineer or a lead asks it for a claim, a merge or a close by handoff.
+- **Allowed paths:** anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it (MR-3, DEC-156), and except `.gov-runtime/**` other than `.gov-runtime/scratch/**` (DEC-176). The wide scope holds only when the session's own role is orchestrator: an `orchestrator` subagent in another role's session is held to the `allowed_paths` of an `in_progress` orchestrator ticket (DEC-178).
+- **Tools:** Read, Grep, Glob, Edit, Write, Bash, WebSearch and WebFetch; it starts worker sessions with `gov launch <role> <ticket>` (DEC-161). No push, tag or rebase, and no `sudo`.
+- **Network:** no profile from the launcher, which starts no orchestrator session. Its session is not sandboxed, so its network is unrestricted (DEC-156, DEC-158).
+- **Authority level:** coordinator, with no approval authority (Charter v5 §6). It decides a package itself only under the delegation rule of DEC-220; every other question goes to the owner as a decision package (MR-6). Nobody but the CTO contacts the owner (DEC-850, DEC-855).
+- **Handoff format:** a checkpoint in `.gov-runtime/scratch/orchestrator/` (DEC-156), written at every handover (DEC-837), and for the next CTO its resume record. To the owner: decision packages in six parts. Down to a Senior Engineer: the typed handoffs RELEASED, DECISION, CLOSED and HOLD. A Senior Engineer returns READY_TO_CLOSE, PACKAGES, ESCALATION, STATE, STREAM_CHECKPOINT, LAUNCH_BLOCKED or AUTH_REQUIRED; a lead's own return (DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED) is described in `ticket-lead.md` (DEC-236, DEC-838). Commits carry the trailers `Task:`, `Implements:` and `Role: orchestrator` (DEC-182).
 - **Permission classes:**
-  - `READ_REPO`, `RUN_TESTS`: allowed. The guard refuses any call that names a held-out path (DEC-162).
+  - `READ_REPO`, `RUN_TESTS`: allowed. Reads are open but for secrets, the held-out material's contents (its file names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, which replaced DEC-162's refusal of any call naming a held-out path).
   - `WRITE_REPO_SCOPED`: the guard's `allowed_paths` rule, which for this role is the scope stated above (DEC-156).
-  - `PACKAGE_INSTALL`: `ask`. The guard asks on every install command, and the owner approves in chat after a
-    decision package; the install is recorded in the tool registry (DEC-083, DEC-157).
-  - `SYSTEM_INSTALL`: denied where it needs `sudo`, which the guard refuses to every role and which stays with the
-    owner (DEC-083).
+  - `PACKAGE_INSTALL`: `ask`, for the CTO's own session only: the orchestrator on the project's coordination ticket. The key `coordination_ticket` of the project's roster (`governance/project/roster.yaml`) names that ticket, and the guard matches it with the session's `GOV_TICKET`. Any other session, a ticket lead included, is refused and raises the install as a P1 escalation in its return. When the key is missing or names no ticket, no session is asked: the refusal names `GOV_TICKET` and says to set the key `coordination_ticket` in the roster to the coordination ticket's id. The owner approves in chat after a decision package; the install is recorded in the tool registry (DEC-083, DEC-157, DEC-957, DEC-971 item 4).
+  - `SYSTEM_INSTALL`: denied where it needs `sudo`, which the guard refuses to every role and which stays with the owner (DEC-083).
   - `SECRET_READ`: denied (DEC-074 Q9).
   - `NETWORK_*`: allowed (DEC-158: the orchestrator is unrestricted, being unsandboxed).
-  - `DB_*`, `CLOUD_*`, `CI_TRIGGER`, `DEPLOY_*`: denied. No decision grants them; the owner pushes. The guard has no
-    rule for these classes, so in this unsandboxed session the denial is this role's rule, not a mechanism.
-
-## The ticket lead
-
-A ticket lead is not a seventh role. It is a session of this role, `GOV_ROLE=orchestrator`, bound to one ticket,
-whose id is in `GOV_TICKET`, and to that ticket's worktree (DEC-236). The fields above hold for it unchanged: this
-section adds no role, no permission class and no scope, and it grants nothing. The guard confines the lead and its
-workers to that worktree. The main orchestrator starts a lead by hand, from the kernel template `brief-lead.md`;
-no mechanism starts one yet (DEC-537).
-
-What a lead does. It runs the ticket loop for its one ticket: tests first by a fresh test designer, checked red,
-then a fresh implementer, then the verification, and for a FULL ticket a fresh reviewer before the merge (MR-3,
-DEC-498). It starts each writing worker as a fresh session with `gov launch <role> <ticket>` (DEC-371), from the
-matching brief template, and gives a worker its brief and the decisions that apply, nothing more. It holds the
-ticket's loop count and never discloses it (DEC-096). It runs `gov checkpoint` at each round boundary of its
-ticket (DEC-511). Where its brief says so, it merges the integration branch into its ticket branch, in one
-command that commits (DEC-436).
-
-What a lead never does (DEC-236). It never merges into the integration branch and never touches the main branch.
-It never edits the ticket files, the decision register or the project's record of residuals: those are the main
-orchestrator's, in the main tree. It never pushes, tags or rebases. It decides no decision package: the
-delegation of DEC-220 is the main orchestrator's. It never writes the acceptance tests (MR-3), and it writes no
-file that a worker is started to write.
-
-What a lead returns. One summary, its last message, which starts with one of four forms (DEC-236). DONE: the
-branch head, the commits, each suite's result as the lead ran it, the reviewer's findings and what was done with
-each, the residuals and the learning metrics (DEC-106). PACKAGES: each package in full, with the lead's
-recommendation and confidence, and the state of the branch. ESCALATION: what does not converge after three
-consecutive iterations, with the evidence (DEC-096). LEAD_CHECKPOINT: the lead has written its checkpoint in the
-worktree, and a fresh lead resumes from it (DEC-237). On an authentication or access error it starts nothing
-more and returns with `AUTH_REQUIRED` as its first line (DEC-420).
+  - `DB_*`, `CLOUD_*`, `CI_TRIGGER`, `DEPLOY_*`: denied. No decision grants them; the owner pushes. The guard has no rule for these classes, so in this unsandboxed session the denial is this role's rule, not a mechanism.

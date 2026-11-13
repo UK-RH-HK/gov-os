@@ -1,0 +1,10 @@
+category: kernel-template
+commit: cc9c94d42a54
+question: "Does an independent auditor fix the problems it finds?"
+gold_answer: >-
+  No. It is a worker independent of the builders and repairs nothing it audits: its findings are recommendations, and
+  contested and owner-level findings go to the owner as decision packages (MR-4).
+sources:
+  - path: template/governance/kernel/roles/independent-auditor.md
+    heading: "- **Authority level:** worker, independent of the builders: it repairs nothing it audits. Its findings are"
+    lines: [18, 19]

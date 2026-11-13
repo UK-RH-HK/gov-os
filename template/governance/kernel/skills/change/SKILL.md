@@ -2,6 +2,8 @@
 name: change
 description: Method for taking a Gov OS change through evidence, proposal, independent review and owner approval to a new version.
 version: "1.0.0"
+metadata:
+  version: "1.0.0"
 ---
 
 # Change

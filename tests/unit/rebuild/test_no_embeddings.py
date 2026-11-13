@@ -50,7 +50,21 @@ def test_a_full_rebuild_is_the_default(tmp_path, asked):
 def test_both_modes_say_where_no_namespace_is_embedded_and_nothing_else_changes(tmp_path, asked, mode, policy):
     """DEC-694: only exactly ``embedded`` embeds; the words stand beside the store's own answer."""
     space = {"paths": ["**"], **({} if policy is None else {"embedding_policy": policy})}
-    semantic = run(tmp_path, _args(*mode), {"path-map.yaml": {"namespaces": {"all": space}}})["stores"]["semantic"]
+    result = run(tmp_path, _args(*mode), {"path-map.yaml": {"namespaces": {"all": space}}})
+    semantic = result["stores"]["semantic"]
     assert semantic.pop("embedding").startswith("no namespace is embedded")
-    assert semantic == run(tmp_path, _args(*mode), EMBEDDED)["stores"]["semantic"]
+    assert "semantic" not in asked  # a project with no embedded namespace embeds nothing
+    reference = run(tmp_path, _args(*mode), EMBEDDED)
+    if mode:  # --no-embeddings: neither project is asked for its vectors, so the store answers the same
+        assert semantic == reference["stores"]["semantic"]
+    else:
+        # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150
+        # (3): the project with an embedded namespace is now asked for its vectors, the one without is not
+        # (``requested: false``, the Interface), so the two semantic answers differ in that and only that; the
+        # words stand beside the not-asked answer, and every other part of the result is still the reference's.
+        assert (semantic["status"], semantic["requested"]) == ("not_recreated", False) and semantic["reason"]
+        assert reference["stores"]["semantic"] == {"status": "recreated"}
+    assert {name: store for name, store in result["stores"].items() if name != "semantic"} == \
+        {name: store for name, store in reference["stores"].items() if name != "semantic"}
+    assert result["digest"] == reference["digest"]
     assert "embedding" not in run(tmp_path, _args(*mode), {})["stores"]["semantic"]  # no path map: unchanged

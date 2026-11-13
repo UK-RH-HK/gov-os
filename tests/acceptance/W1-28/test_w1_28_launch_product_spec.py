@@ -102,9 +102,12 @@ def test_the_research_allowlist_gives_the_product_spec_session_no_host(launch, l
 
 
 def test_the_extra_cli_arguments_reach_the_product_spec_session(launch):
-    """DEC-183: what follows ``--`` is the session's, after the launcher's own ``--settings``."""
-    result = launch(PRODUCT_SPEC, None, "-p", "Do the ticket's work.", "--max-turns", "8")
-    assert result.session()["args"][-4:] == ["-p", "Do the ticket's work.", "--max-turns", "8"], result.describe()
+    """DEC-183: what follows ``--`` is the session's, after the launcher's own ``--settings``. W2-153 (DEC-1050) appends
+    one more pair after the caller's arguments, ``--append-system-prompt-file <root>/.claude/templates/<stem>.md``:
+    the caller's four stay one ordered run, followed by that pair and nothing else (W1-46's helper)."""
+    passed = ["-p", "Do the ticket's work.", "--max-turns", "8"]
+    result = launch(PRODUCT_SPEC, None, *passed)
+    assert w46.caller_args_then_template_pair(result.session()["args"], passed), result.describe()
     assert w46.sandbox_faults(result.settings()) == []
 
 

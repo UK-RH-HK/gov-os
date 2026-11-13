@@ -2,8 +2,9 @@
 
 Loaded at start-up by `gov-reranker-gpu-slot.pth` in the reranker environment, so it runs in every Python of that
 environment; it acts only in the reranker worker (`rerank_worker.py`, by its path or as `-m ...rerank_worker`) and
-leaves every other Python untouched. The worker tries to hold one of `GOV_RERANK_GPU_SLOTS` (default 2) lock files in
-`GOV_RERANK_GPU_LOCK_DIR` (default /tmp) for its whole life; with one, it keeps the GPU. Without one, it polls the
+leaves every other Python untouched. The worker tries to hold one of `GOV_RERANK_GPU_SLOTS` lock files (unset: the
+number the dispatcher derives from the machine, `rerank_gpu_slots` in its `limits.json`, `GOV_RERANK_GPU_LIMITS`;
+unreadable or out of 1 to 64: 2; DEC-1037 (4), DEC-1039 (1b)) in `GOV_RERANK_GPU_LOCK_DIR` (default /tmp) for its whole life; with one, it keeps the GPU. Without one, it polls the
 locks once a second for up to `GOV_RERANK_GPU_WAIT_S` seconds (default 20); if none frees, it ends at once, before
 the worker imports torch or loads a model, with a named line on standard error and exit code 75. `gov.retrieval.
 rerank` then sees a worker that ended without the model and the search goes on unranked (`merge.reranked` false,
@@ -24,6 +25,24 @@ GPU_HIDDEN = 76  # the caller hid the GPU and did not opt in to the CPU
 FAILED = 70  # an error inside this module (EX_SOFTWARE)
 
 _HELD = None
+LIMITS = "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/dispatch/limits.json"
+
+
+def _slots():
+    """The number of GPU slots: GOV_RERANK_GPU_SLOTS; else the dispatcher's derived `rerank_gpu_slots` (limits.json);
+    else 2. A derived number outside 1 to 64 (0: no GPU on the machine) is not used."""
+    if os.environ.get("GOV_RERANK_GPU_SLOTS"):
+        return int(os.environ["GOV_RERANK_GPU_SLOTS"])
+    try:
+        import json
+
+        with open(os.environ.get("GOV_RERANK_GPU_LIMITS", LIMITS)) as fh:
+            n = json.load(fh).get("rerank_gpu_slots")
+        if isinstance(n, int) and not isinstance(n, bool) and 1 <= n <= 64:
+            return n
+    except (OSError, ValueError, AttributeError):
+        pass
+    return 2
 
 
 def _end(code, reason):
@@ -83,7 +102,7 @@ def _main():
                          f"not 1")
     import time
 
-    slots = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2"))
+    slots = _slots()
     wait = float(os.environ.get("GOV_RERANK_GPU_WAIT_S", "20"))
     if not 0 <= wait < float("inf"):  # nan or infinite: never an unbounded wait (review F2)
         raise ValueError("GOV_RERANK_GPU_WAIT_S must be a finite number of seconds")

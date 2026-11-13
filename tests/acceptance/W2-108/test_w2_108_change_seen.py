@@ -133,7 +133,9 @@ def test_a_moved_head_is_checked_afresh(planted, driver, embedder):
     assert_fresh_before(values[:len(WARM) * 2])
     freshness, semantic = calls[-2], calls[-1]
     assert freshness["value"] == {"status": S.FRESH, "stale": []}, freshness["value"]
-    assert semantic["value"] == values[2], "the semantic answer changed although only the head moved"
+    # Rewrite-Reason: DEC-1061 (R-1): compared without W2-126's vector-cache counters (S.answer_of).
+    assert S.answer_of(semantic["value"]) == S.answer_of(values[2]), \
+        "the semantic answer changed although only the head moved"
     assert S.work_of(freshness)[0] >= 1, (
         "after the head moved, the lexical index's freshness was not checked again (no listing or hashing of the "
         f"tracked files)\n{S.describe_effects(calls)}")

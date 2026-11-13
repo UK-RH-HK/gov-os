@@ -1,6 +1,6 @@
 ---
 id: DAEO-cv6c
-status: open
+status: closed
 deps: [DAEO-cy5o]
 links: []
 created: 2026-10-30T05:18:35Z
@@ -11,6 +11,7 @@ parent: DAEO-cy5o
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-cy5o]
 allowed_paths:
 - src/gov/adapters/portability.py
 - src/gov/doctor/command.py
@@ -31,3 +32,4 @@ repair_of_findings: findings-1dd895eef7a7c045
 Findings of the refused close of DAEO-cy5o (disposition: unclassed):
 - tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files is red (failed) and accepted_reds does not list it
 
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (8). Its parent is closed; its lines go with it, and D-10 catches any red it names that still stands.

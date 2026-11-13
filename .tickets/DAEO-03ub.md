@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/guard/bash_writes.py
 - tests/unit/guard/test_w2_42a*
 - docs/changes/W2-42a-evidence.md
+- tests/unit/guard/test_decide.py
 kpis:
   success:
   - 'A heredoc''s body is not read as shell: a body that cat, tee or grep takes as data is no write; its unquoted `$(…)` is judged; a `bash`/`sh` body is judged as commands [DEC-1028 item 4, ACT-GUARD-FIX-3 §7 line 1]'
@@ -44,6 +45,7 @@ sources:
 - DEC-1027
 - DEC-958
 - DEC-953
+- DEC-1044
 est_loc: 600
 acceptance_tests:
   path: tests/acceptance/W2-42a/

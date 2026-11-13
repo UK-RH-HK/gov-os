@@ -1,19 +1,24 @@
 """Check runner (W1-26): load declarations, run checks, compute family statuses, record provenance."""
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
+import os
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 import yaml
 
 from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
+from gov.util.frontmatter import quiet as _frontmatter
 from gov.util.gitenv import git_env, program_env
 
 VERSION = "1.0.0"
@@ -42,6 +47,8 @@ RED, YELLOW, GREEN = "RED", "YELLOW", "GREEN"
 NA_FIELD = "allows-not-applicable"
 EXIT_NOT_APPLICABLE = 2
 TIMEOUT_S = 60  # the limit of a check whose declaration states none (DEC-595)
+EXIT_TOOL_ABSENT = 127  # the shell's "command not found"; also what a command that cannot be started answers
+STOP_GRACE_S = 5  # after the process group is killed, the time its pipes get to close before they are given up
 
 
 def _normalise_family(name: str) -> str:
@@ -97,17 +104,42 @@ def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[in
     env.setdefault("XDG_CONFIG_HOME", xdg_tmp)
     env.setdefault("XDG_DATA_HOME", xdg_tmp)
     try:
-        result = subprocess.run(
-            command, shell=True, capture_output=True, text=True,
-            cwd=str(root), env=env, timeout=timeout,
+        # its own session: on the limit the whole process group is stopped, so a grandchild that holds the
+        # pipe cannot keep the runner waiting (W2-M151)
+        process = subprocess.Popen(
+            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+            cwd=str(root), env=env, start_new_session=True,
         )
-        return result.returncode, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
-        return None, "", ""  # what it printed before the limit is no answer
     except OSError as exc:
-        return 1, "", str(exc)
+        shutil.rmtree(xdg_tmp, ignore_errors=True)
+        return EXIT_TOOL_ABSENT, "", str(exc)  # it could not be started: absent, as the shell says it
+    try:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+            return process.returncode, stdout, stderr
+        except subprocess.TimeoutExpired:
+            _stop(process)
+            return None, "", ""  # what it printed before the limit is no answer
+        except BaseException:  # an interrupt or any other error in the wait: the group is not left running
+            _stop(process)
+            raise
     finally:
         shutil.rmtree(xdg_tmp, ignore_errors=True)
+
+
+def _stop(process: subprocess.Popen) -> None:
+    """Stop ``process`` with every process of its group, then collect it and close its pipes."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        process.kill()
+    try:
+        process.communicate(timeout=STOP_GRACE_S)
+    except subprocess.TimeoutExpired:  # a descendant that left the group still holds a pipe: it is let go
+        for pipe in (process.stdout, process.stderr):
+            if pipe is not None:
+                pipe.close()
+        process.wait()
 
 
 def _augment_declarations(declarations: list[dict], root: Path) -> None:
@@ -133,7 +165,9 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
     allows_na = decl.get(NA_FIELD) == "true"
 
     limit = decl.get(TIMEOUT_FIELD, TIMEOUT_S)
+    started = time.monotonic()
     exit_code, stdout, stderr = _run_command(command, root, limit)
+    times = {"elapsed_s": round(time.monotonic() - started, 3), "time_limit_s": limit}
 
     if exit_code == EXIT_NOT_APPLICABLE and allows_na and stdout.strip():
         try:
@@ -146,31 +180,26 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
                     "status": YELLOW,
                     "reason": parsed.get("reason", ""),
                     "findings": [],
+                    **times,
                     "provenance": _provenance(check_id, commit),
                 }
         except json.JSONDecodeError:
             pass
 
     findings = []
-    if stdout.strip():
-        try:
-            parsed = json.loads(stdout)
-            if isinstance(parsed, list):
-                findings = parsed
-            elif exit_code == 0 and isinstance(parsed, dict) and parsed.get("ok") is True and "result" in parsed:
-                findings = []  # the success form of a gov command is no finding (DEC-612)
-            elif isinstance(parsed, dict):
-                findings = parsed.get("findings", [parsed])
-        except json.JSONDecodeError:
-            if exit_code != 0:
-                findings = [{"code": "CHECK_FAILED", "message": stdout.strip()[:200]}]
-
     if exit_code is None:
-        findings = [{"code": "CHECK_FAILED",
+        findings = [{"code": "CHECK_TIMED_OUT", "time_limit_s": limit,
                      "message": f"{check_id} did not end within its time limit of {limit} seconds"}]
-    elif exit_code != 0 and not findings:
-        findings = [{"code": "CHECK_FAILED", "message": f"{check_id} exited with code {exit_code}",
-                      "stderr": stderr.strip()[:200] if stderr.strip() else None}]
+    elif exit_code == EXIT_TOOL_ABSENT:
+        tool = command.split()[0] if command.split() else command
+        findings = [{"code": "CHECK_TOOL_ABSENT", "tool": tool,
+                     "message": f"{check_id}: its command '{tool}' is not available (exit code {EXIT_TOOL_ABSENT})",
+                     "stderr": stderr.strip()[:200] if stderr.strip() else None}]
+    else:
+        findings = _answered_findings(check_id, exit_code, stdout)
+        if exit_code != 0 and not findings:
+            findings = [{"code": "CHECK_FAILED", "message": f"{check_id} exited with code {exit_code}",
+                         "stderr": stderr.strip()[:200] if stderr.strip() else None}]
 
     status = GREEN
     if findings:
@@ -182,16 +211,74 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
         "severity": severity,
         "status": status,
         "findings": findings,
+        **times,
         "provenance": _provenance(check_id, commit),
     }
 
 
+def _answered_findings(check_id: str, exit_code: int, stdout: str) -> list:
+    """The findings in what a check printed. A check is green only when it exits 0 with none (W2-M129, W2-M212).
+
+    With exit code 0 there is also a finding where its answer is the success form with findings in its result, where
+    a JSON mapping in it (top level or ``result``) says ``"unmeasured": true``, and where output that is no JSON
+    holds the word "unmeasured"."""
+    if not stdout.strip():
+        return []
+    try:
+        parsed = json.loads(stdout)
+    except json.JSONDecodeError:
+        if exit_code != 0:
+            return [{"code": "CHECK_FAILED", "message": stdout.strip()[:200]}]
+        return _unmeasured_text(check_id, stdout)
+    if isinstance(parsed, list):
+        return parsed
+    if not isinstance(parsed, dict):  # a bare JSON value: it is read as the text it is
+        return [] if exit_code != 0 else _unmeasured_text(check_id, stdout)
+    result = parsed.get("result") if parsed.get("ok") is True and "result" in parsed else None
+    success = exit_code == 0 and parsed.get("ok") is True and "result" in parsed
+    if success:  # the success form of a gov command is no finding (DEC-612), but its result's findings are
+        inner = result.get("findings") if isinstance(result, dict) else None
+        findings = inner if isinstance(inner, list) else ([inner] if inner else [])
+    else:
+        findings = parsed.get("findings", [parsed])
+        if exit_code == 0 and parsed.get("unmeasured") is True:
+            findings = parsed["findings"] if isinstance(parsed.get("findings"), list) else []
+    if exit_code == 0:
+        for mapping in (parsed, result):
+            if isinstance(mapping, dict) and mapping.get("unmeasured") is True:
+                findings = [*findings, {"code": "CHECK_UNMEASURED", "message": f"{check_id} did not measure",
+                                        "reason": mapping.get("reason", "")}]
+                break
+    return findings
+
+
+def _unmeasured_text(check_id: str, stdout: str) -> list:
+    """A finding for output that is no JSON and holds the word "unmeasured"; none otherwise."""
+    if re.search(r"\bunmeasured\b", stdout, re.IGNORECASE):
+        return [{"code": "CHECK_UNMEASURED", "message": f"{check_id} printed 'unmeasured': {stdout.strip()[:200]}"}]
+    return []
+
+
+def _timed(check):
+    """``check`` with ``elapsed_s`` and ``time_limit_s`` (the runner's ``TIMEOUT_S``) added to its result (W2-M151)."""
+    @functools.wraps(check)
+    def timed(*args, **kwargs) -> dict:
+        started = time.monotonic()
+        result = check(*args, **kwargs)
+        return {**result, "elapsed_s": round(time.monotonic() - started, 3), "time_limit_s": TIMEOUT_S}
+    return timed
+
+
+@_timed
 def _check_openspec(root: Path, commit: str) -> dict:
     check_id = "openspec-validate"
     findings = []
     has_openspec = shutil.which("openspec") is not None
+    exit_code = stdout = stderr = None
     if has_openspec:
         exit_code, stdout, stderr = _run_command("openspec validate --strict", root)
+        has_openspec = exit_code != EXIT_TOOL_ABSENT  # found on PATH and not startable: absent all the same
+    if has_openspec:
         combined = (stdout + stderr).lower()
         if exit_code != 0 and "nothing to validate" not in combined:
             findings = [{"code": "OPENSPEC_FAILED", "message": stdout.strip()[:200] or stderr.strip()[:200]}]
@@ -203,7 +290,7 @@ def _check_openspec(root: Path, commit: str) -> dict:
             status = GREEN
     else:
         findings = [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}]
-        status = YELLOW
+        status = RED  # a hard-block check whose tool is absent is not measured: never YELLOW (W2-M130, W2-M265)
 
     return {
         "id": check_id,
@@ -215,21 +302,7 @@ def _check_openspec(root: Path, commit: str) -> dict:
     }
 
 
-def _frontmatter(text: str) -> dict | None:
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None
-    try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
-
-
+@_timed
 def _check_skill_version(root: Path, commit: str) -> dict:
     check_id = "skill-version"
     findings = []
@@ -304,6 +377,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
     }
 
 
+@_timed
 def _check_readiness(root: Path, commit: str) -> dict:
     check_id = "readiness"
     findings = []
@@ -354,20 +428,35 @@ def _check_policy_enforcement(root: Path, commit: str, check_families: set[str])
     if not isinstance(policies, dict):
         return results
 
-    enforced = {key for decl in load_declarations(root) for key in decl.get(ENFORCES_FIELD, ())}
+    covering: dict[str, list[dict]] = {}  # the declarations that state each key under ``enforces``
+    for decl in load_declarations(root):
+        for key in decl.get(ENFORCES_FIELD, ()):
+            covering.setdefault(key, []).append(decl)
     for key, strength in policies.items():
         if strength == "informational":
             continue
-        if key not in enforced:
-            severity = HARD_BLOCK if strength == "hard-block" else WARNING
+        started = time.monotonic()
+        covers = covering.get(key, [])
+        severity = HARD_BLOCK if strength == "hard-block" else WARNING
+        finding = None
+        if not covers:
+            finding = {"code": "POLICY_NOT_COVERED", "policy": key, "strength": strength,
+                       "message": f"policy key '{key}' ({strength}) has no associated check"}
+        elif strength == "hard-block" and all(decl["severity"] != HARD_BLOCK for decl in covers):
+            # a hard-block key is covered only by a check of hard-block tier, its ``severity`` (W2-M211, W2-M259)
+            ids = [decl["id"] for decl in covers]
+            finding = {"code": "POLICY_TIER_TOO_LOW", "policy": key, "checks": ids,
+                       "message": f"policy key '{key}' (hard-block) is covered only by checks of severity "
+                                  f"warning: {', '.join(ids)}"}
+        if finding is not None:
             results.append({
                 "id": f"policy-{key}",
                 "family": key,
                 "severity": severity,
                 "status": RED if severity == HARD_BLOCK else YELLOW,
-                "findings": [{"code": "POLICY_NOT_COVERED",
-                              "policy": key, "strength": strength,
-                              "message": f"policy key '{key}' ({strength}) has no associated check"}],
+                "findings": [finding],
+                "elapsed_s": round(time.monotonic() - started, 3),
+                "time_limit_s": TIMEOUT_S,
                 "provenance": _provenance(f"policy-{key}", commit),
             })
     return results
@@ -445,6 +534,7 @@ def run_checks(root: Path) -> tuple[dict, bool]:
     result = {
         "families": families,
         "checks": check_results,
+        "time_limit_s": TIMEOUT_S,
     }
 
     return result, has_hard_block_red

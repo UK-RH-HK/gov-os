@@ -17,7 +17,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
-from gov.retrieval import ollama, semantic  # noqa: E402
+from gov.retrieval import ollama, semantic, vector_cache  # noqa: E402
 
 DIGEST, OTHER = "a" * 64, "b" * 64
 I = semantic.INSTRUCTION
@@ -33,10 +33,10 @@ def vector(own: str, before: str | None) -> bytes:
 @pytest.fixture()
 def embedder(tmp_path, monkeypatch):
     """A project with a runtime folder, and an embedder whose vector for a text depends on the text embedded just
-    before it, as the real one's does; ``state["revision"]`` is what the model list reports, ``state["on_cpu"]``
-    whether the embedder reports the model on the CPU."""
+    before it, as the real one's does; ``state["revision"]`` is what the model list reports, ``state["loaded"]``
+    whether the embedder reports the model loaded (on the GPU: W2-32 S10 refuses the CPU)."""
     (tmp_path / ".gov-runtime").mkdir()
-    state = {"revision": DIGEST, "calls": [], "hosts": [], "fail": False, "previous": None, "on_cpu": True}
+    state = {"revision": DIGEST, "calls": [], "hosts": [], "fail": False, "previous": None, "loaded": True}
 
     def embed(texts, host=None):
         state["calls"].append(texts)
@@ -52,12 +52,19 @@ def embedder(tmp_path, monkeypatch):
     monkeypatch.setenv(ollama.QUERY_HOST_SETTING, QUERY_HOST)
     monkeypatch.setattr(semantic, "_embed", embed)
     monkeypatch.setattr(semantic, "_revision", lambda host=None: state["revision"])
-    monkeypatch.setattr(semantic, "_device", lambda host: "cpu" if state["on_cpu"] else None)
+    monkeypatch.setattr(semantic, "_device", lambda host: "gpu" if state["loaded"] else None)
     return tmp_path, state
 
 
 def cache(root: Path) -> Path:
     return root / semantic.QUERY_VECTORS_REL
+
+
+def no_machine_cache(root: Path, monkeypatch) -> None:
+    """The machine-wide cache made unusable (its folder would sit under a file), so the tree's own cache is all
+    there is (W2-126, DEC-1042: these cases are about that cache, or about no cache at all)."""
+    (root / "a-file").write_text("")
+    monkeypatch.setenv(vector_cache.DIR_SETTING, str(root / "a-file" / "vector-cache"))
 
 
 def vec(root: Path, query: str) -> bytes | None:
@@ -87,11 +94,12 @@ def test_no_request_names_a_runner_option_and_a_chunk_goes_to_the_shared_runner(
                      (QUERY_HOST, {"model": semantic.MODEL, "input": [I, I + "q"]})]
 
 
-def test_a_vector_is_computed_again_to_the_same_bytes_with_the_same_request(embedder):
+def test_a_vector_is_computed_again_to_the_same_bytes_with_the_same_request(embedder, monkeypatch):
     """Without the cache, the vector is the computation's: the same request each time, never one that depends on
-    the cache's state (DEC-782)."""
+    the cache's state (DEC-782). Neither the tree's cache nor the machine-wide one can serve it the second time."""
     root, state = embedder
     first = vec(root, "q")
+    no_machine_cache(root, monkeypatch)
     cache(root).unlink()
     (root / ".gov-runtime").chmod(0o555)
     try:
@@ -148,7 +156,7 @@ def test_the_key_names_the_device_and_a_hash_of_the_text_and_the_text_is_kept_no
     vec(root, "who fires the bowls")
     with sqlite3.connect(cache(root)) as connection:
         rows = connection.execute("SELECT model, revision, device, text_sha256 FROM device_query_vector").fetchall()
-    assert rows == [(semantic.MODEL, DIGEST, "cpu", hashlib.sha256((I + "who fires the bowls").encode()).hexdigest())]
+    assert rows == [(semantic.MODEL, DIGEST, "gpu", hashlib.sha256((I + "who fires the bowls").encode()).hexdigest())]
     assert b"fires" not in cache(root).read_bytes()
 
 
@@ -192,6 +200,7 @@ def test_without_a_revision_the_embedder_s_vector_is_used_and_nothing_is_cached(
 
 def test_the_cache_never_passes_its_bound_and_keeps_the_newest_entries(embedder, monkeypatch):
     root, state = embedder
+    no_machine_cache(root, monkeypatch)
     monkeypatch.setenv(semantic.CACHE_BOUND_SETTING, str(256 * 1024))
     texts = [f"question {n}" for n in range(120)]
     vectors = {}
@@ -208,10 +217,23 @@ def test_the_cache_never_passes_its_bound_and_keeps_the_newest_entries(embedder,
 
 def test_an_entry_larger_than_the_bound_is_not_kept(embedder, monkeypatch):
     root, state = embedder
+    no_machine_cache(root, monkeypatch)
     monkeypatch.setenv(semantic.CACHE_BOUND_SETTING, "4096")
     first = vec(root, "q")
     assert vec(root, "q") == first and len(state["calls"]) == 2
     assert cache(root).stat().st_size <= 4096
+
+
+def test_a_question_whose_tree_cache_is_gone_is_served_by_the_machine_wide_cache(embedder):
+    """The behaviour in force (W2-126, DEC-1032): the question's vector is kept on the machine, so a tree whose own
+    cache was deleted, or another tree, gets the same bytes without asking the embedder."""
+    root, state = embedder
+    first = vec(root, "q")
+    cache(root).unlink()
+    other = root / "other-tree"
+    (other / ".gov-runtime").mkdir(parents=True)
+    assert vec(root, "q") == first and vec(other, "q") == first
+    assert state["calls"] == [[I, I + "q"]]
 
 
 def test_the_default_bound_is_used_when_the_setting_is_not_a_number(monkeypatch):

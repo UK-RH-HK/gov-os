@@ -24,6 +24,17 @@ def git(d, *a):
                           capture_output=True, text=True, check=True).stdout.strip()
 
 
+OLD_HOOK = 'import os\n    slots = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2"))\n'  # the installed copy today
+NEW_HOOK = 'def _slots():\n    pass  # reads limits.json\n'
+
+
+def plant_hook(tmp, text):
+    p = tmp / "hook" / "gov_reranker_gpu_slot.py"
+    p.parent.mkdir(exist_ok=True)
+    p.write_text(text)
+    return p
+
+
 def ticket(tid, status):
     return f"---\nid: {tid}\nstatus: {status}\nwbs_id: W2-X\n---\n# {tid}\n"
 
@@ -84,6 +95,10 @@ def w(tmp_path, healthy_embed):
                DISPATCH_GPU_LOG_QUERY=str(tmp_path / "serve-11435.log"),
                # DEC-1032, all planted: no ss (unless a test plants one), the rerankers' GPU lock files in the folder
                DISPATCH_SS=str(tmp_path / "ss"), DISPATCH_RERANK_GLOB=str(tmp_path / "rerank" / "gov-os-rerank-gpu-*.lock"),
+               # DEC-1039 (1b), planted: no shared-GPU-memory reader (unless a test plants one)
+               DISPATCH_GPU_SHARED_CMD=str(tmp_path / "shared-counter"),
+               # review F2, planted: the installed reranker hook, today's copy (2 locks); a test may plant another
+               DISPATCH_RERANK_HOOK=str(plant_hook(tmp_path, OLD_HOOK)),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -536,7 +551,8 @@ def mixed_history(w):
     (w.orch / "log" / "lead-mem.jsonl").write_text("\n".join(mem) + "\n")
 
 
-def test_the_slots_rule_admits_what_the_literal_rule_refuses(wp):
+def test_the_forecast_admits_what_the_literal_rule_refuses(wp):
+    """DEC-1052 O-A1: a config.json that still names the slots rule (the live one does) is admitted by the forecast."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     mixed_history(wp)
     leads(wp, 4)  # 4 leads at 0.3 GB now
@@ -546,7 +562,9 @@ def test_the_slots_rule_admits_what_the_literal_rule_refuses(wp):
     pk = json.loads((wp.d / "peaks.json").read_text())
     assert pk["lead_outside"]["rss_kb_p95"] == 500_000 and pk["lead_inside"]["rss_kb_p95"] == 2_500_000
     assert pk["slot_run_kb"] == 2_000_000  # the leads' rise beats the test run's own 1 GB share
-    assert s["admit"] and "slots rule" in s["admit_reason"] and calls(wp)[0].startswith("launch W2-A")
+    assert s["admit"] and s["admit_reason"].startswith("memory by the Load Balancer's forecast above the floor 3072 MB")
+    assert 'memory_rule "slots" in config.json read as the forecast' in s["admit_reason"]
+    assert "forecast admits" in s["admit_reason"] and calls(wp)[0].startswith("launch W2-A")
 
 
 def test_the_literal_rule_is_kept_as_an_option(wp):
@@ -559,12 +577,15 @@ def test_the_literal_rule_is_kept_as_an_option(wp):
     assert not s["admit"] and "literal rule" in s["admit_reason"] and calls(wp) == []
 
 
-def test_the_slots_rule_without_enough_history_falls_back_to_gate_check(wp):
+def test_too_little_history_outside_verification_no_longer_falls_back_to_gate_check(wp):
+    """DEC-1052 O-A1: that fallback was the slots rule's; the forecast prices a lead from its phases' floors."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     leads(wp, 1)  # wp's history has a test run every minute: no minute outside verification
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
-    tick(wp)
-    assert status(wp)["admit_reason"].startswith("fallback to gate_check (fewer than 120 minutes")
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    s = status(wp)
+    assert s["admit"] and s["admit_reason"].startswith("memory by the Load Balancer's forecast")
+    assert calls(wp)[0].startswith("launch W2-A")
 
 
 # ---- the review of dispatcher_next.py (F1 to F5) ------------------------------------------------------------------
@@ -626,7 +647,8 @@ def test_f3_a_bad_config_value_refuses(wp):
 
 
 def test_f4_the_newcomer_is_priced_at_its_own_max(wp):
-    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
+    """Under the literal rule (DEC-1052 O-A1 lifted the slots rule this test was first written for)."""
+    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "literal"}))
     mixed_history(wp)
     lines = (wp.orch / "log" / "lead-mem.jsonl").read_text().splitlines()
     r = json.loads(lines[0])
@@ -1563,7 +1585,8 @@ def test_gpu_an_unreadable_nvidia_smi_is_a_status_line_not_a_failure(w, how):
 
 def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
     (w.d / "ready.txt").write_text("")  # no lead starts: the inbox holds only the GPU's items
-    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 14400, 16303, 99")
+    # 13,000 MiB: within the budget (16,303 - 2,048); above it is a gpu-alert of its own (DEC-1039 (1b))
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 13000, 16303, 99")
     glog(w, "shared", LOADED + "an old " + CUDA)  # history before the first pass: not alerted
     tick(w)
     assert gpu_items(w) == []
@@ -1574,7 +1597,7 @@ def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
     body = items[0].read_text().splitlines()
     assert body[0] == "log: serve-11434.log" and body[1] == "GPU: CUDA error (shared)" and body[2].startswith("status: ")
     text = items[0].read_text()
-    assert "shared: CUDA error: unknown error" in text and "14.1/15.9 GB, 99 %" in text and "W2:" not in text
+    assert "shared: CUDA error: unknown error" in text and "12.7/15.9 GB, 99 %" in text and "W2:" not in text
     assert "holders:" in text and "layers: shared 29/29" in text
     assert (w.d / "inbox-stale.txt").read_text().startswith("gpu: the GPU CUDA error (shared) since ")
     tick(w, DISPATCH_NOW=NOW + 120)  # no new line: not again
@@ -1934,6 +1957,7 @@ def test_admission_a_gpu_read_older_than_its_limit_is_not_judged(wp):
 
 
 def test_slots_follow_the_shared_embedders_device(wp):
+    """The slots by device, in the status (DEC-1052 O-A1: no longer reserved in a memory rule)."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     mixed_history(wp)
     (wp.d / "ready.txt").write_text("")
@@ -1946,31 +1970,18 @@ def test_slots_follow_the_shared_embedders_device(wp):
         return status(wp)["slots_target"], status(wp)["admit_reason"], (wp.d / "status.txt").read_text()
     target(NOW)  # the first pass reads the layers
     n, why, text = target(NOW + 60)
-    assert n == 3 and "+ 3 slot runs at" in why and "slots 3 by device (gpu 29/29)" in text
+    assert n == 3 and "slot runs at" not in why and "slots 3 by device (gpu 29/29)" in text
     glog(wp, "shared", "load_tensors: offloaded 20/29 layers to GPU\n")
     target(NOW + 120)
     n, why, text = target(NOW + 180)
-    assert n == 2 and "+ 2 slot runs at" in why and "slots 2 by device (partial 20/29)" in text
+    assert n == 2 and "slots 2 by device (partial 20/29)" in text
     glog(wp, "shared", ON_CPU)
     target(NOW + 240)
     assert target(NOW + 300)[0] == 2 and "slots 2 by device (cpu 0/29)" in target(NOW + 360)[2]
-    conf(wp, memory_rule="slots", slots_gpu=4, slots_cpu=1)  # configured
+    conf(wp, slots_gpu=4, slots_cpu=1)  # configured
     glog(wp, "shared", LOADED)
     target(NOW + 420)
     assert target(NOW + 480)[0] == 4
-
-
-def test_slots_never_count_fewer_than_the_slots_held(wp):
-    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
-    mixed_history(wp)
-    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
-    smi(wp)
-    glog(wp, "shared", ON_CPU)
-    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
-    wp.held.write_text(json.dumps(["/tmp/gov-os-heavy-slot-1.lock", "/tmp/gov-os-heavy-slot-2.lock",
-                                   "/tmp/gov-os-heavy-slot-3.lock"]))
-    tick(wp, DISPATCH_NOW=NOW + 60)
-    assert status(wp)["slots_target"] == 2 and "+ 3 slot runs at" in status(wp)["admit_reason"]
 
 
 def test_gpu_a_partial_load_is_one_alert_per_incident(w):
@@ -2201,3 +2212,846 @@ def test_round2_g1_the_test_request_clears_failing_and_a_runner_task_error_count
         assert server["hits"] == 0 and emb_shared(w)["state"] == "FAILING"
     ptick(w, server, NOW + 360)  # pass 7, five after the refused one: one test request, it answers: cleared
     assert server["hits"] == 1 and emb_shared(w)["state"] == "IDLE" and server_stale(w) == []
+
+
+# ---- DEC-1039 (1b): the Gov Load Balancer; DEC-1037 (4): limits from the machine; DEC-1038 (4): targets -------------
+
+def shared_counter(w, shared_mib, dedicated_mib=6000):
+    """A stand-in for the Windows counters (powershell.exe Get-Counter): two adapters, the card and a virtual one."""
+    exe = w.tmp / "shared-counter"
+    (w.tmp / "shared.txt").write_text(
+        f"\\\\h\\gpu adapter memory(luid_0x00000000_0x00011f5c_phys_0)\\dedicated usage {dedicated_mib * 2 ** 20}\n"
+        "\\\\h\\gpu adapter memory(luid_0x00000000_0x00013318_phys_0)\\dedicated usage 0\n"
+        f"\\\\h\\gpu adapter memory(luid_0x00000000_0x00011f5c_phys_0)\\shared usage {shared_mib * 2 ** 20}\n"
+        "\\\\h\\gpu adapter memory(luid_0x00000000_0x00013318_phys_0)\\shared usage 8192\n")
+    exe.write_text(f"#!{sys.executable}\nimport sys\nsys.stdout.write(open({str(w.tmp / 'shared.txt')!r}).read())\n")
+    exe.chmod(0o755)
+
+
+def lead_proc(w, i, pid, age_s=3600, rss_kb=300_000):
+    (w.wt / f"L{i}").mkdir(exist_ok=True)
+    return {"cmd": LEAD.format(f"T-L{i}"), "cwd": str(w.wt / f"L{i}"), "pid": pid, "ppid": 1, "age_s": age_s,
+            "rss_kb": rss_kb}
+
+
+def jobs_by_name(w):
+    return {j["name"]: j for j in status(w)["jobs"]}
+
+
+def status_line(w, start):
+    return next(l for l in (w.d / "status.txt").read_text().splitlines() if l.startswith(start))
+
+
+def test_lb_a_jobs_phase_is_detected_from_its_processes(w):
+    (w.d / "ready.txt").write_text("")
+    (w.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "BUSY"}}}))
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    review = '/home/u/.local/bin/claude -p --settings {"env":{"GOV_ROLE":"independent-auditor","GOV_TICKET":"T-L4"}}'
+    procs = [lead_proc(w, 0, 100), {"cmd": rr, "cwd": "/", "pid": 101, "ppid": 100, "rss_kb": 2_000_000},
+             lead_proc(w, 1, 110), {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 111, "ppid": 110},
+             lead_proc(w, 2, 120, age_s=60), lead_proc(w, 3, 130),
+             lead_proc(w, 4, 140), {"cmd": review, "cwd": "/", "pid": 141, "ppid": 140},
+             {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1},
+             {"cmd": "bash /x/tools/rebuild_slot.sh /tree", "cwd": "/", "pid": 201, "ppid": 200},
+             {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json",
+              "cwd": "/", "pid": 202, "ppid": 201},
+             {"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 203, "ppid": 202},
+             # waiting for a slot (the live dry pass, 20:05): a wrapper with no flock yet is no running job
+             {"cmd": "bash /x/tools/heavy_slot.sh python3 -m pytest tests", "cwd": "/", "pid": 450, "ppid": 1},
+             {"cmd": "bash /x/tools/rebuild_slot.sh /tree2", "cwd": "/", "pid": 460, "ppid": 1},
+             {"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 300, "ppid": 1, "age_s": 100,
+              "cpu_ticks": 2 * 100 * os.sysconf("SC_CLK_TCK")},  # no earlier sample: its lifetime's 2 cores
+             {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+              "pid": 400, "ppid": 1}, {"cmd": "python3 -m pytest tests", "cwd": "/", "pid": 401, "ppid": 400},
+             {"cmd": "/usr/bin/python3 /x/tools/close_build.py W2-C", "cwd": "/", "pid": 500, "ppid": 1}]
+    w.procs.write_text(json.dumps(procs))
+    tick(w)
+    j = jobs_by_name(w)
+    assert {n: (v["kind"], v["phase"]) for n, v in j.items()} == {
+        "L0": ("lead", "retrieval"), "L1": ("lead", "test"), "L2": ("lead", "start"), "L3": ("lead", "build"),
+        "L4": ("lead", "review"), "land": ("landing", "rebuild.embedding"), "pid 300": ("rebuild", "rebuild.embedding"),
+        "pid 400": ("slot", "test"), "W2-C": ("close", "other")}
+    assert j["L0"]["rss_kb"] == 2_300_000 and j["pid 300"]["cpu"] == 2.0
+    assert "pid 450" not in j and "pid 460" not in j  # waiting for a slot: no job
+    assert "Jobs by phase: lead L0 retrieval (" in (w.d / "status.txt").read_text()
+    (w.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "IDLE"}}}))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert jobs_by_name(w)["pid 300"]["phase"] == "rebuild.lexical"
+
+
+def test_lb_todays_numbers_are_unchanged_on_this_machines_figures(wp):
+    (wp.tmp / "meminfo").write_text(f"MemTotal:       24607384 kB\nMemAvailable: {16 * GB} kB\n")
+    smi(wp)
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    line = status_line(wp, "Limits: ")
+    assert ("from 20 CPUs" in line and "23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 "
+            "workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced "
+            "(the installed hook's own default: 2; proposed 2), spill floor 1019 MiB; config.json overrides: none") \
+        in line, line
+    lim = json.loads((wp.d / "limits.json").read_text())
+    assert lim["rerank_gpu_slots"] == 2 and lim["limits"]["cpu_band"] == [14, 18]
+    assert "(band 14-18: " in status_line(wp, "Balance: ")
+
+
+def test_lb_an_explicit_number_in_config_wins_and_the_status_says_so(wp):
+    conf(wp, memory_rule="literal", cpu_band=[12, 16], rerank_gpu_slots=3)
+    smi(wp)
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    line = status_line(wp, "Limits: ")
+    assert "config.json overrides: cpu_band [12, 16] (derived [14, 18]), rerank_gpu_slots 3 (derived 2)" in line
+    assert "(band 12-16: " in status_line(wp, "Balance: ")
+
+
+def test_lb_a_machine_change_raises_one_item(w):
+    (w.d / "ready.txt").write_text("")
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert not items_with(w, "Machine:")
+    tick(w, DISPATCH_NOW=NOW + 120, DISPATCH_NPROC=32)
+    items = items_with(w, "Machine:")
+    assert len(items) == 1 and "cpus 20 -> 32" in items[0] and "band 22-29" in items[0]
+    tick(w, DISPATCH_NOW=NOW + 180, DISPATCH_NPROC=32)
+    assert len(items_with(w, "Machine:")) == 1
+
+
+def test_lb_the_forecast_refuses_a_start_that_would_put_gpu_memory_over_its_budget(wp):
+    """The embedders (5.6 GiB) and a reranker service (3.5 GiB, one GPU slot) on the 16 GB card, a running lead in
+    its retrieval whose reranker has not taken the GPU yet, and 3 GPU reranker slots enforced (the hook copy that reads
+    limits.json, 3 there): the newcomer's retrieval would bring it to 16.1 of 13.9 GiB: refused, GPU named (the
+    free-memory check alone admits it)."""
+    conf(wp, memory_rule="literal", rerank_gpu_slots=3)
+    wp.env["DISPATCH_RERANK_HOOK"] = str(plant_hook(wp.tmp, NEW_HOOK))
+    (wp.d / "limits.json").write_text(json.dumps({"rerank_gpu_slots": 3}))
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5734 + 3584)
+    hold_rerank_gpu(wp, 0)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    wp.procs.write_text(json.dumps([lead_proc(wp, 0, 100), {"cmd": rr, "cwd": "/", "pid": 101, "ppid": 100}]))
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (GPU binding): GPU memory 16.1 of 13.9 GB")
+    assert all(r.startswith("not admitted: forecast refuses (GPU binding)") for r in s["ready_waits"].values())
+    assert calls(wp) == [] and "lead: REFUSES, binding GPU: GPU memory 16.1 of 13.9 GB" in status_line(wp, "Forecast: ")
+
+
+def test_lb_the_forecast_names_the_binding_resource_when_it_admits(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5734 + 3584)
+    hold_rerank_gpu(wp, 0)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "forecast admits (binding GPU: GPU memory 12.6 of 13.9 GB" in s["admit_reason"]
+    assert calls(wp)[0].startswith("launch W2-A")
+
+
+def test_lb_pairing_chooses_a_gpu_heavy_start_beside_two_running_test_slots(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    (wp.d / "ready.txt").write_text("W2-A T-A A.md W2-A-A5-run1.json first=test\nW2-B T-B B.md W2-B-A5-run1.json\n")
+    hz = os.sysconf("SC_CLK_TCK")
+    procs = []
+    for n, pid in enumerate((400, 410)):
+        procs += [{"cmd": f"flock -n -o -E 213 /tmp/gov-os-heavy-slot-{n + 1}.lock python3 -m pytest tests", "cwd": "/",
+                   "pid": pid, "ppid": 1}, {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": pid + 1,
+                                            "ppid": pid, "cpu_ticks": int(5.9 * 60 * hz)}]
+    wp.procs.write_text(json.dumps(procs))
+    (wp.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": {"401": 0, "411": 0, "400": 0, "410": 0}}))
+    cpu_prev(wp, busy=1000, total=10000)
+    (wp.tmp / "procstat").write_text(PROCSTAT.format(busy=2200, idle=9800, iowait=0))  # 12 busy cores
+    tick(wp, minute=False)
+    s = status(wp)
+    assert s["pair_load"]["cpu"] > s["pair_load"]["gpu"], s["pair_load"]
+    assert calls(wp) == ["launch W2-B T-B B.md W2-B-A5-run1.json"], (calls(wp), s["ready_waits"])
+    assert s["ready_waits"]["W2-A T-A"].startswith("paired: W2-B goes first (its heavy resource gpu is the idler")
+
+
+def test_lb_pairing_chooses_a_cpu_heavy_start_while_the_gpu_embeds(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    (wp.d / "ready.txt").write_text("W2-B T-B B.md W2-B-A5-run1.json\nW2-A T-A A.md W2-A-A5-run1.json first=test\n")
+    (wp.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "BUSY"}}}))
+    wp.procs.write_text(json.dumps([{"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 300,
+                                     "ppid": 1}]))
+    tick(wp)
+    assert calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"], status(wp)["ready_waits"]
+    assert jobs_by_name(wp)["pid 300"]["phase"] == "rebuild.embedding"
+
+
+def test_lb_a_malformed_first_phase_is_refused(w):
+    (w.d / "ready.txt").write_text("W2-A T-A A.md W2-A-A5-run1.json first=lunch\n")
+    tick(w)
+    assert calls(w) == [] and status(w)["ready_waits"]["W2-A T-A"].startswith("malformed line")
+
+
+def test_lb_the_spill_check_raises_one_item_per_incident(w):
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 6000, 16303, 5")
+    shared_counter(w, 600)
+    tick(w)
+    assert gpu_items(w) == [] and "shared GPU memory 600 MiB (floor 1019 MiB): no spill" in status_line(w, "GPU rule: ")
+    shared_counter(w, 1500)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: GPU spill" in items[0].read_text() and "1500 MiB of shared GPU memory" in \
+        items[0].read_text()
+    assert "SPILL" in status_line(w, "GPU rule: ")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(gpu_items(w)) == 1  # the same incident
+    shared_counter(w, 600)
+    tick(w, DISPATCH_NOW=NOW + 180)
+    shared_counter(w, 1500)
+    tick(w, DISPATCH_NOW=NOW + 240)
+    assert len(gpu_items(w)) == 2  # a new spill, a new item
+
+
+def test_lb_an_unreadable_shared_counter_is_said_and_is_no_failure(w):
+    smi(w)
+    tick(w)
+    assert "shared GPU memory unread (shared-counter: No such file" in status_line(w, "GPU rule: ")
+    assert not (w.d / "status.txt").read_text().startswith("TICK FAILED")
+
+
+def test_lb_the_gpu_budget_is_checked_each_pass(w):
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 14400, 16303, 5")
+    shared_counter(w, 600)
+    tick(w)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: GPU budget" in items[0].read_text()
+    assert "ABOVE total minus headroom" in status_line(w, "GPU rule: ")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1
+
+
+def test_lb_each_pass_appends_one_balance_row_and_a_dry_pass_none(w):
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    rows = (w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()
+    assert len(rows) == 2
+    r = json.loads(rows[-1])
+    assert {"busy_cores", "mem_available_mb", "gpu", "jobs", "targets", "forecast", "embedders"} <= set(r)
+    tick(w, "--dry", DISPATCH_NOW=NOW + 120)
+    assert len((w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()) == 2
+
+
+def test_lb_a_16_minute_breach_opens_one_incident_and_15_minutes_held_close_it(wp):
+    (wp.d / "ready.txt").write_text("")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {2 * GB} kB\n")  # under the 3 GB floor: T2 breached
+    for m in range(15):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert not items_with(wp, "Incident: T2")
+    tick(wp, DISPATCH_NOW=NOW + 60 * 16)
+    items = items_with(wp, "Incident: T2")
+    recs = sorted((wp.orch / "log" / "incidents").glob("*-T2.md"))
+    assert len(items) == 1 and len(recs) == 1
+    text = recs[0].read_text()
+    for part in ("— T2: memory available above the floor", "- **Readings:** busy cores", "grouped by tree and session",
+                 "- **Cause:** \n- **Fix:** \n"):
+        assert part in text, part
+    for m in range(17, 21):  # still breached: no second
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert len(items_with(wp, "Incident: T2")) == 1 and status(wp)["incidents_open"] == ["T2"]
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    for m in range(21, 36):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert "Closed:" not in recs[0].read_text()
+    tick(wp, DISPATCH_NOW=NOW + 60 * 36)
+    assert "- **Closed:** " in recs[0].read_text() and "T2" not in status(wp)["incidents_open"]
+
+
+def test_lb_t4_a_timed_out_embedding_opens_an_incident_at_once(w):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    tick(w)
+    slow = '[GIN] 2026/11/02 - 12:45:47 | 200 |  2m5.1s |       127.0.0.1 | POST     "/api/embed"\n'
+    glog(w, "shared", gin(200) + gin(499) + slow + gin(503))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = items_with(w, "Incident: T4")
+    recs = sorted((w.orch / "log" / "incidents").glob("*-T4.md"))
+    assert len(items) == 1 and len(recs) == 1 and "3 timed-out embedding(s)" in items[0]
+    text = recs[0].read_text()
+    assert "| 499 |" in text and "2m5.1s" in text and "| 503 |" in text and "| 200 |  1.0s" not in text
+    glog(w, "shared", gin(499))
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(items_with(w, "Incident: T4")) == 1 and "- **More, " in recs[0].read_text()
+
+
+def test_lb_t5_a_cold_rebuild_in_the_seed_log_opens_an_incident(w):
+    (w.d / "ready.txt").write_text("")
+    seed = w.orch / "log" / "seed.jsonl"
+    seed.write_text(json.dumps({"kind": "rebuild", "tree": "/old", "seed": {"status": "refused"}}) + "\n")
+    tick(w)  # the first read starts at the end: no old event
+    assert not items_with(w, "Incident: T5")
+    with open(seed, "a") as f:
+        f.write(json.dumps({"kind": "rebuild", "tree": "/t", "who": "W2-X", "seed": {"status": "seeded"},
+                            "timing": {"semantic_s": 20}}) + "\n")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert not items_with(w, "Incident: T5")
+    with open(seed, "a") as f:
+        f.write(json.dumps({"kind": "rebuild", "tree": "/t", "who": "W2-X", "seed": {"status": "refused"},
+                            "timing": {"semantic_s": 3000}}) + "\n")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(items_with(w, "Incident: T5")) == 1
+
+
+def test_lb_a_heavy_step_outside_a_slot_becomes_an_incident_after_15_minutes(wp):
+    (wp.d / "ready.txt").write_text("")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    wp.procs.write_text(json.dumps([{"cmd": "python3 -m pytest tests", "cwd": str(wp.wt / "W2-A"), "pid": 700,
+                                     "ppid": 1, "age_s": 400}]))
+    for m in range(16):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert not items_with(wp, "Incident: outside-slot")
+    tick(wp, DISPATCH_NOW=NOW + 60 * 16)
+    items = items_with(wp, "Incident: outside-slot")
+    assert len(items) == 1 and "pid 700" in items[0] and "W2-A" in items[0]
+
+
+# ---- review round 1 of emg/lb: F1 (CPU of reaped children), F2 (reranker slots priced as enforced), F4 (T4) --------
+
+def slot_run(hz, pytest_ticks):
+    return [{"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests", "cwd": "/", "pid": 10,
+             "ppid": 1}, {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 11, "ppid": 10,
+                          "cpu_ticks_all": pytest_ticks}]
+
+
+def test_lbr_f1_a_reaped_childs_lifetime_is_not_counted_again(w):
+    """The reviewer's case: a slot run's 6 workers ran 1 core each for 6 minutes and were reaped this interval (one of
+    them had reaped its own child, 100 s seen, 160 s in all): the job counts their last minute, 7 cores, not their
+    lifetimes again (37 cores before the fix)."""
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, (6 * 360 + 160) * hz)))  # the workers' lifetimes now in its cutime
+    old = {"10": 0, "11": 0, "20": 100 * hz, **{str(p): 300 * hz for p in range(12, 18)}}
+    pp = {"10": 1, "11": 10, "20": 12, **{str(p): 11 for p in range(12, 18)}}
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": old, "ppid": pp}))
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 7.0
+
+
+def test_lbr_f1_a_job_is_capped_at_the_machines_cpus(w):
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, 50 * 60 * hz)))  # 50 cores' worth in a minute (an earlier record's
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": {"10": 0, "11": 0}}))  # form: no ppid)
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 20.0
+
+
+def phase_shares(w, emb, rr):
+    """A phase-peaks.json not due for refresh, with these measured GPU shares."""
+    (w.d / "phase-peaks.json").write_text(json.dumps({"_at": NOW + 86400, "_shares": {"embedders_gpu_mib": emb,
+                                                                                       "reranker_gpu_mib": rr}}))
+
+
+def test_lbr_f2_the_reranker_slots_are_priced_with_the_installed_hooks_count(wp):
+    """The reviewer's case: the shares measured at 5,800 and 4,655 MiB derive 1 reranker GPU slot, while today's
+    installed hook hands out 2. Priced with 1 (1 held, none free) the newcomer's reranker cost nothing and the forecast
+    admitted (10.2 of 13.9 GB); priced with the hook's 2 it is refused: 14.8 of 13.9 GB."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 10455)
+    hold_rerank_gpu(wp, 0)  # pid 4000, a private reranker
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    wp.procs.write_text(json.dumps([{"cmd": rr, "cwd": "/", "pid": 4000, "ppid": 1}]))
+    phase_shares(wp, 5800, 4655)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (GPU binding): GPU memory 14.8 of 13.9 GB")
+    assert "1 GPU reranker slot(s) free" in s["admit_reason"] and calls(wp) == []
+    assert "reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)" in status_line(wp, "Limits: ")
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1  # the proposal, for the new copy
+    # once the owner installs the copy that reads limits.json, it enforces the 1 written there: priced with 1
+    tick(wp, DISPATCH_NOW=NOW + 120, DISPATCH_RERANK_HOOK=str(plant_hook(wp.tmp, NEW_HOOK)))
+    assert "reranker GPU slots 1 priced (the installed hook reads limits.json: 1; proposed 1)" in \
+        status_line(wp, "Limits: ")
+    # no hook at all: nothing bounds the rerankers, every newcomer's reranker is priced
+    tick(wp, DISPATCH_NOW=NOW + 180, DISPATCH_RERANK_HOOK=str(wp.tmp / "none" / "gov_reranker_gpu_slot.py"))
+    assert "reranker GPU slots 64 priced (no hook installed; proposed 1)" in status_line(wp, "Limits: ")
+
+
+def test_lbr_f2_a_derived_count_is_never_0_with_a_gpu(wp):
+    smi(wp)
+    phase_shares(wp, 15000, 3584)  # a spurious embedders' share: (16303 - 15000 - 2048) // 3584 < 0
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1
+
+
+def test_lbr_f2_slots_held_beside_the_shared_service_count_as_used(wp):
+    """DEC-1043 item 2: while the shared reranker service runs, the CTO's tool holds every other slot. Held is used:
+    no slot is free, the newcomer's reranker cannot take the GPU and is priced at nothing; and the tool's slot holds no
+    GPU memory, so it is not a reranker on the GPU in the balance row (the shares' measure)."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5800 + 3584)
+    hold_rerank_gpu(wp, 0, 1)  # pids 4000 and 4001
+    wp.procs.write_text(json.dumps([
+        {"cmd": "/v/reranker-venv/bin/python /x/tools/rerank_service.py", "cwd": "/", "pid": 4000, "ppid": 1},
+        {"cmd": "python3 /x/tools/rerank_service_slot_hold.py", "cwd": "/", "pid": 4001, "ppid": 1}]))
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "the newcomer's 0.0; 0 GPU reranker slot(s) free" in s["admit_reason"], s["admit_reason"]
+    row = json.loads((wp.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
+    assert row["rr_held"] == 2 and row["rr_gpu"] == 1
+
+
+def test_lbr_f4_t4_events_are_not_repeated_when_the_log_becomes_unreadable(w):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", gin(499))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    recs = sorted((w.orch / "log" / "incidents").glob("*-T4.md"))
+    assert len(recs) == 1
+    (w.tmp / "serve-11434.log").unlink()  # moved away: the last read's events must not count again
+    for m in range(2, 17):
+        tick(w, DISPATCH_NOW=NOW + 60 * m)
+    assert "- **More, " not in recs[0].read_text() and "Closed:" not in recs[0].read_text()
+    tick(w, DISPATCH_NOW=NOW + 60 * 17)  # 15 minutes with no event: closed
+    assert "- **Closed:** " in recs[0].read_text()
+
+
+# ---- live 2026-11-02 23:01 and 23:04: two false GPU budget alerts (EMG-lb2) -------------------------------------------
+
+def hold_locks(w, holders):
+    """The reranker GPU slot lock files held by the given pids (slot i by holders[i]), in the planted lock table."""
+    d = w.tmp / "rerank"
+    d.mkdir(exist_ok=True)
+    with open(w.tmp / "proc" / "locks", "a") as f:
+        for i, pid in enumerate(holders):
+            p = d / f"gov-os-rerank-gpu-{i}.lock"
+            p.write_text("")
+            f.write(f"{20 + i}: FLOCK  ADVISORY  WRITE {pid} 08:30:{os.stat(p).st_ino} 0 EOF\n")
+
+
+@pytest.mark.parametrize("slot1", ["worker", "hold tool"])
+def test_lb2_both_reranker_slots_held_is_no_gpu_budget_alert(w, slot1):
+    """dispatch/inbox/read/20261102-230406-gpu-alert.txt: GPU 11.5 of 15.9 GB; slot 0 held by W2-112's shared
+    rerank_service.py (pid 3361765), slot 1 by a private rerank_worker.py of the merge queue's warm clone (pid 2902931)
+    or by the CTO's rerank_service_slot_hold.py --watch (DEC-1043 item 2); running: lead W2-112 building, the landing
+    in its test run, two slot runs; the measured shares 5,800 and 1,650 MiB derive a proposal of 5 slots, and the phases'
+    peaks hold one reranker each. Priced with the proposal the pass found 3 slots free and added the running jobs'
+    reranker peaks (4.8 GB) to what nvidia-smi already counted: "GPU memory 16.3 of 13.9 GB ... 3 GPU reranker slot(s)
+    free", a false alert. Priced with the hook's 2, both held: none free, nothing added, no alert."""
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 11776, 16303, 35",
+        apps="3361765, [Not Found], [N/A]\n2902931, [Not Found], [N/A]\n")
+    rr = 1650
+    peak = lambda gpu: {"cpu": 5.9, "ram_kb": 1910344, "gpu": gpu, "util": 0, "heavy": "cpu", "samples": 40, "how": "p95"}
+    (w.d / "phase-peaks.json").write_text(json.dumps({
+        "_at": NOW + 86400, "_shares": {"embedders_gpu_mib": 5800, "reranker_gpu_mib": rr},
+        "lead.build": dict(peak(rr), cpu=1.0, heavy=None), "landing.test": peak(rr), "slot.test": peak(rr)}))
+    worker = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Qwen/Q"
+    second = ({"cmd": worker, "cwd": "/", "pid": 2902931, "ppid": 201} if slot1 == "worker" else
+              {"cmd": "python3 /x/tools/rerank_service_slot_hold.py --watch", "cwd": "/", "pid": 3518237, "ppid": 1})
+    procs = [lead_proc(w, 0, 100),
+             {"cmd": "/v/reranker-venv/bin/python /x/tools/rerank_service.py", "cwd": "/", "pid": 3361765, "ppid": 1},
+             {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1},
+             {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 201, "ppid": 200}, second]
+    for pid in (3423200, 3544196):
+        procs += [{"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+                   "pid": pid, "ppid": 1}, {"cmd": "python3 -m pytest tests", "cwd": "/", "pid": pid + 1, "ppid": pid}]
+    w.procs.write_text(json.dumps(procs))
+    hold_locks(w, [3361765, second["pid"]])
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert gpu_items(w) == [], [i.read_text() for i in gpu_items(w)]
+    line = status_line(w, "GPU rule: ")
+    assert ("GPU memory 11.5 of 13.9 GB (used 11.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker "
+            "slot(s) free): within total minus headroom") in line, line
+    assert "reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 5)" in status_line(w, "Limits: ")
+    s = status(w)
+    assert s["rerankers"]["gpu_held"] == 2 and s["rerankers"]["gpu_slots"] == 2
+    row = json.loads((w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
+    assert row["rr_held"] == 2 and row["rr_gpu"] == (2 if slot1 == "worker" else 1)
+    assert s["forecast"]["lead"]["resources"]["gpu"]["text"].endswith("the newcomer's 0.0; 0 GPU reranker slot(s) free)")
+
+
+# ---- DEC-1052 O-A1: the slots rule lifted; the Load Balancer's forecast is the memory admission -----------------------
+
+SLOT_RUN_2217_KB = 5134 * 1024  # a slot run's memory in that hour's peaks.json, as the slots rule reserved it
+TRIP_FLOOR_KB = 6_710_886  # the floor tools/oom_watch.sh (the out-of-memory trip-wire) puts back (DEC-961)
+
+
+def case_2217(wp, avail_mb, floor_kb=3 * GB, **kv):
+    """log/incidents/2026-11-02-2217-T1.md: no lead running (the owner's stop); a landing in its rebuild (0.2 GB) and a
+    slot's test run (3.2 GB); GPU 7457 of 16303 MiB; config.json still naming the slots rule (as the live one does);
+    W2-112's lead the newcomer. The slots rule reserved 3 slot runs at 5134 MB on top of the 3.2 GB the running one
+    already held: 15894 - floor 3072 - 3 x 5134 = -2580 MB of room, so a lead cap of 0. Returns the status."""
+    assert 15894 - 3072 - 3 * 5134 == -2580  # the incident's figure, from these planted numbers
+    conf(wp, memory_rule="slots", **kv)
+    (wp.orch / "tools" / "gate-config.json").write_text(json.dumps({"floor_kb": floor_kb}))
+    (wp.d / "peaks.json").write_text(json.dumps({
+        "computed": datetime.fromtimestamp(NOW).strftime("%Y-%m-%d %H:%M:%S"), "days": 7, "kinds": {},
+        "lead": {"rss_kb_p95": 2_180_248, "rss_kb_max": 4 * GB, "samples": 900}, "lead_own_max_kb": {},
+        "lead_outside": {"rss_kb_p95": 2_180_248, "rss_kb_max": 3 * GB, "samples": 300}, "lead_own_outside_max_kb": {},
+        "lead_inside": {"rss_kb_p95": 4_090_592, "rss_kb_max": 5 * GB, "samples": 600}, "slot_run_kb": SLOT_RUN_2217_KB}))
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {avail_mb * 1024} kB\n")
+    gpu_used(wp, 7457)
+    wp.procs.write_text(json.dumps([
+        {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1, "rss_kb": 50_000},
+        {"cmd": "/usr/bin/python3 -m gov.cli.main rebuild", "cwd": "/", "pid": 201, "ppid": 200, "rss_kb": 150_000},
+        {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+         "pid": 1593972, "ppid": 1, "rss_kb": 2000},
+        {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 1593973, "ppid": 1593972, "rss_kb": 3_355_443}]))
+    ready = (wp.d / "ready.txt").read_text()
+    (wp.d / "ready.txt").write_text("")
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1)  # the first pass reads the GPU
+    (wp.d / "ready.txt").write_text(ready)
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 60)
+    return status(wp)
+
+
+def test_o_a1_the_2217_case_is_admitted_by_the_forecast(wp):
+    s = case_2217(wp, 15894)
+    jobs = {j["kind"]: j for j in s["jobs"]}
+    assert jobs["landing"]["phase"].startswith("rebuild.") and jobs["slot"]["phase"] == "test", s["jobs"]
+    reason = s["admit_reason"]
+    assert s["admit"] and calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"], reason
+    assert "lead cap" not in reason and "of room" not in reason and "slot runs at" not in reason
+    assert reason.startswith("memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory "
+                             "trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule \"slots\" in config.json "
+                             "read as the forecast)"), reason
+    assert "forecast admits (binding " in reason and s["lead_cap"] is None
+    text = (wp.d / "status.txt").read_text()
+    assert "admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by " in text
+    assert "no lead cap (memory by the forecast: DEC-1052 O-A1)" in status_line(wp, "Balance: ")
+    ram = s["forecast"]["lead"]["resources"]["ram"]
+    assert ram["ok"] and ram["cap"] == (15894 - 3072) * 1024 and ram["need"] < 5 * GB, ram
+
+
+@pytest.mark.parametrize("forecast_admission", [True, False])
+def test_o_a1_a_real_shortage_is_still_refused_by_the_forecast(wp, forecast_admission):
+    """6 GB available: 3 GB above the floor, less than the slot run's rise to its peak (1.8 GB), the landing's (0.3)
+    and the newcomer's 2.1 GB: refused, RAM named. Under the forecast memory rule the forecast is the memory
+    admission, so forecast_admission false does not switch it off (it would leave memory unjudged: fails open)."""
+    s = case_2217(wp, 6144, forecast_admission=forecast_admission)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (RAM binding): RAM "), s["admit_reason"]
+    assert s["admit_reason"].endswith("(floor 3.0; running jobs' peaks 2.1 + the newcomer's 2.1)") and calls(wp) == []
+    assert all(r.startswith("not admitted: forecast refuses (RAM binding)") for r in s["ready_waits"].values())
+
+
+def test_o_a1_the_floor_and_the_trip_wire_are_kept(wp):
+    """The floor gate-config.json holds, which the out-of-memory trip-wire raises: 9 GB available admits above the
+    3 GB floor and is refused above the trip-wire's 6.4 GB; no floor at all refuses (fail closed)."""
+    s = case_2217(wp, 9216, floor_kb=TRIP_FLOOR_KB)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (RAM binding)"), s["admit_reason"]
+    assert "(floor 6.4; " in s["admit_reason"] and calls(wp) == []
+    s = case_2217(wp, 9216)
+    assert s["admit"] and "above the floor 3072 MB" in s["admit_reason"] and len(calls(wp)) == 1
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    (wp.orch / "tools" / "gate-config.json").write_text("{}")
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 600)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"] == "no floor in gate-config.json (fail closed)" and calls(wp) == []
+
+
+# ---- ACT-DISPATCH-1 (DEC-1140 (1)(a), (2); DEC-1118 H; DEC-1052 O-A1): the lead cap enforced, the idle item once per cause,
+# ---- the forecast counting a held slot at its measured load --------------------------------------------------------------
+
+def one_line_ready(w, *lines):
+    (w.d / "ready.txt").write_text("".join(line + "\n" for line in lines))
+
+
+def idle_items(w):
+    return sorted((w.d / "inbox").glob("*-idle-headroom*.txt")) if (w.d / "inbox").is_dir() else []
+
+
+def test_dispatch_1_the_lead_cap_refuses_a_start_with_its_reason(w):
+    """DEC-1140 (2): max_leads 2 with two leads running: no start, each startable line waits 'lead cap: 2 of 2
+    running'; the same two leads under a cap of 3 leave room, so the first line starts."""
+    conf(w, max_leads=2)
+    leads(w, 2)
+    assert tick(w).returncode == 0
+    s = status(w)
+    assert calls(w) == [] and s["ready_waits"] == {"W2-A T-A": "lead cap: 2 of 2 running",
+                                                    "W2-B T-B": "lead cap: 2 of 2 running"}, s["ready_waits"]
+    assert s["max_leads"] == 2 and s["started_this_tick"] is None
+    conf(w, max_leads=3)
+    tick(w, DISPATCH_NOW=NOW + 130)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_a_launch_pending_counts_against_the_cap_and_no_cap_is_no_refusal(w):
+    """Running plus pending launches reach the cap: the second line waits on it (the first start is a launch pending
+    for 10 minutes); with no max_leads in the configuration the cap does not refuse (the forecast alone admits)."""
+    conf(w, max_leads=1)
+    tick(w)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+    tick(w, DISPATCH_NOW=NOW + 130)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+    assert status(w)["ready_waits"]["W2-B T-B"] == "lead cap: 1 of 1 running", status(w)["ready_waits"]
+    conf(w)
+    tick(w, DISPATCH_NOW=NOW + 260)
+    assert calls(w)[-1] == "launch W2-B T-B B.md W2-B-A5-run1.json"
+    assert "lead cap" not in json.dumps(status(w)["ready_waits"])
+
+
+def test_dispatch_1_a_cap_with_a_line_that_waits_for_another_reason_keeps_that_reason(w):
+    """The cap is checked after the CTO's own preparation checks: a line with no brief still says so."""
+    conf(w, max_leads=2)
+    leads(w, 2)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-B T-B MISSING.md W2-B-A5-run1.json")
+    tick(w)
+    waits = status(w)["ready_waits"]
+    assert waits["W2-A T-A"] == "lead cap: 2 of 2 running" and waits["W2-B T-B"] == "no brief MISSING.md", waits
+
+
+def idle_world(w, **cfg):
+    """One ready line whose log was already used (started, its launch pending expired), a cap of 3, no lead running."""
+    conf(w, max_leads=3, **cfg)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json")
+    tick(w)
+    assert calls(w) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_the_same_waiting_set_gives_one_idle_item_not_two(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1
+    body = idle_items(w)[0].read_text()
+    assert "skipped for a used or returned log: W2-A T-A (already started for W2-A-A5-run1.json)" in body
+    assert "or comment the line out of ready.txt if its ticket needs no new run" in body
+    assert not any(x.startswith("W2: ") for x in body.splitlines())
+    for n in range(1, 8):  # more passes of the same cause: logged, not sent
+        tick(w, DISPATCH_NOW=NOW + 700 + 60 * n)
+    assert len(idle_items(w)) == 1
+    log_text = (w.d / "dispatch.log").read_text()
+    assert log_text.count("idle with headroom: inbox item written (used:W2-A T-A)") == 1
+    assert "the same cause, last item" in log_text and "logged only" in log_text
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+
+
+def test_dispatch_1_a_pass_where_idle_does_not_hold_forgets_nothing(w):
+    """The 11-11 flood: idle stopped holding for one pass (a shut gate) and the cause was forgotten, so it was sent
+    again a few minutes later. Now the last cause is kept until a start or a changed cause."""
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1
+    tick(w, DISPATCH_NOW=NOW + 760, DISPATCH_GATE_CMD="false")
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+    tick(w, DISPATCH_NOW=NOW + 820)
+    tick(w, DISPATCH_NOW=NOW + 880)
+    assert len(idle_items(w)) == 1
+
+
+def test_dispatch_1_a_returned_log_and_an_empty_list_are_separate_causes(w):
+    conf(w, max_leads=3)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json")
+    (w.orch / "log" / "W2-A-A5-run1.json").write_text('{"returned": true}\n')  # the log already holds a return
+    tick(w)
+    assert calls(w) == [] and len(idle_items(w)) == 1
+    assert "W2-A T-A (W2-A-A5-run1.json already holds a return)" in idle_items(w)[0].read_text()
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "used:W2-A T-A"
+    one_line_ready(w)  # an empty list is another cause
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(idle_items(w)) == 2 and "(0 line(s) in ready.txt)" in idle_items(w)[-1].read_text()
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text())["cause"] == "empty"
+
+
+def test_dispatch_1_a_changed_waiting_set_is_a_new_cause_and_a_start_clears_the_last_one(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-O T-O O.md W2-O-A5-run1.json")  # T-O: claim not committed
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert len(idle_items(w)) == 2
+    state = json.loads((w.d / "idle-headroom-reported.json").read_text())
+    assert state["cause"] == "used:W2-A T-A|waiting:W2-O T-O", state
+    assert "waiting for other reasons: W2-O T-O (claim not committed" in idle_items(w)[-1].read_text()
+    one_line_ready(w, "W2-B T-B B.md W2-B-A5-run1.json")  # startable: a real start clears the cause
+    tick(w, DISPATCH_NOW=NOW + 900)
+    assert calls(w)[-1].startswith("launch W2-B")
+    assert json.loads((w.d / "idle-headroom-reported.json").read_text()) == {}
+
+
+def test_dispatch_1_the_cause_is_the_names_of_the_waiting_lines_not_their_reasons(w):
+    """The key is the sorted names: a waiting line whose reason changes between passes is still the same cause."""
+    idle_world(w)
+    one_line_ready(w, "W2-A T-A A.md W2-A-A5-run1.json", "W2-O T-O O.md W2-O-A5-run1.json")
+    tick(w, DISPATCH_NOW=NOW + 700)
+    (w.repo / ".tickets" / "T-O.md").write_text(ticket("T-O", "in_progress"))
+    git(w.repo, "add", "-A")
+    git(w.repo, "commit", "-q", "-m", "claim")
+    (w.wt / "W2-O" / ".tickets" / "T-O.md").write_text(ticket("T-O", "open"))  # now: the worktree does not read in_progress
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert len(idle_items(w)) == 1, [p.read_text()[:200] for p in idle_items(w)]
+    assert "does not read in_progress" in status(w)["ready_waits"]["W2-O T-O"]
+
+
+def test_dispatch_1_the_same_cause_is_sent_again_after_six_hours_as_a_reminder(w):
+    idle_world(w)
+    tick(w, DISPATCH_NOW=NOW + 700)
+    tick(w, DISPATCH_NOW=NOW + 700 + 5 * 3600 + 3000)  # 5 h 50 min after the item
+    assert len(idle_items(w)) == 1
+    tick(w, DISPATCH_NOW=NOW + 700 + 6 * 3600 + 60)
+    items = idle_items(w)
+    assert len(items) == 2 and "reminder: the same cause for 6 h" in items[-1].read_text()
+    assert "as a reminder after 6 h" in (w.d / "dispatch.log").read_text()
+
+
+def test_dispatch_1_no_idle_item_without_a_cap_at_the_cap_or_in_a_dry_pass(w):
+    idle_world(w)
+    tick(w, "--dry", DISPATCH_NOW=NOW + 700)
+    assert idle_items(w) == [] and not (w.d / "idle-headroom-reported.json").exists()
+    conf(w)  # no cap
+    tick(w, DISPATCH_NOW=NOW + 760)
+    assert idle_items(w) == []
+    conf(w, max_leads=1)
+    leads(w, 1)
+    tick(w, DISPATCH_NOW=NOW + 820)
+    assert idle_items(w) == []
+
+
+def test_dispatch_1_an_old_form_of_the_reported_file_is_one_more_item_not_an_error(w):
+    idle_world(w)
+    (w.d / "idle-headroom-reported.json").write_text(json.dumps({"used:W2-A T-A": NOW}))
+    tick(w, DISPATCH_NOW=NOW + 700)
+    assert len(idle_items(w)) == 1 and status(w)["failures"] == []
+
+
+SLOT_CMD = "flock -n -o /tmp/gov-os-heavy-slot-{n}.lock tail -f /dev/null"
+
+
+def held_slots(w, n=3):
+    """n heavy slots held, each by a flock process outside any lead (found as a job of kind slot, phase test)."""
+    w.procs.write_text(json.dumps([{"cmd": SLOT_CMD.format(n=i + 1), "cwd": str(w.wt / "W2-O"), "pid": 600 + i, "ppid": 1,
+                                    "age_s": 3000, "rss_kb": 50_000, "cpu_ticks": 100} for i in range(n)]))
+
+
+def measured(w, cpu, n=3, first=NOW - 900, count=8, phase="test"):
+    """jobs-load.json as the dispatcher writes it: each slot job seen since `first`, `count` samples at `cpu` cores."""
+    (w.d / "jobs-load.json").write_text(json.dumps({
+        f"{600 + i}:{phase}": {"first": first, "s": [[NOW - 60 * (count - k), cpu] for k in range(count)]}
+        for i in range(n)}))
+
+
+def test_dispatch_1_three_held_slots_at_a_low_measured_load_admit_a_lead(wp):
+    """DEC-1140 (2): 2026-11-11 23:21, three held slots (3 x 6) priced at their whole peak: 'CPU 23.4 of 18' on a machine 3
+    of 20 busy. Held slots measured at 0.05 cores for 10 minutes are counted at the floor (1.0 each): the lead is admitted."""
+    held_slots(wp)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    tick(wp)
+    s = status(wp)
+    assert {j["kind"] for j in s["jobs"]} == {"slot"} and len(s["jobs"]) == 3 and s["forecast"]["lead"]["ok"] is False, s["forecast"]["lead"]
+    assert "running jobs' peaks" in s["forecast"]["lead"]["reason"] and "measured load" not in s["forecast"]["lead"]["reason"]
+    measured(wp, 0.05)
+    wp.calls.write_text("")
+    (wp.d / "started.txt").write_text("")
+    tick(wp, DISPATCH_NOW=NOW)
+    s = status(wp)
+    assert s["forecast"]["lead"]["ok"] is True, s["forecast"]["lead"]
+    cpu = s["forecast"]["lead"]["resources"]["cpu"]
+    assert "3 of them at their measured load" in cpu["text"] and cpu["need"] < 8, cpu
+    assert calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
+
+
+def test_dispatch_1_a_slot_measured_busy_a_job_seen_only_briefly_and_the_switch_keep_the_whole_peak(wp):
+    held_slots(wp)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    measured(wp, 5.5)  # the slots really ran 5.5 cores in the window: counted at that, not at the floor
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+    measured(wp, 0.05, first=NOW - 120, count=2)  # seen for two minutes only: the phase's peak, as before
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+    assert "measured load" not in status(wp)["forecast"]["lead"]["reason"]
+    measured(wp, 0.05)
+    conf(wp, memory_rule="literal", held_load=False)  # the switch: off
+    tick(wp)
+    assert status(wp)["forecast"]["lead"]["ok"] is False
+
+
+def test_dispatch_1_the_measured_load_is_recorded_a_pass_and_forgotten_when_the_job_ends(wp):
+    held_slots(wp, 2)
+    tick(wp)
+    rec = json.loads((wp.d / "jobs-load.json").read_text())
+    assert sorted(rec) == ["600:test", "601:test"] and len(rec["600:test"]["s"]) == 1
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert len(json.loads((wp.d / "jobs-load.json").read_text())["600:test"]["s"]) == 2
+    wp.procs.write_text("[]")
+    tick(wp, DISPATCH_NOW=NOW + 120)
+    assert json.loads((wp.d / "jobs-load.json").read_text()) == {}
+    held_slots(wp, 1)
+    tick(wp, "--dry", DISPATCH_NOW=NOW + 180)
+    assert json.loads((wp.d / "jobs-load.json").read_text()) == {}  # a dry pass writes nothing
+
+
+# ---- ACT-DISPATCH-NIGHTLY-SLOT-1 (incident 2026-11-13-0456): the nightly's own suite run is in the slots it holds ----
+NIGHTLY_SH = "/bin/bash /r/governance/project/orchestration/nightly/nightly.sh night"
+FDINFO_LOCKED = "pos:\t0\nflags:\t0100001\nmnt_id:\t82\nino:\t7\nlock:\t1: FLOCK  ADVISORY  WRITE 0 08:30:7 0 EOF\n"
+FDINFO_FREE = "pos:\t0\nflags:\t0100001\nmnt_id:\t82\nino:\t7\n"
+
+
+def plant_nightly(wp, *, marker_age_s=600, fdinfo=FDINFO_LOCKED, slot_file="gov-os-heavy-slot-1.lock",
+                  run_cwd=None, parent=None, script=NIGHTLY_SH):
+    """A planted nightly: nightly.sh (pid 900, in its clone) holding slot 1 on its fd 10 (a link to the slot file, its
+    fdinfo with or without the flock line); its suite run (pid 901, 20 min old) and an xdist worker of it (pid 902)."""
+    runs = wp.tmp / "runs" / "nightly"
+    clone = runs / "20261113-0404"
+    clone.mkdir(parents=True, exist_ok=True)
+    wp.env["DISPATCH_NIGHTLY_RUNS"] = str(runs)
+    slot = wp.tmp / "slots" / slot_file
+    slot.write_text("")
+    for sub in ("fd", "fdinfo"):
+        (wp.tmp / "proc" / "900" / sub).mkdir(parents=True, exist_ok=True)
+    (wp.tmp / "proc" / "900" / "fd" / "10").symlink_to(slot)
+    (wp.tmp / "proc" / "900" / "fdinfo" / "10").write_text(fdinfo)
+    marker = wp.orch / "NIGHTLY-RUNNING"
+    if marker_age_s is not None:
+        marker.write_text("nightly: running (a marker only, DEC-961)\n")
+        os.utime(marker, (NOW - marker_age_s, NOW - marker_age_s))
+    cwd = str(clone) if run_cwd is None else run_cwd
+    night = {"cmd": script, "cwd": str(clone), "pid": 900, "ppid": 1, "age_s": 1500}
+    suite = {"cmd": "python3 -m pytest tests -n auto -q -p no:cacheprovider", "cwd": cwd, "pid": 901,
+             "ppid": 900 if parent is None else parent, "age_s": 1200}
+    worker = {"cmd": "/usr/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))", "cwd": cwd, "pid": 902,
+              "ppid": 901, "age_s": 1190}
+    leads(wp, 1, extra=[night, suite, worker])
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
+
+
+def test_nightly_slot_the_nightlys_suite_run_in_its_clone_under_its_held_slots_is_in_a_slot(wp):
+    plant_nightly(wp)
+    tick(wp)
+    s = status(wp)
+    assert s["outside_slot"] == [] and s["admit"], s.get("admit_reason")
+    assert "heavy steps outside a slot: none" in (wp.d / "status.txt").read_text()
+
+
+@pytest.mark.parametrize("case", ["no marker", "stale marker", "no lock held", "not a slot file", "outside the runs",
+                                  "not under nightly.sh", "the runs root itself"])
+def test_nightly_slot_each_missing_condition_leaves_the_run_outside_a_slot(wp, case):
+    kw = {"no marker": dict(marker_age_s=None),
+          "stale marker": dict(marker_age_s=360 * 60 + 1),
+          "no lock held": dict(fdinfo=FDINFO_FREE),
+          "not a slot file": dict(slot_file="other.lock"),
+          "outside the runs": dict(run_cwd=str(wp.wt / "W2-B")),
+          "not under nightly.sh": dict(script="/bin/bash /r/governance/project/orchestration/nightly/other.sh night"),
+          "the runs root itself": dict(run_cwd=str(wp.tmp / "runs" / "nightly"))}[case]
+    plant_nightly(wp, **kw)
+    tick(wp)
+    s = status(wp)
+    assert "pid 901" in " ".join(s["outside_slot"]) and not s["admit"] and "outside a slot" in s["admit_reason"]
+
+
+def test_nightly_slot_a_heavy_step_elsewhere_still_holds_starts_while_the_nightly_runs(wp):
+    plant_nightly(wp)
+    procs = json.loads(wp.procs.read_text())
+    procs.append({"cmd": "/usr/bin/python3 -P -m gov.context.context_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
+                  "ppid": 1, "age_s": 400})
+    wp.procs.write_text(json.dumps(procs))
+    tick(wp)
+    found = " ".join(status(wp)["outside_slot"])
+    assert "pid 500" in found and "pid 901" not in found and not status(wp)["admit"]

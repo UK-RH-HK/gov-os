@@ -1,0 +1,40 @@
+# Lens B's Q14 (Table 2): "The nine dependents (0mab, 6n5k, h4rh, j8gn, nn1s, rd0g, u4oz, yadm, zqvn)": the answer
+# needs all nine, so each dependent's depends_on line naming DAEO-ym8a (W2-03) is its own entry. Still nine at the
+# commit.
+id: Q14
+category: ticket
+commit: 23079f92a6fa
+ticket: DAEO-ym8a
+radius: 1
+question: Which tickets depend on W2-03?
+gold_answer: >-
+  Nine tickets list DAEO-ym8a (W2-03) in depends_on: DAEO-0mab, DAEO-6n5k, DAEO-h4rh, DAEO-j8gn, DAEO-nn1s,
+  DAEO-rd0g, DAEO-u4oz, DAEO-yadm and DAEO-zqvn.
+sources:
+  - path: .tickets/DAEO-0mab.md
+    heading: "- DAEO-ym8a"
+    lines: [20, 20]
+  - path: .tickets/DAEO-6n5k.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]
+  - path: .tickets/DAEO-h4rh.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]
+  - path: .tickets/DAEO-j8gn.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]
+  - path: .tickets/DAEO-nn1s.md
+    heading: "- DAEO-ym8a"
+    lines: [20, 20]
+  - path: .tickets/DAEO-rd0g.md
+    heading: "- DAEO-ym8a"
+    lines: [18, 18]
+  - path: .tickets/DAEO-u4oz.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]
+  - path: .tickets/DAEO-yadm.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]
+  - path: .tickets/DAEO-zqvn.md
+    heading: "- DAEO-ym8a"
+    lines: [19, 19]

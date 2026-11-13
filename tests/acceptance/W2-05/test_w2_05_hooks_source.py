@@ -18,8 +18,8 @@ hook events and matchers, with paths normalised.
   event in both sources is compared as any other; the check's output form is unchanged. Since ACT 1 this
   repository's two sources differ in exactly those two events, so the case over them is green with the exception.
 
-The temporary project has this repository's shape: W1-38's adopted project (the kernel template's roles, skills and
-hooks, the template's rulesync sources, the registered rulesync version and the check's declaration, copied one
+The temporary project has this repository's shape: W1-38's adopted project (the kernel template's roles, skills,
+templates and hooks, the template's rulesync sources, the registered rulesync version and the check's declaration, copied one
 named file at a time by W1-38's own support), with its kernel moved to ``template/governance/kernel``. Its
 ``.rulesync/hooks.jsonc`` (the repository's source) and ``template/.rulesync/hooks.jsonc`` (the template's) are
 written by the case: the not-drift cases and the last from this repository's two files, read in place as single
@@ -50,7 +50,7 @@ from w2_05_support import skip_without
 SESSION_START_MATCHER = "compact|clear|resume"   # the repository's (DEC-805 item 2)
 REPO_HOOKS_PATH = "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/"
 TEMPLATE_HOOKS_PATH = "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/"
-KERNEL_PARTS = ("hooks", "roles", "skills")
+KERNEL_PARTS = ("hooks", "roles", "skills", "templates")   # templates/: W1-38's builder copies it (W2-153, DEC-1112 (3))
 
 
 def _w138():

@@ -1,6 +1,6 @@
 ---
 id: DAEO-7r5e
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-zflj, DAEO-kia7]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -70,3 +70,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-08), as approved (DEC-729). The list row
   - `gov check` on this repository: 17 of 17 families, no RED, no unexplained YELLOW [W2-H020, W2-L106, W2-L335, W2-M142, W2-L017].
   - DEC-709 is retired by a register entry (DEC-719 item 4).
 - **Failure:** any hook refusal is reported to the owner and never worked round.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): O1 (A), no hook.

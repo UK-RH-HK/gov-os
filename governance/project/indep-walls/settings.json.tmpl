@@ -1,0 +1,63 @@
+{
+  "model": "@MODEL@",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Read(/@WALL@/**)",
+      "Read(/@TREE@/**)",
+      "Edit(/@WALL@/out/**)",
+      "Write(/@WALL@/out/**)"
+    ],
+    "deny": [
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Agent",
+      "NotebookEdit",
+      "Skill",
+      "Bash(gov retrieve *)",
+      "Bash(gov context *)",
+      "Bash(@HOME@/.local/bin/gov *)",
+      "Bash(python3 -m gov.cli.main *)",
+      "Bash(python3 -m gov.retrieval.measure *)",
+      "Bash(git *)",
+      "Bash(ollama *)",
+      "Edit(/@WALL@/.claude/**)",
+      "Edit(/@TREE@/**)",
+      "Edit(/@WALL@/input/**)",
+      "Edit(/@WALL@/WALL.json)",
+      "Edit(/@WALL@/brief.md)",
+      "Edit(/@WALL@/seed.txt)",
+      "Edit(/@WALL@/CLAUDE.md)",
+      "Read(/@REPO@/**)",
+      "Read(/@WORKTREES@/**)",
+      "Read(/@RUNS@/**)",
+      "Read(/@HOME@/.claude/**)",
+      "Read(/@HOME@/.local/share/gov-os/**)",
+      "Read(/@SETS_ROOT@/fixtures/**)",
+      "Read(/@SETS_ROOT@/runs/**)",
+      "Read(/@SETS_ROOT@/transcripts/**)",
+      "Read(/@SETS_ROOT@/governance/**)",
+      "Read(/@WALLS@/APPROVED)",
+      "@OTHER_WALLS@"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I @WALL@/.claude/wall_hook.py @WALL@ @TREE@",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": false,
+  "cleanupPeriodDays": 1
+}

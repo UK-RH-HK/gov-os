@@ -96,6 +96,16 @@ disk=$(bash "$HERE/disk_gate.sh" 2>&1) || {
 date '+%F %T nightly: running (a marker only, DEC-961)' > "$ORCH/NIGHTLY-RUNNING"
 OWN_FLAG=1
 t0=$(date +%s)
+# W2-154 (DEC-1112 (3)), the test seam: with NIGHTLY_SERIAL_STUB=<file> the night skips the clone, the seed, the
+# secrets switch, the rebuild, the gate, the slots and both suites. The stub (sourced here) sets ENTRIES, s_exit and
+# CLONE and writes $JUNIT/serial.xml; the serial count, the verdict, the digest and the ping run as in a real night.
+# Unset, the else branch below is the night as it was (its lines are not indented, to keep the change small).
+if [ -n "${NIGHTLY_SERIAL_STUB:-}" ]; then
+  . "$NIGHTLY_SERIAL_STUB"
+  HEAD=${HEAD:-stub}
+  echo "head $HEAD (the serial stub $NIGHTLY_SERIAL_STUB: no clone, no suites)" >> "$OUT/run.txt"
+  p_exit=${p_exit:-0}; setup=0; lock_wait=0
+else
 CLONE=$RUNS/$STAMP
 git clone -q --no-hardlinks --branch w2/integrate "$REPO" "$CLONE" || { echo "clone failed" >> "$OUT/run.txt"; exit 2; }
 HEAD=$(git -C "$CLONE" rev-parse --short=12 HEAD)
@@ -115,11 +125,17 @@ SEED=${NIGHTLY_SEED:-$ORCH/tools/seed_store.py}
 if [ -f "$SEED" ]; then
   echo "$(python3 "$SEED" seed "$CLONE" --vectors-only --who nightly 2>&1 | tail -1)" >> "$OUT/run.txt"
 fi
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
+# DEC-1045 (owner, 2026-11-02): gitleaks scanning lifted on this repository by its switch
+# (governance/project/secrets.yaml, scan: off): the full scan only when the clone's switch says on; a switch that
+# cannot be read stops the night (fails closed), never "off".
+FULL_SCAN=$(python3 -c "import sys; sys.path.insert(0, '$ORCH/tools'); import secrets_switch as s; print(1 if s.scan_on('$CLONE') else 0)") \
+  || { echo "the secrets switch cannot be read (DEC-1045)" >> "$OUT/run.txt"; exit 2; }
+[ "$FULL_SCAN" = 1 ] || echo "secrets full scan: off by configuration (DEC-1045)" >> "$OUT/run.txt"
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN="$FULL_SCAN" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")
-[ -n "$ENTRIES" ] || { echo "no serial-only entry read" >> "$OUT/run.txt"; exit 2; }
+# W2-154: nothing declared is "serial: 0 declared" below (the serial phase skipped, the night not red), not an exit 2.
 # No shared lock (DEC-961, DEC-962): the run waits for the gate's room for one full run, at night until the latest
 # start. The time spent waiting is recorded apart from the setup, and kept out of the estimate (DEC-939 item 6).
 lock_wait=0
@@ -161,6 +177,7 @@ slot_deadline=$(( $(date +%s) + ${NIGHTLY_SLOT_WAIT:-1800} ))
 if [ "$MODE" = night ] && [ "$latest" -lt "$slot_deadline" ]; then slot_deadline=$latest; fi
 sw0=$(date +%s)
 held=0
+HELD_SLOTS=""
 SLOT_FDS=()
 for i in $(seq 1 "$SLOTS"); do
   unset sfd
@@ -170,10 +187,23 @@ for i in $(seq 1 "$SLOTS"); do
   [ -n "$sfd" ] || continue
   SLOT_FDS+=("$sfd")
   wait_s=$(( slot_deadline - $(date +%s) )); [ "$wait_s" -lt 1 ] && wait_s=1
-  flock -w "$wait_s" "$sfd" && held=$((held + 1))
+  flock -w "$wait_s" "$sfd" && { held=$((held + 1)); HELD_SLOTS+="${HELD_SLOTS:+,}$i"; }
 done
 echo "heavy-job slots held: $held of $SLOTS (waited $(( $(date +%s) - sw0 )) s)" >> "$OUT/run.txt"
 lock_wait=$(( lock_wait + $(date +%s) - sw0 ))
+# DEC-1038 (4), DEC-1039 (the gate review's F2: 20 workers, each gitleaks on every CPU): the suites get what a slot's
+# run gets, one slot per lock held (all three: every CPU, at most the conf's total workers, the thread budget), from the
+# gate's own logic (heavy_slot.sh --held <the slots held>), never a copy of it. The serial phase is one process: it
+# names 1 worker, so its budget is the whole of the held CPUs. A gate without that form (an older heavy_slot.sh): the
+# suites run without the budget and the CPU sets, and run.txt says so.
+HEAVY=${NIGHTLY_HEAVY:-$ORCH/tools/heavy_slot.sh}
+HEAVY_RUN=()
+if [ -f "$HEAVY" ] && grep -q '^# heavy-slot: --held' "$HEAVY"; then
+  HEAVY_RUN=(bash "$HEAVY" --held "$HELD_SLOTS")
+  echo "the suites' thread budget and CPU sets: the gate's, for the slots held (${HELD_SLOTS:-none})" >> "$OUT/run.txt"
+else
+  echo "the suites run WITHOUT the slots' thread budget and CPU sets: no gate with --held at $HEAVY" >> "$OUT/run.txt"
+fi
 noslot() {  # run a command with the slots' descriptors closed
   local f
   for f in "${SLOT_FDS[@]}"; do [ -n "$f" ] && eval "exec $f>&-"; done
@@ -183,25 +213,42 @@ setup=$(( $(date +%s) - t0 - lock_wait ))
 start=$(date +%s)
 # shellcheck disable=SC2086
 ( noslot env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
-  $WITH_LOCK python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
+  "${HEAVY_RUN[@]}" $WITH_LOCK python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
   --junitxml="$JUNIT/parallel.xml" ) > "$OUT/parallel.txt" 2>&1
 p_exit=$?
 mid=$(date +%s)
+s_exit=skipped
+if [ -n "$ENTRIES" ]; then
 # shellcheck disable=SC2086
 ( noslot env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
-  GOV_CLOSE_SERIAL_ONLY_GIVEN="$ENTRIES" \
-  $WITH_LOCK python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
+  GOV_CLOSE_SERIAL_ONLY_GIVEN="$ENTRIES" PYTEST_XDIST_AUTO_NUM_WORKERS=1 \
+  "${HEAVY_RUN[@]}" $WITH_LOCK python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
   --junitxml="$JUNIT/serial.xml" ) > "$OUT/serial.txt" 2>&1
 s_exit=$?
+fi
 # The suites are the heavy part: the slots are released now, so the light steps after them (each red alone, the
 # bisect) neither hold them nor pass them to anything they leave behind.
 for f in "${SLOT_FDS[@]}"; do [ -n "$f" ] && eval "exec $f>&-"; done
 echo "heavy-job slots released after the suites" >> "$OUT/run.txt"
 end=$(date +%s)
 echo "parallel exit $p_exit in $((mid - start)) s: $(tail -1 "$OUT/parallel.txt")" >> "$OUT/run.txt"
-echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"
+[ -n "$ENTRIES" ] && echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"
+fi
+# W2-154 (DEC-1112 (3), the D-10 W2-13 review's F1): the serial phase is reported by the cases it ran, whatever its
+# JUnit file says. N is the number of <testcase> elements of serial.xml (0 where it is missing or cannot be read).
+N=$(python3 -c "import sys, xml.etree.ElementTree as ET; print(sum(1 for _ in ET.parse(sys.argv[1]).iter('testcase')))" "$JUNIT/serial.xml" 2>/dev/null || true)
+N=${N:-0}
+if [ -n "$ENTRIES" ]; then echo "serial: $N cases run" >> "$OUT/run.txt"; else echo "serial: 0 declared" >> "$OUT/run.txt"; fi
 # Every failing case, alone (the close's environment), once.
 python3 "$HERE/nightly_alone.py" "$CLONE" "$JUNIT" >> "$OUT/run.txt" 2>&1
+# With entries declared, a serial phase that ended in a collection error (an exit that is neither 0 nor 1) or ran no
+# case is red, after nightly_alone.py's line so that this is the last verdict line. Both at once: the collection error.
+if [ -n "$ENTRIES" ]; then
+  case "$s_exit" in
+    0|1) [ "$N" -gt 0 ] || echo "verdict: red serial: 0 cases run" >> "$OUT/run.txt" ;;
+    *) echo "verdict: red serial: collection error, exit $s_exit" >> "$OUT/run.txt" ;;
+  esac
+fi
 actual=$(( $(date +%s) - t0 ))
 # The run is over: the marker goes at once (DEC-961: it held nothing).
 rm -f "$ORCH/NIGHTLY-RUNNING"; OWN_FLAG=0
