@@ -10,7 +10,7 @@ integrate's code (DEC-963). The ticket's implementation was never read.
     PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-153 -q -p no:cacheprovider \
       -o tmp_path_retention_policy=failed
 
-About 6 s, 66 cases (revision 4). No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
+About 9 s, 137 passed and 18 skipped (revision 5: 66 cases of revision 4, plus the routed line's 71 run and 18 skipped). No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
 baseline commit in the repository's history.
 
 - **`gov launch` (S1, F1, F2).** Each case runs `gov.launch.launcher.launch` (the launcher's public entry) in a child
@@ -153,6 +153,40 @@ appended after the caller's arguments), the composition, the copies' check and `
 flag goes), and the twelve sources composed. It passed all 50 cases. Two wrong builds each failed the cases meant
 for them: an extra `--verbose` beside the flag failed F2 for all seven roles (and S1's caller-arguments check), and
 the dispatcher without its file check failed its F1.
+
+## Routed line (from W2-33, its S7 copies and F1 drift; DEC-1156 (3); revision 5)
+
+The ticket's sixth success line: *the generated role copies carry each kernel role file's `Launch default`,
+`Launch by criticality` and `Skills` lines unchanged, and a hand edit to a generated role copy is named as drifted by
+the generation check.* The copies ACTs are applied (COPIES-6 `36d1a151b`, COPIES-8 `bb9dfca7a`), so the cases are
+**expected green on this tree**: they are the line's verify, not a build's driver. All in
+`test_w2_153_routed.py`; no other assertion of the folder changed (the support file is untouched). The cases that read
+this repository write nothing; the drift cases build a stand-in project in `tmp_path` (`PortabilityBed` with the
+engineer's role file carrying the three lines) and never touch this repository's files.
+
+| Clause | Test (node id) | Expected on this tree | What it checks |
+|---|---|---|---|
+| unchanged | `test_w2_153_routed.py::test_routed_each_generated_role_copy_carries_the_kernel_role_file_s_line_byte_for_byte` | green; 9 roles x 3 folders x 3 labels = 81 cases, of which 63 run and 18 skip | each line the kernel role file carries (`- **<label>:** ...`) is a whole line, byte for byte (split on `\n` alone), of `.claude/agents/<role>.md`, `.rulesync/subagents/<role>.md` and `template/.rulesync/subagents/<role>.md`; the id names role, folder and label |
+| unchanged | `test_w2_153_routed.py::test_routed_guard_the_cases_below_are_not_a_silent_narrowing` | green (guard) | each label is carried by at least one role file and every role file has `Launch default` and `Skills`, so only the role files' own gaps skip |
+| drift named | `test_w2_153_routed.py::test_routed_the_unedited_stand_in_names_neither_the_generated_agent_nor_the_source` | green (control) | the unedited stand-in has no finding and exits 0 |
+| drift named | `test_w2_153_routed.py::test_routed_a_hand_edit_to_one_of_the_three_lines_is_named_as_drifted` | green; 6 cases (2 files x 3 labels) | one line of `.claude/agents/engineer.md` (rulesync's output) or of `.rulesync/subagents/engineer.md` (the composed source) edited by hand: the check exits non-zero, a finding names that file, and none names the other |
+
+**Skips, stated, never silent:** a role file with no line for a label has no case for it. `Launch by criticality` is
+carried by three role files (engineer, independent-test-designer, qa-engineer); the other six skip it in each of the
+three folders (6 x 3 = 18 skips, ids ending `::no-such-line-in-the-role-file`). Every role file carries
+`Launch default` and `Skills`, which the guard case requires. The folder's run: 71 passed, 18 skipped in the routed
+file alone.
+
+**Planted breaks** (temporary edits, reverted before the commit): one `Launch default` line in
+`template/.rulesync/subagents/engineer.md` changed to `effort low` failed exactly the case
+`engineer::template/.rulesync/subagents::launch-default`, naming the file, the line and the copy's own line; the
+check's generated-file comparison made to report nothing failed exactly the three `generated-agent` drift cases; its
+source comparison made to report nothing failed exactly the three `composed-source` drift cases.
+
+**Limit (see the return's `discoveries`):** `python3 -m gov.adapters.portability` compares `.rulesync/subagents/`
+with `compose()` and `.claude/agents/` with rulesync's output, but looks at `template/.rulesync/subagents/` only
+through the hooks source. A hand edit there is *not* named by the check (probed once in the stand-in: exit 0, no
+finding). The drift cases therefore cover the two files the brief names and no third.
 
 ## Notes and limits (interface gaps; also the return's `discoveries`)
 
