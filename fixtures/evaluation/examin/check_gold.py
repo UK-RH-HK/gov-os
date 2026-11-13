@@ -48,10 +48,14 @@ the question, in this order):
 2. The sources hold the answer (ANSWER_NOT_IN_SPANS), by this rule, applied once to the union of the spans of every
    source that holds structurally (all alternatives of an entry included), whitespace runs collapsed:
    a. the *tokens* of ``gold_answer`` are its back-quoted pieces and its identifier-shaped words (a word with ``_``,
-      ``::`` or ``/``; a camelCase word; a word mixing letters and digits; a hyphenated word with a digit such as
-      ``DEC-051``; a ``--flag``; a dotted name like ``mod.func`` or ``file.py``; at least 3 characters). Every token
-      must occur in the union, case-sensitively, as a substring, or name one of the question's sources (the whole path,
-      or its trailing folders and file name: a span of code does not repeat the name of its own file).
+      ``::`` or ``/``; a camelCase word; a word mixing letters and digits; an id-shaped hyphenated word with a digit
+      such as ``DEC-051``, ``W2-94`` or ``CAP-10``, whose part before the first hyphen starts with an upper-case letter
+      and holds only upper-case letters and digits, so ``level-2`` and ``Level-2`` are no tokens, nor is the tail of a
+      word that starts with a digit; a ``--flag``; a dotted name like ``mod.func`` or ``file.py``; at least 3
+      characters). Every token must occur in the union, case-sensitively, as a substring, or name one of the question's
+      sources (the whole path, or its trailing folders and file name: a span of code does not repeat the name of its
+      own file). A token holding ``/`` is also held when its segments (split on ``/``, empty ones dropped) occur in
+      order in the union, each found at or after the end of the previous one.
    b. when the answer has no token (a prose answer), its *content words* (lower-case letters, 5 or more, not in a small
       list of common words) are looked for by stem (the word without its last 3 letters, at least 5 letters kept),
       case-insensitively; at least one third of the distinct content words (rounded up, at least 1) must occur in the
@@ -74,7 +78,8 @@ a question agents ask, well formed, distinct, stable) and R2's size and kind bey
 brief and the owner's own read of the visible half.
 
 THE SPLIT'S FORM (S1, S5; ``draw ok`` or ``draw FAIL``, ``FAIL draw <code> [k<n>]``):
- - DRAW.txt has one line per category present, ``<k> <category> SEED+<k>=<value> <parity> visible=<id> hidden=<id>``
+ - DRAW.txt has one line per category present, ``<k> <category> SEED+<k>=<value> <parity> visible=<id> hidden=<id>``,
+   or with the letter k written for ``<k>`` in ``SEED+k=<value>`` (then the line's first field is its k)
    (DRAW_MISSING, DRAW_LINE_BAD, DRAW_LINES_MISMATCH: a category present with no line, a line for a category that is
    absent, or two lines for one);
  - every value minus its k is the same integer, the seed (DRAW_SEED_INCONSISTENT); its parity matches the line's word
@@ -119,7 +124,7 @@ QFILE = re.compile(r"q[0-9][0-9]\.yaml\Z")
 QID = re.compile(r"q[0-9][0-9]\Z")
 HEX40 = re.compile(r"[0-9a-fA-F]{40}\Z")
 SET_NAME = re.compile(r"[a-z0-9-]+\Z")
-DRAW_LINE = re.compile(r"([0-9]+) ([a-z-]+) SEED\+([0-9]+)=(-?[0-9]+) (even|odd) visible=(q[0-9][0-9]) "
+DRAW_LINE = re.compile(r"([0-9]+) ([a-z-]+) SEED\+([0-9]+|k)=(-?[0-9]+) (even|odd) visible=(q[0-9][0-9]) "
                        r"hidden=(q[0-9][0-9])\Z")
 RECORD_LINE = re.compile(r"(q[0-9][0-9]\.yaml) ([0-9a-f]{64})\Z")
 
@@ -203,6 +208,7 @@ class Copy:
 
 BACKQUOTED = re.compile(r"`([^`\n]+)`")
 NAMELIKE = re.compile(r"--[A-Za-z][A-Za-z0-9-]*|[A-Za-z_][A-Za-z0-9_]*(?:(?:::|[./-])[A-Za-z0-9_]+)*")
+ID_HEAD = re.compile(r"[A-Z][A-Z0-9]*-")
 EXTENSIONS = {"py", "md", "txt", "yaml", "yml", "json", "toml", "sh", "js", "ts", "tsx", "jsx", "cfg", "ini", "rs",
               "go", "c", "h", "cpp", "java", "css", "html", "sql", "lock", "env", "xml"}
 COMMON = {"about", "after", "again", "also", "because", "before", "being", "between", "could", "does", "during",
@@ -216,7 +222,8 @@ def squash(text):
     return " ".join(text.split())
 
 
-def _shaped(word):
+def _shaped(word, before=""):
+    """``before``: the character just before the word in its text (the hyphen-digit judgement looks at it)."""
     if len(word) < 3:
         return False
     if word.startswith("--") or "_" in word or "::" in word or "/" in word:
@@ -224,7 +231,9 @@ def _shaped(word):
     if "." in word:
         return any(c.isdigit() or c.isupper() for c in word) or word.rsplit(".", 1)[-1] in EXTENSIONS
     if "-" in word:
-        return any(c.isdigit() for c in word)
+        # a hyphenated word with a digit is a token only when id-shaped (DEC-051, W2-94), judged whole
+        return (any(c.isdigit() for c in word) and ID_HEAD.match(word) is not None
+                and not (before and before.isalnum()))
     return bool(re.search(r"[a-z][A-Z]", word)) or (any(c.isdigit() for c in word) and any(c.isalpha() for c in word))
 
 
@@ -233,7 +242,8 @@ def tokens(text, backquoted_only=False):
     found = [squash(m.group(1)) for m in BACKQUOTED.finditer(text)]
     if not backquoted_only:
         rest = BACKQUOTED.sub(" ", text)
-        found += [m.group(0) for m in NAMELIKE.finditer(rest) if _shaped(m.group(0))]
+        found += [m.group(0) for m in NAMELIKE.finditer(rest)
+                  if _shaped(m.group(0), rest[m.start() - 1] if m.start() else "")]
     return list(dict.fromkeys(t for t in found if t))
 
 
@@ -243,6 +253,20 @@ def content_words(text):
     return list(dict.fromkeys(w for w in words if w not in COMMON))
 
 
+def _segments_in_order(token, union):
+    """A token holding ``/``: its non-empty segments each occur in ``union`` at or after the end of the previous."""
+    if "/" not in token:
+        return False
+    segments = [s for s in token.split("/") if s]
+    position = 0
+    for segment in segments:
+        found = union.find(segment, position)
+        if found < 0:
+            return False
+        position = found + len(segment)
+    return bool(segments)
+
+
 def answer_in(text, spans, paths=()):
     """The rule's step 2 on ``gold_answer`` ``text``, the spans and the sources' paths: True when the spans hold the
     answer. A token that names a source's own path (the whole path, or its trailing folders and file name) is held by
@@ -250,7 +274,8 @@ def answer_in(text, spans, paths=()):
     union = squash("\n".join(spans))
     found = tokens(text)
     if found:
-        return all(t in union or any(p == t or p.endswith("/" + t) for p in paths) for t in found)
+        return all(t in union or any(p == t or p.endswith("/" + t) for p in paths) or _segments_in_order(t, union)
+                   for t in found)
     words = content_words(text)
     if not words:
         return True
@@ -449,7 +474,8 @@ def check_draw(base, visible, hidden, categories):
             fails.append(("DRAW_LINE_BAD", []))
             continue
         k, category, k2, value, parity, vis, hid = match.groups()
-        k, k2, value = int(k), int(k2), int(value)
+        k, value = int(k), int(value)
+        k2 = k if k2 == "k" else int(k2)
         tag = [f"k{k}"]
         if k != k2 or not 1 <= k <= len(CATEGORIES) or CATEGORIES[k - 1] != category:
             fails.append(("DRAW_CATEGORY_MISMATCH", tag))
