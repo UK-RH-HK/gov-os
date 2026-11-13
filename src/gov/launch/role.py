@@ -78,6 +78,16 @@ def _front_matter(text: str, rel: str) -> dict:
     return front
 
 
+def _version(front: dict) -> str:
+    """A skill's or command's version: its top-level ``version``, else ``metadata.version`` when ``metadata`` is a
+    map (the kernel's generated copies carry it there); neither is ``no version``."""
+    version = front.get("version")
+    metadata = front.get("metadata")
+    if not version and isinstance(metadata, dict):
+        version = metadata.get("version")
+    return str(version) if version else NO_VERSION
+
+
 def _folder_sha256(folder: Path, rel: str) -> str:
     """The sha256 of each regular file's path and sha256, in path order; a link or another kind of entry refuses."""
     entries = []
@@ -115,9 +125,7 @@ def _skills(root: Path) -> dict[str, dict]:
             skill_name = str(front.get("name") or name)
             if skill_name in skills:
                 raise _refuse(f"two skill folders of {SKILLS_REL} give the name '{skill_name}'")
-            version = front.get("version")
-            skills[skill_name] = {"name": skill_name, "path": f"{rel}/SKILL.md",
-                                  "version": str(version) if version else NO_VERSION,
+            skills[skill_name] = {"name": skill_name, "path": f"{rel}/SKILL.md", "version": _version(front),
                                   "sha256": sha256(data), "folder_sha256": folder_hash,
                                   "named": False, "text": data}
     except (OSError, UnicodeDecodeError):
@@ -150,9 +158,8 @@ def _commands(root: Path) -> list[dict]:
                     continue
                 data = path.read_bytes()
                 front = _front_matter(data.decode("utf-8"), rel)
-                version = front.get("version")
                 commands.append({"name": ":".join(path.relative_to(base).with_suffix("").parts), "path": rel,
-                                 "version": str(version) if version else NO_VERSION, "sha256": sha256(data),
+                                 "version": _version(front), "sha256": sha256(data),
                                  "folder_sha256": sha256(data), "named": False})
     except (OSError, UnicodeDecodeError):
         raise _refuse(f"the commands under {COMMANDS_REL} cannot be read, so the record could not say what the "

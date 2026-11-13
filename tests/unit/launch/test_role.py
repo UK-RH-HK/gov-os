@@ -87,6 +87,40 @@ def test_named_skills_follow_the_role_text_in_the_order_named(tmp_path):
     assert described["c"]["version"] == role.NO_VERSION
 
 
+@pytest.mark.parametrize("front, expected", (
+    ("version: 1.0.0\n", "1.0.0"),
+    ("metadata:\n  version: 1.4.0\n", "1.4.0"),
+    ("version: 2.0.0\nmetadata:\n  version: 1.4.0\n", "2.0.0"),
+    ("metadata: 1.4.0\n", role.NO_VERSION),
+    ("metadata:\n  - version: 1.4.0\n", role.NO_VERSION),
+    ("metadata:\n  author: x\n", role.NO_VERSION),
+    ("description: x\n", role.NO_VERSION),
+))
+def test_a_skill_s_version_is_its_own_else_its_metadata_s(tmp_path, front, expected):
+    text = f"---\nname: a\n{front}---\nA\n"
+    command = f"---\n{front}---\nC\n"
+    tree = _tree(tmp_path, VERSION, DEFAULT, skills={"a": text})
+    (tree / role.COMMANDS_REL).mkdir(parents=True)
+    (tree / role.COMMANDS_REL / "c.md").write_text(command, encoding="utf-8")
+    described = {skill["name"]: skill for skill in role.read_role(tree, "engineer")["skills"]}
+    assert (described["a"]["version"], described["c"]["version"]) == (expected, expected)
+    assert described["a"]["sha256"] == role.sha256(text.encode())
+
+
+def test_a_named_skill_versioned_under_metadata_loads(tmp_path):
+    text = "---\nname: a\nmetadata:\n  version: 1.4.0\n---\nA\n"
+    loaded = role.read_role(_tree(tmp_path, VERSION, DEFAULT, "- **Skills:** a", skills={"a": text}), "engineer")
+    assert [(s["name"], s["version"], s["named"]) for s in loaded["skills"]] == [("a", "1.4.0", True)]
+    assert loaded["appended"].endswith(text.encode())
+
+
+@pytest.mark.parametrize("front", ("", "metadata: 1.4.0\n", "metadata:\n  author: x\n"))
+def test_a_named_skill_with_no_version_in_either_place_refuses(tmp_path, front):
+    tree = _tree(tmp_path, VERSION, DEFAULT, "- **Skills:** a", skills={"a": f"---\nname: a\n{front}---\n"})
+    with pytest.raises(GovError, match="carries no version"):
+        role.read_role(tree, "engineer")
+
+
 def test_the_folder_hash_follows_a_file_beside_skill_md(tmp_path):
     tree = _tree(tmp_path, VERSION, DEFAULT, skills={"a": "---\nname: a\n---\n"})
     before = role.read_role(tree, "engineer")["skills"][0]["folder_sha256"]
