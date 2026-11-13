@@ -10,7 +10,8 @@
 #    (one look a minute), and gives up at the latest start: 07:30 less one and a half times the measured estimate
 #    (nightly_estimate.py; 06:01 today). Giving up writes a night's run.txt whose first line says NOT STARTED and why,
 #    so the 08:00 check calls the night FAILED and pings P1, as it does for any night that did not run; the wrapper
-#    does not ping on its own. Once quiet it writes dispatch/OFF (the CTO's own off switch: no lead starts, no landing,
+#    does not ping on its own. [DEC-1159 (1): leads are left out of the wait (--beside-leads) and no OFF is written;
+#    what follows describes the rule before it.] Once quiet it wrote dispatch/OFF (the CTO's own off switch: no lead starts, no landing,
 #    for the length of the run) and removes it only if the file is still its own; a second look follows the switch.
 # 2. Sized to memory. The run is started inside `systemd-run --user --scope` with MemoryMax = the memory available now
 #    less the 3 GiB floor, at most 12 GiB (D-10 run 2: the run raised memory in use by 8.1 GB at 16 workers), never
@@ -114,21 +115,14 @@ trap cleanup EXIT
 # 1. wait for nothing else running
 quiet=0; last=""; waited0=$(date +%s)
 while :; do
-  if out=$(python3 -I "$HERE/quiet_check.py"); then quiet=$((quiet + 1)); else quiet=0; last=$(echo "$out" | head -3 | tr '\n' ';'); fi
-  if [ "$quiet" -ge "$QUIET_N" ]; then
-    # the dispatcher's own off switch, then a second look (a lead may have started in the last minute)
-    if (set -C; echo "$OFFTOK" > "$OFF") 2>/dev/null; then
-      HAVE_OFF=1
-      if python3 -I "$HERE/quiet_check.py" --no-load --own-off > /dev/null; then break; fi
-      last="something started after the quiet minutes"; rm -f "$OFF"; HAVE_OFF=0; quiet=0
-    else
-      last="dispatch/OFF is there (not this wrapper's)"; quiet=0
-    fi
-  fi
+  # DEC-1159 (1) (the owner, 2026-11-13): the nightly runs beside the leads, in its own capped unit: leads are not waited
+  # for (quiet_check.py --beside-leads) and no dispatch/OFF is written, so leads and landings carry on during the run
+  if out=$(python3 -I "$HERE/quiet_check.py" --beside-leads); then quiet=$((quiet + 1)); else quiet=0; last=$(echo "$out" | head -3 | tr '\n' ';'); fi
+  [ "$quiet" -ge "$QUIET_N" ] && break
   [ "$(date +%s)" -ge "$LATEST" ] && refuse "something else was running until the latest start $(date -d "@$LATEST" +%H:%M): ${last:-unknown}"
   sleep "$POLL_S"
 done
-say "quiet for $QUIET_N looks; waited $(( $(date +%s) - waited0 )) s; dispatch/OFF written"
+say "nothing but leads running for $QUIET_N looks (--beside-leads, DEC-1159 (1)); waited $(( $(date +%s) - waited0 )) s; no dispatch/OFF"
 
 # 2. size to memory
 AV=$(avail_kb)
