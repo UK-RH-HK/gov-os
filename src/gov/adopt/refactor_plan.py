@@ -51,11 +51,22 @@ def _digest(assessment: dict, out: Path) -> str:
     return sha256(text.encode("utf-8"))
 
 
+def _own_folder(rel: str, flagged: set[str], tracked: list[str]) -> bool:
+    """Whether ``rel`` lies in a folder that holds nothing but flagged files: the folder is that code's own."""
+    folder = rel.rpartition("/")[0]
+    if not folder:
+        return False
+    return all(path in flagged for path in tracked if path.startswith(folder + "/"))
+
+
 def _blockers(assessment: dict, path_map: dict | None, out: Path) -> dict[str, dict]:
     """Kind -> ``{paths, why}``, only the kinds that have a blocker."""
     spaces, found = _namespaces(path_map), {}
     for kind, key in (("vendored-no-folder", "vendored"), ("generated-no-folder", "generated")):
-        held = [item["path"] for item in assessment.get(key, []) if item.get("by") != "folder"]  # a folder is its own
+        flagged = {item["path"] for item in assessment.get(key, [])}
+        tracked = _tracked(assessment)
+        held = [item["path"] for item in assessment.get(key, [])
+                if item.get("by") != "folder" and not _own_folder(item["path"], flagged, tracked)]
         if held:
             found[kind] = {"paths": sorted(held), "why": f"{key} code with no folder of its own"}
     faulty = {name: space.get("embedding_policy") for name, space in spaces.items()

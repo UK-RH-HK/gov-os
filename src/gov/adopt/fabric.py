@@ -36,7 +36,7 @@ RETRIEVE_BUDGET_MS = 2000  # proposed (W2-88-evidence.md, seams, item 1): the co
 PLAIN_QUESTION = "where is the project's configuration defined"
 DIGEST_KEYS = ("record", "lexical", "vectors", "codegraph_bytes")
 JUDGING = ("lexical", "vectors", "codegraph")  # the stores whose lists cover the tracked files (the record store reports)
-REASONS = ("secrets", "binary", "not-embedded", "unsupported-language", "over-limit", "not-indexed")
+REASONS = ("secrets", "binary", "not-embedded", "unsupported-language", "over-limit")
 DECISION = re.compile(r"DEC-[0-9]+(?::[a-z_]+)?")
 SETTINGS = ("reranker", "reranker_service", "pool", "bundle_tokens", "widen")
 
@@ -244,10 +244,10 @@ def _stores(run, result: dict) -> dict:
         elif state == 1:
             lexical_i.append(rel)
         elif state == 2:
-            lexical_r.append({"path": rel, "reason": "not-indexed"})
+            lexical_r.append({"path": rel, "reason": "not-embedded"})
         elif _memory_class(run.config, namespaces[rel]) != "governance":
             # ``gov.secrets.indexable`` lets through only a namespace whose memory_class is governance
-            lexical_r.append({"path": rel, "reason": "not-indexed"})
+            lexical_r.append({"path": rel, "reason": "not-embedded"})
         else:
             try:
                 binary = b"\0" in project.blob(run.root, run.tracked[rel])[:8000]
@@ -266,7 +266,7 @@ def _stores(run, result: dict) -> dict:
         elif Path(rel).suffix.lower() in assess.OTHER_CODE_SUFFIXES:
             code_r.append({"path": rel, "reason": "unsupported-language"})
         else:
-            code_r.append({"path": rel, "reason": "secrets" if verdicts.get(rel) == 0 else "not-indexed"})
+            code_r.append({"path": rel, "reason": "secrets" if verdicts.get(rel) == 0 else "not-embedded"})
     nodes = edges = 0
     if called_for and (code_i or code_r):
         try:
@@ -274,11 +274,9 @@ def _stores(run, result: dict) -> dict:
             nodes, edges = len(graph), sum(len(each) for each in users.values())
         except Exception:  # noqa: BLE001 - the tool is not here: nodes and edges are asked of it, never invented
             nodes = edges = 0
-    markdown = [rel for rel in paths if rel.endswith(".md")]
-    held = sorted(records & set(markdown))
+    held = sorted(records & set(paths))  # the record store judges the files that carry records (a plain file is none)
     return {
-        "record": {**base, "judged": len(markdown), "indexed": held, "nodes": n_records, "edges": n_edges,
-                   "refused": [{"path": rel, "reason": "not-indexed"} for rel in markdown if rel not in records],
+        "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],
                    "seconds": timing.get("record_s", 0.0)},
         "lexical": {**base, "judged": len(paths), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
                     "seconds": timing.get("lexical_s", 0.0)},

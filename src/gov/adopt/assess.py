@@ -191,11 +191,11 @@ class _Scan:
 
 def _name_flags(rel: str) -> dict:
     parts = PurePosixPath(rel).parts
-    folders = set(parts[:-1])
+    folders = {part.lower() for part in parts[:-1]}
     flags = {}
-    if folders & set(VENDORED_FOLDERS):
+    if folders & {name.lower() for name in VENDORED_FOLDERS} or any(f.startswith("vendor") for f in folders):
         flags["vendored"] = "folder"
-    if folders & set(GENERATED_FOLDERS):
+    if folders & {name.lower() for name in GENERATED_FOLDERS} or any(f.startswith(("generated", "autogen")) for f in folders):
         flags["generated"] = "folder"
     elif GENERATED_NAMES.search(rel):
         flags["generated"] = "name"
