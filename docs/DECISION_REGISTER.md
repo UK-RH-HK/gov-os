@@ -14955,6 +14955,18 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (5) **Message 5:** the owner's operator removes `permissions.additionalDirectories` (ACT-LEADS-ADD-DIR-1 §5 step 3), the process check clean.
 - **Basis:** the owner's message of 2026-11-13 (~13:50), its yes lines verbatim; `log/act-approvals.jsonl`.
 
+### DEC-1167 — The afternoon of 2026-11-13: W2-88 RV2-1 (a); W2-60a P-5 (B) and W2-184; the 18-November cuts; W2-182 E (1) and W2-185; 7cc654e49 accepted; W2-111 (a)+(c); SANDBOX-1 (b)
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~14:45; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1010, DEC-946 (7), DEC-974, DEC-1126 (3), DEC-1120, DEC-1163 (3), (6), (9), DEC-1104, DEC-1128 (4), DEC-158, DEC-1064 (2), DEC-836 (2), DEC-105 · DEC-1164 still held (the owner reading)
+- **Decision:**
+  - (1) **P1-W2-88-RV2-1 (a):** A9's undo is fixed in W2-88 (`fabric.py` only): it unstages and deletes only what it wrote, and refuses without resetting if HEAD moved; RV2-2 with it; a narrow independent check, no third review round; then the land.
+  - (2) **P1-W2-60a-P5 (B):** W2-60a lands its reviewed scope (the merge, S12, P-3; its S3, S4, S8 and S10 back to their DEC-839 forms; S11 and F4 out); RUBRIC-2's lines move to a follow-up, **W2-184 (`DAEO-6f0s`), filed**; DEC-1126 (3)'s "apply now" becomes "after the copy starts"; W2-184 is no W2-27 gate (the copy's launches use each role's `Launch default` line).
+  - (3) **The 18-November cuts (DEC-946 (7)):** W2-60b, W2-156, W2-93, W2-94 and W2-174 are off W2-27's start: W2-94, W2-174 and W2-93 move to W2-28's deps, W2-156 to W2-29's, W2-60b to after the copy starts. **Correction:** W2-93's and W2-94's walled writers delivered on 11-12 (60 and 20 questions; EXAMIN's visible half released and confirmed, DEC-1152): the CTO brings what each still lacks and closes both in parallel.
+  - (4) **P-W2-182-E-1 (1):** E's template line (f0cb5284d) is reverted, B, C, R, D and F land on a narrow check of the revert; E goes to one gap ticket, **W2-185 (`DAEO-qyt2`), filed**: the line, W1-38's fixture with seven hooks, portability's lift exemption per hook.
+  - (5) **"accept 7cc654e49":** ACT-DISPATCH-NIGHTLY-SLOT-1's commit stands as is (`Role: orchestrator`); the CTO brings soon the landing check's route for the CTO's (b) ACTs (`Role: orchestrator` with `Act:` and the approvals log entry), so they stop needing the owner's operator.
+  - (6) **P-W2-111-MEASURE-1 round 2 (a)+(c):** W2-111 lands form B as decided; the ticket speeding up the guard's designer-read path is filed after EXAMIN's copy starts.
+  - (7) **SANDBOX-1 (b):** the sandbox stays (DEC-1128 (4)); B1 (briefs, facts and the pytest line name the session's `$TMPDIR`; workers' search through their lead, R4), B2 (DEC-1163 (9)'s cache ACT **withdrawn**, and the one-line fix so the reranker's log names the true cause, the socket's EPERM), B3 (probe R1, a loopback route) now; B4 only on B3's evidence (then a ticket and an amendment of DEC-158 for the owner); B5 (W3-P29's premise re-stated, the stale `.git/config.lock` sweep). The correction of CLAUDE.md's guard sentence comes by its route.
+- **Basis:** the owner's message of 2026-11-13 (~14:45).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15055,3 +15067,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.544 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1163 (the morning of 11-13: the "until W2-56" line deleted; Node 22 nightly; W2-111 (a); go W2-33; three ACT yeses; the nightly's D, E, route; W2-37 F1 (a), P-1; W2-98 CIT-P; two ACTs; two corrections). Next free id: DEC-1164. |
 | 0.545 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1165 (gov context's ceiling: the close's packet at a project setting and the supplementary cap; W2-183 filed). DEC-1164 held (PROPOSED, the owner reading). Next free id: DEC-1166. |
 | 0.546 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1166 (three ACT yeses; W2-37's CIT-P at 1.1.0; message 5). Next free id: DEC-1167. |
+| 0.547 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1167 (W2-88 RV2-1 (a); W2-60a P-5 (B), W2-184; the cuts; W2-182 E (1), W2-185; 7cc654e49 accepted; W2-111 (a)+(c); SANDBOX-1 (b)). Next free id: DEC-1168. |
