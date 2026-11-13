@@ -3,7 +3,7 @@ type: probe
 task: DAEO-f58b
 decisions: [DEC-1157, DEC-1052, DEC-966, DEC-983, DEC-982, DEC-801, DEC-808, DEC-1010]
 reviewer_session: cf8cd743-3f8d-4164-ab28-ec09fbbe1000 (the session folder in this session's tool-output path)
-implementer_session: 48f136f9-ab88-4fe1-a3a9-16e5b906ffb3 (engineer, eng-2: S2 committed); c88a0d4c-7359-436c-ba83-1a5591864573 (engineer, eng-1: R2-F3, 09247e423)
+implementer_session: "48f136f9-ab88-4fe1-a3a9-16e5b906ffb3 (engineer, eng-2: S2 committed); c88a0d4c-7359-436c-ba83-1a5591864573 (engineer, eng-1: R2-F3, 09247e423)"
 reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 probed_commit: d4f05d6577a15e97e15eeed10404332c81f0cc1b
