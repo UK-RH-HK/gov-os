@@ -28,6 +28,7 @@ allowed_paths:
 - tests/acceptance/W2-128/test_w2_128_rows.py  # row 8: the 'until W2-56' line deleted (DEC-1163 (1)), widened by the CTO (DEC-1157 (12))
 - tests/acceptance/W2-128/README.md
 - docs/probes/DAEO-5y8d/**  # the probe record
+- tests/acceptance/W2-182/**  # the revision's own folder: its README maps the revised case ids so gov accept W2-182 runs them (DEC-892; the W2-90 form); CTO, DEC-1157 (12)
 - template/.rulesync/hooks.jsonc  # E (a): the template's hooks source gains context_watch.py (a product-spec worker's line, not a test designer's)
 reads:
 - .gov-runtime/scratch/orchestrator/drafts/nightly-20261113-analysis.md

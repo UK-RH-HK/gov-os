@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: engineer
 profile: STANDARD
-status: open
+status: in_progress
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-13
@@ -40,7 +40,7 @@ non_goals:
 - 'no change to gov check''s context-reproducibility (it stays green while some tickets refuse over the ceiling, DEC-1025) and none to the brief builder''s prose budgets (facts.yaml `budgets:`)'
 - 'no change to the default ceiling of 6,000 for gov context and briefs'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1165, DEC-1027, DEC-860]
+sources: [DEC-1165, DEC-1027, DEC-860, CAP-15.d]
 acceptance_tests: {path: tests/acceptance/W2-183/}
 ---
 
