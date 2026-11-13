@@ -6,11 +6,17 @@ in the repository: no file, no index entry, no ref. A secret is named by its rul
 the value of a finding is read from the scanner's report into a local that is not kept, and no text of a file leaves
 this module.
 
-The no-route rule (stated once, here; W2-88 S1): a file has no route when (1) it is over the chunker's limit (more than
-``FILE_LIMIT_BYTES`` or a line over ``LINE_LIMIT``: ``no_route: over-limit``), or (2) its suffix is in
-``OTHER_CODE_SUFFIXES``, a code language the code graph does not read (``CODE_GRAPH_SUFFIXES`` are the ones it reads):
-``no_route: unsupported-language``. A binary has no route of its own (it is listed in ``binary``). A file of any other
-suffix (a document, data, a file with no suffix) is no code and has a route through the keyword and meaning indexes.
+The no-route rule (stated once, here; W2-88 S1): a file has no route when (1) it is over the chunker's limit (a tracked
+file, not a link, of more than ``FILE_LIMIT_BYTES``, text or binary; or a text file with a line over ``LINE_LIMIT``:
+``no_route: over-limit``), or (2) its suffix is in ``OTHER_CODE_SUFFIXES``, a code language the code graph does not read
+(``CODE_GRAPH_SUFFIXES`` are the ones it reads): ``no_route: unsupported-language``. A binary over the limit is listed
+in ``binary`` and in ``no_route`` (the keyword index chunks a binary's bytes as text, so the stores take what its size
+makes: L-1a); a binary at or under the limit has no route of its own and is listed in ``binary`` only. A file of any
+other suffix (a document, data, a file with no suffix) is no code and has a route through the keyword and meaning indexes.
+
+The estimate of the index time counts what the stores take: ``estimate.chunks`` is the sum over the tracked files (not
+links) of ``ceil(size / CHUNK_STEP)``, binaries included, and ``index_seconds`` is those chunks at ``EMBED_S_PER_CHUNK``
+plus the code files at ``GRAPH_S_PER_FILE`` (L-1b).
 
 The secrets scan is judged on what ran: with no ``gitleaks`` on ``PATH``, or blobs over ``SCAN_LIMIT_BYTES``, the
 assessment says so (``secrets_scanned``, ``secrets_unscanned``, ``secrets_unscanned_reason``) and the plan never calls
@@ -30,6 +36,7 @@ import time
 from pathlib import Path, PurePosixPath
 
 from gov.cli.errors import GovError
+from gov.retrieval import chunking
 from gov.util.digest import sha256
 from gov.util.gitenv import git_env
 
@@ -41,7 +48,11 @@ LARGEST = 10
 # DEC-078 (the register): the envelope tested, and the measured costs the estimate scales by.
 ENVELOPE = {"nodes": 80_000, "edges": 270_000, "peak_rss_bytes": 2_200_000_000}
 GRAPH_S_PER_FILE = 0.061       # 61.4 s for 1,005 files (the code graph)
-EMBED_S_PER_FILE = 1.07        # the ticket: 2,521 files took 7 to 45 min here, the slow end per file
+# Seconds per chunk the meaning index takes with the real embedder. A lower bound: W2-81's legacy-documents repository
+# (94,222 chunks) had not finished after 3,720 s (the lead's proof run, 2026-11-13); consistent with the ticket's 2,521
+# files in 7 to 45 min.
+EMBED_S_PER_CHUNK = 0.04
+CHUNK_STEP = chunking.MAX_CHARS - chunking.OVERLAP_CHARS  # 1,080 characters a chunk
 NODES_PER_FILE = 77.0          # 77,346 nodes / 1,005 files
 EDGES_PER_FILE = 269.0         # 270,647 edges / 1,005 files
 RSS_PER_EDGE = 8_130           # 2.2 GB / 270,647 edges
@@ -278,7 +289,7 @@ def assess(root: Path, out: Path) -> dict:
     files, total, languages, largest, tracked = 0, 0, {}, [], []
     lists = {"binary": [], "generated": [], "minified": [], "vendored": []}
     secrets, no_route, unscanned = [], [], []
-    code_files = embeddable = 0
+    code_files = chunks = 0
     blobs, scan = _Blobs(root), _Scan(rules or ())
     try:
         for entry in listing:
@@ -298,6 +309,7 @@ def assess(root: Path, out: Path) -> dict:
                 for kind, how in flags.items():
                     lists[kind].append({"path": rel, "by": how})
                 continue
+            chunks += -(-size // CHUNK_STEP)  # the keyword index chunks every tracked file's bytes, a binary's too
             data, _size = blobs.read(sha, SCAN_LIMIT_BYTES)
             binary = b"\0" in data[:8000]
             longest = 0 if binary else max((len(row) for row in data.split(b"\n")), default=0)
@@ -312,14 +324,12 @@ def assess(root: Path, out: Path) -> dict:
                         scan.add(rel, data)
             for kind, how in flags.items():
                 lists[kind].append({"path": rel, "by": how})
-            if not binary and (size > FILE_LIMIT_BYTES or longest > LINE_LIMIT):
+            if size > FILE_LIMIT_BYTES or longest > LINE_LIMIT:  # a binary's ``longest`` is 0: only its size counts
                 no_route.append({"path": rel, "reason": "over-limit"})
             if suffix in OTHER_CODE_SUFFIXES and not binary:
                 no_route.append({"path": rel, "reason": "unsupported-language"})
             if suffix in CODE_GRAPH_SUFFIXES and not binary:
                 code_files += 1
-            if not binary:
-                embeddable += 1
         if rules is not None:
             scan.flush()
         secrets = [{"path": rel, "rule": rule} for rel, rule in scan.found]
@@ -346,7 +356,7 @@ def assess(root: Path, out: Path) -> dict:
         "limits": {"file_limit_bytes": FILE_LIMIT_BYTES, "line_limit_chars": LINE_LIMIT,
                    "code_graph_suffixes": sorted(CODE_GRAPH_SUFFIXES)},
         "estimate": {
-            "index_seconds": round(embeddable * EMBED_S_PER_FILE + code_files * GRAPH_S_PER_FILE),
+            "chunks": chunks, "index_seconds": round(chunks * EMBED_S_PER_CHUNK + code_files * GRAPH_S_PER_FILE),
             "peak_rss_bytes": rss, "disk_bytes": disk, "estimated_nodes": nodes, "estimated_edges": edges,
             "envelope": {**ENVELOPE, "source": "DEC-078", "within": nodes <= ENVELOPE["nodes"]
                          and edges <= ENVELOPE["edges"] and rss <= ENVELOPE["peak_rss_bytes"]},
