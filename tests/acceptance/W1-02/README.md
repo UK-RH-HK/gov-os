@@ -2688,3 +2688,56 @@ Left open on purpose; the tests take no side:
 - Bash forms outside the plain list (KD-5), and a record of each ordinary refusal (no KPI asks for one).
 
 - **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_02_support.hook_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+## W2-111: the hook-latency case(s) time the hook's own work (DAEO-qvff; `Rewrite-Reason: DEC-979`)
+
+`Rewrite-Reason: DEC-979` (the owner's D2 (a) on CAPACITY-1, P-LATENCY-1; DEC-906, DEC-968). Revised by a fresh
+independent test designer; the case ids, parameters and the bound are the same, nothing is skipped, marked or removed.
+
+**What it measures.** `test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms` (5 parameters: `no-role-deny`, `engineer-allow-from-ticket-frontmatter`, `engineer-deny-outside-the-ticket`, `test-designer-allow`, `frozen-deny`): the CPU time of the guard's hook process and its children over one write decision (`HookResult.cpu_seconds`, filled by `run_hook_raw`: the `RUSAGE_CHILDREN` difference around the one `subprocess.run`), p95 under 100 ms. The case fails, and does not fall back to wall time, if no CPU time was measured.
+
+**Why wall time under load is not the measure.** A wall clock under load times the scheduler's queue, not the hook. On 2026-10-31 the 11 cases (then) were traced in
+three rounds, with W2-106 and without it: red 8, 0, 1 of 11 with it and 0, 0, 5 without, at loads of 15 to 30, with
+run times of 34 to 152 s, whatever the change; they pass alone on a quiet machine. The sample is therefore the CPU time
+(user and system) the hook's process and every process it waited for spent on the call, read from
+`resource.getrusage(resource.RUSAGE_CHILDREN)` before and after one synchronous call: the hook, its forked decision
+process and the git it runs are all counted; the time a process waits to be scheduled is not. The bound is unchanged
+(100 ms at p95, by nearest rank over 40 samples after 3 warm-up calls). The wall p95 is printed beside the CPU p95 in
+the failure message, for information only; it decides nothing.
+
+*The rounds.* The "repeat up to three rounds, passing on the best" rule stays. It lowers nothing: it was there before,
+the bound is the same, and a hook that does 150 ms of its own work misses it in every round (the planted run: 3 of 3
+rounds over the bound in all 15 cases). CPU time is not free of noise (cache and frequency effects under load), so a
+round that a burst of contention inflates may still be repeated.
+
+*What this form does not see.* A hook that is slow only by waiting (a sleep, a lock, a network wait) spends no CPU and
+passes here; the case judges the work the hook does. A wait the hook causes is a product ticket's (the ticket's "Not
+here"), and the other candidate measure (wall time against a quiet reference measured beside it) was not chosen
+(DEC-1052; the lead's choice).
+
+
+**Measured figures.**
+
+Measured 2026-11-12 to 2026-11-13, inside the launched sandbox, each run through the heavy slot (so on the slot's
+share of the CPUs; `taskset`), one round each (the first round passed in every case). The three real-hook runs of the 15
+cases: run A at 23:47 (`/proc/loadavg` 3.85 before, 4.05 after), run B at 00:00 (12.67 before, 10.64 after), run C at
+00:04 (9.85 before, 12.43 after); an earlier run at 23:43 (9.16, 4.93) also passed 15 of 15. Cells are CPU p95 / wall
+p95 in ms. Every real-hook case is under 100 ms in every run (the highest CPU p95 of the 15: 80 ms, W1-05
+`Read-engineer`, run C, load about 12). The planted run (below) ran at 23:48 to 23:59 (load 3.96 before, 15.41 after).
+The quiet-machine run and the load-50 run are not made here: the CTO runs them (the ticket's KPI line 2), and the
+figures of this section are not a claim about them.
+
+| case (parameter) | run A: CPU / wall p95 ms | run B | run C | planted 150 ms hook: CPU p95 ms | verdict |
+|---|---|---|---|---|---|
+| `engineer-allow-from-ticket-frontmatter` | 52 / 50 | 63 / 62 | 72 / 70 | 196 to 201 (3 rounds) | fails |
+| `engineer-deny-outside-the-ticket` | 47 / 45 | 43 / 43 | 63 / 61 | 213 to 242 (3 rounds) | fails |
+| `frozen-deny` | 44 / 43 | 39 / 39 | 57 / 56 | 201 to 217 (3 rounds) | fails |
+| `no-role-deny` | 64 / 62 | 45 / 44 | 66 / 63 | 202 to 205 (3 rounds) | fails |
+| `test-designer-allow` | 48 / 46 | 45 / 45 | 63 / 61 | 203 to 204 (3 rounds) | fails |
+
+**The planted hook.** A scratch harness (a pytest plugin outside the repository, passed with `-p`; nothing in a
+committed test carries a switch) ran the installed PreToolUse hook behind a launcher that busy-loops until its own
+`time.process_time()` reaches 0.150 s and then `exec`s the real hook, so the decision is the real one and only the
+latency changes. Every one of the 15 cases FAILED, each on the CPU-p95 assertion (`AssertionError: p95 CPU time ...`,
+all three rounds over the bound, CPU p95 196 to 262 ms; none on a decision assertion or a setup error). Log:
+`.gov-runtime/scratch/td/real-planted1.log` (figures `real-planted1.figs`).
