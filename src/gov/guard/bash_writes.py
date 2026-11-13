@@ -1119,8 +1119,8 @@ def _kind(words):
         opts = [a for a in args if a.startswith("-")]
         if any("c" in o.lstrip("-") for o in opts if not o.startswith("--")):
             return "data"
-        if "-s" in opts:
-            return "shell"
+        if "-s" in opts or len(opts) == len(args):
+            return "shell"  # the reading before the fix, kept as its floor (fail closed)
         script = _shell_script(args)
         # No script, a script that is standard input, or an option the guard does not know: the shell reads the
         # body as commands (review round 1, F1: an option's value is no script name).

@@ -300,3 +300,10 @@ def test_f1_no_form_that_gave_a_target_gives_none_now(root):
     """Fail closed: each reader that the earlier _kind read as shell is read as shell still."""
     for reader in ["bash", "sh", "bash -s", "bash -e", "bash -x -s a", "dash", "zsh", "ksh -s"]:
         assert bash_writes._kind(reader.split()) == "shell", reader
+
+
+@pytest.mark.parametrize("reader", ["bash -- -euo", "zsh -- -u -o -O", "bash - -x", "bash --norc -- -es"])
+def test_f1_a_reader_the_earlier_kind_read_as_shell_stays_shell(reader):
+    """Fail closed: where every word is an option-like word, the body was read as commands before the fix; so it is
+    still, though bash takes a word after -- for the script's name."""
+    assert bash_writes._kind(reader.split()) == "shell"

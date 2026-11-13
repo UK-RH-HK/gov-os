@@ -182,3 +182,18 @@ at `aac18cca`: 12582 passed, 10 failed, 7 skipped.
   - W2-50 secrets-scan scale: a gitleaks suite (DEC-1045);
   - W2-54 `green_here`: no store in this worktree;
   - containment `test_committed_rename_names_old_path`.
+
+**Review round 1, F1 (the fix round).** Before the fix, a shell given an option with a value took that value for a
+script's name. Spellings: `bash -euo pipefail <<'EOF'`, `-eu -o pipefail`, `sh -o errexit`, `-O extglob`,
+`+o posix`, `--rcfile f`, and the same through `cat <<EOF | bash -o pipefail`. So the parser read the heredoc body as
+data, and the read judge dropped it.
+- **The fix:** `_kind` (`src/gov/guard/bash_writes.py`) now finds the script word with `_shell_script`. `-o`, `+o`,
+  `-O` and `+O` take a value, once for each such letter in a cluster. `--rcfile` and `--init-file` take one too. A `-s`
+  in a cluster, or an option it does not know, means the shell reads standard input. As F4's ride-along,
+  `/dev/stdin`, `/dev/fd/0` and `/proc/self/fd/0` count as standard input.
+- **Fail closed:** the reading before the fix is kept as a floor. `_script_words` counts option values the same way.
+- **Unit cases:** `test_f1_*` in `test_w2_42a_parser.py` and `test_w2_42a_reads.py`. The base code fails 32 of them.
+- **Fail-closed comparison:** across 161,760 generated shell readers, the new `_kind` gives data for none that the
+  base read otherwise. Across 8,748 heredoc commands, the new parser gives a target or the sentinel for every one
+  where the base gave a target.
+- **Counts:** the acceptance folder went from 24 failed, 467 passed, 2 xfailed to **491 passed, 2 xfailed**. tests/unit/guard: **569 passed**.
