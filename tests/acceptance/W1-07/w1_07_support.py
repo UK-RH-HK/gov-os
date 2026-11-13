@@ -49,10 +49,6 @@ RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "conte
 # three are ``gov`` commands. ``lock`` is no ``gov`` command: it is the module command ``python3 -m gov.lock``, the
 # template's Copier task (DEC-499), and recording it adds none. Cases: ``test_w1_07_recorded_commands.py``.
 # DEC-970 (W2-96, P-W2-96-CMDLIST (a)): ``accept`` joins the recorded ``gov`` commands.
-<<<<<<< HEAD
-# DEC-747 (W2-104): ``skilleval`` joins them too.
-RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry", "accept", "skilleval")
-=======
 RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry", "accept")
 
 # Revised after implementation began (DEC-491; ported for DEC-1097 (8) from W2-20's 10-17 commit 173e8e97a):
@@ -65,7 +61,9 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("resources",)
 # DEC-1088 (3)), ``links`` (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088). The set stays
 # exact (W1-32's suite).
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
->>>>>>> w2/integrate
+
+# DEC-747 (W2-104): ``skilleval`` joins them too.
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)
 RECORDED_MODULE_COMMANDS = ("lock",)
 
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).

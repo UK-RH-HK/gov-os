@@ -80,12 +80,6 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     so the recorded ``gov`` commands are four, not the three of the case's name, which W1-32's README map names
     and so stays as it is.
 
-<<<<<<< HEAD
-    Revised for DEC-747 (W2-104): ``skilleval`` is recorded, so the recorded ``gov`` commands are five.
-    """
-    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "skilleval", "telemetry"}, \
-        RECORDED
-=======
     Revised for W2-20 (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20's KPI adds ``resources`` to the
     recorded ``gov`` commands; the set is still exact, and ``release`` is still excused until recorded (DEC-753).
 
@@ -105,10 +99,11 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     kept: any other command ``gov`` offers that no list records still fails the case, a recorded command (the four
     included) gone from ``gov --help`` still fails it, the module command is still none of ``gov``'s, and ``release``
     alone is still excused until recorded (DEC-753).
+
+    Revised for DEC-747 (W2-104): ``skilleval`` is recorded, so the recorded ``gov`` commands are nine.
     """
     assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) - set(RECORDED_HERE) == {
-        "accept", "brief", "ci", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
->>>>>>> w2/integrate
+        "accept", "brief", "ci", "launch", "links", "plan", "resources", "skilleval", "telemetry"}, RECORDED
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     recorded = set(RECORDED) | set(RECORDED_HERE)
     run = support.gov(empty_project, sandbox, "--help")
