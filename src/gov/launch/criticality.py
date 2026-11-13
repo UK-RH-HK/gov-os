@@ -10,6 +10,7 @@ call; one that is missing, cannot be read or is not of the stated form refuses t
 from __future__ import annotations
 
 import fnmatch
+import os
 import re
 from pathlib import Path
 
@@ -32,7 +33,6 @@ def _refuse(reason: str) -> GovError:
 
 def exists(root: Path) -> bool:
     """True when the file is there (a link counts), whether or not it is well formed."""
-    import os
     return os.path.lexists(root / REL)
 
 
