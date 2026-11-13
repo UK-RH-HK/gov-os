@@ -16,7 +16,7 @@ def test_a_hyphenated_name_finds_its_underscore_folder():
 def test_the_command_is_declared_by_its_module():
     command = cli._load(cli._known()["session-watch"], reserved=False)
     assert command.fault is None and command.child_exit_code and command.cls == "act"
-    assert command.act_paths == (".gov-runtime/session-watch/**",)
+    assert command.act_paths == (".gov-runtime/session-watch/**", ".gov-runtime/dispatch/inbox/**")
 
 
 def test_session_watch_is_recorded_and_its_module_is_looked_up_in_the_underscore_folder(tmp_path):

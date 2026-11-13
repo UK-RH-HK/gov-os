@@ -1,6 +1,6 @@
 ---
 id: DAEO-fd0p
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-wnnz, DAEO-t8mp, DAEO-6lid]
 created: 2026-11-11T01:20:19Z
@@ -24,6 +24,8 @@ allowed_paths:
 - docs/changes/W2-160-evidence.md
 - src/gov/session_watch/command.py  # the helper-watch action and its entry in the act and path list, about 20 lines (DEC-1153 (2))
 - docs/probes/DAEO-fd0p/**  # the probe record (PKG-W2-160-IFACE-1, the CTO)
+- tests/unit/session_watch/test_route.py  # the ACT_PATHS assertion only: the two-path tuple (ROUTE-1 (a), DEC-1156 (1))
+- tests/acceptance/W2-159/test_f4_scope.py  # one test-designer revision: judged only on w2/W2-159 (DEC-1156 (6), as P1-N)
 reads:
 - src/gov/launch/**
 - governance/project/orchestration/packages/EMERGENCY-TOOLS-1.md
@@ -165,3 +167,9 @@ Interface takes I1 and I2 as written."
 - S2 says "as `gov launch` writes it", but `gov launch` in this tree writes no `<base>.pid`. The `<base>.pid`,
   `<base>.exit` and `<base>.json` names are `launch_worker.sh`'s. The tests plant the files, so S2 can still be
   tested; the ticket's wording is wrong and should be noted.
+
+## Run 3 (DEC-1156 (1), (6), 2026-11-12)
+
+- **ROUTE-1 (a):** `tests/unit/session_watch/test_route.py:19` asserts the two-path tuple `(".gov-runtime/session-watch/**", ".gov-runtime/dispatch/inbox/**")` (DEC-1153 (2)); that assertion only, by an engineer.
+- **W2-159's F4** (`tests/acceptance/W2-159/test_f4_scope.py`): a test designer's revision with its Rewrite-Reason: judged only when HEAD is `refs/heads/w2/W2-159`, skipped elsewhere with its reason (the branch found, or "detached HEAD"), the form W2-180 gave W2-170's F5 and P1-N gave W2-171's F5; on a planted `w2/W2-159` branch with a change outside W2-159's paths it still fails.
+- Then a narrow independent check of both changes (DEC-1154), its record as the probe record (the older one to `-round-1.md`), and the land.
