@@ -1,6 +1,6 @@
 ---
 id: DAEO-a3u2
-status: in_progress
+status: closed
 deps: [DAEO-jsg1]
 links: []
 created: 2026-10-30T22:14:08Z
