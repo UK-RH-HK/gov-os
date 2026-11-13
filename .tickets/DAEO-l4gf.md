@@ -1,6 +1,6 @@
 ---
 id: DAEO-l4gf
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-zqvn, DAEO-o5x1]
 created: 2026-11-10T12:05:36Z

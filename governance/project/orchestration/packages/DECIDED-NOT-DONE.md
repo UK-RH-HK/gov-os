@@ -331,3 +331,4 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 
 ## 3. Count
 Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue entries in §2, plus ADR-0002 due now and the untriggered label-audit cadence with rubric v3). Waiting on a trigger: 36 (owner's word 6, before the lift 9, at or after the lift or D-10 15, dated 2, other 4). Superseded: 7.
+| 108 | W2-141's guard rule (an engineer's search that can reach its own acceptance folder is refused unless it excludes it) is built and closed (DEC-1162 (1)) but not live: the live `.claude/hooks/pretooluse.py` lacks "Glob" in G-14's tool list (line 1075) and the two staged hook files differ from it | NOT STARTED: the switch-on is the guard's operator ACT once set-up A's evidence shows 100 % (DEC-1128 (2)); the staged files brought level with the live hook first | the owner, DEC-1162 (1), 2026-11-13 |

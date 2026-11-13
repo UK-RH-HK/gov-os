@@ -1,6 +1,6 @@
 ---
 id: DAEO-qskx
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-t8mp, DAEO-rmhj]
 created: 2026-11-07T19:01:42Z

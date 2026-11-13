@@ -2,6 +2,13 @@
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
+- **Version:** 1.1.0
+- **Launch default:** model claude-sonnet-5-5, effort high
+- **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
+- **Skills:** test-design, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** write a ticket's acceptance tests from its KPIs and the Contract before implementation starts, and
   show them red for the stated reason (MR-3, DEC-069). A session runs as `GOV_ROLE=independent-test-designer`,
   started with `gov launch independent-test-designer <ticket>` on any `in_progress` ticket.
@@ -9,11 +16,12 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
   `in_progress`; plus `.gov-runtime/scratch/**` (DEC-108). It is the only role the guard lets write there. By its
   brief it writes its ticket's folder, `tests/acceptance/<ticket-id>/`, and an earlier ticket's tests only when the
   KPIs name them for revision. In a launched session the `Edit` deny rules close `.tickets/**`, `.claude/**` (DEC-315)
-  and `.gov-runtime/**` other than scratch (DEC-180).
+  and `.gov-runtime/**` other than scratch (DEC-180). Reads of the engineer's work on the same ticket are denied: the
+  test designer never reads the engineer's (the implementer's) work, the counterpart's work on the same ticket
+  (DEC-820, DEC-957).
 - **Tools:** Read, Grep, Glob, Edit, Write, Bash, WebSearch and WebFetch. No installs, no `sudo`, no push or merge.
 - **Network:** the launcher's profile for this role, which is empty (DEC-158): a strict sandbox allowlist with no
   allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158).
-- **Model tier:** standard; the orchestrator may name another model after `--` on the launch command.
 - **Authority level:** worker, independent of the implementer: it never writes the code its tests judge. It does
   not guess at an ambiguous KPI; a dispute goes to the orchestrator as a decision package.
 - **Handoff format:** the tests and a README that maps each KPI line to its tests and gives the expected red reason,
