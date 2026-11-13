@@ -141,6 +141,13 @@ class Store:
 
 
 TRACKED = ("README.md",)
+# W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a worker launch without the role's role file, its
+# version line and its default line; every store holds one per worker role (no skills line, so no skill copy is
+# needed), so the launcher's cases reach what they test (S9's guard case launches an engineer). Leads need none.
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-136 fixture)\n\n- **Version:** 1.0.0\n"
+    "- **Launch default:** model claude-opus-5-5, effort high\n") for role in WORKER_ROLES}
 
 
 def build(root: Path, tickets, files=(), order=None, *, with_tickets: bool = True) -> Store:
@@ -152,6 +159,10 @@ def build(root: Path, tickets, files=(), order=None, *, with_tickets: bool = Tru
         p = root / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(f"planted {rel}\n", encoding="utf-8")
+    for rel, text in ROLE_FILES.items():
+        p = root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
     tickets = list(tickets)
     if with_tickets:
         (root / ".tickets").mkdir()
