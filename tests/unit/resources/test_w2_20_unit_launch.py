@@ -51,6 +51,20 @@ def sessions(planted, monkeypatch):
     return started, seen
 
 
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
+
+
+def plant_role_files(root: Path) -> None:
+    """W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): a worker launch refuses a project without its role's role file
+    (version and default line); one per worker role, with no skills line, so the gate's refusal is still the one tested.
+    The orchestrator needs none."""
+    for role in WORKER_ROLES:
+        path = root / "template" / "governance" / "kernel" / "roles" / f"{role}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {role} role (W2-20 fixture)\n\n- **Version:** 1.0.0\n"
+                        "- **Launch default:** model claude-opus-5-5, effort high\n", encoding="utf-8")
+
+
 def _plant_templates(root: Path) -> None:
     """Every role's template copy a session starts with (W2-153 S1, DEC-1112 (3)), so the gate's refusal is the one
     tested: any content will do."""
@@ -58,6 +72,7 @@ def _plant_templates(root: Path) -> None:
         path = root / launcher.TEMPLATES_REL / f"{stem}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"# {stem}\n")
+    plant_role_files(root)
 
 
 def _project(planted) -> Path:

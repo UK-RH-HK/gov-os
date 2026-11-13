@@ -62,6 +62,13 @@ def _quiet_launch_checks(planted, monkeypatch) -> Path:
         path = project / launcher.TEMPLATES_REL / f"{stem}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"# {stem}\n")
+    # W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): a worker launch refuses a project without its role's role file
+    # (version and default line); one per worker role, with no skills line, so the gate is still what decides here.
+    for role in ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research"):
+        path = project / "template" / "governance" / "kernel" / "roles" / f"{role}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {role} role (W2-20 fixture)\n\n- **Version:** 1.0.0\n"
+                        "- **Launch default:** model claude-opus-5-5, effort high\n", encoding="utf-8")
     return project
 
 

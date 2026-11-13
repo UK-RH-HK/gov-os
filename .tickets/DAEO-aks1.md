@@ -17,12 +17,12 @@ state_class: AUTHORITATIVE
 role: research
 profile: STANDARD
 depends_on:
-- DAEO-2bdu  # W2-88: the tools (assessment, plan, A9 lite, the measure) these proofs run
+- DAEO-2bdu
 waits_on:
 - ref: DAEO-2bdu
   reason: the proofs run W2-88's landed tools
 allowed_paths:
-- experiments/W2-88/**  # the one folder a research worker writes (DEC-996 (3) C); the proof record is here
+- experiments/W2-88/**
 est_loc: 0
 reads:
 - .tickets/DAEO-2bdu.md
@@ -48,3 +48,5 @@ track: A
 # W2-88b W2-88's proofs on real repositories (a child of W2-88)
 
 Filed by the owner's decision (DEC-1150 (1), package 1 (a), 2026-11-12), under DEC-996 (1)'s split list: W2-88 mixed three roles (DEC-995). This child holds the research half: proofs (b) and (c) moved word for word, the proof record (its path moved to `experiments/W2-88/any-repository.md`, the one folder a research worker writes), and the scale and measure lines for the real repositories. The owner added: proof (c) works on copies only; nothing is written in ~/workspace or in any of the owner's own repositories. It starts after W2-88 lands; it is not on W2-27's dependency chain (W2-27 needs W2-88's tools). If the research wall refuses the clones' folder under ~/gov-os-runs/W2-88/, that comes back as a package.
+
+**Notes moved from the front matter (2026-11-13, the CTO; the launcher reads list items raw):** `DAEO-2bdu` is W2-88: the tools (assessment, plan, A9 lite, the measure) these proofs run. `experiments/W2-88/**` is the one folder a research worker writes (DEC-996 (3) C); the proof record is here. **The copies' folder (P2 (a), the CTO under DEC-1156 (7)):** the clones go under `~/gov-os-runs/W2-88b/` (the folder the guard gives this ticket); where S2, S3, F1 and F2 name `~/gov-os-runs/W2-88/`, read `~/gov-os-runs/W2-88b/`, and the record states the path and the reason.

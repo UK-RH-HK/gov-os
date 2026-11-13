@@ -185,15 +185,21 @@ def _start(tmp, role, probe):
     """Build the fixture project, start one real session through ``gov launch`` and return what its probe left."""
     _prerequisites()
     sandbox = s.make_sandbox(tmp)
-    project = s.make_project(sandbox, base=True, extra={s.SETTINGS_REL: live_settings_text()})
+    # W2-60a: the model and effort come from the role file's default line (DEC-839 item 5); a live harness case runs
+    # on Haiku 4.5 at effort low (DEC-839 item 2), so its role file says so and no --model is passed. The file is in
+    # the base commit, so the tree is clean when the session starts (DEC-951). The fixture's live settings name the
+    # hook's interpreter (D-10).
+    project = s.make_project(sandbox, base=True, extra={
+        f"{s.ROLES_REL}/{role}.md": s.role_file_text(role, "claude-haiku-4-5-20251001", "low"),
+        s.SETTINGS_REL: live_settings_text()})
     s.write(project / SCRATCH / "probe.sh", probe)
     env = {key: value for key, value in os.environ.items()
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
     env.update({"PYTHONPATH": s.python_path(), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
     env.update(s.plant_open_gate(sandbox))
-    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT,"--permission-mode", "acceptEdits",
-                      "--model", "haiku", "--max-turns", "6", "--allowedTools", "Bash")
+    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT, "--permission-mode", "acceptEdits",
+                      "--max-turns", "6", "--allowedTools", "Bash")
     try:
         done = subprocess.run(argv, cwd=str(project), env=env, capture_output=True, text=True,
                               timeout=SESSION_TIMEOUT_S, stdin=subprocess.DEVNULL)

@@ -121,6 +121,7 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
     outside.mkdir()
     if prepare is not None:
         prepare(project)
+    support.set_live_launch_default(project, role)
     support.write(project, probe_rel, probe.replace("@OUTSIDE@", str(outside)).replace("@STAND_IN@", str(stand_in))
                   .replace("@RESULTS@", results_rel))
     before = {rel: (project / rel).read_text(encoding="utf-8")
@@ -132,7 +133,7 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
     env.update(support.plant_open_gate(sandbox))
     run = support.run_gov(project, sandbox, "launch", role, support.TICKET_OF[role], "--",
                           "-p", prompt.replace("@OUTSIDE@", str(outside)).replace("@ROOT@", str(project)),
-                          "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "8",
+                          "--permission-mode", "acceptEdits", "--max-turns", "8",
                           "--allowedTools", "Bash,Write", env=env, timeout=SESSION_TIMEOUT_S)
     results_path = project / results_rel
     if not results_path.is_file() or "end=1" not in results_path.read_text(encoding="utf-8"):
