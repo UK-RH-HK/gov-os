@@ -28,12 +28,16 @@ Each KPI is a line `- K<n>: <behaviour>` followed by an indented line `  Fails i
 ```
 
 The behaviour is something an observer sees or measures, from outside. It is testable without naming code.
-A KPI with no `Fails if:` line is refused; a KPI whose behaviour line names code is refused. Both name the KPI's id.
+A KPI with no `Fails if:` line is refused; a KPI whose behaviour line names code is refused; a KPI with no behaviour
+is refused. Each names the KPI's id. A behaviour or a `Fails if:` text that is empty or a placeholder (below) counts as
+missing: `K<n> has no behaviour`, `K<n> has no Fails if: line`.
 
 The KPI line is a `-` or `*` bullet, then `K<n>:` (digits only, the colon right after them; the id may be bold, as
 `**K1**:` or `**K1:**`), then the behaviour. Under `## KPIs`, any other list item (a `-`, `*`, `+` or numbered item,
 such as `- K2 : ...`, `2. K2: ...`, `- K2a: ...` or `- **K2** - ...`) is refused, quoted, unless it is a `Fails if:`
-line. A plain prose line before the first KPI is allowed.
+line. So is a line that is not a list item but starts with a KPI id: optional indentation, optional `*` or `_`
+emphasis, `K` and digits, then anything but a letter, digit or underscore (`K2: ...`, `**K2:** ...`, `K2. ...`); it is
+never read as part of the KPI before it. A plain prose line before the first KPI (`Key results follow.`) is allowed.
 
 The `Fails if:` label may carry emphasis (`**Fails if:**`, `*Fails if:*`, `_Fails if:_`), and its text may sit on the
 next line. A KPI's behaviour runs from its line to its `Fails if:` line, and the failure text from there to the next list
@@ -72,8 +76,24 @@ A table under `## Test data`, one row per source, with these header words in thi
   where it does not measure. An empty cell is refused.
 - `secured`: `yes`, or `no` where it cannot be secured.
 
-An `owner`, `source` or `licence or recipe` cell holding only a placeholder counts as empty (`-`, an em or en dash,
-`TBD`, `TODO`, `unknown`, `?`, `n/a`, `none`; case, spaces and `*`/`_` emphasis ignored).
+An `owner`, `source` or `licence or recipe` cell holding only a placeholder counts as empty. A `licence or recipe` cell
+that says no licence was found also counts as empty: `unlicensed`, `unlicenced`, `none found`, `not found`, `no licence`,
+`no license`.
+
+### The placeholder class
+
+One test serves the KPI behaviour, the `Fails if:` text and the owner, source and licence-or-recipe cells. It first
+removes surrounding spaces, `*`/`_` emphasis, backticks, surrounding brackets or parentheses and trailing `.,;:!?`,
+then compares the whole text, without regard to case, with each kind below; a word inside a sentence never counts.
+
+- empty, or no letter or digit at all: `-`, `—`, `–`, `?`, `...`;
+- a lone angle-bracket slot: `<owner>`, `<behaviour>`;
+- a deferral: `TBD`, `TBC`, `TBA`, `TODO`, `pending`, `unknown`, or `to be <word>` (`to be decided`);
+- an absence word alone: `none`, `nobody`, `no one`, `n/a`, `na`, `nil`, `null`.
+
+So `**TBD**`, `(none)`, `N/A.` and `<owner>` are placeholders; `None of the members sees the page.`, `NASA data
+office` and `Nadia` are not. The `privacy` and `secrets` cells are outside this test: any stated text, `none` included,
+passes, and only an empty cell is refused.
 
 A row with `secured: no` is never passed and never skipped: the check prints `P1 Test data: <source> cannot be
 secured`, writes `<spec stem>.P1.md` beside the spec (the source, why as far as the row states, options with their

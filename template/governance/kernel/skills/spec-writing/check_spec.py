@@ -32,13 +32,33 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])(?:\s|$)")
 KPI_LINE = re.compile(r"^\s*[-*]\s+(\*\*)?K(\d+)(?(1)(?:\*\*:|:\*\*)|:)\s*(.*)$")
 # The label may carry emphasis (**Fails if:**, *Fails if:*, _Fails if:_) and a bullet.
 FAILS_LINE = re.compile(r"^\s*(?:[-*+]\s+)?(?:\*\*|__|\*|_)?Fails if:(?:\*\*|__|\*|_)?\s*(.*)$", re.I)
-PLACEHOLDERS = ("", "-", "—", "–", "tbd", "todo", "unknown", "?", "n/a", "none")
+# An unbulleted line that starts with a KPI id: optional emphasis, K, digits, then not a letter, digit or underscore
+# (a closing emphasis mark, as in _K2_, is not a word character here).
+KPI_ID_LINE = re.compile(r"^\s*[*_]*K\d+(?:[*_]+(?![A-Za-z0-9])|(?![A-Za-z0-9_]))")
 MARKER = re.compile(r"<!--\s*imported:\s*(.*?)\s*-->")
+# The placeholder class (spec-form.md): matched against the whole text, after plain().
+DEFERRALS = ("tbd", "tbc", "tba", "todo", "pending", "unknown")
+ABSENCES = ("none", "nobody", "no one", "n/a", "na", "nil", "null")
+TO_BE = re.compile(r"to be [\w-]+")
+LONE_SLOT = re.compile(r"<[^<>]*>")
+NO_LICENCE = re.compile(r"un-?licen[cs]ed|none found|not found|no licen[cs]e(?: found)?")
 
 
-def unstated(value):
-    """True for an empty cell or one holding only a placeholder (emphasis and spaces ignored)."""
-    return value.strip().strip("*_ ").lower() in PLACEHOLDERS
+def plain(text):
+    """The text in lower case, spaces folded, with emphasis, backticks, brackets and trailing punctuation peeled."""
+    text, before = " ".join(text.lower().split()), None
+    while text != before:  # however they nest: `**(TBD).**`
+        before = text
+        text = text.strip(" *_`()[]{}").rstrip(".,;:!?").strip()
+    return text
+
+
+def is_placeholder(text):
+    """The one placeholder test (KPI behaviour, Fails if: text, owner, source, licence or recipe): empty or no letter
+    or digit; a lone <slot>; a deferral (TBD, to be <word>); an absence word alone. Never a word inside a sentence."""
+    text = plain(text)
+    return (not re.search(r"[^\W_]", text) or bool(LONE_SLOT.fullmatch(text)) or text in DEFERRALS + ABSENCES
+            or bool(TO_BE.fullmatch(text)))
 
 
 def names_code(text):
@@ -76,7 +96,8 @@ def split_sections(text):
 def check_kpis(lines):
     """Each KPI is its line, then every non-blank line up to its Fails if: line (indented or not), and the Fails if:
     text with every non-blank line after it; both end at the next list item or section. A list item that is neither
-    a KPI line in form nor a Fails if: line is refused, quoted."""
+    a KPI line in form nor a Fails if: line is refused, quoted, as is an unbulleted line that starts with a KPI id.
+    An empty or placeholder behaviour or Fails if: text counts as missing."""
     kpis, refused, into = [], [], None
     for line in lines:
         kpi = KPI_LINE.match(line)
@@ -91,20 +112,24 @@ def check_kpis(lines):
             refused.append('REFUSED KPIs: list item "%s" is not a KPI line (- K<n>: <behaviour>) or a Fails if: line'
                            % line.strip())
             into = None
+        elif KPI_ID_LINE.match(line):
+            refused.append('REFUSED KPIs: line "%s" starts with a KPI id but is not a list item (- K<n>: <behaviour>)'
+                           % line.strip())
+            into = None
         elif into is not None and line.strip():
             into.append(line)
     if not kpis:
         return refused + ["REFUSED KPIs: no K<n> line (- K<n>: <behaviour>)"]
     for number, behaviour, failure in kpis:
-        has_fails = any(text.strip() for text in failure)
-        kind = names_code("\n".join(behaviour))
-        if kind:
-            refused.append("REFUSED KPIs: K%s names code (%s)" % (number, kind))
-        kind = names_code("\n".join(failure))
-        if kind:
-            refused.append("REFUSED KPIs: K%s names code in its Fails if: line (%s)" % (number, kind))
-        if not has_fails:
+        behaviour, failure = "\n".join(behaviour), "\n".join(failure)
+        if is_placeholder(behaviour):
+            refused.append("REFUSED KPIs: K%s has no behaviour" % number)
+        elif names_code(behaviour):
+            refused.append("REFUSED KPIs: K%s names code (%s)" % (number, names_code(behaviour)))
+        if is_placeholder(failure):
             refused.append("REFUSED KPIs: K%s has no Fails if: line" % number)
+        elif names_code(failure):
+            refused.append("REFUSED KPIs: K%s names code in its Fails if: line (%s)" % (number, names_code(failure)))
     return refused
 
 
@@ -131,16 +156,17 @@ def check_data(lines):
         def cell(name):
             return row[header.index(name)] if name in header and header.index(name) < len(row) else ""
         source = cell("source")
-        if "source" in header and unstated(source):
+        if "source" in header and is_placeholder(source):
             refused.append("REFUSED Test data: row %d has no source" % number)
             continue
         label = source or "row %d" % number
         kind = cell("kind").lower()
-        if "owner" in header and unstated(cell("owner")):
+        if "owner" in header and is_placeholder(cell("owner")):
             refused.append("REFUSED Test data: %s has no owner" % label)
         if "kind" in header and kind not in ("imported", "synthetic"):
             refused.append("REFUSED Test data: %s has kind '%s' (imported or synthetic)" % (label, cell("kind")))
-        elif "licence or recipe" in header and unstated(cell("licence or recipe")):
+        elif "licence or recipe" in header and (is_placeholder(cell("licence or recipe"))
+                                                or NO_LICENCE.fullmatch(plain(cell("licence or recipe")))):
             refused.append("REFUSED Test data: %s has no %s" % (label, "licence" if kind == "imported" else "recipe"))
         for column in ("privacy", "secrets"):  # `none` is a stated value here; only an empty cell is refused
             if column in header and not cell(column).strip():
