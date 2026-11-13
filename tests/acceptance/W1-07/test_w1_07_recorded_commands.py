@@ -52,8 +52,9 @@ def test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve():
     # ``tests/optin-lifted-breadth.txt`` (line 42) names this function and ``test_optin_lifted.py``'s
     # ``test_every_entry_of_the_real_lists_names_a_test_path_or_function_that_exists`` fails on an entry naming a
     # function that no longer exists; that list is outside W2-37's paths, so the rename waits on its line.
+    # DEC-747: ``skilleval`` (W2-104) is recorded too, so the lines name eleven.
     assert sorted(recorded) == ["accept", "brief", "ci", "impact", "launch", "links", "lock", "plan", "resources",
-                                "telemetry"], recorded
+                                "skilleval", "telemetry"], recorded
     assert not set(recorded) & set(support.RESERVED_COMMANDS), "a recorded command is one of the twelve"
 
 
@@ -67,6 +68,7 @@ def test_a_recorded_gov_command_is_offered_and_answers_its_help(gov, name):
 
     Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite, DEC-491): ``impact`` joins them, so
     the recorded ``gov`` commands are nine; the case gains ``[impact]``, read from the support's lines.
+    ``skilleval`` (DEC-747, W2-104) makes them ten.
     """
     listed = gov("--help")
     assert listed.returncode == 0, listed.describe()
