@@ -118,3 +118,97 @@ Without it, `--integration` refuses, and `gov launch` sets no `GOV_STORE` (today
   and `-m "not local_only" -k "not real and not green_here and not time_limit"`, `HOME` an empty folder: **257
   passed** (249 + the 8 new), none deselected: the real-model exclusion removes no case in these folders.
 - Every run went through `heavy_slot.sh`. No real embedder, reranker or model was started.
+
+# Pass 2b: S2 (the two daily refreshes, `gov status`'s integration_store part) and R2-F3 (the token's mark)
+
+Built to the interface text of P-W2-116-S2-INTERFACE Q1 (a) (the CTO, DEC-1157 (12)) with the lead's settlement of one
+gap (DEC-1052). Nothing runs in production here: the cron line every 5 minutes (`flock <link>.refresh.lock`) is window
+4's ACT.
+
+## What was built
+
+| Part | Where | Against the interface |
+|---|---|---|
+| `gov rebuild --integration <branch> --when-due` | `src/gov/rebuild/command.py` (the flag, the usage refusal), `src/gov/rebuild/integration.py` (`refresh_settings`, `now`, `due_reason`, `refresh_when_due`, `read_record`, `_write_record`) | Only valid with `--integration` (else `REBUILD_FAILED`). Due: runs the S1/S4 refresh unchanged and sets `integration.reason`. Not due: nothing built or written, `{"integration": {"status": "not_due", "branch", "link", "last_refresh"}}`. A plain `gov rebuild --integration` never reads the times and never writes the record. |
+| This repository's line | `governance/project/rebuild.yaml` | `integration_refresh: {branch: w2/integrate, after_nightly: {verdict: .gov-runtime/scratch/orchestrator/log/nightly/*/run.txt, latest: "10:00"}, second: "18:00"}` (Q2 (b)). A unit test reads it. |
+| `gov status`'s `integration_store` part | `src/gov/status/integration_store.py` (new), `src/gov/status/command.py` (the ninth part, `_part`) | `{link, half, head, branch, branch_head, built_at, age_seconds, stale, stale_reason, last_refresh}`; unread forms as the interface states. Never refuses; exit 0. |
+| R2-F3, the token's mark | `src/gov/retrieval/retrieve.py` (committed in pass 2a, `09247e423`) | The token carries `f`, the store root as resolved once; another folder refuses `CONTINUATION_INVALID` even at one commit, naming both; a token with no `f` refuses. |
+
+## The due rules (`integration.due_reason`)
+
+- **after_nightly:** a counting verdict file whose time is later than the record's `at` (any one with no record); or
+  `now` at or after today's `latest` with no scheduled `after_nightly` refresh whose `at` is on today's date. Both due:
+  one refresh, reason `after_nightly`.
+- **second:** `now` at or after today's `second` and the record's `at` before it (or no record).
+- A verdict file *counts* once it has a line `^verdict:` or parses as JSON with a `"verdict"` key (a nightly still
+  running holds neither). Its time is its modification time. `HH:MM` times are wall-clock times on `now`'s date, in
+  `now`'s offset.
+- **The clock:** `GOV_NOW` (ISO 8601; with an offset it is that instant and that offset's wall clock, kept as given; naive
+  is local time), else the real clock. An invalid or empty one refuses `REBUILD_CONFIG_INVALID`, `key: "GOV_NOW"`.
+- **Configuration refusals:** a missing or invalid time, a missing `branch` or no `integration_refresh` refuses
+  `REBUILD_CONFIG_INVALID`; `details` = `{key, value}` (dotted key; value null when missing); nothing is built, no record
+  written. Checked before anything else, so a bad line never builds.
+
+## The record `<link>.refresh.json`
+
+`{"at": <now, ISO with offset>, "reason", "head" (full sha), "status", "branch", "after_nightly_at"}`, written whole by
+an atomic replace (a temporary file beside it, then `os.replace`) after a refresh that switched or found the head built.
+`at` is `now` as the decision was taken (so a verdict file that lands during a long build is later than it and the next
+tick is due again). A failed refresh refuses `REBUILD_FAILED` as before and leaves the record.
+
+**`after_nightly_at` (the lead's settlement of the first session's gap, DEC-1052):** the record keeps only the last
+refresh, so after an `after_nightly` refresh at 10:00 and a `second` one at 18:00 the literal rule would make one more
+`after_nightly` refresh due. The record therefore also carries `after_nightly_at`, the `at` of the last refresh with the
+reason `after_nightly`: written by that refresh, carried over (as written) by a `second` refresh. The rule "no scheduled
+`after_nightly` refresh has an `at` on today's date" reads it. A record without the key (written before this) is read
+as its own `at` where its reason is `after_nightly`. The acceptance case
+`test_s2_success_second_is_due_once_after_its_time_and_brings_the_store_to_the_branch_head` expects `not_due` on the tick
+after the second refresh; it passes.
+
+## The stale rule (`gov status`)
+
+`stale` is true with a `stale_reason` of the reasons that hold, joined by `"; "`, each starting with its code:
+- `behind_branch: ...` when the half's head is not the branch's head in the project (both named, 12 hex digits);
+- `built_before_due: ...` when `built_at` (`written_at` of the half's `.gov-runtime/rebuild/stores.json`) is before the last
+  time a refresh fell due: the latest at or before `now` among the newest counting verdict file's time, `second` on today's
+  and yesterday's dates, and `latest` on today's and yesterday's dates each counted only where no counting verdict file's
+  time falls on that date before that `latest` (`integration.last_due`). The text names that time and what made it so.
+- A figure that cannot be read is never an answer: where `integration_refresh` is missing or invalid, `branch`,
+  `branch_head`, `stale` and `stale_reason` are each `{"read": false, "reason": ...}` naming the key, the rest given;
+  where only one reason cannot be judged and none holds, `stale` is unread, not `false`.
+- No `integration_store`, no link or a link that leads to no folder: the part is `{"read": false, "reason": ...}` and is
+  in `not_read`.
+
+## The first session's choices, kept (item 3 of the brief)
+
+- The command line's `--integration <branch>` is what is built; `gov status` reads the config's `branch`.
+- An empty `GOV_NOW` is invalid.
+- A missing `after_nightly` block is key `integration_refresh.after_nightly.latest` with value null; an `after_nightly`
+  that is not a map is key `integration_refresh.after_nightly`.
+- A verdict file stamped after `now` does not count yet (applied in `due_reason`: `seen <= when`; a unit row pins it).
+- A record with no readable `at` is no record.
+- No acceptance case showed otherwise.
+
+## Tests (pass 2b)
+
+Every run went through `heavy_slot.sh` with the sandbox's own `TMPDIR`; a whole-folder run adds `-m "not local_only" -k
+"not real and not green_here and not time_limit"` and `HOME` an empty scratch folder. No real embedder, reranker or model
+was started; no `gov retrieve` or `gov context` was run.
+
+- Unit, new: `tests/unit/rebuild/test_w2_116_when_due.py` 27 passed (the due rules as a table of 37 rows, the edge
+  minutes, the offsets, `after_nightly_at` carried over by a `second` refresh, a verdict file stamped after `now`, the
+  refusals by key, the clock, the record whole and left on a failed refresh, the usage refusal); `tests/unit/status/
+  test_w2_116_integration_store.py` 25 passed; `tests/unit/retrieval/test_w2_116_token_mark.py` 8 passed (pass 2a).
+- Acceptance: `tests/acceptance/W2-116/` with the two new unit files: **111 passed**, 80 deselected by the real-model
+  exclusion (pass 1's cases and pass 2b's `test_w2_116_s2_*` and `test_w2_116_r2f3_continuation.py` all green).
+- Regression, `tests/unit/rebuild tests/unit/status tests/unit/retrieval tests/unit/retrieve`: **724 passed, 2 skipped,
+  27 failed**, 517 deselected. The 27 are none of this pass's cases and are named, not fixed:
+  - `tests/unit/status/test_status.py:172` `test_a_status_with_a_part_not_read_names_every_such_place`: asserts the exact
+    `PARTS` tuple and `not_read == []`; the interface's new part turns it red. Outside this ticket's paths; the CTO fixes
+    it (DEC-1156 (7)).
+  - Six cases of other tickets that compare a continuation token decoded "without its s key" (DEC-1090 (3)) and now also
+    differ by R2-F3's `f` key (the only difference in the assertion output): `test_w2_131_register_ids.py:189` and `:209`,
+    `test_w2_133_gap_label.py:170` and `:191`, `test_w2_135_item_cap.py:358` and the continuation case of the same file.
+    Their `_without_s` helper must drop `f` as well. Outside this ticket's paths.
+  - 20 cases of `tests/unit/retrieval/test_w2_112_shared_reranker.py`: `PermissionError: [Errno 1] Operation not
+    permitted` from the sandbox (the shared reranker's socket); they do not touch this ticket's code.
