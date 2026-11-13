@@ -154,3 +154,78 @@ freshness case, the killed build (the ready half moved) and the model-less re-in
 **D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w2_116_support.launch_and_search` plants an open gate (`plant_open_gate`, W2-136's form) in the box's HOME and adds its readings to the launch's environment. Its six launch cases stay red after it, for another reason reported to the CTO: the session's cleaned environment (W2-56 S5) no longer carries `W2_116_SESSION_LOG` to the stand-in CLI. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
 
 **D-10's red fix, the cleaned session environment (2026-11-10, W2-116 `DAEO-f58b`, DEC-1112 (3); Rewrite-Reason DEC-826 Q5, DEC-877 item 4):** W2-56 S5 gives a launched session a cleaned environment, so no parent variable reaches the stand-in CLI: not `W2_116_SESSION_LOG` (its `KeyError`), nor the question, the stand-in endpoints or `PYTHONPATH`. The stand-in now has its log, its question and the case's environment written into it when the case plants it (`install_cli`); its search runs with the case's environment beneath the session's own environment and the settings' `env` block, so whatever the launch gives the session wins, as before W2-56 (the case's environment names no store). The fixture project also plants the eight `.claude/templates/<stem>.md` copies (W2-153, DEC-1050; W1-46's and W2-56's form): without them `gov launch` refused every case with `LAUNCH_NO_TEMPLATE` before the session ran. No assertion changes. On integrate `9ca161a6f` the six launch cases (`test_w2_116_launch.py::test_s3_every_worker_session_searches_the_integration_store_from_a_worktree_with_none[engineer]`, `[independent-auditor]`, `[independent-test-designer]`, `[product-spec]`, `test_w2_116_launch.py::test_s3_failure1_a_designer_never_reads_the_ticket_worktree_s_own_store`, `test_w2_116_launch.py::test_s3_guard_the_launched_session_keeps_its_role_and_ticket`) pass.
+
+## Pass 2b: S2 (the two daily times, `gov status`) and R2-F3 (the continuation token carries the half)
+
+Written by the independent test designer (MR-3) from the KPI line S2 and the CTO's stated interface
+(`P-W2-116-S2-INTERFACE` Q1 (a), Q2 (b), Q3 (a), DEC-1157 (12); the same text as the engineer's brief), before and without
+reading this pass's implementation. Added beside pass 1's files, which are unchanged: `w2_116_s2_support.py` (the
+configuration with `integration_refresh`, `GOV_NOW`, verdict files by `os.utime`, the record, `gov status`, two folders
+at one commit and the link between them), and four test files. `conftest.py` and `w2_116_support.py` are untouched.
+
+**The interface the cases assume** (all from the brief; nothing else is pinned): `rebuild.yaml`'s
+`integration_refresh: {branch, after_nightly: {verdict, latest}, second}`; `gov rebuild --json --integration <branch>
+--when-due` (result `integration.status` `switched`/`unchanged` with `integration.reason` `after_nightly`/`second`, or
+`{"integration": {"status": "not_due", branch, link, last_refresh}}`); the record `<link>.refresh.json`
+(`at`, `reason`, `head`, `status`, `branch`); `REBUILD_CONFIG_INVALID` with `details.key` / `details.value`;
+`gov status --json` `result.integration_store`; `gov retrieve --continue <token>` and `CONTINUATION_INVALID` naming both
+folders. The clock is `GOV_NOW`. Cases of the due rule use a fixed day (2026-06-10/11, offset +00:00) and tick the
+command with `GOV_NOW` moved on; the status cases plant `GOV_NOW` and the times relative to the build's real
+`written_at`, in the UTC offset where the real clock reads about 12:00 (so no planted time crosses a midnight of the wall
+clock `GOV_NOW`'s offset states).
+
+### Map (KPI line S2)
+
+| KPI | Tests (node ids) | Expected red reason (old code) |
+|---|---|---|
+| S2: two times read from the configuration | `test_w2_116_s2_when_due.py::test_s2_success_the_two_times_are_read_from_the_planted_configuration` | `--when-due` unknown: usage error, exit 2 |
+| S2: refresh after the verdict, with the record | `test_w2_116_s2_when_due.py::test_s2_success_a_refresh_runs_after_a_newer_verdict_file_and_writes_the_record`, `::test_s2_success_a_json_verdict_file_newer_than_the_last_refresh_is_due`, `::test_s2_success_the_verdict_glob_defaults_to_docs_close_nightly_nr_json` | as above |
+| S2: a file without a verdict / an older verdict is not due | `test_w2_116_s2_when_due.py::test_s2_failure_a_file_without_a_verdict_or_an_older_verdict_does_not_make_a_refresh_due` | as above |
+| S2: latest without a verdict; once a day | `test_w2_116_s2_when_due.py::test_s2_success_latest_passes_without_a_verdict_and_the_same_day_is_not_due_again`, `::test_s2_success_a_second_refresh_does_not_stand_in_for_the_after_nightly_one`, `::test_s2_success_when_both_are_due_one_refresh_runs_with_reason_after_nightly` | as above |
+| S2: the second time, once | `test_w2_116_s2_when_due.py::test_s2_success_second_is_due_once_after_its_time_and_brings_the_store_to_the_branch_head` | as above |
+| S2: a missing or invalid time refuses by name | `test_w2_116_s2_config.py::test_s2_failure_a_missing_or_invalid_setting_refuses_by_name_and_builds_nothing` for ids `second-missing`, `second-empty`, `second-not-a-string`, `second-9-5`, `second-10am`, `second-25-00`, `second-24-00`, `second-12-60`, `latest-missing`, `latest-25-00`, `latest-10am`, `latest-not-a-string`, `branch-missing`, `no-integration-refresh`; `::test_s2_failure_an_invalid_now_refuses_by_name_and_builds_nothing` | `--when-due` unknown: exit 2, no `REBUILD_CONFIG_INVALID` |
+| S2: scope of `--when-due`, plain refresh, failed refresh | `test_w2_116_s2_config.py::test_s2_failure_when_due_is_only_valid_with_integration` (red: argparse's usage error, not `REBUILD_FAILED`), `::test_s2_failure_a_plain_refresh_leaves_the_record_as_it_was`, `::test_s2_failure_a_failed_refresh_refuses_and_leaves_the_record_so_the_next_tick_is_due_again` (red: first tick unknown option), `::test_s2_failure_the_times_are_not_read_without_when_due_and_no_record_is_written` (**green on the old code, a guard**: a plain refresh already ignores the times and writes no record; it must not start to) | as above |
+| S2: `gov status` head, age, stale | `test_w2_116_s2_status.py::test_s2_success_status_names_the_integration_store_s_head_and_age_and_a_fresh_store_is_not_stale`, `::test_s2_success_a_store_behind_the_branch_is_stale_and_the_reason_names_both_heads`, `::test_s2_success_a_store_built_before_latest_fell_due_is_stale_and_the_reason_names_the_time`, `::test_s2_success_a_store_built_before_a_verdict_file_is_stale`, `::test_s2_success_a_latest_that_a_verdict_already_answered_does_not_make_the_store_stale` | no `integration_store` part in `result` (the first case also fails earlier at its `--when-due` tick) |
+| S2: unread parts, exit 0 | `test_w2_116_s2_status.py::test_s2_failure_no_store_configured_or_no_link_gives_an_unread_part_and_status_still_exits_0`, `::test_s2_failure_without_a_refresh_configuration_the_store_is_named_and_the_stale_judgement_is_unread`, `::test_s2_failure_an_invalid_time_leaves_the_stale_judgement_unread_naming_the_key` | no `integration_store` part |
+
+### The ride-along: the continuation token carries the half (not a KPI line)
+
+| Ride-along | Test (node id) | Expected red reason (old code) |
+|---|---|---|
+| token and the half | `test_w2_116_r2f3_continuation.py::test_r2f3_a_token_made_on_one_folder_is_refused_on_another_at_the_same_commit`, `::test_r2f3_a_token_made_through_the_link_is_refused_once_the_link_points_at_the_other_half`, `::test_r2f3_a_token_made_through_the_link_is_refused_on_the_other_half_used_directly` | the token is accepted on the other folder at the same commit (`ok: true`, exit 0) |
+| guard | `test_w2_116_r2f3_continuation.py::test_r2f3_guard_a_token_used_on_the_folder_it_was_made_on_pages` | **green on the old code, a guard** |
+
+### Red record (old code, `w2/W2-116-tests` at e51b1fdf6, through the heavy slot): 40 cases, 38 failed, 2 passed
+
+Every `--when-due` case fails on `gov: error: unrecognized arguments: --when-due` (exit 2): the first tick of each case,
+or, for the refusal cases, the expected `REBUILD_CONFIG_INVALID` envelope. Every `gov status` case fails on
+`gov status has no integration_store part: ['config_files', 'decision_packages', 'doctor', ...]`. The two token cases
+fail with `a token made on <a> was not refused CONTINUATION_INVALID on <b>` (exit 0, `ok: true`, a page of `docs/other.md`
+from the other folder). Raw log: scratch `red1.log`.
+
+### Check of the cases themselves
+
+A scratch sketch of this pass (about 150 lines in a copy of `src`, never committed: `--when-due`, the record, the status
+part, the token's mark) was written from the brief's text alone to check that the cases pass against a correct reading
+of the interface and that a failure is the case's. It passes all 40 cases (2 min 2 s through the heavy slot). Its after_nightly
+fallback keeps the last after_nightly refresh's time in an extra field of the record, which is how P2b-1 below is resolved in the
+sketch; no case pins that field.
+
+### Notes and limits
+
+- **P2b-1. The after_nightly fallback and a single record.** The brief says the fallback is due when "no scheduled
+  refresh with reason `after_nightly` has an `at` on today's date", and the record holds only the last refresh. After
+  `after_nightly` at 10:05 and `second` at 18:05 the record's reason is `second`, so read literally the fallback is due
+  again at 18:10, and at every tick until midnight. The cases pin the intent (a tick after `second` is `not_due`:
+  `test_s2_success_second_is_due_once_...`, brief item 4) and no case asks what the record holds beyond its stated fields.
+  The case that ticks after `latest` when an `after_nightly` refresh ran earlier the same day from a verdict file (09:00,
+  then 10:05) is not planted: the literal rule and the "record's `at` before today's `latest`" rule differ there.
+- **P2b-2. "Past `second`" with no earlier tick.** With no record, a tick past both times is `after_nightly`
+  (`test_s2_success_when_both_are_due_one_refresh_runs_with_reason_after_nightly`), so reason `second` needs the day's
+  `after_nightly` slot used first (or `second` before `latest`): the cases plant it so.
+- **P2b-3. Not pinned:** the text of `stale_reason` beyond its code and the names it must carry (12 hex digits of both
+  heads; the time as `HH:MM` in `GOV_NOW`'s offset or in UTC); the key of `after_nightly` missing altogether; a token
+  without the mark (its form is the implementation's, so no case forges one); the order in which two invalid keys are
+  reported; running under cron (window 4).
+- **P2b-4. Unquoted times.** `second: 1800` (a number) is planted as "not a string"; an unquoted `18:00` is not, since
+  the YAML reader's reading of it is the reader's.
