@@ -11,9 +11,9 @@ external-ref: W2-94
 tags: [wave-2, audit, evaluation, held-out, standard, examin-minimum]
 wbs_id: W2-94
 title: 'EXAMIN''s question set: memory questions with gold sources about the owner''s copy, a visible and a hidden half, by a session independent of the adopting team, before W2-27'
-class: implementation  # was audit; the GOLD change's engineer (P-W2-94-GOLD-2 (A), CTO, 2026-11-13)
+class: implementation
 state_class: AUTHORITATIVE
-role: engineer  # was independent-auditor (the walled writers' delivery is done); the launcher lets an engineer change check_gold.py for W2-94 GOLD (a)
+role: engineer
 depends_on: [DAEO-m1u3]
 allowed_paths:
 - tests/acceptance/W2-94/**  # its acceptance tests, form only (CTO, DEC-1167 (3): the close)
@@ -56,3 +56,5 @@ Card: MEMORY-SPEC-MAP gap 7, resolved by the owner in DEC-957; W2-61's KPI 6 mov
 - **The clone:** made by the orchestrator or the auditor by exact path, `git clone --no-hardlinks` from the owner's copy (DEC-723, DEC-728); removed at the end.
 - **Started by the orchestrator,** never by an adoption or retrieval ticket's lead.
 - **Verify re-worded (CTO, 2026-11-13, DEC-1157 (12), DEC-1167 (3)):** S3's brief path is where it is installed; S4's script is the test designer's, run by the CTO (the walled writer has no shell); the KPI text before each Verify unchanged except the brief's path.
+
+**Role changed 2026-11-13 (P-W2-94-GOLD-2 (A), the CTO):** class audit -> implementation and role independent-auditor -> engineer, so the launcher lets the engineer the owner's W2-94 GOLD (a) names change `check_gold.py`; the walled writers' delivery is done, and the narrow check stays independent.
