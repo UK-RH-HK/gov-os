@@ -1,0 +1,437 @@
+"""The impact of a stated change over the record graph and the code graph (W2-37; CAP-33.b, CAP-33.g, DEC-167).
+
+``assess(root, changes, config)`` takes record ids, symbol names or one plain-language question ("What's the impact of
+X?") and returns the impact assessment: the affected specifications, decisions, tickets, tests and code, each with
+the graph it came from, the radius and the depth it implies (``gov.closure.depth_of_radius``), the gaps, and the
+change-impact proposal (CIT-P) as frontmatter. The two graphs are joined by id (G-16): a record's edge to no record is
+looked up as a symbol of the code index, and a symbol reaches the records whose edges name it. ``compare(root, rel)``
+checks a change-execution record (CIT-E) against the CIT-P it names.
+
+It only reads. It builds neither the store nor the code index, and a graph that is missing, stale or unreadable is
+said, and the report is then never complete. The readings still with the owner are in ``gov.impact.readings``.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import re
+import sqlite3
+import subprocess
+from collections import Counter
+from pathlib import Path
+
+from gov.cli.errors import GovError
+from gov.impact import readings
+from gov.impact.readings import CODE, KINDS, OK, RECORD
+from gov.retrieval import graph_route
+
+CITP_TYPE, CITE_TYPE = "change-impact-proposal", "change-execution-record"
+DEPTH_LIMIT, UNRESOLVED, NO_KIND = "DEPTH_LIMIT_REACHED", "UNRESOLVED", "NO_KIND"  # the first two as gov closure's
+_QUESTION = re.compile(r"\s*what(?:'s|’s|\s+is)\s+the\s+impact\s+of\s+[`'\"]?([^\s`'\"?]+)[`'\"]?\s*\??\s*",
+                       re.IGNORECASE)
+_NAME = re.compile(r"[A-Za-z_][\w.:/#-]*")  # a record id or a symbol name
+
+__all__ = ["assess", "compare"]
+
+
+def _git(root: Path, *args: str) -> str:
+    return subprocess.run(["git", "--no-optional-locks", "-C", str(root), "-c", "core.quotePath=false", *args],
+                          capture_output=True, text=True).stdout
+
+
+def _front(text: str) -> dict | None:
+    import yaml
+
+    lines = text.split("\n")
+    ends = [number for number, line in enumerate(lines) if line.rstrip() == "---"]
+    if len(ends) < 2 or ends[0] != 0:
+        return None
+    try:
+        found = yaml.safe_load("\n".join(lines[1:ends[1]]))
+    except yaml.YAMLError:
+        return None
+    return found if isinstance(found, dict) else None
+
+
+class _Records:
+    """The record graph of the store, read once; ``state`` is OK only when the store was loaded from ``HEAD`` and no
+    record differs from it in the working tree."""
+
+    def __init__(self, root: Path):
+        from gov import records
+
+        try:
+            self.by_id = {record["id"]: record for record in records.records(root)}
+            edges, stored = records.edges(root), {entry["commit"] for entry in records.commits(root)}
+        except GovError as error:
+            raise GovError("IMPACT_RECORD_GRAPH_MISSING", f"the record graph cannot be read: {error.message}; "
+                           "gov impact never loads the store", {"graph": RECORD}) from None
+        except sqlite3.Error as error:
+            raise GovError("IMPACT_RECORD_GRAPH_UNREADABLE", f"the record graph cannot be read: the store is "
+                           f"unreadable ({error})", {"graph": RECORD}) from None
+        self.near, self.named_by = {}, {}
+        for edge in edges:
+            self.near.setdefault(edge["source"], set()).add(edge["target"])
+            self.near.setdefault(edge["target"], set()).add(edge["source"])
+            if edge["source"] != edge["target"]:
+                self.named_by.setdefault(edge["target"], set()).add(edge["source"])
+        self.testers = {edge["source"] for edge in edges if edge["type"] == "TESTS"}
+        # F1 (a), DEC-1163 (7): the links the records state that no edge holds (a ticket's sources and closes, the
+        # register's Under and Changes lines) name their target too. None: the store holds no such table.
+        links = graph_route.stated_links(root)
+        for link in links or []:
+            if link["source"] != link["target"]:
+                self.named_by.setdefault(link["target"], set()).add(link["source"])
+        head = _git(root, "rev-parse", "HEAD").strip()
+        stored_paths = {record["path"] for record in self.by_id.values()} | _register_paths(root)
+        dirty = _uncommitted(root, stored_paths)
+        if not head or set(_git(root, "rev-list", "HEAD").split()) != stored:  # the store holds HEAD's history alone
+            self.state = f"stale: the store was not loaded from HEAD {head[:12] or '(none)'}; gov impact never loads " \
+                         "it again"
+        elif dirty:
+            self.state = f"stale: {', '.join(dirty)} differ from HEAD, which the store was loaded from; gov impact " \
+                         "never loads it again"
+        elif links is None:  # a graph not read in full never makes an item deletable (R8)
+            self.state = "stale: the store holds no stated links (it was built before them); gov impact never loads " \
+                         "it again"
+        else:
+            self.state = OK
+
+
+def _register_paths(root: Path) -> set:
+    """The decision register the path map of ``HEAD`` names: a register with no entry at ``HEAD`` still feeds the store
+    when it gets one, so its path counts as a stored record's does (B)."""
+    import yaml
+    from gov.store.loader import PATH_MAP_REL, REGISTER_KEY
+
+    try:
+        named = (yaml.safe_load(_git(root, "show", f"HEAD:{PATH_MAP_REL}")) or {}).get(REGISTER_KEY)
+    except (yaml.YAMLError, AttributeError):
+        return set()
+    return {named} if isinstance(named, str) and named.strip() else set()
+
+
+def _uncommitted(root: Path, stored: set) -> list[str]:
+    """The paths of the working tree that differ from ``HEAD`` and can change the record graph (DEC-391 DP-7): a
+    stored record's file, a Markdown file with frontmatter, a path map."""
+    changed = _git(root, "diff", "--no-renames", "--name-only", "-z", "HEAD").split("\0") \
+        + _git(root, "ls-files", "-z", "--others", "--exclude-standard").split("\0")
+    found = set()
+    for rel in filter(None, changed):
+        path = root / rel
+        if rel in stored or rel.endswith("path-map.yaml"):
+            found.add(rel)
+        elif rel.endswith(".md") and path.is_file():
+            try:
+                with open(path, "rb") as text:
+                    begins = text.readline().rstrip()
+            except OSError:
+                begins = b"---"  # a file that cannot be read may be a record: never read as none
+            if begins == b"---":
+                found.add(rel)
+    return sorted(found)
+
+
+class _Code:
+    """The code graph of the code index, read once if it was built; ``usable`` when it was read, even stale."""
+
+    def __init__(self, root: Path):
+        from gov import codeintel
+
+        self.root, self.dead, self.paths = root, Counter(), {}
+        staged = codeintel.home(root).parent / "files"
+        if not staged.is_dir():
+            self.state = "missing: no code index was built here; gov impact never builds it"
+            return
+        try:
+            self.dead = Counter(entry["name"] for entry in codeintel.dead_code(root))
+        except (RuntimeError, OSError, LookupError, ValueError, TypeError) as error:
+            self.state = f"unavailable: the code index cannot be read ({error})"
+            return
+        self.state = _staleness(root, staged) or OK
+
+    @property
+    def usable(self) -> bool:
+        return self.state == OK or self.state.startswith("stale")
+
+    def defined(self, name: str) -> list[str]:
+        from gov import codeintel
+
+        if self.usable and name not in self.paths:
+            self.paths[name] = sorted({entry["path"] for entry in codeintel.definitions(self.root, name)})
+        return self.paths.get(name, [])
+
+    def near(self, name: str) -> set:
+        from gov import codeintel
+
+        return {entry["name"] for entry in codeintel.callers(self.root, name) + codeintel.callees(self.root, name)}
+
+    def is_dead(self, name: str) -> bool:
+        """Dead code only when every definition of the name is (R8): one called definition keeps the name alive."""
+        from gov import codeintel
+
+        return self.dead[name] > 0 and self.dead[name] >= len(codeintel.definitions(self.root, name))
+
+
+def _staleness(root: Path, staged: Path) -> str | None:
+    """Why the code index is not the working tree's: a file it copied changed or went, or a file the index would copy
+    now is not in it, whatever its modification time (R4)."""
+    from gov.secrets import indexable, path_holds_secret
+
+    listed = [rel for rel in _git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").split("\0")
+              if rel]
+    copies = {path.relative_to(staged).as_posix(): path for path in staged.rglob("*") if path.is_file()}
+    for rel in sorted(copies):
+        path = root / rel
+        if not path.is_file() or path.read_bytes() != copies[rel].read_bytes():
+            return f"stale: {rel} changed after the code index was built; gov impact never builds it again"
+    new = sorted(set(listed) - set(copies))
+    if not new:
+        return None
+    try:  # the index's own filter (gov.codeintel.index): what it leaves out is not missing from the index
+        held = [rel for rel in indexable(root, new) if not path_holds_secret(root, rel)]
+    except (RuntimeError, OSError, LookupError, ValueError, TypeError) as error:
+        more = f" and {len(new) - 1} more" if len(new) > 1 else ""
+        return f"stale: whether {new[0]}{more} belong in the code index cannot be decided ({error}); gov impact " \
+               "never builds it again"
+    if held:
+        return f"stale: {held[0]} is not in the code index; gov impact never builds it again"
+    return None
+
+
+def _stated(values: list[str]) -> list[str]:
+    """The ids and names of the stated change; a question gives the one it names (KPI 3)."""
+    ids, malformed = [], []
+    for value in values:
+        asked = _QUESTION.fullmatch(value)
+        item = asked.group(1) if asked else value.strip()
+        if not _NAME.fullmatch(item):
+            malformed.append(value)
+        elif item not in ids:
+            ids.append(item)
+    if malformed:
+        raise GovError("IMPACT_CHANGE_MALFORMED", f"{', '.join(map(repr, malformed))}: neither a record id, a symbol "
+                       "name nor a question \"What's the impact of X?\"", {"malformed": malformed})
+    if not ids:
+        raise GovError("IMPACT_NO_CHANGE", "no stated change: give a record id, a symbol name or a question")
+    return ids
+
+
+def _walk(graph: _Records, code: _Code, start: list[str], depth: int) -> tuple[dict, dict]:
+    """``id -> graph`` of what is at most ``depth`` hops from ``start`` over both graphs, and ``id -> gap reason``."""
+    seen, gaps, front = {}, {}, set(start)
+    for _ in range(depth + 1):
+        named = set()
+        for item in sorted(front):
+            if item in graph.by_id:
+                seen[item] = RECORD
+                named |= graph.near.get(item, set())
+            elif code.defined(item):  # G-16: a name no record holds is a symbol of the code index, or a gap
+                seen[item] = CODE
+                named |= code.near(item) | graph.near.get(item, set())
+            else:
+                gaps[item] = UNRESOLVED if code.usable else "CODE_GRAPH_" + code.state.split(":")[0].upper()
+        front = named - seen.keys() - gaps.keys()
+    gaps.update(dict.fromkeys(front, DEPTH_LIMIT))
+    return seen, gaps
+
+
+def _grouped(graph: _Records, code: _Code, seen: dict, start: list[str], gaps: dict) -> dict:
+    affected = {kind: [] for kind in KINDS}
+    for item, where in sorted(seen.items()):
+        if item in start:
+            continue
+        kind = readings.record_kind(graph.by_id[item], graph.testers) if where == RECORD \
+            else readings.symbol_kind(code.defined(item))
+        if kind is None:
+            gaps[item] = NO_KIND
+        else:
+            affected[kind].append({"id": item, "graph": where})
+    return affected
+
+
+def _in_place(root: Path, record: dict) -> list[dict]:
+    """Edits of a closed specification that keep it closed: in a commit after it was closed, or in the working tree."""
+    rel, found, before = record["path"], [], None
+    for commit in _git(root, "log", "--reverse", "--format=%H", "--", rel).split():
+        now = (_front(_git(root, "show", f"{commit}:{rel}")) or {}).get("status")
+        if before == now == readings.CLOSED:
+            found.append(commit)
+        before = now
+    path = root / rel
+    if before == readings.CLOSED and _git(root, "status", "--porcelain", "--", rel).strip() and path.is_file() \
+            and (_front(path.read_text(encoding="utf-8", errors="replace")) or {}).get("status") == readings.CLOSED:
+        found.append("working tree")
+    return [{"code": "CLOSED_SPEC_EDITED_IN_PLACE", "id": record["id"], "path": rel, "where": where,
+             "message": f"{record['id']} is closed and was edited in place ({where}): a change to a closed "
+                        "specification goes through a CIT-P and one of DEC-105's options"} for where in found]
+
+
+def _options(closed: list[str], count: int) -> list[dict]:
+    """DEC-105's three options for a change to a closed specification, each with its cost (CAP-33.e)."""
+    names = ", ".join(closed)
+    return [
+        {"option": "apply now", "cost": f"{names} changes now, through this CIT-P and the owner's approval; the "
+                                        f"{count} affected items are checked against the new text before they close"},
+        {"option": "defer", "cost": f"the finding is recorded and work continues; the {count} affected items keep "
+                                    f"building on {names} as it stands until the owner takes the finding up"},
+        {"option": "re-baseline", "cost": f"{names} is reopened and re-planned from; the work it invalidates among "
+                                          f"the {count} affected items is retired, and every version is kept"},
+    ]
+
+
+def assess(root: Path, values: list[str], config: dict, out: str | None = None) -> dict:
+    """The impact assessment of the stated change, with its CIT-P; with ``out``, the CIT-P written there too."""
+    from gov.closure import depth_of_radius
+
+    root, ids = Path(root), _stated(values)
+    graph, code = _Records(root), _Code(Path(root))
+    unknown = [item for item in ids if item not in graph.by_id and not code.defined(item)]
+    if unknown:
+        looked = "" if code.usable else f", and the code graph cannot be asked ({code.state})"
+        raise GovError("IMPACT_CHANGE_UNKNOWN", f"{', '.join(unknown)}: no record of the store and no symbol of the "
+                       f"code index{looked}", {"unknown": unknown, "graphs": {RECORD: graph.state, CODE: code.state}})
+    if out is not None:
+        _check_out(root, out, graph)
+    current = graph.state == OK
+    change = []
+    for item in ids:
+        record = graph.by_id.get(item)
+        named = bool(graph.named_by.get(item))
+        dead, path = (True, record["path"]) if record else (code.is_dead(item), (code.defined(item) or [None])[0])
+        change.append({"id": item, "graph": RECORD if record else CODE, "path": path,
+                       "deletable": readings.deletable(named, dead, current and (record is not None or code.state == OK)),
+                       "governance": readings.governance(config.get("path-map.yaml", {}).get("namespaces"), path)})
+    near, near_gaps = _walk(graph, code, ids, 1)
+    one_hop = {kind for kind, listed in _grouped(graph, code, near, ids, {}).items() if listed}
+    if any(reason.startswith("CODE_GRAPH_") for reason in near_gaps.values()):
+        one_hop.add("code")  # what the code graph could not say is never read as nothing
+    number = readings.radius(all(entry["deletable"] for entry in change), one_hop)
+    depth = depth_of_radius(number)
+    seen, gaps = _walk(graph, code, ids, depth)
+    affected = _grouped(graph, code, seen, ids, gaps)
+    closed = [item for item in ids if item in graph.by_id and readings.closed_specification(graph.by_id[item])]
+    record_id = "CITP-" + hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()[:8]
+    if out is not None and re.fullmatch(r"[A-Z][A-Z0-9]*-[A-Za-z0-9._-]+", Path(out).stem):
+        record_id = Path(out).stem
+    graphs = {RECORD: graph.state, CODE: code.state}
+    complete = not gaps and all(state == OK for state in graphs.values())
+    listed_gaps = [{"id": item, "reason": gaps[item]} for item in sorted(gaps)]
+    # The CIT-P says what the assessment says of its completeness (R3, R4): a file never reads as more than it is.
+    proposal = {"id": record_id, "type": CITP_TYPE, "status": "PROPOSED", "state_class": "DERIVED",
+                "title": f"The impact of changing {', '.join(ids)}", "change": ids, "radius": f"R{number}",
+                "depth": depth, "affected": {kind: [entry["id"] for entry in affected[kind]] for kind in KINDS},
+                "complete": complete, "graphs": dict(graphs), "gaps": [dict(gap) for gap in listed_gaps]}
+    result = {
+        "change": change, "radius": f"R{number}", "depth": depth, "depth_source": readings.DEPTH_SOURCE,
+        "affected": affected, "graphs": graphs, "complete": complete, "gaps": listed_gaps, "proposal": proposal,
+        "options": _options(closed, sum(map(len, affected.values()))) if closed else [],
+        "findings": [finding for item in closed for finding in _in_place(root, graph.by_id[item])],
+    }
+    if out is not None:
+        _write(root, out, proposal)
+    return result
+
+
+def _out_path(root: Path, out: str) -> Path:
+    return Path(out) if Path(out).is_absolute() else root / out
+
+
+def _check_out(root: Path, out: str, graph: _Records) -> None:
+    """Refuse an ``--out`` that cannot be written, with its real cause, before anything is written (E, F4)."""
+    if not out.strip():
+        raise GovError("IMPACT_OUT_EMPTY", "--out is an empty path: give the file the CIT-P is written to",
+                       {"out": str(out)})
+    path = _out_path(root, out)
+    if path.is_dir():
+        raise GovError("IMPACT_OUT_IS_FOLDER", f"{out}: a folder is there, not a file; give the file the CIT-P is "
+                       "written to", {"out": str(out)})
+    if path.exists():
+        raise GovError("IMPACT_OUT_EXISTS", f"{out}: a file is there already; gov impact writes no file over another",
+                       {"out": str(out)})
+    if path.stem in graph.by_id:
+        raise GovError("IMPACT_OUT_ID_TAKEN", f"{out}: its file stem {path.stem} is the id of a record already in the "
+                       "store; the CIT-P would clash with it", {"out": str(out), "id": path.stem})
+
+
+def _write(root: Path, out: str, proposal: dict) -> None:
+    """The CIT-P as a record file at ``out``: the one file gov impact writes, and never over another."""
+    import yaml
+
+    path = _out_path(root, out)
+    if path.exists():
+        raise GovError("IMPACT_OUT_EXISTS", f"{out}: a file is there already; gov impact writes no file over another",
+                       {"out": str(out)})
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = "" if proposal["complete"] else ", from an assessment that is not complete (see `graphs` and `gaps`)"
+    path.write_text(f"---\n{yaml.safe_dump(proposal, sort_keys=False, allow_unicode=True)}---\n\n"
+                    f"# {proposal['id']}: {proposal['title']}\n\nWritten by `gov impact`: radius {proposal['radius']}, "
+                    f"depth {proposal['depth']}{partial}.\n", encoding="utf-8")
+
+
+def _lists(value, which: str, ids: dict) -> dict | None:
+    """``kind -> set of ids`` of an ``affected`` map; None when there is none. A kind that is not a list is refused
+    (R6): one item or a map in its place is never read as nothing."""
+    if not isinstance(value, dict) or not value:
+        return None
+    malformed = sorted(str(kind) for kind, listed in value.items() if not isinstance(listed, (list, type(None))))
+    if malformed:
+        raise GovError("IMPACT_AFFECTED_MALFORMED", f"{which}'s `affected` gives {', '.join(malformed)} as no list: "
+                       "the records cannot be compared", {**ids, "kinds": malformed})
+    return {str(kind): {str(item.get("id") if isinstance(item, dict) else item) for item in (listed or [])}
+            for kind, listed in value.items()}
+
+
+def compare(root: Path, rel: str) -> dict:
+    """The CIT-E at ``rel`` checked against the CIT-P it names: ``matches``, or every difference (KPI 2)."""
+    root = Path(root)
+    path = Path(rel) if Path(rel).is_absolute() else root / rel
+    try:
+        front = _front(path.read_text(encoding="utf-8")) or {}
+    except (OSError, UnicodeDecodeError):
+        raise GovError("IMPACT_EXECUTION_MISSING", f"{rel}: no change-execution record can be read there",
+                       {"path": str(rel)}) from None
+    execution = str(front.get("id", rel))
+    if front.get("type") != CITE_TYPE:
+        raise GovError("IMPACT_NOT_AN_EXECUTION_RECORD", f"{rel} ({execution}) is no {CITE_TYPE}: its type is "
+                       f"{front.get('type')!r}", {"path": str(rel)})
+    named = front.get("proposal")
+    if not isinstance(named, str) or not named:
+        raise GovError("IMPACT_NO_PROPOSAL", f"{execution} names no proposal: its `proposal` key gives no CIT-P id",
+                       {"execution": execution})
+    record = _Records(root).by_id.get(named)
+    if record is None or record["type"] != CITP_TYPE:
+        what = "no record of the store" if record is None else f"a {record['type']}, no {CITP_TYPE}"
+        raise GovError("IMPACT_PROPOSAL_UNKNOWN", f"{execution} names the proposal {named}, which is {what}",
+                       {"execution": execution, "proposal": named})
+    named_ids = {"execution": execution, "proposal": named}
+    # The proposal as HEAD holds it, which the store was loaded from: an edit of its file in the working tree, staged or
+    # not, never changes what the CIT-E is compared against (A). A file that is gone is refused as missing (E).
+    shown = subprocess.run(["git", "--no-optional-locks", "-C", str(root), "show", f"HEAD:{record['path']}"],
+                           capture_output=True)
+    if not (root / record["path"]).is_file() or shown.returncode != 0:
+        raise GovError("IMPACT_PROPOSAL_MISSING", f"{execution} names the proposal {named}, but its file "
+                       f"{record['path']} does not exist" + ("" if shown.returncode else " in the working tree"),
+                       {**named_ids, "path": record["path"]})
+    try:
+        proposed_front = _front(shown.stdout.decode("utf-8")) or {}
+    except UnicodeDecodeError:
+        proposed_front = {}
+    proposed = _lists(proposed_front.get("affected"), named, named_ids)
+    done = _lists(front.get("affected"), execution, named_ids)
+    for which, lists in ((execution, done), (named, proposed)):
+        if lists is None:
+            raise GovError("IMPACT_NOTHING_LISTED", f"{which} lists nothing under `affected`: the records cannot be "
+                           "compared", {"execution": execution, "proposal": named})
+    differences = [{"id": item, "kind": kind, "only_in": side}
+                   for kind in sorted(set(proposed) | set(done))
+                   for side, here, there in (("proposal", proposed, done), ("execution", done, proposed))
+                   for item in sorted(here.get(kind, set()) - there.get(kind, set()))]
+    # The proposal's own completeness and gaps (C): a CIT-P that was not complete is never compared as if it were, and
+    # one that does not say is not read as complete.
+    said, gaps = proposed_front.get("complete"), proposed_front.get("gaps")
+    gaps = [dict(gap) if isinstance(gap, dict) else {"id": str(gap)} for gap in gaps] if isinstance(gaps, list) else []
+    if not isinstance(said, bool):
+        gaps.append({"id": named, "reason": "COMPLETENESS_NOT_STATED"})
+    return {"proposal": named, "execution": execution, "matches": not differences, "differences": differences,
+            "complete": said is True and not gaps, "gaps": gaps}

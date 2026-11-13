@@ -99,9 +99,13 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     kept: any other command ``gov`` offers that no list records still fails the case, a recorded command (the four
     included) gone from ``gov --help`` still fails it, the module command is still none of ``gov``'s, and ``release``
     alone is still excused until recorded (DEC-753).
+
+    Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite by a fresh test designer, DEC-491):
+    W1-07's lines record ``impact`` (``gov impact``, approved and built), so the first assert's set gains it; nothing
+    else in the case changes, and ``RECORDED_HERE`` stays as it is.
     """
     assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) - set(RECORDED_HERE) == {
-        "accept", "brief", "ci", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
+        "accept", "brief", "ci", "impact", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     recorded = set(RECORDED) | set(RECORDED_HERE)
     run = support.gov(empty_project, sandbox, "--help")
