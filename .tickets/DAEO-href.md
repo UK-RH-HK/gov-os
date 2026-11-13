@@ -18,6 +18,7 @@ allowed_paths:
 - governance/project/facts.yaml
 - tests/unit/context/test_w2_183_*.py
 - tests/unit/close/test_w2_183_*.py
+- tests/unit/close/test_context.py  # its :31 case pins build_context(ROOT, "T-1"); revised to the decided call with budget= (DEC-1165; CTO, DEC-1156 (7), DEC-1157 (12))
 - docs/probes/DAEO-href/**  # the probe record
 reads:
 - src/gov/context/context_check.py
