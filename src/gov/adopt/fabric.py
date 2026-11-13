@@ -173,9 +173,10 @@ def install(run, head: str) -> dict:
     """Write, byte for byte, the kernel files Gov OS ships into the adopted repository and stage them (the stage's one
     commit takes them with its record): the retrieval and discovery skills to ``.claude/skills/``, T-0 and T-8 to
     ``governance/kernel/templates/``, and Gov OS's ``retrieval.yaml`` only where the repository tracks none (its own is
-    kept, and judged). ``{installed: [{path, sha256, from}], kept: [{path, sha256}], written, dirs}``: the last two are
-    what ``undo`` removes. The copies join ``run.tracked`` (the stores judge them like any file). An untracked file at a
-    destination is never overwritten (refused, naming it)."""
+    kept, and judged). ``{installed: [{path, sha256, from}], kept: [{path, sha256}], written, dirs, staged, replaced}``:
+    what A9 wrote, the folders it made, the index entry ``(mode, blob)`` it staged per path and the blob of each path the
+    start commit tracked: what ``undo`` judges by. The copies join ``run.tracked`` (the stores judge them like any
+    file). An untracked file at a destination is never overwritten (refused, naming it)."""
     root, tracked = run.root, run.tracked
     wanted, kept = _sources(), []
     if RETRIEVAL in tracked:
@@ -188,7 +189,8 @@ def install(run, head: str) -> dict:
     if taken:
         raise project.refuse("WOULD_OVERWRITE", "an untracked file stands at " + ", ".join(taken) + ": the tool writes "
                              "nothing over a file it did not write", paths=taken)
-    copies = {"installed": [], "kept": kept, "written": [], "dirs": []}
+    copies = {"installed": [], "kept": kept, "written": [], "dirs": [], "staged": {},
+              "replaced": {target: tracked[target] for _, target in wanted if target in tracked}}
     try:
         for source, target in wanted:
             data, place = (GOV_OS / source).read_bytes(), root / target
@@ -208,22 +210,85 @@ def install(run, head: str) -> dict:
         for entry in project.git(root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", *copies["written"]).split("\0"):
             meta, _, rel = entry.partition("\t")
             if rel:  # the copies are tracked files of the project from here on: judged like every other
-                run.tracked[rel] = meta.split()[1]
-    except BaseException:
-        undo(root, head, copies)
+                mode, blob_id = meta.split()[:2]
+                copies["staged"][rel] = (mode, blob_id)
+                run.tracked[rel] = blob_id
+    except BaseException as exc:
+        undone(root, head, copies, exc)
         raise
     return copies
 
 
-def undo(root: Path, head: str, copies: dict) -> None:
-    """Back to ``head`` as the stage found it (a clean tree): what was staged is undone and the copies and the folders
-    made for them are removed; a refusal of A9 writes nothing in the repository's tree."""
-    project.restore(root, head, copies["written"])
+def _entries(listing: str, blob_at: int) -> dict[str, tuple[str, str]]:
+    """Path -> ``(mode, blob)`` from a ``-z`` listing of ``ls-files -s`` (blob at field 1) or ``ls-tree`` (field 2)."""
+    found = {}
+    for entry in listing.split("\0"):
+        meta, _, rel = entry.partition("\t")
+        if rel:
+            fields = meta.split()
+            found[rel] = (fields[0], fields[blob_at])
+    return found
+
+
+def undo(root: Path, head: str, copies: dict) -> str | None:
+    """Undo only what A9 did (RV2-1), judged against the commit HEAD names now: never ``git reset --hard``, never a
+    checkout, never a move of the branch. In the index, a path A9 staged is unstaged (put back to the commit's entry
+    where the commit tracks it) only where its entry is still the blob A9 staged; in the tree, a file A9 wrote is
+    deleted (or, where the commit tracks the path, or the start commit did, given back that content) only where its
+    bytes are still A9's; then the folders A9 made, each only when empty. A copy the commit itself holds (committed
+    during the run) is left as it is, and so is every other path: a tracked file edited, a file staged or made during
+    the run. Returns the commit HEAD names now where it is not ``head`` (the caller refuses ``HEAD_MOVED``), else
+    None."""
+    written = list(copies["written"])
+    now = project.resolve(root, "HEAD")
+    if written:
+        index = _entries(project.git(root, "--literal-pathspecs", "ls-files", "-s", "-z", "--", *written), 1)
+        held = _entries(project.git(root, "--literal-pathspecs", "ls-tree", "-r", "-z", now, "--", *written), 2) \
+            if now else {}
+        sums = {item["path"]: item["sha256"] for item in copies["installed"]}
+        staged, lines = copies.get("staged") or {}, []
+        for rel in written:
+            mine = staged.get(rel)
+            if mine is None or index.get(rel) != mine or held.get(rel, (None, None))[1] == mine[1]:
+                continue  # not staged by A9, re-staged by someone, or the commit holds A9's copy: left as it is
+            if rel in held:
+                lines.append(f"{held[rel][0]} {held[rel][1]}\t{rel}\0")
+            else:
+                lines.append(f"0 {'0' * len(mine[1])}\t{rel}\0")
+        if lines:
+            project._run(root, ("update-index", "-z", "--index-info"), (0,), "".join(lines).encode("utf-8", "surrogateescape"))
+        for rel in written:
+            place = root / rel
+            if place.is_symlink() or not place.is_file():
+                continue
+            if hashlib.sha256(place.read_bytes()).hexdigest() != sums.get(rel):
+                continue  # changed during the run: the bytes are someone else's now
+            if rel in held and held[rel][1] == staged.get(rel, (None, None))[1]:
+                continue  # the commit holds A9's copy (committed during the run)
+            back = held.get(rel, (None, None))[1] or (copies.get("replaced") or {}).get(rel)
+            if back:  # a file the commit (or the start commit) tracks: its content is put back, never deleted
+                place.write_bytes(project.blob(root, back))
+            else:
+                place.unlink()
     for folder in sorted(copies["dirs"], key=lambda each: len(each.parts), reverse=True):
         try:
             folder.rmdir()
         except OSError:
             pass
+    return now if now != head else None
+
+
+def undone(root: Path, head: str, copies: dict, exc: BaseException) -> None:
+    """``undo``, then ``HEAD_MOVED`` (chained from ``exc``) where HEAD no longer names ``head``: nothing was reset and
+    the branch stays where it is. Where HEAD did not move, the caller re-raises ``exc`` as it was."""
+    now = undo(root, head, copies)
+    if now is None:
+        return
+    cause = exc.code if isinstance(exc, GovError) else type(exc).__name__
+    raise GovError("HEAD_MOVED", f"A9 stopped ({cause}) after HEAD moved from {head} (the commit A9 started on) to "
+                   f"{now}: nothing was reset and the branch stays at {now}; only A9's own copies (still as A9 wrote "
+                   "and staged them, and not held by the new commit) were removed",
+                   {"started": head, "now": now, "cause": cause}) from exc
 
 
 # ---- the checks that refuse (F2, F3)
@@ -555,7 +620,9 @@ def _domains(config: dict) -> tuple[dict[str, str], list[str]]:
 def a9(run) -> dict:
     """Stage A9 lite (see the module's text). ``run`` is ``gov.adopt.stages.Run``. The standard is judged first (a
     refusal there writes nothing); then the kernel files are installed and staged, the stores built and the record
-    committed with them in one commit; a refusal after the copies undoes them (nothing is left in the tree)."""
+    committed with them in one commit. A refusal or an interrupt after the copies undoes only what A9 did (``undo``:
+    its copies still as it wrote and staged them, and the folders it made when empty; every other edit, staged file or
+    commit made during the run stays) and keeps its own code, or is ``HEAD_MOVED`` where HEAD moved meanwhile."""
     root, args = run.root, run.args
     out = _out(args, root)
     decisions = list(getattr(args, "decision", None) or [])
@@ -564,8 +631,8 @@ def a9(run) -> dict:
     copies = install(run, head)
     try:
         return _stage(run, out, standard, copies)
-    except BaseException:
-        undo(root, head, copies)
+    except BaseException as exc:
+        undone(root, head, copies, exc)
         raise
 
 

@@ -169,12 +169,12 @@ def plan(assessment: dict, path_map: dict | None, out: Path) -> dict:
         proposals.append({"file": f"{FOLDER}/{name}", "kind": kind, "title": head["title"]})
     blind = unscanned(assessment)
     if blind:  # never "no secret" for a scan that did not run (B-1.5): PLAN.md says so, with the proposals found
-        where = (f"all {blind['all']} tracked files" if blind["all"] is not None
-                 else "\n".join(f"- `{path}`" for path in blind["unscanned"]))
+        where = (f" all {blind['all']} tracked files" if blind["all"] is not None  # one line (RV2-2)
+                 else "\n" + "\n".join(f"- `{path}`" for path in blind["unscanned"]))  # a list from the next line
         lines = [f"- `{item['file'].rsplit('/', 1)[-1]}`: {item['kind']}: {item['title']}" for item in proposals]
         (folder / "PLAN.md").write_text(
             "# Refactoring plan\n\nSources: memory-assessment sha256:" + digest + "\n\n"
-            f"secrets: not scanned ({blind['reason']})\n\nUnscanned paths: {where}\n\n"
+            f"secrets: not scanned ({blind['reason']})\n\nUnscanned paths:{where}\n\n"
             + ("\n".join(lines) + "\n" if lines else "No other blocker was found.\n"), encoding="utf-8")
     elif proposals:
         lines = [f"- `{item['file'].rsplit('/', 1)[-1]}`: {item['kind']}: {item['title']}" for item in proposals]
