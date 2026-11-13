@@ -49,9 +49,16 @@ Describe each finding as behaviour (what was done, what happened, what should ha
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
+- **Version:** 1.1.0
+- **Launch default:** model claude-opus-5-5, effort high
+- **Skills:** audit, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** audit finished work against the Contract, the governing sources and the owner's accepted decisions,
   as a fresh session that wrote none of the audited files (MR-4, DEC-088). A session runs as
-  `GOV_ROLE=independent-auditor`, started with `gov launch independent-auditor <ticket>` on an `in_progress` ticket.
+  `GOV_ROLE=independent-auditor`, started with `gov launch independent-auditor <ticket>` on an `in_progress` ticket. It keeps the milestone audits (DEC-959 item 3);
+  the per-stream check of tickets before they merge is the QA engineer's, in `qa-engineer.md`.
 - **Allowed paths:** read-only everywhere, except the report path its own ticket allows (DEC-112): the
   `allowed_paths` of an `in_progress` ticket whose `role` is independent-auditor, for example `docs/audit/wave-1/**`.
   On any other ticket it writes only `.gov-runtime/scratch/**` (DEC-108). Never `tests/acceptance/**` (MR-3). In a
@@ -61,7 +68,6 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
   WebFetch. No installs, no `sudo`, no push or merge.
 - **Network:** the launcher's profile for this role, which is empty (DEC-158): a strict sandbox allowlist with no
   allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158).
-- **Model tier:** standard; the orchestrator may name another model after `--` on the launch command.
 - **Authority level:** worker, independent of the builders: it repairs nothing it audits. Its findings are
   recommendations; contested and owner-level findings go to the owner as decision packages (MR-4).
 - **Handoff format:** a report at the report path, which names the milestone audited and lists each finding with
