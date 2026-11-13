@@ -8,9 +8,9 @@ base: 6c2c3ed93bee
 head: f0259229e2b5
 ticket: DAEO-wi46 (W2-98)
 author: orchestrator (the ticket lead of W2-98), for three product-spec sessions
-review: two rounds by fresh read-only reviewers (independent-auditor, Opus); round 1 FAIL on 384c92b8b429, fixed; round 2 FAIL on c530a0a1a236 (F1-F3); the owner's P-W2-98-R2 (a): one fix batch, then a narrow independent check, PASS on f0259229e2b5 (docs/probes/DAEO-wi46/PR-DAEO-wi46.md)
+review: 'two rounds by fresh read-only reviewers (independent-auditor, Opus); round 1 FAIL on 384c92b8b429, fixed; round 2 FAIL on c530a0a1a236 (F1-F3); the owner''s P-W2-98-R2 (a): one fix batch, then a narrow independent check, PASS on f0259229e2b5 (docs/probes/DAEO-wi46/PR-DAEO-wi46.md)'
 decisions_carried: [DEC-959, DEC-957, DEC-616, DEC-645, DEC-1083, DEC-1084, DEC-315, DEC-1112, DEC-1156]
-owner_approval: "W2-98 CIT-P approved at 3a86f11c3981" (the owner, chat, 2026-11-13; DEC-1163 (8))
+owner_approval: '"W2-98 CIT-P approved at 3a86f11c3981" (the owner, chat, 2026-11-13; DEC-1163 (8))'
 state_class: EVIDENCE
 ---
 
