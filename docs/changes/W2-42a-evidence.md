@@ -197,3 +197,20 @@ data, and the read judge dropped it.
   base read otherwise. Across 8,748 heredoc commands, the new parser gives a target or the sentinel for every one
   where the base gave a target.
 - **Counts:** the acceptance folder went from 24 failed, 467 passed, 2 xfailed to **491 passed, 2 xfailed**. tests/unit/guard: **569 passed**.
+
+**The apostrophe fix (reopened under DEC-1164 (18), DEC-1174 (1)).** An apostrophe in a comment inside a shell's
+heredoc body made the whole call unreadable and refused, and two such comments could pair into a quote that hid a
+write. The fix: `heredocs` (`src/gov/guard/bash_writes.py`) drops a comment's text, where the `#` starts a word
+outside quotes and the character before it is not escaped (`x\ #y` and `a\;#b` are one word to bash); a quote open
+outside every comment is `UnclosedQuote`, which `_extract_bash_write_targets` reads as the unresolvable target, as it
+does a scan failure with a quote in a comment. DEC-409's `_lift_in` (`decide.py`) reads the command as before and
+again with the quotes of its comments blanked (`bash_writes.comment_spans`: the top-level text and the bodies of
+heredocs a shell runs; Python and data bodies are read as before); the form found by either reading refuses, the
+comment's words stay, and an open quote outside comments cannot be read. A `python3 -c` string's writes are now product
+targets (as KPI 8's Python file), so the F1 reversal call that the apostrophe used to refuse whole stays refused for its
+write. **Counts:** test_w2_42a_apostrophe.py went from 120 failed, 192 passed to **312 passed**; the acceptance folder
+with tests/unit/guard: **1416 passed, 2 xfailed**; with tests/unit/hooks, pause, containment and tests/acceptance/W1-28:
+**1731 passed, 2 xfailed**. **Fail closed:** across 211,200 generated commands (8 heads, comment, quote and write
+lines), no lift form the base found is lost, and each of the 39,319 commands whose answer changed toward free, run in
+real bash with a stand-in `gov`, neither writes the acceptance folder nor runs the lift form where the new guard leaves
+it free.
