@@ -15,6 +15,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
+from gov.cli import main as cli  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
 from gov.launch import launcher, role  # noqa: E402
 
@@ -180,6 +181,38 @@ def test_a_plan_with_no_role_file_refuses_naming_it(tmp_path):
     tree = _planted(tmp_path)
     with pytest.raises(GovError, match=f"{role.ADOPTED_ROLES_REL}/engineer.md"):
         launcher.plan(tree, "engineer", "DAEO-p1an")
+
+
+def _no_launch(monkeypatch):
+    launched = []
+    monkeypatch.setattr(launcher, "launch", lambda *a, **k: launched.append(a) or 0)
+    return launched
+
+
+def test_gov_launch_plan_through_the_cli_prints_the_line_and_launches_nothing(tmp_path, monkeypatch, capsys):
+    tree, launched = _planted(_tree(tmp_path, VERSION, DEFAULT)), _no_launch(monkeypatch)
+    before = sorted(p.relative_to(tree) for p in tree.rglob("*"))
+    assert cli.main(["launch", "--plan", "engineer", "DAEO-p1an", "--root", str(tree)]) == 0
+    assert capsys.readouterr().out == "model claude-opus-5-5, effort high\n"
+    assert launched == [] and sorted(p.relative_to(tree) for p in tree.rglob("*")) == before
+
+
+@pytest.mark.parametrize("lines", ((VERSION,), (VERSION, "- **Launch default:** model claude-opus-5-5, effort huge")))
+def test_gov_launch_plan_through_the_cli_refuses_with_exit_1_naming_the_role_file(tmp_path, monkeypatch, capsys,
+                                                                                    lines):
+    tree, launched = _planted(_tree(tmp_path, *lines)), _no_launch(monkeypatch)
+    assert cli.main(["launch", "--plan", "engineer", "DAEO-p1an", "--root", str(tree)]) == 1
+    out, err = capsys.readouterr()
+    assert out == "" and "LAUNCH_REFUSED" in err and f"{role.ROLES_REL}/engineer.md" in err and launched == []
+
+
+def test_gov_launch_without_plan_still_launches_and_names_plan_in_its_usage(tmp_path, monkeypatch, capsys):
+    tree, launched = _planted(_tree(tmp_path, VERSION, DEFAULT)), _no_launch(monkeypatch)
+    assert cli.main(["launch", "engineer", "DAEO-p1an", "--root", str(tree)]) == 0
+    assert len(launched) == 1 and capsys.readouterr().out == ""
+    with pytest.raises(SystemExit):
+        cli.main(["launch"])
+    assert "[--plan]" in capsys.readouterr().err
 
 
 def test_the_folder_hash_follows_a_file_beside_skill_md(tmp_path):
