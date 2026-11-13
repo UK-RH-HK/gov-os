@@ -37,6 +37,12 @@ Return: T-0's form; `work_completed` holds the verdict in two lines.
 
 Delivered with the launcher (W1-46, DEC-163). The full research lifecycle (CAP-32) stays in Wave 3.
 
+- **Version:** 1.1.0
+- **Launch default:** model claude-sonnet-5-5, effort high
+- **Skills:** discovery, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** run a discovery spike, a bake-off or an experiment, and leave an evidence record. A research or
   experiment session runs as `GOV_ROLE=research`, started with `gov launch research <ticket>`.
 - **Allowed paths:** its ticket's `allowed_paths`, which is exactly one experiment folder, `<folder>/**` (DEC-242),
@@ -46,7 +52,6 @@ Delivered with the launcher (W1-46, DEC-163). The full research lifecycle (CAP-3
   inside the experiment folder (DEC-163, DEC-240); never system-wide, never `sudo`.
 - **Network:** the launcher's research profile, the allowlist of DEC-158 and DEC-241: the kernel default extended by
   `governance/project/research-allowlist.yaml`. The guard grants no network.
-- **Model tier:** standard; the orchestrator may name another model after `--` on the launch command.
 - **Authority level:** worker. It decides nothing outside its experiment; a finding that changes the plan goes to the
   orchestrator as a recommendation.
 - **Handoff format:** an evidence record in the experiment folder (question, method, commands run, results, verdict,

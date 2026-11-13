@@ -202,11 +202,10 @@ def _night_hold(w, holding):
 
 
 HOLDS = {
-    # DEC-1141 (6), ACT-OPERATOR-HOURS-2: 02:10 to 03:09 always holds; from 03:10 to 07:59 the night hold's state file decides
-    "before-the-night-hold": (lambda w: w.set_clock("2026-11-10T02:30:00+00:00"),
-                              lambda w: w.set_clock("2026-11-10T08:00:00+00:00")),
-    "night-hold-on": (lambda w: (w.set_clock("2026-11-10T05:30:00+00:00"), _night_hold(w, True)),
-                      lambda w: _night_hold(w, False)),
+    # DEC-1157 (2), ACT-OPERATOR-HOURS-3: no time hold; at night the nightly's own flag holds (05:30, cleared when it ends)
+    "nightly-running": (lambda w: (w.set_clock("2026-11-10T05:30:00+00:00"),
+                                   (w.scratch / "NIGHTLY-RUNNING").write_text("2026-11-10 04:00:05 nightly: running\n")),
+                        lambda w: (w.scratch / "NIGHTLY-RUNNING").unlink()),
     "nightly-window": (lambda w: w.set_clock("2026-11-10T21:30:00+00:00"),
                        lambda w: w.set_clock("2026-11-10T22:30:00+00:00")),
     "close-queue-running": (lambda w: w.close_flag.write_text("running\n"), lambda w: w.close_flag.unlink()),
@@ -236,3 +235,23 @@ def test_s13_g9_a_hold_waits_then_proceeds_once_cleared(world, hold):
     assert last_json(out).get("result") == "applied"
     assert world.read("repo", "tests/optin-lifted.txt") == b.dir.joinpath(
         "after/repo/tests/optin-lifted.txt").read_bytes()
+
+
+# DEC-1157 (2), ACT-OPERATOR-HOURS-3: the night hold is removed; G9 holds no hour of the night, whatever its old state file says
+NIGHT = {
+    "0230-no-state-file": ("2026-11-10T02:30:00+00:00", None),
+    "0530-night-hold-true": ("2026-11-10T05:30:00+00:00", True),
+}
+
+
+@pytest.mark.parametrize("night", list(NIGHT))
+def test_s13_g9_no_time_hold_at_night(world, night):
+    clock, holding = NIGHT[night]
+    b = world.ready("ACT-T-G9N", [world.optin_removal()], review_kw={"at": "2026-11-09T09:00:00+00:00"})
+    world.set_clock(clock)
+    if holding is not None:
+        _night_hold(world, holding)
+    r = world.run(b)
+    applied(world, r, b)
+    g9 = [line for line in world.gate_lines(b.act) if line.get("gate") == "G9"]
+    assert g9 and all(line.get("result") != "held" for line in g9), g9

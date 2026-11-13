@@ -188,7 +188,9 @@ def test_the_dispatchers_lead_form_is_otherwise_the_same_command():
     """F2: removing the added flag line leaves the exec command as integrate's (the call form kept, D-4)."""
     lines = LAUNCH_NOW.read_text(encoding="utf-8").splitlines()
     start = next(i for i, line in enumerate(lines) if line.startswith("exec /home/usain/.local/bin/claude "))
-    command = [line for line in lines[start:start + 6] if "--append-system-prompt-file" not in line]
+    # ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)) added the lead's --add-dir line after W2-153; it is judged apart from this.
+    command = [line for line in lines[start:start + 7]
+               if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]
     assert command[:4] == [
         "exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json "
         "--permission-mode acceptEdits \\",
