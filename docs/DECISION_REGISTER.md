@@ -14907,6 +14907,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **W2-33's CIT-P approved at `c4b97716164e`** (CAP-33): the nine kernel role files (`engineer.md` c94f98d7…, `independent-auditor.md` 4b4a5f94…, `independent-test-designer.md` 890c91f5…, `orchestrator.md` 08ba69e6…, `product-spec.md` bb9a46da…, `research.md` f9bc3b72…, `ticket-lead.md` 0c93598c…, `qa-engineer.md` 40fd68fd…, `senior-engineer.md` 243e8b84…) and `template/.rulesync/subagents/orchestrator.md` (ef15ea7d…), as `docs/changes/W2-33-CIT-P.md` §2 lists them in full; **C0 is Haiku low** (`claude-haiku-5-5`) for the engineer, test designer and QA engineer. The CTO adds the hashes to the kernel gate's approved list and lands W2-33 by a hand merge with the copies ACT.
 - **Basis:** the owner's message of 2026-11-13 ~01:20 ("The nightly's memory minimum: (a). W2-33 CIT-P approved at c4b97716164e, C0 Haiku low.").
 
+### DEC-1161 — P-W2-98-R2 (a); W2-60a P-1 (A) at the morning handover, in the CTO's order
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~01:45; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1010, DEC-1154, DEC-313, DEC-1140 (4), DEC-1157
+- **Decision:**
+  - (1) **P-W2-98-R2 (a):** W2-98's round 2 F1-F3 (placeholder failure and behaviour text; an unbulleted KPI id line; owner and licence placeholders) land by one fix batch and a narrow independent check (DEC-1154), not a third round; the CIT-P's hashes are rewritten for the owner's approval after it.
+  - (2) **W2-60a P-1 (A), at the morning handover (DEC-1140 (4)), in this order:** an ACT giving ticket leads `--add-dir` for their own `-tests` worktree and the runs from `launch_now.sh` (class (b)); then a fresh CTO session started by the owner's operator with `--add-dir /home/usain/gov-os-worktrees --add-dir /home/usain/gov-os-runs` and `--remote-control`; then the owner's operator removes `permissions.additionalDirectories` from the main checkout's `.claude/settings.local.json`. Workers stay walled (DEC-313); W2-60a's half-done merge waits in its worktree (backup `merge-r4/`) until then. The ACT and the steps come in the 09:00 digest.
+- **Basis:** the owner's message of 2026-11-13 ~01:45.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15002,3 +15009,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.539 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1158 (the emergency of 11-02 lifted; six superseded, two spent). Next free id: DEC-1159. |
 | 0.540 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1159 (the nightly beside the leads; W2-155 option 1, option 5 the fallback; the live reranker's limit). Next free id: DEC-1160. |
 | 0.541 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1160 (the nightly's minimum cap 7.5 GiB; W2-33's kernel role files approved, C0 Haiku low). Next free id: DEC-1161. |
+| 0.542 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1161 (P-W2-98-R2 (a); W2-60a P-1 (A) at the morning handover). Next free id: DEC-1162. |
