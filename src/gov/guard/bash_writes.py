@@ -105,12 +105,13 @@ def joined(command):
 
 # -- the shell text: heredocs and substitutions out --------------------------------------------------------------
 
-def heredocs(command, comments=None):
+def heredocs(command, comments=None, legacy=False):
     """``command`` without its heredoc bodies and its comments, and the bodies. Each heredoc operator and its
     delimiter become ``< __gov_hdl_<k>__`` (an input redirect the parser skips), so the reader is known by position.
     A comment's text (a ``#`` that starts a word, outside quotes, to the end of its line) is dropped, so a quote in it
     is no quote (DEC-1174 (1)); its span is added to ``comments`` when a list is given. Raises Unreadable for
-    anything the scan cannot read for certain."""
+    anything the scan cannot read for certain. ``legacy``: ``${`` is not followed, so a ``#`` inside it may start a
+    comment, as the scan read it before APOS-3 (judge's fail-closed second reading only)."""
     out, bodies, pending = [], [], []
     # The shell's contexts: "top"; '"' (double quotes); "$(" (a command substitution, whose quoting starts
     # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic); "${" (a
@@ -133,7 +134,7 @@ def heredocs(command, comments=None):
         if ctx[0] == '"':
             if c == '"':
                 stack.pop()
-            elif command.startswith("${", i):
+            elif not legacy and command.startswith("${", i):
                 stack.append(["${", 0])
                 out.append("${")
                 i += 2
@@ -192,7 +193,7 @@ def heredocs(command, comments=None):
             out.append("$(")
             i += 2
             continue
-        if command.startswith("${", i):
+        if not legacy and command.startswith("${", i):
             stack.append(["${", 0])
             out.append("${")
             i += 2
@@ -1254,9 +1255,12 @@ class Judgement:
     naming of the acceptance tests refuses an unresolvable target; ``code``: it is code (Python, perl or node, a
     script body), whose naming counts in any spelling (names_tests)."""
 
-    def __init__(self, parse, expand, bodies=None):
+    def __init__(self, parse, expand, bodies=None, loose=frozenset()):
         self.parse = parse    # the product's parser: (command, cwd) -> targets or None
         self.expand = expand  # the product's word expansion: (word) -> text or None
+        # judge's second readings of a command the first cannot read (APOS-3/APOS-4): "strings", a here-string a
+        # command may run is taken as data; "legacy", a # inside ${...} may start a comment, as before APOS-3.
+        self.loose = loose
         self.shell, self.findings = [], []
         # The product's (W2-42a): the writes the line parser does not read, and the runs it cannot read.
         self.writes, self.unread = [], []
@@ -1285,14 +1289,14 @@ class Judgement:
         if depth > MOST_DEPTH:
             self.shell.append(SENT)
             return
-        text, bodies = heredocs(command)
+        text, bodies = heredocs(command, legacy="legacy" in self.loose)
         base = len(self.bodies)
         self.bodies += bodies
         # This command's own heredocs get their number among all met so far (a nested command's marks are
         # already numbered so).
         text = re.sub(r"__gov_hdl_(\d+)__", lambda m: f"__gov_heredoc_{base + int(m.group(1))}__", text)
         text, subs = lift(text)
-        if "<<<" in text:
+        if "<<<" in text and "strings" not in self.loose:
             _check_here_strings(simples(tokens(text)))
 
         def expand(value, env):
@@ -1432,7 +1436,7 @@ class Judgement:
         """A script file's shell body, run by this command: its writes are the command's (rule 5); under rule 1 a
         target that names the tests refuses wherever the script runs, and one it cannot work out refuses when the
         body names them."""
-        sub = Judgement(self.parse, self.expand, self.bodies)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
         try:
             sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:
@@ -1453,7 +1457,7 @@ class Judgement:
         self.findings.append(([(SENT, None)], part + "\n" + text, True))
         if shell:
             self.unread.append(SENT)
-            sub = Judgement(self.parse, self.expand, self.bodies)
+            sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
             try:
                 sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
                 self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
@@ -1507,7 +1511,7 @@ class Judgement:
 
     def unknown_cwd(self, command, whole, depth):
         """A command judged where the shell's folder is unknown: its relative targets are unresolvable."""
-        sub = Judgement(self.parse, self.expand, self.bodies)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
         sub.run(command, UNKNOWN, whole, depth + 1)
         self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
         self.adopt(sub)
@@ -1584,7 +1588,7 @@ class Judgement:
 
     def nested(self, whole):
         def judge(text, cwd, depth):
-            sub = Judgement(self.parse, self.expand)
+            sub = Judgement(self.parse, self.expand, loose=self.loose)
             if cwd is None:
                 sub.unknown_cwd(text, whole, depth)
             else:
@@ -1602,7 +1606,7 @@ class Judgement:
         name = os.path.basename(reader[0]) if reader else ""
         if name in _PRODUCT_DATA:
             return
-        sub = Judgement(self.parse, self.expand, self.bodies)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
         try:
             sub.run(body["text"], UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:
@@ -1638,11 +1642,37 @@ class Judgement:
 
 def judge(command, cwd, parse, expand):
     """The Judgement of ``command`` run at ``cwd``; Unreadable when the scan cannot read it for certain."""
-    j = Judgement(parse, expand)
     # A line continuation is removed before the text is read (round 2, F3); the whole command's naming of the tests
     # is read on both spellings.
-    j.run(command, cwd, command if "\\\n" not in command else command + "\n" + joined(command))
-    return j
+    whole = command if "\\\n" not in command else command + "\n" + joined(command)
+    j = Judgement(parse, expand)
+    try:
+        j.run(command, cwd, whole)
+        return j
+    except Unreadable as unread:
+        first = unread
+    # Fail closed (APOS-3/APOS-4, DEC-1174 (1)): a command the reading above cannot read (a here-string a command may
+    # run; a # inside ${...} that the scan once took for a comment, which hid a later form it cannot read) is also
+    # read with here-strings as data and with the earlier comment rule. Where one of those readings works, its
+    # targets join what the caller gives an unreadable command (the line parser, and the unresolvable target for a
+    # quote open or in a comment), so no target either reading gives is lost.
+    found = []
+    for loose in (("strings",), ("legacy",), ("strings", "legacy")):
+        try:
+            again = Judgement(parse, expand, loose=frozenset(loose))
+            again.run(command, cwd, whole)
+        except Unreadable:
+            continue
+        found += again.targets()
+    if not found:
+        raise first
+    out = Judgement(parse, expand)
+    out.writes = found + list(parse(command, cwd) or [])
+    if "\\\n" in command:
+        out.writes += list(parse(joined(command), cwd) or [])
+    if isinstance(first, UnclosedQuote) or COMMENT_QUOTE.search(command):
+        out.unread.append(SENT)
+    return out
 
 
 def reads_view(command):

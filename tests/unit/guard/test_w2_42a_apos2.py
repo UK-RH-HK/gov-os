@@ -145,6 +145,25 @@ def test_f4_a_here_string_a_command_may_run_is_read_as_before(root, command):
         bash_writes.comment_spans(command)
 
 
+PY_T = f"python3 -c \"open('{T}','w')\""
+
+
+@pytest.mark.parametrize("command", [
+    PY_T + "; echo ${x:-'}' #q} && xargs touch <<< " + T,     # the here-string a command may run is unreadable
+    PY_T + "; echo ${x:-${x:- #in} #out} && cat <<EOF",         # the ${...} once hid a heredoc with no body
+    PY_T + "; bash <<< ls",
+])
+def test_fail_closed_a_target_the_base_read_is_kept_when_the_scan_cannot_read_the_command(root, command):
+    assert f"R/{T}" in got(command, root)
+
+
+def test_fail_closed_the_second_readings_keep_the_unreadable_answer_too(root):
+    # the line parser's targets and the unresolvable target for a comment's quote, as for any unreadable command
+    command = f"echo x > src/ok.py; bash <<< ls # it's"
+    out = got(command, root)
+    assert "R/src/ok.py" in out and SENT in out
+
+
 def test_f4_a_here_string_to_bash_holding_a_hash_is_refused_as_before():
     assert "cannot be read" in lift_refusal('bash <<< "ls # b"')
     assert lift_refusal('bash <<< "gov pause --off"')
