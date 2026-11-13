@@ -199,18 +199,43 @@ class TestWave2Items:
 
 
 # ============================================================================
-# S14: the ticket lead is a section of the orchestrator role file, not a seventh role
+# S14: the ticket lead has a role file of its own
 # ============================================================================
 
-class TestTicketLeadSection:
-    """covers: S14"""
+# Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the ticket lead has its own role file, ``roles/ticket-lead.md``
+# (ROLES-SPEC-1 §3.3), and ``orchestrator.md`` loses its ``## The ticket lead`` section; the cases of this class keep
+# their intent (what a lead is, does, never does, returns, cites) and read that file in place of the section.
+TICKET_LEAD_REL = f"{support.ROLES_REL}/ticket-lead.md"
+
+# Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the kernel roles folder grows from six to nine files: the six, the ticket
+# lead, the QA engineer and the senior engineer (DEC-1087 (13)); no independent-reviewer.md. Defined here: the support
+# module's ROLE_FILES (the six) is not part of this revision.
+NINE_ROLE_FILES = (*support.ROLE_FILES, "ticket-lead.md", "qa-engineer.md", "senior-engineer.md")
+
+# The machine-readable defaults lines every role file carries (the ticket's Interface, ROLES-SPEC-1 §5.1): they hold
+# a version number and a model id by the owner's decision, so the wording checks leave them out.
+DEFAULTS_LINE_PREFIXES = ("- **Version:**", "- **Launch default:**", "- **Launch by criticality:**",
+                          "- **Model tier:**")
+
+
+def _ticket_lead_text():
+    """The body of the ticket lead's own role file (its frontmatter left out), read as the lead section was."""
+    path = support.path(TICKET_LEAD_REL)
+    assert path.is_file(), f"{TICKET_LEAD_REL} does not exist: the ticket lead has a role file of its own"
+    body = support.split_frontmatter(support.read(TICKET_LEAD_REL))[1]
+    assert body.strip(), f"{TICKET_LEAD_REL} has no text"
+    return body
+
+
+class TestTicketLeadRoleFile:
+    """covers: S14
+
+    Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: formerly ``TestTicketLeadSection``, which read a section of the
+    orchestrator role file. The ticket lead is now a role file of its own; each case below keeps its old intent.
+    """
 
     def _section(self):
-        section = support.lead_section(support.read(support.ROLE_REL))
-        assert section is not None and section.strip(), (
-            f"{support.ROLE_REL} has no section whose heading names the ticket lead"
-        )
-        return section
+        return _ticket_lead_text()
 
     def _found(self, ideas):
         return [s for _n, s in support.statements(self._section()) if support.carries(s, ideas)]
@@ -247,25 +272,35 @@ class TestTicketLeadSection:
             "the ticket lead section cites no CAP, DEC or MR id"
         )
 
-    def test_the_section_adds_no_labelled_field_to_the_role(self):
-        """W1-33 and W1-38 read every list item that starts with a bold label as a field of the role and
-        compare the fields with the generated definition. The lead is text of the role, not a ninth field."""
-        labelled = [line.strip()[:80] for line in self._section().splitlines()
-                    if re.match(r"^[-*]\s+\*\*[^*]+?:?\*\*", line)]
-        assert not labelled, (
-            f"the ticket lead section holds list items that start with a bold label: {labelled}"
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: this case asserted the lead was text of the orchestrator role, not a
+    # field of it (no bold-labelled list item in the section). The lead is now a role file with fields of its own, so
+    # the case asserts the other half of the decision: ``orchestrator.md`` holds no section whose heading names the
+    # ticket lead, and it names ``ticket-lead.md`` as the lead's file.
+    def test_the_orchestrator_role_holds_no_ticket_lead_section(self):
+        """W1-33 and W1-38 read every list item that starts with a bold label as a field of the role. The lead's
+        fields are now those of ``ticket-lead.md``; the orchestrator role (the CTO's file) holds no lead section
+        and points at the lead's file."""
+        text = support.read(support.ROLE_REL)
+        section = support.lead_section(text)
+        assert section is None, (
+            f"{support.ROLE_REL} still has a section whose heading names the ticket lead "
+            f"(its first line: {section.strip().splitlines()[:1] if section.strip() else 'empty'}): the lead has "
+            f"a role file of its own"
         )
+        assert "ticket-lead.md" in text, f"{support.ROLE_REL} does not name ticket-lead.md, the lead's role file"
 
-    def test_the_roster_stays_at_the_same_roles(self):
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the kernel roles folder grows from six to nine files (the six, plus
+    # ticket-lead.md, qa-engineer.md and senior-engineer.md) and holds no independent-reviewer.md. The second half of
+    # the old assertion (the rulesync subagent sources in template/.rulesync/subagents/ stay at six) is dropped: those
+    # sources are W2-153's and their generated copies are an ACT's, outside ticket W2-33; their count is not asserted.
+    def test_the_roles_folder_holds_the_nine_role_files(self):
         roles = sorted(p.name for p in support.path(support.ROLES_REL).glob("*.md"))
-        assert roles == sorted(support.ROLE_FILES), (
-            f"{support.ROLES_REL}/ holds {roles}: the lead is a section of the orchestrator role, not a role"
+        assert roles == sorted(NINE_ROLE_FILES), (
+            f"{support.ROLES_REL}/ holds {roles}: it holds exactly the nine role files {sorted(NINE_ROLE_FILES)} "
+            f"(the lead, the QA engineer and the senior engineer each have a file; no independent-reviewer.md)"
         )
-        sources = sorted(p.name for p in support.path(support.SOURCE_SUBAGENTS_REL).glob("*.md"))
-        assert sources == sorted(support.ROLE_FILES), (
-            f"{support.SOURCE_SUBAGENTS_REL}/ holds {sources}: no new rulesync subagent"
-        )
-        self._section()   # and the section is there: the lead is stated somewhere
+        assert "independent-reviewer.md" not in roles, f"{support.ROLES_REL}/ holds independent-reviewer.md"
+        self._section()   # and the lead's file is there with text
 
 
 # ============================================================================
@@ -348,11 +383,16 @@ class TestBriefTemplates:
 class TestWording:
     """covers: S14 (language-neutral where tests are named, DEC-534; a project's own values, DEC-539)"""
 
+    # Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the ticket lead's text is its own role file, ``roles/ticket-lead.md``,
+    # in place of a section of ``orchestrator.md``. The machine-readable defaults lines every role file carries
+    # (``- **Version:**``, ``- **Launch default:**``, ``- **Launch by criticality:**``, ``- **Model tier:**``) are left
+    # out: they hold a version number and a model id by the owner's decision (the ticket's Interface). The wording
+    # checks hold for the rest of the file unchanged.
     def _texts(self):
-        """The delivered text: the skill's body, the ticket lead section, the five briefs."""
-        lead = support.lead_section(support.read(support.ROLE_REL))
-        assert lead is not None, f"{support.ROLE_REL} has no ticket lead section"
-        texts = {support.SKILL_REL: _skill()[1], f"{support.ROLE_REL} (ticket lead section)": lead}
+        """The delivered text: the skill's body, the ticket lead's role file, the five briefs."""
+        lead = "\n".join(line for line in _ticket_lead_text().splitlines()
+                         if not line.lstrip().startswith(DEFAULTS_LINE_PREFIXES))
+        texts = {support.SKILL_REL: _skill()[1], TICKET_LEAD_REL: lead}
         for kind in sorted(support.BRIEFS):
             texts[support.brief_rel(kind)] = support.read(support.brief_rel(kind))
         return texts
