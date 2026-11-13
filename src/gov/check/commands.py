@@ -11,9 +11,6 @@ RESERVED_COMMANDS = (
     "closure", "retrieve", "checkpoint", "close", "adopt", "pause",
 )
 # Recorded in the command list beside the twelve (DEC-542).
-<<<<<<< HEAD
-RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "telemetry", "skilleval")
-=======
 RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "resources", "telemetry")
 # brief (W2-152, DEC-1088 (3)), links (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and plan (W2-136, DEC-1088).
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
@@ -21,7 +18,7 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 # ``gov`` imports); check() accepts that folder or a folder of the command's own name, as it is.
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
->>>>>>> w2/integrate
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)  # skilleval (W2-104, DEC-747, DEC-1020): the skill evaluation harness
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 
