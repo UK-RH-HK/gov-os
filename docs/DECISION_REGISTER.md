@@ -14487,7 +14487,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   DEC-953's practices instead; the id is kept so the register stays whole.
 
 ### DEC-1132 — The lift's closes by DEC-953's practices (option D); ADOPT-VERIFY-1 option (d) and W2-174; the rg tripwire; the nightly's restart as an ACT; set-up A's bar defined for approval
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1)'s route standing until W2-115 · **Under:** DEC-953 (1), (5), DEC-1052 (Q-8), DEC-1126 (7), DEC-1128 (2), (3), DEC-1130 (2), DEC-1083 · **Source:** the owner's answers (chat, 2026-11-11 ~15:20 UTC) to row 127, ADOPT-VERIFY-1, rows 142-143, SWITCHED-OFF-1 · **Changed by:** DEC-1159 (1) (item (4): the nightly beside the leads)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1)'s route standing until W2-115 · **Under:** DEC-953 (1), (5), DEC-1052 (Q-8), DEC-1126 (7), DEC-1128 (2), (3), DEC-1130 (2), DEC-1083 · **Source:** the owner's answers (chat, 2026-11-11 ~15:20 UTC) to row 127, ADOPT-VERIFY-1, rows 142-143, SWITCHED-OFF-1 · **Changed by:** DEC-1159 (1) (item (4): the nightly beside the leads), DEC-1160 (1) (its minimum cap)
 - **Decision:**
   - (1) **Option D:** the nine ready tickets (W2-122, W2-123, W2-126, W2-92, W2-96, W1-01b, W2-66b, W2-90c, W2-151) are
     closed now by DEC-953's practices, each with `tk close` and a close record; DAEO-feon is closed as not needed;
@@ -14900,6 +14900,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) **No worker sends the live shared reranker requests above its limit outside a GPU window** (a row: W2-155's profile sent five requests of 39,000 characters over the 24,000 limit while leads ran).
 - **Basis:** the owner's message of 2026-11-13 ~00:30.
 
+### DEC-1160 — The nightly's minimum memory cap 7.5 GiB; W2-33's kernel role files approved at c4b97716164e, C0 Haiku low
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~01:20; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`); (1) standing · **Under:** DEC-1159 (1), DEC-1132 (4), CAP-33, DEC-1156 (3), (4), DEC-1120 (3)
+- **Decision:**
+  - (1) **The nightly's minimum memory cap is 7.5 GiB (was 9 GiB, option (a)):** `nightly_restart.sh`'s `NR_CAP_MIN_MB` default 7680, so the nightly starts beside the leads once 10.5 GiB is available; its cap stays what memory allows (at most 12 GiB) and the scope still kills only the nightly if it exceeds it. Applied as an amendment of ACT-NIGHTLY-RESTART-1 after a narrow independent check (the rehearsal: 80 cases).
+  - (2) **W2-33's CIT-P approved at `c4b97716164e`** (CAP-33): the nine kernel role files (`engineer.md` c94f98d7…, `independent-auditor.md` 4b4a5f94…, `independent-test-designer.md` 890c91f5…, `orchestrator.md` 08ba69e6…, `product-spec.md` bb9a46da…, `research.md` f9bc3b72…, `ticket-lead.md` 0c93598c…, `qa-engineer.md` 40fd68fd…, `senior-engineer.md` 243e8b84…) and `template/.rulesync/subagents/orchestrator.md` (ef15ea7d…), as `docs/changes/W2-33-CIT-P.md` §2 lists them in full; **C0 is Haiku low** (`claude-haiku-5-5`) for the engineer, test designer and QA engineer. The CTO adds the hashes to the kernel gate's approved list and lands W2-33 by a hand merge with the copies ACT.
+- **Basis:** the owner's message of 2026-11-13 ~01:20 ("The nightly's memory minimum: (a). W2-33 CIT-P approved at c4b97716164e, C0 Haiku low.").
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14994,3 +15001,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.538 | 2026-11-12 | Owner (recorded by the orchestrator, DEC-861): DEC-1157 (every rule that holds or delays a lead removed except the machine's and the governance's protections; DEC-1138 and DEC-1156 (8) superseded; nine changed). Next free id: DEC-1158. |
 | 0.539 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1158 (the emergency of 11-02 lifted; six superseded, two spent). Next free id: DEC-1159. |
 | 0.540 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1159 (the nightly beside the leads; W2-155 option 1, option 5 the fallback; the live reranker's limit). Next free id: DEC-1160. |
+| 0.541 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1160 (the nightly's minimum cap 7.5 GiB; W2-33's kernel role files approved, C0 Haiku low). Next free id: DEC-1161. |
