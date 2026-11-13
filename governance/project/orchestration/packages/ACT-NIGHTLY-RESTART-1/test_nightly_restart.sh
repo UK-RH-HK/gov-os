@@ -137,12 +137,12 @@ reset; clean_runs; rm -f "$NR_MARK"; echo "# changed" >> "$FIX/$REL/quiet_check.
 [ $rc -eq 2 ] && contains "$r" "is not its commit at HEAD" && [ ! -e "$NR_MARK" ] && ok "code that differs from its commit: refused" || bad "uncommitted code ($rc)"
 git -C "$FIX" checkout -q -- "$REL/quiet_check.py"
 
-printf 'MemTotal: 24607392 kB\nMemAvailable: %s kB\n' 12000000 > "$T/meminfo"
+printf 'MemTotal: 24607392 kB\nMemAvailable: %s kB\n' 10000000 > "$T/meminfo"
 reset; clean_runs; rm -f "$NR_MARK"; NR_MEMINFO=$T/meminfo NR_INNER=$INNER wrun; rc=$?; r=$(lastrun)
-[ $rc -eq 2 ] && contains "$r" "memory: 12000000 kB available less the 3 GiB floor leaves" && [ ! -e "$NR_MARK" ] && ok "11.4 GiB available (cap would be 8.4 GiB, under 9): refused" || bad "memory refusal ($rc: $(tail -1 "$r"))"
+[ $rc -eq 2 ] && contains "$r" "memory: 10000000 kB available less the 3 GiB floor leaves" && [ ! -e "$NR_MARK" ] && ok "9.5 GiB available (cap would be 6.5 GiB, under 7.5, DEC-1160): refused" || bad "memory refusal ($rc: $(tail -1 "$r"))"
 
 # ---- the wrapper: a quiet machine; the cap, the swap limit, the score, the workers
-for avail in 40000000:12288:16 20000000:12288:16 13000000:9623:12; do
+for avail in 40000000:12288:16 20000000:12288:16 13000000:9623:12 11500000:8158:9; do   # 11500000: at the new 7.5 GiB minimum's edge (DEC-1160)
   IFS=: read -r kb cap w <<< "$avail"
   printf 'MemAvailable: %s kB\n' "$kb" > "$T/meminfo"
   reset; clean_runs; rm -f "$NR_MARK"; NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=60 wrun; rc=$?

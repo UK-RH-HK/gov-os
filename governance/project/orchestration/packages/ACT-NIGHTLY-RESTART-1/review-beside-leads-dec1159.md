@@ -49,3 +49,14 @@ PASS accepted. F1 is not acted on tonight: counting land.py and close_build.py i
 ```verdict
 {"kpis": [{"kpi": "nightly-f5-check", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
 ```
+
+---
+
+# Follow-up: the nightly's minimum memory cap 7.5 GiB (DEC-1160 (1)) — narrow check `nightly-min-check`, PASS
+
+- **The change:** `nightly_restart.sh` line 54, `NR_CAP_MIN_MB` default 9216 -> 7680, and the header comment; the rehearsal's memory-refusal case at 10,000,000 kB (cap 6.5 GiB, refused) and a sizing case at 11,500,000 kB (cap 8158 MB, 9 workers). Rehearsal with a planted memory file: 80 cases, 0 failures.
+- **The check (a fresh read-only independent auditor, Opus high, 2026-11-13 ~01:28):** the diff only the minimum; 9 workers at the minimum; the rebuild (nightly.sh:124) ends before pytest (:206), so their peaks do not overlap; the scope (MemoryMax, no swap, OOMPolicy=kill, memory.oom.group=1, oom_score_adj 500) kills only the nightly, never the leads. Rows: F1 case 66 can flake under load (a failed transient unit listed, pre-existing); F2 about 0.7 GiB headroom between the rebuild's ~6.8 GiB peak and a 7.5 GiB cap (the owner's accepted risk; the cgroup charge may be higher than RSS); F3 no case at the exact start threshold (11,010,048 kB).
+
+```verdict
+{"kpis": [{"kpi": "nightly-min-check", "verdict": "pass", "findings": [{"id": "F1", "scope": "out", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "out", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}]}
+```

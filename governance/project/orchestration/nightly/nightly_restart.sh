@@ -15,7 +15,7 @@
 #    for the length of the run) and removes it only if the file is still its own; a second look follows the switch.
 # 2. Sized to memory. The run is started inside `systemd-run --user --scope` with MemoryMax = the memory available now
 #    less the 3 GiB floor, at most 12 GiB (D-10 run 2: the run raised memory in use by 8.1 GB at 16 workers), never
-#    under 9 GiB (the clone's rebuild peaks at 7.3 GB), and MemorySwapMax=0, OOMPolicy=kill (the kernel kills the whole
+#    under 7.5 GiB (DEC-1160, was 9 GiB; the clone's rebuild peaks at 7.3 GB, about 6.8 GiB), and MemorySwapMax=0, OOMPolicy=kill (the kernel kills the whole
 #    run, never a part of it, and never swaps it into the machine's 8 GB), RuntimeMaxSec 3 h. The pytest workers are
 #    (cap - 2 GiB) / 0.6 GB, 4 to 16. The run's processes take an oom_score_adj of 500, so the kernel picks them first
 #    if the machine itself ever runs short. A watchdog (every 10 s) stops the run's scope when MemAvailable falls below
@@ -51,7 +51,7 @@ if [ -z "${NR_OOM_FLOOR_KB:-}" ] && [ -r "$GATE_JSON" ]; then
   read -r f o < <(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["memory_floor_bytes"]["value"]//1024, d["oom_floor_bytes"]["value"]//1024)' "$GATE_JSON" 2>/dev/null)
   [ -n "${f:-}" ] && FLOOR_KB=$f; [ -n "${o:-}" ] && OOM_FLOOR_KB=$o
 fi
-CAP_MAX_KB=$((12 * GIB_KB)); CAP_MIN_KB=$((${NR_CAP_MIN_MB:-9216} * 1024))
+CAP_MAX_KB=$((12 * GIB_KB)); CAP_MIN_KB=$((${NR_CAP_MIN_MB:-7680} * 1024))   # DEC-1160: 7.5 GiB (was 9 GiB), so the nightly starts beside the leads
 QUIET_N=${NR_QUIET_N:-5}; POLL_S=${NR_POLL_S:-60}; WATCH_S=${NR_WATCH_S:-10}; RG_TRIP=200
 MEMINFO=${NR_MEMINFO:-/proc/meminfo}
 avail_kb() { awk '/^MemAvailable:/ {print $2}' "$MEMINFO"; }
