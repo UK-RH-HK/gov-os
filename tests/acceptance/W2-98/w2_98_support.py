@@ -143,6 +143,39 @@ def build_spec(omit=(), kpis=CLEAN_KPIS, rows=CLEAN_ROWS):
     return "\n".join(parts)
 
 
+def spec_with_kpi_text(kpi_text, **spec_args):
+    """The planted spec with the text under ``## KPIs`` replaced by ``kpi_text`` as written (review round 1's cases
+    plant lines ``kpi_block`` cannot: a lazy continuation, a numbered item, an emphasised label)."""
+    spec = build_spec(**spec_args)
+    old = kpi_block(spec_args.get("kpis", CLEAN_KPIS))
+    assert old in spec, "the planted KPI block is not in the planted spec"
+    return spec.replace(old, kpi_text, 1)
+
+
+def clean_kpi(n):
+    """The clean KPI ``K<n>`` of ``CLEAN_KPIS`` (n = 1..3) as text: its line and its indented ``Fails if:`` line."""
+    behaviour, fails = CLEAN_KPIS[n - 1]
+    return f"- K{n}: {behaviour}\n  Fails if: {fails}"
+
+
+def planted_imports_folder(tmp_path, parts, imports_yaml):
+    """A planted skill folder like the imports cases': a SKILL.md, each part in ``parts`` as a file carrying its
+    ``<!-- imported: <part> -->`` marker, and ``imports.yaml`` holding the mapping ``imports_yaml`` as given."""
+    folder = tmp_path / "planted-skill"
+    folder.mkdir()
+    (folder / "SKILL.md").write_text("---\nname: planted\nversion: \"1.0.0\"\ndescription: Planted.\n---\n\n# Planted\n",
+                                     encoding="utf-8")
+    for part in parts:
+        (folder / part).write_text(f"<!-- imported: {part} -->\n\nCopied text of the part.\n", encoding="utf-8")
+    (folder / "imports.yaml").write_text(yaml.safe_dump(imports_yaml), encoding="utf-8")
+    return folder
+
+
+def record(part, licence):
+    """One import record in the vendored form."""
+    return {"part": part, "source": "https://example.org/skills", "version": "v1.0.0", "licence": licence}
+
+
 def write_spec(tmp_path, text, name="spec.md"):
     path = tmp_path / name
     path.write_text(text, encoding="utf-8")
