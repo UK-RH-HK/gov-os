@@ -144,6 +144,11 @@ def holders(count: int | None = None) -> tuple[list[dict], str | None]:
     return sorted(out, key=lambda e: e["slot"]), "; ".join(unreadable) or None
 
 
+def runners(held: list[dict] | None = None) -> dict[int, int]:
+    """``{runner pid: slot}`` of the slots held (``holders()``'s entries, or ``held`` when it is already read)."""
+    return {entry["pid"]: entry["slot"] for entry in (holders()[0] if held is None else held)}
+
+
 def _take(count: int) -> tuple[int, int] | None:
     """``(slot, fd)`` of a free slot, or None when every slot is held."""
     place = folder()

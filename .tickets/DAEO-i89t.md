@@ -1,6 +1,6 @@
 ---
 id: DAEO-i89t
-status: open
+status: closed
 deps: [DAEO-k7hz]
 links: [DAEO-k7hz]
 created: 2026-11-01T15:16:06Z
@@ -20,9 +20,10 @@ allowed_paths:
 - tests/unit/check/test_w2_120*
 kpis:
   success:
-  - 'gov check''s skill validator refuses a skill whose front matter has no output class or carries a key outside the skill template''s list (allowed-tools, permissions, paths, sandbox, network, model, effort or any other), naming the file and the key; it reads the kernel skills and every generated copy, and names each vendored skill so found Verify: planted skills: one with no output class, one with each of the listed keys (allowed-tools, permissions, paths, sandbox, network, model, effort) and one with another key: `gov check` refuses each, printing the file and the key; a planted vendored skill is named; a planted copy under the generated folders is read as well as the kernel one; a clean skill passes. [DEC-995, DEC-996, CAP-24.b]'
+  - 'gov check''s skill validator refuses a skill whose front matter carries a key outside the skill template''s list (the "no output class" half deferred, DEC-1156 (2)) (allowed-tools, permissions, paths, sandbox, network, model, effort or any other), naming the file and the key; it reads the kernel skills and every generated copy, and names each vendored skill so found Verify: planted skills: one with no output class, one with each of the listed keys (allowed-tools, permissions, paths, sandbox, network, model, effort) and one with another key: `gov check` refuses each, printing the file and the key; a planted vendored skill is named; a planted copy under the generated folders is read as well as the kernel one; a clean skill passes. [DEC-995, DEC-996, CAP-24.b]'
   failure: []
   lifted:
+  - 'The "no output class" half: gov check''s skill validator refuses a skill whose front matter has no output class [DEC-995, DEC-996] [deferred, DEC-1156 (2): waits for a product-spec follow-up that adds `output` to the 10 kernel skills in all three copies; this ticket names no missing output]'
   - 'gov check''s skill validator refuses a brief template without the twelve-field rule (the twelve labelled return fields, the payload-after rule and the two-refusal stop), naming the file and what is missing; the kernel''s five brief templates as W2-11 leaves them pass [AR-5, AR-6, W2-L097, DEC-995] [lifted (was S1), DEC-1083: re-scoped to S3]'
   - 'The validator checks every `gov` command a skill or brief names against the reserved command list, not the gov installed on the machine [W2-L097] [lifted (was S2), DEC-1083: re-scoped to S3]'
   - 'A brief template without the twelve-field rule, or a skill with allowed-tools or another permission key in its front matter, that the validator passes [DEC-995] [lifted (was F1), DEC-1083: re-scoped to S3]'
@@ -46,3 +47,11 @@ list_rows: [W2-L097]
 The owner's decision on P-W2-11-9 (c) (DEC-995, DEC-996): W2-11 (a product-spec ticket) cannot hold code, so its
 validator failure line and row W2-L097 move here, to an engineer, after W2-11 lands (W2-11's skill template and
 briefs are what this validator checks). The closed skill front matter is DEC-996 item 4's line for this ticket.
+
+## Interface (DEC-1052; P-W2-120-1 (b), the owner, DEC-1156 (2), 2026-11-12)
+
+- **I1 Output:** the existing JSON on stdout, `{"findings": [...]}`, each finding with `code`, `file`, `key` and `message`; exit 1 when any finding refuses, 0 when clean (a named-only finding never changes the exit).
+- **I2 What is refused, on every copy read:** a permission key (allowed-tools, permissions, paths, sandbox, network, model, effort) or any key outside the skill template's list (`template/governance/kernel/templates/skill.md`: name, version, description, output, metadata.version). For the generated copies under `.claude/skills/` the list is name, description and metadata (rulesync drops the other top-level keys).
+- **I3 Which copies:** from the kernel folder it is given (`--both-layouts`), the validator itself finds the kernel source, `.rulesync/skills/`, `template/.rulesync/skills/` and `.claude/skills/`, so `gov check` reads them with no edit to the three skill-regression check files.
+- **I4 Vendored skills** (openspec-*, superpowers/*): named, `code` `SKILL_VENDORED_KEY` with file and key, exit unchanged, until DEC-996 item 5 strips them.
+- **Deferred:** a missing `output` is not refused by this ticket (its line is lifted above; W2-142 S1/S2 and the hard-block checks stay green).

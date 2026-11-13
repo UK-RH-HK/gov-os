@@ -1,0 +1,4 @@
+# Which close this project runs (W2-115 S1; DEC-953 item 1, DEC-983): `scoped` (the smart close: the scoped
+# selection only, a close refused only by a red its own change caused, no lists, a close record) or `strict` (the
+# close of W1-30/W2-07/W2-66, every lifted gate). No file: strict. Any other value: every close is refused.
+close: scoped

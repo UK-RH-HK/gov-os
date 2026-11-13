@@ -1,6 +1,6 @@
 ---
 id: DAEO-ar89
-status: open
+status: in_progress
 deps: []
 links: [DAEO-zqvn]
 created: 2026-11-11T01:07:01Z
@@ -45,6 +45,7 @@ needs: []
 reads:
 - src/gov/retrieve/**
 - src/gov/retrieval/**
+plan_override: DEC-1157  # its waits (W2-138, W2-145) are merged into w2/integrate; merged counts as met for starting (DEC-1157 (9)); closing still waits for them
 waits_on:
 - DAEO-rmhj  # W2-138 and W2-145 write the retrieval and reranker paths first (P1); the profile follows them
 - DAEO-2tfd
@@ -60,3 +61,10 @@ Filed by the CTO on the owner's decision DEC-1125 (1), 2026-11-11: **after the l
 - **The owner's note for whoever takes it:** profile the warm query path, including the retrieval changes since the
   budget last held, but do not over-spend time on it: the gap is not noticeable and does no harm. If a simple cause is
   found, fix it; if not within a short time box, stop and bring the owner the evidence and options instead.
+
+## Interface (stated at claim by the CTO, DEC-1157 (3), 2026-11-12 23:55)
+
+- **No interface change:** every public function and command in `src/gov/retrieve/**` and `src/gov/retrieval/**` keeps its signature, its output and its exit codes; `gov retrieve`'s results for the same store and query are unchanged (same items, same order, same fields), only faster.
+- **The profile record:** `docs/research/` is outside the paths, so the profile (where the warm query's 0.54-0.59 s goes, by stage, with the method and the machine's load) is returned in the lead's DONE or PACKAGES, not committed; a fix, if any, is in the paths above with a unit case that pins the result unchanged.
+- **The time box** (the owner's note): about two hours of the lead's work; with no simple cause found by then, PACKAGES with the evidence and the options.
+- **The measure:** W1-19's and W2-13's warm real-model latency cases, run alone through heavy_slot.sh, at the machine's load recorded; never generating load.

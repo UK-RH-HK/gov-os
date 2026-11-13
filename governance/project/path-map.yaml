@@ -93,6 +93,7 @@ namespaces:
       - "docs/close/**"
       - "docs/checkpoints/**"
       - "docs/probes/**"
+      - "experiments/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
@@ -409,13 +410,23 @@ acceptance_exemptions:
     decision: DEC-1123  # item (3); the owner's ACT-GUARD-SETS-1 commit deleted W2-84's hidden-half cases (DEC-1061, DEC-1097)
   - commit: "6fbe73b1adde40571f00d490b4b478cf86b70a52"
     decision: DEC-1136  # the owner's ACT-OPERATOR-ROUNDS-1 commit changed the acceptance support file tests/acceptance/W2-148/w2_148_support.py (DEC-1136 (1)); not a test designer's commit
+  - commit: "8ed7561b68a32feaa6114f8f11c22182d5ead2c3"
+    decision: DEC-1141  # ACT-OPERATOR-HOURS-2's commit (DEC-1136 (2))
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
 # gov close's owner-accepted known reds, a ratchet (DEC-757): each red by exact test id, the owner's decision
 # that accepts it, its reason and the ticket that fixes it. Only an owner's commit adds an entry; a listed test
 # that passes leaves the list in the same close.
-accepted_reds: []
+accepted_reds:
+  - test: "tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95"
+    decision: DEC-1134
+    reason: "the warm real-model query latency, p95 0.54-0.59 s against the 0.5 s budget: the named red of DEC-1125 (1)"
+    fixed_by: W2-155
+  - test: "tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget"
+    decision: DEC-1134
+    reason: "the warm real-model query latency, p95 0.54-0.59 s against the 0.5 s budget: the named red of DEC-1125 (1)"
+    fixed_by: W2-155
 # gov close's named load-sensitive tests (DEC-757): a listed test that fails counts only if it passes in an
 # isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
 # names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
@@ -551,6 +562,25 @@ evaluation_sets:
   sandbox-guard-exp-1:
     visible: []
     hidden: ["fixtures/evaluation/sandbox-guard-exp-1/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+  # examin, EXAMIN's question set (W2-94; DEC-957, DEC-828 items 3-4, DEC-1130 (3)): 20 questions about the owner's copy,
+  # written blind by the walled writer (DEC-1101 (3); brief EXAMIN-writer), kept under the sets root (the measure's
+  # --sets-root), never in a tree. The ten visible-half questions are delivered with the hidden half and released to
+  # visible/ by the owner's one copy step; the ten measured ones stay in hidden/. Every role but the orchestrator is
+  # refused the hidden half (as memory-verdict-2); the CTO and leads by sets_root_hidden's fixtures/evaluation/*/hidden/**.
+  examin:
+    visible: ["fixtures/evaluation/examin/visible/**"]
+    hidden: ["fixtures/evaluation/examin/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+  # adoption-proving-ground, W2-81's held-out half (W2-93; DEC-957, DEC-941, DEC-1130 (3)): hidden questions and
+  # planted-problem variants per synthetic repository, written blind by the walled writer (brief PROVING-GROUND-writer),
+  # kept under the sets root. The visible half is W2-81's own questions folder; the runner reads the hidden half from
+  # its --hidden folder. Every role but the orchestrator is refused the hidden half.
+  adoption-proving-ground:
+    visible: ["tests/acceptance/W2-81/questions/**"]
+    hidden: ["fixtures/evaluation/adoption-proving-ground/hidden/**"]
     measures:
       roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
 # The source families (DEC-1078 (4), DEC-1079; W2-61h S7): a gold source and its official copies, each family a list

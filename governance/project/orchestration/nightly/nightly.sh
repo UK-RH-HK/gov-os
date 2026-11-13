@@ -96,6 +96,16 @@ disk=$(bash "$HERE/disk_gate.sh" 2>&1) || {
 date '+%F %T nightly: running (a marker only, DEC-961)' > "$ORCH/NIGHTLY-RUNNING"
 OWN_FLAG=1
 t0=$(date +%s)
+# W2-154 (DEC-1112 (3)), the test seam: with NIGHTLY_SERIAL_STUB=<file> the night skips the clone, the seed, the
+# secrets switch, the rebuild, the gate, the slots and both suites. The stub (sourced here) sets ENTRIES, s_exit and
+# CLONE and writes $JUNIT/serial.xml; the serial count, the verdict, the digest and the ping run as in a real night.
+# Unset, the else branch below is the night as it was (its lines are not indented, to keep the change small).
+if [ -n "${NIGHTLY_SERIAL_STUB:-}" ]; then
+  . "$NIGHTLY_SERIAL_STUB"
+  HEAD=${HEAD:-stub}
+  echo "head $HEAD (the serial stub $NIGHTLY_SERIAL_STUB: no clone, no suites)" >> "$OUT/run.txt"
+  p_exit=${p_exit:-0}; setup=0; lock_wait=0
+else
 CLONE=$RUNS/$STAMP
 git clone -q --no-hardlinks --branch w2/integrate "$REPO" "$CLONE" || { echo "clone failed" >> "$OUT/run.txt"; exit 2; }
 HEAD=$(git -C "$CLONE" rev-parse --short=12 HEAD)
@@ -125,7 +135,7 @@ env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")
-[ -n "$ENTRIES" ] || { echo "no serial-only entry read" >> "$OUT/run.txt"; exit 2; }
+# W2-154: nothing declared is "serial: 0 declared" below (the serial phase skipped, the night not red), not an exit 2.
 # No shared lock (DEC-961, DEC-962): the run waits for the gate's room for one full run, at night until the latest
 # start. The time spent waiting is recorded apart from the setup, and kept out of the estimate (DEC-939 item 6).
 lock_wait=0
@@ -207,21 +217,38 @@ start=$(date +%s)
   --junitxml="$JUNIT/parallel.xml" ) > "$OUT/parallel.txt" 2>&1
 p_exit=$?
 mid=$(date +%s)
+s_exit=skipped
+if [ -n "$ENTRIES" ]; then
 # shellcheck disable=SC2086
 ( noslot env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
   GOV_CLOSE_SERIAL_ONLY_GIVEN="$ENTRIES" PYTEST_XDIST_AUTO_NUM_WORKERS=1 \
   "${HEAVY_RUN[@]}" $WITH_LOCK python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
   --junitxml="$JUNIT/serial.xml" ) > "$OUT/serial.txt" 2>&1
 s_exit=$?
+fi
 # The suites are the heavy part: the slots are released now, so the light steps after them (each red alone, the
 # bisect) neither hold them nor pass them to anything they leave behind.
 for f in "${SLOT_FDS[@]}"; do [ -n "$f" ] && eval "exec $f>&-"; done
 echo "heavy-job slots released after the suites" >> "$OUT/run.txt"
 end=$(date +%s)
 echo "parallel exit $p_exit in $((mid - start)) s: $(tail -1 "$OUT/parallel.txt")" >> "$OUT/run.txt"
-echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"
+[ -n "$ENTRIES" ] && echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"
+fi
+# W2-154 (DEC-1112 (3), the D-10 W2-13 review's F1): the serial phase is reported by the cases it ran, whatever its
+# JUnit file says. N is the number of <testcase> elements of serial.xml (0 where it is missing or cannot be read).
+N=$(python3 -c "import sys, xml.etree.ElementTree as ET; print(sum(1 for _ in ET.parse(sys.argv[1]).iter('testcase')))" "$JUNIT/serial.xml" 2>/dev/null || true)
+N=${N:-0}
+if [ -n "$ENTRIES" ]; then echo "serial: $N cases run" >> "$OUT/run.txt"; else echo "serial: 0 declared" >> "$OUT/run.txt"; fi
 # Every failing case, alone (the close's environment), once.
 python3 "$HERE/nightly_alone.py" "$CLONE" "$JUNIT" >> "$OUT/run.txt" 2>&1
+# With entries declared, a serial phase that ended in a collection error (an exit that is neither 0 nor 1) or ran no
+# case is red, after nightly_alone.py's line so that this is the last verdict line. Both at once: the collection error.
+if [ -n "$ENTRIES" ]; then
+  case "$s_exit" in
+    0|1) [ "$N" -gt 0 ] || echo "verdict: red serial: 0 cases run" >> "$OUT/run.txt" ;;
+    *) echo "verdict: red serial: collection error, exit $s_exit" >> "$OUT/run.txt" ;;
+  esac
+fi
 actual=$(( $(date +%s) - t0 ))
 # The run is over: the marker goes at once (DEC-961: it held nothing).
 rm -f "$ORCH/NIGHTLY-RUNNING"; OWN_FLAG=0

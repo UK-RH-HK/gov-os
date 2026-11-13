@@ -1,6 +1,6 @@
 ---
 id: DAEO-61vm
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-52ku, DAEO-2bdu, DAEO-k1e2, DAEO-p8tv, DAEO-qz4p]
 created: 2026-11-11T01:20:37Z
@@ -46,6 +46,10 @@ sources:
 - DEC-1050
 - DEC-1073
 - DEC-1052
+- DEC-1129
+- DEC-1010
+- DEC-1131
+- DEC-1133
 est_loc: 450
 acceptance_tests:
   path: tests/acceptance/W2-170/
@@ -348,3 +352,7 @@ file with a `fingerprints` row; a `gov` link into a folder named `pin-<12 hex>`.
    closed and is not a finding about the set.
 8. **`DC-DECISION` writes no map entry before an `ok: true` declaration** (TD-4): the map entry follows a declaration that
    passed, never a refused one.
+9. **The pre-flighted set is the set declared** (review round 1's RV1, PKG-W2-170-R1-PREFLIGHT-FRESH, option (a); a
+   delegated stricter-only decision): `PREFLIGHT.json` records each delivered file's sha256 by id; `DC-PREFLIGHT` also refuses
+   when a kept file is not byte-equal to a pre-flighted one (a set whose writer round 2 replaced `hidden/` after the
+   pre-flight is never marked `USED` until it is pre-flighted again). Sections 3 and 5 read with this line.

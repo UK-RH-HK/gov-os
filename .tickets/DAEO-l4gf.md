@@ -1,6 +1,6 @@
 ---
 id: DAEO-l4gf
-status: open
+status: closed
 deps: []
 links: [DAEO-zqvn, DAEO-o5x1]
 created: 2026-11-10T12:05:36Z
@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/close/command.py  # the serial-afterwards run's line only
 - governance/project/orchestration/nightly/nightly.sh
 - tests/unit/close/test_serial*
+- tests/acceptance/serial-only.txt  # S4 only: W1-16's ui_off line restored by a test designer with its Rewrite-Reason (the owner, DEC-1157 (12) route, 2026-11-13: S4 (a))
 kpis:
   success:
   - 'S1 An entry of tests/acceptance/serial-only.txt whose every case an opt-in list (tests/optin-lifted*.txt) leaves out of the run is "not in this run": the close''s serial plugin neither stops the serial phase on it (today exit 4, "no case is named by the entry") nor runs its cases elsewhere, and the run''s record names each such entry; an entry that names no case at all (no opt-in list explains it) still stops the phase, as today. Verify: a planted serial-only.txt with one entry whose every case an opt-in list leaves out, one entry that names no case and has no opt-in list, and the run''s record: the first run does not stop the serial phase and the record names the first entry; the second exits 4 with "no case is named by the entry" [DEC-1112 (3), DEC-1061, DEC-549]'
@@ -71,3 +72,27 @@ lift**, not now (the week's usage).
 - **Sizes:** about 120 lines; one test designer, one engineer, one review.
 
 [DEC-1112 (3), DEC-1061, DEC-889 item 5, DEC-549]
+
+## Interface (DEC-1052; P-W2-154-1 (a), the CTO's delegated decision, DEC-1112 (3), 2026-11-12)
+
+- **I1 How the plugin knows (S1).** In the serial-afterwards run (its environment variable set), the plugin's
+  `pytest_collection_modifyitems` is `trylast=True` and records every item the run's other plugins (the project's conftest's
+  opt-in mechanism) passed to `pytest_deselected`. An entry with no collected case and at least one such deselected case is
+  "not in this run"; an entry with neither still raises `UsageError` "no case is named by the entry" (exit 4), as today. The
+  plugin stays standard-library only and never reads `tests/optin-lifted*.txt` itself.
+- **I2 What the run records (S1).** For each such entry the plugin prints `gov_close_serial_only: not in this run: <entry>`
+  and writes the entry, one per line, to the file named by `GOV_CLOSE_SERIAL_ONLY_OUT`; `command.py` reads that file after the
+  serial-afterwards run and its stated record (the serial run's entry) gains `"not_in_this_run": [<entry>, ...]`; `"cases"`
+  keeps only the entries that ran. When every given entry is out, the run ends exit 0 and the close counts a serial run of 0
+  cases, with no finding.
+- **I3 nightly.sh's serial lines (S3).** N is the number of `<testcase>` elements in `serial.xml`. With entries declared:
+  `serial: N cases run`. With nothing declared: `serial: 0 declared`, the serial phase skipped, not red (replacing today's
+  exit 2 "no serial-only entry read"). When N is 0, or the serial phase's exit is neither 0 nor 1 (a collection error),
+  nightly.sh appends `verdict: red serial: 0 cases run` or `verdict: red serial: collection error, exit E` after
+  `nightly_alone.py`'s line, so the final line reads red and the P1 ping follows (nightly_alone.py is not changed).
+- **I4 The test seam (S3).** With `NIGHTLY_SERIAL_STUB=<file>` set, nightly.sh skips the clone, the rebuild, the gate and both
+  suites, sources the stub (which sets `ENTRIES`, `s_exit` and writes `$JUNIT/serial.xml`), and runs only the serial count and
+  verdict steps. Tests run nightly.sh only with the stub; the real nightly is never run by a test.
+- **Out of this run:** the `--verify` path (`command.py:1572-1620`, the serial phase without the plugin) stays as it is (the
+  allowed path is the serial-afterwards run's line only); the riding-along citation in `src/gov/check/commands.py:15` is outside
+  the allowed paths and stays recorded here, not done.

@@ -5,8 +5,6 @@
     },
     "bash": {
       "gov launch:*": "allow",
-      "npm install*": "deny",
-      "pip install*": "deny",
       "sudo *": "deny"
     }
   }

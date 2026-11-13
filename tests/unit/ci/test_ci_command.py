@@ -70,14 +70,14 @@ def openspec(tmp_path, monkeypatch):
 def test_the_job_gate_names_a_check_whose_tool_is_absent_as_unmeasured_and_refuses(tmp_path, monkeypatch):
     _declare(tmp_path, "G1", "true")
     _declare(tmp_path, "G2", """echo '{"findings": [{"code": "RULESYNC_ABSENT", "message": "m"}]}'; exit 1""")
-    monkeypatch.setenv("PATH", "/usr/bin:/bin")  # no openspec: the runner gives OPENSPEC_ABSENT, YELLOW
+    monkeypatch.setenv("PATH", "/usr/bin:/bin")  # no openspec: the runner gives OPENSPEC_ABSENT, RED
     with pytest.raises(GovError) as refused:
         command._checks(tmp_path, list(command.JOB_TIERS), job=True)
     assert refused.value.code == command.NOT_MEASURED and refused.value.exit_code != 0
     message = refused.value.message
     assert message.startswith("unmeasured: check-g2 (rulesync is not on the runner), openspec-validate (openspec ")
     assert "hard-block checks failed: check-g2" in message
-    assert refused.value.details["checks"]["openspec-validate"] == "YELLOW"
+    assert refused.value.details["checks"]["openspec-validate"] == "RED"
 
 
 def test_the_job_gate_refuses_a_declared_check_of_an_unknown_family_and_the_hook_gate_does_not(tmp_path, openspec):

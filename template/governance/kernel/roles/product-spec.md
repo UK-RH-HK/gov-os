@@ -2,6 +2,12 @@
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
+- **Version:** 1.1.0
+- **Launch default:** model claude-sonnet-5-5, effort high
+- **Skills:** planning, change, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** write what a ticket specifies rather than codes: schemas, templates, skills, role files, readiness
   records and documentation; and draft the answer to a specification gap the orchestrator names. A session runs as
   `GOV_ROLE=product-spec`, started with `gov launch product-spec <ticket>` on an `in_progress` ticket whose `role` is
@@ -14,7 +20,6 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 - **Network:** the launcher's profile for this role, which is empty (DEC-386): a strict sandbox allowlist with no
   allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158). An
   experiment that needs the network runs as a research session, with the research allowlist (DEC-158, DEC-163).
-- **Model tier:** standard; the definition names no model, so the session uses the model it is started with.
 - **Authority level:** worker, with no approval authority. It decides nothing outside its ticket; a gap, a dispute
   or an ambiguous KPI goes back to the orchestrator as a decision package with a recommendation and a confidence.
 - **Handoff format:** for a ticket, commits with the trailers `Task: <ticket>`, `Implements: <ids>` and

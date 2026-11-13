@@ -110,13 +110,15 @@ def _known() -> dict[str, Command]:
     """The reserved commands, then every other name with a command module, none of them loaded."""
     known = {command.name: command for command in COMMANDS}
     for path in sorted(PACKAGE.glob("*/command.py")):
-        known.setdefault(path.parent.name, Command(path.parent.name, "act", ""))
+        name = path.parent.name.replace("_", "-")  # a hyphenated command lives in its underscore folder (P-W2-159-1)
+        known.setdefault(name, Command(name, "act", ""))
     return known
 
 
 def _module_name(name: str) -> str | None:
-    if (PACKAGE / name / "command.py").is_file():
-        return f"gov.{name}.command"
+    folder = name.replace("-", "_")
+    if (PACKAGE / folder / "command.py").is_file():
+        return f"gov.{folder}.command"
     if (PACKAGE / "cli" / "commands" / f"{name}.py").is_file():
         return f"gov.cli.commands.{name}"
     return None

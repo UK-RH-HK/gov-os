@@ -10,11 +10,12 @@
 #    (one look a minute), and gives up at the latest start: 07:30 less one and a half times the measured estimate
 #    (nightly_estimate.py; 06:01 today). Giving up writes a night's run.txt whose first line says NOT STARTED and why,
 #    so the 08:00 check calls the night FAILED and pings P1, as it does for any night that did not run; the wrapper
-#    does not ping on its own. Once quiet it writes dispatch/OFF (the CTO's own off switch: no lead starts, no landing,
+#    does not ping on its own. [DEC-1159 (1): leads are left out of the wait (--beside-leads) and no OFF is written;
+#    what follows describes the rule before it.] Once quiet it wrote dispatch/OFF (the CTO's own off switch: no lead starts, no landing,
 #    for the length of the run) and removes it only if the file is still its own; a second look follows the switch.
 # 2. Sized to memory. The run is started inside `systemd-run --user --scope` with MemoryMax = the memory available now
 #    less the 3 GiB floor, at most 12 GiB (D-10 run 2: the run raised memory in use by 8.1 GB at 16 workers), never
-#    under 9 GiB (the clone's rebuild peaks at 7.3 GB), and MemorySwapMax=0, OOMPolicy=kill (the kernel kills the whole
+#    under 7.5 GiB (DEC-1160, was 9 GiB; the clone's rebuild peaks at 7.3 GB, about 6.8 GiB), and MemorySwapMax=0, OOMPolicy=kill (the kernel kills the whole
 #    run, never a part of it, and never swaps it into the machine's 8 GB), RuntimeMaxSec 3 h. The pytest workers are
 #    (cap - 2 GiB) / 0.6 GB, 4 to 16. The run's processes take an oom_score_adj of 500, so the kernel picks them first
 #    if the machine itself ever runs short. A watchdog (every 10 s) stops the run's scope when MemAvailable falls below
@@ -33,7 +34,7 @@ ORCH=${NR_ORCH:-$REPO/.gov-runtime/scratch/orchestrator}
 REL=governance/project/orchestration/nightly
 export HOME=/home/usain
 export LANG=C.UTF-8
-export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
 # cron has neither: the user manager's bus is reached by its path
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}
@@ -50,7 +51,7 @@ if [ -z "${NR_OOM_FLOOR_KB:-}" ] && [ -r "$GATE_JSON" ]; then
   read -r f o < <(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["memory_floor_bytes"]["value"]//1024, d["oom_floor_bytes"]["value"]//1024)' "$GATE_JSON" 2>/dev/null)
   [ -n "${f:-}" ] && FLOOR_KB=$f; [ -n "${o:-}" ] && OOM_FLOOR_KB=$o
 fi
-CAP_MAX_KB=$((12 * GIB_KB)); CAP_MIN_KB=$((${NR_CAP_MIN_MB:-9216} * 1024))
+CAP_MAX_KB=$((12 * GIB_KB)); CAP_MIN_KB=$((${NR_CAP_MIN_MB:-7680} * 1024))   # DEC-1160: 7.5 GiB (was 9 GiB), so the nightly starts beside the leads
 QUIET_N=${NR_QUIET_N:-5}; POLL_S=${NR_POLL_S:-60}; WATCH_S=${NR_WATCH_S:-10}; RG_TRIP=200
 MEMINFO=${NR_MEMINFO:-/proc/meminfo}
 avail_kb() { awk '/^MemAvailable:/ {print $2}' "$MEMINFO"; }
@@ -114,21 +115,14 @@ trap cleanup EXIT
 # 1. wait for nothing else running
 quiet=0; last=""; waited0=$(date +%s)
 while :; do
-  if out=$(python3 -I "$HERE/quiet_check.py"); then quiet=$((quiet + 1)); else quiet=0; last=$(echo "$out" | head -3 | tr '\n' ';'); fi
-  if [ "$quiet" -ge "$QUIET_N" ]; then
-    # the dispatcher's own off switch, then a second look (a lead may have started in the last minute)
-    if (set -C; echo "$OFFTOK" > "$OFF") 2>/dev/null; then
-      HAVE_OFF=1
-      if python3 -I "$HERE/quiet_check.py" --no-load --own-off > /dev/null; then break; fi
-      last="something started after the quiet minutes"; rm -f "$OFF"; HAVE_OFF=0; quiet=0
-    else
-      last="dispatch/OFF is there (not this wrapper's)"; quiet=0
-    fi
-  fi
+  # DEC-1159 (1) (the owner, 2026-11-13): the nightly runs beside the leads, in its own capped unit: leads are not waited
+  # for (quiet_check.py --beside-leads) and no dispatch/OFF is written, so leads and landings carry on during the run
+  if out=$(python3 -I "$HERE/quiet_check.py" --beside-leads); then quiet=$((quiet + 1)); else quiet=0; last=$(echo "$out" | head -3 | tr '\n' ';'); fi
+  [ "$quiet" -ge "$QUIET_N" ] && break
   [ "$(date +%s)" -ge "$LATEST" ] && refuse "something else was running until the latest start $(date -d "@$LATEST" +%H:%M): ${last:-unknown}"
   sleep "$POLL_S"
 done
-say "quiet for $QUIET_N looks; waited $(( $(date +%s) - waited0 )) s; dispatch/OFF written"
+say "nothing but leads running for $QUIET_N looks (--beside-leads, DEC-1159 (1)); waited $(( $(date +%s) - waited0 )) s; no dispatch/OFF"
 
 # 2. size to memory
 AV=$(avail_kb)

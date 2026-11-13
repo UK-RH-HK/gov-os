@@ -1,6 +1,6 @@
 ---
 name: role-lead
-version: 1.0.0
+version: 1.0.1
 role: orchestrator
 skills: [orchestration, checkpoint]
 ---
@@ -24,9 +24,14 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the 
 - Build each worker's brief with `gov context {ID} --role <the worker's role>` ({CMD:context}), outside the sandbox [DEC-1065].
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
-- Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
 - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
 - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+
+Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+
+The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].
+
+Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
 
 ## Your run: {RUN_KIND} (only this section is in your brief)
 **tests**: the tests only.

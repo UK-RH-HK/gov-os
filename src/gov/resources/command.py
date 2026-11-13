@@ -9,8 +9,12 @@
 - ``--sample`` / ``--remeasure``: one sample; write the measured figures into the configuration file (S9).
 - ``--init-config``: write this machine's dated, sourced configuration file, never over an existing one (P-3).
 - ``--trip-wire``: one pass of the out-of-memory trip-wire (S11).
+- ``--backstop PGID...``: watch the named process groups of a GPU job and pause them (SIGSTOP) when GPU memory passes
+  its limit, spills into shared memory or an embedder is not wholly on the GPU; the limit, the period and the embedders
+  are the gate file's, no option or variable sets them (W2-157; ``gov.resources.backstop``).
 
-It writes only under ``~/.gov-os/machine/``, never the project.
+It writes only under ``~/.gov-os/machine/``; ``--backstop`` also writes one inbox item into the project's
+``.gov-runtime/dispatch/inbox/`` when it trips.
 """
 
 from __future__ import annotations
@@ -21,11 +25,20 @@ from gov.launch.gate import EXIT_GATE_SHUT
 
 CLASS = "act"
 HELP = "the machine-wide resource gate: memory, load, CPU, disk, the GPU and every live Gov OS session"
-ACT_PATHS = ()  # everything it writes is under ~/.gov-os/machine/, outside the project
+ACT_PATHS = (".gov-runtime/dispatch/inbox/**",)  # else under ~/.gov-os/machine/; --backstop's one inbox item is here
 EXIT_CODES = {EXIT_GATE_SHUT: "the resource gate is shut: no session starts"}
 PASSTHROUGH = True       # --slot's command follows "--"
 CHILD_EXIT_CODE = True   # --slot ends with its job's exit code
 GPU_KINDS = ("embedder", "reranker", "other")
+
+
+def _group(text: str) -> int:
+    """A process group id: a decimal integer above 1 (S4); anything else is argparse's usage error naming it."""
+    import argparse
+
+    if not text.isascii() or not text.isdigit() or int(text) <= 1:
+        raise argparse.ArgumentTypeError(f"not a process group id (a decimal integer above 1): {text!r}")
+    return int(text)
 
 
 def add_arguments(parser) -> None:
@@ -39,6 +52,8 @@ def add_arguments(parser) -> None:
     mode.add_argument("--init-config", action="store_true", help="write this machine's configuration file (never "
                       "over an existing one)")
     mode.add_argument("--trip-wire", action="store_true", help="one pass of the out-of-memory trip-wire")
+    mode.add_argument("--backstop", metavar="<pgid>", nargs="+", type=_group,
+                      help="watch these process groups of a GPU job and pause them on a GPU trip (limit, spill, embedder)")
     parser.add_argument("--gpu-need-mib", metavar="<MiB>", type=int, help="the start's declared GPU need")
     parser.add_argument("--gpu-kind", metavar="<kind>", choices=GPU_KINDS, default="other",
                         help="the GPU work's kind for its share (embedder, reranker, other; default other)")
@@ -60,6 +75,9 @@ def run(root: Path, args, config: dict):
         raise invalid("--ticket and --session-role go with --register")
     if args.gpu_need_mib is not None and (args.gpu_need_mib < 1 or not (args.check or _plain(args))):
         raise invalid("--gpu-need-mib is a positive number of MiB, with --check or the reading")
+    if getattr(args, "backstop", None):
+        from gov.resources.backstop import watch
+        return watch(args.backstop, root)
     if args.register is not None:
         from gov.resources.registry import folder, register
         if not (args.ticket and args.session_role):
@@ -96,4 +114,4 @@ def run(root: Path, args, config: dict):
 
 def _plain(args) -> bool:
     return not any((args.check, args.register is not None, args.init_config, args.sample, args.remeasure,
-                    args.trip_wire, args.slot))
+                    args.trip_wire, args.slot, getattr(args, "backstop", None)))

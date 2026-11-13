@@ -36,6 +36,8 @@ import re
 import subprocess
 import tempfile
 
+from gov.util.gitenv import git_binary, git_env
+
 PATH_MAP_REL = "governance/project/path-map.yaml"
 KEY = "role_paths"
 ACCEPTANCE = "tests/acceptance"
@@ -51,8 +53,16 @@ class RolePathsError(Exception):
     """The section or the session's ticket cannot be read: what a role may be handed cannot be worked out."""
 
 
-def _git_env() -> dict:
-    return {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+def _git(where, *args, timeout: float):
+    """git ``args`` in the repository at ``where`` (``-C``): in ``git_env(where, pinned=True)``, so no inherited
+    ``GIT_*`` location, index, trace or configuration variable reaches it, lazy fetching is off and the system's and
+    the person's configuration are unread; and by ``git_binary()``, never a git first on ``PATH`` (DEC-710, DEC-712,
+    W2-L160). No git in the system's folders raises ``OSError``: each caller's "git cannot say" (DEC-580)."""
+    git = git_binary()
+    if git is None:
+        raise OSError("no git in the system's folders")
+    return subprocess.run([git, "-C", str(where), *args], capture_output=True, text=True, timeout=timeout,
+                          env=git_env(where, pinned=True))
 
 
 # -- the section ----------------------------------------------------------------------------------------------------
@@ -109,8 +119,7 @@ def check(found) -> None:
 def main_tree(root) -> str:
     """The repository's main working tree (the folder of the common .git of the tree at ``root``), else ``root``."""
     try:
-        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute", "--git-common-dir"],
-                             capture_output=True, text=True, timeout=5, env=_git_env()).stdout.strip()
+        out = _git(root, "rev-parse", "--path-format=absolute", "--git-common-dir", timeout=5).stdout.strip()
     except (OSError, subprocess.SubprocessError):
         out = ""
     if out and os.path.basename(out.rstrip("/")) == ".git":
@@ -172,7 +181,7 @@ def linked_tests(main: str, names, wbs: str):
     one on the first-parent line of w2/<WBS>-tests since it left w2/integrate. Kept in LINK_CACHE per (method,
     repository, names, the three heads). None when git cannot say: then only the ticket's own folder is judged."""
     def git(*args, ok=(0,)):
-        r = subprocess.run(["git", "-C", main, *args], capture_output=True, text=True, timeout=10, env=_git_env())
+        r = _git(main, *args, timeout=10)
         if r.returncode not in ok:
             raise OSError("git")
         return r.stdout
@@ -248,7 +257,9 @@ def changed(tree: str):
     """The files (relative) the branch at ``tree`` changes against its merge base with w2/integrate, committed or
     not; None when git cannot say (then nothing there is filtered)."""
     def git(*args):
-        p = subprocess.run(["git", "-C", tree, *args], capture_output=True, text=True, timeout=5, env=_git_env())
+        # pinned too: an ignore file the person names in their configuration (core.excludesFile) is unread, so an
+        # untracked file it alone hides is counted as changed: withheld, never handed out (sweep row 71)
+        p = _git(tree, *args, timeout=5)
         if p.returncode:
             raise OSError("git")
         return p.stdout
@@ -265,7 +276,7 @@ def engineer_side(tree: str, wbs: str):
     """The files (relative) the ticket branch's commits carried into the designer's tests tree ``tree``; None when
     git cannot say."""
     def git(*args, ok=(0,)):
-        p = subprocess.run(["git", "-C", tree, *args], capture_output=True, text=True, timeout=5, env=_git_env())
+        p = _git(tree, *args, timeout=5)
         if p.returncode not in ok:
             raise OSError("git")
         return p

@@ -1,6 +1,6 @@
 ---
 name: role-product-spec
-version: 1.0.0
+version: 1.0.1
 role: product-spec
 skills: [discovery, change]
 ---
@@ -16,6 +16,12 @@ You write what the ticket specifies rather than codes: schemas, templates, skill
 7. Name a capability item's provider ticket and source decision in `contract.yaml` ({CONTRACT}) [DEC-1073].
 8. Write only {PATHS}. Run the checks your paths have: {CMD:schema_check} for schemas and records, {CMD:unit_tests} for your unit tests.
 9. Commit in T-0's form; a report or assessment goes in a commit of its own [DEC-924].
+
+Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+
+The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].
+
+Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
 
 For a specification gap (no ticket paths): write nothing; return a draft answer with its sources, options, recommendation and confidence.
 An interface point the ticket leaves open: take the simplest reading and name it in `discoveries`; never widen the scope.

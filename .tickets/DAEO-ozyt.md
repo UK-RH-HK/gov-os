@@ -1,6 +1,6 @@
 ---
 id: DAEO-ozyt
-status: open
+status: closed
 deps: [DAEO-r30l]
 links: [DAEO-r30l, DAEO-5emz]
 created: 2026-11-11T01:20:16Z
@@ -22,6 +22,7 @@ allowed_paths:
 - src/gov/resources/config.py  # the one new value, gpu_backstop_limit_mib
 - tests/unit/resources/test_w2_157*
 - docs/changes/W2-157-evidence.md
+- docs/probes/DAEO-ozyt/**  # the probe record, so F4 holds at the branch head (run 1's F4 note; the CTO, 2026-11-12 07:20)
 reads:
 - src/gov/resources/**
 - governance/project/orchestration/packages/EMERGENCY-TOOLS-1.md
@@ -45,6 +46,7 @@ kpis:
   - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
+- DEC-1010
 - DEC-1067
 - DEC-1068
 - DEC-1030
@@ -70,3 +72,26 @@ Filed by the product-spec helper of the night audit (DAEO-sdxk's anti-drift audi
 - **Rabbit holes.** Matching processes by name or `ps | grep` (the groups are named, nothing else); reading Windows' shared-usage counter (WSL cannot; the total-minus-64 MiB sign stands).
 
 [DEC-1067 (GPU safety), DEC-1068 (4), DEC-1119 (5)]
+
+## Run 1's notes (the CTO, delegated P2, 2026-11-12 07:20)
+
+F4: the probe record's folder is in allowed_paths (no test change after the review). The lead's L2 key `gpu_backstop_embedders` and
+the three backstop keys outside `template()` (W2-20's frozen key set) stand. Rows: FR-11 (a try/finally so the own group's pause
+happens whatever the item write does), FR-12, FR-13, FR-3 (an owner question: a GPU that cannot be read), FR-4, FR-6 to FR-10.
+After the land the owner's operator adds the three gate.json entries (docs/changes/W2-157-evidence.md).
+
+## Reopened for one fix (the owner, DEC-1144 (2), P1-B (a), 2026-11-12)
+
+`tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log` hung two
+merge-queue runs (1 h 45 min, then 77 min). The cause: the test replaces the backstop's sleep, then calls `watch()` on planted process
+groups; a call that does not trip polls forever, because a group whose members are all zombies (unreaped) or paused still passes
+`os.killpg(g, 0)`. The fix, inside S4 as written ("when every named group has ended on its own, the watch logs it and ends") and this
+ticket's paths: (1) a group whose live members are all zombies counts as ended; (2) `watch()` takes a bound (a maximum number of polls
+or seconds, a keyword argument whose default keeps the command's behaviour), and every test that calls it passes one; (3) each test reaps
+the process groups it plants. No KPI line changes. One C2 run; it lands through the queue (DEC-989). The owner's temporary skip (P1-B (b))
+cannot take effect without a control-path change (DEC-1144 (2)'s note), so until this lands a hang is stopped by pid.
+
+## The template default moved to W2-121b (the CTO, 2026-11-12 18:5x)
+
+The fix run returned DONE before the default's line could ride it; to land the hang fix at once, the line (DEC-1149 (2)) moved to W2-121b, whose paths hold `src/gov/resources/**`.
+

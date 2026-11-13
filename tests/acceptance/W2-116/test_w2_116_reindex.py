@@ -37,7 +37,14 @@ def test_s5_guard_a_model_less_re_index_of_a_tree_keeps_its_vectors_and_reports_
     assert vectors, "premise: the tree's full rebuild left no vectors"
     support.land_h2(project)
     run = support.rebuild(project, {**env, "OLLAMA_HOST": support.closed_host()})
-    semantic = (run.result.get("stores") or {}).get("semantic") or {}
+    # Rewrite-Reason: DEC-1027 C (the rebuild refuses an embedded namespace with no embedder); P1-L (a), DEC-1150 (3):
+    # the model-less re-index now fails (exit 1, ``REBUILD_FAILED``, ``store: semantic``) and the semantic facet's
+    # refusal is read from the stores in ``error.details``, not from a result.
+    error = run.envelope().get("error") or {}
+    assert run.returncode == 1 and run.envelope().get("ok") is False and error.get("code") == "REBUILD_FAILED", (
+        f"a model-less re-index did not fail with REBUILD_FAILED\n{run.describe()}")
+    assert (error.get("details") or {}).get("store") == "semantic", f"the failure names no semantic store\n{run.describe()}"
+    semantic = ((error.get("details") or {}).get("stores") or {}).get("semantic") or {}
     assert semantic.get("status") != "recreated" and semantic.get("reason"), (
         f"a model-less re-index does not report the semantic facet unavailable\n{run.describe()}")
     assert support.vector_count(project) == vectors, (

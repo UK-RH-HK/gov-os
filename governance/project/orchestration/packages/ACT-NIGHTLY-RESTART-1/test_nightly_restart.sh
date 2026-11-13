@@ -70,6 +70,32 @@ out=$(NR_LOAD=3.4 qout); [ $? -eq 1 ] && echo "$out" | grep -q "load 3.4" && ok 
 out=$(NR_LOAD=3.4 qout --no-load); [ $? -eq 0 ] && ok "--no-load leaves the load out" || bad "--no-load"
 : > "$FIX/untracked.txt"; out=$(qout); [ $? -eq 1 ] && echo "$out" | grep -q "main tree is not clean" && ok "an untracked file in the main tree: busy" || bad "dirty tree ($out)"; rm -f "$FIX/untracked.txt"
 
+# ---- quiet_check.py --beside-leads (DEC-1159 (1): the nightly beside the leads)
+reset; status_lead; out=$(qout --beside-leads); rc=$?; [ $rc -eq 0 ] && ok "--beside-leads: a lead in the status is left out" || bad "beside: lead ($rc: $out)"
+reset; echo '[{"cmd": "claude -p work", "cwd": "/home/usain/gov-os-worktrees/W2-999"}, {"cmd": "python3 -B -m pytest tests/unit", "cwd": "/home/usain/gov-os-worktrees/W2-999"}, {"cmd": "bash heavy_slot.sh python3 -m pytest", "cwd": "/x"}, {"cmd": "bash rebuild_slot.sh tree", "cwd": "/x"}, {"cmd": "bash launch_worker.sh --class C2 engineer high b.md", "cwd": "/x"}]' > "$PROC"
+out=$(qout --beside-leads); rc=$?; [ $rc -eq 0 ] && ok "--beside-leads: a lead's worktree process, pytest, heavy_slot.sh, rebuild_slot.sh and launch_worker.sh are left out" || bad "beside: lead processes ($rc: $out)"
+reset; ( exec 9> "$SLOTS/gov-os-heavy-slot-2.lock"; flock -n 9 || exit 1; exec sleep 30 ) & HOLD=$!; sleep 0.5
+out=$(qout --beside-leads); rc=$?; [ $rc -eq 0 ] && ok "--beside-leads: a held heavy slot is left out (the nightly waits for the slots itself)" || bad "beside: slot ($rc: $out)"
+kill "$HOLD" 2>/dev/null; wait "$HOLD" 2>/dev/null
+out=$(NR_LOAD=9.0 qout --beside-leads); [ $? -eq 0 ] && ok "--beside-leads: the load is left out" || bad "beside: load ($out)"
+for f in CLOSE-RUNNING NIGHTLY-RUNNING MEASURE-RUNNING log/act-in-progress.txt; do
+  reset; : > "$ORCH/$f"; out=$(qout --beside-leads); rc=$?; [ $rc -eq 1 ] && ok "--beside-leads: $f present is still busy" || bad "beside: $f ($rc: $out)"
+done
+reset; echo '[{"cmd": "python3 land.py W2-1=abc", "cwd": "/x"}, {"cmd": "python3 merge_queue.py run", "cwd": "/x"}, {"cmd": "python3 close_build.py W2-1", "cwd": "/x"}]' > "$PROC"
+out=$(qout --beside-leads); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "land.py" && ok "--beside-leads: a landing, the merge queue and a close are still busy" || bad "beside: land/queue/close ($rc: $out)"
+reset; sed -i 's/"land_running": false/"land_running": true/' "$ORCH/dispatch/status.json"; out=$(qout --beside-leads); rc=$?
+[ $rc -eq 1 ] && echo "$out" | grep -q "a landing runs" && ok "--beside-leads: a landing in the dispatcher's status is still busy" || bad "beside: status landing ($rc: $out)"
+reset; sed -i 's/"jobs": \[\]/"jobs": [{"kind": "rebuild", "name": "pid 1", "phase": "rebuild.lexical"}]/' "$ORCH/dispatch/status.json"; out=$(qout --beside-leads); rc=$?
+[ $rc -eq 0 ] && ok "--beside-leads: a worker's rebuild job in the status is left out (F5)" || bad "beside: rebuild job ($rc: $out)"
+out=$(qout); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "job rebuild" && ok "without the flag, a rebuild job is still busy" || bad "no flag: rebuild job ($rc: $out)"
+reset; echo '[{"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/tmp/pytest-of-usain/pytest-5/test_x0/proj"}]' > "$PROC"; out=$(qout --beside-leads); rc=$?
+[ $rc -eq 0 ] && ok "--beside-leads: a test helper's rebuild in a temporary project is left out (F2)" || bad "beside: temp rebuild ($rc: $out)"
+out=$(qout); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "a rebuild" && ok "without the flag, that rebuild is still busy" || bad "no flag: temp rebuild ($rc: $out)"
+reset; : > "$T/none"; out=$(qout --beside-leads); [ $? -eq 1 ] && ok "--beside-leads: the operator's commit freeze is still busy" || bad "beside: operator freeze"; rm -f "$T/none"
+reset; : > "$FIX/untracked.txt"; out=$(qout --beside-leads); [ $? -eq 1 ] && echo "$out" | grep -q "main tree is not clean" && ok "--beside-leads: a dirty main tree is still busy" || bad "beside: dirty tree ($out)"; rm -f "$FIX/untracked.txt"
+reset; sed -i 's/"time": "[^"]*"/"time": "2020-01-01 00:00:00"/' "$ORCH/dispatch/status.json"
+out=$(qout --beside-leads); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "s old" && ok "--beside-leads: a stale dispatcher status is still busy" || bad "beside: stale status ($rc: $out)"
+
 # ---- the wrapper: refusals
 NOW=$(date +%s)
 wrun() { NR_LATEST_EPOCH=$(( $(date +%s) + ${LATEST_IN:-5} )) NR_POLL_S=1 NR_QUIET_N=${QN:-2} NR_EST=3000 bash "$W"; }
@@ -89,13 +115,13 @@ export NR_MARK=$T/mark.txt
 reset; clean_runs; status_lead
 rm -f "$NR_MARK"; NR_INNER=$INNER wrun; rc=$?
 r=$(lastrun)
-[ $rc -eq 2 ] && ok "a planted lead running: the wrapper refuses at the latest start (exit 2)" || bad "lead refusal exit ($rc)"
-head -1 "$r" | grep -q "nightly night: NOT STARTED by nightly_restart.sh" && contains "$r" "lead(s) running" && ok "run.txt's first line says NOT STARTED, and why (the 08:00 check reads it as FAILED and pings)" || bad "run.txt ($(cat "$r" 2>&1 | head -2))"
-[ ! -e "$NR_MARK" ] && [ ! -e "$ORCH/dispatch/OFF" ] && ok "the nightly never started, and no dispatch/OFF was left" || bad "inner ran or OFF left"
+[ $rc -eq 0 ] && ok "a planted lead running: the wrapper runs beside it (DEC-1159 (1)), exit 0" || bad "beside a lead: exit ($rc)"
+[ -f "$NR_MARK" ] && ok "beside a lead: the nightly ran" || bad "beside a lead: the nightly did not run ($(cat "$r" 2>&1 | head -2))"
+contains "$NR_MARK" "off=no" && [ ! -e "$ORCH/dispatch/OFF" ] && ok "beside a lead: no dispatch/OFF during the run or after it" || bad "beside a lead: OFF written"
 
 reset; clean_runs; ( exec 9> "$SLOTS/gov-os-heavy-slot-1.lock"; flock -n 9 || exit 1; exec sleep 30 ) & HOLD=$!; sleep 0.5
 rm -f "$NR_MARK"; NR_INNER=$INNER wrun; rc=$?; r=$(lastrun)
-[ $rc -eq 2 ] && contains "$r" "heavy slot 1 is held" && [ ! -e "$NR_MARK" ] && ok "a planted heavy slot held: the wrapper refuses and names the slot" || bad "slot refusal ($rc)"
+[ $rc -eq 0 ] && [ -f "$NR_MARK" ] && ok "a planted heavy slot held: the wrapper does not wait for it (the nightly takes the slots itself), the run starts" || bad "beside a slot ($rc)"
 kill "$HOLD" 2>/dev/null; wait "$HOLD" 2>/dev/null
 
 reset; clean_runs; rm -f "$NR_MARK"; : > "$ORCH/log/act-in-progress.txt"; NR_INNER=$INNER wrun; rc=$?; r=$(lastrun)
@@ -111,12 +137,12 @@ reset; clean_runs; rm -f "$NR_MARK"; echo "# changed" >> "$FIX/$REL/quiet_check.
 [ $rc -eq 2 ] && contains "$r" "is not its commit at HEAD" && [ ! -e "$NR_MARK" ] && ok "code that differs from its commit: refused" || bad "uncommitted code ($rc)"
 git -C "$FIX" checkout -q -- "$REL/quiet_check.py"
 
-printf 'MemTotal: 24607392 kB\nMemAvailable: %s kB\n' 12000000 > "$T/meminfo"
+printf 'MemTotal: 24607392 kB\nMemAvailable: %s kB\n' 10000000 > "$T/meminfo"
 reset; clean_runs; rm -f "$NR_MARK"; NR_MEMINFO=$T/meminfo NR_INNER=$INNER wrun; rc=$?; r=$(lastrun)
-[ $rc -eq 2 ] && contains "$r" "memory: 12000000 kB available less the 3 GiB floor leaves" && [ ! -e "$NR_MARK" ] && ok "11.4 GiB available (cap would be 8.4 GiB, under 9): refused" || bad "memory refusal ($rc: $(tail -1 "$r"))"
+[ $rc -eq 2 ] && contains "$r" "memory: 10000000 kB available less the 3 GiB floor leaves" && [ ! -e "$NR_MARK" ] && ok "9.5 GiB available (cap would be 6.5 GiB, under 7.5, DEC-1160): refused" || bad "memory refusal ($rc: $(tail -1 "$r"))"
 
 # ---- the wrapper: a quiet machine; the cap, the swap limit, the score, the workers
-for avail in 40000000:12288:16 20000000:12288:16 13000000:9623:12; do
+for avail in 40000000:12288:16 20000000:12288:16 13000000:9623:12 11500000:8158:9; do   # 11500000: at the new 7.5 GiB minimum's edge (DEC-1160)
   IFS=: read -r kb cap w <<< "$avail"
   printf 'MemAvailable: %s kB\n' "$kb" > "$T/meminfo"
   reset; clean_runs; rm -f "$NR_MARK"; NR_MEMINFO=$T/meminfo NR_INNER=$INNER LATEST_IN=60 wrun; rc=$?
@@ -133,7 +159,7 @@ contains "$NR_MARK" "memmax=12884901888" && ok "the scope's memory.max is 12 GiB
 contains "$NR_MARK" "swapmax=0" && ok "the scope's memory.swap.max is 0" || bad "swap.max ($(grep swapmax "$NR_MARK"))"
 contains "$NR_MARK" "oomgroup=1" && ok "memory.oom.group is 1 (the kernel kills the whole run)" || bad "oom.group ($(grep oomgroup "$NR_MARK"))"
 contains "$NR_MARK" "oomadj=500" && ok "the run's processes carry oom_score_adj 500" || bad "oom_score_adj ($(grep oomadj "$NR_MARK"))"
-contains "$NR_MARK" "off=yes" && [ ! -e "$ORCH/dispatch/OFF" ] && ok "dispatch/OFF was there during the run and is gone after it" || bad "OFF during/after"
+contains "$NR_MARK" "off=no" && [ ! -e "$ORCH/dispatch/OFF" ] && ok "no dispatch/OFF during the run or after it (DEC-1159 (1))" || bad "OFF during/after"
 # cron's bare environment: no XDG_RUNTIME_DIR, no bus address, a short PATH
 reset; clean_runs; rm -f "$NR_MARK"
 envargs=(); while IFS= read -r kv; do envargs+=("$kv"); done < <(env | grep '^NR_')

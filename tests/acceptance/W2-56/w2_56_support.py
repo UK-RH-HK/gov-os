@@ -530,10 +530,16 @@ def run_launch(box: Box, role: str, ticket: str, cli_args=None, *, env=None, cwd
 
 def start_launch(box: Box, role: str, ticket: str, cli_args=None, *, env=None, cwd=None) -> subprocess.Popen:
     """``gov launch`` started in a session (and process group) of its own, so a signal sent to its pid reaches
-    the launcher alone, as a signal sent to the launcher by its caller does."""
+    the launcher alone, as a signal sent to the launcher by its caller does. The launcher owns its signal start
+    state: SIGINT, SIGTERM and SIGHUP are all set to their default before it runs (none is named ignored here),
+    because an ignored signal stays ignored across ``exec`` and a test process started as a background job
+    (``lead_verify.sh``, the cron nightly: SIGINT ignored) would otherwise pass the ignore on (W2-177, cause (B))."""
+    def starting():
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            signal.signal(signum, signal.SIG_DFL)
     return subprocess.Popen(launch_argv(role, ticket, cli_args), cwd=str(cwd or box.project),
                             env=env or base_environment(box), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE, text=True, start_new_session=True)
+                            stderr=subprocess.PIPE, text=True, start_new_session=True, preexec_fn=starting)
 
 
 def wait_for(predicate, timeout: float, step: float = 0.05) -> bool:

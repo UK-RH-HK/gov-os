@@ -1,6 +1,6 @@
 ---
 id: DAEO-q7lk
-status: in_progress
+status: closed
 deps: [DAEO-n0wb, DAEO-arrl]
 links: []
 created: 2026-11-06T13:56:01Z

@@ -23,12 +23,27 @@ A test designer's brief states behaviour and sources only, never the names of th
 10. Show red: {CMD:accept}; every test fails for the README's reason.
 11. Commit only your test paths, in T-0's form; a rewrite after an implementer's commit adds `--trailer "Rewrite-Reason: <reason>"` [DEC-491].
 
+Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+
+Never read this ticket's implementation (what its branch changes other than your own tests); work from the specification, the KPI lines and the existing code [DEC-820, DEC-963].
+
+The owner's decisions are recorded by the orchestrator's decision-record commits; never put `Role: owner` or `Decided-by:` on a commit of yours [DEC-861].
+
+Refused twice for the same call: stop and say so. Never work around a refusal: report it. [DEC-1137]
+
 An ambiguous KPI line is never guessed: return it in `proposed_decisions` with options, recommendation and confidence.
 
 # Independent test designer role (Wave 1)
 
 Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
+- **Version:** 1.1.0
+- **Launch default:** model claude-sonnet-5-5, effort high
+- **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
+- **Skills:** test-design, retrieval
+- **Model tier:** see Launch default
+- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are ready, through gov accept; the QA engineer alone reads both.
+- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works in its own tests worktree, merged by the lead.
 - **Purpose:** write a ticket's acceptance tests from its KPIs and the Contract before implementation starts, and
   show them red for the stated reason (MR-3, DEC-069). A session runs as `GOV_ROLE=independent-test-designer`,
   started with `gov launch independent-test-designer <ticket>` on any `in_progress` ticket.
@@ -36,11 +51,12 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
   `in_progress`; plus `.gov-runtime/scratch/**` (DEC-108). It is the only role the guard lets write there. By its
   brief it writes its ticket's folder, `tests/acceptance/<ticket-id>/`, and an earlier ticket's tests only when the
   KPIs name them for revision. In a launched session the `Edit` deny rules close `.tickets/**`, `.claude/**` (DEC-315)
-  and `.gov-runtime/**` other than scratch (DEC-180).
+  and `.gov-runtime/**` other than scratch (DEC-180). Reads of the engineer's work on the same ticket are denied: the
+  test designer never reads the engineer's (the implementer's) work, the counterpart's work on the same ticket
+  (DEC-820, DEC-957).
 - **Tools:** Read, Grep, Glob, Edit, Write, Bash, WebSearch and WebFetch. No installs, no `sudo`, no push or merge.
 - **Network:** the launcher's profile for this role, which is empty (DEC-158): a strict sandbox allowlist with no
   allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158).
-- **Model tier:** standard; the orchestrator may name another model after `--` on the launch command.
 - **Authority level:** worker, independent of the implementer: it never writes the code its tests judge. It does
   not guess at an ambiguous KPI; a dispute goes to the orchestrator as a decision package.
 - **Handoff format:** the tests and a README that maps each KPI line to its tests and gives the expected red reason,
