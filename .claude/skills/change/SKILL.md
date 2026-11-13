@@ -4,7 +4,7 @@ description: >-
   Method for taking a Gov OS change through evidence, proposal, independent
   review and owner approval to a new version.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 # Change
 
@@ -45,11 +45,12 @@ The owner chooses among these options. CIT-E records what was done. Every versio
 
 ## Impact assessment
 
-Per DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1, the method is:
+Per DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. From Wave 2 the question runs `gov impact` (DEC-167, CAP-33.g):
 
-1. Draft an OpenSpec proposal describing the change (DEC-167, CAP-33.f).
-2. Run `gov closure` over the affected records to identify downstream specifications, decisions, tickets, tests and code (DEC-167).
-3. Present the impact summary to the requester (CAP-33.f).
+1. Run `gov impact "What is the impact of DEC-NNN?"`, or `gov impact <id or symbol>...` (DEC-167, CAP-33.g).
+2. It reads the record graph and the code graph. It reports the state of each graph, whether the report is `complete` and its gaps, each stated item with whether it is deletable, the affected specifications, decisions, tickets, tests and code, and the radius (CAP-33.g).
+3. Add `--out <path>` to write the CIT-P as a record. Run `gov impact --compare <CIT-E path>` to check a CIT-E against its CIT-P (CAP-33.g).
+4. Present the result to the requester (CAP-33.f).
 
 ## Audit ticket
 
@@ -57,4 +58,4 @@ Per DEC-088 (CAP-47.d), an accepted CIT-E that changes a closed spine creates an
 
 ## Tools
 
-CIT-P and CIT-E use OpenSpec (installed, v1.13.2) for drafting proposals and recording outcomes (CAP-33.a). Run `gov closure` to compute the downstream impact of a proposed change (DEC-167, CAP-33.f). Run `gov status` to check the current state of a CIT-P or CIT-E (CAP-33.d).
+CIT-P and CIT-E use OpenSpec (installed, v1.13.2) for drafting proposals and recording outcomes (CAP-33.a). Run `gov impact` to compute the downstream impact of a proposed change (DEC-167, CAP-33.g). Run `gov status` to check the current state of a CIT-P or CIT-E (CAP-33.d).
