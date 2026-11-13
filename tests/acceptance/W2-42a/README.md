@@ -13,7 +13,7 @@ cd <tree> && TMPDIR=/tmp/gov-os-emg-<name> PYTHONPATH=<tree>/src \
   python3 -m pytest tests/acceptance/W2-42a -q -n auto -o tmp_path_retention_policy=failed -p no:cacheprovider
 ```
 
-493 cases in five files (the 452 of the first design and td-2's 41, below). The replay and the planted cases run the hook once each (about 1 to 3 s a call: the
+805 cases in six files (the 452 of the first design, td-2's 41 and td-4's 312, below). The replay and the planted cases run the hook once each (about 1 to 3 s a call: the
 hook lists every worktree for rules 2 and 5), so run with `-n auto`.
 
 ## What judges what
@@ -89,6 +89,27 @@ hook lists every worktree for rules 2 and 5), so run with `-n auto`.
   no KPI row; strict so that they fail loudly (XPASS) the moment the hook is fixed by ACT-GUARD-FIX-5
   (P1-GUARD-HEREDOC-OPTS-1), whose companion removes the marks (td-3, the CTO's request of 2026-11-13). **Red on `e9e4f7bac`: 24 failed, 15 passed, 2 xfailed**: 12 spellings fail on both sides (no write, no
   read); `--noprofile --norc`, `-s` and the unknown flag, the 4 controls on both sides and the data-file check pass.
+- **`test_w2_42a_apostrophe.py`** (td-4, 2026-11-13; the reopen under DEC-1164 (18), DEC-1174 (1), Rewrite-Reason
+  DEC-1174 (1)): an apostrophe in a comment of a shell's heredoc body is no quote. Each case asks the product guard
+  itself, `gov.guard.decide.decide("Bash", {"command": …}, root, "engineer", "DAEO-03ub", cwd=root, flag="open")`, in
+  a `tmp_path` project of its own: an in-progress engineer ticket `DAEO-03ub` allowing `src/**`, so a write under
+  `src/` passes and a refusal of `T` = `tests/acceptance/X/zz.py` is about `T`; no session variable, its own `HOME`.
+  The heads are the F1 fixture's `bash -euo pipefail`, `-o pipefail`, `-O extglob`, `--rcfile f`, `/dev/stdin`,
+  `cat <<… | bash -o pipefail` and plain `bash`, each with a quoted and an unquoted delimiter (14). (a) a harmless body
+  with an apostrophe comment (`# don't overwrite` / `echo hi`, `# it's fine` / `ls`, a trailing and an indented
+  comment) is allowed, also when the call then writes `src/ok.py` (70). (b) the call then writing `T` by `> T`, `cp`
+  or `python3 -c` is refused (42), and ACT-GUARD-FIX-5 round 2's four F1 reversal calls by name (4). (c) a body
+  writing `T` after such a comment (28); a write of `T` between two apostrophe comments (42); the comment drop's
+  edges, each a body line writing `T`, with and without an apostrophe comment above (`a#b`, `${#v}`, `${v#a}`, `$#`,
+  `#` inside double and single quotes, `"it's # here"`, a comment after the write; 64): all refused. (d) a real
+  unclosed quote outside a comment, also after an apostrophe comment, after `a#b` and after `$#`, is refused (20).
+  Controls (42, green on the base): the same bodies without the apostrophe are allowed; without it a write of
+  `src/ok.py` passes and a write of `T` is refused naming `T`. **Red on `d73bd2756`: 120 failed, 192 passed**: the
+  70 (a) cases, each refused "the command cannot be read, so it is not known to be free of the lift form of gov pause
+  (--off)" (`lift_refusal` in `decide.py` reads the body as shell); and 50 cases the base **allows** (a fail-open):
+  the 42 writes of `T` between two apostrophe comments, the 4 edges with a comment after the write below an
+  apostrophe comment, and the 4 unclosed quotes after an apostrophe comment. Read as text the two apostrophes pair
+  into one quote and hide what lies between; a shell reads both as comments and runs it. The other 142 pass.
 
 ## The KPI map (read by `gov close`)
 
@@ -96,7 +117,7 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 
 | KPI | Tests |
 |---|---|
-| S1 | `test_w2_42a_parser.py::test_kpi1_a_data_body_for_cat_is_no_write_and_its_quotes_do_not_break_the_reading`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_tee_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_grep_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_quoted_data_body_s_substitution_is_text`, `test_w2_42a_parser.py::test_kpi1_an_unquoted_data_body_s_substitution_is_judged`, `test_w2_42a_parser.py::test_kpi1_a_shell_body_is_judged_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_the_data_file_holds_every_spelling_of_the_finding`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_data_body_stays_data` |
+| S1 | `test_w2_42a_parser.py::test_kpi1_a_data_body_for_cat_is_no_write_and_its_quotes_do_not_break_the_reading`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_tee_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_grep_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_quoted_data_body_s_substitution_is_text`, `test_w2_42a_parser.py::test_kpi1_an_unquoted_data_body_s_substitution_is_judged`, `test_w2_42a_parser.py::test_kpi1_a_shell_body_is_judged_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_the_data_file_holds_every_spelling_of_the_finding`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_data_body_stays_data`, `test_w2_42a_apostrophe.py::test_apostrophe_a_a_harmless_shell_body_with_an_apostrophe_comment_is_allowed`, `test_w2_42a_apostrophe.py::test_apostrophe_a_the_call_then_writing_an_allowed_path_is_allowed`, `test_w2_42a_apostrophe.py::test_apostrophe_c_two_apostrophe_comments_do_not_pair_into_a_quote_that_hides_a_write`, `test_w2_42a_apostrophe.py::test_apostrophe_c_a_hash_that_starts_no_comment_keeps_the_write_on_its_line`, `test_w2_42a_apostrophe.py::test_apostrophe_control_the_same_body_without_an_apostrophe_is_allowed`, `test_w2_42a_apostrophe.py::test_apostrophe_control_without_the_apostrophe_an_allowed_write_passes_and_a_write_of_t_is_refused_for_t` |
 | S2 | `test_w2_42a_parser.py::test_kpi2_a_variable_set_once_at_the_top_before_use_is_expanded`, `test_w2_42a_parser.py::test_kpi2_a_variable_built_from_one_set_before_it_is_expanded`, `test_w2_42a_parser.py::test_kpi2_a_literal_for_loop_s_words_are_judged_one_by_one`, `test_w2_42a_parser.py::test_kpi2_any_other_binding_is_unresolvable` |
 | S3 | `test_w2_42a_parser.py::test_kpi3_a_substitution_in_quotes_sh_c_and_eval_are_judged_as_commands`, `test_w2_42a_parser.py::test_kpi3_shell_keywords_are_not_the_command_s_name`, `test_w2_42a_parser.py::test_kpi3_prefixes_are_not_the_command_s_name` |
 | S4 | `test_w2_42a_parser.py::test_kpi4_an_unmatched_glob_is_its_literal_path`, `test_w2_42a_parser.py::test_kpi4_an_unmatched_glob_after_a_cd_is_its_literal_path`, `test_w2_42a_parser.py::test_kpi4_a_matched_glob_is_still_its_matches` |
@@ -107,8 +128,8 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 | S9 | `test_w2_42a_measured.py::test_kpi9_the_parser_resolves_the_writes_of_all_but_at_most_2_of_the_61_logged_commands`, `test_w2_42a_measured.py::test_kpi9_no_planted_shell_write_is_missed_by_the_parser`, `test_w2_42a_measured.py::test_kpi9_the_measures_are_stated_in_the_evidence_file` |
 | S10 | `test_w2_42a_read_judge.py::test_kpi10_a_loop_over_seq_reading_a_literal_file_is_judged_by_that_file`, `test_w2_42a_read_judge.py::test_kpi10_a_substitution_that_yields_no_file_name_leaves_the_literal_files`, `test_w2_42a_read_judge.py::test_kpi10_a_python_heredoc_naming_its_files_literally_is_judged_by_them`, `test_w2_42a_read_judge.py::test_kpi10_a_data_heredoc_appended_to_a_record_is_judged_by_its_file`, `test_w2_42a_read_judge.py::test_kpi10_names_given_at_run_time_are_still_judged_as_a_listing`, `test_w2_42a_read_judge.py::test_kpi10_a_literal_hidden_file_is_still_refused` |
 | S11 | `test_w2_42a_replay.py::test_kpi11_each_logged_refusal_replayed`, `test_w2_42a_replay.py::test_kpi11_the_replay_holds_every_recoverable_line`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused` |
-| F1 | `test_w2_42a_measured.py::test_failure1_no_write_the_base_parser_catches_is_missed`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands` |
-| F2 | `test_w2_42a_parser.py::test_failure2_an_unparseable_or_unknown_form_is_unresolvable`, `test_w2_42a_parser.py::test_failure2_a_form_read_uncertainly_keeps_its_write`, `test_w2_42a_read_judge.py::test_failure2_an_unparseable_command_naming_a_secret_is_refused`, `test_w2_42a_measured.py::test_kpi9_no_planted_shell_write_is_missed_by_the_parser`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused` |
+| F1 | `test_w2_42a_measured.py::test_failure1_no_write_the_base_parser_catches_is_missed`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands`, `test_w2_42a_apostrophe.py::test_apostrophe_b_the_call_writing_the_acceptance_folder_after_the_heredoc_is_refused`, `test_w2_42a_apostrophe.py::test_apostrophe_b_the_four_f1_reversal_calls_of_act_guard_fix_5_stay_refused`, `test_w2_42a_apostrophe.py::test_apostrophe_c_a_body_writing_the_acceptance_folder_after_an_apostrophe_comment_is_refused`, `test_w2_42a_apostrophe.py::test_apostrophe_c_a_hash_that_starts_no_comment_keeps_the_write_on_its_line` |
+| F2 | `test_w2_42a_parser.py::test_failure2_an_unparseable_or_unknown_form_is_unresolvable`, `test_w2_42a_parser.py::test_failure2_a_form_read_uncertainly_keeps_its_write`, `test_w2_42a_read_judge.py::test_failure2_an_unparseable_command_naming_a_secret_is_refused`, `test_w2_42a_measured.py::test_kpi9_no_planted_shell_write_is_missed_by_the_parser`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused`, `test_w2_42a_apostrophe.py::test_apostrophe_d_a_body_with_an_unclosed_quote_outside_a_comment_is_refused` |
 
 ## KPI lines, their cases and the expected red reasons
 
@@ -128,6 +149,7 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 | F1 no write the base catches is missed | measured: `test_failure1_*` (53) | green by construction on the base (each is a case the base catches) |
 | F2 unknown forms fail closed | parser: `test_failure2_*` (6); read judge: `test_failure2_*` (1); and the planted unknown forms in S9 and S11 | `eval "$X"`, `sh -c "$X"` and `bash -c` with unbalanced quotes give no write on the base (3 red); the unbalanced quotes, the unterminated heredoc, the shift in arithmetic and the unparseable secret read are green |
 | review F1 (td-2): a shell with options reading a heredoc | f1: `test_review_f1_*` (1 + 15 + 4 + 15 + 4; 2 hook cases xfail strict until ACT-GUARD-FIX-5, in no row) | the head reads `bash -euo pipefail <<'EOF'` and the other 11 red spellings as data: no write and no read from the body (24 red). Green: `--noprofile --norc`, `-s`, the unknown flag, the 4 controls on both sides, the data-file check |
+| reopen (td-4, DEC-1174 (1)): an apostrophe comment in a shell body (S1, F1, F2) | apostrophe: `test_apostrophe_a_*` (56 + 14), `test_apostrophe_b_*` (42 + 4), `test_apostrophe_c_*` (28 + 42 + 64), `test_apostrophe_d_*` (20), `test_apostrophe_control_*` (28 + 14) | (a) all 70 red: refused "the command cannot be read" (`lift_refusal` reads the apostrophe as an unclosed quote). Red too, the base allows them (a fail-open): the 42 writes of `T` between two apostrophe comments, the 4 edges with a comment after the write below an apostrophe comment, the 4 unclosed quotes after an apostrophe comment (the two apostrophes pair into one quote). Green: (b), the rest of (c) and (d), the controls (120 red, 192 green on `d73bd2756`) |
 
 **The red run on the base** (`a58ba344`, through the gate, `-n auto`): **94 failed, 358 passed**, no errors, each
 failure for the reason above: S1 4, S2 4, S3 14, S4 2, S5 13, S6 4, S7 5, S8 3, S9 32, S10 5, S11 5, F2 3.
