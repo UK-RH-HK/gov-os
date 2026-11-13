@@ -10,7 +10,7 @@ import ast
 from collections import Counter
 from pathlib import Path
 
-from w2_182_support import ROOT, mapped_node_ids
+from w2_182_support import ROOT, guarded_node_ids
 
 LOWERING = {"skip", "skipif", "xfail", "flaky", "rerun", "reruns", "importorskip"}
 
@@ -34,9 +34,9 @@ def lowering_names(tree: ast.AST) -> Counter:
 
 
 def mapped_functions() -> list[tuple[str, str]]:
-    """(file, function) of every mapped case but this file's own."""
+    """(file, function) of every guarded case (mapped, then revised-not-run) but this file's own."""
     found = []
-    for node in mapped_node_ids():
+    for node in guarded_node_ids():
         file, _, name = node.partition("::")
         if Path(file).name != Path(__file__).name:
             found.append((file, name.split("[")[0]))
@@ -67,6 +67,6 @@ def problems_in(source_of, functions) -> list[str]:
 
 def test_no_revised_case_is_lowered_skipped_or_marked():
     functions = mapped_functions()
-    assert len(functions) >= 7, functions  # the seven revised functions of the README's map (F's two ids are one)
+    assert len(functions) >= 7, functions  # the seven revised functions: six mapped (F's two ids are one) and W2-23 S6, revised, not run here
     problems = problems_in(lambda file: (ROOT / file).read_text(encoding="utf-8"), functions)
     assert not problems, "\n".join(problems)
