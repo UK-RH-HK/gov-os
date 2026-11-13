@@ -429,3 +429,53 @@ def test_the_copies_are_in_place_before_the_build(tmp_path, stand_ins, monkeypat
     root = planted(tmp_path)
     run_a9(root, tmp_path / "out")
     assert seen == [True]
+
+
+# ---- run 4 after the designer's revision: a route that raised has a time, a stale proposal goes, held records are listed
+
+def test_a_raising_route_still_has_its_time_and_a_stale_proposal_is_not_this_runs(tmp_path, stand_ins, monkeypatch):
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "SCALE-PROPOSAL.md").write_text("an earlier run's proposal\n")
+
+    def down(root, question):
+        raise RuntimeError("down")
+
+    monkeypatch.setattr(fabric, "vector_scan", down)
+    root = planted(tmp_path)
+    done = run_a9(root, out, budget_ms=1)
+    found = head_of(root, done)["scale"]
+    assert all(isinstance(value, float) for value in found["routes"].values()) and found["vector_scan_ms"] is None
+    assert not (out / "SCALE-PROPOSAL.md").exists()
+
+
+def test_a_file_the_store_holds_outside_the_path_map_is_listed_indexed(tmp_path, stand_ins):
+    root = planted(tmp_path)
+    run_a9(root, tmp_path / "out")  # the first run's record is a tracked file the second run's store holds
+    import gov.retrieval.lexical as lexical
+
+    def with_records(where):  # a keyword index that holds the adoption's own records too
+        db = sqlite3.connect(where / STORE_REL)
+        db.executescript("CREATE TABLE IF NOT EXISTS lexical_file (path TEXT PRIMARY KEY, blob TEXT NOT NULL, indexed INTEGER NOT NULL);"
+                         "CREATE TABLE IF NOT EXISTS lexical_chunk (id INTEGER PRIMARY KEY, chunk_id TEXT NOT NULL UNIQUE, "
+                         "path TEXT NOT NULL, start_line INTEGER NOT NULL, end_line INTEGER NOT NULL, parent_id TEXT NOT NULL);"
+                         "DELETE FROM lexical_file; DELETE FROM lexical_chunk;")
+        for rel in subprocess.run(["git", "-C", str(where), "ls-files"], capture_output=True, text=True, env=ENV).stdout.split():
+            state = 0 if rel in ("blob.bin", "cfg.env") else 1
+            db.execute("INSERT INTO lexical_file VALUES (?, 'b', ?)", (rel, state))
+            if state:
+                db.execute("INSERT INTO lexical_chunk (chunk_id, path, start_line, end_line, parent_id) VALUES (?, ?, 1, 1, 'p')",
+                           (f"c-{rel}", rel))
+        db.commit()
+        db.close()
+        return {"digest": "x", "indexed": []}
+
+    import pytest as _pytest
+    patch = _pytest.MonkeyPatch()
+    patch.setattr(lexical, "refresh", with_records)
+    try:
+        done = run_a9(root, tmp_path / "out2")
+    finally:
+        patch.undo()
+    block = head_of(root, done)["stores"]["lexical"]
+    assert "governance/adoption/A9-memory-fabric.md" in block["indexed"]

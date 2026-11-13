@@ -356,9 +356,15 @@ def _stores(run, result: dict) -> dict:
             except GovError:
                 binary = False
             lexical_r.append({"path": rel, "reason": "binary" if binary else "secrets"})  # a binary the store did not take
+    for rel in sorted(set(verdicts) - set(paths)):  # held by the store, outside the path map (the adoption's records)
+        state = verdicts[rel]
+        if state == 1:
+            lexical_i.append(rel)
+        else:
+            lexical_r.append({"path": rel, "reason": "not-embedded" if state == 2 else "secrets"})
     vec_i = [rel for rel in lexical_i if rel in vectored]
     vec_r = [{"path": rel, "reason": "not-embedded"} for rel in lexical_i
-             if rel in chunked and rel not in vectored and _policy(run.config, namespaces[rel]) != "embedded"]
+             if rel in chunked and rel not in vectored and _policy(run.config, namespaces.get(rel)) != "embedded"]
     code = [rel for rel in paths if Path(rel).suffix.lower() in assess.CODE_GRAPH_SUFFIXES | assess.OTHER_CODE_SUFFIXES]
     called_for = project.code_intelligence(run.config)
     code_i, code_r = [], []
@@ -381,7 +387,7 @@ def _stores(run, result: dict) -> dict:
     return {
         "record": {**base, "judged": len(held), "indexed": held, "nodes": n_records, "edges": n_edges, "refused": [],
                    "seconds": timing.get("record_s", 0.0)},
-        "lexical": {**base, "judged": len(paths), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
+        "lexical": {**base, "judged": len(lexical_i) + len(lexical_r), "indexed": lexical_i, "refused": lexical_r, "chunks": n_chunks,
                     "binary_held": [rel for rel in lexical_i if rel in binary_files], "seconds": timing.get("lexical_s", 0.0)},
         "vectors": {**base, "judged": len([rel for rel in lexical_i if rel in chunked]), "indexed": vec_i, "refused": vec_r,
                     "chunks": n_chunks, "vectors": n_vectors, "binary_held": [rel for rel in vec_i if rel in binary_files],
@@ -424,8 +430,8 @@ def _scan(root: Path) -> tuple[float | None, float | None, str | None]:
     start = time.perf_counter()
     try:
         reply = vector_scan(root, PLAIN_QUESTION)
-    except Exception as exc:  # noqa: BLE001 - a route that raised was not measured: the record names the error
-        return None, None, type(exc).__name__
+    except Exception as exc:  # noqa: BLE001 - a route that raised ran no scan: the record names the error
+        return round((time.perf_counter() - start) * 1000, 1), None, type(exc).__name__
     took = round((time.perf_counter() - start) * 1000, 1)
     if isinstance(reply, dict) and reply.get("available") is True:
         return took, took, None
@@ -587,6 +593,8 @@ def _stage(run, out: Path, standard: dict, copies: dict) -> dict:
     said = over(found_scale)
     if said:
         proposal(out, said, found_scale)
+    else:  # this run's record decides: a proposal an earlier run left in the folder is not this run's
+        (out / "SCALE-PROPOSAL.md").unlink(missing_ok=True)
     domains, dropped = _domains(run.config)
     blind = [project.FOLDER + "/**", memory_sets.WALLS + "/**", "memory-audit/**"]
     made = memory_sets.variants(GOV_OS / memory_sets.BRIEFS, domains, blind, dropped)
