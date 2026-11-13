@@ -1,7 +1,7 @@
 ---
 id: DAEO-csj8
 status: open
-deps: [DAEO-g0ip, DAEO-h4rh]
+deps: [DAEO-g0ip, DAEO-h4rh, DAEO-g87r, DAEO-zmo4, DAEO-6y0x]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
