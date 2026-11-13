@@ -51,9 +51,9 @@ def radius(all_deletable: bool, kinds_at_one_hop: set) -> int:
     return 1 if len(kinds_at_one_hop) <= 1 else 2 if len(kinds_at_one_hop) <= 3 else 3
 
 
-# P-2, W2-L319: where the depth of a radius comes from. gov.closure.depth_of_radius holds DEC-035's placeholders, read
-# as hops by DEC-391 DP-3; no owner decision or measurement sets them yet. This names that source, as it is.
-DEPTH_SOURCE = "DEC-035"
+# P-2, W2-L319: where the depth of a radius comes from. The owner set it for Wave 2 in DEC-815 (P-W2-45 (a)): R0 and R1
+# one hop, R2 three, R3 eight, as gov.closure.depth_of_radius holds them. This names that source.
+DEPTH_SOURCE = "DEC-815"
 
 # P-5, reading R9: a closed specification is a ``specification`` record whose status is CLOSED.
 CLOSED = "CLOSED"

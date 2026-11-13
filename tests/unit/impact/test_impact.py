@@ -202,3 +202,118 @@ def test_a_malformed_change_is_refused(asked):
 def test_the_radius_reading():
     assert readings.radius(True, {"code"}) == 0
     assert [readings.radius(False, set(readings.KINDS[:n])) for n in range(6)] == [1, 1, 2, 2, 3, 3]
+
+
+# The second review's findings (DEC-812) and the depth source (DEC-815).
+def records_of_a_change(root, proposal_front=None):
+    """CITP-001 (listing DEC-002 and DEC-050) and CITE-001 (listing DEC-050 alone), committed and loaded."""
+    import yaml
+
+    proposed = {"id": "CITP-001", "type": impact.CITP_TYPE, "affected": {"decisions": ["DEC-002", "DEC-050"]},
+                **(proposal_front or {})}
+    executed = {"id": "CITE-001", "type": impact.CITE_TYPE, "proposal": "CITP-001",
+                "affected": {"decisions": ["DEC-002", "DEC-050"]}}
+    for rel, front in (("CITP-001.md", proposed), ("CITE-001.md", executed)):
+        (root / rel).write_text(f"---\n{yaml.safe_dump({'status': 'ACCEPTED', **front})}---\n", encoding="utf-8")
+    git(root, "add", "CITP-001.md", "CITE-001.md")
+    git(root, "commit", "-q", "-m", "the change's records")
+    store.load(root)
+
+
+def test_a_compare_never_matches_on_a_proposal_edited_after_the_commit(root):
+    """A: CITP-001 lists DEC-002 at HEAD; the working tree's copy does not, and the CIT-E does not either."""
+    import yaml
+
+    records_of_a_change(root)
+    assert impact.compare(root, "CITE-001.md")["matches"] is True
+    edited = {"id": "CITP-001", "type": impact.CITP_TYPE, "status": "ACCEPTED", "affected": {"decisions": ["DEC-050"]}}
+    (root / "CITP-001.md").write_text(f"---\n{yaml.safe_dump(edited)}---\n", encoding="utf-8")
+    (root / "CITE-001.md").write_text(
+        f"---\n{yaml.safe_dump({**edited, 'id': 'CITE-001', 'type': impact.CITE_TYPE, 'proposal': 'CITP-001'})}---\n",
+        encoding="utf-8")
+    for staged in (False, True):  # uncommitted, then staged
+        if staged:
+            git(root, "add", "CITP-001.md")
+        found = impact.compare(root, "CITE-001.md")
+        assert found["matches"] is False and {"id": "DEC-002", "kind": "decisions", "only_in": "proposal"} in \
+            found["differences"]
+
+
+def test_a_compare_refuses_a_proposal_whose_file_is_gone(root):
+    """E: the proposal's file does not exist: refused as missing, not as listing nothing."""
+    records_of_a_change(root)
+    (root / "CITP-001.md").unlink()
+    with pytest.raises(GovError) as refused:
+        impact.compare(root, "CITE-001.md")
+    assert refused.value.code == "IMPACT_PROPOSAL_MISSING" and "CITP-001.md" in refused.value.message
+
+
+def test_a_compare_carries_the_proposals_completeness_and_gaps(root):
+    """C: a CIT-P written with ``complete: false`` and its gaps, a CIT-E with the same lists."""
+    gaps = [{"id": "apply", "reason": "CODE_GRAPH_MISSING"}]
+    records_of_a_change(root, {"complete": False, "gaps": gaps})
+    found = impact.compare(root, "CITE-001.md")
+    assert found["matches"] is True and found["complete"] is False and found["gaps"] == gaps
+
+
+def test_a_compare_of_a_complete_proposal_is_complete_and_one_that_does_not_say_is_not(root):
+    records_of_a_change(root, {"complete": True, "gaps": []})
+    assert impact.compare(root, "CITE-001.md")["complete"] is True
+    git(root, "rm", "-q", "-f", "CITP-001.md", "CITE-001.md")
+    git(root, "commit", "-q", "-m", "undo")
+    records_of_a_change(root)
+    found = impact.compare(root, "CITE-001.md")
+    assert found["complete"] is False and found["gaps"] == [{"id": "CITP-001", "reason": "COMPLETENESS_NOT_STATED"}]
+
+
+@pytest.mark.parametrize("namespace", ["governance", "scratch"])
+def test_a_registers_first_uncommitted_entry_makes_the_record_graph_stale(root, namespace):
+    """B: the register named by the path map holds no entry at HEAD; one is added, uncommitted."""
+    (root / "governance" / "project").mkdir(parents=True)
+    (root / "governance" / "project" / "path-map.yaml").write_text(
+        f"decision_register: docs/REGISTER.md\nnamespaces:\n  {namespace}:\n    paths: [\"**\"]\n"
+        f"    memory_class: {namespace}\n", encoding="utf-8")
+    (root / "docs").mkdir()
+    (root / "docs" / "REGISTER.md").write_text("# The register\n", encoding="utf-8")
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "a register without an entry")
+    store.load(root)
+    config = {"path-map.yaml": {"namespaces": {namespace: {"paths": ["**"], "memory_class": namespace}}}}
+    assert impact.assess(root, ["DEC-050"], config)["graphs"]["record"] == "ok"
+    (root / "docs" / "REGISTER.md").write_text("# The register\n\n### DEC-090\n\n**Status:** ACCEPTED\n",
+                                              encoding="utf-8")
+    found = impact.assess(root, ["DEC-050"], config)
+    assert found["graphs"]["record"].startswith("stale") and "docs/REGISTER.md" in found["graphs"]["record"]
+    assert found["complete"] is False and found["change"][0]["deletable"] is False
+    git(root, "add", "docs/REGISTER.md")  # staged is no different
+    assert impact.assess(root, ["DEC-050"], config)["graphs"]["record"].startswith("stale")
+
+
+@pytest.mark.parametrize("out,code", [("", "IMPACT_OUT_EMPTY"), ("   ", "IMPACT_OUT_EMPTY"),
+                                      ("app", "IMPACT_OUT_IS_FOLDER"), ("app/flow.py", "IMPACT_OUT_EXISTS")])
+def test_an_out_that_cannot_be_written_is_refused_with_its_cause(root, out, code):
+    """E."""
+    before = sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if ".git" not in path.parts)
+    with pytest.raises(GovError) as refused:
+        impact.assess(root, ["DEC-001"], {}, out=out)
+    assert refused.value.code == code
+    assert sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if ".git" not in path.parts) == before
+
+
+def test_an_out_whose_stem_is_a_stored_id_is_refused(root):
+    """F4: ``CITP-001.md`` at a new path, while CITP-001 is a record of the store."""
+    records_of_a_change(root)
+    with pytest.raises(GovError) as refused:
+        impact.assess(root, ["DEC-001"], {}, out="proposals/CITP-001.md")
+    assert refused.value.code == "IMPACT_OUT_ID_TAKEN" and "CITP-001" in refused.value.message
+    assert not (root / "proposals").exists()
+    impact.assess(root, ["DEC-001"], {}, out="proposals/CITP-777.md")  # a new id is written
+    assert (root / "proposals" / "CITP-777.md").is_file()
+
+
+def test_the_depth_of_a_radius_is_the_owners_decision(root):
+    found = impact.assess(root, ["DEC-001"], {})
+    assert found["depth_source"] == readings.DEPTH_SOURCE == "DEC-815"
+    from gov.closure import depth_of_radius
+
+    assert [depth_of_radius(number) for number in range(4)] == [1, 1, 3, 8]

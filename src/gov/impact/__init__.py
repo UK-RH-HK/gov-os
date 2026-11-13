@@ -76,7 +76,8 @@ class _Records:
                 self.named_by.setdefault(edge["target"], set()).add(edge["source"])
         self.testers = {edge["source"] for edge in edges if edge["type"] == "TESTS"}
         head = _git(root, "rev-parse", "HEAD").strip()
-        dirty = _uncommitted(root, {record["path"] for record in self.by_id.values()})
+        stored_paths = {record["path"] for record in self.by_id.values()} | _register_paths(root)
+        dirty = _uncommitted(root, stored_paths)
         if not head or set(_git(root, "rev-list", "HEAD").split()) != stored:  # the store holds HEAD's history alone
             self.state = f"stale: the store was not loaded from HEAD {head[:12] or '(none)'}; gov impact never loads " \
                          "it again"
@@ -85,6 +86,19 @@ class _Records:
                          "never loads it again"
         else:
             self.state = OK
+
+
+def _register_paths(root: Path) -> set:
+    """The decision register the path map of ``HEAD`` names: a register with no entry at ``HEAD`` still feeds the store
+    when it gets one, so its path counts as a stored record's does (B)."""
+    import yaml
+    from gov.store.loader import PATH_MAP_REL, REGISTER_KEY
+
+    try:
+        named = (yaml.safe_load(_git(root, "show", f"HEAD:{PATH_MAP_REL}")) or {}).get(REGISTER_KEY)
+    except (yaml.YAMLError, AttributeError):
+        return set()
+    return {named} if isinstance(named, str) and named.strip() else set()
 
 
 def _uncommitted(root: Path, stored: set) -> list[str]:
@@ -267,6 +281,8 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
         looked = "" if code.usable else f", and the code graph cannot be asked ({code.state})"
         raise GovError("IMPACT_CHANGE_UNKNOWN", f"{', '.join(unknown)}: no record of the store and no symbol of the "
                        f"code index{looked}", {"unknown": unknown, "graphs": {RECORD: graph.state, CODE: code.state}})
+    if out is not None:
+        _check_out(root, out, graph)
     current = graph.state == OK
     change = []
     for item in ids:
@@ -307,11 +323,32 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
     return result
 
 
+def _out_path(root: Path, out: str) -> Path:
+    return Path(out) if Path(out).is_absolute() else root / out
+
+
+def _check_out(root: Path, out: str, graph: _Records) -> None:
+    """Refuse an ``--out`` that cannot be written, with its real cause, before anything is written (E, F4)."""
+    if not out.strip():
+        raise GovError("IMPACT_OUT_EMPTY", "--out is an empty path: give the file the CIT-P is written to",
+                       {"out": str(out)})
+    path = _out_path(root, out)
+    if path.is_dir():
+        raise GovError("IMPACT_OUT_IS_FOLDER", f"{out}: a folder is there, not a file; give the file the CIT-P is "
+                       "written to", {"out": str(out)})
+    if path.exists():
+        raise GovError("IMPACT_OUT_EXISTS", f"{out}: a file is there already; gov impact writes no file over another",
+                       {"out": str(out)})
+    if path.stem in graph.by_id:
+        raise GovError("IMPACT_OUT_ID_TAKEN", f"{out}: its file stem {path.stem} is the id of a record already in the "
+                       "store; the CIT-P would clash with it", {"out": str(out), "id": path.stem})
+
+
 def _write(root: Path, out: str, proposal: dict) -> None:
     """The CIT-P as a record file at ``out``: the one file gov impact writes, and never over another."""
     import yaml
 
-    path = Path(out) if Path(out).is_absolute() else root / out
+    path = _out_path(root, out)
     if path.exists():
         raise GovError("IMPACT_OUT_EXISTS", f"{out}: a file is there already; gov impact writes no file over another",
                        {"out": str(out)})
@@ -358,9 +395,17 @@ def compare(root: Path, rel: str) -> dict:
         raise GovError("IMPACT_PROPOSAL_UNKNOWN", f"{execution} names the proposal {named}, which is {what}",
                        {"execution": execution, "proposal": named})
     named_ids = {"execution": execution, "proposal": named}
+    # The proposal as HEAD holds it, which the store was loaded from: an edit of its file in the working tree, staged or
+    # not, never changes what the CIT-E is compared against (A). A file that is gone is refused as missing (E).
+    shown = subprocess.run(["git", "--no-optional-locks", "-C", str(root), "show", f"HEAD:{record['path']}"],
+                           capture_output=True)
+    if not (root / record["path"]).is_file() or shown.returncode != 0:
+        raise GovError("IMPACT_PROPOSAL_MISSING", f"{execution} names the proposal {named}, but its file "
+                       f"{record['path']} does not exist" + ("" if shown.returncode else " in the working tree"),
+                       {**named_ids, "path": record["path"]})
     try:
-        proposed_front = _front((root / record["path"]).read_text(encoding="utf-8")) or {}
-    except (OSError, UnicodeDecodeError):
+        proposed_front = _front(shown.stdout.decode("utf-8")) or {}
+    except UnicodeDecodeError:
         proposed_front = {}
     proposed = _lists(proposed_front.get("affected"), named, named_ids)
     done = _lists(front.get("affected"), execution, named_ids)
@@ -372,4 +417,11 @@ def compare(root: Path, rel: str) -> dict:
                    for kind in sorted(set(proposed) | set(done))
                    for side, here, there in (("proposal", proposed, done), ("execution", done, proposed))
                    for item in sorted(here.get(kind, set()) - there.get(kind, set()))]
-    return {"proposal": named, "execution": execution, "matches": not differences, "differences": differences}
+    # The proposal's own completeness and gaps (C): a CIT-P that was not complete is never compared as if it were, and
+    # one that does not say is not read as complete.
+    said, gaps = proposed_front.get("complete"), proposed_front.get("gaps")
+    gaps = [dict(gap) if isinstance(gap, dict) else {"id": str(gap)} for gap in gaps] if isinstance(gaps, list) else []
+    if not isinstance(said, bool):
+        gaps.append({"id": named, "reason": "COMPLETENESS_NOT_STATED"})
+    return {"proposal": named, "execution": execution, "matches": not differences, "differences": differences,
+            "complete": said is True and not gaps, "gaps": gaps}
