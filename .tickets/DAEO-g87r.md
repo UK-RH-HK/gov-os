@@ -11,9 +11,9 @@ external-ref: W2-94
 tags: [wave-2, audit, evaluation, held-out, standard, examin-minimum]
 wbs_id: W2-94
 title: 'EXAMIN''s question set: memory questions with gold sources about the owner''s copy, a visible and a hidden half, by a session independent of the adopting team, before W2-27'
-class: audit
+class: implementation  # was audit; the GOLD change's engineer (P-W2-94-GOLD-2 (A), CTO, 2026-11-13)
 state_class: AUTHORITATIVE
-role: independent-auditor
+role: engineer  # was independent-auditor (the walled writers' delivery is done); the launcher lets an engineer change check_gold.py for W2-94 GOLD (a)
 depends_on: [DAEO-m1u3]
 allowed_paths:
 - tests/acceptance/W2-94/**  # its acceptance tests, form only (CTO, DEC-1167 (3): the close)
