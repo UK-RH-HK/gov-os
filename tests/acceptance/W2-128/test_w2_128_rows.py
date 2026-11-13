@@ -70,9 +70,21 @@ def test_row_7_t4_the_readme_map_names_every_case_by_its_full_node_id():
 
 
 @pytest.mark.parametrize("stem", LEAD_AND_CTO)
-def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+def test_row_8_no_unit_carries_the_gov_accept_outside_the_sandbox_until_w2_56_line(stem):
+    """Row 8 records that the line "Run `gov accept` for a ticket whose suites need the code index outside the
+    sandbox, until W2-56" is gone from both templates.
+
+    Revised for DEC-1163 (1) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; routed by
+    DEC-1156 (7), widened by DEC-1157 (12)). Reason: the case required that line in ``role-lead.md`` and
+    ``role-cto.md``; W2-56 is closed (1c02c490f), ``gov brief`` refused every lead brief ``UNTIL_CLOSED W2-56`` while
+    the line stood, and the owner's DEC-1163 (1) had it deleted from both templates (and from the orchestrator
+    source), commit b88a76172, so the case was red (and W2-152 S10, which runs ``gov accept W2-128``, with it).
+    Decided behaviour: no unit of either template holds "gov accept", "outside", "sandbox" and "W2-56" together,
+    found as the old case found it (``units_with``: each unit a paragraph or list item, ``{CMD:name}`` expanded,
+    case and white space folded). What the case still catches: the line, or any rewording of it that keeps those four
+    words in one unit, planted back into either template, which names the unit it found."""
     hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
-    _cited(hits, stem, 8)
+    assert not hits, f"{stem}.md still carries the line telling a lead to run gov accept outside the sandbox until W2-56 (gone by DEC-1163 (1)): {hits}"
 
 
 @pytest.mark.parametrize("stem", LEAD_AND_CTO)
