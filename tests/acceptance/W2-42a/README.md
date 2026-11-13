@@ -13,7 +13,7 @@ cd <tree> && TMPDIR=/tmp/gov-os-emg-<name> PYTHONPATH=<tree>/src \
   python3 -m pytest tests/acceptance/W2-42a -q -n auto -o tmp_path_retention_policy=failed -p no:cacheprovider
 ```
 
-452 cases in four files. The replay and the planted cases run the hook once each (about 1 to 3 s a call: the
+493 cases in five files (the 452 of the first design and td-2's 41, below). The replay and the planted cases run the hook once each (about 1 to 3 s a call: the
 hook lists every worktree for rules 2 and 5), so run with `-n auto`.
 
 ## What judges what
@@ -74,6 +74,20 @@ hook lists every worktree for rules 2 and 5), so run with `-n auto`.
   unmatched glob in `/tmp`) is left out: KPI line 4 makes it pass. The main tree's path is written `{ROOT}` and
   replaced by the tree under test. `base_caught`: whether the base's parser catches each Bash case (computed on
   `a58ba344`, for failure line 1).
+- **`fixtures/f1_shell_options.json`** (td-2, 2026-11-13; the FULL review's finding F1, round 1, with F4's
+  `/dev/stdin` ride-along): a shell that reads its commands from standard input is a shell whatever options it is
+  given, so its heredoc body is commands. 19 plain-data cases `{id, command, expect, targets_include, note}`: 15
+  spellings that must give the body's writes (`bash -euo pipefail`, `-e -u -o pipefail`, `-eu -o pipefail` unquoted,
+  `sh -o errexit`, `-O extglob`, `+o posix`, `--noprofile --norc`, `--rcfile f`, `cat <<'EOF' | bash -o pipefail` and
+  `| bash -euo pipefail`, `-s`, `/dev/stdin`, `/dev/fd/0`, an unknown `--some-new-flag` read as a shell (fail closed),
+  and the auditor's `sed -i …; cp …` body) and 4 kept-as-data controls (`cat`, `tee f`, `grep -e x`, `bash script.sh`).
+  Paths are relative to the case's folder; the JSON names no secret and no hidden folder, and is meant to be reused
+  to check the live hook's own fix. `test_w2_42a_f1_shell_options.py` drives it through the product: the write parser
+  (each target or the unresolvable target; a control gives its own targets only) and the read judge (the same head
+  with a body naming the case project's hidden file is refused under a shell, not refused as data). Its two hook-level
+  cases judge the hook fixture, which has the same gap and is not changed here: they are `xfail` (not strict) and in no
+  KPI row. **Red on `e9e4f7bac`: 24 failed, 15 passed, 2 xfailed**: 12 spellings fail on both sides (no write, no
+  read); `--noprofile --norc`, `-s` and the unknown flag, the 4 controls on both sides and the data-file check pass.
 
 ## The KPI map (read by `gov close`)
 
@@ -81,18 +95,18 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 
 | KPI | Tests |
 |---|---|
-| S1 | `test_w2_42a_parser.py::test_kpi1_a_data_body_for_cat_is_no_write_and_its_quotes_do_not_break_the_reading`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_tee_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_grep_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_quoted_data_body_s_substitution_is_text`, `test_w2_42a_parser.py::test_kpi1_an_unquoted_data_body_s_substitution_is_judged`, `test_w2_42a_parser.py::test_kpi1_a_shell_body_is_judged_as_commands` |
+| S1 | `test_w2_42a_parser.py::test_kpi1_a_data_body_for_cat_is_no_write_and_its_quotes_do_not_break_the_reading`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_tee_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_data_body_for_grep_is_no_write`, `test_w2_42a_parser.py::test_kpi1_a_quoted_data_body_s_substitution_is_text`, `test_w2_42a_parser.py::test_kpi1_an_unquoted_data_body_s_substitution_is_judged`, `test_w2_42a_parser.py::test_kpi1_a_shell_body_is_judged_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_the_data_file_holds_every_spelling_of_the_finding`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_data_body_stays_data` |
 | S2 | `test_w2_42a_parser.py::test_kpi2_a_variable_set_once_at_the_top_before_use_is_expanded`, `test_w2_42a_parser.py::test_kpi2_a_variable_built_from_one_set_before_it_is_expanded`, `test_w2_42a_parser.py::test_kpi2_a_literal_for_loop_s_words_are_judged_one_by_one`, `test_w2_42a_parser.py::test_kpi2_any_other_binding_is_unresolvable` |
 | S3 | `test_w2_42a_parser.py::test_kpi3_a_substitution_in_quotes_sh_c_and_eval_are_judged_as_commands`, `test_w2_42a_parser.py::test_kpi3_shell_keywords_are_not_the_command_s_name`, `test_w2_42a_parser.py::test_kpi3_prefixes_are_not_the_command_s_name` |
 | S4 | `test_w2_42a_parser.py::test_kpi4_an_unmatched_glob_is_its_literal_path`, `test_w2_42a_parser.py::test_kpi4_an_unmatched_glob_after_a_cd_is_its_literal_path`, `test_w2_42a_parser.py::test_kpi4_a_matched_glob_is_still_its_matches` |
 | S5 | `test_w2_42a_parser.py::test_kpi5_the_named_writers_write_their_paths`, `test_w2_42a_parser.py::test_kpi5_git_mv_writes_both_paths`, `test_w2_42a_parser.py::test_kpi5_rsync_writes_into_its_destination`, `test_w2_42a_parser.py::test_kpi5_patch_appliers_write_unresolvable_targets` |
-| S6 | `test_w2_42a_read_judge.py::test_kpi6_arithmetic_is_no_command_substitution`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_naming_a_secret_is_no_read`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_for_tee_naming_a_key_is_no_read`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_holding_a_listing_loop_is_no_listing`, `test_w2_42a_read_judge.py::test_kpi6_a_shell_body_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_an_unquoted_data_body_s_substitution_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_a_substitution_inside_arithmetic_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_a_plain_secret_read_is_still_refused` |
+| S6 | `test_w2_42a_read_judge.py::test_kpi6_arithmetic_is_no_command_substitution`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_naming_a_secret_is_no_read`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_for_tee_naming_a_key_is_no_read`, `test_w2_42a_read_judge.py::test_kpi6_a_data_body_holding_a_listing_loop_is_no_listing`, `test_w2_42a_read_judge.py::test_kpi6_a_shell_body_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_an_unquoted_data_body_s_substitution_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_a_substitution_inside_arithmetic_is_still_read`, `test_w2_42a_read_judge.py::test_kpi6_a_plain_secret_read_is_still_refused`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_data_body_naming_a_hidden_file_is_no_read` |
 | S7 | `test_w2_42a_parser.py::test_kpi7_a_continued_word_is_one_word`, `test_w2_42a_parser.py::test_kpi7_a_continued_command_writes_its_target`, `test_w2_42a_parser.py::test_kpi7_a_continued_copy_writes_its_destination_and_nothing_with_a_newline`, `test_w2_42a_parser.py::test_kpi7_a_backslash_newline_inside_single_quotes_is_kept`, `test_w2_42a_read_judge.py::test_kpi7_a_secret_named_across_a_continued_line_is_refused`, `test_w2_42a_read_judge.py::test_kpi7_a_hidden_file_named_across_a_continued_line_is_refused` |
 | S8 | `test_w2_42a_parser.py::test_kpi8_a_script_written_then_run_by_bash_is_judged_as_its_code`, `test_w2_42a_parser.py::test_kpi8_a_script_written_after_a_cd_then_run_by_its_path_is_judged`, `test_w2_42a_parser.py::test_kpi8_a_python_file_written_then_run_is_its_code_or_unresolvable`, `test_w2_42a_parser.py::test_kpi8_a_run_the_parser_cannot_read_is_unresolvable`, `test_w2_42a_parser.py::test_kpi8_a_run_by_a_word_that_does_not_expand_is_unresolvable`, `test_w2_42a_parser.py::test_kpi8_a_written_file_that_is_only_read_is_judged_as_data` |
 | S9 | `test_w2_42a_measured.py::test_kpi9_the_parser_resolves_the_writes_of_all_but_at_most_2_of_the_61_logged_commands`, `test_w2_42a_measured.py::test_kpi9_no_planted_shell_write_is_missed_by_the_parser`, `test_w2_42a_measured.py::test_kpi9_the_measures_are_stated_in_the_evidence_file` |
 | S10 | `test_w2_42a_read_judge.py::test_kpi10_a_loop_over_seq_reading_a_literal_file_is_judged_by_that_file`, `test_w2_42a_read_judge.py::test_kpi10_a_substitution_that_yields_no_file_name_leaves_the_literal_files`, `test_w2_42a_read_judge.py::test_kpi10_a_python_heredoc_naming_its_files_literally_is_judged_by_them`, `test_w2_42a_read_judge.py::test_kpi10_a_data_heredoc_appended_to_a_record_is_judged_by_its_file`, `test_w2_42a_read_judge.py::test_kpi10_names_given_at_run_time_are_still_judged_as_a_listing`, `test_w2_42a_read_judge.py::test_kpi10_a_literal_hidden_file_is_still_refused` |
 | S11 | `test_w2_42a_replay.py::test_kpi11_each_logged_refusal_replayed`, `test_w2_42a_replay.py::test_kpi11_the_replay_holds_every_recoverable_line`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused` |
-| F1 | `test_w2_42a_measured.py::test_failure1_no_write_the_base_parser_catches_is_missed`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused` |
+| F1 | `test_w2_42a_measured.py::test_failure1_no_write_the_base_parser_catches_is_missed`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused`, `test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands` |
 | F2 | `test_w2_42a_parser.py::test_failure2_an_unparseable_or_unknown_form_is_unresolvable`, `test_w2_42a_parser.py::test_failure2_a_form_read_uncertainly_keeps_its_write`, `test_w2_42a_read_judge.py::test_failure2_an_unparseable_command_naming_a_secret_is_refused`, `test_w2_42a_measured.py::test_kpi9_no_planted_shell_write_is_missed_by_the_parser`, `test_w2_42a_replay.py::test_kpi11_each_planted_case_still_refused` |
 
 ## KPI lines, their cases and the expected red reasons
@@ -112,6 +126,7 @@ S1 to S11 are the ticket's success lines in order, F1 and F2 its failure lines.
 | S11 replay and planted, through the hook | replay: `test_kpi11_*` (76 + 1 + 155) | see "The replay" (5 red) |
 | F1 no write the base catches is missed | measured: `test_failure1_*` (53) | green by construction on the base (each is a case the base catches) |
 | F2 unknown forms fail closed | parser: `test_failure2_*` (6); read judge: `test_failure2_*` (1); and the planted unknown forms in S9 and S11 | `eval "$X"`, `sh -c "$X"` and `bash -c` with unbalanced quotes give no write on the base (3 red); the unbalanced quotes, the unterminated heredoc, the shift in arithmetic and the unparseable secret read are green |
+| review F1 (td-2): a shell with options reading a heredoc | f1: `test_review_f1_*` (1 + 15 + 4 + 15 + 4; 2 hook cases xfail, in no row) | the head reads `bash -euo pipefail <<'EOF'` and the other 11 red spellings as data: no write and no read from the body (24 red). Green: `--noprofile --norc`, `-s`, the unknown flag, the 4 controls on both sides, the data-file check |
 
 **The red run on the base** (`a58ba344`, through the gate, `-n auto`): **94 failed, 358 passed**, no errors, each
 failure for the reason above: S1 4, S2 4, S3 14, S4 2, S5 13, S6 4, S7 5, S8 3, S9 32, S10 5, S11 5, F2 3.

@@ -1,0 +1,138 @@
+{
+  "about": "W2-42a (DAEO-03ub), FULL review round 1, finding F1 (and F4's /dev/stdin ride-along): a shell that reads its commands from standard input is a shell, whatever options it is given; its heredoc body is commands. Each command's first line is its head, its last line the heredoc's delimiter, the lines between the body. Paths are relative to the case's folder, which holds tests/acceptance/X/t.py, x.py, src/ and script.sh (`echo hi`). expect 'write': the parser gives each of targets_include, or the unresolvable target. expect 'no-write': the parser gives targets_include and nothing else (no body target, no unresolvable target). Reusable to check the live hook's own reading.",
+  "cases": [
+    {
+      "id": "bash-euo-pipefail-auditor",
+      "command": "bash -euo pipefail <<'EOF'\nsed -i s/a/b/ tests/acceptance/X/t.py; cp x.py src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/t.py", "src/other.py"],
+      "note": "the auditor's example: no target on the review head; the base parser gave 3"
+    },
+    {
+      "id": "bash-euo-pipefail",
+      "command": "bash -euo pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "combined short options with an option value (pipefail)"
+    },
+    {
+      "id": "bash-e-u-o-pipefail",
+      "command": "bash -e -u -o pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "separate short options; -o's value is not a script name"
+    },
+    {
+      "id": "bash-eu-o-pipefail-unquoted",
+      "command": "bash -eu -o pipefail <<EOF\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "unquoted delimiter; the body holds no expansion"
+    },
+    {
+      "id": "sh-o-errexit",
+      "command": "sh -o errexit <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "sh with a long-named -o option"
+    },
+    {
+      "id": "bash-O-extglob",
+      "command": "bash -O extglob <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "-O takes a shopt name as its value"
+    },
+    {
+      "id": "bash-plus-o-posix",
+      "command": "bash +o posix <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "a + option (unset) with a value"
+    },
+    {
+      "id": "bash-noprofile-norc",
+      "command": "bash --noprofile --norc <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "long options without a value"
+    },
+    {
+      "id": "bash-rcfile-f",
+      "command": "bash --rcfile f <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "a long option with a separate value (f is not a script name)"
+    },
+    {
+      "id": "cat-pipe-bash-o-pipefail",
+      "command": "cat <<'EOF' | bash -o pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "the body reaches the shell through a pipe from cat"
+    },
+    {
+      "id": "cat-pipe-bash-euo-pipefail",
+      "command": "cat <<'EOF' | bash -euo pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "through a pipe, combined options with a value"
+    },
+    {
+      "id": "bash-s",
+      "command": "bash -s <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "-s: commands from standard input, still a shell"
+    },
+    {
+      "id": "bash-dev-stdin",
+      "command": "bash /dev/stdin <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "F4 ride-along: /dev/stdin as the script is standard input"
+    },
+    {
+      "id": "sh-dev-fd-0",
+      "command": "sh /dev/fd/0 <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "F4 ride-along: /dev/fd/0 as the script is standard input"
+    },
+    {
+      "id": "bash-unknown-flag-fails-closed",
+      "command": "bash --some-new-flag <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
+      "expect": "write",
+      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
+      "note": "fail closed: an option the reader does not know is read as a shell, never as data"
+    },
+    {
+      "id": "data-cat",
+      "command": "cat <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
+      "expect": "no-write",
+      "targets_include": [],
+      "note": "control: cat takes the body as data"
+    },
+    {
+      "id": "data-tee-f",
+      "command": "tee f <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
+      "expect": "no-write",
+      "targets_include": ["f"],
+      "note": "control: tee writes only f"
+    },
+    {
+      "id": "data-grep-e",
+      "command": "grep -e x <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
+      "expect": "no-write",
+      "targets_include": [],
+      "note": "control: grep's -e value is a pattern, the body data"
+    },
+    {
+      "id": "data-bash-script-sh",
+      "command": "bash script.sh <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
+      "expect": "no-write",
+      "targets_include": [],
+      "note": "control: the body is script.sh's standard input, not code; script.sh (echo hi) is not written"
+    }
+  ]
+}
