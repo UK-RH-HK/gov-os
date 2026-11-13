@@ -78,7 +78,11 @@ def test_i3_gov_check_runs_the_check_file_and_refuses_the_planted_key(tmp_path):
     """I1 and I3 through ``gov check`` itself: a planted project holding ``skill-regression-a.yaml`` as the kernel
     ships it, its folder list swapped for the planted skill's, and a generated copy with ``allowed-tools``: the
     check's entry is red and its findings name the generated file and the key. Judged on the real validator only
-    (``gov check`` runs ``python3 -m gov.check.skill_validator`` as the file says, so a stand-in is not reachable)."""
+    (``gov check`` runs ``python3 -m gov.check.skill_validator`` as the file says, so a stand-in is not reachable).
+
+    ``gov check --json`` ends with 3 when a hard-block check is red; its envelope is then ``ok: false`` with
+    ``result: {}`` and the per-check entries under ``error.details.checks`` (on success under ``result.checks``).
+    So the entry is looked for anywhere in the payload, and its status is spelled ``RED`` (``GREEN``, ``YELLOW``)."""
     if not sup.REAL:
         pytest.skip("gov check runs the real validator named in the check file; a stand-in switch is set")
     copies = sup.plant_clean(tmp_path, "alpha")
@@ -91,12 +95,12 @@ def test_i3_gov_check_runs_the_check_file_and_refuses_the_planted_key(tmp_path):
     env = sup.env_for()
     done = subprocess.run([sys.executable, "-P", "-m", "gov.cli.main", "check", "--json"], cwd=tmp_path, env=env,
                           capture_output=True, text=True, timeout=300, check=False)
+    assert done.returncode == 3, f"gov check ends with 3 on a red hard-block check: {done.returncode} {done.stderr[:300]}"
     payload = json.loads(done.stdout)
-    document = payload.get("result", payload) if isinstance(payload, dict) else payload
-    entries = [entry for entry in _walk(document) if isinstance(entry, dict) and entry.get("id") == "skill-regression-a"]
+    entries = [entry for entry in _walk(payload) if entry.get("id") == "skill-regression-a"]
     assert entries, f"gov check printed no entry for skill-regression-a: {done.stdout[:600]} {done.stderr[:300]}"
     entry = entries[0]
-    assert entry.get("status") == "red", entry
+    assert str(entry.get("status")).upper() == "RED", entry
     findings = [f for f in entry.get("findings", []) if isinstance(f, dict)]
     assert any(sup.same_file(tmp_path, f.get("file"), planted) and f.get("key") == "allowed-tools"
                for f in findings), f"no finding names the file and key: {findings}"
