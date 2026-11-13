@@ -226,7 +226,7 @@ def test_without_gov_now_it_is_the_real_clock(monkeypatch):
 # the due rules ---------------------------------------------------------------------------------------------------------
 
 def _due(now: str, record=None, verdicts=()):
-    return integration.due_reason(SETTINGS, _at(now), record, [_at(when) for when in verdicts])
+    return integration.due_reason(SETTINGS, datetime.fromisoformat(now), record, [_at(when) for when in verdicts])
 
 
 def _rec(at: str, reason: str = "after_nightly") -> dict:

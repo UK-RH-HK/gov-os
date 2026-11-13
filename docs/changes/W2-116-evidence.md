@@ -195,12 +195,16 @@ Every run went through `heavy_slot.sh` with the sandbox's own `TMPDIR`; a whole-
 "not real and not green_here and not time_limit"` and `HOME` an empty scratch folder. No real embedder, reranker or model
 was started; no `gov retrieve` or `gov context` was run.
 
-- Unit, new: `tests/unit/rebuild/test_w2_116_when_due.py` 27 passed (the due rules as a table of 37 rows, the edge
-  minutes, the offsets, `after_nightly_at` carried over by a `second` refresh, a verdict file stamped after `now`, the
-  refusals by key, the clock, the record whole and left on a failed refresh, the usage refusal); `tests/unit/status/
-  test_w2_116_integration_store.py` 25 passed; `tests/unit/retrieval/test_w2_116_token_mark.py` 8 passed (pass 2a).
-- Acceptance: `tests/acceptance/W2-116/` with the two new unit files: **111 passed**, 80 deselected by the real-model
-  exclusion (pass 1's cases and pass 2b's `test_w2_116_s2_*` and `test_w2_116_r2f3_continuation.py` all green).
+- The repository's opt-in list keeps only the first row of a parametrised test unless `GOV_TESTS_OPTIN=lifted,breadth`
+  is set, so the table cases are counted both ways:
+  - Unit, new, default: `test_w2_116_when_due.py` 27 passed, `test_w2_116_integration_store.py` 25 passed,
+    `test_w2_116_token_mark.py` 8 passed (pass 2a).
+  - Unit, new, with the opt-in lifted (every table row): **138 passed** (the three files). The first run of it found two
+    rows of the first session's table wrong in the test's own helper (it read `now` as local time, not the given offset,
+    as `integration.now()` now keeps it); fixed in the test, not the code.
+  - Acceptance `tests/acceptance/W2-116/` + `tests/unit/rebuild` + `tests/unit/status`, opt-in lifted: **329 passed, 1
+    failed** (the known red below), 1 deselected. Pass 1's cases and pass 2b's `test_w2_116_s2_*` and
+    `test_w2_116_r2f3_continuation.py` are all green.
 - Regression, `tests/unit/rebuild tests/unit/status tests/unit/retrieval tests/unit/retrieve`: **724 passed, 2 skipped,
   27 failed**, 517 deselected. The 27 are none of this pass's cases and are named, not fixed:
   - `tests/unit/status/test_status.py:172` `test_a_status_with_a_part_not_read_names_every_such_place`: asserts the exact
