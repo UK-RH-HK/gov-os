@@ -113,6 +113,23 @@ def test_s1_f5_no_output_holds_the_secrets_value(orchard, box, host):
     W.assert_no_secret(orchard.secret, texts, "the assessment's outputs")
 
 
+def test_s1_f5_no_hidden_question_is_read_or_printed(orchard, box, host):
+    """F5's second half: a planted hidden question (outside the repository, in a sets root the environment names) has a
+    unique word; a grep of every output and record of the assessment for it finds 0 hits, and the guard's call log (the empty
+    HOME's ``.gov-os/guard-calls``) holds no read of it."""
+    word = "snorkelvantry-w288"
+    sets = box.base / "sets-root"
+    W.write(sets, "fixtures/evaluation/memory-verdict-9/hidden/q01.yaml", f"id: q01\nquestion: Where is the {word} rule?\n")
+    environment = W.env(box, host, GOV_MEMAUDIT_SETS_ROOT=str(sets))
+    out = box.base / "out-hidden"
+    run = W.run_adopt(orchard.root, environment, "MA", "--out", str(out))
+    W.assert_offered(run, "MA")
+    assert run.returncode == 0, run.describe()
+    texts = W.all_text(out, box.home / ".gov-os", runs=(run,))
+    assert len(texts) >= 3, "the run left nothing to grep"
+    assert not [n for n, data in texts.items() if word.encode() in data], "a hidden question's word is in an output"
+
+
 def test_s1_f1_the_repository_is_byte_identical_before_and_after(orchard, box, host):
     W.settle(orchard.root)
     before = W.repo_state(orchard.root)
