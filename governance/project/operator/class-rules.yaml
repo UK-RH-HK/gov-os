@@ -51,6 +51,13 @@ rows:
       - {root: home, path: ".claude/hooks/**"}
     class: b
     control: true
+  - id: agent-instructions
+    why: "the agent instructions every session loads (CLAUDE.md, AGENTS.md): a change alters what agents are told, so it is (b): a reviewed bundle, the owner's yes, applied by the operator agent (DEC-1173)"
+    match:
+      - {root: repo, path: "CLAUDE.md"}
+      - {root: repo, path: "AGENTS.md"}
+    class: b
+    control: true
   - id: settings
     why: "the repository's settings: items only added to permissions.deny tighten (a); allow rules, hooks blocks, any other key alter a control (b) (PERMISSIONS-1/2, QUIET-DENY-1, STOP-WAITER-1)"
     match:
