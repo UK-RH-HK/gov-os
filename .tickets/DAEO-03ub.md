@@ -1,6 +1,6 @@
 ---
 id: DAEO-03ub
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-fau3]
 created: 2026-11-02T10:58:34Z
