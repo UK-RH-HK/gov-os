@@ -12,7 +12,10 @@ judged_by: orchestrator
 judgement: pass
 probed_commit: 3b3a90d74c3e0c5478f366453b07cb921c0c6f88
 narrow_check_commit: 1221ee0e4feb0585bc452fca2bab2ae00a9bc087
-decisions_applied: [DEC-1052, DEC-1010, DEC-801, DEC-808, DEC-1156, DEC-957]
+narrow_check_2_session: rv-3 (independent-auditor, Opus 5.5 high, read-only)
+narrow_check_2_commit: 9ace61e8ce72e7371b88be5c6a65abfd9baaa1fd
+test_designer_session_td4: td-4 (W1-33 revision, commit 4452d6b8c)
+decisions_applied: [DEC-1052, DEC-1010, DEC-801, DEC-808, DEC-1156, DEC-957, DEC-1154, DEC-1160]
 ---
 
 # Probe record: W2-33 (DAEO-lrre), STANDARD review round 1 and the narrow check after it
@@ -133,3 +136,46 @@ nothing else in the file changed (the reviewer compared `3df1ac2de` with HEAD).
     definitions (5), and the unit adapters (2);
   - 1 is an older case the CTO revises under DEC-1156 (7): `tests/acceptance/W1-33/test_w1_33_kernel_role_files.py:149-155`.
 - On `3b3a90d74c3e` the run had 50 reds; the three W2-128 reds turned green with the fix `c4b977161`.
+
+## Run 4: W1-33's two revised cases and the second narrow check (DEC-1156 (3), (7); DEC-1154)
+
+- **What changed.** The CTO put two older W1-33 cases in the ticket's paths (DEC-1156 (7), `aa3bfdc19`, merged from
+  `w2/integrate` in `707d23b82`). An independent test designer (td-4, Sonnet 5.5 high, class C2, its own tests
+  worktree) revised exactly those two in `4452d6b8c`, merged in `54ba5bcd2`, each with a `Rewrite-Reason:`:
+  - `test_w1_33_kernel_role_files.py`: `test_the_research_role_file_is_unchanged` becomes
+    `test_the_research_role_file_body_is_unchanged` (DEC-163). It keeps the one-file glob; research.md's lines less
+    the seven Interface line heads hash to a pin computed from W1-46's file (`c70bbb69d`); and four Interface lines
+    (Launch default Sonnet high, Model tier, Work order, One writer) are asserted once and whole. Green on this head.
+  - `test_w1_33_agent_definitions.py`: the agents roster wants nine definitions (the six plus `ticket-lead`,
+    `qa-engineer`, `senior-engineer`), no `independent-reviewer`, each once. **Red until the copies ACT** generates the
+    three agents (DEC-315); the CTO pairs that ACT with the land.
+- `9ace61e8c` writes the owner's approval line into CIT-P §6 (DEC-1160); records only; the role files are byte for
+  byte those at `c4b97716164e` (`git diff --stat c4b97716164e HEAD -- template/governance/kernel/roles
+  template/.rulesync/subagents/orchestrator.md` is empty).
+- **Who checked.** rv-3, a fresh read-only session (independent-auditor, Opus 5.5 high), checked only
+  `git diff 707d23b82 4452d6b8c`. It wrote nothing (`git status --porcelain` empty at its end). It recomputed the pin
+  (`4793c8eb…3596`) from `c70bbb69d` and found it equal; it confirmed `c70bbb69d`'s whole file hashes to the old
+  `60f9092f…`; 19 mutations of a copy of research.md in its TMPDIR (body lines added, removed, changed; the asserted
+  lines dropped, changed, duplicated) each turned case 1 red as they should; it compared the asserted strings with the
+  ticket's Interface programmatically and found none fitted to HEAD's file (`Version` and `Skills` values not asserted).
+  The designer's own note, that it printed HEAD's Interface-head lines by an oversight while computing the pin, was
+  checked under this question.
+
+```verdict
+verdict: PASS
+probed_commit: 9ace61e8ce72e7371b88be5c6a65abfd9baaa1fd
+findings: 2
+```
+
+| id | finding (as described behaviour) | where | triage |
+|---|---|---|---|
+| N1 (rv-3) | lines starting with one of the seven heads are invisible to case 1's body hash, and case 1 asserts only four of them: a duplicate or extra head line, or a dropped `Version`/`Skills` line, leaves it green | `tests/acceptance/W1-33/test_w1_33_kernel_role_files.py:182-187` | row, not blocking: W2-33's `test_w2_33_lines` turns red on each (each head once, whole, at column 0; `Launch by criticality` absent where RUBRIC-2 does not vary) |
+| N2 (rv-3) | `splitlines` and `"\n".join(...) + "\n"` normalise line endings and the final newline | same, `:182-184` | row, negligible: DEC-163 pins the body's text |
+
+W1-33 on `9ace61e8c` (rv-3, through the heavy slot, twice): 6 failed, 105 passed, 1 skipped, 2 deselected. Case 1
+passes; the six reds are case 2 and the five `test_the_definition_agrees_with_its_kernel_role_file[*]`, all the
+copies ACT's. The run-3 red at `test_w1_33_kernel_role_files.py:149-155` is gone.
+
+The lead's run on `9ace61e8c` (W1-33, W2-33 and W1-35 together, through the heavy slot):
+`6 failed, 325 passed, 1 skipped, 44 deselected in 312.72s`; the six reds are the same six W1-33 cases above
+(the copies ACT's); every W2-33 and W1-35 case passes.
