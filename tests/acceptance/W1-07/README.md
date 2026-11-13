@@ -225,12 +225,8 @@ DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command lis
 line." DEC-546: the lines are written by a test designer in the follow-up, "with the list itself".
 
 **The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`,
-<<<<<<< HEAD
-`accept` since DEC-970, W2-96, and `skilleval` since DEC-747, W2-104) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
-=======
-`accept` since DEC-970, W2-96, and `resources`, W2-20's command, in DEC-542's form: `173e8e97`, ported for
-DEC-1097 (8)) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
->>>>>>> w2/integrate
+`accept` since DEC-970, W2-96, `resources`, W2-20's command, in DEC-542's form: `173e8e97`, ported for
+DEC-1097 (8), and `skilleval` since DEC-747, W2-104) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
 (CAP-28.b): no existing list, case or invocation of this suite changed, and only those lines were added to the
 support.
 
@@ -312,4 +308,4 @@ Cases: 138 in the full run, 86 in `breadth`, 0 in `lifted`.
 | F1: A command writes outside its declared act paths | `test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths` (14 of 14) | the ticket's words |
 | F2: Envelope fields drift from docs/interfaces/API-0002.yaml | `test_w1_07_envelope.py::test_the_envelope_has_no_field_outside_the_interface` (13 of 13) | the ticket's words |
 
-**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** `w1_07_support.py::RECORDED_GOV_COMMANDS` records `brief` (W2-152), `links` (W2-129) and `plan` (W2-136), one line in DEC-542's form; the recorded commands are nine (eight `gov` commands and `lock`). `test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` pins the nine; `test_w1_07_recorded_commands.py::test_a_recorded_gov_command_is_offered_and_answers_its_help` gains `[brief]`, `[links]`, `[plan]`, green on `w2/integrate` (the commands are built). 10 cases in this section.
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`; DEC-753, DEC-1088, DEC-1074 (7), DEC-1109; a fresh test designer, Rewrite-Reason):** `w1_07_support.py::RECORDED_GOV_COMMANDS` records `brief` (W2-152), `links` (W2-129) and `plan` (W2-136), one line in DEC-542's form; the recorded commands are nine (eight `gov` commands and `lock`). `test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` pins the nine; `test_w1_07_recorded_commands.py::test_a_recorded_gov_command_is_offered_and_answers_its_help` gains `[brief]`, `[links]`, `[plan]`, green on `w2/integrate` (the commands are built). 10 cases in this section. With `skilleval` (DEC-747, W2-104) recorded beside them, as W2-104's run 3 keeps it after the merge of `w2/integrate`, the recorded commands are ten (nine `gov` commands and `lock`), the same case pins the ten, and `[skilleval]` is one more case of the parametrized one.

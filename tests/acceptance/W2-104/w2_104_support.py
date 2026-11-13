@@ -82,7 +82,7 @@ JUDGE_LAST_FAIL = "JUDGEW2104_PASSTHENFAIL"            # PASS on one line, FAIL 
 JUDGE_LAST_PASS = "JUDGEW2104_FAILTHENPASS"            # FAIL on one line, PASS on the last
 JUDGE_EXIT_NONZERO = "JUDGEW2104_EXITNONZERO"
 
-REPLY_TOKEN = "STUBREPLYW2104"   # in every session reply; a prompt that holds it is a judgement's
+REPLY_TOKEN = "".join(("STUB", "REPLY", "W2104"))   # in every session reply; a prompt that holds it is a judgement's
 TAG_RE = r"TAGW2104s[0-9]+"
 SESSION_SLEEP_S = 30
 SESSION_COST = 0.25
