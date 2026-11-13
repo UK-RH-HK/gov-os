@@ -78,6 +78,45 @@ def test_s1_a_draw_or_halves_that_break_the_split_are_reported(tmp_path, name):
     assert s.question_failures(run) == {}, "the source checks of the questions still hold"
 
 
+@pytest.mark.parametrize("name", sorted(c.S1_DRAW_LITERAL))
+def test_s1_a_draw_in_the_literal_seed_form_with_a_break_is_reported_by_its_code(tmp_path, name):
+    """W2-94 GOLD (iii): the literal ``SEED+k=`` form keeps every rule of the digit form; ``SEED+K=``, ``SEED+<k>=`` and
+    any other spelling is a bad line."""
+    build_kwargs, case, rc = c.S1_DRAW_LITERAL[name]
+    world = s.build(tmp_path, count=10, **build_kwargs)
+    expected, kwargs = case(world)
+    world.rerelease()
+    run = s.run_check(world, **kwargs)
+    assert run.returncode == rc, run.describe()
+    for words in expected:
+        assert s.has(run, *words), f"{name}: no line begins FAIL {' '.join(words)}\n{run.describe()}"
+    assert "draw FAIL" in run.lines[0] and "release ok" in run.lines[0], run.describe()
+    assert s.question_failures(run) == {}, "the source checks of the questions still hold"
+
+
+@pytest.mark.parametrize("name", sorted(c.S1_DRAW_FORMS))
+def test_s1_a_draw_written_in_the_literal_seed_form_or_mixed_is_accepted(tmp_path, name):
+    build_kwargs, case, rc = c.S1_DRAW_FORMS[name]
+    world = s.build(tmp_path, count=10, **build_kwargs)
+    case(world)
+    assert "SEED+k=" in world.draw.read_text(encoding="utf-8"), "the planted draw holds a literal line"
+    run = s.run_check(world)
+    assert run.returncode == rc, run.describe()
+    assert run.lines == ["10 questions (5 visible, 5 hidden); draw ok; release ok", "10 of 10 hold"], run.describe()
+
+
+@pytest.mark.parametrize("count,visible,hidden", [(10, 5, 5), (20, 10, 10), (13, 6, 7)], ids=["ten", "twenty", "thirteen-odd"])
+@pytest.mark.parametrize("seed", [20260900, 20260901], ids=["even-seed", "odd-seed"])
+def test_s1_a_set_whose_draw_is_wholly_literal_is_accepted_for_either_seed_parity(tmp_path, count, visible, hidden, seed):
+    world = s.build(tmp_path, count=count, seed=seed)
+    c._literal_all(world)
+    assert all("SEED+k=" in line for line in world.draw_lines()), world.draw_lines()
+    run = s.run_check(world)
+    assert run.returncode == 0, run.describe()
+    assert run.lines == [f"{count} questions ({visible} visible, {hidden} hidden); draw ok; release ok",
+                         f"{count} of {count} hold"], run.describe()
+
+
 def test_s1_a_category_in_one_half_only_is_reported_though_the_halves_are_equal(tmp_path):
     world = s.build(tmp_path, count=10)
     c._category_in_one_half(world)

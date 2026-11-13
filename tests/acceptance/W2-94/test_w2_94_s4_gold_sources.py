@@ -44,6 +44,19 @@ def test_s4_a_source_that_is_absent_or_does_not_hold_its_answer_is_reported_by_i
     assert run.lines[0] == "20 questions (10 visible, 10 hidden); draw ok; release ok", "only the sources failed"
 
 
+@pytest.mark.parametrize("name", sorted(c.S4_HOLDS))
+def test_s4_a_hyphen_digit_word_that_is_not_id_shaped_and_a_path_by_its_segments_hold(tmp_path, name):
+    """W2-94 GOLD (i) and (ii): ``level-2`` is not an identifier token; an id-shaped word the span has holds; a path
+    token whose segments occur in order in the spans holds (the same case in `S4_BREAKS` fails when out of order)."""
+    build_kwargs, case, rc = c.S4_HOLDS[name]
+    world = s.build(tmp_path, count=20, **build_kwargs)
+    expected, kwargs = case(world)
+    run = s.run_check(world, **kwargs)
+    assert run.returncode == rc, f"{name}\n{run.describe()}"
+    assert run.lines == ["20 questions (10 visible, 10 hidden); draw ok; release ok", "20 of 20 hold"], f"{name}\n{run.describe()}"
+    assert s.question_failures(run) == {}, f"{name}\n{run.describe()}"
+
+
 @pytest.mark.parametrize("name", sorted(c.NONEXISTENT_BREAKS))
 def test_s4_a_nonexistent_question_whose_name_exists_or_whose_source_is_bad_is_reported(tmp_path, name):
     build_kwargs, case, rc = c.NONEXISTENT_BREAKS[name]

@@ -165,7 +165,23 @@ def _stray_file(world):
     return [("set", "UNEXPECTED_FILE")], {}
 
 
+def _digit_k_differs_from_the_first_field(world):
+    """Line 3 reads ``3 <category> SEED+4=<seed+4> ...`` (a digit form whose k is not the line's first field), with the
+    parity word, the pair and the files all fitting that value: only the k that disagrees is wrong."""
+    seed = world.seed
+    old = (world.visible_ids[2], world.hidden_ids[2])
+    new = s.draw_halves(3, seed + 1)
+    if new != old:
+        world.move_half(old[0])
+        world.move_half(old[1])
+    value = seed + 4
+    parity = "even" if value % 2 == 0 else "odd"
+    _rewrite_draw_line(world, 3, lambda t: f"3 {t.split()[1]} SEED+4={value} {parity} visible={new[0]} hidden={new[1]}")
+    return [("draw", "DRAW_CATEGORY_MISMATCH")], {}
+
+
 S1_DRAW = {
+    "digit-form-k-differs-from-the-first-field": ({}, _digit_k_differs_from_the_first_field, 1),
     "seed-inconsistent": ({}, _seed_inconsistent, 1),
     "parity-wrong": ({}, _parity_wrong, 1),
     "category-in-one-half-only": ({}, _category_in_one_half, 1),
@@ -177,6 +193,89 @@ S1_DRAW = {
     "id-in-no-half": ({}, _draw_id_missing, 1),
     "category-wrong-in-a-line": ({}, _draw_category_wrong, 1),
     "a-stray-file-in-the-measured-half": ({}, _stray_file, 1),
+}
+
+# --------------------------------------------------------------------------
+# S1, after W2-94 GOLD (owner, 2026-11-13) (iii): a draw line may also be written in the literal letter form
+# ``<k> <category> SEED+k=<value> <parity> visible=<id> hidden=<id>`` (the k of ``SEED+<k>`` is the first field); every
+# other rule is as for the digit form. Only the literal spelling ``SEED+k=`` is accepted besides ``SEED+<digits>=``.
+# --------------------------------------------------------------------------
+
+def _literal(text):
+    """One draw line with its ``SEED+<digits>=`` written ``SEED+k=``."""
+    return re.sub(r"SEED\+\d+=", "SEED+k=", text)
+
+
+def _literal_all(world):
+    world.set_draw_lines([_literal(line) for line in world.draw_lines()])
+
+
+def _literal_odd_k_only(world):
+    world.set_draw_lines([_literal(line) if int(line.split()[0]) % 2 else line for line in world.draw_lines()])
+
+
+def _ok(prepare):
+    def case(world):
+        prepare(world)
+        return [], {}
+    return case
+
+
+S1_DRAW_FORMS = {
+    "every-line-in-the-literal-form": ({}, _ok(_literal_all), 0),
+    "some-lines-digit-form-some-literal": ({}, _ok(_literal_odd_k_only), 0),
+}
+
+
+def _in_literal_form(change, code):
+    def case(world):
+        _literal_all(world)
+        change(world)
+        return [("draw", code)], {}
+    return case
+
+
+def _lit_seed_inconsistent(world):
+    _rewrite_draw_line(world, 3, lambda t: re.sub(r"SEED\+k=(\d+)", lambda m: f"SEED+k={int(m.group(1)) + 2}", t))
+
+
+def _lit_parity_wrong(world):
+    _rewrite_draw_line(world, 2, lambda t: t.replace(" even ", " ODD ").replace(" odd ", " even ").replace(" ODD ", " odd "))
+
+
+def _lit_rule_violated(world):
+    visible, hidden = world.visible_ids[1], world.hidden_ids[1]
+    world.move_half(visible)
+    world.move_half(hidden)
+    _rewrite_draw_line(world, 2, lambda t: t.replace(f"visible={visible} hidden={hidden}", f"visible={hidden} hidden={visible}"))
+
+
+def _lit_category_wrong(world):
+    _rewrite_draw_line(world, 1, lambda t: t.replace("code-location", "callers"))
+
+
+def _lit_id_in_no_half(world):
+    _rewrite_draw_line(world, 1, lambda t: re.sub(r"visible=q\d\d", "visible=q88", t))
+
+
+def _spelled(spelling):
+    return lambda world: _rewrite_draw_line(world, 1, lambda t: t.replace("SEED+k=", spelling))
+
+
+S1_DRAW_LITERAL = {
+    "literal-seed-inconsistent": ({}, _in_literal_form(_lit_seed_inconsistent, "DRAW_SEED_INCONSISTENT"), 1),
+    "literal-parity-wrong": ({}, _in_literal_form(_lit_parity_wrong, "DRAW_PARITY_MISMATCH"), 1),
+    "literal-rule-violated": ({}, _in_literal_form(_lit_rule_violated, "DRAW_RULE_VIOLATED"), 1),
+    "literal-category-wrong-for-its-k": ({}, _in_literal_form(_lit_category_wrong, "DRAW_CATEGORY_MISMATCH"), 1),
+    "literal-id-in-no-half": ({}, _in_literal_form(_lit_id_in_no_half, "DRAW_ID_MISSING"), 1),
+    "an-upper-case-K": ({}, _in_literal_form(_spelled("SEED+K="), "DRAW_LINE_BAD"), 1),
+    "the-placeholder-in-angle-brackets": ({}, _in_literal_form(_spelled("SEED+<k>="), "DRAW_LINE_BAD"), 1),
+    "another-letter": ({}, _in_literal_form(_spelled("SEED+x="), "DRAW_LINE_BAD"), 1),
+    "two-letters": ({}, _in_literal_form(_spelled("SEED+kk="), "DRAW_LINE_BAD"), 1),
+    "a-space-before-the-plus": ({}, _in_literal_form(_spelled("SEED +k="), "DRAW_LINE_BAD"), 1),
+    "a-space-after-the-plus": ({}, _in_literal_form(_spelled("SEED+ k="), "DRAW_LINE_BAD"), 1),
+    "a-space-before-the-equals-sign": ({}, _in_literal_form(_spelled("SEED+k ="), "DRAW_LINE_BAD"), 1),
+    "no-k-at-all": ({}, _in_literal_form(_spelled("SEED+="), "DRAW_LINE_BAD"), 1),
 }
 
 # --------------------------------------------------------------------------
@@ -325,6 +424,102 @@ S4_BREAKS = {
                 "SOURCE_PATH_ABSENT"), 1),
     "an-entry-the-answer-needs-dropped": (
         {}, _s4(lambda d: d.update(sources=[{"path": s.source_path(7), "lines": [4, 4]}]), "ANSWER_NOT_IN_SPANS"), 1),
+}
+
+# --------------------------------------------------------------------------
+# S4, rule 2a after W2-94 GOLD (owner, 2026-11-13): (i) a hyphen-digit word is an identifier token only when it is
+# id-shaped (the part before the first hyphen starts with an upper-case letter and holds only upper-case letters and
+# digits: ``DEC-051``, ``W2-94``); (ii) a path token is also held when its segments occur in order in the spans
+# ``q07``'s answer is the good one with a word added; the held ones expect "20 of 20 hold"
+# --------------------------------------------------------------------------
+
+GOOD_07 = f"The routine `{s.WORD}func07_run` returns {s.WORD}ans07."
+ID_TOKEN = "ZQXW-9451"                              # made up; id-shaped (upper-case prefix, then a digit)
+JOINER = f"src/{s.WORD}/joiner.py"                  # a span that joins a path the way code does
+LITERAL_HOLDER = f"src/{s.WORD}/literal_holder.py"  # a span that holds the same path literally
+PATH_TOKEN = f"{s.WORD}spec/2-PLAN/{s.WORD}VIEWS.md"
+JOINER_TEXT = ("import os\n"
+               "# The view list path is joined here.\n"
+               f"def {s.WORD}_views():\n"
+               f"    return os.path.join(\"{s.WORD}spec/2-PLAN\", \"{s.WORD}VIEWS.md\")\n")
+LITERAL_TEXT = ("import os\n"
+                f"# The view list path is {PATH_TOKEN} here.\n"
+                f"def {s.WORD}_views():\n"
+                "    return None\n")
+
+
+def _with_id_in_the_span():
+    """The planted source of q07 with the id-shaped word on its line 5 (the file keeps its eight lines)."""
+    lines = s.source_lines(7)
+    lines[4] = f"It returns {s.WORD}ans07 to its caller, see {ID_TOKEN}."
+    return {s.source_path(7): "\n".join(lines) + "\n"}
+
+
+def _answer_adds(text):
+    """The good answer of q07 with ``text`` added: the added words are what the case is about."""
+    return lambda d: d.update(gold_answer=f"{GOOD_07} {text}")
+
+
+def _joined(answer, path=JOINER, last=4):
+    """q07 cites the joiner file (lines 1 to ``last``) and states ``answer``."""
+    return lambda d: (d["sources"][0].update(path=path, lines=[1, last], heading=None), d.update(gold_answer=answer))
+
+
+def _path_answer(token):
+    return f"The view list path is `{token}`."
+
+
+def _holds(change):
+    def case(world):
+        world.edit("q07", change)
+        return [], {}
+    return case
+
+
+S4_BREAKS.update({
+    # (i) an id-shaped hyphen-digit word the spans lack is still a token that is not held
+    "an-id-shaped-word-the-span-lacks": ({}, _s4(_answer_adds(f"It is tagged {ID_TOKEN}."), "ANSWER_NOT_IN_SPANS"), 1),
+    "an-id-shaped-word-with-digits-in-its-prefix-the-span-lacks": (
+        {}, _s4(_answer_adds("It is tagged ZQXW94-7."), "ANSWER_NOT_IN_SPANS"), 1),
+    "a-one-letter-id-shaped-word-the-span-lacks": ({}, _s4(_answer_adds("It is tagged X-5."), "ANSWER_NOT_IN_SPANS"), 1),
+    "a-back-quoted-lower-case-hyphen-digit-word-the-span-lacks": (
+        {}, _s4(_answer_adds("It reads `level-2`."), "ANSWER_NOT_IN_SPANS"), 1),
+    # (ii) segments out of order, one absent or one repeated beyond what the spans hold do not hold
+    "path-segments-in-reverse-order": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _s4(_joined(_path_answer(f"{s.WORD}VIEWS.md/2-PLAN/{s.WORD}spec")), "ANSWER_NOT_IN_SPANS"), 1),
+    "path-segments-with-the-middle-one-swapped": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _s4(_joined(_path_answer(f"{s.WORD}spec/{s.WORD}VIEWS.md/2-PLAN")), "ANSWER_NOT_IN_SPANS"), 1),
+    "a-path-segment-absent-from-the-spans": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _s4(_joined(_path_answer(f"{s.WORD}spec/2-PLAN/{s.WORD}NOPE.md")), "ANSWER_NOT_IN_SPANS"), 1),
+    "a-path-segment-held-once-but-named-twice": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _s4(_joined(_path_answer(f"{s.WORD}spec/{s.WORD}spec/{s.WORD}VIEWS.md")), "ANSWER_NOT_IN_SPANS"), 1),
+})
+
+S4_HOLDS = {
+    # (i) lower-case or mixed-case hyphen-digit words are not tokens (they count as prose, if at all)
+    "lower-case-hyphen-digit-words": ({}, _holds(_answer_adds("It handles level-2 and top-3.")), 0),
+    "a-capitalised-hyphen-digit-word-with-lower-case-letters": ({}, _holds(_answer_adds("It reaches Level-2.")), 0),
+    "a-hyphen-digit-word-that-starts-with-a-digit": ({}, _holds(_answer_adds("It uses 2D-3.")), 0),
+    "a-lower-case-look-alike-of-an-id": ({}, _holds(_answer_adds("It is tagged zqxw-9451.")), 0),
+    # (i) the id-shaped word is held when the span has it
+    "an-id-shaped-word-the-span-holds": (
+        {"extra_copy": _with_id_in_the_span()}, _holds(_answer_adds(f"It is tagged {ID_TOKEN}.")), 0),
+    # (ii) a path joined by code, a literal path, empty segments, a subsequence of the segments
+    "a-path-joined-the-way-code-joins-it": (
+        {"extra_copy": {JOINER: JOINER_TEXT}}, _holds(_joined(_path_answer(PATH_TOKEN))), 0),
+    "a-literal-path-in-the-span": (
+        {"extra_copy": {LITERAL_HOLDER: LITERAL_TEXT}},
+        _holds(_joined(_path_answer(PATH_TOKEN), path=LITERAL_HOLDER, last=3)), 0),
+    "a-path-with-a-leading-and-a-doubled-slash": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _holds(_joined(_path_answer(f"/{s.WORD}spec//2-PLAN/{s.WORD}VIEWS.md"))), 0),
+    "a-path-whose-segments-are-some-of-the-spans-in-order": (
+        {"extra_copy": {JOINER: JOINER_TEXT}},
+        _holds(_joined(_path_answer(f"{s.WORD}spec/{s.WORD}VIEWS.md"))), 0),
 }
 
 # --------------------------------------------------------------------------
