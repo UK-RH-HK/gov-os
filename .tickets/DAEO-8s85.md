@@ -1,6 +1,6 @@
 ---
 id: DAEO-8s85
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-t8mp]
 created: 2026-11-09T20:40:06Z
@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- docs/probes/DAEO-8s85/**  # the probe record (the routed line's narrow check)
 - src/gov/launch/launcher.py
 - src/gov/adapters/portability.py
 - tests/unit/launch/test_w2_153*

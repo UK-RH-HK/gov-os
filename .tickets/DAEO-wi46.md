@@ -1,6 +1,6 @@
 ---
 id: DAEO-wi46
-status: in_progress
+status: closed
 deps: [DAEO-k7hz]
 links: []
 created: 2026-10-30T23:20:53Z
