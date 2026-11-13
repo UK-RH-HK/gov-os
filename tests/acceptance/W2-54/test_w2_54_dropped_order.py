@@ -169,11 +169,34 @@ def test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once(box, ti
         "the order of the files, the store or the process changed what is dropped, not only its order"
 
 
-def test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing(box, tied):
-    """TK-W254-SMALL with room for every item of its evidence (a budget from the packet's own figures): every item
-    its batches read is stacked, once, in their order; nothing is dropped, nothing left for a further batch, and the
-    last batch read fewer items than its limit (the evidence ended)."""
-    packet = S.packet_of(S.context_run(box, tied, S.TK_SMALL, "--budget", S.room_for_all(box, tied, S.TK_SMALL)))
+CAP = 6000   # the most supplementary context a packet holds, whatever --budget is passed (DEC-1165 (2), DEC-860)
+
+
+def _fitting_files():
+    """TK-W254-SMALL's project without the big charter (about 36,000 tokens, one line of it: it can never fit under the
+    cap): the ticket, its one source and the evidence the other files give, together well under ``CAP``."""
+    return {rel: text for rel, text in S.tied_corpus((S.TK_SMALL,)).items() if rel != "docs/charter/big.md"}
+
+
+@pytest.fixture(scope="module")
+def fits(box):
+    """A project whose every file together comes to fewer tokens than the cap: its evidence fits under it."""
+    _need_gitleaks(box)
+    return S.order_project(box, box.workdir / "fits" / "repo", _fitting_files())
+
+
+def test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing(box, fits):
+    """TK-W254-SMALL, in a project whose evidence fits under the 6,000-token cap, with room for every item of it (a
+    budget from the packet's own figures): every item its batches read is stacked, once, in their order; nothing is
+    dropped, nothing left for a further batch, and the last batch read fewer items than its limit (the evidence ended).
+
+    Rewrite-Reason: DEC-1165 (2): the supplementary block holds at most 6,000 tokens whatever ``--budget`` is, so a
+    budget can no longer make room for the shared project's evidence (the big charter alone is about 36,000 tokens, an
+    item no room under the cap holds). The case keeps its point (what fits is kept, nothing dropped) on a stand-in
+    whose evidence is under the cap, and checks that premise instead of assuming it."""
+    total = sum(S.tokens(text) for text in _fitting_files().values())
+    assert total <= CAP, f"the fixture is wrong: the project's files come to {total} tokens, over the cap of {CAP}"
+    packet = S.packet_of(S.context_run(box, fits, S.TK_SMALL, "--budget", S.room_for_all(box, fits, S.TK_SMALL)))
     read = S.batch_items(packet)
     assert packet[S.K_DROPPED] == [], f"something is dropped from a context that fits: {packet[S.K_DROPPED]}"
     assert packet[S.K_FURTHER] == [], f"something is left from a context that fits: {packet[S.K_FURTHER]}"

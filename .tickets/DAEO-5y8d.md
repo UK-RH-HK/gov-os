@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: independent-test-designer
 profile: LITE
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-13

@@ -165,7 +165,7 @@ launcher cases, `'orchestrator' is not a worker role` (D-1); none on a premise.
 | S10 | `test_w2_136_never_a_gate.py::test_s10_no_module_of_the_category_imports_or_calls_gov_plan[claim]` | green (guard) | `src/gov/tasks/claims.py`, `src/gov/check/claims.py` |
 | S10 | `test_w2_136_never_a_gate.py::test_s10_no_module_of_the_category_imports_or_calls_gov_plan[readiness]` | green (guard) | `src/gov/readiness/**` |
 | S10 | `test_w2_136_never_a_gate.py::test_s10_no_module_of_the_category_imports_or_calls_gov_plan[hooks]` | green (guard) | `src/gov/hooks/**`, the kernel's hooks, `.claude/hooks/` |
-| S10 | `test_w2_136_never_a_gate.py::test_s10_no_module_of_gov_outside_plan_and_launch_imports_or_calls_gov_plan` | green (guard) | every module of `src/gov` but `plan/` and `launch/` |
+| S10 | `test_w2_136_never_a_gate.py::test_s10_no_module_of_gov_outside_plan_and_launch_imports_or_calls_gov_plan` | green (guard) | every module of `src/gov` but `plan/`, `launch/` and `session_watch/` (revised for DEC-1163 (6) D (a), W2-182: W2-159's S5 reads the ready list by `gov plan --ready`) |
 
 **A check of the tests themselves** (a scratch copy of `src`, never committed): a sketch of `gov plan` (about 200
 lines: the guard's matcher on the tracked files, then literal-against-pattern exactly and two wildcards by their

@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- src/gov/launch/command.py  # S12's --plan flag and its call (P-6 (a), CTO, DEC-1157 (12)); the plan's refusal exits 1 like a launch
 - src/gov/launch/launcher.py
 - src/gov/launch/role.py
 - src/gov/launch/record.py
@@ -39,6 +40,18 @@ allowed_paths:
 - tests/acceptance/W2-56/test_w2_56_environment.py  # the same
 - tests/acceptance/W2-56/test_w2_56_endings.py  # the same
 - tests/acceptance/W2-56/test_w2_56_refused_arguments.py  # the same
+- tests/acceptance/W1-28/w1_28_launch_support.py  # P-8 (a), CTO, DEC-1156 (7): older launch fixtures plant the role file and its named skills' copies; a test designer, one Rewrite-Reason a file, no assertion changed
+- tests/acceptance/W1-32/w1_32_launch_support.py  # the same
+- tests/acceptance/W1-46/w1_46_support.py  # the same
+- tests/acceptance/W1-50/w1_50_freeze_support.py  # the same
+- tests/acceptance/W2-116/w2_116_support.py  # the same
+- tests/acceptance/W2-136/w2_136_support.py  # the same
+- tests/acceptance/W2-20/w2_20_support.py  # the same
+- tests/acceptance/W2-56/w2_56_support.py  # the same
+- tests/acceptance/W2-56/w2_56_sandbox_support.py  # the same
+- tests/unit/resources/test_w2_20_unit_launch.py  # the same
+- tests/unit/resources/test_w2_20_round3.py  # the same
+- tests/unit/resources/conftest.py  # the same
 kpis:
   success:
   - 'gov launch <role> <ticket> starts the session as its role: the role''s text (its generated agent, or the role file''s text appended) is in the session''s context at its start, shown by a launched session''s log; the launch record holds the role file''s path, version and content hash. Verify: a planted role file and a launch of that role: the session''s first context names the role''s text, and the launch record holds the file''s path, version and sha256 [DEC-826 Q1, lens E F2] [Verify clause added, DEC-1157 (12)]'
@@ -96,3 +109,4 @@ Card: the draft card `W2-60` (W2-60a part), from the accepted plan (`docs/plan/W
 - **Older cases (P-3, DEC-1156 (7)):** a test designer plants a role file (and, for W2-60a's own suite, the template and an open gate file) in the fixtures of W2-136, W2-153 and W2-56 listed in the paths, and revises W2-153's appended-file asserts to "the one appended file starts with the role text and ends with the template's bytes"; each with its Rewrite-Reason; no case loses its point.
 - **The merge's four acceptance conflicts** (W2-50's and W2-58's files in the paths): resolved by a test designer keeping both sides' cases.
 - **S10 moved to W2-184 (CTO, 2026-11-13 15:20, DEC-1157 (12), within P1-W2-60a-P5 (B)):** S10 (the second review on a different setting) entered with DEC-1015 after review 3 and was never built or tested; DEC-1167 (2)'s "back to its DEC-839 form" was the CTO's error for it (it never had one). W2-184 carries RUBRIC-2's review-setting line in its place.
+- **Delegated (CTO, 2026-11-13 16:35):** P-6 (a): `src/gov/launch/command.py` added for `--plan`; the plan's refusal exits 1 (EXIT_GOV_ERROR, like every LAUNCH_REFUSED), S12's case revised under Rewrite-Reason. P-7 (a): `role.py` takes a named skill's version from `template/governance/kernel/skills/superpowers/vendored.yaml` when the loaded copy carries none and is listed there (the hash stays the loaded copy's, the record names the source); a really unversioned skill still refuses (S2 holds).

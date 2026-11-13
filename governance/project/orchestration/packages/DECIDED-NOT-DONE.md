@@ -340,3 +340,5 @@ Action items checked: 251. Done: 193. Not done or partly done: 15 (12 overdue en
 | 185 | DEC-1167 (6): W2-111 lands form B; the guard designer-read speed ticket filed after EXAMIN's copy starts | IN PROGRESS: next: land W2-111 (3da7242f4461); the ticket at W2-27's start |
 | 186 | DEC-1167 (7) SANDBOX-1 (b): B1 briefs/facts $TMPDIR + R4; B2 cache ACT withdrawn + the reranker log fix; B3 the loopback probe; B5 W3-P29 + config.lock sweep; B4 on B3's evidence; CLAUDE.md's guard sentence by its route | NOT STARTED: next: helpers for B1, B3, B5; the log fix's route |
 | 187 | DEC-1167 (3): W2-60b to after the copy starts | WAITS: W2-27's start |
+| 188 | DEC-1172 (1): W2-88 NC-1 (a), run 6 (A9's own record commit in fabric.py, its narrow undo, no reset) | IN PROGRESS: run 6 released 17:38 |
+| 189 | DEC-1172 (2): W2-23 `project.commit`'s reset for A1-A8, the CTO's P2 under DEC-1164 (18), listed for the owner's reading | WAITS: W2-27's start; before any adoption of EXAMIN's real repository |

@@ -176,6 +176,7 @@ budgets:
   role-reviewer: 3500
   role-lead: 8000
   role-cto: 6000
+  close_context_tokens: 65536  # tokens: the close's context packet ceiling (DEC-1165 (1)); the others count characters
 
 # The tools a launched session runs without asking: launch_worker.sh's --allowedTools (the reviewer: no Edit, Write).
 harness_allowed:
