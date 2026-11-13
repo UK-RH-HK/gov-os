@@ -76,6 +76,16 @@ class Unreadable(Exception):
     """The scan cannot read the command for certain: the caller judges it as before this fix."""
 
 
+class UnclosedQuote(Unreadable):
+    """A quote the scan finds open outside every comment (DEC-1174 (1)): a reader blind to comments may pair it with
+    a comment's apostrophe, so the caller is not to take such a reading for a free one."""
+
+
+# A comment holding a quote: where the scan cannot read a command, a reader blind to comments may pair that quote
+# with another and hide the text between them (DEC-1174 (1)).
+COMMENT_QUOTE = re.compile(r"(?:^|[\s;&|(])#[^\n]*['\"`]")
+
+
 # Code that names the acceptance tests' folder in any spelling an honest script uses: 'tests/acceptance' with or
 # without the slash, 'tests', 'acceptance' as separate pieces (os.path.join, Path / ..., '/'.join, %), or a glob.
 _CODE_NAMES = re.compile(r"tests\b.{0,40}?accept|ests/accept", re.S)
@@ -95,10 +105,12 @@ def joined(command):
 
 # -- the shell text: heredocs and substitutions out --------------------------------------------------------------
 
-def heredocs(command):
-    """``command`` without its heredoc bodies, and the bodies. Each heredoc operator and its delimiter become
-    ``< __gov_hdl_<k>__`` (an input redirect the parser skips), so the reader is known by position. Raises
-    Unreadable for anything the scan cannot read for certain."""
+def heredocs(command, comments=None):
+    """``command`` without its heredoc bodies and its comments, and the bodies. Each heredoc operator and its
+    delimiter become ``< __gov_hdl_<k>__`` (an input redirect the parser skips), so the reader is known by position.
+    A comment's text (a ``#`` that starts a word, outside quotes, to the end of its line) is dropped, so a quote in it
+    is no quote (DEC-1174 (1)); its span is added to ``comments`` when a list is given. Raises Unreadable for
+    anything the scan cannot read for certain."""
     out, bodies, pending = [], [], []
     # The shell's contexts: "top"; '"' (double quotes); "$(" (a command substitution, whose quoting starts
     # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic).
@@ -154,7 +166,7 @@ def heredocs(command):
         if c == "'":
             end = command.find("'", i + 1)
             if end < 0:
-                raise Unreadable("an unclosed single quote")
+                raise UnclosedQuote("an unclosed single quote")
             out.append(command[i:end + 1])
             i = end + 1
             continue
@@ -191,10 +203,13 @@ def heredocs(command):
             out.append(c)
             i += 1
             continue
-        if c == "#" and (not out or out[-1][-1:] in " \t\n;&|("):
+        if c == "#" and (not out or (out[-1][-1:] in " \t\n;&|(" and out[-1][:1] != "\\")):
+            # A comment: the # starts a word (after a blank or an operator that is not escaped: "x\ #y" and "a\;#b"
+            # are one word to bash). Its text is dropped; a quote in it is no quote (DEC-1174 (1)).
             end = command.find("\n", i)
             end = n if end < 0 else end
-            out.append(command[i:end])
+            if comments is not None:
+                comments.append((i, end))
             i = end
             continue
         if command.startswith("<<", i) and not command.startswith("<<<", i):
@@ -249,9 +264,35 @@ def heredocs(command):
             continue
         out.append(c)
         i += 1
+    if any(ctx[0] in ('"', "`") for ctx in stack):
+        raise UnclosedQuote("an unclosed double quote or backtick")
     if len(stack) > 1 or pending:
         raise Unreadable("unbalanced quotes or a heredoc with no body")
     return "".join(out), bodies
+
+
+def comment_spans(command, depth=0):
+    """Where a shell reads comment text in ``command`` (DEC-1174 (1)): the (start, end) of each comment in its own
+    text and, within the bodies of the heredocs a shell reads as commands (``bash <<EOF``, ``cat <<EOF | sh``), in
+    theirs, as offsets into ``command``. A body any other program reads (Python, data) holds none. Raises Unreadable
+    for anything the scan cannot read for certain."""
+    found = []
+    text, bodies = heredocs(command, found)
+    if not bodies or depth >= MOST_DEPTH:
+        return found  # a body deeper than the guard reads keeps its text: read as before (fail closed)
+    lifted, _ = lift(text)
+    stage, at = [], []
+    for words, reds, sep in simples(tokens(lifted)):
+        stage.append(_kind(words))
+        at += [(int(m), len(stage) - 1) for r in reds for m in re.findall(r"^__gov_hdl_(\d+)__$", r[1])]
+        if sep not in ("|", "|&"):
+            for k, i in at:
+                runs = [kind for kind in stage[i:] if kind != "data"]
+                if runs == ["shell"] and k < len(bodies):
+                    s = bodies[k]["span"][0]
+                    found += [(s + a, s + b) for a, b in comment_spans(bodies[k]["text"], depth + 1)]
+            stage, at = [], []
+    return sorted(found)
 
 
 def spans(command):
