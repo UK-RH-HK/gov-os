@@ -186,6 +186,64 @@ def test_s2_a_blob_over_the_scan_limit_is_named_unscanned_and_the_run_is_not_ok(
     W.assert_state_equal(before, W.repo_state(root), "MA with a blob over the scan limit")
 
 
+# ---- RV2-2 (run 5, P1-W2-88-RV2-1 (a)): PLAN.md's unscanned list is a list ---------------------------------------------------
+
+UNSCANNED_HEAD = "Unscanned paths:"
+
+
+def test_s2_rv2_2_unscanned_paths_are_a_list_after_a_line_that_says_only_unscanned_paths(box, host):
+    """RV2-2: the secrets scan ran (gitleaks on PATH) and skipped some paths, not all: two tracked text blobs over
+    ``assess.SCAN_LIMIT_BYTES``. ``refactor-plan/PLAN.md`` holds the line ``Unscanned paths:`` alone, and the paths follow as a list
+    starting on the next line, each `` - `path` `` at the start of its own line (a path that stood on the header's line, or after
+    prose, is no list item); the run is still ``SECRETS_UNSCANNED`` naming both paths."""
+    try:
+        from gov.adopt import assess
+        limit = int(getattr(assess, "SCAN_LIMIT_BYTES", W.SCAN_LIMIT_FALLBACK))
+    except ImportError:
+        limit = W.SCAN_LIMIT_FALLBACK
+    root = P.plant_clean(box.base, "two-huge")
+    paths = ["data/huge-a.log", "data/huge-b.log"]
+    for number, rel in enumerate(paths):
+        W.write(root, rel, f"row {number} of the long table\n" * ((limit // 22) + 400))
+    W.commit_all(root, "two blobs over the scan limit")
+    run, out, before = assess_unscanned(box, host, root, "two-huge-out", environment=W.env(box, host))
+    details = assert_unscanned_refusal(run, "MA with two blobs over the scan limit")
+    named = json.dumps(details["unscanned"])
+    assert all(rel in named for rel in paths), f"details['unscanned'] does not name both skipped blobs: {details['unscanned']!r}"
+    lines = (out / W.PLAN_DIR / "PLAN.md").read_text(encoding="utf-8").splitlines()
+    heads = [number for number, line in enumerate(lines) if UNSCANNED_HEAD in line]
+    assert len(heads) == 1, f"PLAN.md names `{UNSCANNED_HEAD}` on {len(heads)} lines, one expected: {[lines[n] for n in heads]}"
+    head = heads[0]
+    assert lines[head].strip() == UNSCANNED_HEAD, \
+        f"the `{UNSCANNED_HEAD}` line is {lines[head]!r}: it holds the header alone, the paths follow as a list on the next lines"
+    listed = []
+    for line in lines[head + 1:]:
+        if not line.startswith("- `"):
+            break
+        listed.append(line)
+    for rel in paths:
+        assert any(line.startswith(f"- `{rel}`") for line in listed), \
+            f"{rel} is no `- `path`` line right after the `{UNSCANNED_HEAD}` line (the list after it: {listed})"
+    assert len(listed) == len(paths), f"the list after `{UNSCANNED_HEAD}` holds {len(listed)} items, the two skipped paths expected: {listed}"
+    W.assert_state_equal(before, W.repo_state(root), "MA with two blobs over the scan limit")
+
+
+def test_s2_rv2_2_no_scan_at_all_keeps_the_one_line_form(box, host):
+    """RV2-2 (the form that stays): with no ``gitleaks`` on PATH nothing was scanned, and PLAN.md keeps the one line
+    ``Unscanned paths: all <n> tracked files`` (no list)."""
+    root = P.plant_clean(box.base, "no-scan-form")
+    run, out, before = assess_unscanned(box, host, root, "no-scan-form-out")
+    assert_unscanned_refusal(run, "MA with no gitleaks on PATH")
+    tracked = len(W.git(root, "ls-files").splitlines())
+    plan = (out / W.PLAN_DIR / "PLAN.md").read_text(encoding="utf-8")
+    assert re.search(rf"^{re.escape(UNSCANNED_HEAD)} all {tracked} tracked files\s*$", plan, re.MULTILINE), \
+        f"PLAN.md has no line `{UNSCANNED_HEAD} all {tracked} tracked files`:\n{plan[-600:]}"
+    lines = plan.splitlines()
+    at = next(number for number, line in enumerate(lines) if line.startswith(UNSCANNED_HEAD))
+    assert not (at + 1 < len(lines) and lines[at + 1].startswith("- `")), \
+        f"the no-scan form is followed by a list of paths: {lines[at + 1]!r}"
+
+
 # ---- L-1a (DEC-1052, the lead's stated interface): a binary over the chunker's limit is a blocker like a text file ----------
 
 def ma_plan(box, host, root, name):
