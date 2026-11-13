@@ -111,4 +111,4 @@ There is no `independent-reviewer.md`, before or after.
 
 Approve the nine kernel role files and the orchestrator's rulesync source at the hashes above (CAP-33):
 
-Owner approval: ______________________ (date, decision id)
+Owner approval: W2-33 CIT-P approved at c4b97716164e, C0 Haiku low (owner, 2026-11-13, DEC-1160)
