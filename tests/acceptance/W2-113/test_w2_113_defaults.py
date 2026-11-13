@@ -2,10 +2,13 @@
 
 (i) a roster that already names an existing ticket: A0 keeps it and creates nothing;
 (ii) a roster without the key: A0 adds the key and changes nothing else;
-(iii) ``tk`` missing: A0 refuses and writes nothing.
+(iii) ``tk`` missing: A0 completes without creating the ticket or the key, and its record says so; the guard stays closed
+      (every install refused, the refusal naming ``GOV_TICKET`` and how to set the key) (PKG-3 (b), the owner, DEC-1157
+      (15); was: A0 refuses and writes nothing).
 
-The wording of the refusal in (iii) is not judged beyond I2: a refusal is the tool's own (exit code not 0, no Python
-traceback, an ``ok: false`` envelope; W2-23's ``refusal``).
+In (iii) A0 ends as W2-23's success does (exit 0, an ``ok: true`` envelope). "Its record says so" is judged on the
+record's text, not on a field name (``w2_113_support.says_no_ticket_was_created_because_tk_is_missing``; README, "The
+record says so"). "The guard stays closed" is the kernel hook's decision, as the rest of the suite reads it.
 """
 
 from __future__ import annotations
@@ -86,23 +89,47 @@ def test_a_roster_without_the_key_keeps_its_text_and_its_comments(adoption):
         f"the key's line must be the only line A0 adds; it added {extra}")
 
 
-# --- (iii) tk missing: A0 refuses and writes nothing ---------------------------------------------------------------------
+# --- (iii) tk missing: A0 completes without the ticket or the key, says so, and the guard stays closed -----------------
 
-def test_a0_refuses_when_tk_is_missing(adoption):
-    adopted = adoption("no-tk")
-    assert not (adopted.project / support.TK_REL).exists(), "the planted repository still holds the vendored tk"
-    error = w23.refusal(adopted.done)
-    assert isinstance(error, dict) and error, f"the refusal carries no error object\n{adopted.done.describe()}"
-
-
-def test_a0_writes_nothing_when_tk_is_missing(adoption):
+def test_a0_completes_without_a_ticket_or_a_key_and_its_record_says_so_when_tk_is_missing(adoption):
     adopted = adoption("no-tk")
     project, before = adopted.project, adopted.before
-    assert adopted.done.returncode != 0, f"A0 must refuse (a non-zero exit)\n{adopted.done.describe()}"
+    assert not (project / support.TK_REL).exists(), "the planted repository still holds the vendored tk"
+    support.assert_succeeded(adopted)                     # PKG-3 (b): A0 completes, it does not refuse
     assert adopted.created == set(), f"A0 created a ticket although tk is missing: {sorted(adopted.created)}"
-    assert support.roster_bytes(project) == before.roster, f"A0 changed {support.ROSTER_REL} (it had {before.roster!r})"
-    assert w23.head(project) == before.head and support.commit_count(project) == before.commits, "A0 made a commit"
-    assert not (project / support.A0_RECORD).exists(), f"A0 left its record {support.A0_RECORD}"
-    assert w23.at_head(project, support.A0_RECORD) is None, f"{support.A0_RECORD} is committed"
-    assert tuple(support.refs(project)) == before.refs, f"A0 left a ref: {support.refs(project)}"
+    assert support.roster_bytes(project) == before.roster, (
+        f"A0 changed {support.ROSTER_REL} (it had {before.roster!r}): with tk missing no {support.KEY} key is added")
+    record = project / support.A0_RECORD
+    assert record.is_file(), f"A0 completed but left no record at {support.A0_RECORD}"
+    text = record.read_text(encoding="utf-8")
+    assert support.says_no_ticket_was_created_because_tk_is_missing(text), (
+        f"A0's record {support.A0_RECORD} must say that no coordination ticket was created because tk is missing "
+        f"(it must name tk and say a ticket was not made); the record reads:\n{text}")
+
+
+def test_the_guard_stays_closed_when_tk_is_missing(adoption, sandbox):
+    """No key was written, so the install rule cannot run: every session's install is refused (fail closed), and the
+    refusal names ``GOV_TICKET`` and says how to set the key, as KPI success 2 asks of every such refusal."""
+    adopted = adoption("no-tk")
+    support.assert_succeeded(adopted)
+    project = adopted.project
+    settings = w110.wiring.load_settings(project)
+    sessions = [w110.cto(support.OTHER.id, "orchestrator on an existing ticket"),
+                w110.cto(w110.COORDINATION.id, "orchestrator on a would-be coordination ticket"),
+                w110.Session("orchestrator with no ticket", w110.ORCHESTRATOR, None),
+                w110.Session("engineer", w110.ENGINEER, support.ENGINEERING.id)]
+    problems = []
+    for session in sessions:
+        for command in support.INSTALLS:
+            answer = w110.call(project, settings, sandbox, session, command)
+            if answer.decision != "deny":
+                problems.append(f"{session}: `{command}` was {answer.decision}, not refused: {answer.describe()}")
+                continue
+            if not support.names_the_variable(answer.reason):
+                problems.append(f"{session}: the refusal of `{command}` does not name {support.NAMES_THE_VARIABLE}: "
+                                f"{answer.reason!r}")
+            if not support.says_how_to_set_the_key(answer.reason):
+                problems.append(f"{session}: the refusal of `{command}` does not say how to set the key (name "
+                                f"{support.ROSTER_REL} and {support.KEY}): {answer.reason!r}")
+    assert not problems, "with tk missing the guard must stay closed:\n" + "\n".join(problems)
     assert w23.porcelain(project) == "", f"A0 left the tree dirty:\n{w23.porcelain(project)}"

@@ -252,5 +252,31 @@ def says_how_to_set_the_key(reason: str) -> bool:
     return w110.says_how_to_set_the_key(reason)
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# What A0's record must say when ``tk`` is missing (Interface I2 (iii), PKG-3 (b), DEC-1157 (15))
+# ---------------------------------------------------------------------------------------------------------------
+
+# The interface fixes no field name, so the record's TEXT is judged, not a key: the record names ``tk`` and, within a
+# short span of the same text (YAML folding and line breaks are collapsed first), says a ticket was not made. Narrow on
+# purpose: a record that is silent about ``tk`` fails; a record that names ``tk`` but says nothing negative about a
+# ticket fails; "tk is missing: no coordination ticket was created", "coordination_ticket: none (tk missing)" and
+# "skipped: tk not found, so the ticket and the key were not created" pass. (README, "The record says so".)
+_TK_WORD = re.compile(r"(?<!\w)tk(?!\w)", re.IGNORECASE)
+_NOT_MADE = re.compile(r"\b(?:no|not|none|null|never|without|skipped|skip|nothing)\b|n't\b", re.IGNORECASE)
+_A_TICKET = re.compile(r"ticket", re.IGNORECASE)
+_SPAN = 160
+
+
+def says_no_ticket_was_created_because_tk_is_missing(record_text: str) -> bool:
+    """The record names ``tk`` and, within ``_SPAN`` characters of it, speaks of a ticket in a negative way (no, not,
+    none, null, never, without, skipped, nothing, n't)."""
+    flat = " ".join(record_text.split())
+    for found in _TK_WORD.finditer(flat):
+        window = flat[max(0, found.start() - _SPAN): found.end() + _SPAN]
+        if _NOT_MADE.search(window) and _A_TICKET.search(window):
+            return True
+    return False
+
+
 def remove_tree(path: Path) -> None:
     w110.remove_tree(Path(path))
