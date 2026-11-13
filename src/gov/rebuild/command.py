@@ -254,6 +254,79 @@ def _not_built(root: Path, stores: dict, has_path_map: bool) -> list[dict]:
     return named
 
 
+def _replace_stale(root: Path) -> dict | None:
+    """A store of another layout version is replaced, never read as current (W2-88 F3, DEC-957): the file and its
+    journals are removed so that every store in it is built again. ``{found, expected, rebuilt: True}`` where one was
+    replaced, None where the store is current, absent or not a store this layout can be asked of."""
+    import sqlite3
+
+    from gov.store import STORE_REL, layout
+
+    path = Path(root) / STORE_REL
+    if not path.is_file():
+        return None
+    try:
+        connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=30.0)
+        try:
+            found = layout.found_of(connection)
+        finally:
+            connection.close()
+    except sqlite3.Error:
+        return None
+    if found is None:
+        return None
+    for suffix in ("", "-wal", "-shm", "-journal"):
+        Path(str(path) + suffix).unlink(missing_ok=True)
+    return {"found": found, "expected": layout.LAYOUT_VERSION, "rebuilt": True}
+
+
+def _table_digest(connection, tables: dict[str, str]) -> str:
+    """sha256 over the sorted rows of ``tables`` (name -> the columns read); a table the store lacks counts as no
+    rows, so a store not asked for has a digest of its own (the empty one) and never an absent one."""
+    import hashlib
+    import json
+    import sqlite3
+
+    present = {name for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+    content = []
+    for table, columns in tables.items():
+        try:
+            rows = connection.execute(f"SELECT {columns} FROM {table}").fetchall() if table in present else []
+        except sqlite3.Error:
+            rows = []
+        content.append([table, sorted([[item.hex() if isinstance(item, bytes) else item for item in row]
+                                       for row in rows], key=repr)])
+    return hashlib.sha256(json.dumps(content).encode("utf-8")).hexdigest()
+
+
+def digests_of(root: Path, record: str) -> dict:
+    """The per-store digests (W2-88 S4, F3): ``record`` (the record graph's, as ``digest`` has it), ``lexical`` and
+    ``vectors`` (sha256 over the sorted rows of their tables; the lexical chunk's row id, a counter, is left out) and
+    ``codegraph_bytes`` (the size of the code graph's files in bytes: reported, never compared)."""
+    import sqlite3
+
+    from gov.store import STORE_REL
+
+    lexical = {"lexical_file": "path, blob, indexed", "lexical_parent": "parent_id, path, kind, start_line, end_line",
+               "lexical_chunk": "chunk_id, path, start_line, end_line, parent_id"}
+    vectors = {"semantic_vector": "chunk_id, embedding", "semantic_pin": "key, value"}
+    try:
+        connection = sqlite3.connect((Path(root) / STORE_REL).resolve().as_uri() + "?mode=ro", uri=True, timeout=30.0)
+        try:
+            found = {"lexical": _table_digest(connection, lexical), "vectors": _table_digest(connection, vectors)}
+        finally:
+            connection.close()
+    except sqlite3.Error:
+        found = {"lexical": _table_digest(sqlite3.connect(":memory:"), lexical),
+                 "vectors": _table_digest(sqlite3.connect(":memory:"), vectors)}
+    from gov.codeintel import BASE_REL
+
+    folder = Path(root) / BASE_REL
+    size = sum(path.stat().st_size for path in folder.rglob("*") if path.is_file() and not path.is_symlink()) \
+        if folder.is_dir() else 0
+    return {"record": record, **found, "codegraph_bytes": size}
+
+
 def _build(root: Path, args, config: dict, watch) -> dict:
     import sys
 
@@ -266,6 +339,10 @@ def _build(root: Path, args, config: dict, watch) -> dict:
 
     has_path_map = "path-map.yaml" in config
     embeddings = not getattr(args, "no_embeddings", False)
+    replaced = _replace_stale(root)  # W2-88: before anything reads or seeds the store, a stale layout is made anew
+    if replaced:
+        print(f"rebuild: the store's layout was {replaced['found']}, this gov reads {replaced['expected']}: replaced",
+              file=sys.stderr, flush=True)
 
     # The tree is no warm base while it is rebuilt: its record is written again only once its stores are complete.
     # A record that cannot be removed is said and the rebuild goes on (W2-76: its own records never fail it).
@@ -438,7 +515,8 @@ def _build(root: Path, args, config: dict, watch) -> dict:
         "secrets_counts": secrets_counts,
         "complete": not not_built,
         "not_built": not_built,
-    } | ({} if seeded is None else {"seed": seeded})
+        "digests": digests_of(root, store_result["digest"]),
+    } | ({} if seeded is None else {"seed": seeded}) | ({} if replaced is None else {"layout": replaced})
     if not scan_on(root):  # DEC-1045: the filter gave nothing to gitleaks, and the report says so
         secrets_counts["scan"] = built["secrets_scan"] = SCAN_OFF
         print(f"rebuild: {SCAN_OFF}", file=sys.stderr)

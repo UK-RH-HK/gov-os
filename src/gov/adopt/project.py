@@ -19,10 +19,10 @@ from gov.util.digest import sha256
 from gov.util.gitenv import git_env
 
 FOLDER = "governance/adoption"  # the tool's own records: no artefact of the project, so not in its inventory
-STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
+STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8", "A9")
 TITLES = {"A0": "safety baseline", "A1": "inventory", "A2": "classification", "A3": "target path map",
           "A4": "batched plan", "A5": "independent review of the path map", "A6": "controlled migration",
-          "A8": "legacy import and retirement"}
+          "A8": "legacy import and retirement", "A9": "memory fabric"}
 MOVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT")  # the actions that take an artefact to another path
 # The files A0 sets up (W2-23 S5): held by the template's namespace when the project's own path map names neither,
 # so that no later stage refuses them as unknown.
@@ -85,13 +85,19 @@ def dirty(root: Path) -> list[str]:
     return paths
 
 
-def require_repository(root: Path) -> None:
-    """Refuse unless ``root`` is the top level of a git repository that has a commit and a clean tree."""
+def require_commit(root: Path) -> None:
+    """Refuse unless ``root`` is the top level of a git repository that has a commit. Reads only: the memory
+    assessment (MA) needs no clean tree and writes nothing in the repository."""
     code, top = _run(root, ("rev-parse", "--show-toplevel"), (0, 128))
     if code != 0 or Path(top.decode("utf-8", "surrogateescape").removesuffix("\n")).resolve() != root:
         raise refuse("NOT_A_REPOSITORY", f"{root} is not the top level of a git repository: nothing is adopted there")
     if resolve(root, "HEAD") is None:
         raise refuse("NO_COMMIT", f"{root} has no commit: there is no baseline to adopt from")
+
+
+def require_repository(root: Path) -> None:
+    """Refuse unless ``root`` is the top level of a git repository that has a commit and a clean tree."""
+    require_commit(root)
     paths = dirty(root)
     if paths:
         from gov.adopt import safety
