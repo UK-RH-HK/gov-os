@@ -15,7 +15,7 @@ import subprocess
 from pathlib import Path
 
 from gov.dispatch import config as configuration
-from gov.dispatch import peaks, procs, readiness, returns, status
+from gov.dispatch import heavy, landing, peaks, procs, readiness, returns, status
 from gov.dispatch import state as states
 from gov.dispatch.shell import Runner
 
@@ -66,7 +66,7 @@ def tick(root: Path, now=None) -> tuple[int, dict | None]:
 
 def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
     from gov.resources import config as gate_config
-    from gov.resources import gate, machine
+    from gov.resources import gate, machine, slots
 
     conf = configuration.load(root)
     runner = Runner(conf.command_timeout_s)
@@ -74,7 +74,8 @@ def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
     reading = gate.read(True)
     values = gate_config.load()["values"]
     floor, working = values.get("memory_floor_bytes"), values.get("working_size_bytes")
-    running = procs.find(machine.processes(), conf.job_markers)
+    table = machine.processes()
+    running = procs.find(table, conf.job_markers)
     started = state.started()
     lately = {s.log for s in started if not state.exit_file(s.log).exists() and s.ticket not in running.tickets()
               and (now - s.at).total_seconds() <= conf.never_ran_after_s}
@@ -85,6 +86,8 @@ def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
     new_returns = returns.finished(ctx, problems)
     never = returns.never_ran(ctx, now)
     ctx.unread = {item.w2 for item in state.items() if item.w2}
+    landed = landing.step(ctx, running, now, spawn)
+    heavy_steps, findings = heavy.steps(running.jobs, table, slots.runners(reading["slots"]["held"]))
     shown_peaks = peaks.refresh(state, root / conf.history, now)
     coming = peaks.ahead(shown_peaks, working, running, len(pending))
 
@@ -140,7 +143,7 @@ def _pass(root: Path, state: states.State, now) -> tuple[int, dict]:
                  "disk": {"open": disk["open"], "free_bytes": disk["free_bytes"], "free_inodes": disk["free_inodes"]}},
         "slots": reading["slots"],
         "peaks": peaks.shown(shown_peaks, working), "peaks_ahead": coming,
-        "queue": _queue(state),
+        "queue": _queue(state), **landed, "heavy_steps": heavy_steps, "findings": findings,
         "inbox": [{"name": i.path.name, "W2": i.w2, "log": i.log, "status": i.status, "age_s": round(i.age_s)}
                   for i in state.items()],
         "started": None if began is None else {"W2": began.w2, "log": began.log, "ticket": began.ticket},

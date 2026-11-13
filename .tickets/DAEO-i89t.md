@@ -1,6 +1,6 @@
 ---
 id: DAEO-i89t
-status: in_progress
+status: closed
 deps: [DAEO-k7hz]
 links: [DAEO-k7hz]
 created: 2026-11-01T15:16:06Z

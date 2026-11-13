@@ -319,3 +319,17 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 
 - **CIT-P:** `docs/changes/W2-88-CIT-P.md` stays in the paths but unused: the Contract CIT-P is W2-88a's (DEC-1150 (1)).
 - **Three values for the engineer to confirm from the code** (proposals, not KPIs): the file-size limit (1 MiB or a line over `chunking.READ_CHARS`), where the retrieve budget comes from, and the code graph's language list.
+
+## Interface additions (P-W2-88-TD-1, the CTO's delegated decision, DEC-1157 (3), (12), 2026-11-13 01:35)
+
+- **R1 (b):** A3 refuses with `ASSESSMENT_MISSING` only when `--assessment` is given and holds no `memory-assessment.json` for HEAD's commit; a bare A3 runs as today and its record says `assessment: none`. "MA before A3" is carried by the adopt skill's order (W2-88a's S17). The case `test_i2_a3_without_an_assessment_for_head_refuses` loses its "no `--assessment` at all" half (a decided-behaviour revision, DEC-1156 (7)); S1's "before A3" holds on the skill's path.
+- **P-1:** the engineer names, from the code, the retrieve budget's source (one of the three values it confirms) and A9's question-set input (e.g. `--questions <file>`, defaulting to W2-81's per-repository set); the test designer then adds the planted over-budget (S5) and low-measure (S6) cases.
+- **P-2:** S15 is judged on `gov.memaudit`'s output here and on the record at W2-27; no new case.
+- **P-3:** the real code-graph tool is not used in this suite; nodes and edges asserted present only, a named residual.
+- **P-4 (a):** S3's "refused by W2-76's lock" reads "never two at once" (serialised: a second rebuild waits); and the unit seam `fabric.check_coverage(record, tracked)` raising `FABRIC_INCOMPLETE` for F2 (the case uses it instead of deleting store rows).
+- **P-5 (a):** A9's `memory-audit/AUDIT-RECORD.json` carries `not due: no verdict set used` until the verdict set is used; W2-172's `due` is not changed.
+- **P-6 (a):** the stage that installs the kernel today copies the retrieval skill and T-0; the engineer names it; if no existing stage copies the kernel skills, the lead returns that case as a package (it is not moved to W2-88a).
+- **P-7:** F4 keeps its upper bound only.
+- **P-8, P-9:** F6's tuning-set citation check and F8's checker are residuals for W2-27's first full run (and W2-170 for F8's checker); no case here, no new ticket.
+- **P-10:** the engineer names the `retrieval.yaml` key for each `fabric.STANDARD` setting; the test designer aligns the plant in one narrow revision.
+- **The seams the engineer names (P-1, P-4, P-10)** are recorded in the lead's return and in `docs/changes/W2-88-evidence.md` if it is in the paths; the CTO copies them into this section at the next commit.

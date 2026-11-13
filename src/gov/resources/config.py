@@ -217,8 +217,9 @@ def template(cpus: list[int] | None = None) -> dict:
     return {
         "memory_floor_bytes": _entry(3 * GIB, "2026-10-29", "DEC-942 item 2: the memory floor 3 GiB"),
         "oom_floor_bytes": _entry(2 * GIB, "2026-10-29", "DEC-947 item 5: the trip-wire below 2 GiB available"),
-        "working_size_bytes": _entry(2140236 * 1024, "2026-10-29",
-                                     "DEC-947 item 2: a lead's working size outside verification, 2,140,236 kB"),
+        "working_size_bytes": _entry(805_306_368, "2026-11-12",
+                                     "DEC-1149 (1), (2): 0.75 GiB per live session, from the lead-memory ledger "
+                                     "(ACT-P95-1)"),
         "verification_peak_bytes": _entry(7404492 * 1024, "2026-10-29",
                                           "DEC-947 item 1: a verification run's peak, 7,404,492 kB"),
         "rebuild_peak_bytes": _entry(7404492 * 1024, "2026-11-01",

@@ -54,6 +54,16 @@ def render(data: dict) -> str:
     ahead = data["peaks_ahead"]
     out.append(f"peaks ahead: memory {ahead['memory_bytes']}, cpu {ahead['cpu']:g}, jobs {len(ahead['jobs'])}")
     out.append(f"queue ({len(data['queue'])}): " + (", ".join(data["queue"]) or "empty"))
+    if data.get("land"):
+        out.append(f"land: {data['land']}")
+    if data.get("land_hold") and data.get("land") != data["land_hold"]:
+        out.append(f"land: {data['land_hold']}")
+    out += [f"land: {note}" for note in data.get("land_notes", [])]
+    steps = data.get("heavy_steps", [])
+    if steps:
+        out.append(f"heavy steps ({len(steps)}): " + ", ".join(
+            f"{s['kind']} pid {s['pid']} " + (f"slot {s['slot']}" if s["slot"] is not None else "no slot")
+            for s in steps))
     inbox = data["inbox"]
     out.append(f"inbox ({len(inbox)} unread): " + (", ".join(f"{i['name']} ({i['W2']}, {i['status']})" for i in inbox)
                                                   or "empty"))
@@ -64,6 +74,9 @@ def render(data: dict) -> str:
     out.append("started: " + (f"{started['W2']} as {started['log']}" if started else "none"))
     out.append(f"skipped ({len(data['skipped'])}):")
     out += [f"  {s['W2'] or s['line']}: {s['reason']}" for s in data["skipped"]]
+    if data.get("findings"):
+        out.append("findings:")
+        out += [f"  {f}" for f in data["findings"]]
     if data["problems"]:
         out.append("problems:")
         out += [f"  {p}" for p in data["problems"]]
