@@ -5,11 +5,11 @@ status: PROPOSED
 date: 2026-11-12
 branch: w2/W2-33
 base: 3df1ac2deb1b (the acceptance tests merged, red)
-head: 4c6a47d8c (the role files as verified; later commits add only records)
+head: c4b97716164e (the role files as verified; later commits add only records)
 ticket: DAEO-lrre (W2-33)
 task: DAEO-lrre
 author: orchestrator (W2-33 ticket lead)
-review: pending (independent-auditor, read-only; docs/probes/DAEO-lrre/)
+review: PASS, independent-auditor session bf9dae7f-1b6d-4e7e-80bf-517a182f778a on 3b3a90d74c3e, 7 findings, none blocking; narrow check of the fix c4b977161 (docs/probes/DAEO-lrre/PR-DAEO-lrre.md)
 decisions_carried: [DEC-954, DEC-957, DEC-959, DEC-963, DEC-983, DEC-982, DEC-847, DEC-1010, DEC-1119, DEC-1120, DEC-236, DEC-839]
 decisions_applied: [DEC-1052, DEC-1087, DEC-1156, DEC-971]
 state_class: EVIDENCE
@@ -37,18 +37,18 @@ from W2-113 to this ticket by DEC-1156 (4)). Kernel role files change, so this g
 
 ## 2. The kernel files and their sha256
 
-| file | version after | sha256 before (`3df1ac2deb1b`) | sha256 after (`4c6a47d8c`) | lines +/- |
+| file | version after | sha256 before (`3df1ac2deb1b`) | sha256 after (`c4b97716164e`) | lines +/- |
 |---|---|---|---|---|
-| `template/governance/kernel/roles/engineer.md` | 1.1.0 | `66c094102c731f9e5e4504af393fca5954c5fe8afdcc93eeba9f457367233c5f` | `4c422966365c7f0974aae64d934413ab76f4078a259045065404a39be36ff217` | +10 / -2 |
+| `template/governance/kernel/roles/engineer.md` | 1.1.0 | `66c094102c731f9e5e4504af393fca5954c5fe8afdcc93eeba9f457367233c5f` | `c94f98d7fc17b60bfbea3d3bb2fcf7e2d84d698490e3e4464ece957c15f5b423` | +10 / -2 |
 | `template/governance/kernel/roles/independent-auditor.md` | 1.1.0 | `4d6f6bdf8596a485dc20388e0529915a128441fc3950665474f062829856a9a9` | `4b4a5f947206517e167d6b39c9531d3fa7a96476b1d0658ea52e84277a92746c` | +8 / -2 |
 | `template/governance/kernel/roles/independent-test-designer.md` | 1.1.0 | `62e1ec3f86c0c266d4736c8e510306a9c5a7ed7924de06efcf38f578fc54b340` | `890c91f577c8b934761cbc95a079fbbc50f4201f60f1f7ef52471afb16014fce` | +10 / -2 |
-| `template/governance/kernel/roles/orchestrator.md` | 2.0.0 | `97e6d049d6f2478bfb02ee33263e9a99fb5b1e90bc8bce6dea611b4e422b2e4b` | `4489e5eef43e620ca88a382491f9d2d64d9caf602acc00ca7b595160d1fcfa0a` | +20 / -60 |
+| `template/governance/kernel/roles/orchestrator.md` | 2.0.0 | `97e6d049d6f2478bfb02ee33263e9a99fb5b1e90bc8bce6dea611b4e422b2e4b` | `08ba69e63d51adeb901ef8998f6dc2a21490dff9b326c69a603fafbf14d47d10` | +20 / -60 |
 | `template/governance/kernel/roles/product-spec.md` | 1.1.0 | `fd432110627c85b352e8ed268e87177855a1a291679921aaf089a17ff498fb9c` | `bb9a46da12c7b34208cc1f6fcc37f523821783530d3faf8675032502ebf74e43` | +6 / -1 |
 | `template/governance/kernel/roles/research.md` | 1.1.0 | `60f9092f37430a096eeb932907b5814661585afaf38c52a045c3d775c933e678` | `f9bc3b721b568bf80210f2f438dce5d18954eb24a986b75d6c82733793b9d1cd` | +6 / -1 |
 | `template/governance/kernel/roles/ticket-lead.md` (new) | 1.0.0 | absent | `0c93598c82daf3f5401c9d5c3293a00144a40565682fd878f289926593b355af` | +35 / -0 |
 | `template/governance/kernel/roles/qa-engineer.md` (new) | 1.0.0 | absent | `40fd68fdadf35df679a14842f86e6b51ce849eec65d241cf6fca04f63b362f3a` | +28 / -0 |
 | `template/governance/kernel/roles/senior-engineer.md` (new) | 1.0.0 | absent | `243e8b8422eca053c7da99f108941d736962e4437bbc0c507fc98feadc25f415` | +29 / -0 |
-| `template/.rulesync/subagents/orchestrator.md` (the source, = `portability.compose(root, 'orchestrator')`) | n/a | `7f235d5105881000c8c9443abc11dc6887401d8ab42f536dd533054bdec1520c` | `59cfd390088ce8a4589f914455c7e0061205eca4d581db6047c04395fa2e5367` | +22 / -62 |
+| `template/.rulesync/subagents/orchestrator.md` (the source, = `portability.compose(root, 'orchestrator')`) | n/a | `7f235d5105881000c8c9443abc11dc6887401d8ab42f536dd533054bdec1520c` | `ef15ea7d3ea78b674f4e4480e521c43db4ad43eb8bcbc7a8be66f83f582d266c` | +22 / -62 |
 
 There is no `independent-reviewer.md`, before or after.
 
@@ -72,11 +72,29 @@ There is no `independent-reviewer.md`, before or after.
 - **Launcher (W2-60a):** reads `Version`, `Launch default` and `Skills` from each file; all nine are in its form.
 - **Guard (W2-60b):** `qa-engineer` and `senior-engineer` are not yet known role ids. The guard's refusal of a QA
   write elsewhere and the launcher's refusal of two writers in one worktree are judged there (the Interface).
-- **Generated copies (W2-153, the copies ACT):** `.claude/agents/**`, the root `.rulesync/**` and the other
-  `template/.rulesync/subagents/*` sources are not changed here. Until the copies ACT, these cases stay red:
-  - W1-33's kernel-equals-generated cases (`tests/acceptance/W1-33/test_w1_33_agent_definitions.py:56-68`);
-  - W1-38's field agreement (`tests/acceptance/W1-38/test_w1_38_rulesync.py:56-90`).
-  The CTO pairs the copies ACT with the land.
+- **Generated copies (W2-153, the copies ACT):** `.claude/agents/**`, the root `.rulesync/**` and the five other
+  `template/.rulesync/subagents/*` sources are not changed here. Their composition (`portability.compose`) changes
+  with the kernel bodies. Until the copies ACT rewrites them, these cases stay red on this branch (the lead's
+  full-suite run on `3b3a90d74c3e`: 5590 tests, 50 failed, all listed here; the review's R1):
+  - W2-153: 23 cases in `tests/acceptance/W2-153/test_w2_153_sources.py`: the S3 body and fields cases for the
+    sources in `.rulesync/` and `template/.rulesync/` (all but the template's orchestrator source), and
+    `test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository`;
+  - the unit cases `tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition` and
+    `tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition`;
+  - W1-38: `tests/acceptance/W1-38/test_w1_38_rulesync.py`, `TestRoleFieldAgreement` (5) and
+    `TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project`;
+    `tests/acceptance/W1-38/test_w1_38_heldout_step.py` (10; each reads `SOURCE_DIFFERS` from the role sources);
+  - W1-33: `tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file`
+    (5 roles).
+  The CTO pairs the copies ACT with the land. When that ACT adds the three new roles' agents,
+  `tests/acceptance/W1-33/test_w1_33_agent_definitions.py:86-90` (the roster pinned at six plus research) needs a
+  revision too.
+- **An older case asserting the old file (the CTO's, DEC-1156 (7)):**
+  `tests/acceptance/W1-33/test_w1_33_kernel_role_files.py:149-155` (`test_the_research_role_file_is_unchanged`, DEC-163)
+  pins `research.md` at the hash W1-46 placed. The owner's lines in every role file (S2, S4, S5, S7) change it.
+- **Older W2-128 cases kept green:** the fix `c4b977161` puts back, in the CTO's file, the kernel templates a lead's
+  brief is built from (`role-lead.md`, `brief.md`; DEC-1050), a fact the removed lead section carried. It also keeps
+  `engineer.md`'s Purpose on line 5 (`tests/acceptance/W2-128/test_w2_128_round2a.py:222`, `test_w2_128_templates.py:100`).
 - **Older cases revised (DEC-1156 (7)):** a test designer revised three cases in
   `tests/acceptance/W1-35/test_w1_35_orchestration.py`, each with a Rewrite-Reason. They now read `ticket-lead.md`
   and the nine-file roster. The rulesync half of the roster case is dropped: the agreement of the generated sources
@@ -84,8 +102,8 @@ There is no `independent-reviewer.md`, before or after.
 
 ## 5. Evidence
 
-- `gov accept W2-33` on `4c6a47d8c`: outcome pass, 96 passed, 0 failed, 11 lines mapped, 0 unmapped
-  (`.gov-runtime/scratch/lead/log/accept-build-2.txt` in the worktree).
+- `gov accept W2-33`: outcome pass, 96 passed, 0 failed, 11 lines mapped, 0 unmapped (on `4c6a47d8c` and again on
+  the final head; logs `accept-build-2.txt`, `accept-build-3.txt` in the worktree's lead records).
 - Verification and the independent review: see the probe record in `docs/probes/DAEO-lrre/`.
 
 ## 6. For the owner
