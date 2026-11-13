@@ -1,6 +1,6 @@
 ---
 id: DAEO-c4pb
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-0pyc, DAEO-k4wm]
 created: 2026-11-06T19:40:00Z

@@ -1,6 +1,6 @@
 ---
 id: DAEO-k4wm
-status: in_progress
+status: closed
 deps: [DAEO-r8vq]
 links: [DAEO-r8vq, DAEO-n0wb]
 created: 2026-11-06T12:38:09Z
