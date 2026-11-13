@@ -10,7 +10,8 @@ with no combinatorial expansion. Every covers id has at least one test.
 
 **81 cases** (65 test functions) in eleven files, a support module and a conftest. 13 cases are `local_only`.
 With the second batch (the first review's findings, below): **96 cases** (75 test functions) in twelve files,
-20 of them `local_only`.
+20 of them `local_only`. With the third batch (the second review's findings, below): **115 cases** in thirteen files,
+21 of them `local_only`.
 
 ## How the suite runs, and the code it runs (DEC-732)
 
@@ -255,6 +256,51 @@ reads it, widened to the working tree and to a change of branch: "stale" may be 
 paths that differ. Behaviour 3 takes R3 (the CIT-P is the result's `proposal` and the `--out` file) to mean that
 the file says what the result says about completeness. No new package: each behaviour follows from a source the
 suite already cites.
+
+## Third batch: the second review's findings A, B, C, E and F4 (DEC-812 (1) and (2), DEC-136)
+
+A fresh independent test designer added these in the resume, before the fixes, from the second review's findings
+passed on as described behaviours (DEC-136). Every case is in `test_w2_37_resume_findings.py`, built on the suite's
+fixtures (`project`, `repo`, `built`, `tools`, `box`) and its support module, which is unchanged (helpers specific to
+the batch are in the new file). No earlier case was changed. Each behaviour has a failure and a success half (a
+success half is green today, a guard for the fix).
+
+Run at the commit that added the batch, with `gov impact` built, in the sandbox, excluding `local_only`
+(`-m "not local_only"`): **13 failed, 81 passed** (21 `local_only` deselected). The 94 earlier cases keep their
+results (the three known reds: `test_w2_37_rows.py::test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement`
+and `test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[template]` and `[claude-copy]`). The
+new file has **19 cases** (17 functions): 10 red, 8 green, 1 `local_only`. With them the suite is **115 cases**
+(92 test functions), 21 of them `local_only`.
+
+Readings taken here: the result of `--compare` carries `complete` and `gaps` under the keys an assessment uses
+(`complete: false` and a list of maps with `id`); "names the clash", "says the file is missing", "says the path is
+empty" and "says it is a folder" are each a word of a list in the file's head (`CLASH_WORDS`, `MISSING_WORDS`,
+`EMPTY_WORDS`, `FOLDER_WORDS`) found in the refusal's `error`; a refusal exits 1, prints no traceback and writes nothing.
+
+| # | Behaviour | Test (`test_w2_37_resume_findings.py::`) | `local_only` | Red reason (today) |
+|---|---|---|---|---|
+| A | `--compare` checks the CIT-E against the proposal as committed. CIT-P lists DEC-002; CIT-E leaves it out: `matches: false`. Then DEC-002 is removed from the CIT-P file in the working tree, not committed: not `matches: true`; either DEC-002 is still a difference, or the result or refusal names the CIT-P file (`CITP-001.md`) that differs from HEAD | `test_a_proposal_edited_after_it_was_committed_never_turns_a_difference_into_a_match` | no | **failed**: `matches: true`, `differences: []` |
+| | Success | `test_a_proposal_edited_and_committed_is_the_one_compared`: the same edit committed and the store loaded again: `matches: true` | no | green |
+| B | A register that had no entry at HEAD (the path map's `decision_register`), the store loaded, a first entry (DEC-090, `**Supersedes:** DEC-001`) added and not committed: `graphs.record` not `ok`, reads `stale`, `complete` false, and names `records/decision-log.md`. The fixture's premise (a clean tree reads `ok`) is asserted first | `test_a_register_with_no_entry_at_head_and_a_first_one_uncommitted_reads_stale` | no | **failed**: "`graphs.record` says 'ok' although that graph was not" |
+| | The same with the register in a non-governance namespace of the path map (`records/**` is `product` memory) | `test_a_register_in_a_non_governance_namespace_with_a_first_entry_uncommitted_reads_stale` | no | **failed**: as above |
+| | The same with a current code graph (both graphs `ok` and, with no gap, `complete: true` before the entry): the report is never `complete` while the record graph is stale | `test_with_a_current_code_graph_a_first_register_entry_uncommitted_is_never_complete` | **yes** | expected: `graphs.record` says `ok` and `complete` is true while the register's first entry is missing. In my runs it is **skipped** (`codebase-memory-mcp` is not on the PATH `heavy_slot.sh` gives pytest); in a worker's sandbox it would error at setup in the fixture `indexed_split_register` (P-W2-38). Not run: the lead runs it outside |
+| | Guard: the register holds one entry (DEC-070) at HEAD and a further one is uncommitted | `test_a_register_that_held_one_entry_at_head_and_gets_a_further_one_uncommitted_reads_stale` | no | green: `stale`, naming the register |
+| | Success: the first entry committed and the store loaded again: `graphs.record` is `ok`; DEC-090 is a stated change read from a current record graph | `test_a_register_entry_committed_and_the_store_loaded_again_reads_the_record_graph_current` | no | green |
+| C | A CIT-P written with `complete: false` and gaps (SPEC-002) and a CIT-E with the same lists: the result carries `complete: false` and the gaps (it may say `matches: true`) | `test_a_match_with_a_proposal_written_as_incomplete_carries_its_incompleteness` | no | **failed**: the result is `proposal`, `execution`, `matches`, `differences` only |
+| | End to end: the CIT-P `--out` writes without a code tool (`complete: false`), a CIT-E recording its lists, compared: `complete: false` | `test_a_match_with_a_proposal_the_assessment_wrote_as_incomplete_carries_it_end_to_end` | no | **failed**: as above |
+| | Success: a CIT-P with `complete: true` and no gaps: the result is not incomplete and lists no gap | `test_a_match_with_a_proposal_written_as_complete_says_no_incompleteness` | no | green |
+| E | `--compare` against a CIT-P whose file is gone (committed, the store loaded, the file removed from the working tree) is refused, exit 1, naming the proposal and saying the file is missing, not that it "lists nothing under `affected`" | `test_comparing_against_a_proposal_whose_file_is_gone_is_refused_as_missing` | no | **failed**: `IMPACT_NOTHING_LISTED`, "CITP-001 lists nothing under `affected`: the records cannot be compared" |
+| | `--out ""` is refused as an empty path, not as "a file is there already"; exit 1, nothing written | `test_out_with_an_empty_path_is_refused_as_empty` | no | **failed**: `IMPACT_OUT_EXISTS`, ": a file is there already; gov impact writes no file over another" |
+| | `--out <an existing folder>` is refused as a folder, not as "a file is there already"; exit 1, nothing written | `test_out_naming_an_existing_folder_is_refused_as_a_folder` | no | **failed**: `IMPACT_OUT_EXISTS` with the same message |
+| | Success: `--compare` naming a file that does not exist (`docs/changes/CITP-404.md`, `docs/changes/CITE-404.md`) is refused naming it as missing | `test_comparing_a_file_that_does_not_exist_is_refused_as_missing[CITP-404]`, `[CITE-404]` | no | green: these two forms are refused as missing today; the form that reads "lists nothing" is the proposal whose file is gone (row above) |
+| | Success: `--out <a file that is there>` is refused naming it, "already"; the file untouched | `test_out_naming_a_file_that_is_there_already_is_refused_as_that` | no | green |
+| F4 | `--out` whose stem is an id the store holds (`CITP-001`, a stored CIT-P; `DEC-001`, a stored decision), written to a new path, is refused naming the id and the clash; nothing written | `test_out_whose_stem_is_an_id_the_store_holds_is_refused_naming_the_clash[a-cit-p]`, `[a-decision]` | no | **failed**: exit code 0; `docs/proposals/CITP-001.md` is written, and its `proposal.id` is the stem |
+| | Success: a stem no record holds, in a new folder, is written | `test_out_whose_stem_is_a_new_id_is_written` | no | green |
+
+No new package. Two points for the reading of the fixes: (1) finding A accepts both ways the brief names, so a fix that
+reads the proposal from HEAD or the store passes with DEC-002 still a difference, and one that refuses or reports not
+matching while the CIT-P file differs from HEAD passes by naming `CITP-001.md`; (2) a CIT-P file removed from the
+working tree is expected to be refused as missing (finding E), also by a fix that reads the proposal from HEAD for A.
 
 ## Packages, and the tests that depend on each
 
