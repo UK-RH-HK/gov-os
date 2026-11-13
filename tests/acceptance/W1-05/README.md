@@ -249,13 +249,13 @@ independent test designers (round 1 and round 2, 2026-11-13); the case ids, thei
 the 3 warm-up calls, the 40 samples, the nearest-rank p95 and the three-round repeat are the same as before the
 revision; nothing is skipped, marked or removed.
 
-**What it measures.** `test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook` (9 parameters: `Edit-engineer`, `Glob-engineer`, `Glob-no-role`, `Grep-engineer`, `Grep-no-role`, `NotebookEdit-engineer`, `Read-engineer`, `Read-no-role`, `Write-engineer`): the CPU time of one call's PreToolUse hooks (every command registered for the tool, started together as the harness starts them, and what each waited for: the `RUSAGE_CHILDREN` difference before and after the call, so the sum of their work, stricter than the wall time of commands that run side by side), less the median CPU time of one reference hook called just before each of the 40 timed calls, in the same round (one reference hook per call, whatever the number of commands). The bound is 100 ms at p95.
+**What it measures.** `test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook` (9 parameters: `Edit-engineer`, `Glob-engineer`, `Glob-no-role`, `Grep-engineer`, `Grep-no-role`, `NotebookEdit-engineer`, `Read-engineer`, `Read-no-role`, `Write-engineer`): the CPU time of one call's PreToolUse hooks (every command registered for the tool, started together as the harness starts them, and what each waited for: the `RUSAGE_CHILDREN` difference before and after the call, so the sum of their work, stricter than the wall time of commands that run side by side), less the median CPU time of one reference hook called just before each of the 40 timed calls, in the same round (one reference hook per call, whatever the number of commands). The bound is 100 ms at p95. The measure is the owner's decision DEC-1163 (3) (P-W2-111-MEASURE-1 (a)).
 
 **What it counts, and what it does not.** It counts the CPU time (user and system) of the hook's process and of every
 process it waited for (its forked decision process, the git it runs), less one reference hook's. It leaves out, once per
 call, what any hook costs before it does anything of its own: a fresh interpreter's start and the read of the event
 (the reference hook's CPU time: about 15 ms on a quiet machine, about 21 ms with every CPU busy). **This lowers what is
-judged by that much**: a hook that spends 100 ms of CPU in all, 85 ms of it its own, is judged at 85 ms and passes; the
+judged by that much** (accepted by the owner under DEC-906: DEC-1163 (3)): a hook that spends 100 ms of CPU in all, 85 ms of it its own, is judged at 85 ms and passes; the
 ceiling on a hook's total CPU time is about 115 ms quiet and 121 ms loaded. It was chosen over a form that leaves
 nothing out because no such form held its verdict under load (below). It does not see a hook that is slow only by
 waiting (a sleep, a lock, a network wait): that spends no CPU. It does not remove the effect of load on CPU time: with
