@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: independent-test-designer
 profile: LITE
-status: open
+status: in_progress
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-13
@@ -25,6 +25,7 @@ allowed_paths:
 - tests/acceptance/W2-136/README.md
 - tests/acceptance/W2-23/test_w2_23_space.py
 - tests/acceptance/W2-23/README.md
+- docs/probes/DAEO-5y8d/**  # the probe record
 - template/.rulesync/hooks.jsonc  # E (a): the template's hooks source gains context_watch.py (a product-spec worker's line, not a test designer's)
 kpis:
   success:
