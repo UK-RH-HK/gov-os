@@ -52,14 +52,19 @@ rows:
     class: b
     control: true
   - id: settings
-    why: "settings: items only added to permissions.deny tighten (a); allow rules, hooks blocks, any other key alter a control (b) (PERMISSIONS-1/2, QUIET-DENY-1, STOP-WAITER-1, PUSH-INPUT-1)"
+    why: "the repository's settings: items only added to permissions.deny tighten (a); allow rules, hooks blocks, any other key alter a control (b) (PERMISSIONS-1/2, QUIET-DENY-1, STOP-WAITER-1)"
     match:
       - {root: repo, path: ".claude/settings*.json"}
-      - {root: home, path: ".claude/settings*.json"}
     list:
       kind: json
       only_added: ["permissions.deny"]
     else: b
+    control: true
+  - id: home-settings
+    why: "the home ~/.claude/settings*.json: any change alters a control (b), deny additions too; the (a) after-check's replay and control snapshot read only the repository's settings (DEC-1142 (4), W2-148 S15; PUSH-INPUT-1, GUARD-FIX-4, EFFORT-HIGH-1/2)"
+    match:
+      - {root: home, path: ".claude/settings*.json"}
+    class: b
     control: true
   - id: rulesync-permissions
     why: "the settings' source: only new deny entries tighten (a); anything else alters a control (b)"
