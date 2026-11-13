@@ -14945,6 +14945,16 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) The mandatory part is never shortened (CAP-15.d); a ticket whose mandatory part alone passes its ceiling (W2-88's, about 61,500) still needs its text trimmed, which this does not do.
 - **Basis:** the owner's message of 2026-11-13 (~12:40): "The context ceiling: add the supplementary cap; file it."; the two scopes as brought at ~12:02.
 
+### DEC-1166 — Three ACT yeses (COPIES-8, COPIES-7, the dispatcher's nightly slot); W2-37's CIT-P approved at version 1.1.0; message 5 run
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~13:50; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1163 (1), (7), (8), (9), DEC-1161 (2), DEC-1104, CAP-33
+- **Decision:**
+  - (1) **`yes ACT-CLAUDE-COPIES-8 e2fc9815`:** the "until W2-56" line deleted from the four generated copies; queued for the operator agent 13:53.
+  - (2) **`yes ACT-CLAUDE-COPIES-7 78de1c5f`:** W2-98's spec-writing skill copies, after the CTO's hand merge of W2-98; then W2-98 closes.
+  - (3) **`yes ACT-DISPATCH-NIGHTLY-SLOT-1 9ff4f275`:** applied by the CTO (class (b), the package's route) 7cc654e49, follow-up cases 689abbafa (215 passed). The operator's landing check flags its `Role: orchestrator` (no route for a CTO-applied (b) ACT): brought to the owner.
+  - (4) **`yes W2-37 CIT-P a25b02a7, version 1.1.0`:** the change skill's impact section approved, the version lines set to 1.1.0 by a short resume with a narrow check; then the CTO's hand merge with P-7 and a copies ACT.
+  - (5) **Message 5:** the owner's operator removes `permissions.additionalDirectories` (ACT-LEADS-ADD-DIR-1 §5 step 3), the process check clean.
+- **Basis:** the owner's message of 2026-11-13 (~13:50), its yes lines verbatim; `log/act-approvals.jsonl`.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15044,3 +15054,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.543 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1162 (W2-141 closed as built, switch-on parked; yes ACT-CLAUDE-COPIES-6). Next free id: DEC-1163. |
 | 0.544 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1163 (the morning of 11-13: the "until W2-56" line deleted; Node 22 nightly; W2-111 (a); go W2-33; three ACT yeses; the nightly's D, E, route; W2-37 F1 (a), P-1; W2-98 CIT-P; two ACTs; two corrections). Next free id: DEC-1164. |
 | 0.545 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1165 (gov context's ceiling: the close's packet at a project setting and the supplementary cap; W2-183 filed). DEC-1164 held (PROPOSED, the owner reading). Next free id: DEC-1166. |
+| 0.546 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1166 (three ACT yeses; W2-37's CIT-P at 1.1.0; message 5). Next free id: DEC-1167. |
