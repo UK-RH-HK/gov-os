@@ -38,3 +38,14 @@ PASS accepted. F1 is not acted on tonight: counting land.py and close_build.py i
 ```verdict
 {"kpis": [{"kpi": "nightly-beside-leads-check", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "out", "ordinary_work": "yes", "consequence": "other"}, {"id": "F4", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F5", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F6", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
 ```
+
+---
+
+# Follow-up: F5 fixed (rebuild jobs left out), with F2 of its check (test helpers' rebuilds) — narrow check `nightly-f5-check`, PASS
+
+- **The change (on 60917fb0d):** under `--beside-leads`, a dispatcher status job of kind "rebuild" is left out (a lead's or worker's store; a landing's or close's rebuild is classed landing or close and still counted), and so is a `gov rebuild` process outside the busy folders (a test helper's rebuild in a temporary project; F2 of the check, ridden along as the reviewer allowed). Four rehearsal cases added (each with and without the flag). Rehearsal with a planted memory file: 79 cases, 0 failures.
+- **The check (a fresh read-only independent auditor, Opus high, 2026-11-13 ~01:00):** the diff only that; no-flag behaviour unchanged; landings, closes and the merge queue still seen (their kinds, land_running, close_running, queue_busy, the run lock, the job scripts, CLOSE-RUNNING). Rows: F1 the integration store's refresh no longer waited for (it writes the standby half; the nightly reads the ready half; both share the heavy slots); F2 the temp rebuilds (fixed in this commit).
+
+```verdict
+{"kpis": [{"kpi": "nightly-f5-check", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
+```

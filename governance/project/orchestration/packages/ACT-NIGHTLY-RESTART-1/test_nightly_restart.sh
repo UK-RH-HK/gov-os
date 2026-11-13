@@ -85,6 +85,12 @@ reset; echo '[{"cmd": "python3 land.py W2-1=abc", "cwd": "/x"}, {"cmd": "python3
 out=$(qout --beside-leads); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "land.py" && ok "--beside-leads: a landing, the merge queue and a close are still busy" || bad "beside: land/queue/close ($rc: $out)"
 reset; sed -i 's/"land_running": false/"land_running": true/' "$ORCH/dispatch/status.json"; out=$(qout --beside-leads); rc=$?
 [ $rc -eq 1 ] && echo "$out" | grep -q "a landing runs" && ok "--beside-leads: a landing in the dispatcher's status is still busy" || bad "beside: status landing ($rc: $out)"
+reset; sed -i 's/"jobs": \[\]/"jobs": [{"kind": "rebuild", "name": "pid 1", "phase": "rebuild.lexical"}]/' "$ORCH/dispatch/status.json"; out=$(qout --beside-leads); rc=$?
+[ $rc -eq 0 ] && ok "--beside-leads: a worker's rebuild job in the status is left out (F5)" || bad "beside: rebuild job ($rc: $out)"
+out=$(qout); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "job rebuild" && ok "without the flag, a rebuild job is still busy" || bad "no flag: rebuild job ($rc: $out)"
+reset; echo '[{"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/tmp/pytest-of-usain/pytest-5/test_x0/proj"}]' > "$PROC"; out=$(qout --beside-leads); rc=$?
+[ $rc -eq 0 ] && ok "--beside-leads: a test helper's rebuild in a temporary project is left out (F2)" || bad "beside: temp rebuild ($rc: $out)"
+out=$(qout); rc=$?; [ $rc -eq 1 ] && echo "$out" | grep -q "a rebuild" && ok "without the flag, that rebuild is still busy" || bad "no flag: temp rebuild ($rc: $out)"
 reset; : > "$T/none"; out=$(qout --beside-leads); [ $? -eq 1 ] && ok "--beside-leads: the operator's commit freeze is still busy" || bad "beside: operator freeze"; rm -f "$T/none"
 reset; : > "$FIX/untracked.txt"; out=$(qout --beside-leads); [ $? -eq 1 ] && echo "$out" | grep -q "main tree is not clean" && ok "--beside-leads: a dirty main tree is still busy" || bad "beside: dirty tree ($out)"; rm -f "$FIX/untracked.txt"
 reset; sed -i 's/"time": "[^"]*"/"time": "2020-01-01 00:00:00"/' "$ORCH/dispatch/status.json"

@@ -8,7 +8,7 @@ nothing does. Standard library only.
                                      wrapper's own (its second look, just after it wrote the switch; the status is then not read)
 
 --beside-leads (DEC-1159 (1), the owner 2026-11-13: the nightly runs beside the leads, in its own capped unit): leads and
-their work are not "something else running": a running or launching lead, a lead's or slot's job, a heavy slot held, a
+their work are not "something else running": a running or launching lead, a lead's, slot's or rebuild job, a heavy slot held, a
 heavy step outside a slot, a process in a worktree or the runs folder, pytest, heavy_slot.sh, launch_worker.sh,
 launch_now.sh, rebuild_slot.sh, a rebuild lock, and the load are left out. Still counted: a landing, a close, the merge queue, an ACT,
 the operator's freeze, a memory measure, another nightly, the main tree (a merge, a change, a young head), the rg storm,
@@ -120,7 +120,7 @@ def process_reasons(beside=False):
         if why is None and not beside and (prog in ("pytest", "py.test") or module == "pytest"
                                            or script in ("pytest", "py.test")):
             why = "a test run: " + " ".join(argv[:4])[:100]
-        if why is None and ((module == "gov.cli.main" and "rebuild" in argv[1:8]) or (prog == "gov" and "rebuild" in argv[1:3])):
+        if why is None and not beside and ((module == "gov.cli.main" and "rebuild" in argv[1:8]) or (prog == "gov" and "rebuild" in argv[1:3])):   # --beside-leads: a test helper's rebuild in a temporary project is a lead's work (F2 of the F5 check); a landing's is named by the landing
             why = "a rebuild: " + " ".join(argv[:5])[:100]
         if why:
             out.append(f"{why} (pid {pid})" if pid else why)
@@ -144,7 +144,7 @@ def status_reasons(own_off=False, beside=False):
     if s.get("lead_count") and not beside:
         out.append(f"{s['lead_count']} lead(s) running: {', '.join(map(str, s.get('leads', [])))[:80]}")
     for j in s.get("jobs") or []:
-        if beside and j.get("kind") in ("lead", "slot"):
+        if beside and j.get("kind") in ("lead", "slot", "rebuild"):   # a rebuild job is a lead's or worker's store (F5); a landing's is named by land_running
             continue
         out.append(f"job {j.get('kind')} {j.get('name')} ({j.get('phase')})")
     for key, text in (("land_running", "a landing runs"), ("close_running", "a close runs"),
