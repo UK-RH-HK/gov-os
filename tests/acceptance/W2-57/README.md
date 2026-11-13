@@ -325,51 +325,73 @@ Cases: 20 in the full run, 1 in `breadth`, 0 in `lifted`.
 | S9: Then the orchestrator commits the removal of every load_sensitive entry this ticket makes unnecessary (DEC-861: a removal only shrinks the list... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone`, `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | the ticket's words |
 | F1: A rulesync or doctor timeout that skips or passes a case; a serial entry without its reason; a live or real-model file left in the close; a cas... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone`, `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | the ticket's words |
 
-## W2-111: the hook-latency case(s) time the hook's own work (DAEO-qvff; `Rewrite-Reason: DEC-979`)
+## W2-111: the hook-latency case(s) judge the hook's own work against a reference hook timed beside them (DAEO-qvff; `Rewrite-Reason: DEC-979`)
 
-`Rewrite-Reason: DEC-979` (the owner's D2 (a) on CAPACITY-1, P-LATENCY-1; DEC-906, DEC-968). Revised by a fresh
-independent test designer; the case ids, parameters and the bound are the same, nothing is skipped, marked or removed.
+`Rewrite-Reason: DEC-979` (the owner's D2 (a) on CAPACITY-1, P-LATENCY-1; DEC-906, DEC-968). Revised twice by fresh
+independent test designers (round 1 and round 2, 2026-11-13); the case ids, their parameters, the 100 ms bound at p95,
+the 3 warm-up calls, the 40 samples, the nearest-rank p95 and the three-round repeat are the same as before the
+revision; nothing is skipped, marked or removed.
 
-**What it measures.** `test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95` (one case): the CPU time of the hook and its children (the git that finds the files the branch changes, Policy 2 (c)) over one test designer's read on a branch with 120 changed files (`HookResult.cpu_seconds` through `run_hook`), p95 under 100 ms. The fixture check that the read takes Policy 2 (c)'s path is unchanged. This README's earlier note, "on a quiet machine a read took a median of 50 ms, p95 55 ms", is a wall-time figure of that day.
+**What it measures.** `test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95` (one case): the CPU time of the hook and its children for a test designer's read on a branch with 120 changed files (the git that finds the files the branch changes, Policy 2 (c): `HookResult.cpu_seconds`), less the median CPU time of a reference hook called just before each of the 40 timed reads, in the same round. The bound is 100 ms at p95. The measure is the owner's decision DEC-1163 (3) (P-W2-111-MEASURE-1 (a)).
 
-**Why wall time under load is not the measure.** A wall clock under load times the scheduler's queue, not the hook. On 2026-10-31 the 11 cases (then) were traced in
-three rounds, with W2-106 and without it: red 8, 0, 1 of 11 with it and 0, 0, 5 without, at loads of 15 to 30, with
-run times of 34 to 152 s, whatever the change; they pass alone on a quiet machine. The sample is therefore the CPU time
-(user and system) the hook's process and every process it waited for spent on the call, read from
-`resource.getrusage(resource.RUSAGE_CHILDREN)` before and after one synchronous call: the hook, its forked decision
-process and the git it runs are all counted; the time a process waits to be scheduled is not. The bound is unchanged
-(100 ms at p95, by nearest rank over 40 samples after 3 warm-up calls). The wall p95 is printed beside the CPU p95 in
-the failure message, for information only; it decides nothing.
+**What it counts, and what it does not.** It counts the CPU time (user and system) of the hook's process and of every
+process it waited for (its forked decision process, the git it runs), less one reference hook's. It leaves out, once per
+call, what any hook costs before it does anything of its own: a fresh interpreter's start and the read of the event
+(the reference hook's CPU time: about 15 ms on a quiet machine, about 21 ms with every CPU busy). **This lowers what is
+judged by that much** (accepted by the owner under DEC-906: DEC-1163 (3)): a hook that spends 100 ms of CPU in all, 85 ms of it its own, is judged at 85 ms and passes; the
+ceiling on a hook's total CPU time is about 115 ms quiet and 121 ms loaded. It was chosen over a form that leaves
+nothing out because no such form held its verdict under load (below). It does not see a hook that is slow only by
+waiting (a sleep, a lock, a network wait): that spends no CPU. It does not remove the effect of load on CPU time: with
+every CPU busy the same work costs about 1.4 times the CPU time (a busy sibling thread on the same core), so the judged
+figure of a case rises under load (a hook case of 25 ms quiet is judged at 45 to 57 ms at load 25 to 58); the verdict
+holds by its margin: the highest judged figure of the 15 cases at load 52 to 59 was 91 ms (the designer's read,
+W2-57), against the 100 ms bound, and a hook doing 150 ms of CPU of its own is judged at 173 to 326 ms at every load
+measured.
 
-*The rounds.* The "repeat up to three rounds, passing on the best" rule stays. It lowers nothing: it was there before,
-the bound is the same, and a hook that does 150 ms of its own work misses it in every round (the planted run: 3 of 3
-rounds over the bound in all 15 cases). CPU time is not free of noise (cache and frequency effects under load), so a
-round that a burst of contention inflates may still be repeated.
+**Why wall time under load is not the measure, and why CPU time alone was not.** A wall clock under load times the
+scheduler's queue, not the hook. On 2026-10-31 the 11 cases (then) were traced in three rounds, with W2-106 and without
+it: red 8, 0, 1 of 11 with it and 0, 0, 5 without, at loads of 15 to 30, with run times of 34 to 152 s, whatever the
+change; they pass alone on a quiet machine. Under load the p95 wall time of one call is 120 to 350 ms at load 25 to 58
+for a hook that takes 40 to 60 ms alone. Round 1 judged the CPU time alone (`RUSAGE_CHILDREN`); the CTO's benchmark
+(2026-11-13 06:36 to 07:20, load 20 and 50 and more) found it is not load-independent on this machine (an i7-12700F,
+20 logical CPUs, two threads per core): 3 of the 15 cases were red at both loads (CPU p95 100 to 186 ms, against 40 to
+60 ms quiet), because a CPU time counts time on a CPU, not work done, and the same work takes about 1.4 times as long on
+a core whose sibling thread is busy. The reference hook is timed in the same round, in the same CPU share (the same
+process, the call before the real one), so what load adds to a trivial hook's CPU time is taken off the real hook's.
+(A reference minimum or low percentile as a quiet baseline for a ratio form was measured and does not work: with every
+CPU busy the fastest of 60 reference calls is 1.35 to 1.8 times its quiet CPU time, so no quiet figure exists in a run
+that is loaded throughout.)
 
-*What this form does not see.* A hook that is slow only by waiting (a sleep, a lock, a network wait) spends no CPU and
-passes here; the case judges the work the hook does. A wait the hook causes is a product ticket's (the ticket's "Not
-here"), and the other candidate measure (wall time against a quiet reference measured beside it) was not chosen
-(DEC-1052; the lead's choice).
+**The reference hook.** A fresh interpreter (`sys.executable -c`) that reads the event on standard input and prints the
+"allow" answer, started as the hook is (a child process of the test), its CPU time read from `RUSAGE_CHILDREN` before
+and after. It is called once before each timed call and once after each warm-up call, so the 40 calls of a round have
+40 reference calls beside them. The round's figure is `p95(40 CPU times) - median(40 reference CPU times)`; the failure
+message prints the figure, the raw CPU p95, the reference median and the wall p95 of each round.
 
+**Measured figures.** Cells are the judged figure of the first round in ms (bold), then, in brackets, the raw CPU p95
+less the reference median that made it; a case that needed more rounds shows each, separated by semicolons. Judged
+figures under 100 pass. Provenance: the quiet, load 23 to 28 and load 52 to 59 columns come from an instrumented run
+of the same 15 cases (a scratch plugin outside the repository, `-p td_plugin2`, that times the reference hook before each
+call and applies the committed arithmetic; the three shards run together through the heavy slot, `taskset` to the slot's
+CPUs): quiet 2026-11-13 07:42, load 1.8 to 2.5; the load windows below. The committed code itself ran, through the heavy
+slot, at ambient load about 9 to 11 (2026-11-13 07:57, 15 passed in 43 s; judged 26 to 50 ms) and planted at ambient
+load about 5 to 9 (the "planted" column). The committed code was not run at load 23 to 28 or at
+52 and more (the four load windows were used on the measures above): the lead's driver (`-p td_plugin`, `TD_FIGURES`,
+`TD_PLANT_S`) is the run of the committed code at those loads. The load windows (the lead's `load_window.sh`, unpinned busy loops at nice 0;
+a window's loops end by themselves): window 1, N=22, 07:27 (the loops died with the Bash call that started them: no
+load was seen, no measure was made); window 2, N=56, 07:32 to 07:37 (experiments outside pytest); window 3, N=24, 07:44
+(load 20 at +72 s, shards of the real cases at `/proc/loadavg` 20.2 to 27.7); window 4, N=56, 07:49 (load 50.6 at
++121 s, real shards at 50.6 to 58.6, planted shards at 58.6 to 59.7).
 
-**Measured figures.**
-
-Measured 2026-11-12 to 2026-11-13, inside the launched sandbox, each run through the heavy slot (so on the slot's
-share of the CPUs; `taskset`), one round each (the first round passed in every case). The three real-hook runs of the 15
-cases: run A at 23:47 (`/proc/loadavg` 3.85 before, 4.05 after), run B at 00:00 (12.67 before, 10.64 after), run C at
-00:04 (9.85 before, 12.43 after); an earlier run at 23:43 (9.16, 4.93) also passed 15 of 15. Cells are CPU p95 / wall
-p95 in ms. Every real-hook case is under 100 ms in every run (the highest CPU p95 of the 15: 80 ms, W1-05
-`Read-engineer`, run C, load about 12). The planted run (below) ran at 23:48 to 23:59 (load 3.96 before, 15.41 after).
-The quiet-machine run and the load-50 run are not made here: the CTO runs them (the ticket's KPI line 2), and the
-figures of this section are not a claim about them.
-
-| case (parameter) | run A: CPU / wall p95 ms | run B | run C | planted 150 ms hook: CPU p95 ms | verdict |
+| case (parameter) | quiet (load 1.8 to 2.5) | load 23 to 28 | load 52 to 59 | planted 150 ms hook, committed code, ambient load 5 to 9, 3 rounds | planted 150 ms hook, load 52 to 59, 1 round of 8 calls |
 |---|---|---|---|---|---|
-| `the one case` | 75 / 72 | 62 / 60 | 68 / 65 | 251 to 261 (3 rounds) | fails |
+| `designer-read` | **49** (64 - 15) | **71** (93 - 22) | **91** (112 - 21); **92** (114 - 22); **87** (117 - 30) | 201 (217 - 16); 199 (215 - 16); 201 (217 - 16) | 239 (261 - 22) |
 
-**The planted hook.** A scratch harness (a pytest plugin outside the repository, passed with `-p`; nothing in a
-committed test carries a switch) ran the installed PreToolUse hook behind a launcher that busy-loops until its own
-`time.process_time()` reaches 0.150 s and then `exec`s the real hook, so the decision is the real one and only the
-latency changes. Every one of the 15 cases FAILED, each on the CPU-p95 assertion (`AssertionError: p95 CPU time ...`,
-all three rounds over the bound, CPU p95 196 to 262 ms; none on a decision assertion or a setup error). Log:
-`.gov-runtime/scratch/td/real-planted1.log` (figures `real-planted1.figs`).
+**The planted hook.** A scratch harness (a pytest plugin outside the repository, passed with `-p`; nothing in a committed
+test carries a switch, an environment variable or a hook) ran the installed PreToolUse hook behind a launcher that
+busy-loops until its own `time.process_time()` reaches 0.150 s and then `exec`s the real hook, so the decision is the
+real one and only the latency changes. Every case FAILED on the latency assertion (`AssertionError: p95 CPU time ...`),
+never on a decision assertion or a setup error: 1 of 1 at ambient load (judged figures 199 to 201 ms in every round), 1 of 1 at load 52 to 59 (judged 239 to 239 ms). A plant that is itself a CPU time is not divided by the load
+factor here (the reference is subtracted, not divided into it); a fixed-work plant (a loop calibrated to 150 ms of CPU
+quiet, 2.1 million iterations) costs 270 to 285 ms of CPU with every CPU busy, so it fails by more. Logs:
+`.gov-runtime/scratch/td/final-planted-amb.log` and `real2-w4-pl-{a,b,c}.log` (the figures beside them, `.figs`).
