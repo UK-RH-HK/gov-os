@@ -505,21 +505,18 @@ def fork(nine, name: str, retrieval: str | None = None) -> "Adoption":
 
 def retrieval_variant(kind: str) -> str:
     """The repository's ``retrieval.yaml`` (as Gov OS ships it) with one setting changed: ``pool-off``,
-    ``second-reranker`` or ``bundle-budget`` (the keys are ``fabric.STANDARD``'s names, I3)."""
+    ``second-reranker`` or ``bundle-budget``, in the keys the engineer named for each ``fabric.STANDARD`` setting (P-10,
+    P-W2-88-TD-1): pool off is ``pool: {meaning_uncut: false, ...}`` (the shipped block's other keys kept); a second
+    reranker is ``rerank: {service: private}`` (``rerank.service`` absent: ``shared``); another bundle budget is
+    ``bundle: {tokens: 4000}`` (``bundle.tokens`` absent: 6000). ``gov.config.loader`` refuses a top-level ``rerank`` or
+    ``bundle`` key today (``CONFIG_INVALID``): package P-W2-88-B-1; the plant is the one the seam states."""
     document = yaml.safe_load(RETRIEVAL_SRC.read_text(encoding="utf-8"))
     if kind == "pool-off":
-        document.pop("pool", None)
+        document["pool"] = {**document["pool"], "meaning_uncut": False}
     elif kind == "second-reranker":
-        document["reranker"] = "bge-reranker-v2-m3"
+        document["rerank"] = {"service": "private"}
     elif kind == "bundle-budget":
-        document["bundle_tokens"] = 4000
+        document["bundle"] = {"tokens": 4000}
     else:
         raise ValueError(kind)
     return yaml.safe_dump(document, sort_keys=False)
-
-
-def child_gov(adoption, script: str, *args):
-    """A suite program (``script``) run as a child in the adoption's project, with its environment."""
-    import subprocess
-    return subprocess.run([sys.executable, str(HERE / script), *map(str, args)], cwd=str(adoption.project),
-                          env=adoption.env(), capture_output=True, text=True, timeout=600, stdin=subprocess.DEVNULL)

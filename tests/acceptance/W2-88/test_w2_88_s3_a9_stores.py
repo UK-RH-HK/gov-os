@@ -81,25 +81,101 @@ def test_s3_a_store_the_path_map_calls_for_and_not_built_is_never_ok(worlds):
     W.assert_refused(run, "FABRIC_INCOMPLETE", "A9 with the code graph called for and not built")
 
 
-def test_s3_a_tracked_file_in_neither_list_makes_the_stage_not_ok(worlds):
-    """F2: a tracked file that no list holds. Planted after the real rebuild (``a9_drop_file.py``: its rows removed from the
-    lexical and semantic tables), so the file is judged, indexed nowhere and refused for no reason."""
-    nine = worlds.a9("a8-for-forks", run_a9=False)
-    nine.need_chain()
-    adoption = W.fork(nine, "fork-neither")
-    done = W.child_gov(adoption, "a9_drop_file.py", "docs/guide.md", "adopt", "--lite", "--stage", "A9", "--out",
-                       adoption.box.base / "neither-out", "--json", "--session", W.SESSION)
-    assert "invalid choice" not in done.stderr, "gov adopt --lite does not take --stage A9 on this head (argparse: invalid choice)"
-    planted = [line for line in done.stderr.splitlines() if line.startswith("planted:")]
-    assert planted and not planted[-1].endswith(" 0 rows"), f"the plant did not take (no row named docs/guide.md): {done.stderr[-400:]}"
-    run = W.S124.Run(("adopt", "A9"), done.returncode, done.stdout, done.stderr, 0.0)
-    W.assert_refused(run, "FABRIC_INCOMPLETE", "A9 with docs/guide.md in no list")
+# ---- F2, "a tracked file in neither list": the unit seam fabric.check_coverage(record, tracked) (P-4 (a), DEC-1157 (3)) ----
+#
+# ``record`` is the A9 record's data (``stores``: each ``{judged, indexed: [paths], refused: [{path, reason}], ...}``);
+# ``tracked`` any iterable of tracked paths. It returns None, or raises ``GovError("FABRIC_INCOMPLETE", ..., {"missing":
+# [<sorted paths>]})`` for a tracked file in neither the indexed nor the refused list of a store that judges it (the
+# lexical store judges every tracked file). The run-2 case that deleted store rows after a rebuild is replaced by these:
+# no store row is deleted anywhere.
+
+TRACKED = ("README.md", "docs/guide.md", "lib/util.py", "assets/logo.bin", "config/settings.env", "archive/old.md")
+LEFT_OUT = {"assets/logo.bin": "binary", "config/settings.env": "secrets"}
+
+
+def coverage_record(*, lexical_leaves_out=(), lexical_refuses=()):
+    """An A9 record's ``stores`` in which every store lists every tracked path (indexed, or refused with a reason of
+    I3's list and ``not-indexed``), so a store's own judging rule cannot leave a path out; ``lexical_leaves_out`` are removed
+    from the lexical store's two lists, ``lexical_refuses`` moved from its indexed list to its refused list."""
+    stores = {}
+    for name in W.STORES:
+        indexed, refused = [], []
+        for path in TRACKED:
+            if path in LEFT_OUT:
+                refused.append({"path": path, "reason": LEFT_OUT[path]})
+            elif name == "vectors" and path == "archive/old.md":
+                refused.append({"path": path, "reason": "not-embedded"})
+            elif name == "codegraph" and not path.endswith(".py"):
+                refused.append({"path": path, "reason": "unsupported-language"})
+            elif name == "lexical" and path in lexical_refuses:
+                refused.append({"path": path, "reason": "not-indexed"})
+            else:
+                indexed.append(path)
+        judged = len(indexed) + len(refused)                  # the store judged them all, whatever it then listed
+        if name == "lexical":
+            indexed = [p for p in indexed if p not in lexical_leaves_out]
+            refused = [r for r in refused if r["path"] not in lexical_leaves_out]
+        stores[name] = {"judged": judged, "indexed": indexed, "refused": refused, "chunks": 0,
+                        "vectors": 0, "nodes": 0, "edges": 0, "seconds": 0.0, "peak_rss_bytes": 0}
+    return {"stores": stores}
+
+
+def test_s3_f2_check_coverage_passes_a_record_that_leaves_no_tracked_path_out():
+    from gov.adopt import fabric
+    assert fabric.check_coverage(coverage_record(), TRACKED) is None, "a complete record: no refusal, and None"
+    assert fabric.check_coverage(coverage_record(), iter(TRACKED)) is None, "tracked is any iterable (a generator here)"
+
+
+@pytest.mark.parametrize("path", ["docs/guide.md", "lib/util.py"])
+def test_s3_f2_check_coverage_names_a_tracked_path_that_no_list_of_the_lexical_store_holds(path):
+    from gov.adopt import fabric
+    from gov.cli.errors import GovError
+    with pytest.raises(GovError) as raised:
+        fabric.check_coverage(coverage_record(lexical_leaves_out=(path,)), TRACKED)
+    assert raised.value.code == "FABRIC_INCOMPLETE", f"{raised.value.code} for a tracked file ({path}) in neither list"
+    assert raised.value.details.get("missing") == [path], f"details['missing'] is {raised.value.details.get('missing')!r}, not [{path!r}]"
+
+
+def test_s3_f2_check_coverage_lists_every_missing_path_sorted():
+    from gov.adopt import fabric
+    from gov.cli.errors import GovError
+    gone = ("lib/util.py", "README.md", "docs/guide.md")                  # left out in one order, tracked given in the reverse
+    with pytest.raises(GovError) as raised:
+        fabric.check_coverage(coverage_record(lexical_leaves_out=gone), iter(reversed(TRACKED)))
+    assert raised.value.code == "FABRIC_INCOMPLETE"
+    assert raised.value.details.get("missing") == sorted(gone), f"missing: {raised.value.details.get('missing')!r}"
+
+
+def test_s3_f2_a_path_named_in_the_refused_list_alone_is_covered():
+    """A path in a store's refused list with a reason (``not-indexed`` is the reason added for a namespace whose lexical
+    policy keeps it out) and in no indexed list is named, so it is no gap."""
+    from gov.adopt import fabric
+    assert fabric.check_coverage(coverage_record(lexical_refuses=("archive/old.md",)), TRACKED) is None
+
+
+def test_s3_f2_check_coverage_raises_for_a_store_that_was_not_built():
+    """A store the path map calls for and the stage did not build: the lexical store judges every tracked file, so one that
+    holds no list at all (an empty block, or no block) leaves every tracked path out."""
+    from gov.adopt import fabric
+    from gov.cli.errors import GovError
+    empty = coverage_record()
+    empty["stores"]["lexical"] = {"judged": 0, "indexed": [], "refused": []}
+    with pytest.raises(GovError) as raised:
+        fabric.check_coverage(empty, TRACKED)
+    assert raised.value.code == "FABRIC_INCOMPLETE"
+    assert raised.value.details.get("missing") == sorted(TRACKED), f"missing: {raised.value.details.get('missing')!r}"
+    absent = coverage_record()
+    del absent["stores"]["lexical"]
+    with pytest.raises(GovError) as raised:
+        fabric.check_coverage(absent, TRACKED)
+    assert raised.value.code == "FABRIC_INCOMPLETE", f"a record with no lexical store: {raised.value.code}"
 
 
 def test_s3_a_second_rebuild_waits_for_the_first_under_w2_76s_lock(worlds):
-    """While another process holds the machine's rebuild lock (W2-76's holder), A9 does not build beside it: it is still
-    waiting after 8 s with no record committed, and finishes ok once the lock is let go. (The ticket says the second is
-    "refused"; W2-76's code makes it wait, one after the other: README, package P-4.)"""
+    """S3's "refused by W2-76's lock" reads "never two at once" (P-4 (a), DEC-1157 (3)): while another process holds the
+    machine's rebuild lock (W2-76's holder), A9 does not build beside it, nor is it refused: it is still waiting after 8 s
+    with no record committed (``gov.rebuild.watch.take`` blocks), and finishes ok, one after the other, once the lock is
+    let go."""
     nine = worlds.a9("a8-for-forks", run_a9=False)
     nine.need_chain()
     adoption = W.fork(nine, "fork-lock")
