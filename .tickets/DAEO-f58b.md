@@ -27,6 +27,10 @@ allowed_paths:
 - docs/changes/W2-116-evidence.md
 - tests/unit/rebuild/test_w2_116*
 - tests/unit/launch/test_w2_116*
+- governance/project/rebuild.yaml  # S2, P-W2-116-S2-INTERFACE Q2 (b) (CTO, DEC-1157 (12)): this repository's integration_refresh line lands with the code that reads it
+- src/gov/retrieval/retrieve.py  # R2-F3, Q3 (a) (CTO): the continuation token carries the half it was made on (about 20 lines)
+- tests/unit/status/test_w2_116*
+- tests/unit/retrieval/test_w2_116*
 kpis:
   success:
   - '`gov rebuild --integration <branch>` keeps a store of that branch''s head in two detached worktrees outside the project, building into the one not in use and switching a link to it only when the build succeeded; a search during a build is answered from the ready one [DEC-963, DEC-983, DEC-982] Verify: the success-1 cases in tests/acceptance/W2-116/test_w2_116_double_buffer.py (the build in a detached worktree behind the link, the two halves alternating, a search during a build and a killed build answered from the ready half) pass [Verify clause added, DEC-1157 (12)]'
@@ -72,6 +76,22 @@ The owner's SMART-WORK-1 decision 2 (DEC-983): the designers' store (DEC-963, DE
 **DEC-1087 (3) placed here (CTO, 2026-11-06, delegated P3 on the scope):** the owner orders the refresh after every
 merge into integrate built, tested and reviewed before re-pin window 4, so the window puts it live. The worktrees get
 the integration store's path, so workers can search.
+- **S2's interface (pass 2b; P-W2-116-S2-INTERFACE Q1 (a), the CTO, DEC-1157 (12), 2026-11-13).** A product tick that
+  watches a configured verdict file; the nightly does not change.
+  - **Config** in `rebuild.yaml`: `integration_refresh: {branch, after_nightly: {verdict: <glob>, latest: "HH:MM"},
+    second: "HH:MM"}`.
+  - **Command:** `gov rebuild --integration <branch> --when-due`. It refreshes when a verdict file is newer than the
+    last scheduled refresh, when `latest` passes without one, or once `second` passes; otherwise it builds nothing and
+    says `not_due`.
+  - **Record:** each scheduled refresh writes `<link>.refresh.json`. Tests plant the clock with `GOV_NOW`.
+  - **Error:** a missing or invalid time refuses `REBUILD_CONFIG_INVALID`, naming the key.
+  - **`gov status`** gains an `integration_store` part: head, branch head, built time, age, `stale` and the stale
+    reason. **Stale:** the store's head is behind the branch, or it was built before the last time a refresh fell due.
+  - **This repository's values** (Q2 (b), in this ticket's paths): `branch: w2/integrate`, verdict glob
+    `.gov-runtime/scratch/orchestrator/log/nightly/*/run.txt`, `latest: "10:00"`, `second: "18:00"`.
+  - **Cron:** a line every 5 minutes, in window 4's ACT next to the hook (not this ticket).
+  - **R2-F3 (Q3 (a)):** the continuation token carries a mark of the half it was made on, checked when it is used
+    (`src/gov/retrieval/retrieve.py`).
 - **This pass builds S1, S3 (widened, below), S4 and S5, and the three failure lines.** S2's two daily times and
   `gov status` stay for the next pass. Until then the CTO's `store_refresh_daily.sh` runs as the backstop (DEC-1087
   (3)).
