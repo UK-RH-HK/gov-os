@@ -2,17 +2,25 @@
 type: probe
 task: DAEO-wi46
 reviewer_session: 94bd151d-d1d8-4871-8c76-aaa71f5fe88f
+narrow_check_session: b50d44f5-62fd-49c6-bb2b-ce325f70d477
 implementer_session: c373daad-ed0e-4f33-96ee-99c90f253460
+fix_implementer_session: ace0ce13-5ad5-4d78-94a7-3c20fea6e686
 reviewer_wrote_nothing: false
 commissioned_by: orchestrator
 judged_by: orchestrator
 judgement: fail
+narrow_check_judgement: pass
 probed_commit: c530a0a1a2365cff3ea136182a8c604ab6c8e1b6
+narrow_check_commit: f0259229e2b5eb386e8786588a1720ae7cd4b833
 ---
 
 # Probe record: W2-98 (DAEO-wi46), the spec-writing skill for product-spec: two review rounds (STANDARD)
 
 ## The lead's judgement
+
+**Then: pass on the narrow check (2026-11-13).** The owner chose option (a) below (P-W2-98-R2 (a)): one fix batch,
+then a narrow independent check of exactly that fix. The check passed on `f0259229e2b5`; see "Narrow independent
+check" at the end. Round 2's verdict stands as written; nothing below it is changed.
 
 **Fail, after the last round.** Round 2 found three findings that are in scope, reachable in ordinary work and fail
 open (F1-F3 below). They are near variants of round 1's F1 and F2, next to the forms that round's fix closed. The
@@ -92,3 +100,47 @@ Round 2 also found these sound:
 - **lead_verify at `384c92b8b429`:** 5140 tests; 3 failed, the same three copies-ACT cases.
 - **Validator:** `gov.check.skill_validator` on SKILL.md: `{"findings": []}`, exit 0.
 - **Copies:** `diff -r` of each `.rulesync` copy against the kernel source is empty. The adapter check reports only `GENERATED_DIFFERS` for the four `.claude/skills/spec-writing/` files.
+
+## Narrow independent check (head f0259229e2b5): PASS
+
+- **The owner's decision:** P-W2-98-R2 (a), 2026-11-13: one fix batch for round 2's F1-F3, then a narrow independent
+  check of exactly that fix (no third review round, DEC-1010).
+- **The fix, as described behaviours C1-C3** (DEC-136): a placeholder class (empty or no letter or digit; a lone
+  `<...>` slot; a deferral such as TBD, TBC, TODO or `to be <word>`; an absence word alone such as none, nobody, n/a)
+  refused in a KPI's behaviour and `Fails if:` text (C1) and in the owner, source and licence-or-recipe cells (C3, with
+  the "no licence found" forms); an unbulleted line under KPIs that starts with a KPI id refused, quoted (C2).
+  - Tests: `6a1290b8eb7d`, `9cf504f573df` (independent test designer, session `d32e0706-2007-4ab3-a739-af272ddecdad`):
+    `test_w2_98_review_r2.py`, 236 cases, 186 red at `c0f68478a` for the stated reasons, 50 controls green; merged in
+    `f0259229e2b5`.
+  - Code: `0b6d3e07746b` (product-spec, session `ace0ce13-5ad5-4d78-94a7-3c20fea6e686`, without reading the tests):
+    one `plain()` normalisation and one `is_placeholder()` test used for every text and cell, and a shape rule for a
+    KPI-id line; `spec-form.md` states both; the two `.rulesync` copies are byte copies.
+- **The check:** a fresh read-only session (independent-auditor, Opus, high; session
+  `b50d44f5-62fd-49c6-bb2b-ce325f70d477`) of `git diff c530a0a1a236 f0259229e2b5` on the skill folders and
+  `tests/acceptance/W2-98`. It probed in memory with bytecode writing off and wrote nothing (`git status` empty,
+  no `__pycache__`).
+  - All 29 round 2 reproductions of F1-F3 are refused, exit 1, no PASS.
+  - C1-C3 hold as a class: about 230 unplanted variants (case, punctuation, emphasis, backticks, brackets, other
+    `to be` phrases and slots, KPI-id shapes such as `K12:`, `K2 -`, tabs, `_K2_:`) are refused.
+  - Nothing broken: ordinary owners (`NASA data office`, `None Ltd`, `Na Li`), licences (`Unlicense`), sentences with
+    a placeholder word, `Kiosk`/`K8s` continuation lines, prose before the first KPI and `none` in privacy and
+    secrets pass; round 1's B1-B6 still hold.
+  - The tests test C1-C3, and the code passes them with no special case for the planted text.
+
+| Id | Observation | Ordinary work / consequence | Triage |
+|---|---|---|---|
+| N1 | Licence wordings outside C3's six forms pass: `licence not found`, `license unknown`, `not licensed`, `no licence stated` | yes / fails open; outside the stated class | Row |
+| N2 | A placeholder with extra words passes: `TBC by Friday`, `to be decided later`, `none yet`, `TBD (later)`; also quoted, struck-through or dotted forms (`"TBD"`, `~~TBD~~`, `T.B.D.`) | yes for the first group, no for the rest / fails open; outside the stated class (the whole text is matched, never a word in a sentence) | Row |
+| N3 | A KPI id after a heading or quote marker (`### K2: ...`, `> K2: ...`), `k2:` and `K 2:` are not refused | no / fails open | Row |
+| N4 | `K12 students see it too.` as a continuation, and an owner of just `Na` or `Nil`, are refused | yes, rare / other (fails closed) | Row |
+
+- **The lead's judgement: pass.** No finding is in the fix's scope with ordinary work and fail open; N1-N4 are rows
+  for a later wave (N1 and N2 widen the class beyond the owner's stated behaviours).
+- **Evidence at `f0259229e2b5`:**
+  - `gov accept W2-98`: 500 passed, 2 failed (success-6 and failure-5, the two `.claude` copy cases), 0 unmapped.
+  - lead_verify: 5644 tests, 5634 passed, 3 failed, 7 skipped. The three failures are the copies-ACT cases named
+    above (W2-98's `test_the_claude_copy_matches_the_kernel_source` and
+    `test_the_adapter_check_finds_no_generated_drift_in_the_real_skill`; W2-11's
+    `test_the_skill_carries_one_version_in_all_four_places[spec-writing]`, `tests/acceptance/W2-11/test_w2_11_skills.py:140`).
+  - The check's own suite run: 500 passed, 2 failed (the same two). Validator: `{"findings": []}`, exit 0. `diff -r`
+    of each `.rulesync` copy against the kernel source: empty.
