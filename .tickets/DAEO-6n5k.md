@@ -23,6 +23,12 @@ allowed_paths:
 - tests/unit/impact/**
 - template/governance/kernel/skills/change/SKILL.md
 - template/.rulesync/skills/change/SKILL.md
+- src/gov/check/commands.py  # P-7 (a), DEC-812 item 6: the RECORDED_GOV_COMMANDS line records `impact` only
+- tests/acceptance/W1-07/w1_07_support.py  # P-7 (a): W1-07's lists gain `impact`, by a test designer with a Rewrite-Reason
+- tests/acceptance/W1-07/test_w1_07_recorded_commands.py  # the same (its count test renamed)
+- tests/acceptance/W1-07/README.md  # the same
+- tests/acceptance/W1-32/test_w1_32_command_set.py  # P-7 (a): W1-32's command-set assertion gains `impact`
+- tests/conftest.py  # _CBM_SUITES gains W2-37 (its code-graph cases run with the tool on PATH), CTO, DEC-1156 (7)
 kpis:
   success:
   - '"What''s the impact of X?" in plain language runs gov impact [CAP-33.g, DEC-167]. Verify: a planted question "what is the impact of DEC-NNN?" given to the plain-language entry runs gov impact on DEC-NNN and prints its result [Verify clause added, DEC-1157 (12)]'
