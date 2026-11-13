@@ -108,9 +108,19 @@ OWN_PATH = {
 # ``.claude/hooks`` since ACT-GUARD-FIX-4: the settings' PreToolUse line runs
 # ``$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py``, so a project that copies the settings without it refuses every
 # call (D-4's red fix R-2, DEC-1061). In the project, ``role_reads`` finds no ``role_paths:`` and checks nothing.
-PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", SETTINGS_REL,
-                     "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
+# ``.claude/skills`` since W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a role file whose
+# ``- **Skills:**`` line names a skill that is not at ``.claude/skills/<name>/SKILL.md`` with a version; the kernel's
+# role files are copied, so the skills they name are too (the three vendored Superpowers skills take their version from
+# ``template/governance/kernel/skills/superpowers/vendored.yaml``, copied with the kernel template).
+PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", ".claude/skills",
+                     SETTINGS_REL, "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
                      ":(exclude)template/governance/kernel/vendor")
+# W2-60a (DAEO-cv58; P-8 (a)): gov launch refuses a model after ``--`` that is not the role file's (DEC-839 item 1).
+# The launch cases here hand a worker ``--model claude-opus-5-5`` after ``--``; the project's copies of the worker role
+# files say that model at effort high (the rest of each file, its version and skills lines included, is this
+# repository's). A live case still sets Haiku at effort low on its own copy (``set_live_launch_default``).
+FIXTURE_MODEL = "claude-opus-5-5"
+FIXTURE_LAUNCH_DEFAULT = f"- **Launch default:** model {FIXTURE_MODEL}, effort high"
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
@@ -180,6 +190,9 @@ def make_project(directory, root=REPO_ROOT):
             target = directory / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
+    for role in WORKER_ROLES:
+        if (directory / ROLES_REL / f"{role}.md").is_file():
+            set_live_launch_default(directory, role, FIXTURE_LAUNCH_DEFAULT)
     files = dict(PROJECT_FILES)
     tickets = check_support.default_tickets()
     tickets[f"{RESEARCH_TICKET}.md"] = check_support.ticket_text(
