@@ -186,6 +186,58 @@ def test_s2_a_blob_over_the_scan_limit_is_named_unscanned_and_the_run_is_not_ok(
     W.assert_state_equal(before, W.repo_state(root), "MA with a blob over the scan limit")
 
 
+# ---- L-1a (DEC-1052, the lead's stated interface): a binary over the chunker's limit is a blocker like a text file ----------
+
+def ma_plan(box, host, root, name):
+    """MA on ``root`` (gitleaks on PATH): ``(run, folder of the plan)``."""
+    out = box.base / name
+    run = W.run_adopt(root, W.env(box, host), "MA", "--out", str(out))
+    W.assert_offered(run, "MA")
+    W.assert_ok(run, f"MA on {name}")
+    return run, out / W.PLAN_DIR
+
+
+def test_s2_l1a_a_tracked_binary_over_the_limit_gets_the_over_limit_proposal_and_no_nothing_to_refactor(box, host):
+    """L-1a: MA on a repository whose only finding is one tracked binary of 2 MiB (``assets/big.bin``): the plan holds one
+    ``over-limit`` proposal, in the kernel ticket form citing the assessment, naming the binary and reaching it in its ``allowed_paths``
+    (exactly as for a text file over the limit); ``PLAN.md`` lists it; there is no ``NOTHING-TO-REFACTOR.md``."""
+    root = P.plant_with_binary(box.base, "plan-bin-over", 2 * (1 << 20))
+    run, folder = ma_plan(box, host, root, "plan-bin-over-out")
+    assert not (folder / "NOTHING-TO-REFACTOR.md").exists(), \
+        "NOTHING-TO-REFACTOR.md is written for a repository whose only finding is a 2 MiB binary"
+    files = P.plan_files(folder.parent)
+    assert sorted(files) == ["over-limit"] and len(files["over-limit"]) == 1, \
+        f"the plan holds {({k: len(v) for k, v in files.items()})}, not one over-limit proposal"
+    (path,) = files["over-limit"]
+    text = path.read_text(encoding="utf-8")
+    assert P.BINARY_REL in text, f"{path.name} does not name {P.BINARY_REL}"
+    head = P.split_frontmatter(text) or {}
+    assert P.covers(head.get("allowed_paths"), P.BINARY_REL), f"{path.name}: allowed_paths {head.get('allowed_paths')} reach no {P.BINARY_REL}"
+    digest = W.sha256_file(folder.parent / W.ASSESSMENT)
+    assert not P.ticket_problems(text, digest), f"{path.name}: {P.ticket_problems(text, digest)}"
+    plan = (folder / "PLAN.md").read_text(encoding="utf-8")
+    assert path.name in plan or path.stem in plan, f"PLAN.md does not list {path.name}"
+
+
+def test_s2_l1a_a_binary_at_or_under_the_limit_gets_no_proposal_and_one_byte_over_gets_one(box, host):
+    """L-1a, the edge, at the plan: a tracked binary of 4 KiB and one of exactly ``assess.FILE_LIMIT_BYTES`` get no proposal (a
+    repository whose only finding is such a binary has nothing to refactor, as today: ``NOTHING-TO-REFACTOR.md``, no ``RP-*``);
+    one of ``FILE_LIMIT_BYTES + 1`` gets one ``over-limit`` proposal naming it and no ``NOTHING-TO-REFACTOR.md``."""
+    limit, _ = W.limits()
+    for size, over in ((4096, False), (limit, False), (limit + 1, True)):
+        root = P.plant_with_binary(box.base, f"plan-bin-{size}", size)
+        run, folder = ma_plan(box, host, root, f"plan-bin-{size}-out")
+        proposals = sorted(p.name for p in folder.glob("RP-*"))
+        if over:
+            assert len(proposals) == 1 and "over-limit" in proposals[0], f"a binary of {size} B (one byte over the limit) got {proposals}"
+            assert P.BINARY_REL in (folder / proposals[0]).read_text(encoding="utf-8"), f"{proposals[0]} does not name {P.BINARY_REL}"
+            assert not (folder / "NOTHING-TO-REFACTOR.md").exists(), f"NOTHING-TO-REFACTOR.md for a binary of {size} B (over the limit)"
+        else:
+            assert not proposals, f"a binary of {size} B (at or under the limit {limit}) got proposals {proposals}"
+            assert (folder / "NOTHING-TO-REFACTOR.md").is_file(), \
+                f"no NOTHING-TO-REFACTOR.md for a repository whose only finding is a binary of {size} B: {sorted(p.name for p in folder.glob('*'))}"
+
+
 def test_s2_a_clean_repository_says_there_is_nothing_to_refactor(box, host):
     root = P.plant_clean(box.base)
     out = box.base / "clean-out"
