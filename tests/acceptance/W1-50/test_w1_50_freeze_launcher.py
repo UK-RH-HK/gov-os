@@ -245,6 +245,7 @@ def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(kernel_free
     sandbox = launch_support.cli_support.make_sandbox(tmp_path / "sandbox")
     support.w47.configure_stand_in(project, support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
     launch_support.write(project, f"{SCRATCH}/probe.sh", PROBE)
+    launch_support.set_live_launch_default(project, ENGINEER)
     runtime = project / support.RUNTIME_REL
     assert not os.path.lexists(runtime / FLAG_NAME) and not os.path.lexists(runtime / "s")
 
@@ -258,7 +259,7 @@ def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(kernel_free
     watcher.start()
     try:
         run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER], "--",
-                                     "-p", PROMPT, "--permission-mode", "acceptEdits", "--model", "haiku",
+                                     "-p", PROMPT, "--permission-mode", "acceptEdits",
                                      "--max-turns", "6", "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
     finally:
         stop.set()

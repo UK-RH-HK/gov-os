@@ -240,6 +240,7 @@ def test_a_flag_put_over_the_placeholder_during_a_command_stays(kernel_freeze_la
     sandbox = launch_support.cli_support.make_sandbox(tmp_path / "sandbox")
     support.w47.configure_stand_in(project, support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
     launch_support.write(project, f"{SCRATCH}/probe.sh", PROBE)
+    launch_support.set_live_launch_default(project, ENGINEER)
     flag = support.put_text(project, FLAG_AT_LAUNCH)          # a marked flag exists at launch: the settings name it
     new_flag = tmp_path / "the-flag-to-put"                   # on the project's file system: a rename, not a copy
     new_flag.write_bytes(FLAG_PUT_DURING_THE_COMMAND)
@@ -266,7 +267,7 @@ def test_a_flag_put_over_the_placeholder_during_a_command_stays(kernel_freeze_la
             # The stream of messages, so that a failure can say what the session's Bash call returned.
             run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER],
                                          "--", "-p", PROMPT, "--output-format", "stream-json", "--verbose",
-                                         "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "6",
+                                         "--permission-mode", "acceptEdits", "--max-turns", "6",
                                          "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
             time.sleep(1.0)   # what the end of the session does at the path is in the log too
         finally:
