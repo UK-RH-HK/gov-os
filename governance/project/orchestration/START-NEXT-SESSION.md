@@ -3,7 +3,7 @@
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`. The emergency
 of 2026-11-02 is lifted (DEC-1158): normal working, under DEC-1157's practices (§2). This file maps everything you
 need, in order. Where it and an older note differ, this file holds; DECISIONS-IN-FORCE, the register and the owner's
-word hold over both. **Next free id: DEC-1160.**
+word hold over both. **Next free id: DEC-1168** (DEC-1164 held: drafted, PROPOSED, the owner reading).
 
 ## 0. NOW: read CHECKPOINT's RESUME HERE first, then the 09:00 digest's items
 - **The current state** (leads running, the queue, what is in flight, what to record next) is in

@@ -24,7 +24,6 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the 
 - Build each worker's brief with `gov context {ID} --role <the worker's role>` ({CMD:context}), outside the sandbox [DEC-1065].
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
-- Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
 - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
 - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
 

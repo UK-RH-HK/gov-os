@@ -3,6 +3,7 @@ type: probe
 task: DAEO-lrre
 reviewer_session: bf9dae7f-1b6d-4e7e-80bf-517a182f778a
 narrow_check_session: df3266a7-78dc-4a12-a435-1990cc97d20c
+implementer_session: 3ab69be5-e7a0-44ac-a4be-2f8f6b384243
 implementer_sessions: [3ab69be5-e7a0-44ac-a4be-2f8f6b384243, 1ddf88ff-eaff-47e5-8712-3e229e6e9d82]
 fix_session: ps-4 (product-spec, commit c4b977161)
 test_designer_sessions: [89acd12a (td-1), cb31b557 (td-2), 47dc5eaf-eca2-4a04-8ddc-43beab668764 (td-3, W1-35 revision)]

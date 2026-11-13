@@ -80,6 +80,10 @@ TIMEOUT_S = int(E("DISPATCH_TIMEOUT_S", "60"))
 SLOTS = [Path(f"/tmp/gov-os-heavy-slot-{n}.lock") for n in (1, 2, 3)]
 SLOT_GLOB = E("DISPATCH_SLOT_GLOB", "/tmp/gov-os-heavy-slot-*.lock")  # the slot-progress pass (DEC-1015 item 2)
 PROC = Path(E("DISPATCH_PROC", "/proc"))  # the process table that pass reads; a planted one in the tests
+# ACT-DISPATCH-NIGHTLY-SLOT-1 (incident 2026-11-13-0456): the nightly's run folder (nightly.sh's RUNS: its clones) and
+# how fresh its marker must be to count (nightly.sh's own rule for another nightly's marker: under 360 minutes)
+NIGHTLY_RUNS = E("DISPATCH_NIGHTLY_RUNS", "/home/usain/gov-os-runs/W2-00/nightly")
+NIGHTLY_FRESH_S = 360 * 60
 EMBED_URL = "http://127.0.0.1:11434/api/embed"
 RUN_LOCK = ORCH / "merge-queue" / "run.lock"
 MARKER = 'GOV_ROLE":"orchestrator","GOV_TICKET'  # the launch form's identity, as gate_check.py counts leads
@@ -725,13 +729,59 @@ def tree_rss(facts, root):
 
 
 def in_slot(facts, f):
-    """Whether a process runs under a heavy-job slot (an ancestor's arguments name a gov-os-heavy-slot lock)."""
+    """Whether a process runs under a heavy-job slot (an ancestor's arguments name a gov-os-heavy-slot lock), or is the
+    nightly's own run under the slots the nightly holds itself (`nightly_in_slot`)."""
     by_pid = {x["pid"]: x for x in facts}
     seen, cur = set(), f
     while cur and cur["pid"] not in seen:
         seen.add(cur["pid"])
         if any("gov-os-heavy-slot" in a or a.endswith("heavy_slot.sh") or a.endswith("rebuild_slot.sh")
                or a.endswith("verify_lock.sh") for a in cur["argv"]):
+            return True
+        cur = by_pid.get(cur["ppid"])
+    return nightly_in_slot(by_pid, f)
+
+
+def holds_slot_lock(pid):
+    """Whether the process holds a heavy-slot lock on a descriptor of its own, nightly.sh's form (DEC-984: `exec
+    {fd}>/tmp/gov-os-heavy-slot-<n>.lock; flock fd`): one of its fds names a slot file (SLOT_GLOB) and that fd's
+    fdinfo carries an exclusive flock line. The lock table names the `flock` program that took the lock, gone by then
+    (or hides the line), so the holder is read from its descriptors."""
+    slots = set(glob.glob(SLOT_GLOB))
+    fds = PROC / str(pid) / "fd"
+    try:
+        names = os.listdir(fds)
+    except OSError:
+        return False
+    for n in names:
+        try:
+            if os.readlink(fds / n) not in slots:
+                continue
+            info = (PROC / str(pid) / "fdinfo" / n).read_text()
+        except OSError:
+            continue
+        if any(line.startswith("lock:") and " FLOCK " in line and " WRITE " in line for line in info.splitlines()):
+            return True
+    return False
+
+
+def nightly_in_slot(by_pid, f):
+    """ACT-DISPATCH-NIGHTLY-SLOT-1 (incident 2026-11-13-0456): nightly.sh holds the heavy slots by flock on its own
+    descriptors (DEC-984), not through heavy_slot.sh, so its suite run counts as in a slot only when all three hold:
+    the process works in a clone under the nightly's run folder (NIGHTLY_RUNS/<stamp>), ORCH/NIGHTLY-RUNNING is under
+    NIGHTLY_FRESH_S old, and an ancestor is nightly.sh holding a heavy-slot lock (`holds_slot_lock`). Anything else,
+    and a nightly that holds no slot, stays outside."""
+    if not os.path.normpath(f.get("cwd") or "/").startswith(os.path.normpath(NIGHTLY_RUNS) + "/"):
+        return False
+    try:
+        if now() - (ORCH / "NIGHTLY-RUNNING").stat().st_mtime >= NIGHTLY_FRESH_S:
+            return False
+    except OSError:
+        return False
+    seen, cur = {f["pid"]}, by_pid.get(f["ppid"])
+    while cur and cur["pid"] not in seen:
+        seen.add(cur["pid"])
+        if any(re.search(r"/nightly/nightly\.sh$", a) for a in cur["argv"][:3]) and holds_slot_lock(cur["pid"]):
             return True
         cur = by_pid.get(cur["ppid"])
     return False

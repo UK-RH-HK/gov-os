@@ -719,22 +719,6 @@ gov rebuild       # derived state
 
 ## 12. Change log
 
-### DEC-1163 — The morning of 2026-11-13: the "until W2-56" line deleted; the nightly on Node 22; W2-111's measure (a); go W2-33; the three ACTs; the nightly's D, E and route; W2-37 F1 (a); W2-98's CIT-P; two ACTs; two corrections
-- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~10:30-11:15; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1157, DEC-1156 (7), DEC-1159, DEC-1160, DEC-1161, DEC-1162, DEC-906, DEC-979, DEC-105, DEC-1052
-- **Decision:**
-  - (1) **The "until W2-56" line deleted** (W2-56 closed 1c02c490f; `gov brief` refused every lead brief UNTIL_CLOSED W2-56): the owner approved the bytes `role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb` (template/governance/kernel/templates/role-lead.md, role-cto.md, template/.rulesync/subagents/orchestrator.md), committed b88a76172; the four generated copies (.claude/templates/role-lead.md, role-cto.md, .rulesync/subagents/orchestrator.md, .claude/agents/orchestrator.md) by ACT-CLAUDE-COPIES-8 after its review. The owner: "This should have been P1 number one."
-  - (2) **`yes NIGHTLY-NODE22 bdfdc24b`:** the nightly wrappers' PATH on Node 22.23.3 and nightly_alone.py's class-id fix, an amendment of ACT-NIGHTLY-RESTART-1 (class (b)); applied 8f68e0c7c.
-  - (3) **P-W2-111-MEASURE-1 (a):** W2-111's cases judge the round's CPU p95 of the hook and its children minus the median CPU of a stub hook timed beside each call, at the same 100 ms (form B, a5bf1c0131b8); the start-up cost left out (~16-21 ms) is accepted under DEC-906.
-  - (4) **`go W2-33`:** merged by hand (f6163461e) with the template commit (d172bc71f); ACT-CLAUDE-COPIES-6 by the owner's operator.
-  - (5) **`yes ACT-OPERATOR-HOURS-3 716da9dc`** (Part B by the owner's operator first, then Part A by the CTO); **`yes ACT-W2-148-S15-1 a3df8ff6`** (after HOURS-3 Part B); **`yes ACT-LEADS-ADD-DIR-1 1781a708`** (the handover, DEC-1161 (2)).
-  - (6) **The nightly of 11-13 (P1-6):** D (a): W2-136's S10 allows `src/gov/session_watch` (W2-159's S5 holds); E (a): adopted projects get the context watch (`template/.rulesync/hooks.jsonc` gains `context_watch.py`, W2-23 S6 says 7 hooks); the route (a): one small gap ticket for the drift reds (B: W1-32's command list; C: W1-18 and W2-123 expect REBUILD_FAILED; R: W2-121 S1's race; D's and E's case edits), test designer only, a narrow check, a land.
-  - (7) **W2-37 (P1-8):** F1 (a): G-24's "no record names the item" counts the store's stated links, in this ticket; P-1 as stated: W2-37's paths gain `template/governance/kernel/skills/change/SKILL.md` and `template/.rulesync/skills/change/SKILL.md` (a CIT-P for the owner's approval of those kernel bytes; the root .rulesync and .claude copies by a copies ACT), then a resume and a narrow check.
-  - (8) **W2-98's CIT-P approved at 3a86f11c3981**; then ACT-CLAUDE-COPIES-7 and the hand merge, as W2-33. W2-88a's two sections: the owner approves after reading their text.
-  - (9) **Yes to two ACTs:** the sandbox's write to `~/.cache/gov-os` (sandboxed workers' unranked searches) and the dispatcher's outside-slot check reading the nightly's slot locks as in-slot (each built, reviewed and brought with its yes line). The CTO brings the DIF sweep's supersede entry, and gov context's ceiling as a full package before any close refuses on it.
-  - (10) **Corrections:** W2-113's PKG-2 was decided (b) on 11-12 (S2 and F2 into W2-33, no child ticket); ACT-EXAMIN-WRITERS-INSTALL-1 was applied on 11-12 (ba27e4c0d), so W2-15a, W2-93 and W2-94 wait only on the walled-route wording, which the CTO brings now.
-  - (11) For each by-hand step (HOURS-3 Part B, S15-1, COPIES-6, the handover's), the CTO gives the owner's operator's exact message, in order.
-- **Basis:** the owner's message of 2026-11-13 (~10:30) and "W2-56 UNTIL deletion approved: role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb" (~11:05).
-
 | Version | Date | Change |
 |---|---|---|
 | 0.12 | 2026-09-30 | DEC-078 (scale probes, RAM correction, envelope), DEC-079 (GitHub remote), DEC-080 (retrieval completeness all in W1), DEC-081 (how S1 runs), DEC-082 (how S1-A runs); DEC-077 DONE. |
@@ -14937,6 +14921,52 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **`yes ACT-CLAUDE-COPIES-6 85c9b1c7`** (W2-33's generated copies; review PASS, `acts/ACT-CLAUDE-COPIES-6/review.md`): applied by hand by the owner's operator (`Role: owner`, the package's §4), as COPIES-4 and -5, after the CTO's hand merge of W2-33 and its template commit, so W2-33 lands tonight.
 - **Basis:** the owner's message of 2026-11-13 ~02:20.
 
+### DEC-1163 — The morning of 2026-11-13: the "until W2-56" line deleted; the nightly on Node 22; W2-111's measure (a); go W2-33; the three ACTs; the nightly's D, E and route; W2-37 F1 (a); W2-98's CIT-P; two ACTs; two corrections
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~10:30-11:15; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1157, DEC-1156 (7), DEC-1159, DEC-1160, DEC-1161, DEC-1162, DEC-906, DEC-979, DEC-105, DEC-1052
+- **Decision:**
+  - (1) **The "until W2-56" line deleted** (W2-56 closed 1c02c490f; `gov brief` refused every lead brief UNTIL_CLOSED W2-56): the owner approved the bytes `role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb` (template/governance/kernel/templates/role-lead.md, role-cto.md, template/.rulesync/subagents/orchestrator.md), committed b88a76172 (the owner's exception (a) to the control-path rule, COPIES-8's review covers it); the four generated copies (.claude/templates/role-lead.md, role-cto.md, .rulesync/subagents/orchestrator.md, .claude/agents/orchestrator.md) by ACT-CLAUDE-COPIES-8 after its review. The owner: "This should have been P1 number one."
+  - (2) **`yes NIGHTLY-NODE22 bdfdc24b`:** the nightly wrappers' PATH on Node 22.23.3 and nightly_alone.py's class-id fix, an amendment of ACT-NIGHTLY-RESTART-1 (class (b)); applied 8f68e0c7c.
+  - (3) **P-W2-111-MEASURE-1 (a):** W2-111's cases judge the round's CPU p95 of the hook and its children minus the median CPU of a stub hook timed beside each call, at the same 100 ms (form B, a5bf1c0131b8); the start-up cost left out (~16-21 ms) is accepted under DEC-906.
+  - (4) **`go W2-33`:** merged by hand (f6163461e) with the template commit (d172bc71f); ACT-CLAUDE-COPIES-6 by the owner's operator.
+  - (5) **`yes ACT-OPERATOR-HOURS-3 716da9dc`** (Part B by the owner's operator first, then Part A by the CTO); **`yes ACT-W2-148-S15-1 a3df8ff6`** (after HOURS-3 Part B); **`yes ACT-LEADS-ADD-DIR-1 1781a708`** (the handover, DEC-1161 (2)).
+  - (6) **The nightly of 11-13 (P1-6):** D (a): W2-136's S10 allows `src/gov/session_watch` (W2-159's S5 holds); E (a): adopted projects get the context watch (`template/.rulesync/hooks.jsonc` gains `context_watch.py`, W2-23 S6 says 7 hooks); the route (a): one small gap ticket for the drift reds (B: W1-32's command list; C: W1-18 and W2-123 expect REBUILD_FAILED; R: W2-121 S1's race; D's and E's case edits), test designer only, a narrow check, a land.
+  - (7) **W2-37 (P1-8):** F1 (a): G-24's "no record names the item" counts the store's stated links, in this ticket; P-1 as stated: W2-37's paths gain `template/governance/kernel/skills/change/SKILL.md` and `template/.rulesync/skills/change/SKILL.md` (a CIT-P for the owner's approval of those kernel bytes; the root .rulesync and .claude copies by a copies ACT), then a resume and a narrow check.
+  - (8) **W2-98's CIT-P approved at 3a86f11c3981**; then ACT-CLAUDE-COPIES-7 and the hand merge, as W2-33. W2-88a's two sections: the owner approves after reading their text.
+  - (9) **Yes to two ACTs:** the sandbox's write to `~/.cache/gov-os` (sandboxed workers' unranked searches) and the dispatcher's outside-slot check reading the nightly's slot locks as in-slot (each built, reviewed and brought with its yes line). The CTO brings the DIF sweep's supersede entry, and gov context's ceiling as a full package before any close refuses on it.
+  - (10) **Corrections:** W2-113's PKG-2 was decided (b) on 11-12 (S2 and F2 into W2-33, no child ticket); ACT-EXAMIN-WRITERS-INSTALL-1 was applied on 11-12 (ba27e4c0d), so W2-15a, W2-93 and W2-94 wait only on the walled-route wording, which the CTO brings now.
+  - (11) For each by-hand step (HOURS-3 Part B, S15-1, COPIES-6, the handover's), the CTO gives the owner's operator's exact message, in order.
+- **Basis:** the owner's message of 2026-11-13 (~10:30) and "W2-56 UNTIL deletion approved: role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb" (~11:05).
+
+### DEC-1165 — gov context's ceiling: the close's packet at a project setting, and the supplementary cap; W2-183 filed
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 is held: drafted, PROPOSED, waiting for the owner's reading
+- **Decision:** of the two scopes brought for gov context's ceiling (DEC-1027 H refuses most tickets: W2-88 at 56,284 tokens against 6,000; every lead works round it with `--budget`), the owner chose **"add the supplementary cap"**, and a ticket filed for it (W2-183, `DAEO-href`):
+  - (1) `gov close` builds its context packet at a project setting, `budgets.close_context_tokens` in `governance/project/facts.yaml` (65536 here; corrected 13:25 from `context.close_tokens`: the kernel's facts schema admits no new top-level key, `budgets:` admits it), so closes stop refusing on the ceiling; with no setting, the default of 6,000 applies.
+  - (2) Every packet carries at most 6,000 tokens of supplementary context above its mandatory part, whatever `--budget` a lead passes.
+  - (3) The mandatory part is never shortened (CAP-15.d); a ticket whose mandatory part alone passes its ceiling (W2-88's, about 61,500) still needs its text trimmed, which this does not do.
+- **Basis:** the owner's message of 2026-11-13 (~12:40): "The context ceiling: add the supplementary cap; file it."; the two scopes as brought at ~12:02.
+
+### DEC-1166 — Three ACT yeses (COPIES-8, COPIES-7, the dispatcher's nightly slot); W2-37's CIT-P approved at version 1.1.0; message 5 run
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~13:50; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1163 (1), (7), (8), (9), DEC-1161 (2), DEC-1104, CAP-33
+- **Decision:**
+  - (1) **`yes ACT-CLAUDE-COPIES-8 e2fc9815`:** the "until W2-56" line deleted from the four generated copies; queued for the operator agent 13:53.
+  - (2) **`yes ACT-CLAUDE-COPIES-7 78de1c5f`:** W2-98's spec-writing skill copies, after the CTO's hand merge of W2-98; then W2-98 closes.
+  - (3) **`yes ACT-DISPATCH-NIGHTLY-SLOT-1 9ff4f275`:** applied by the CTO (class (b), the package's route) 7cc654e49, follow-up cases 689abbafa (215 passed). The operator's landing check flags its `Role: orchestrator` (no route for a CTO-applied (b) ACT): brought to the owner.
+  - (4) **`yes W2-37 CIT-P a25b02a7, version 1.1.0`:** the change skill's impact section approved, the version lines set to 1.1.0 by a short resume with a narrow check; then the CTO's hand merge with P-7 and a copies ACT.
+  - (5) **Message 5:** the owner's operator removes `permissions.additionalDirectories` (ACT-LEADS-ADD-DIR-1 §5 step 3), the process check clean.
+- **Basis:** the owner's message of 2026-11-13 (~13:50), its yes lines verbatim; `log/act-approvals.jsonl`.
+
+### DEC-1167 — The afternoon of 2026-11-13: W2-88 RV2-1 (a); W2-60a P-5 (B) and W2-184; the 18-November cuts; W2-182 E (1) and W2-185; 7cc654e49 accepted; W2-111 (a)+(c); SANDBOX-1 (b)
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~14:45; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1010, DEC-946 (7), DEC-974, DEC-1126 (3), DEC-1120, DEC-1163 (3), (6), (9), DEC-1104, DEC-1128 (4), DEC-158, DEC-1064 (2), DEC-836 (2), DEC-105 · DEC-1164 still held (the owner reading)
+- **Decision:**
+  - (1) **P1-W2-88-RV2-1 (a):** A9's undo is fixed in W2-88 (`fabric.py` only): it unstages and deletes only what it wrote, and refuses without resetting if HEAD moved; RV2-2 with it; a narrow independent check, no third review round; then the land.
+  - (2) **P1-W2-60a-P5 (B):** W2-60a lands its reviewed scope (the merge, S12, P-3; its S3, S4, S8 and S10 back to their DEC-839 forms; S11 and F4 out); RUBRIC-2's lines move to a follow-up, **W2-184 (`DAEO-6f0s`), filed**; DEC-1126 (3)'s "apply now" becomes "after the copy starts"; W2-184 is no W2-27 gate (the copy's launches use each role's `Launch default` line).
+  - (3) **The 18-November cuts (DEC-946 (7)):** W2-60b, W2-156, W2-93, W2-94 and W2-174 are off W2-27's start: W2-94, W2-174 and W2-93 move to W2-28's deps, W2-156 to W2-29's, W2-60b to after the copy starts. **Correction:** W2-93's and W2-94's walled writers delivered on 11-12 (60 and 20 questions; EXAMIN's visible half released and confirmed, DEC-1152): the CTO brings what each still lacks and closes both in parallel.
+  - (4) **P-W2-182-E-1 (1):** E's template line (f0cb5284d) is reverted, B, C, R, D and F land on a narrow check of the revert; E goes to one gap ticket, **W2-185 (`DAEO-qyt2`), filed**: the line, W1-38's fixture with seven hooks, portability's lift exemption per hook.
+  - (5) **"accept 7cc654e49":** ACT-DISPATCH-NIGHTLY-SLOT-1's commit stands as is (`Role: orchestrator`); the CTO brings soon the landing check's route for the CTO's (b) ACTs (`Role: orchestrator` with `Act:` and the approvals log entry), so they stop needing the owner's operator.
+  - (6) **P-W2-111-MEASURE-1 round 2 (a)+(c):** W2-111 lands form B as decided; the ticket speeding up the guard's designer-read path is filed after EXAMIN's copy starts.
+  - (7) **SANDBOX-1 (b):** the sandbox stays (DEC-1128 (4)); B1 (briefs, facts and the pytest line name the session's `$TMPDIR`; workers' search through their lead, R4), B2 (DEC-1163 (9)'s cache ACT **withdrawn**, and the one-line fix so the reranker's log names the true cause, the socket's EPERM), B3 (probe R1, a loopback route) now; B4 only on B3's evidence (then a ticket and an amendment of DEC-158 for the owner); B5 (W3-P29's premise re-stated, the stale `.git/config.lock` sweep). The correction of CLAUDE.md's guard sentence comes by its route.
+- **Basis:** the owner's message of 2026-11-13 (~14:45).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15035,3 +15065,6 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.542 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1161 (P-W2-98-R2 (a); W2-60a P-1 (A) at the morning handover). Next free id: DEC-1162. |
 | 0.543 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1162 (W2-141 closed as built, switch-on parked; yes ACT-CLAUDE-COPIES-6). Next free id: DEC-1163. |
 | 0.544 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1163 (the morning of 11-13: the "until W2-56" line deleted; Node 22 nightly; W2-111 (a); go W2-33; three ACT yeses; the nightly's D, E, route; W2-37 F1 (a), P-1; W2-98 CIT-P; two ACTs; two corrections). Next free id: DEC-1164. |
+| 0.545 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1165 (gov context's ceiling: the close's packet at a project setting and the supplementary cap; W2-183 filed). DEC-1164 held (PROPOSED, the owner reading). Next free id: DEC-1166. |
+| 0.546 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1166 (three ACT yeses; W2-37's CIT-P at 1.1.0; message 5). Next free id: DEC-1167. |
+| 0.547 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1167 (W2-88 RV2-1 (a); W2-60a P-5 (B), W2-184; the cuts; W2-182 E (1), W2-185; 7cc654e49 accepted; W2-111 (a)+(c); SANDBOX-1 (b)). Next free id: DEC-1168. |
