@@ -174,7 +174,7 @@ command with `GOV_NOW` moved on; the status cases plant `GOV_NOW` and the times 
 `written_at`, in the UTC offset where the real clock reads about 12:00 (so no planted time crosses a midnight of the wall
 clock `GOV_NOW`'s offset states).
 
-### Map (KPI line S2 and R2-F3)
+### Map (KPI line S2)
 
 | KPI | Tests (node ids) | Expected red reason (old code) |
 |---|---|---|
@@ -187,8 +187,13 @@ clock `GOV_NOW`'s offset states).
 | S2: scope of `--when-due`, plain refresh, failed refresh | `test_w2_116_s2_config.py::test_s2_failure_when_due_is_only_valid_with_integration` (red: argparse's usage error, not `REBUILD_FAILED`), `::test_s2_failure_a_plain_refresh_leaves_the_record_as_it_was`, `::test_s2_failure_a_failed_refresh_refuses_and_leaves_the_record_so_the_next_tick_is_due_again` (red: first tick unknown option), `::test_s2_failure_the_times_are_not_read_without_when_due_and_no_record_is_written` (**green on the old code, a guard**: a plain refresh already ignores the times and writes no record; it must not start to) | as above |
 | S2: `gov status` head, age, stale | `test_w2_116_s2_status.py::test_s2_success_status_names_the_integration_store_s_head_and_age_and_a_fresh_store_is_not_stale`, `::test_s2_success_a_store_behind_the_branch_is_stale_and_the_reason_names_both_heads`, `::test_s2_success_a_store_built_before_latest_fell_due_is_stale_and_the_reason_names_the_time`, `::test_s2_success_a_store_built_before_a_verdict_file_is_stale`, `::test_s2_success_a_latest_that_a_verdict_already_answered_does_not_make_the_store_stale` | no `integration_store` part in `result` (the first case also fails earlier at its `--when-due` tick) |
 | S2: unread parts, exit 0 | `test_w2_116_s2_status.py::test_s2_failure_no_store_configured_or_no_link_gives_an_unread_part_and_status_still_exits_0`, `::test_s2_failure_without_a_refresh_configuration_the_store_is_named_and_the_stale_judgement_is_unread`, `::test_s2_failure_an_invalid_time_leaves_the_stale_judgement_unread_naming_the_key` | no `integration_store` part |
-| R2-F3: token and the half | `test_w2_116_r2f3_continuation.py::test_r2f3_a_token_made_on_one_folder_is_refused_on_another_at_the_same_commit`, `::test_r2f3_a_token_made_through_the_link_is_refused_once_the_link_points_at_the_other_half`, `::test_r2f3_a_token_made_through_the_link_is_refused_on_the_other_half_used_directly` | the token is accepted on the other folder at the same commit (`ok: true`, exit 0) |
-| R2-F3: guard | `test_w2_116_r2f3_continuation.py::test_r2f3_guard_a_token_used_on_the_folder_it_was_made_on_pages` | **green on the old code, a guard** |
+
+### The ride-along: the continuation token carries the half (not a KPI line)
+
+| Ride-along | Test (node id) | Expected red reason (old code) |
+|---|---|---|
+| token and the half | `test_w2_116_r2f3_continuation.py::test_r2f3_a_token_made_on_one_folder_is_refused_on_another_at_the_same_commit`, `::test_r2f3_a_token_made_through_the_link_is_refused_once_the_link_points_at_the_other_half`, `::test_r2f3_a_token_made_through_the_link_is_refused_on_the_other_half_used_directly` | the token is accepted on the other folder at the same commit (`ok: true`, exit 0) |
+| guard | `test_w2_116_r2f3_continuation.py::test_r2f3_guard_a_token_used_on_the_folder_it_was_made_on_pages` | **green on the old code, a guard** |
 
 ### Red record (old code, `w2/W2-116-tests` at e51b1fdf6, through the heavy slot): 40 cases, 38 failed, 2 passed
 
