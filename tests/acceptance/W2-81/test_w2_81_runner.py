@@ -441,3 +441,142 @@ def test_a_hidden_forbidden_citation_with_a_mistyped_fact_is_refused(ready_run, 
     assert code == 2, (code, out, err)
     assert err.startswith(f"refused: {data['questions'][2]['id']}: "), err
     assert "stael" not in out + err
+
+
+# --------------------------------------------------------------------------
+# W2-93 (DEC-1144 (6)): --sets-root <root>, the hidden half found under the evaluation sets' root
+# --------------------------------------------------------------------------
+
+REL = runner.HIDDEN_UNDER_SETS_ROOT
+
+
+def _sets_root(tmp_path, source=None, name="sets"):
+    """A stand-in evaluation sets' root in the case's own folder, holding a stand-in hidden half under REL."""
+    root = tmp_path / name
+    if source is None:
+        standin.write_hidden_stand_in(root / REL)
+    else:
+        shutil.copytree(source, root / REL)
+    return root
+
+
+def _with_sets_root(folder, mode, root, *more):
+    return ["--folder", str(folder), "--mode", mode, "--large-size", str(SMALL), "--sets-root", str(root), *more]
+
+
+def test_the_sets_root_constant_is_the_one_relative_path():
+    assert runner.HIDDEN_UNDER_SETS_ROOT == "fixtures/evaluation/adoption-proving-ground/hidden"
+
+
+def test_a_sets_root_is_found_and_its_hidden_half_read_with_only_the_sets_root_given(ready_run, tmp_path, capfd):
+    """The hidden half sits under the root; no --hidden is named; the verdict line says it is present and asked."""
+    root = _sets_root(tmp_path, ready_run["hidden"])
+    govs = ready_run["govs"]
+    code = runner.main(_with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"])))
+    out, err = capfd.readouterr()
+    assert code == 1 and "hidden half: present and asked in 6 of 6 repositories" in out, (code, out, err)
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["hidden_half"] == "present and asked in 6 of 6 repositories"
+    assert all(saved["repositories"][n]["hidden_half"] == {"questions": 10, "asked": 10, "needed": 10,
+                                                           "present": True} for n in runner.EXPECTED)
+    assert str(root) not in out + err
+
+
+def test_a_sets_root_is_read_exactly_as_the_hidden_folder_is(ready_run, tmp_path):
+    """Same folder, same report: --sets-root and --hidden give one verdict, one list of reasons, one hidden half."""
+    govs = ready_run["govs"]
+    root = _sets_root(tmp_path, ready_run["hidden"])
+    more = {"gov": govs["good"], "pinned_gov": govs["good"], "close_ticket": "PG-1"}
+    direct = _read(ready_run, **more)
+    argv = _with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"]), "--pinned-gov",
+                           str(govs["good"]), "--close-ticket", "PG-1")
+    through = runner.run(runner.parse(argv), built=ALL)
+    assert through["verdict"] == direct["verdict"] == judge.READY, (through["reasons"], direct["reasons"])
+    assert through["reasons"] == direct["reasons"] and through["hidden_half"] == direct["hidden_half"]
+    assert {n: r["hidden_half"] for n, r in through["repositories"].items()} == \
+        {n: r["hidden_half"] for n, r in direct["repositories"].items()}
+
+
+def test_a_sets_root_with_nine_questions_in_one_repository_is_not_ready_naming_it(ready_run, tmp_path):
+    """The same refusal as --hidden's: a repository with 9 hidden questions is not counted present."""
+    root = _sets_root(tmp_path, ready_run["hidden"])
+    data = yaml.safe_load((root / REL / "rust-workspace.yaml").read_text())
+    data["questions"] = data["questions"][:9]
+    (root / REL / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+    govs = ready_run["govs"]
+    report = runner.run(runner.parse(_with_sets_root(ready_run["folder"], "read", root, "--gov", str(govs["good"]),
+                                                     "--pinned-gov", str(govs["good"]), "--close-ticket", "PG-1")),
+                        built=ALL)
+    assert report["verdict"] == judge.NOT_READY
+    assert report["reasons"] == ["rust-workspace: the measurement (hidden) half is not present and asked: 9 hidden "
+                                 "questions asked, at least 10 needed"], report["reasons"]
+    assert report["hidden_half"] == "absent in 1 of 6 repositories"
+
+
+def test_a_build_reads_the_hidden_variants_from_the_sets_root(tmp_path, capfd):
+    """Build mode finds the variants under the root too: four hidden variants in the run's record and manifests."""
+    root = tmp_path / "sets"
+    _hidden_stand_in(root / REL)
+    folder = tmp_path / "run"
+    code = runner.main(_with_sets_root(folder, "build", root, "--seed", "23"))
+    out, err = capfd.readouterr()
+    assert code == 0 and out.startswith("BUILT (seed 23)"), (code, out, err)
+    record = json.loads((folder / "run.json").read_text())
+    assert record["hidden_variants"] == 4
+    _, repos = runner._read_back(folder)
+    rust = repos["rust-workspace"].manifest["planted"]
+    assert any(e.get("hidden") and e["variant"] == "front-matter-status" for e in rust)
+    assert HIDDEN_QUESTION not in out + err and str(root) not in out + err
+
+
+@pytest.mark.parametrize("how", ["empty-root", "no-such-root", "hidden-is-a-file", "another-set-only",
+                                 "set-folder-without-hidden"])
+@pytest.mark.parametrize("mode", ["build", "run", "read"])
+def test_a_sets_root_without_the_hidden_half_exits_2_naming_the_missing_folder(ready_run, tmp_path, capfd, how, mode):
+    """A root without the hidden folder is refused in every mode, before anything is built, never by falling back to
+    another hidden folder; the refusal names the folder relative to the root, never the root."""
+    root = tmp_path / "sets"
+    if how == "empty-root":
+        root.mkdir()
+    elif how == "hidden-is-a-file":
+        (root / REL).parent.mkdir(parents=True)
+        (root / REL).write_text("not a folder")
+    elif how == "another-set-only":
+        standin.write_hidden_stand_in(root / "fixtures" / "evaluation" / "examin" / "hidden")
+    elif how == "set-folder-without-hidden":
+        (root / REL).parent.mkdir(parents=True)
+    folder = ready_run["folder"] if mode == "read" else tmp_path / "run"
+    listing = sorted(p.name for p in ready_run["folder"].iterdir())
+    code = runner.main(_with_sets_root(folder, mode, root))
+    out, err = capfd.readouterr()
+    assert code == 2, (code, out, err)
+    assert err.startswith(f"refused: --sets-root holds no hidden half: {REL}"), err
+    assert str(root) not in out + err
+    if mode != "read":
+        assert not folder.exists(), "something was built before the refusal"
+    else:
+        assert sorted(p.name for p in folder.iterdir()) == listing
+
+
+@pytest.mark.parametrize("mode", ["build", "run", "read"])
+def test_a_sets_root_with_a_hidden_folder_is_refused(ready_run, tmp_path, capfd, mode):
+    """--sets-root and --hidden together are refused (exit 2), in every mode, even when both name a hidden half."""
+    root = _sets_root(tmp_path, ready_run["hidden"])
+    folder = ready_run["folder"] if mode == "read" else tmp_path / "run"
+    code = runner.main(_with_sets_root(folder, mode, root, "--hidden", str(ready_run["hidden"])))
+    out, err = capfd.readouterr()
+    assert code == 2, (code, out, err)
+    assert err.startswith("refused: ") and "--sets-root" in err and "--hidden" in err, err
+    assert str(root) not in out + err and str(ready_run["hidden"]) not in out + err
+    if mode != "read":
+        assert not folder.exists(), "something was built before the refusal"
+
+
+def test_a_sets_root_whose_variants_file_cannot_be_read_is_refused_naming_the_file(tmp_path, capfd):
+    """Read as --hidden is read: a variants file of bad YAML is refused naming the file only (exit 2)."""
+    root = _sets_root(tmp_path)
+    (root / REL / "variants.yaml").write_text("variants: [unclosed\n  - Zephyr-bad: text", encoding="utf-8")
+    code = runner.main(_with_sets_root(tmp_path / "run", "build", root))
+    out, err = capfd.readouterr()
+    assert code == 2 and err.startswith("refused: the hidden file variants.yaml cannot be read"), (code, out, err)
+    assert "Zephyr" not in out + err
