@@ -89,11 +89,20 @@ def test_this_readme_is_a_kpi_map_gov_accept_can_run():
         named |= set(names)
         for item in items:
             (files if item.endswith(".py") else words).add(item)
-    every_line = {f"success-{n}" for n in range(1, 6)} | {f"failure-{n}" for n in range(1, 5)}
-    assert named == every_line, f"the map names success 1 to 5 and failure 1 to 4, not success 6: {sorted(named)}"
+    # D-10 (DEC-1112 (3)) added success 7 (S-D10a) and success 8 (S-D10b); its cases are named by full node id
+    # (``test_<file>.py::test_<name>``, DEC-1059), each naming a function its file defines.
+    every_line = ({f"success-{n}" for n in (1, 2, 3, 4, 5, 7, 8)} | {f"failure-{n}" for n in range(1, 5)})
+    assert named == every_line, \
+        f"the map names success 1 to 5, 7 and 8 and failure 1 to 4, not success 6: {sorted(named)}"
     defined = {path.name: support.test_functions(path) for path in support.HERE.glob("test_*.py")}
     premises = {"test_w2_96_at_premises.py"}
     assert files <= set(defined) - premises, f"file items that are no test file here, or the premises: {files}"
+    node_ids = {word for word in words if "::" in word}
+    bad_ids = sorted(word for word in node_ids if word.partition("::")[0] not in set(defined) - premises
+                     or word.partition("::")[2] not in defined[word.partition("::")[0]]
+                     or word.partition("::")[2].startswith("test_premise_"))
+    assert not bad_ids, f"node ids in the map that name no test function of their file here, or premises: {bad_ids}"
+    words = {word for word in words if "::" not in word} | {word.partition("::")[2] for word in node_ids}
     owner = {name: file for file, names in defined.items() for name in names}
     stray = sorted(word for word in words
                    if word not in owner or owner[word] in premises or word.startswith("test_premise_"))

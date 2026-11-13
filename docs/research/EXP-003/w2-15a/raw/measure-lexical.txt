@@ -1,0 +1,53 @@
+measure: set memory-retrieval, part all
+retriever: /home/usain/gov-os-runs/W2-15a/gov-lexical; version: gov 0.1.0 (commit 156a5feb677ba5087bece72723e749860e1bf3bc); gov.__file__: None
+root: /home/usain/gov-os-runs/D4B/m1/repo at commit 156a5feb677b
+budget: batch size 10, bundle budget 6000, stack budget 24000 tokens
+Q01 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 5 calls
+Q02 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q03 (visible): hit@5 yes (first gold rank 5), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q04 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q05 (visible): hit@5 yes (first gold rank 2), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q06 (visible): hit@5 no (first gold rank 29), in the bundle no; full evidence yes (2 of 2 pieces); 5 calls
+Q07 (visible): hit@5 no (first gold rank 27), in the bundle no; full evidence yes (1 of 1 pieces); 2 calls
+Q08 (visible): hit@5 no (first gold rank 14), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q09 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+Q10 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+Q11 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+Q12 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 1 calls
+Q13 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence no (1 of 2 pieces); 2 calls
+Q14 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 9 pieces); 5 calls
+Q15 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+Q16 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+Q17 (visible): hit@5 no (first gold rank 9), in the bundle yes; full evidence no (1 of 2 pieces); 2 calls
+Q18 (visible): hit@5 yes (first gold rank 2), in the bundle yes; full evidence yes (2 of 2 pieces); 2 calls
+Q19 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+Q20 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence no (1 of 2 pieces); 2 calls
+q21 (visible): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+q22 (visible): hit@5 yes (first gold rank 2), in the bundle yes; full evidence no (1 of 3 pieces); 2 calls
+q23 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+q24 (visible): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+h01 (hidden): hit@5 yes (first gold rank 3), in the bundle yes; full evidence no (1 of 2 pieces); 2 calls
+h02 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+h03 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h04 (hidden): hit@5 yes (first gold rank 3), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h05 (hidden): hit@5 no (first gold rank 22), in the bundle no; full evidence yes (1 of 1 pieces); 2 calls
+h06 (hidden): hit@5 yes (first gold rank 2), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h07 (hidden): hit@5 no (first gold rank 9), in the bundle yes; full evidence yes (1 of 1 pieces); 5 calls
+h08 (hidden): hit@5 no (first gold rank 10), in the bundle yes; full evidence no (2 of 3 pieces); 2 calls
+h09 (hidden): hit@5 yes (first gold rank 2), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h10 (hidden): hit@5 yes (first gold rank 2), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h11 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 2 calls
+h12 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+h13 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h14 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h15 (hidden): hit@5 yes (first gold rank 4), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h16 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+h17 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (2 of 2 pieces); 5 calls
+h18 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (2 of 2 pieces); 2 calls
+h19 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h20 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 2 pieces); 2 calls
+h21 (hidden): hit@5 yes (first gold rank 1), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h22 (hidden): hit@5 no (first gold rank 29), in the bundle no; full evidence no (1 of 2 pieces); 5 calls
+h23 (hidden): hit@5 no (first gold rank 15), in the bundle yes; full evidence yes (1 of 1 pieces); 2 calls
+h24 (hidden): hit@5 no (first gold rank -), in the bundle no; full evidence no (0 of 1 pieces); 1 calls
+total: hit@5 25 of 48 (52.1 %, floor 85); full evidence 27 of 48 (56.2 %, target 99 %)

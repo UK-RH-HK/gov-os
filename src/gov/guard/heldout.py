@@ -15,6 +15,8 @@ import os
 import shlex
 
 from gov.guard.decide import MOST_PATH, _expand_token
+# The duplicate-key YAML reader is ``gov.util.parts``'s: one source (W2-150 S6, DEC-1109 (2)).
+from gov.util.parts import load_yaml_unique
 
 CONFIG_REL = "governance/project/held-out.yaml"
 CONFIG_KEY = "held_out_paths"
@@ -24,22 +26,6 @@ _EDIT_TOOLS = frozenset({"Write", "Edit", "MultiEdit"})
 
 class HeldOutError(Exception):
     """``held-out.yaml`` exists and is not of the stated shape (DEC-218)."""
-
-
-def load_yaml_unique(stream):
-    """yaml.safe_load that refuses a mapping with a key written twice:
-    a reader that kept the last value would drop the first without a word."""
-    import yaml
-
-    class Loader(yaml.SafeLoader):
-        def construct_mapping(self, node, deep=False):
-            mapping = super().construct_mapping(node, deep=deep)
-            if len(mapping) != len(node.value):
-                raise yaml.constructor.ConstructorError(
-                    None, None, "a key is written twice", node.start_mark)
-            return mapping
-
-    return yaml.load(stream, Loader=Loader)
 
 
 def load_held_out(project_root: str) -> list[str]:

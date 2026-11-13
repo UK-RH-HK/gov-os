@@ -1,0 +1,9 @@
+# W2-33 (DAEO-lrre) closed: merged by hand on the owner's go with its copies (ACT-CLAUDE-COPIES-6), checks green, closed by DEC-953's practices (DEC-1132 (1))
+
+- Merged into w2/integrate by hand on the owner's "go W2-33" (2026-11-13): merge f6163461e (head 82da49202ab1; kernel gate ok, the 10 role-file hashes of DEC-1160's approval at c4b97716164e); the CTO's template commit d172bc71f (the eight template/.rulesync role sources, byte-equal to the reviewed template patch); ACT-CLAUDE-COPIES-6 applied by the owner's operator, 36d1a151b (`Role: owner`, 18 files; review PASS, manifest 85c9b1c7)
+- Checks on w2/integrate after the copies (a clean worktree, through heavy_slot.sh): `tests/acceptance/W2-33`, `W1-33`, `W1-38`, `W2-153`, `tests/unit/adapters`: 414 passed, 4 failed. The 4 (W2-153 S3 orchestrator-.rulesync, its drift guard, `test_the_twelve_sources_are_the_composition`, `test_this_repositorys_sources_are_the_composition`) are the root `.rulesync/subagents/orchestrator.md` still carrying the "until W2-56" line the owner's DEC-1163 (1) deleted from its sources (b88a76172); with that line deleted from the two root copies, as ACT-CLAUDE-COPIES-8 does, the same suites give 168 passed, 0 failed. They are COPIES-8's, not W2-33's. The kernel gate: no kernel path changed outside the approved hashes
+- Review: run 3 rounds 1-2 READY; run 4's two W1-33 revisions with a narrow check PASS; probe record on w2/W2-33; the copies ACT's review PASS (`acts/ACT-CLAUDE-COPIES-6/review.md`)
+- The owner's W2-113 PKG-2 (b) (11-12): S2 and F2 into W2-33, no child ticket (DEC-1163 (10))
+- Rows: the new role agents (qa-engineer, senior-engineer, ticket-lead) are not known to the guard until W2-60b; DEC-1087 (13)'s exact words kept
+- Waited on by: W2-35, W2-27, W2-46, W2-116 (pass 2), W2-153's routed line
+- Closed: 2026-11-13, by the orchestrator under DEC-953 items 1 and 5, DEC-1132 (1)

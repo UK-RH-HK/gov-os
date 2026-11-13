@@ -1,0 +1,430 @@
+# W2-148 acceptance tests: the operator agent applies ACTs by class from a queue, in a walled session
+
+Ticket DAEO-xafn (W2-148), profile FULL, the owner's DEC-1104 (2) approving OPERATOR-AGENT-1 with Q1 to Q7 as
+recommended. Written by the independent test designer (MR-3) from the ticket's KPI lines S1 to S24, its fourteen
+failure lines, the package's §1 to §6 and the CTO's readings in the ticket's body, before any implementation, reading
+only `w2/integrate` (`5f015c990` on `w2/W2-148-tests`). Nothing of the engineer's work was read (there is none yet).
+
+## How they run
+
+    PYTHONPATH=<worktree>/src TMPDIR=<scratch> python3 -m pytest tests/acceptance/W2-148 -q \
+      -p no:cacheprovider -o tmp_path_retention_policy=failed
+
+Every case builds its own planted world under `tmp_path` (`w2_148_support.World`): no real `~/gov-os-operator`,
+`~/.claude`, crontab, git hook, push channel, `claude`, network, GPU or model. Each subprocess gets the world's `HOME`
+and a `PATH` that starts with the world's stubs (`claude`, `crontab`, `sudo`, `pkill`, `killall`), plus
+`PYTHONUSERBASE` (the real user site, for PyYAML) and `PYTHONDONTWRITEBYTECODE=1`. Nothing needs a live session; the
+`live` marker is registered and no case carries it. 183 cases (169 before DEC-1108 (2), whose round changed two and
+added fourteen, N-11), most of them a full planted run of a few seconds.
+
+## The interface the tests call (the engineer builds to it)
+
+The code lives in `governance/project/operator/`. The tests copy that folder (less `__pycache__`) into
+`<operator root>/install/`, write `install/APPROVED`, and run the copies, as the cron will run the live install.
+The install runs standalone: the standard library and PyYAML, no `gov` import, no `PYTHONPATH`.
+
+**Files the tests name** (the rest is the engineer's): `operator_run.py`, `operator_launch.py`, `act_class.py`,
+`class-rules.yaml`, `landing_check.py`, `verdict.py` (byte for byte the CTO's reference, sha256
+`277c8ca9…d909378`), `brief.md`, `reviewer-brief.md`.
+
+**`install/APPROVED`:** one line per install file, `<sha256>  <path relative to install/>` (sha256sum's form), every
+file under `install/` but `APPROVED` itself, `__pycache__/` and the commit freeze `act-in-progress.txt`. Any file not
+matching its line refuses every run and every launch. Every result prints `approved_sha256` (the sha256 of
+`install/APPROVED`).
+
+**The commit freeze (DEC-1106 (3)):** `<operator root>/install/act-in-progress.txt` (the default of the `freeze`
+setting; the tests leave the setting out). The run writes it before `apply.sh apply` and removes it at the end; it is
+never in either `log/` (the operator root's or the scratch's). The APPROVED check never counts it: a freeze present
+during the run never makes an APPROVED check fail, and a stale one left from an earlier run never makes a later run
+refuse on APPROVED; it holds G9 (a `G9` line with result `held`) until it is gone, and the run never removes a freeze
+it did not write. The install's control-file hash (S15, F15) leaves it out too. G9 still also holds on the CTO's
+`<scratch>/log/act-in-progress.txt`.
+
+**Settings (S24):** both scripts take `--config <file.json>` before the step; a key left out takes today's default.
+Keys: `operator_root` (default: the install's parent), `repo`, `home` (the live HOME, for home-rooted touched files and
+the control files under it), `scratch` (the CTO's scratch: bundles at `<scratch>/acts/<ACT>/`, the session id in
+`<scratch>/log/cto-session.txt`, the CTO's hold `<scratch>/log/act-in-progress.txt`), `transcripts` (the folder holding
+`<session id>.jsonl`), `clock` (a file holding one ISO-8601 time with its offset, read each time the code needs the
+time; default the system clock; an explicit nightly window compares against that time's own wall clock; G9 has no time hold since DEC-1157 (2)),
+`pings_log`, `push_cmd`, `calls` (the CTO's call set for the replay, DEC-1108 (2)), `guard_calls` (the guard's call
+log, a folder; default `<home>/.gov-os/guard-calls`, DEC-1108 (2)), `replay_stale_h` (how old the set's `until` may
+be, hours; default 12, DEC-1108 (2)), `close_flag` (exists while a close queue runs), `nightly_window`
+(`HH:MM-HH:MM`; none by default since DEC-1141 (6)), `poll_s` (a hold's poll interval, seconds), `freeze` (the commit freeze's file; default
+`<operator_root>/install/act-in-progress.txt`, DEC-1106 (3)).
+
+**Commands:**
+- `python3 install/operator_run.py --config C run <ACT> <manifest sha>`: G1 to G9, the recompute, the apply, the
+  checks, the commit, the after-checks. `... undo <ACT> <manifest sha>`: the owner's undo (S22).
+  `... digest [--since <ISO>]`: the digest (S21; default the last 24 hours by the clock).
+- `python3 install/operator_launch.py --config C`: the journal first, then the oldest request, the canary, the session.
+- `python3 act_class.py <bundle dir>`: reads `<bundle dir>/manifest.json` and the bundle's files, with
+  `class-rules.yaml` beside it; prints `{"class": "a"|"b"|"O", ...}`.
+- `python3 landing_check.py --repo <repo> <rev range>`: prints a JSON list, one item per flagged first-parent commit:
+  `{"commit": "<40 hex>", "priority": "P1", ...}`.
+- Each of the first two prints its result as the **last line of stdout, one JSON object**: `result` (`applied`,
+  `refused`, `undone`, `launched`, ...), `gate` (`G1`…`G9`, `recompute`, ...) and `reason` on a refusal,
+  `approved_sha256`, and for the launcher `request: {act, sha256}` and `session: {pid, pgid, exit}`. Exit 0 when
+  applied, undone (the undo step) or launched; non-zero on a refusal. **The undo step and the recovery leaving a file
+  (DEC-1107):** the undo step (`... undo <ACT> <sha>`, on the owner's line) and the launcher's recovery of an unfinished
+  journal print `result` `refused` and exit non-zero whenever they leave any file untouched that is not the ACT's own
+  (a touched file whose bytes are neither its before- nor its after-copy); then no JSON object on the launcher's stdout,
+  nested ones included, carries `result` `undone`; the ACT's own touched files (at their after-copy) are still undone,
+  a P1 names each file left, and the lock is held. With nothing left, the undo step says `undone` with exit 0 and the
+  recovery's result (on the launcher's stdout, at any nesting) is `undone`. Fixed phrases in `reason`: `changed after
+  review` (any sha mismatch, S5), `to the owner` (a third review round), `yours` (class O), `rebuild, rehearse,
+  re-review` (G7).
+- **Test hook:** `GOV_OPERATOR_TEST_HOOK=<executable>` is run as `<exe> <point> <frozen folder>` at the points
+  `after-G1` (the copy made and hashed) and `after-G6` (G6 passed; the recompute comes next and classifies the frozen
+  bytes as they are then). The walled session's clean environment never carries it.
+  DEC-1106 (1) adds two points, called the same way:
+  - `in-G8`: after the dry run's steps in the clone (`check`, `apply`, the checks, `undo`) and before the live
+    re-hash that ends G8 (F15 below); the pre-dry-run hashes are already taken.
+  - `in-apply-checks`: for every class, after the live `apply.sh apply` and the manifest's checks have passed, and
+    before the after-check (S15) begins; before or after the run's own commit is the engineer's.
+  At every point the run waits for the hook to exit before going on and ignores its exit code; it holds no git lock
+  on the live repository (`.git/index.lock`) while the hook runs; the hook gets the run's own environment (HOME,
+  PATH) and any cwd. The tests' hooks use absolute paths and their own git environment, write live files, and commit
+  in the live repository with `git commit -- <paths>` (only those paths: anything the run has staged stays staged);
+  a hook ignores every point but its own.
+
+**The ACT bundle** (`<scratch>/acts/<ACT>/`): `manifest.json`; `apply.sh`; `rehearsal.log`; `before/<root>/<path>` and
+`after/<root>/<path>` for each touched file that exists before or after; `review.md`, the review record (not listed in
+the manifest, since it names the manifest's sha; its sha256 is the `Review:` trailer). The manifest sha is the sha256
+of `manifest.json`'s bytes. `<root>` is `repo` (relative to the repository), `home` (relative to HOME) or `crontab`
+(path `crontab`: the output of `crontab -l`). Manifest fields:
+`act`, `dec`, `author`, `claimed_class` (`a|b|O`), `touched` (`[{root, path, before, after}]`, sha256 or null),
+`files` (`{bundle-relative path: sha256}` for every bundle file but `manifest.json` and `review.md`), `rehearsal`
+(`{log, sha256}`; the log's last non-empty line is `failures: <n>`, and G3 wants 0), `checks`
+(`[{cmd, exit, count}]`: run with cwd the repository; red unless the exit code is `exit` and, when `count` is not null,
+the last non-empty stdout line is that integer), `commands` (other shell lines; the classifier scans them, `apply.sh`
+and the checks for script hits).
+
+**`apply.sh check|apply|undo`** is run as `bash <frozen folder>/apply.sh <step>` with cwd the repository (the live one,
+or the dry run's clone) and HOME the live or the planted HOME; it reads its bundle from its own folder. The planted
+scripts do some things only in the live repository (it holds an untracked, excluded `.live-marker` a clone never has):
+that is how a case makes the live apply differ from the dry run.
+
+**The verdict block** (verdict.py's fenced form, the last block decides; one block per round): `kpis` as verdict.py,
+plus `manifest_sha256`, `class`, `reviewer` (never the manifest's `author`), `reviewer_brief_sha256` (must equal
+`reviewer-brief.md`'s line in APPROVED), `time` (ISO; the yes must come after it), and optionally `replay_refused`
+(the call ids the review expects the replay to turn to refused). Three blocks: refused, "to the owner".
+
+**The queue:** one request per file `<operator root>/queue/*.req`, one line `ACT-<id> <64 lowercase hex>\n`; the
+oldest by mtime first. A malformed file is refused, no session starts, and it is moved aside (anywhere under the
+operator root but the queue's top level).
+
+**The wall:** `<operator root>/wall/`, built by the launcher (the session's cwd, never the root); its
+`.claude/settings.json` holds a non-empty `permissions.deny` and a `PreToolUse` hook. The session and its canary are
+started as `claude -p --restricted --settings <wall>/.claude/settings.json --no-session-persistence
+--strict-mcp-config --max-budget-usd <n> ...` with no `GOV_*` and no `CLAUDE_PROJECT_DIR`. The stub reads `--settings`
+like Claude Code: a file it cannot parse is ignored, and then the canary's Read comes back allowed. S19 drives the hook
+command the launcher wrote into the wall's settings, as Claude Code would (`bash -c <command>`, the event on stdin, cwd
+the wall, `CLAUDE_PROJECT_DIR` the wall); a refusal is exit 2 or a `permissionDecision: deny`; any other non-zero exit
+fails the test (Claude Code would let the call through). Allowed forms tested: `python3 <install>/operator_run.py run
+<ACT> <sha>` (no option), `bash <frozen>/apply.sh check|apply|undo`, a manifest check's exact `cmd`, `git -C <repo> add
+<listed path>`, a Read of `<transcripts>/<session id>.jsonl`.
+
+**The log** `<operator root>/log/operator.jsonl`: one JSON line per gate reached per ACT with the keys `time`, `act`,
+`manifest_sha256`, `votes` (`{code, claim, review}`; null before G6), `gate`, `result` (`pass`, `refused`, `held`,
+...), `commit`, `checks`, `undo`. A hold writes a `G9` line with result `held`. The yes is copied verbatim into
+`<operator root>/log/act-approvals.jsonl`. The commit freeze is `<operator root>/install/act-in-progress.txt`, never
+in either log (DEC-1106 (3), above); it must exist during the apply and be gone after.
+
+**Notices:** each one is sent as `<push_cmd> <notice JSON>` and appended to `pings_log` as one JSON line. Notice keys:
+`time`, `act`, `priority` (`P1` or another word), `kind` (the tests read `applied` and `disagreement`), `text`. The
+digest (JSON) holds `approved_sha256`, `applied` (`[{act, class, votes, touched, commit, undo}]`, `undo` the line
+`undo ACT-<id> <sha8>`), `disagreements`, and `missing_notices` (log events with no line in `pings_log`).
+
+**Commits:** only the listed repository files; trailers `Role: operator`, `Act: <ACT>`, `Act-sha: <manifest sha>`,
+`Class: a|b`, `Review: <sha256 of review.md>`, and for (b) `Approved-by: owner (chat, <time>)`; never `Role: owner`,
+never a push or a tag (the bare remote and the tag list are checked).
+
+**The replay (S15), checked against the guard's call log (DEC-1108 (2)):** the replay runs when an (a) ACT touches
+the path map or a deny list, as before; until a set is configured such an ACT is refused at its after-check.
+- **The call set** (the `calls` setting's file), JSON lines, the events' paths relative to the repository:
+  - line 1, the header: `{"v": 1, "window": {"since": ISO, "until": ISO}, ...}` (other keys ignored);
+  - a call: `{"id", "time", "session", "role", "ticket", "agent", "sha256", "event": {"tool_name", "tool_input",
+    "cwd"}}` (the line's own `sha256` is ignored: the agent recomputes it from the event);
+  - a dropped call: `{"id", "time", "session", "sha256", "dropped": "<reason>"}`, no `event` (a call the CTO's tool
+    may not copy, such as one naming the sets root): checked against the log, never re-judged.
+- **The guard's log:** setting `guard_calls` (a folder; default `<home>/.gov-os/guard-calls`). One file per UTC day,
+  `<YYYY-MM-DD>.jsonl`; each line `{"v": 1, "time": ISO ms "Z", "session", "role", "agent", "ticket", "tool",
+  "decision", "rule", "tree", "ms", "sha256", "keyed"}`; a marker file `<day>.jsonl.capped` means that day was cut
+  short.
+- **The hash:** `sha256(json.dumps({"tool": tool_name, "input": tool_input}, sort_keys=True, separators=(",", ":"),
+  ensure_ascii=False).encode("utf-8"))`, hex.
+- **Before anything is re-judged** (no run of the guard hook before), the replay refuses (so the after-check undoes
+  the ACT and pushes a P1, as any replay refusal does) unless all hold:
+  1. **The window:** the first line is the header; `until` is no later than the clock plus 5 minutes and no older
+     than the clock minus `replay_stale_h` hours; `until - since` is at least 48 hours.
+  2. **Well formed:** every other line is a call (an `event` object) or a dropped call (a 64-hex `sha256` and a
+     non-empty `dropped`); anything else is malformed (fail closed).
+  3. **The log readable and whole:** the folder exists; no day file from `since - 2 min` to `until + 2 min` has a
+     `.capped` marker; no line in those files is malformed.
+  4. **Set to log:** every set line whose `time` lies in `[since, until]` has a log line with the **same session**
+     and the same sha256 (a call's recomputed from its event; a dropped call's from its line), the log line's time
+     within `[since - 2 min, until + 2 min]`.
+  5. **Log to set:** every log line whose time lies in `[since + 2 min, until - 2 min]`, whose `session` is a UUID
+     (lower-case 8-4-4-4-12 hex) and whose `tree` is `main` or `worktree`, has a set line (call or dropped) with the
+     same session and sha256; a null `sha256` counts as missing. Other sessions (the suites' fixed names) and trees
+     (`run`, `scratch`, `other`) are not required.
+  - **The refusal's reason** (the result line's `reason` or a P1's `text`) names the mismatches (at most 5 of each
+    kind): a set call by its `id`, a logged call by its session's first 8 characters, its sha256's first 12 and its
+    time as the log line writes it (at least to the minute); never an input's text. The check's other refusals carry
+    a fixed phrase: `no header`; `window short`; `window stale` (an `until` older than the clock minus
+    `replay_stale_h`); `log capped` and `log malformed`, each with the day `YYYY-MM-DD`; `log missing`. A refusal by
+    the re-judging carries none of these phrases and not the word `malformed`.
+- **Then the re-judging, as today,** over the set's calls (not the dropped ones) in the window, each with the **role
+  and ticket of its matching log line** (they win over the set's), given to the hook as `GOV_ROLE` and `GOV_TICKET`
+  (as the live guard reads them); the dropped calls are counted by reason. The replay's own runs of the hook never
+  write the live log: each is run with `GOV_GUARD_CALLS_DIR` set to an absolute folder inside the replay's own
+  temporary folder, never in `guard_calls` or `<home>/.gov-os/guard-calls`; no file in `guard_calls` changes.
+- The planted guard `.claude/hooks/pretooluse.py` reads `<CLAUDE_PROJECT_DIR or cwd>/governance/project/path-map.yaml`
+  and the event on stdin and denies a Read under a `sets_root_hidden` glob. Calls outside the header's window are
+  neither checked nor re-judged. The DEC-1108 cases commit a variant of it before the ACT is built
+  (`plant_guard`): `record` appends `{dir: GOV_GUARD_CALLS_DIR, role: GOV_ROLE, path}` per run to a file of the
+  world; `role_aware` denies only when `GOV_ROLE` is in the path map's `sets_root_hidden.refused_roles`.
+
+**The control files (S15), as planted:** the hook folder `.claude/hooks/**`, `.claude/settings*.json`, the rest of
+`.claude/**`, `<repo>/.git/hooks/**`, `crontab -l`, the pin `<home>/.local/bin/gov`, the dead-man's and the
+sentinel's code `governance/project/orchestration/tools/deadman.py` and `sentinel-brief.md`, and the install. After
+an (a) ACT changed one of them, the ACT's own touched files are undone and the control file is left exactly as it is
+(the agent cannot tell that change from someone else's), the lock held and a P1 naming it (DEC-1106 (1), the restore
+rule below).
+
+**The restore rule (F15, DEC-1106 (1)).** The agent never writes a live file it cannot show is its own change.
+- **After the G8 dry run** the agent re-hashes the live touched files and the control files above, with the path map
+  `governance/project/path-map.yaml` among them, as the sets of files under each (a file created or removed under
+  `.claude/**` is a difference), against the hashes it took before the dry run. A touched file whose live bytes equal
+  the frozen `after/` copy is its own dry-run change: it restores that file to its pre-dry-run bytes, refuses (`gate`
+  `G8`) and sends a P1 whose `text` holds the phrase `live files changed` and names the file. Any other difference
+  (a control file, a file created or removed, a touched file whose bytes are neither its before- nor its after-copy)
+  is left exactly as it is: nothing written, the run refused at `G8`, the lock held (the next queued ACT is not
+  launched, S22's form), and a P1 whose `text` names each such file. Both at once: its own file restored, the rest
+  left, the lock held, every other file named.
+- **In the (a) after-check's undo (S15):** a difference that is not the ACT's own (a control file the ACT does not
+  list, or a touched file whose bytes are neither the ACT's after-copy nor its before-copy) is left exactly as it is,
+  the lock held, a P1 whose `text` names each such file; the ACT's own touched files are undone as before; the
+  result is `undone` or `refused`, never `applied`. A commit someone else made meanwhile stays in HEAD's history.
+- A P1 names a file by its path relative to its root (`crontab` for the crontab); an absolute path holding it counts.
+  A launch while the lock is held changes none of those files.
+
+**The evidence record (S23)** `docs/changes/W2-148-evidence.md`, Markdown tables: one with `ACT file` and `Class`
+columns (a row per ACT file, the class `(a)`, `(b)` or `(O)`); one with `Class` and `Count`; a heading naming the
+`Rises`; one with `Replay`, `Class`, `Outcome` (outcome `applied` or `refused`); one with `Fault` and `Outcome`
+(outcome `refused`, `undone` or `lock held`; the fault cells naming `after review`, `class`, `unlisted`, `red`,
+`undo`, `missing`, `older`); one with `Path`, `Before`, `After` (sha256s, equal; rows for `gov-os-operator` and
+`.claude`).
+
+**Left to the engineer:** the journal's form and place; the clone's place (outside the live tree, cleaned up); the
+wall hook's file and arguments; the default paths; how the launcher hands the request to the session; the brief's
+text; how the guard replay gets a tree for the old and the new map; how the lock is held after a failing undo; the
+names of other steps.
+
+## KPI lines, tests, and the outcome on `w2/integrate`
+
+Every case is **red on integrate for the right reason**: `governance/project/operator/` does not exist (the world's
+build and the classifier fail on `require_operator`), and S23's record does not exist. No case is a green guard on
+integrate; the cases marked "guard" are green once the code is built and fail an implementation that refuses too much.
+
+| KPI line | Test (node id) | On integrate | Why |
+|---|---|---|---|
+| S1 | `test_w2_148_gates.py::test_s1_g1_a_byte_changed_before_the_copy_refuses` | red | no code; G1 refuses a bundle file whose bytes differ from the manifest |
+| S1 | `test_w2_148_gates.py::test_s1_g1_the_run_uses_its_frozen_copy_not_the_source_edited_after_it` | red | no code; the hook edits the source after G1; the frozen bytes run; `acts/*<sha12>*` read-only |
+| S2 | `test_w2_148_gates.py::test_s2_g2_refuses_a_decision_not_accepted_in_the_register` | red | no code; PROPOSED, absent and missing DEC ids, each refused at G2 |
+| S3 | `test_w2_148_gates.py::test_s3_g3_refuses_a_rehearsal_log_missing_mismatched_or_failing` | red | no code; three bundles, one per case, refused at G3 |
+| S4 | `test_w2_148_gates.py::test_s4_g4_refuses_a_review_that_is_not_ready_for_an_act` | red | no code; not READY, malformed, no block, a fail with no blocking finding, a changed brief, reviewer = author, three rounds ("to the owner") |
+| S4 | `test_w2_148_gates.py::test_s4_g4_a_block_naming_another_manifest_sha_refuses` | red | no code; refused at G4 or G5 (N-3) |
+| S4 | `test_w2_148_gates.py::test_s4_guard_a_ready_review_of_two_rounds_passes` | red | no code; guard: two READY rounds apply |
+| S4 | `test_w2_148_gates.py::test_s4_the_install_pins_verdict_py_byte_for_byte` | red | no `governance/project/operator/verdict.py` |
+| S5 | `test_w2_148_gates.py::test_s5_g5_any_sha_differing_refuses_changed_after_review` | red | no code; request, verdict and recomputed sha, one pair differing each time |
+| S6 | `test_w2_148_classify.py::test_s6_the_classifier_gives_each_table_row_its_class` | red | no `act_class.py`; 35 planted manifests: every row and its other side, each script hit, unknown path, unparsable lists, mixed |
+| S7 | `test_w2_148_votes_yes.py::test_s7_code_a_claim_a_review_b_applies_as_b` | red | no code; (a)/(a)/(b) with a yes: `Class: b`, votes logged, a P1 `disagreement` |
+| S7 | `test_w2_148_votes_yes.py::test_s7_a_b_vote_is_never_lowered_without_a_yes_it_is_refused` | red | no code; (b)/(a)/(a) and (a)/(b)/(a): refused at G6 with no yes, logged, P1 |
+| S7 | `test_w2_148_votes_yes.py::test_s7_a_review_vote_of_o_refuses_as_yours` | red | no code; (a)/(a)/(O): "yours", logged, P1 |
+| S8 | `test_w2_148_votes_yes.py::test_s8_a_frozen_patch_classifying_higher_after_g6_is_refused` | red | no code; the hook adds an allow rule to the frozen patch after G6: refused at `recompute`, P1 |
+| S9 | `test_w2_148_gates.py::test_s9_g6_an_a_act_proceeds_with_no_yes` | red | no code; (a) applies with an empty transcript, no disagreement |
+| S9 | `test_w2_148_gates.py::test_s9_g6_an_o_act_is_refused_as_yours` | red | no code; (O) refused at G6, "yours" |
+| S10 | `test_w2_148_votes_yes.py::test_s10_a_human_yes_after_the_review_applies_and_is_copied_verbatim` | red | no code; terminal string and Remote Control text blocks: applied, `Approved-by`, `log/act-approvals.jsonl` |
+| S10 | `test_w2_148_votes_yes.py::test_s10_a_yes_that_does_not_count_is_refused` | red | no code; none, other ACT, other sha, before the review, tool result, task notification, meta, sidechain, assistant, no origin mark |
+| S10 | `test_w2_148_votes_yes.py::test_s10_a_yes_in_a_record_the_cto_wrote_or_another_session_does_not_count` | red | no code; the yes only in the scratch's records and another session's transcript |
+| S11 | `test_w2_148_gates.py::test_s11_g7_a_moved_live_file_refuses_rebuild_rehearse_re_review` | red | no code; a listed live file moved: G7 |
+| S12 | `test_w2_148_gates.py::test_s12_g8_the_dry_run_refuses` | red | no code; unlisted file in the tree, in the planted HOME, a non-byte-for-byte undo, a listed file not changed |
+| S12 | `test_w2_148_restore_freeze.py::test_s12_f15_a_concurrent_commit_during_the_dry_run_is_left_untouched_refused_and_held` | red | no code; DEC-1106 (1): a CTO commit at `in-G8` (the path map's new hidden glob; a new `.claude/skills/` file; the touched file at third bytes): left as committed, HEAD the CTO's, tree clean, refused at G8, lock held, P1 naming the file |
+| S12 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | no code; DEC-1106 (1): the live touched file at the after-copy at `in-G8`: restored, live state as before the run, refused at G8, P1 "live files changed" naming it |
+| S12 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | no code; DEC-1106 (1): its own file restored, the pin re-written in HOME left, lock held, P1 naming the pin |
+| S13 | `test_w2_148_gates.py::test_s13_g9_a_hold_waits_then_proceeds_once_cleared` | red | no code; the nightly running (05:30 with a fresh `NIGHTLY-RUNNING`, cleared when it is removed), the nightly window, a close queue, the CTO's `act-in-progress.txt` (DEC-1157 (2), ACT-OPERATOR-HOURS-3: no time hold; DEC-1141 (6)'s night-hold hours and DEC-1104 (2)'s quiet hours are gone) |
+| S13 | `test_w2_148_gates.py::test_s13_g9_no_time_hold_at_night` | red | no code; DEC-1157 (2), ACT-OPERATOR-HOURS-3: at 02:30 with no night-hold state file and at 05:30 with a fresh `holding: true` the run applies and its G9 lines hold nothing |
+| S14 | `test_w2_148_apply.py::test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers` | red | no code; files, trailers, the freeze in `install/` (in neither `log/`) during the apply and gone after (DEC-1106 (3)), no push, tag or sudo |
+| S14 | `test_w2_148_apply.py::test_s14_an_extra_staged_file_refuses_and_undoes` | red | no code; `git diff --cached` differs: no commit, undone, P1 |
+| S14 | `test_w2_148_apply.py::test_s14_a_check_whose_count_differs_from_the_rehearsal_is_red_and_undone` | red | no code; count 3 against 2: undone, P1 |
+| S14 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | no code; DEC-1106 (3): a stale `install/act-in-progress.txt`: G9 held (not an APPROVED refusal), the freeze kept, then applied once it is gone, same `approved_sha256` |
+| S13 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | as above: a hold, never a refusal |
+| S15 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | no code; eight families (hooks, settings, `.claude/**`, git hooks, crontab by a stub, the pin, the dead-man's code, the install): the ACT's file undone, the control file left as the apply wrote it, lock held, P1 naming it (DEC-1106 (1)) |
+| S15 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | no code; DEC-1106 (1): at `in-apply-checks` the hook file written, a `.claude/agents/` file committed, the crontab by its store: left as written (the commit kept in HEAD's history), the ACT's file undone, not applied, lock held, P1 naming the file |
+| S15 | `test_w2_148_apply.py::test_s15_guard_a_path_map_addition_whose_replay_refuses_only_listed_calls_stays` | red at `7438f7e91` | guard, changed by DEC-1108 (2): a header and a log agreeing both ways (three calls, one dropped call); the listed newly refused call and one before the window leave it applied. Today: undone, the header and the dropped call read as "a malformed line (fail closed)" |
+| S15 | `test_w2_148_apply.py::test_s15_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone` | red at `7438f7e91` | changed by DEC-1108 (2): the check passes; call-r2, not listed, turned to refused: undone, P1, the reason the re-judging's (no check phrase, not `malformed`). Today: undone, but at the check ("malformed line") |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_call_with_no_log_line_is_refused_and_named` | red at `7438f7e91` | an invented call: undone, P1, the reason naming `call-invented`, no input's text, the guard never re-run. Today: undone for "malformed line", the id not named |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_call_whose_input_was_altered_by_one_character_is_refused_and_named` | red at `7438f7e91` | `docs/notes.md` → `docs/notez.md` in the event, the line's own `sha256` left at the logged hash: undone, P1, naming `call-notes`, neither path quoted. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_hash_logged_only_under_another_session_is_refused_and_named` | red at `7438f7e91` | call-notes' hash logged only under another UUID session: undone, P1, naming `call-notes`. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_logged_live_call_missing_from_the_set_is_refused_and_named` | red at `7438f7e91` | the CTO dropped a logged live call: undone, P1, naming its session's first 8, its sha256's first 12 and its time to the minute. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_window_shorter_than_48_hours_is_refused` | red at `7438f7e91` | 47 hours: undone, P1, `window short`, the guard never re-run. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_stale_window_is_refused` | red at `7438f7e91` | `until` 13 hours old, `replay_stale_h` at its default 12: undone, P1, `window stale`. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_with_no_header_is_refused` | red at `7438f7e91` | the set's calls with no header line: undone, P1, `no header`. Today: "malformed line" (the dropped call) |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_capped_day_in_the_window_is_refused` | red at `7438f7e91` | `2026-11-09.jsonl.capped`: undone, P1, `log capped` and the day. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_malformed_log_line_is_refused` | red at `7438f7e91` | a cut line in `2026-11-09.jsonl`: undone, P1, `log malformed` and the day. Today: "malformed line" of the set, not the log's phrase |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_missing_log_folder_is_refused` | red at `7438f7e91` | `guard_calls` absent: undone, P1, `log missing`. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_guard_suite_sessions_other_trees_and_the_window_s_edge_are_not_required` | red at `7438f7e91` | guard: logged calls absent from the set by `guard4-check` (main), a UUID in `run`, `scratch` and `other` trees, and a live call one minute after `since`: applied, the guard re-run. Today: undone ("malformed line") |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_the_log_s_role_wins_over_the_set_s_when_re_judging` | red at `7438f7e91` | a role-aware planted guard; call-role's set line and log line disagree on the role: `[log-refuses]` (set research, log engineer) undone, P1, the re-judging's reason; `[log-allows]` (set engineer, log research) applied; both: every hook run on call-role had `GOV_ROLE` the log's. Today: undone at the check, call-role never re-judged |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_the_replay_s_hook_runs_never_name_or_change_the_live_log` | red at `7438f7e91` | applied; every hook run had an absolute `GOV_GUARD_CALLS_DIR` outside `guard_calls` and `<home>/.gov-os/guard-calls`; no file in `guard_calls` changed. Today: undone at the check, the hook never run |
+| S16 | `test_w2_148_apply.py::test_s16_the_landing_check_flags_control_commits_outside_a_ticket_without_the_trailers` | red | no `landing_check.py`; flags the CTO's and the operator-without-`Act:` commits only |
+| S17 | `test_w2_148_launch.py::test_s17_the_launcher_starts_the_walled_session_for_the_oldest_request_clean_and_by_pid` | red | no code; oldest request, canary then session, flags, cwd the wall, clean environment, pgid recorded |
+| S17 | `test_w2_148_launch.py::test_s17_a_malformed_request_line_is_refused_and_moved_aside` | red | no code; five malformed lines |
+| S17 | `test_w2_148_launch.py::test_s17_an_install_file_changed_by_a_byte_refuses_the_launch` | red | no code; APPROVED mismatch: no session |
+| S17 | `test_w2_148_launch.py::test_s17_an_install_file_changed_by_a_byte_refuses_a_run_by_hand` | red | no code; the same gates by hand |
+| S17 | `test_w2_148_launch.py::test_s17_no_name_matched_kill_in_the_operator_code` | red | no code to search; then none of `pkill`, `killall`, `pgrep -f` in `.py`/`.sh` code lines |
+| S18 | `test_w2_148_launch.py::test_s18_settings_that_did_not_load_fail_the_canary_and_no_real_session_starts` | red | no code; a stub modelling ignored settings: refused after one call |
+| S19 | `test_w2_148_launch.py::test_s19_the_wall_hook_allows_each_allowed_form` | red | no code; seven allowed forms |
+| S19 | `test_w2_148_launch.py::test_s19_the_wall_hook_refuses_each_refused_class` | red | no code; nineteen refused classes |
+| S19 | `test_w2_148_launch.py::test_s19_the_wall_hook_fails_closed_on_malformed_input` | red | no code; not JSON, no tool input |
+| S20 | `test_w2_148_notices_undo.py::test_s20_a_full_run_logs_one_line_per_gate_with_every_field` | red | no code; G1 to G9 pass lines, every field, the commit |
+| S20 | `test_w2_148_notices_undo.py::test_s20_a_refused_run_logs_each_gate_reached_and_no_further` | red | no code; refused at G3: G1 to G3 only |
+| S21 | `test_w2_148_notices_undo.py::test_s21_an_a_act_is_pushed_for_the_first_14_days_then_the_digest_only` | red | no code; day 1 and day 14 pushed, day 15 not |
+| S21 | `test_w2_148_notices_undo.py::test_s21_a_refusal_after_g7_on_day_30_is_pushed_as_a_p1` | red | no code; a G8 refusal on day 30 |
+| S21 | `test_w2_148_notices_undo.py::test_s21_the_digest_lists_every_applied_act_and_a_notice_missing_from_the_channels` | red | no code; the digest's rows and the missing day-1 notice |
+| S22 | `test_w2_148_notices_undo.py::test_s22_a_red_check_undoes_at_once_with_a_p1` | red | no code |
+| S22 | `test_w2_148_notices_undo.py::test_s22_the_owner_s_undo_line_on_day_3_undoes_and_none_refuses` | red | no code; no line: refused; a human line on day 3: undone, P1 |
+| S22 | `test_w2_148_notices_undo.py::test_s22_the_owner_s_undo_line_on_day_8_is_refused` | red | no code |
+| S22 | `test_w2_148_notices_undo.py::test_s22_an_undo_after_the_next_act_on_the_same_files_is_refused` | red | no code |
+| S22 | `test_w2_148_notices_undo.py::test_s22_a_failing_undo_holds_the_lock_and_the_next_queued_act_is_not_run` | red | no code; P1; the launcher starts no real session |
+| S22 | `test_w2_148_notices_undo.py::test_s22_an_apply_failing_partway_is_undone_from_the_backups_with_a_p1` | red | no code |
+| S22 | `test_w2_148_notices_undo.py::test_s22_an_unfinished_journal_is_undone_at_the_next_launch_with_a_p1` | red | no code; the run stopped by its pgid mid-apply; the next launch (empty queue) undoes |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_the_owner_s_undo_leaving_another_s_file_exits_non_zero_refused_held` | red at `b134a760b` | DEC-1107: an applied two-file ACT, one file then at third bytes, a valid owner's line on day 3: exit non-zero, `refused`, that file as the other wrote it, the other file undone, a P1 naming it, lock held. Today: non-zero and `refused` (`moved since the apply`) but nothing undone |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_the_crash_recovery_leaving_another_s_file_is_refused_non_zero_held` | red at `b134a760b` | DEC-1107: the run stopped mid-apply (first file placed), the second file then at third bytes, a launch with an empty queue: non-zero, `refused`, no `undone` on stdout, no session, that file as written, the placed file undone, a P1 naming it, lock held. Today: non-zero but `result` `undone` |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_guard_the_crash_recovery_with_nothing_foreign_still_says_undone` | green at `b134a760b` | guard (DEC-1107): the same stop with nothing foreign: every file at its before bytes, a result `undone` on stdout and none `refused`, a P1. The owner's undo guard is `test_s22_the_owner_s_undo_line_on_day_3_undoes_and_none_refuses` (`undone`, exit 0) |
+| S23 | `test_w2_148_trial.py::test_s23_the_record_has_a_row_per_act_file_with_its_class` | red | no record; the 54 at `116c2b413` and the two later |
+| S23 | `test_w2_148_trial.py::test_s23_the_counts_per_class_match_the_rows` | red | no record |
+| S23 | `test_w2_148_trial.py::test_s23_no_pinned_act_is_classed_lower_than_the_table` | red | no record; the pinned subset (N-6) |
+| S23 | `test_w2_148_trial.py::test_s23_the_rises_are_listed` | red | no record |
+| S23 | `test_w2_148_trial.py::test_s23_eight_replays_give_their_expected_class_and_outcome` | red | no record |
+| S23 | `test_w2_148_trial.py::test_s23_seven_planted_faults_are_each_refused` | red | no record |
+| S23 | `test_w2_148_trial.py::test_s23_no_live_file_changed_before_and_after_hashes` | red | no record |
+| S24 | `test_w2_148_launch.py::test_s24_a_full_run_and_launch_leave_the_owner_s_operator_files_unchanged` | red | no code; owner's `CLAUDE.md`, `.claude/`, `hooks/`, `log/*.log` unchanged; top level only the agent's folders; cwd the wall |
+
+The failure lines, by the cases that would catch each:
+
+| KPI line | Test (node id) | On integrate | Why |
+|---|---|---|---|
+| F1 | `test_w2_148_gates.py::test_s4_g4_refuses_a_review_that_is_not_ready_for_an_act` | red | a malformed block or no block refused (fail closed); every gate's own case in this file |
+| F1 | `test_w2_148_gates.py::test_s12_g8_the_dry_run_refuses` | red | a gate that errors is never a pass |
+| F2 | `test_w2_148_gates.py::test_s5_g5_any_sha_differing_refuses_changed_after_review` | red | bytes or request changed after review |
+| F2 | `test_w2_148_gates.py::test_s1_g1_a_byte_changed_before_the_copy_refuses` | red | as above, in the bundle |
+| F3 | `test_w2_148_classify.py::test_s6_the_classifier_gives_each_table_row_its_class` | red | unknown path, unparsable list, script hit never (a) |
+| F3 | `test_w2_148_votes_yes.py::test_s7_a_b_vote_is_never_lowered_without_a_yes_it_is_refused` | red | no class lower than a vote; the disagreement logged and pushed |
+| F4 | `test_w2_148_votes_yes.py::test_s10_a_yes_that_does_not_count_is_refused` | red | each wrong source, ACT, sha or time |
+| F4 | `test_w2_148_votes_yes.py::test_s10_a_yes_in_a_record_the_cto_wrote_or_another_session_does_not_count` | red | a record the CTO wrote |
+| F5 | `test_w2_148_gates.py::test_s12_g8_the_dry_run_refuses` | red | an unlisted file in the tree or the planted HOME |
+| F6 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | the ACT undone, lock held, P1 naming the file |
+| F6 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | a control change during the apply: the ACT undone, never left applied without a P1 naming the file |
+| F15 | `test_w2_148_restore_freeze.py::test_s12_f15_a_concurrent_commit_during_the_dry_run_is_left_untouched_refused_and_held` | red | any live change made by the operator that is not its own: none (the CTO's commit kept, not reverted or deleted) |
+| F15 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | as above, with its own change beside it |
+| F15 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | as above, in the (a) after-check's undo |
+| F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_owner_s_undo_leaving_another_s_file_exits_non_zero_refused_held` | red at `b134a760b` | DEC-1107: in the owner's undo, another's file left as written, never a success code (`refused`, non-zero) |
+| F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_crash_recovery_leaving_another_s_file_is_refused_non_zero_held` | red at `b134a760b` | DEC-1107: as above, in the crash recovery |
+| F5 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | a dry run that changed a live file is refused, the file restored |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_malformed_log_line_is_refused` | red at `7438f7e91` | DEC-1108 (2): an unreadable log is never a pass (fail closed) |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_capped_day_in_the_window_is_refused` | red at `7438f7e91` | as above: a log cut short is never a pass |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_missing_log_folder_is_refused` | red at `7438f7e91` | as above: no log is never a pass |
+| F6 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_call_with_no_log_line_is_refused_and_named` | red at `7438f7e91` | a path-map change kept on a replay of a call set the log does not show: undone with a P1 |
+| F6 | `test_w2_148_replay_check.py::test_s15_dec1108_a_logged_live_call_missing_from_the_set_is_refused_and_named` | red at `7438f7e91` | as above, a call left out of the set |
+| F12 | `test_w2_148_replay_check.py::test_s15_dec1108_a_call_whose_input_was_altered_by_one_character_is_refused_and_named` | red at `7438f7e91` | the CTO's set cannot shape the replay: an altered input refused |
+| F12 | `test_w2_148_replay_check.py::test_s15_dec1108_a_hash_logged_only_under_another_session_is_refused_and_named` | red at `7438f7e91` | as above, a call moved to another session |
+| F7 | `test_w2_148_apply.py::test_s16_the_landing_check_flags_control_commits_outside_a_ticket_without_the_trailers` | red | flagged |
+| F8 | `test_w2_148_launch.py::test_s17_the_launcher_starts_the_walled_session_for_the_oldest_request_clean_and_by_pid` | red | the wall's settings, cwd, clean environment |
+| F8 | `test_w2_148_launch.py::test_s18_settings_that_did_not_load_fail_the_canary_and_no_real_session_starts` | red | settings not loaded |
+| F8 | `test_w2_148_launch.py::test_s24_a_full_run_and_launch_leave_the_owner_s_operator_files_unchanged` | red | never the root or the owner's settings |
+| F9 | `test_w2_148_launch.py::test_s19_the_wall_hook_refuses_each_refused_class` | red | push, tag, sudo, tests/acceptance, ~/.claude, its own files |
+| F9 | `test_w2_148_launch.py::test_s17_an_install_file_changed_by_a_byte_refuses_a_run_by_hand` | red | APPROVED mismatch refuses |
+| F10 | `test_w2_148_notices_undo.py::test_s21_a_refusal_after_g7_on_day_30_is_pushed_as_a_p1` | red | pushed |
+| F10 | `test_w2_148_notices_undo.py::test_s21_the_digest_lists_every_applied_act_and_a_notice_missing_from_the_channels` | red | in the digest |
+| F10 | `test_w2_148_notices_undo.py::test_s20_a_full_run_logs_one_line_per_gate_with_every_field` | red | in the log |
+| F11 | `test_w2_148_notices_undo.py::test_s22_an_apply_failing_partway_is_undone_from_the_backups_with_a_p1` | red | undone |
+| F11 | `test_w2_148_notices_undo.py::test_s22_a_failing_undo_holds_the_lock_and_the_next_queued_act_is_not_run` | red | nothing else applied |
+| F11 | `test_w2_148_notices_undo.py::test_s22_an_unfinished_journal_is_undone_at_the_next_launch_with_a_p1` | red | undone at the next launch |
+| F12 | `test_w2_148_votes_yes.py::test_s10_a_yes_in_a_record_the_cto_wrote_or_another_session_does_not_count` | red | a CTO record makes nothing run |
+| F12 | `test_w2_148_launch.py::test_s17_a_malformed_request_line_is_refused_and_moved_aside` | red | a queue line that is not the form starts nothing |
+| F13 | `test_w2_148_launch.py::test_s17_no_name_matched_kill_in_the_operator_code` | red | no name match |
+| F14 | `test_w2_148_trial.py::test_s23_no_live_file_changed_before_and_after_hashes` | red | the trial's hashes |
+| F14 | `test_w2_148_launch.py::test_s24_a_full_run_and_launch_leave_the_owner_s_operator_files_unchanged` | red | planted roots only |
+
+## Notes and limits
+
+- **N-1. Readings of the interface.** Where the KPI lines leave a form open (the config file, the result line, the
+  bundle's layout, the log's keys, the notice's keys, the test hook), the tests fix the smallest form above; a change
+  to it is a test designer's revision, not the engineer's choice.
+- **N-2. The two "none" rows.** The CTO's own scratch tools and the blind writers' walls are not the operator's; the
+  classifier answers (O) (a path no rule names, for these), so a manifest naming them is refused at G6 as "yours".
+- **N-3. G4 against G5.** A verdict block naming another sha fails G4 ("names this manifest sha") and G5; the tests
+  accept either gate, and S5's cases want `changed after review` in the reason whichever gate refuses.
+- **N-4. Where the freeze and the approvals go.** DEC-1028 (6)'s `log/act-in-progress.txt` and DEC-1058's
+  `log/act-approvals.jsonl` live in the CTO's scratch today; S24 puts the agent's files under its own `log/`. The tests
+  read the yes copy under the operator root and hold G9 on the scratch's file (the CTO's hand ACTs and FRESH-80's hold
+  write it there). The agent's own freeze is `install/act-in-progress.txt` by DEC-1106 (3) (round 1 accepted it in
+  either log; revised). Wiring the CTO's tools and the landing hook to read it, and the guard's deny of the CTO's
+  writes to it, are ACT-OPERATOR-1's.
+- **N-5. The landing check's "control path".** A CTO commit on its records (`CHECKPOINT.md`) is not flagged: the (O)
+  catch-all for a path no rule names is not a control path; only the named (b) and (O) rows' paths are.
+- **N-6. S23's pinned subset.** Every ACT the §2 table names in its example column, at its row's class: (b) for
+  1-GUARD, GUARD-FIX-1 to 4, G14, G14b, INDEP-WALLS-1, GUARD-SETS-1, PERMISSIONS-1/2, QUIET-DENY-1, STOP-WAITER-1,
+  PUSH-INPUT-1, SELECT-HOOK-1, SELECT-FIXES-1, GATE-CONFIG-1, NIGHTLY-1, NIGHTLY-STOP-1, SCHEDULE-STOP-2,
+  DISPATCH-CRON-2, DISPATCHER-1, RUNS-SWEEP-1, DEADMAN-1, SENTINEL-1, RERANK-TRIAL-1/2; (O) for W1-01-EXEMPT-1,
+  W2-57-LS-1, P-TRACE-IMPL-1, REPIN-1, REPIN-2, REPIN-EMERGENCY-1, REPIN-W2 to W4, WSL-INTEROP-1, NIGHTLY-0400, D8. The
+  servers' and SANDBOX-SEAL-1's (a) and the walled sessions' rows are not pinned (any class passes "not lower").
+- **N-7. The server row.** The committed module `governance/project/orchestration/tools/gov_reranker_gpu_slot.py`
+  (RERANK-GPU-SLOTS-1, RERANK-WAIT-1) stands for "the shared servers' committed configs and modules": (a) by Q3.
+- **N-8. A failing undo** is the frozen `apply.sh undo` exiting non-zero (before it restores anything).
+- **N-9. DEC-1106 (the owner, 2026-11-09), round 2 of this design.** (1) F15: the restore rule above replaces "restore
+  every live difference", in the G8 re-hash and in the (a) after-check's undo; it overrides S15's "undone byte for
+  byte" for a control file the ACT does not list (that file is left as it is; only the ACT's own touched files are
+  undone). The new cases make the concurrent change at the test hook's `in-G8` and `in-apply-checks` points, never by
+  a timed race; the S15 family cases are revised to the rule (`Rewrite-Reason: DEC-1106 (1)`). (3) The commit freeze
+  is `install/act-in-progress.txt`, outside APPROVED's count; the S14 case that accepted it in either `log/` is
+  revised (`Rewrite-Reason: DEC-1106 (3)`). (4) F7 kept: S19's allowed forms are unchanged. (2) (the guard's call log)
+  is its own ACT and not tested here. The failure line "any live change made by the operator that is not its own" is
+  DEC-1106's, mapped as F15 above. Nothing of the engineer's work was read for this round.
+- **N-10. DEC-1107 (the owner, 2026-11-09), round 3 of this design (F21).** The owner's undo and the crash recovery
+  exit non-zero and say `refused` whenever they leave another's file untouched (the interface line above); the P1
+  naming each file and the held lock stay as DEC-1106 (1) put them, and the ACT's own touched files are still undone.
+  "Someone else" writes third bytes into one touched file before the undo or the launch is called (no hook point). The
+  new cases are in `test_w2_148_undo_refused.py`, mapped to S22 and F15; their reds were seen on the merged agent at
+  `b134a760b`, run only through the cases (G-14). The owner's undo case trips today on a different path from the one
+  the review reported: it already refuses (`moved since the apply`) but undoes nothing, so it is red on the ACT's own
+  file. The 166 earlier cases are unchanged. Nothing of the engineer's work was read for this round.
+- **N-11. DEC-1108 (2) (the owner, 2026-11-09), round 4 of this design (ACT-GUARD-CALLLOG-1 §2, §3 (a), §7 item 2).**
+  S15's replay no longer trusts the `calls` file: the CTO's tool builds the 48-hour call set and the agent checks it
+  against the guard's call log by sha256 both ways before it re-judges anything (the interface under "The replay
+  (S15)"; the settings `guard_calls` and `replay_stale_h`). The two earlier replay cases now plant a header and a
+  matching log so they test the re-judging (`Rewrite-Reason: DEC-1108 (2)`); fourteen new cases in
+  `test_w2_148_replay_check.py` refuse each break of the check on its own (an invented, an altered, a dropped and a
+  moved call; a short, a stale and a missing window header; a capped, a malformed and a missing log), pass what the
+  check does not require, judge with the log's role, and keep the replay's hook runs off the live log. Readings the
+  tests fix (N-1): the check's phrases (`no header`, `window short`, `window stale`, `log capped`, `log malformed`,
+  `log missing`); the reason's place (the result line's `reason` or a P1's `text`); the role and ticket given to the
+  hook as `GOV_ROLE` and `GOV_TICKET`; no guard hook run before the check passes. Not covered by a case: an `until`
+  later than the clock plus 5 minutes, a null `sha256` in a live log line, a non-UUID-shaped session in a live tree,
+  the five-per-kind cap. The world's config now carries `guard_calls` (a folder under the world, planted only by these
+  cases). The reds were seen on `7438f7e91` (the merged agent), run only through the cases (G-14): today's replay
+  reads the header and the dropped call as "a malformed line (fail closed)". The 167 other cases are unchanged and
+  pass there (`gov accept`: 167 passed, 16 failed, all 16 these). Nothing of the engineer's work was read for this round.
+
+## Files
+
+- `w2_148_support.py`: the planted world, the bundles and their `apply.sh`, the review records, the transcript
+  shapes, the stubs, the snapshot, the evidence record's table reader.
+- `conftest.py`: the `world` fixture; the `live` marker.
+- `test_w2_148_gates.py` (S1-S5, S9, S11-S13), `test_w2_148_classify.py` (S6), `test_w2_148_votes_yes.py` (S7, S8,
+  S10), `test_w2_148_apply.py` (S14-S16), `test_w2_148_launch.py` (S17-S19, S24), `test_w2_148_notices_undo.py`
+  (S20-S22), `test_w2_148_trial.py` (S23), `test_w2_148_restore_freeze.py` (DEC-1106: F15 in S12 and S15, the freeze
+  in S14 and S13), `test_w2_148_undo_refused.py` (DEC-1107: the owner's undo and the crash recovery leaving another's
+  file, S22 and F15), `test_w2_148_replay_check.py` (DEC-1108 (2): S15's call set checked against the guard's call
+  log both ways before the re-judging).

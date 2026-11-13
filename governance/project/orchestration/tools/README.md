@@ -30,9 +30,12 @@ python3 merge_queue.py run --repo <repo> --queue <dir>
 - `run` processes every approved entry, in approval order, as one batch on one head.
 
 `run`'s options: `--base <commit>` (the known state reds are traced against: the last nightly with a verdict until a
-green one after ACT 1, then the last green one, DEC-988, DEC-989; see below); `--integration` (default `w2/integrate`); `--work` (the clean clones; default
-`~/gov-os-runs/W2-00/merge-queue/`, each run's own folder removed when the run ends); `--rounds` (default 3, the
-re-runs of each red alone); and the three stand-ins below.
+green one after ACT 1, then the last green one, DEC-988, DEC-989; see below; the old way, which builds a clone at
+the baseline: since Q-1, DEC-1050, `land.py` no longer passes it, and without it no baseline clone is built);
+`--integration` (default `w2/integrate`); `--work` (the clean clones; default
+`~/gov-os-runs/W2-00/merge-queue/`, each run's own folder removed when the run ends); `--rounds` (default 1, Q-1,
+DEC-1050: the re-runs of each red alone); `--load-sensitive <file>` (a plain list, one test id, function or file per
+line: those cases get 3 rounds); and the three stand-ins below.
 
 ### The queue folder (`--queue`, created if missing)
 
@@ -68,8 +71,10 @@ commit that brings another ticket's commits, or a candidate that cannot be isola
    attempts, then exit 4). If not, the branch is fast-forwarded to the tested merge: `merge --ff-only` in the worktree
    that has it checked out, else the ref is moved only if it still holds the old head.
 5. **Red:** each failing test is re-run alone once; a pass alone is a **flaky candidate** (named, decides nothing). A
-   red alone is traced on the head without the batch, interleaved, `--rounds` rounds (and as many again unless
-   decisive): red there too is **not the batch's** (`unowned`, DEC-968) and does not stop the advance.
+   red alone is traced on the head without the batch **once each way** (Q-1, DEC-1050: its alone re-run with the
+   batch, one alone run without it); a case the load-sensitive list names is traced interleaved, 3 rounds (and as many
+   again unless decisive). Red there too, failing the same way, is **not the batch's** (`unowned`, DEC-968) and does
+   not stop the advance.
 6. **A red the batch caused:** one ticket is ejected. In a batch of several, each candidate is tried: the result is
    built without it and each red re-run alone `--rounds` times; green in every round means it explains the red. A test
    a ticket added is blamed on it only if red, every round, with that ticket alone merged. **Only the culprits are
@@ -154,3 +159,35 @@ the baseline and closes each ticket that lands in the same step.
   <tree>` takes a heavy-job slot and rebuilds with a lock of the tree's own (`GOV_REBUILD_LOCK`), so rebuilds of
   different trees run side by side, at most as many as there are slots.
 - `land.py` passes `--warm` and the baseline nightly's record. Tests: `tests/unit/orchestration/test_merge_queue_speed.py`.
+
+### No cold rebuild (DEC-1032 step (iv); for review)
+
+`--integration-store <link>` (the link to the integration store's ready half, `~/gov-os-worktrees/W2-00-store`) turns
+on three things; without it the queue works as before. `land.py` passes it, with `--nightly-log` and `--nightly-junit`.
+- **Seed:** a clone with no `.gov-runtime/store.db` (a fresh `merged` or `alt`, or one replaced) is seeded before its
+  first rebuild by `.gov-runtime/scratch/orchestrator/tools/seed_store.py`: where the clone's own `gov rebuild` offers
+  `--seed` (W2-122), the rebuild gets `--seed <the ready half>`; otherwise the seeder copies the ready half's store
+  (the whole store at the same commit, else its vectors only, where the code that makes a chunk's text is the same),
+  so only chunks with no vector are embedded. A seed refused, or a seeder that cannot answer, is named in `queue.txt`
+  and the rebuild runs as before. Every prepare is one line of the run's `prepares.jsonl`.
+- **Promotion:** after a landing, when the `merged` clone's stores were rebuilt at exactly the landed commit (and the
+  branch is still there), the standby half is checked out at that commit, seeded from the clone (`--replace`), rebuilt
+  (nothing left to embed; the code index is made anew, since it holds its tree's absolute path) and the link moved,
+  under the store's lock (`<link>.lock`, which `refresh_integration_store.sh` takes too). Otherwise (a skipped run, a
+  moved head, the lock held, a failed step) the normal refresh is started apart, named.
+- **The head without the batch is never rebuilt.** A red the baseline cleared, or one the batch may own, is first
+  judged from the nightly of exactly that head (its `run.txt` names it, it has a verdict and JUnit files): green there
+  means not on the head; red alone there with the same failure means on the head only for a red that would stop the
+  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in a throwaway
+  detached worktree of that head (`git worktree add --detach <work>/head-<id>-<n>`), made in the run's work folder,
+  holding a copy of the integration store's stores (the whole store, the same commit: nothing embedded; copied under a
+  shared hold of the store's lock, the only time it is held) and its code index made anew. Nothing ever runs in the
+  integration store's own tree (review of 2026-11-02, A1, A2). The throwaway tree is checked before every case against
+  its state when made (HEAD, changes, ignored files, its stores' stamps); a case that changed it gets a new one. The
+  run removes its own throwaway worktrees (`git worktree remove --force`, only paths named `head-*` in its work
+  folder); one a killed run left is removed at the next run's start. A store behind the head is refreshed first (its
+  standby half, incrementally) while the branch is still at that head; if it still is not (or the branch moved on,
+  the 2026-11-02 20:41 stop), the throwaway tree is rebuilt once, seeded from the integration store (never cold; Q-1).
+  With no `--base`, the trace against the head without the batch runs there too. The `alt` clone is built only at the
+  baseline (a red its nightly's record does not clear) and for the culprit search.
+- Tests: `tests/unit/orchestration/test_merge_queue_seed.py`; the seeder's: `.gov-runtime/scratch/orchestrator/tools/test_seed_store.py`.

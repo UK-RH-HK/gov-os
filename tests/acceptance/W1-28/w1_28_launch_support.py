@@ -240,6 +240,7 @@ def interrupted_launch(project, sandbox, cli, role, ticket, target):
     """
     ready = sandbox.elsewhere / "session-is-running.json"
     plan(cli, files={"work/left-behind.txt": "left by the session\n"}, ready=ready, wait=120)
+    w46.plant_open_gate(sandbox)   # W2-20 S19 (DEC-1088 (5)(b)): the gate is planted open, its readings in the env
     script = cli_support.write_launcher(project, sandbox)
     process = subprocess.Popen([sys.executable, str(script), "launch", role, ticket], cwd=str(project),
                                env=w46.gov_environment(project, sandbox, cli), stdin=subprocess.DEVNULL,

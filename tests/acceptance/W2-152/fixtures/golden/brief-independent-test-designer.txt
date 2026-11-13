@@ -1,0 +1,14 @@
+# Brief for DAEO-fx01 (W2-901)
+Role independent-test-designer; profile STANDARD.
+Objective: Build the widget.
+Write tree: /fx/wt/W2-901-tests
+Tree: /fx/wt/W2-901
+Tests tree: /fx/wt/W2-901-tests
+Main: /fx/main
+Ticket file: /fx/main/.tickets/DAEO-fx01.md
+Accept: gov accept W2-901 --root /fx/wt/W2-901-tests
+Lead note: none
+Repair: none
+Alpha step: run printenv GOV_ROLE GOV_TICKET [DEC-1].
+Beta step line.
+End of the planted brief.

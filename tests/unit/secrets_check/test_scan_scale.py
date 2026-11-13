@@ -153,7 +153,7 @@ def test_no_gitleaks_on_path_raises_and_records_nothing(project, monkeypatch):
 
 
 def test_the_largest_store_is_judged_first_and_the_result_keeps_the_path_order(project, scanned, monkeypatch):
-    monkeypatch.setattr(secrets.os, "cpu_count", lambda: 1)
+    monkeypatch.setattr(secrets, "_workers", lambda: 1)  # one at a time: the order judged is the order started
     small = _write(project, ".gov-runtime/a/small.md", f"The value is {PLANTED} today.\n")
     large = _write(project, ".gov-runtime/z/large.md", "Ordinary text.\n" * 1000 + f"The value is {PLANTED}.\n")
     middle = _write(project, ".gov-runtime/m/middle.md", "Ordinary text.\n" * 100)

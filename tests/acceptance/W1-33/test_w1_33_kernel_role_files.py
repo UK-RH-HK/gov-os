@@ -29,6 +29,8 @@ of ``research.md`` (W1-46). The tests of ``.claude/agents/`` are in
 
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 
 import w1_33_support as support
@@ -146,13 +148,57 @@ def test_the_orchestrator_role_file_states_its_write_scope():
 # Success 5: the research role file is left as it is (DEC-163)
 # --------------------------------------------------------------------------
 
-def test_the_research_role_file_is_unchanged():
-    """Green before implementation; it must stay green."""
+# Rewrite-Reason: DEC-1156 (3), (7): the owner decided that every kernel role file carries the Interface's lines
+# (Version, Launch default, Launch by criticality, Skills, Model tier, Work order, One writer per worktree), so the
+# whole-file hash of W1-46's research.md (RESEARCH_ROLE_FILE_SHA256, 60f9092f...) can no longer hold. DEC-163 is kept:
+# the file's own body, less those lines, is still the one W1-46 placed. The glob assertion is as it was.
+_INTERFACE_LINE_HEADS = (
+    "- **Version:**",
+    "- **Launch default:**",
+    "- **Launch by criticality:**",
+    "- **Skills:**",
+    "- **Model tier:**",
+    "- **Work order:**",
+    "- **One writer per worktree:**",
+)
+# sha256 of W1-46's research.md (`git show c70bbb69d:template/governance/kernel/roles/research.md`) less every line that
+# starts with one of _INTERFACE_LINE_HEADS, the remaining lines joined by "\n" and ended by one "\n" (see
+# _without_interface_lines). Computed once from that git object; the case needs no git at run time.
+_W1_46_RESEARCH_BODY_SHA256 = "4793c8eba118c7e39acb9211a60b802b73c101f2c28348e69b11593b476d3596"
+
+# The research role's values of the Interface's lines, as the ticket's Interface and S7 fix them (S7: "product-spec
+# and research Sonnet high"; the Work order and One writer sentences word for word in every file).
+_RESEARCH_INTERFACE_LINES = (
+    "- **Launch default:** model claude-sonnet-5-5, effort high",
+    "- **Model tier:** see Launch default",
+    "- **Work order:** product-spec writes the spec and KPIs; the independent test designer and the engineer work in "
+    "parallel from them, never reading each other's work; the engineer runs the acceptance tests once they are "
+    "ready, through gov accept; the QA engineer alone reads both.",
+    "- **One writer per worktree:** two sessions that write never share a worktree; a ticket's test designer works "
+    "in its own tests worktree, merged by the lead.",
+)
+
+
+def _without_interface_lines(text):
+    kept = [line for line in text.splitlines() if not line.startswith(_INTERFACE_LINE_HEADS)]
+    return "\n".join(kept) + "\n"
+
+
+def test_the_research_role_file_body_is_unchanged():
+    """DEC-163 (rewritten, DEC-1156 (3), (7)): the kernel holds one research role file; its own body is the one W1-46
+    placed, apart from the owner's every-role-file lines; and it carries the lines the ticket fixes for research."""
     files = sorted(path.name for path in (support.REPO_ROOT / support.ROLES_DIR_REL).glob("research*"))
     assert files == ["research.md"], f"the kernel holds another research role file: {files}"
-    assert support.sha256(support.role_file_rel(support.RESEARCH)) == support.RESEARCH_ROLE_FILE_SHA256, (
-        "template/governance/kernel/roles/research.md is not the file W1-46 placed"
+    text = _role_file(support.RESEARCH)
+    body = _without_interface_lines(text)
+    assert hashlib.sha256(body.encode("utf-8")).hexdigest() == _W1_46_RESEARCH_BODY_SHA256, (
+        "template/governance/kernel/roles/research.md, less its Interface lines, is not the body W1-46 placed "
+        f"({len(body.splitlines())} lines remain after leaving out the lines that start with "
+        f"{', '.join(_INTERFACE_LINE_HEADS)})"
     )
+    lines = text.splitlines()
+    for wanted in _RESEARCH_INTERFACE_LINES:
+        assert lines.count(wanted) == 1, f"research.md does not carry the line once and whole: {wanted!r}"
 
 
 # --------------------------------------------------------------------------

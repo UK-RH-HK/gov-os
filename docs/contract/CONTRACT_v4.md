@@ -1,25 +1,26 @@
 ---
 id: CONTRACT-v4
 status: ACCEPTED
-version: "4.2"
-revised: 2026-10-17
+version: "4.3"
+revised: 2026-11-09
 depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
-decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-722]
+decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-722, DEC-1089, DEC-1090]
 type: specification
 state_class: AUTHORITATIVE
 ---
 
-# Governance OS — Capability Acceptance Contract v4 (version 4.2)
+# Governance OS — Capability Acceptance Contract v4 (version 4.3)
 
 Contract v4 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
 
-**Version 4.2** (2026-10-17). The file names and the id `CONTRACT-v4` are unchanged.
+**Version 4.3** (2026-11-09). The file names and the id `CONTRACT-v4` are unchanged.
 
 | Version | Date | Change |
 |---|---|---|
 | 4.0 | 2026-09-30 | Contract v4 as closed by S1 and audited by S1-A (DEC-083…DEC-096). |
 | 4.1 | 2026-10-03 | S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended. MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session's Bash) and the guard (file tools, the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied). New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37). Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by commit trailers). |
 | 4.2 | 2026-10-17 | W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741). Carries DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release contents of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers items: CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions) and CAP-43.d (the rest of the release contents). CAP-44.h lists the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, each marked W2 or W3, from the named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18 the owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343; DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items. |
+| 4.3 | 2026-11-09 | W2-27 specification change (docs/changes/W2-27-CIT-P.md, W2-27-CIT-E.md), approved by the owner (DEC-1093). Carries DEC-1089 (2) and DEC-1090 (5): gov update is built in Wave 3, so CAP-45.a moves from Wave 2 to Wave 3, and CAP-45 with it, since no Wave 2 part of it remains. The Wave 2 clause of version 4.2 (in Wave 2 the authenticated source is the release's manifest and file hashes, DEC-741 D) is withdrawn; the manifest and file hashes stay part of the authenticated source, beside the signed tag (CAP-02.c). 62 capabilities (W2 7 → 6, W3 11 → 12); 214 covers items (W2 20 → 19, W3 38 → 39). |
 
 **Precedence:** Charter v5 → Contract v4 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
@@ -30,8 +31,8 @@ Contract v4 states what the Gov OS must do, as outcomes with **one observable ac
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
 | W1 | 38 | 4 | 0 | 42 |
-| W2 | 7 | 0 | 0 | 7 |
-| W3 | 11 | 0 | 0 | 11 |
+| W2 | 6 | 0 | 0 | 6 |
+| W3 | 12 | 0 | 0 | 12 |
 | NONE | 0 | 0 | 2 | 2 |
 | **All** | 56 | 4 | 2 | 62 |
 
@@ -713,12 +714,12 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** The owner can update the Gov OS in a repository without losing overlay configuration.
 - **Acceptance:** `gov update --check` reports the version change and migrations; `copier update` applies them with the overlay files unchanged and `gov doctor` green.
-- **Wave:** W2 (first real `copier update` in W2; the pending-update report of `gov doctor` is W3 (DEC-165))
-- **Provider:** Copier 9.18.2, W2: gov update --check, W3: gov doctor pending-update report
+- **Wave:** W3 (gov update and the first real `copier update` are W3 (DEC-1089, DEC-1090); the pending-update report of `gov doctor` is W3 (DEC-165))
+- **Provider:** Copier 9.18.2, W3: gov update --check, W3: gov doctor pending-update report
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-023; DEC-165
+- **Sources:** Contract v3 Gate S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-023; DEC-165; DEC-1090
 - **Covers:**
-  - `CAP-45.a` [W2] gov update: check/impact, authenticated source (the signed tag in W3, CAP-02.c), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance; in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3), DEC-722 — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722
+  - `CAP-45.a` [W3] gov update: check/impact, authenticated source (the signed tag, CAP-02.c, and the release's manifest and file hashes, CAP-43.b), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722; DEC-1090
   - `CAP-45.b` [W3] In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update` — DEC-165
 - **Scenarios:** dev CHAOS-A-10, CHAOS-X-01 · qual CHAOS-X-Q01
 

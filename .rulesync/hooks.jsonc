@@ -8,6 +8,14 @@
         "timeout": 60
       }
     ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "matcher": "Bash",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" -E \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/context_watch.py\"",
+        "timeout": 10
+      }
+    ],
     "preCompact": [
       {
         "type": "command",

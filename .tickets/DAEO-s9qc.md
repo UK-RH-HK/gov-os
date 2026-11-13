@@ -1,7 +1,7 @@
 ---
 id: DAEO-s9qc
 status: closed
-deps: []
+deps: [DAEO-ym8a]
 links: []
 created: 2026-10-30T16:27:09Z
 type: task

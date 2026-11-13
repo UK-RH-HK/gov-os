@@ -11,7 +11,13 @@ RESERVED_COMMANDS = (
     "closure", "retrieve", "checkpoint", "close", "adopt", "pause",
 )
 # Recorded in the command list beside the twelve (DEC-542).
-RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "telemetry")
+RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "resources", "telemetry")
+# brief (W2-152, DEC-1088 (3)), links (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and plan (W2-136, DEC-1088).
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
+# session-watch (W2-159, DEC-1110): a hyphenated command, its module in the underscore folder session_watch (what
+# ``gov`` imports); check() accepts that folder or a folder of the command's own name, as it is.
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 
@@ -22,9 +28,10 @@ def check(root: Path) -> list[dict]:
     root = Path(root)
     findings = []
     for command in GOV_COMMANDS:
-        module_path = root / "src" / "gov" / command / "command.py"
+        module_path = root / "src" / "gov" / command.replace("-", "_") / "command.py"
+        own_path = root / "src" / "gov" / command / "command.py"
         alt_path = root / "src" / "gov" / "cli" / "commands" / f"{command}.py"
-        if not module_path.is_file() and not alt_path.is_file():
+        if not (module_path.is_file() or own_path.is_file() or alt_path.is_file()):
             findings.append({
                 "code": "COMMAND_NO_MODULE",
                 "command": command,

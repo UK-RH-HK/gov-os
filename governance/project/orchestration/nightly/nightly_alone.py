@@ -18,6 +18,21 @@ clone, out = Path(sys.argv[1]), Path(sys.argv[2])
 accepted = {e["test"] for e in (yaml.safe_load((clone / "governance/project/path-map.yaml").read_text())
                                 .get("accepted_reds") or [])}
 failing = []
+
+
+def node_of(case):
+    """The case's pytest id. Without a `file` attribute (junit_family xunit2), the classname is the module's dotted
+    path followed by any test classes: the longest prefix that is a file in the clone is the module, the rest the
+    classes (a class-based case, e.g. W1-36's TestAuditReproGovCheck, was re-run under a path that does not exist)."""
+    if case.get("file"):
+        return f"{case.get('file')}::{case.get('name')}"
+    parts = case.get("classname", "").split(".")
+    for cut in range(len(parts), 0, -1):
+        if (clone / ("/".join(parts[:cut]) + ".py")).is_file():
+            return "::".join(["/".join(parts[:cut]) + ".py", *parts[cut:], case.get("name")])
+    return f"{'/'.join(parts)}.py::{case.get('name')}"
+
+
 for name in ("parallel.xml", "serial.xml"):
     path = out / name
     if not path.is_file():
@@ -25,8 +40,7 @@ for name in ("parallel.xml", "serial.xml"):
         continue
     for case in ET.parse(path).iter("testcase"):
         if case.find("failure") is not None or case.find("error") is not None:
-            file = case.get("file") or (case.get("classname", "").replace(".", "/") + ".py")
-            failing.append(f"{file}::{case.get('name')}")
+            failing.append(node_of(case))
 env = {k: v for k, v in os.environ.items() if k not in ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")}
 env["PYTHONPATH"] = str(clone / "src")
 reds = flaky = 0

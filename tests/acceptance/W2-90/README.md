@@ -29,6 +29,7 @@ wiring. Seven could not be moved: they are left exactly as they stood (see "Case
   line starts its program with the `python3` first on `PATH`, and a product has `gov` installed. Nothing is installed
   by a test: `install_gov_for(home)` writes a path file naming this worktree's `src` into the stand-in home's user site
   folder, as an editable install does (W1-38's `make_session_sandbox` does the same).
+- **D-10's pinned-gov fix (2026-11-10, W2-20 `DAEO-r30l`, Rewrite-Reason: DEC-866, W2-106):** `install_gov_for` also plants the editable install's `gov` script at `<home>/.local/bin/gov` (W1-47's `plant_pinned_gov`), the fix W2-106's README names, so the kernel's pinned line never takes the runner's `PATH`. With `PATH=/usr/bin:/bin`, before → after, both opt-ins: W1-05 53 → 4 red (left: the 2 switch-over setup errors, red on both PATHs, and 2 p95 latency cases red only under `-n 6` load, 9 passed alone), W1-28 3 → 1 (red on both PATHs), W1-47 11 → 0; nothing new red under the runner's `PATH`.
 - **Fixture files.** Each suite plants what its cases name, and commits it:
   - W1-05 and W1-47: the fixture ticket `DAEO-zz90`, `README.md`, `src/gov/guard/decide.py`,
     `tests/acceptance/W1-02/README.md`.
@@ -102,6 +103,19 @@ imports the same `src`, through the path file in the stand-in home. `gov launch`
 
 They stay red on the head after ACT 1, for the reason they were red before this revision. On `aafd45c1` they pass, as
 before.
+
+## The next round (W2-90b, DEC-999 item 1)
+
+W2-90b (`DAEO-nqa2`) revised this folder's helper and the cases that need neither W2-105 nor W2-110
+(`tests/acceptance/W2-90b/README.md`):
+
+- **`install_gov_for`** now also gives the stand-in home the editable install's `gov` script at `<home>/.local/bin/gov`,
+  by calling W1-47's `plant_pinned_gov` (integrate's D-10 fix, above). The template's guard lines are pinned since
+  W2-106, so without the script they ran the owner's pin, not this worktree's code.
+- **The four W2-59 cases above** now run the template's pinned line and pass.
+- **The three install cases above, and W1-33's orchestrator install case,** judge the kernel's wiring and are red only
+  on the template's install deny rules. They wait for W2-105, in W2-90c.
+- **The 14 ids ACT 1 dropped** are restored on the template's post-tool lines.
 
 ## Split functions (every id kept)
 

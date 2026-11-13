@@ -1,6 +1,6 @@
 ---
 id: DAEO-kia7
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-0z8c]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -82,3 +82,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-06), as approved (DEC-729). The list row
   - The staged-secrets scan reads only the staged files [W2-M243, W2-M143].
   - A re-index never empties the semantic index; a model-less re-index reports the semantic facet unavailable instead [DEC-719].
 - **KPIs, failure:** a re-index that fails leaves the previous index and reports the failure; it never leaves no index [W2-M088].
+
+**D9-FATES (DEC-1083):** Merged into W2-116 by DEC-1083. S1 and S2 fold into W2-116's S4 (no hook, O1); S5 and F1 moved to W2-116 as lines; S3 and S4 lifted. None goes to W2-122.

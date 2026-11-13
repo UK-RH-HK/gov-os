@@ -1,6 +1,6 @@
 ---
 id: DAEO-a3m2
-status: open
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -64,3 +64,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-09), as approved (DEC-729). The list row
   - The read-only tools the owner lists (for example Monitor and read-only MCP tools) are judged, not refused as unknown [W2-M016, W2-I015].
 - **KPIs, failure:** an unknown tool is still refused by default (DEC-685); a tool on the list with a write effect is judged like Bash.
 - **Row W2-H055 (DEC-743 §6.2, 2026-10-17):** a `git clone` destination is judged as a write target for every role; a clone into another ticket's folder, the `~/gov-os-runs` root or the workbench is refused with the guard's reason. This ticket edits `decide.py` after W2-50.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): G-4.

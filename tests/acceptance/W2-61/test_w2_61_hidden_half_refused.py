@@ -6,7 +6,7 @@ DEC-845 item 2]". Failure 1: "A measured role can read the hidden half by a rout
 ordinary work."
 
 Two refusals, on a planted set (``planted-memory``, measured: the roles engineer and research, and the tickets
-DAEO-zz61 and W2-195) in a temporary repository, never the real hidden half:
+DAEO-zz61 and the planted WBS id ``MEASURED_WBS``) in a temporary repository, never the real hidden half:
 
 - **the guard** (W2-58's (d), driven as W2-58's tests drive it): a session of a measured role is refused the
   planted hidden part by the Read tool, Grep and Glob over its folder, and a Bash ``cat``, ``head`` and ``grep``;

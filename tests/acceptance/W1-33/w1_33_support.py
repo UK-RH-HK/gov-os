@@ -28,7 +28,9 @@ Nothing here imports ``src/gov`` and nothing names a held-out path.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -67,7 +69,12 @@ NOT_TEST_DESIGNER = tuple(role for role in ROLES if role != TEST_DESIGNER)
 IMPLEMENTERS = (ENGINEER, PRODUCT_SPEC)                # KPI failure 2
 NOT_ORCHESTRATOR = tuple(role for role in ROLES if role != ORCHESTRATOR)
 EMPTY_PROFILE_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR)   # DEC-158: launched workers with an empty allowlist
-NOT_LAUNCHED = (ORCHESTRATOR,)   # the launcher refuses it (W1-46). Owner decision, DEC-386: product-spec is launched
+# The orchestrator is not a worker role. On a ticket it is a lead launch (W2-136 S9, DEC-1088 (5)(a)): refused,
+# naming the ticket and the approved ready list, unless that list holds the ticket with its waits met. Owner
+# decision, DEC-386: product-spec is launched.
+NOT_LAUNCHED = (ORCHESTRATOR,)
+READY_REL = "governance/project/orchestration/ready.txt"   # the approved ready list (W2-136)
+LEAD_REFUSAL_WORDS = ("ready list", "batch")
 
 # The research role file, as W1-46 committed it. KPI success 5: W1-33 leaves it.
 RESEARCH_ROLE_FILE_SHA256 = "60f9092f37430a096eeb932907b5814661585afaf38c52a045c3d775c933e678"
@@ -475,3 +482,62 @@ def role_faults(role, text):
     if role in EMPTY_PROFILE_ROLES:
         faults += network_faults(role, text)
     return faults
+
+
+# --------------------------------------------------------------------------
+# An open resource gate for the launcher's cases (W2-20 S19, DEC-1088 (5)(b))
+# --------------------------------------------------------------------------
+
+GIB = 1024 ** 3
+
+
+def plant_open_gate(home, base):
+    """Plant an open resource gate and return the variables that point ``gov launch`` at its readings.
+
+    W2-20 S19 runs the gate on every launch, and S8 shuts it when the configuration is missing. The form is
+    W2-136's ``_plant_open_gate`` (``tests/acceptance/W2-136/test_w2_136_launch_check.py``), from W2-20's README,
+    "The configuration file": every value dated and sourced, in ``<home>/.gov-os/machine/gate.json``. The readings
+    are files under ``base`` with room to spare, named through ``GOV_RESOURCES_*``. That way these cases test the
+    network profile and the lead refusal alone, whatever the machine is doing. The variables go into the
+    environment of the ``gov launch`` process: W1-46's runner passes only the ones it names.
+    """
+    today = datetime.date.today().isoformat()
+
+    def dated(value, source="planted for the W1-33 launcher cases (W2-20 README)"):
+        return {"value": value, "date": today, "source": source}
+
+    base = Path(base)
+    base.mkdir(parents=True)
+    cpu = str(max(os.sched_getaffinity(0)))
+    values = {
+        "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+        "verification_peak_bytes": dated(4 * GIB),
+        "working_size_bytes": dated(1 * GIB),
+        "rebuild_peak_bytes": dated(2 * GIB),
+        "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+        "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+        "verification_lock": dated(str(base / "verification.lock")),
+        "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+        "oom_floor_bytes": dated(1 * GIB),
+        "heavy_slots": dated(2),
+        "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+        "embedding_servers": {
+            "shared": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+            "query": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+        },
+    }
+    machine = Path(home) / ".gov-os" / "machine"
+    machine.mkdir(parents=True)
+    (machine / "gate.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
+    readings = {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+    env = {"GOV_RESOURCES_NPROC": "64"}
+    for variable, (name, text) in readings.items():
+        (base / name).write_text(text, encoding="utf-8")
+        env[variable] = str(base / name)
+    return env

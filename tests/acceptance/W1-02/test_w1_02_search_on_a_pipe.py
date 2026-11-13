@@ -204,8 +204,8 @@ UNFED_BY_ROLE = [(folders.NOT_A_WRITER, "on-a-pipe-with-the-absolute-start-as-it
 
 @pytest.mark.parametrize("who,form", UNFED_BY_ROLE, ids=[f"{who}-{form}" for who, form in UNFED_BY_ROLE])
 def test_a_search_of_the_root_is_decided_by_policy_2_for_other_roles(world, who, form):
-    """The engineer's content search from the root takes in its ticket's acceptance folder (``tests/acceptance/W1-90/``):
-    refused for (c) (DEC-821 item 1). The session with no role: allowed."""
+    """The engineer's content search from the root takes in its ticket's acceptance folder
+    (``tests/acceptance/<TICKET_WBS_ID>/``): refused for (c) (DEC-821 item 1). The session with no role: allowed."""
     result = _ask(world, UNFED[form], ROOT, who)
     what = f"the search '{form}' at the root by '{who}'"
     if who == folders.NOT_A_WRITER:

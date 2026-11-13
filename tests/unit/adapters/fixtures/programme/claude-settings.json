@@ -1,0 +1,28 @@
+{
+  "model": "programme-model",
+  "permissions": {
+    "allow": [
+      "Bash(make check)",
+      "Bash(git status)"
+    ],
+    "deny": [
+      "Read(./secrets/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/tools/programme-hook.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "PROGRAMME_FLAG": "1"
+  }
+}

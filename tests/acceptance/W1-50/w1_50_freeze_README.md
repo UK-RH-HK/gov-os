@@ -52,6 +52,10 @@ green; every red case waited for `gov pause`); those 16 are green now.
 - **Two live cases** (`local_only`) each start a real engineer session through `gov launch`. A launched test
   designer cannot run them (the sandbox refuses the API host): the ticket lead runs them, with `-m local_only`.
 
+**The CTO-only install rule (DEC-980; `Rewrite-Reason: DEC-957, DEC-971 item 4`).** The `freeze_project` fixture
+now commits `governance/project/roster.yaml` with `coordination_ticket: DAEO-zz91`: the orchestrator on `DAEO-zz91` is
+the CTO, so `test_the_install_rule_reads_the_flag_as_the_guard_does` keeps its `ask` before the flag is put there.
+
 ## The three KPI lines
 
 70 cases when the first batch was written: 69 run without a session, 1 is live. Before implementation 30 were red

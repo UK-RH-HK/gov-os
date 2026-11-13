@@ -275,7 +275,8 @@ class TestPreCompactCombined:
         precompact.main()
         out = capsys.readouterr().out
         assert out, "P9: a non-orchestrator whose checkpoint cannot be written must be told"
-        msg = json.loads(out)
+        assert out.startswith('Begin the compaction summary with this line: "READ FIRST:')
+        msg = json.loads(out.splitlines()[-1])
         assert "systemMessage" in msg
         assert "checkpoint not written" in msg["systemMessage"]
 

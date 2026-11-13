@@ -180,6 +180,63 @@ def _contract(root: Path, ticket: str, findings: list[str], fingerprint: str) ->
                           sort_keys=False, allow_unicode=True, width=10 ** 6).rstrip("\n").split("\n")
 
 
+RED_KEY = "repair_of_red"  # the node id of the red a scoped close's repair ticket is for (W2-115 S5)
+RED_ASSIGNEE = "orchestrator"
+
+
+def open_red_repair(root: Path, ticket: str, red: dict) -> str:
+    """The repair ticket of a red the scoped close of ``ticket`` found not caused by its change (W2-115 S5): for the
+    orchestrator to fix at once or escalate, the red's node id and failure type in its text; its id. An open one
+    for the same red is reused. Opened by the ticket tool where there is one, else written in the project's ticket
+    form; committed alone, as the orchestrator's record. ``OSError`` where it cannot be written."""
+    import hashlib
+    import yaml
+    from datetime import datetime, timezone
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    root = Path(root)
+    test, kind = str(red.get("test")), str(red.get("failure_type") or "unknown")
+    for path in sorted((root / TICKETS_REL).glob("*.md")):
+        front = frontmatter(path) or {}
+        if front.get(RED_KEY) == test and str(front.get("status")) != "closed":
+            return path.stem
+    title = f"Repair: {test} red ({kind}), not caused by {ticket}"
+    text = (f"The scoped close of {ticket} found `{test}` red with failure type `{kind}`, and not caused by its "
+            f"change: {red.get('reason', '')}\n\nFix it at once or escalate (DEC-968).\n\n- test: {test}\n"
+            f"- failure_type: {kind}\n- found by: the close of {ticket}\n")
+    fields = {"state_class": "AUTHORITATIVE", "role": "orchestrator", RED_KEY: test, "failure_type": kind}
+    repair_id = None
+    try:
+        find(root)
+        created = tk(root, "create", title, "-a", RED_ASSIGNEE, "-d", text, "--tags", "repair,red")
+        repair_id = created.strip().split("\n")[-1].strip()
+        path = root / TICKETS_REL / f"{repair_id}.md"
+        lines = path.read_text(encoding="utf-8").split("\n")
+        end = lines.index("---", 1)
+        extra = yaml.safe_dump(fields, sort_keys=False, allow_unicode=True, width=10 ** 6).rstrip("\n").split("\n")
+        _state.write_whole(path, "\n".join(lines[:end] + extra + lines[end:]))
+    except (GovError, ValueError, OSError):
+        repair_id = None
+    if repair_id is None:
+        prefix = ticket.split("-", 1)[0] if "-" in ticket else "repair"
+        digest = hashlib.sha256(f"{ticket}\n{test}".encode("utf-8")).hexdigest()
+        n = 4
+        while (root / TICKETS_REL / f"{prefix}-{digest[:n]}.md").exists():
+            n += 1
+        repair_id = f"{prefix}-{digest[:n]}"
+        front = {"id": repair_id, "status": "open", "deps": [], "links": [],
+                 "created": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "type": "bug",
+                 "priority": 1, "assignee": RED_ASSIGNEE, "tags": ["repair", "red"], **fields}
+        body = "---\n" + yaml.safe_dump(front, sort_keys=False, allow_unicode=True, width=10 ** 6) + "---\n"
+        (root / TICKETS_REL).mkdir(parents=True, exist_ok=True)
+        _state.write_whole(root / TICKETS_REL / f"{repair_id}.md", body + f"# {title}\n\n{text}")
+    try:
+        _commit_alone(root, f"{TICKETS_REL}/{repair_id}.md", repair_id, ticket)
+    except GovError:  # it stays untracked, as the strict close's repair ticket may (DEC-490)
+        pass
+    return repair_id
+
+
 def _open_repair_of(root: Path, ticket: str, fingerprint: str) -> str | None:
     """The open repair ticket of ``ticket`` opened for the same findings, if there is one."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter

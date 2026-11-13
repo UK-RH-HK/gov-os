@@ -322,7 +322,7 @@ def _install_env_cli(sandbox):
 def _launch_by_wbs(sandbox, role, wbs):
     """``gov launch <role> <wbs_id>``: the run, and the GOV_TICKET the one session started was handed."""
     log = _install_env_cli(sandbox)
-    run = s.run_gov(sandbox, sandbox.project, "launch", role, wbs)
+    run = s.run_gov(sandbox, sandbox.project, "launch", role, wbs, env=s.launch_environment(sandbox))  # gate open
     calls = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()] if log.is_file() else []
     assert run.returncode == 0 and len(calls) == 1, (
         f"gov launch {role} {wbs} did not start exactly one session ({len(calls)} recorded)\n{run.describe()}")

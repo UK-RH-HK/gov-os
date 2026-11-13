@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sgx1-overlap-auditor-result.schema.json",
+  "title": "SANDBOX-GUARD-EXP-1's overlap auditor: out/result.json (its brief's section 6: numbers and fixed words only; W2-149, DEC-1113 (2))",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cases",
+    "decided",
+    "allow",
+    "refuse",
+    "ask",
+    "agrees_x",
+    "agrees_y",
+    "neither",
+    "cannot_settle",
+    "may_change_verdict",
+    "by_class",
+    "instructions_ignored",
+    "stopped"
+  ],
+  "properties": {
+    "cases": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "decided": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "allow": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "refuse": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ask": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "agrees_x": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "agrees_y": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "neither": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cannot_settle": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "may_change_verdict": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "by_class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "properties": {
+        "1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "5": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "6": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "7": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "9": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "10": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "11": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "12": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "13": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "14": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "instructions_ignored": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stopped": {
+      "type": "string",
+      "enum": [
+        "none",
+        "input-missing",
+        "input-malformed",
+        "forbidden-read-needed"
+      ]
+    }
+  }
+}

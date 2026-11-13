@@ -222,7 +222,7 @@ def test_a_name_filter_that_takes_a_protected_file_in_is_decided_by_policy_2_for
     """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above).
 
     Allowed under Policy 2. The engineer's search from the root lies above its ticket's acceptance folder
-    (``tests/acceptance/W1-90/``); whether a name filter for the settings file or the held-out list keeps that folder
+    (``tests/acceptance/<TICKET_WBS_ID>/``); whether a name filter for the settings file or the held-out list keeps that folder
     out is not stated by any source, so that one cell asks only that the call is not refused as a read of the two
     files (DEC-821 item 1, item 3).
     """
@@ -287,7 +287,8 @@ def test_a_search_with_a_filter_that_cannot_match_either_file_stays_allowed(worl
 @pytest.mark.parametrize("form", ("grep-include-quoted-with-a-dot", "rg-short-option-with-the-filter-as-the-next-word"))
 def test_a_search_from_the_root_with_a_source_filter_stays_allowed_for_every_role(world, form, who):
     """Rewritten by W2-58 for the engineer (DEC-821 item 1): a filter for ``*.py`` from the root takes in its ticket's
-    acceptance test (``tests/acceptance/W1-90/test_fixture.py``): refused for (c). The other roles: allowed."""
+    acceptance test (``tests/acceptance/<TICKET_WBS_ID>/test_fixture.py``): refused for (c). The other roles:
+    allowed."""
     result = rnd.ask_form(world, SOURCE_FILTER[form], ROOT, who)
     what = f"{form} from the root by '{who}'"
     if who == folders.NOT_A_WRITER:

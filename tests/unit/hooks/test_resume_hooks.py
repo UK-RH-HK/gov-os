@@ -116,7 +116,8 @@ def test_an_unset_role_is_not_the_orchestrator(tmp_path):
     path = _checkpoint(tmp_path, age_s=3 * 24 * 3600)
     before = _run("precompact.py", tmp_path, role=None)
     after = _run("sessionstart.py", tmp_path, role=None)
-    assert (before.returncode, before.stdout, before.stderr) == (0, "", "")
+    assert (before.returncode, before.stderr) == (0, "") and len(before.stdout.splitlines()) == 1
+    assert before.stdout.startswith('Begin the compaction summary with this line: "READ FIRST:')
     assert (after.returncode, after.stdout) == (0, "")
     assert path.read_text(encoding="utf-8") == WRITTEN
 
@@ -127,7 +128,8 @@ def test_precompact_appends_one_block_and_sessionstart_warns(tmp_path):
     was = path.stat().st_mtime_ns
     for _ in range(2):
         run = _run("precompact.py", tmp_path)
-        assert (run.returncode, run.stdout, run.stderr) == (0, "", "")
+        assert (run.returncode, run.stderr) == (0, "") and len(run.stdout.splitlines()) == 1
+        assert run.stdout.startswith('Begin the compaction summary with this line: "READ FIRST:')
     text = path.read_text(encoding="utf-8")
     assert text.startswith(WRITTEN + BEGIN) and text.endswith(END + "\n") and text.count(BEGIN) == 1
     assert text.count("unavailable (FileNotFoundError)") == 3 and "not known to the hook" in text
@@ -143,7 +145,8 @@ def test_a_checkpoint_precompact_cannot_write_is_left_as_it_was(tmp_path):
     path = _checkpoint(tmp_path, age_s=60)
     path.chmod(0o444)
     run = _run("precompact.py", tmp_path)
-    assert run.returncode == 0 and ORCH in json.loads(run.stdout)["systemMessage"]
+    assert run.stdout.startswith('Begin the compaction summary with this line: "READ FIRST:')
+    assert run.returncode == 0 and ORCH in json.loads(run.stdout.splitlines()[-1])["systemMessage"]
     assert path.read_text(encoding="utf-8") == WRITTEN
     assert sorted(p.name for p in path.parent.iterdir()) == ["CHECKPOINT.md"]
 
@@ -167,4 +170,6 @@ def test_a_write_that_fails_part_way_leaves_the_checkpoint_as_it_was(tmp_path, m
     was = path.stat().st_mtime_ns
     precompact.main()
     assert path.read_text(encoding="utf-8") == WRITTEN + "old tail\n" and path.stat().st_mtime_ns == was
-    assert ORCH in json.loads(capsys.readouterr().out)["systemMessage"]
+    out = capsys.readouterr().out
+    assert out.startswith('Begin the compaction summary with this line: "READ FIRST:')
+    assert ORCH in json.loads(out.splitlines()[-1])["systemMessage"]

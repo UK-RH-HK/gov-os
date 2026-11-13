@@ -54,7 +54,7 @@ list_rows: []
 ---
 # W2-80 Acceptance tests for the close queue's gates (a) to (h) and its refusal path
 
-**WITHDRAWN by the owner (DEC-953 item 10c, approved by DEC-954, 2026-10-30), unbuilt.** The close queue's gates (a) to (h) are lifted (LIFTED-BY-DEC953.md A: ended). It ends by that decision, not by a 10-practice close.
+**WITHDRAWN by the owner (DEC-953 item 10c, approved by DEC-954, 2026-10-30), unbuilt.** The close queue's gates (a) to (h) are lifted (DECISIONS-IN-FORCE.md, its "Lifted" section: ended). It ends by that decision, not by a 10-practice close.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-80), from package P-TOOLS-REVIEW-1 §4 (a) item 2, accepted by the owner (DEC-941; DEC-936 item 2.4).
 

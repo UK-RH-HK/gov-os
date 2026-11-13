@@ -1,6 +1,6 @@
 ---
 id: DAEO-168f
-status: open
+status: closed
 deps: [DAEO-3r1j]
 links: []
 created: 2026-10-31T23:52:57Z
@@ -48,3 +48,5 @@ The owner's SMART-WORK-1 decision 2 (DEC-983): before EXAMIN's copy (W2-27).
 - **Why:** EXAMIN's agents will meet the guard in ordinary work; a refusal that should not happen costs minutes each time, and today only this repository's CTO counts them, from session transcripts (`guard_refusals.py`, DEC-958: 43 since ACT 1, all false). The CTO's script is retired once this lands.
 - **Order:** after W2-110 (the kernel hook's file).
 - **FULL:** it is the guard, though it only records; the QA engineer probes for any decision changed and any text recorded.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): G-10: the harvest is stopped.

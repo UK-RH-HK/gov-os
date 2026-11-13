@@ -498,6 +498,7 @@ def run_hook(command, tree, sandbox, stdin, role=ORCHESTRATOR, ticket=None, path
         "CLAUDE_PROJECT_DIR": str(tree),
         "PYTHONDONTWRITEBYTECODE": "1",
         "GIT_CONFIG_GLOBAL": os.devnull,
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     if role is not None:
         env["GOV_ROLE"] = role

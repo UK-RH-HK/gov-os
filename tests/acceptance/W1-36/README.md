@@ -144,3 +144,27 @@ does not silently drop this part of S2.
 ## Earlier tests revised
 
 None beyond the DEC-447 revision above.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 74 in the full run, 10 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Retrieval runs facets in disposable subagents and returns only the validated bundle [CAP-16.b, CAP-56.a] | `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_says_only_the_validated_bundle_returns` | the ticket's words |
+| S2: Audit produces a report naming its milestone (DEC-088) with one row per contract item and decision in scope, each classed OK/MISSING/WEAKENED/C... | `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_has_rows_per_contract_item_and_decision`, `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_yellow_when_no_audit_report_folder_missing` | the ticket's words |
+| S3: Contested and owner-level findings appear in chat as decision packages; agreed fixes become tickets; each skill versioned, body <= 2.5k tokens | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_level_findings_become_decision_packages`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_finding_requires_decision_package_before_ticket`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_contested_findings_become_decision_packages` | the ticket's words |
+| S4: No skill file grants a permission or states a rule as its own authority: a skill is a method, holds no tool permissions, and cites the policy o... | `test_w1_36_audit_skill.py::TestAuditReport::test_the_skill_cites_dec_088`, `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_report_states_pack_hash`, `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_cites_dec_032` | the ticket's words |
+| S5: Registers the skill-regression family check over its four skills and the audit-reproducibility family check (an audit report's cited commit, ro... | `test_w1_36_check_declarations.py::TestSkillRegressionCheck::test_family_normalises_to_skill_regression`, `test_w1_36_check_declarations.py::TestAuditReproducibilityCheck::test_family_normalises_to_audit_reproducibility`, `test_w1_36_audit_skill.py::TestAuditReportDEC441Form::test_mentions_commit_as_report_field` | the ticket's words |
+| S6: The audit skill starts a fresh session whose only inputs are the bounded context pack from gov context and the repository, and the report state... | `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_inputs_are_context_pack_and_repository`, `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_report_states_pack_hash` | the ticket's words |
+| S7: A wave-exit audit report has one row per LITE feature specification closed in the wave (DEC-088) [CAP-47.d] | `test_w1_36_audit_skill.py::TestAuditWaveExit::test_wave_exit_covers_every_lite_feature_spec` | the ticket's words |
+| F1: Intermediate retrieval batches appear in the main context | `test_w1_36_retrieval_skill.py::TestRetrievalFailure::test_the_skill_addresses_the_main_context_boundary` | the ticket's words |
+| F2: The audit skill edits audited files | `test_w1_36_audit_skill.py::TestAuditReadOnly::test_the_skill_says_it_does_not_edit_audited_files` | the ticket's words |
+| F3: An owner-level finding becomes a ticket without a decision package | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_finding_requires_decision_package_before_ticket` | the ticket's words |

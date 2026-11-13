@@ -248,7 +248,8 @@ class Run:
 def line_env(box: Box, project: Path, path: str, inherited: dict | None = None) -> dict:
     env = {"HOME": str(box.home), "PATH": path, "LANG": "C.UTF-8", "TMPDIR": os.environ.get("TMPDIR", "/tmp"),
            "CLAUDE_PROJECT_DIR": str(project), "GOV_ROLE": "engineer", "GOV_TICKET": TICKET,
-           "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+           "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+           **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"}}  # DEC-1108 (5): the test's own log
     env.update(inherited or {})
     return env
 

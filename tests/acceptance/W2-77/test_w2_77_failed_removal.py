@@ -113,6 +113,11 @@ def test_the_failed_removal_goes_to_standard_error_on_a_line_naming_the_clone(ni
 
 
 def test_a_failed_clean_up_does_not_change_the_verdict(night):
+    """The verdict stays green and the record's other keys are exactly today's (``support.RECORD_KEYS``, which names
+    ``secrets_full_scan``); ``cleanup`` is the one key a failed removal adds.
+
+    Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+    """
     result = support.green(night.run)
     record, _ = support.record_of(night.project, night.run)
     assert record.get("verdict") == support.GREEN and result.get("verdict") == support.GREEN, \

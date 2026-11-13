@@ -26,6 +26,9 @@ State. A gate is in one of five states: open, answered, declined, revoked, stale
 The state lives in `status` alone, with no second key (DEC-328): `PROPOSED` is open, `ACCEPTED` is answered,
 `DECLINED` is declined, `REVOKED` is revoked and `STALE` is stale.
 Only an answered gate of the same CIT permits the next actions.
+
+Links (LINK-INTEGRITY §5). Name every decision the question rests on by id, ACCEPTED ones as rules and a PROPOSED
+one as "proposed"; `constrains:` holds ticket ids only (DEC-1073).
 -->
 
 ## Question

@@ -165,3 +165,24 @@ test designer: `tests/acceptance/W2-54/test_w2_54_audit_report.py`, 24 passed; t
 5. **W2-59, `test_w2_59_judge_checks.py`** — compares core-schema's status between two runs in the same environment
    and asserts no `No module named`; with no check-jsonschema on its judge's `PATH` both runs are RED and the
    comparison still holds. Not expected to be affected.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 70 in the full run, 13 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: core-schema validates every record against its schema through check-jsonschema (pinned in the tool registry), not a subset; lens G's planted ti... | `test_w2_64_full_validator.py::test_lens_g_planted_ticket_is_refused_naming_record_and_rule` | the ticket's words |
+| S2: docs/imported/ is left out of the schema check, as history, and the check says so by name [DEC-844] | `test_w2_64_imported.py::test_a_refused_record_under_docs_imported_does_not_fail_and_is_named_as_history`, `test_w2_64_live.py::test_core_schema_is_green_here_and_names_docs_imported`, `test_w2_64_imported.py::test_the_refusal_also_names_docs_imported_as_left_out` | the ticket's words |
+| S3: Every record on w2/integrate today, the close records of docs/close/ included, still validates [DEC-872 item 2] | `test_w2_64_live.py::test_every_close_record_here_validates_under_the_pinned_validator`, `test_w2_64_close_schema.py::test_this_repository_s_close_records_validate` (1 of 3) | the ticket's words |
+| S4: The close schema states the evidence block W2-66's close writes (scope, base commit, head, tree, what ran, what was left out and why, every ski... | `test_w2_64_close_schema.py::test_an_evidence_block_without_a_required_field_is_refused` (12 of 12) | the ticket's words |
+| S5: W2-61's 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3] | `test_w2_64_full_validator.py::test_the_installed_layout_alone_is_measured` | the ticket's words |
+| F1: A record that its schema refuses passes core-schema; a refusal that does not name the record and the rule. | `test_w2_64_full_validator.py::test_lens_g_planted_ticket_is_refused_naming_record_and_rule` | the ticket's words |
+| F2: check-jsonschema missing or failing to run reported as anything but RED. | `test_w2_64_tool_red.py::test_check_jsonschema_absent_from_path_is_red_naming_the_tool`, `test_w2_64_tool_red.py::test_a_validator_that_fails_to_run_or_answers_no_json_is_red` (1 of 5) | the ticket's words |

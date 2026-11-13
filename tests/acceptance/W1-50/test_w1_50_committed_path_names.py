@@ -30,7 +30,7 @@ acceptance test. Then, in the working tree only:
    untracked file for ``git status``.
 
 ``git status`` is empty after the call: the swap is hidden. The commit still
-changes ``tests/acceptance/W1-90/test_fixture.py``.
+changes ``ACCEPTANCE_FILE`` (the planted ticket's ``test_fixture.py``).
 
 The same commit without the swap is
 ``test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is``

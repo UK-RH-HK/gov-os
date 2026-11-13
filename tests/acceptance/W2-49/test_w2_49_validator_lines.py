@@ -23,6 +23,7 @@ from __future__ import annotations
 import re
 
 import pytest
+import yaml
 
 from w2_49_support import (
     CHECK_APPLIED,
@@ -179,12 +180,21 @@ def test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it(tmp_path, i
     assert_pass(checks, output, CHECK_MOVED)
 
 
+# An item that stays in Wave 2 under every change decided so far: not one of W2-49's, not CAP-45.a (DEC-1093),
+# not one of DEC-841's nine.
+STAYS_W2 = "CAP-61.f"
+
+
 def test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it(tmp_path, inputs):
-    """Failure (ii), edge: a CIT-P line the Contract never applied (CAP-45.a to W3; it is W2) fails, naming it."""
+    """Failure (ii), edge: a CIT-P line the Contract never applied (CAP-61.f to W3; it is W2) fails, naming it."""
+    # Rewrite-Reason: DEC-1093 (1) — CAP-45.a really is W3 after the apply, so a "CAP-45.a, wave W3" line would be
+    # applied; the edge case is built on CAP-61.f, which stays W2 (checked first), with the same expectations.
+    covers = {c["id"]: c.get("wave") for cap in yaml.safe_load(inputs[CONTRACT_YAML])["capabilities"] for c in cap.get("covers") or []}
+    assert covers.get(STAYS_W2) == "W2", f"the premise fails: {STAYS_W2} is {covers.get(STAYS_W2)!r} in contract.yaml, not W2"
     files = dict(inputs)
     rel = "docs/changes/W2-49-CIT-P.md"
     assert rel in files, f"{rel} is not in this tree"
-    files[rel] = inputs[rel] + "\n```yaml\n  - id: CAP-45.a\n    wave: W3\n```\n"
+    files[rel] = inputs[rel] + f"\n```yaml\n  - id: {STAYS_W2}\n    wave: W3\n```\n"
     checks, output = run_validator(build(tmp_path, files))
-    assert_fails_naming(checks, output, CHECK_APPLIED, "CAP-45.a", list(CIT_P_LINES))
+    assert_fails_naming(checks, output, CHECK_APPLIED, STAYS_W2, list(CIT_P_LINES))
     assert_pass(checks, output, CHECK_MOVED)

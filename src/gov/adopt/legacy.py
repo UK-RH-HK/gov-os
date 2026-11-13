@@ -20,7 +20,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-from gov.adopt import project
+from gov.adopt import project, safety
 from gov.adopt.project import FOLDER, git, refuse
 from gov.cli.errors import GovError
 
@@ -141,25 +141,26 @@ def _proof(run, store: list[str], retiring: set, rule_files: list[str]) -> dict:
     # a record counts unless its status says it no longer stands: any other status, or none, holds the store back
     read = [record for record in records if record["status"] not in NO_LONGER_STANDS and record["path"] not in retiring
             and not record["path"].startswith(FOLDER + "/")]
-    for record in read:
+    for record in read:  # by the record graph's edges, and in its text by the store's paths and ids (W2-23 S3)
         text = project.blob(run.root, run.tracked[record["path"]]).decode("utf-8", "replace")
+        found = safety.citations(text, store, ids)
         cited = sorted({edge["target"] for edge in edges if edge["source"] == record["id"] and edge["target"] in ids}
-                       | {rel for rel in store if rel in text})
+                       | {item["cites"] for item in found})
         if cited:
-            citers.append({"record": record["id"], "path": record["path"], "cites": cited})
+            citers.append({"record": record["id"], "path": record["path"], "cites": cited, "found": found})
     declared = {item["path"] for item in run.records["A3"]["artefacts"] if item.get("kind") == "rule-file"}
     rules = sorted({rel for rel in run.tracked if rel.startswith(LOADED) or PurePosixPath(rel).name in LOADED_NAMES}
                    .union(rule_files, declared & set(run.tracked)) - set(store))
     for rel in rules:
-        text = project.blob(run.root, run.tracked[rel]).decode("utf-8", "replace")
-        cited = [name for name in (*store, *ids) if re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", text)]
-        if cited:
-            citers.append({"rule": rel, "cites": cited})
+        found = safety.citations(project.blob(run.root, run.tracked[rel]).decode("utf-8", "replace"), store, ids)
+        if found:
+            citers.append({"rule": rel, "cites": sorted({item["cites"] for item in found}), "found": found})
     proof = {"store": store, "ids": ids, "records_read": [record["id"] for record in read], "rules_read": rules,
              "citers": citers}
     if citers:
         raise refuse("STORE_STILL_CITED", "the legacy memory store is not retired, it is still cited by "
-                     + ", ".join(f"{item.get('record') or item['rule']} ({item.get('path') or 'a rule'})"
+                     + "; ".join(f"{item.get('record') or item['rule']} ({item.get('path') or 'a rule'})"
+                                 + "".join(f", {cite['form']} {cite['found']!r}" for cite in item.get("found", []))
                                  for item in citers) + ": nothing is retired", **proof)
     return proof
 
@@ -205,7 +206,8 @@ def retire(run) -> dict:
     from gov.adopt.stages import REFS, guard, rebuild
 
     guard(run)
-    listed = [item for item in run.records["A3"]["artefacts"] if item["action"] == "RETIRE"]
+    safety.refuse_after_failed_a6(run)
+    listed =[item for item in run.records["A3"]["artefacts"] if item["action"] == "RETIRE"]
     moved = [item["path"] for item in listed if run.tracked.get(item["path"]) != item["blob"]]
     if moved:
         raise refuse("PLAN_NOT_EXECUTABLE", ", ".join(moved) + ": not in the tree as the path map recorded them; "
@@ -257,7 +259,7 @@ def retire(run) -> dict:
         result = run.finish(data, {CIT_E: _cit_e(head, archive, retired, proof)} if listed else None,
                             next_step=GENERATE, retired=sorted(retiring))
     except (OSError, GovError):
-        project.restore(run.root, head)
+        project.restore(run.root, head, [*targets, CIT_E])  # only what this stage wrote (W2-23 S1)
         if listed and existed is None:
             git(run.root, "update-ref", "-d", archive)
         raise

@@ -5,6 +5,8 @@
   "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/record_id" },
-    "type": { "const": "research" }
+    "type": { "const": "research" },
+    "sources": { "description": "The ids the research cites (DEC-1073); optional.", "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "decisions": { "description": "The decisions the research feeds (DEC-1073); optional.", "type": "array", "items": { "type": "string", "minLength": 1 } }
   }
 }

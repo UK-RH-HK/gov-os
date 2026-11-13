@@ -1,0 +1,20 @@
+category: contract
+commit: cc9c94d42a54
+question: "What must a question for the owner contain, and how many can I send at once?"
+gold_answer: >-
+  A decision package in the active chat with MR-6's eight fields: question, why now, options, impact, reversibility,
+  cost, recommendation and confidence (the template carries ten). Packages are ranked P1 to P3 and sent at most five
+  at a time; a P1 may bypass the cap (MR-6 in the Charter and the Contract; DEC-093).
+sources:
+  - path: docs/charter/CHARTER_v5.md
+    heading: "- **MR-6 The human is the customer and final authority (L5).** The questions that matter reach the human:"
+    lines: [115, 118]
+  - - path: docs/contract/contract.yaml
+      heading: "- id: MR-6"
+      lines: [205, 210]
+    - path: docs/contract/CONTRACT_v4.md
+      heading: "| MR-6 | The human is the customer and final authority | Every owner question appears in the active chat as a package with all eight MR-6 fields (the template carries ten), ranked P1–P3 and batched at most five at a time, P1 allowed to bypass; the dependent branch waits while an independent branch proceeds; each answer is committed as a decision record. | W1-34, W1-35, W1-42 | MR-A-03, MR-B-03 | DEC-065, DEC-093 |"
+      lines: [60, 60]
+    - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-093 — Decision packages: at most five at a time; P1 may bypass the cap"
+      lines: [846, 849]

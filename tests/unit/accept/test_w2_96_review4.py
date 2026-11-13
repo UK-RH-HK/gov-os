@@ -22,6 +22,7 @@ import pytest
 
 from gov.accept import runner
 from gov.cli.main import main
+from w2_96_reap import launch_fixture
 
 pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="the subreaper is Linux only")
 
@@ -53,7 +54,6 @@ FORKER = {"hop": ("import os, sys, time\nstop = time.monotonic() + 20\nwhile tim
 FORKING = ("import os, subprocess, sys, time\n\ndef test_a():\n"
            "    subprocess.Popen([sys.executable, {forker!r}, {pids!r}], start_new_session=True)\n"
            "    time.sleep(0.5)\n{tail}")
-WRAPPER = "import sys\nfrom gov.cli.main import main\nsys.exit(main(sys.argv[1:]))\n"
 
 
 def _plant(root: Path, test: str) -> None:
@@ -106,12 +106,9 @@ def _subreaper() -> int:
     return value.value
 
 
-def _launch(root: Path, temp: Path, tmp_path: Path) -> subprocess.Popen:
-    script = tmp_path / "w296_gov.py"
-    script.write_text(WRAPPER)
-    env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]), TMPDIR=str(temp))
-    return subprocess.Popen([sys.executable, str(script), "accept", "DAEO-t001", "--json", "--root", str(root)],
-                            env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+# the stop tests' planted gov: reaped, with the pytest it started and every own-session process under it, however
+# the case ends (``w2_96_reap``; incident 2026-11-10 00:43)
+launch = launch_fixture()
 
 
 def _wait_for(path: Path, seconds: float = 60) -> None:
@@ -144,12 +141,13 @@ def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_finished_run_cleans_
 
 
 @pytest.mark.parametrize("signum", [2, 15, 1])
-def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, signum):
+def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                   signum):
     root, temp = project
     started = tmp_path / "started"
     test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
     _plant(root, test)
-    gov = _launch(root, temp, tmp_path)
+    gov = launch(root, temp)
     _wait_for(started)
     gov.send_signal(signum)
     out, _ = gov.communicate(timeout=60)
@@ -164,14 +162,14 @@ def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_u
 
 @pytest.mark.parametrize("kind", ["hop", "breed"])
 @pytest.mark.parametrize("stop", [None, 15])
-def test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound(project, tmp_path, kind, stop):
+def test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound(project, tmp_path, launch, kind, stop):
     root, temp = project
     forker, pids, started = tmp_path / "w296_forker.py", tmp_path / "forked.pids", tmp_path / "started"
     forker.write_text(FORKER[kind])
     tail = "" if stop is None else f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n"
     _plant(root, FORKING.format(forker=str(forker), pids=str(pids), tail=tail))
     began = time.monotonic()
-    gov = _launch(root, temp, tmp_path)
+    gov = launch(root, temp)
     if stop is not None:
         _wait_for(started)
         gov.send_signal(stop)

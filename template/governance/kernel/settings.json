@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(gov launch:*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

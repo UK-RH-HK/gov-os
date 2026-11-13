@@ -12,12 +12,16 @@ imports nothing but the standard library. pytest's own ``--deselect`` cannot do 
 begins with its argument, so ``file::test_a`` would take ``file::test_a_too`` with it.
 
 The serial run afterwards is given the module too, with the entries of that run: an entry that names no case
-ends the run with an error, where pytest itself passes over a file without a case (DEC-549).
+ends the run with an error, where pytest itself passes over a file without a case (DEC-549). One exception
+(W2-154; DEC-1112 (3), DEC-1061): an entry whose every case another plugin of the run left out (the project's
+opt-in lists, reported to ``pytest_deselected``) is "not in this run": the plugin says so, names the entry in the
+file ``GOV_CLOSE_SERIAL_ONLY_OUT`` names, and the run does not stop. The plugin never reads an opt-in list itself.
 """
 
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 LIST_REL = "tests/acceptance/serial-only.txt"
@@ -26,6 +30,11 @@ PLUGIN = "gov_close_serial_only"
 ROOT_VARIABLE = "GOV_CLOSE_SERIAL_ONLY_OF"
 # Names to the plugin, in the serial run afterwards, the entries that run was given, one on a line.
 GIVEN_VARIABLE = "GOV_CLOSE_SERIAL_ONLY_GIVEN"
+# Names the file the serial run afterwards writes the entries that are "not in this run" to, one on a line.
+OUT_VARIABLE = "GOV_CLOSE_SERIAL_ONLY_OUT"
+
+# The node ids (relative to the project's root) that other plugins passed to ``pytest_deselected`` in this run.
+_deselected: list[str] = []
 
 
 def entries(root: Path) -> list[str]:
@@ -48,6 +57,26 @@ def _node(item, root: str) -> str:
     return path + "".join(item.nodeid.partition("::")[1:])
 
 
+def pytest_configure(config) -> None:
+    _deselected.clear()
+
+
+def pytest_deselected(items) -> None:
+    """Every case another plugin leaves out of the run, as the list gives ids; only the run afterwards uses them."""
+    root = os.environ.get(ROOT_VARIABLE)
+    if root and os.environ.get(GIVEN_VARIABLE):
+        _deselected.extend(_node(item, root) for item in items)
+
+
+def _say(config, line: str) -> None:
+    """``line`` to the run's output: pytest's terminal reporter (the run's capture would swallow a print here)."""
+    reporter = config.pluginmanager.get_plugin("terminalreporter")
+    if reporter is not None:
+        reporter.write_line(line)
+    else:
+        print(line, file=sys.__stdout__, flush=True)
+
+
 def pytest_collection_modifyitems(config, items) -> None:
     root = os.environ.get(ROOT_VARIABLE)
     given = os.environ.get(GIVEN_VARIABLE)
@@ -56,8 +85,17 @@ def pytest_collection_modifyitems(config, items) -> None:
 
         nodes = [_node(item, root) for item in items]
         empty = [entry for entry in given.split("\n") if not any(declares(entry, node) for node in nodes)]
+        # An entry with no collected case whose cases another plugin left out is not in this run (W2-154).
+        out = [entry for entry in empty if any(declares(entry, node) for node in _deselected)]
+        empty = [entry for entry in empty if entry not in out]
+        target = os.environ.get(OUT_VARIABLE)
+        if target:
+            Path(target).write_text("".join(entry + "\n" for entry in out), encoding="utf-8")
         if empty:
             raise pytest.UsageError(f"no case is named by the entry of {LIST_REL}: {', '.join(empty)}")
+        for entry in out:
+            _say(config, f"{PLUGIN}: not in this run: {entry}")
+        config._gov_close_serial_only_out = bool(out)
         return
     declared = entries(Path(root)) if root else []
     if not declared:
@@ -68,3 +106,15 @@ def pytest_collection_modifyitems(config, items) -> None:
     if apart:
         config.hook.pytest_deselected(items=apart)
         items[:] = kept
+
+
+# The hook runs after the project's own (its conftest's opt-in mechanism reports what it leaves out first), and the
+# module stays standard-library only: pluggy's marks are set as ``pytest.hookimpl(trylast=True)`` sets them.
+pytest_collection_modifyitems.pytest_impl = {"wrapper": False, "hookwrapper": False, "optionalhook": False,
+                                             "tryfirst": False, "trylast": True, "specname": None}
+
+
+def pytest_sessionfinish(session, exitstatus) -> None:
+    """A run of which every entry given is out ends 0: pytest itself ends 5 when it runs no case (W2-154)."""
+    if getattr(session.config, "_gov_close_serial_only_out", False) and session.exitstatus == 5:
+        session.exitstatus = 0

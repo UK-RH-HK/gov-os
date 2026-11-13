@@ -1,0 +1,16 @@
+# W2-88a (DAEO-pg6i) closed: merged and closed in one step by the merge queue (DEC-989)
+
+- Commit tested (the lead's final, verified result): c79a20f1fa69; merge 5d535ee621ba; w2/integrate 36fc597ca74f -> 5d535ee621ba (fast-forward to the tested merge); profile STANDARD
+- Queue record: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/5d535ee621ba.json; log /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261113-125209-395177
+- Batch: W2-88a
+- Run: scoped, 142 targets; counts {'tests': 5667, 'failures': 4, 'errors': 4, 'skipped': 9}
+- Selected: tests/acceptance/W2-88a/, tests/unit/accept, tests/unit/adapters, tests/unit/adopt, tests/unit/bridge, tests/unit/brief, tests/unit/check, tests/unit/checkpoint, tests/unit/ci, tests/unit/cli, tests/unit/close/test_evidence.py, tests/unit/close/test_nightly.py, tests/unit/close/test_nightly_cleanup.py, tests/unit/close/test_parallel_runs.py, tests/unit/close/test_run_and_record.py, tests/unit/close/test_select.py, tests/unit/close/test_serial.py, tests/unit/close/test_serial_eng_w2_154.py, tests/unit/close/test_serial_w2_154_nightly.py, tests/unit/close/test_serial_w2_154_plugin.py, tests/unit/close/test_serial_w2_154_support.py, tests/unit/close/test_tool.py, tests/unit/close/test_w2_115_attribution.py, tests/unit/close/test_w2_115_batch.py, tests/unit/close/test_w2_115_close.py, tests/unit/close/test_w2_115_nightly.py, tests/unit/close/test_w2_115_select.py, tests/unit/close/test_w2_115_support.py, tests/unit/close/test_w2_115_verdict.py, tests/unit/close/test_w2_115_verify.py, tests/unit/closure, tests/unit/codeintel, tests/unit/context, tests/unit/decisions, tests/unit/dispatch, tests/unit/doctor, tests/unit/gitenv, tests/unit/guard/test_decide.py::TestAuditor, tests/unit/guard/test_decide.py::TestNonRoleSubagent, tests/unit/guard/test_decide.py::TestDenyOutputFormat ...
+- Reds caused by the change: none (the queue advances only then); flaky candidates: tests/unit/dispatch/test_peaks.py, tests/unit/dispatch/test_returns.py, tests/unit/dispatch/test_start.py, tests/unit/dispatch/test_status.py
+- Traced against: 36fc597ca74fe6b6e51ad56ff3b70f8a94dcf5cf (the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050))
+- Red on the head without the batch too, the same failure, not this change's (investigated by the CTO at once, DEC-968): tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[], tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition, tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead], tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]
+- Acceptance tests' authors (G-1, DEC-1050): 1 commit(s) changing tests/acceptance/, each with Role: independent-test-designer or owner
+- Core changed (scoped, not full, DEC-968): none; unplaced: none
+- Review: not required (STANDARD)
+- gitleaks: off by configuration (DEC-1045): the change was not scanned
+- Queue run: 2026-11-13 12:52:09 to 2026-11-13 13:11:56
+- Closed: 2026-11-13 13:12:43 GMT, by the orchestrator under DEC-953 items 1 and 5, DEC-989

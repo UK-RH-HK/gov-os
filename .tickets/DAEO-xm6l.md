@@ -1,6 +1,6 @@
 ---
 id: DAEO-xm6l
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-a3m2]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -78,3 +78,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-22), as approved (DEC-729). The list row
   - Model hashes are cached by size and mtime [W2-L101].
   - `gov doctor` exits 0 on this repository [F-M2, W2-M290].
 - **KPIs, failure:** a tool at the wrong version still fails; a real canary miss still fails.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): B1-24 ("`gov doctor` green" lives in W2-27 and W2-46).

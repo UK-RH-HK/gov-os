@@ -15,8 +15,8 @@ T is ``DAEO-zz58`` (``wbs_id: W2-95``); its acceptance folder is
 engineer <T>`` hands the CLI holds no ``Read`` deny rule and no sandbox read
 denial that covers a file of T's acceptance folder. The CLI turns every Read
 deny rule that matches existing files into a read denial of the session's own
-commands, whatever its form (``<folder>/**``, ``<file>*``, ``W2-5[8]/**``,
-measured in P-W2-58-1): a wildcard does not keep the sandbox out, so pytest would
+commands, whatever its form (``<folder>/**``, ``<file>*``, the folder's name with
+its last digit in brackets and ``/**``, measured in P-W2-58-1): a wildcard does not keep the sandbox out, so pytest would
 collect nothing. The guard alone refuses (c). The held-out material keeps its
 Read rules (b). What a launched session does with this is in
 ``test_w2_58_launched_sessions.py``.

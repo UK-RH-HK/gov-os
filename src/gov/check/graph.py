@@ -5,35 +5,13 @@ import json
 import re
 from pathlib import Path
 
-import yaml
+from gov.util.frontmatter import ids as _ids
+from gov.util.frontmatter import quiet as _frontmatter
 
 VERSION = "1.0.0"
 
 RECORD_PATHS = (".tickets", "docs")
 GENERAL_ID = re.compile(r"^[A-Za-z0-9]+-[A-Za-z0-9._-]+$")
-
-
-def _frontmatter(text: str) -> dict | None:
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None
-    try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
-
-
-def _ids(value) -> list[str]:
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, list):
-        return [str(v) for v in value if v]
-    return []
 
 
 def check(root: Path) -> list[dict]:

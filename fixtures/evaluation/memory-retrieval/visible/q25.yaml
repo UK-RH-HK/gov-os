@@ -1,0 +1,11 @@
+category: plan
+commit: cc9c94d42a54
+question: "Before I start new work in Wave 2, how do I decide whether it becomes a list row or must go to the owner first?"
+gold_answer: >-
+  Classify it first (the plan's finish line, WAVE_2_WBS.md §6): if it breaks a Wave 2 exit criterion (§5) or is a
+  fail-open hole that ordinary work produces, it comes to the owner as a package before any round starts; if neither,
+  it goes on the Wave 2 list as a new row, triaged to Wave 3 or the backlog, with no new round.
+sources:
+  - path: docs/plan/WAVE_2_WBS.md
+    heading: "- **Before opening any new work in Wave 2, classify it.** Does it break a Wave 2 exit criterion (§5)? Is it a fail-open hole that ordinary work produces?"
+    lines: [1875, 1877]

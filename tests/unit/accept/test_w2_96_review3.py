@@ -3,7 +3,8 @@ private folder tolerates a process that changes it meanwhile or removes it first
 the entries, not their square (R15).
 
 Each test plants a tiny project, or a tree, in a temporary folder; the signal test starts ``gov accept`` as its
-own process. Nothing runs against this repository's own acceptance folders.
+own process, reaped with everything it started however the case ends (``w2_96_reap``; incident
+2026-11-10 00:43). Nothing runs against this repository's own acceptance folders.
 """
 
 from __future__ import annotations
@@ -13,8 +14,6 @@ import json
 import os
 import shutil
 import signal
-import subprocess
-import sys
 import tempfile
 import threading
 import time
@@ -24,6 +23,7 @@ import pytest
 
 from gov.accept import runner
 from gov.cli.main import main
+from w2_96_reap import launch_fixture
 
 MARK = "PLANTED-LEAK-91d4"  # planted in assertions, output and names: must never reach the caller
 ONE_LINE = "| KPI | Test |\n|---|---|\n| S1 | `test_a.py` |\n"
@@ -250,11 +250,10 @@ def test_w2_96_r14_an_unstopped_run_whose_entries_vanish_is_never_a_crash(projec
     assert list(temp.iterdir()) == []
 
 
-# gov accept as its own process; with W296_VANISH set, every entry the removal takes is removed just before it by
-# "another process", so that each of its own calls meets "file not found"
-WRAPPER = """import os, sys
-from gov.cli.main import main
-if os.environ.get("W296_VANISH"):
+# the planted gov's own head: with W296_VANISH set, every entry the removal takes is removed just before it by
+# "another process", so that each of its own calls meets "file not found". Every planted gov is reaped, with the
+# pytest it started and the writer's own session, however the case ends (``w2_96_reap``).
+HEAD = """if os.environ.get("W296_VANISH"):
     unlink, rmdir = os.unlink, os.rmdir
     def first_unlink(name, *, dir_fd=None):
         unlink(name, dir_fd=dir_fd)
@@ -265,25 +264,18 @@ if os.environ.get("W296_VANISH"):
         if dir_fd is not None:
             rmdir(name, dir_fd=dir_fd)
     os.unlink, os.rmdir = first_unlink, first_rmdir
-sys.exit(main(sys.argv[1:]))
 """
+launch = launch_fixture(HEAD)
 
 
 @pytest.mark.parametrize("signum", [2, 15, 1])
 @pytest.mark.parametrize("vanish", [True, False])
-def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, signum, vanish):
+def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
     root, temp = project
     started = tmp_path / "started"
     test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
     _plant(root, {"test_a.py": test})
-    script = tmp_path / "w296_gov.py"
-    script.write_text(WRAPPER)
-    env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]), TMPDIR=str(temp))
-    env.pop("W296_VANISH", None)
-    if vanish:
-        env["W296_VANISH"] = "1"
-    gov = subprocess.Popen([sys.executable, str(script), "accept", "DAEO-t001", "--json", "--root", str(root)],
-                           env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
     deadline = time.monotonic() + 60
     while not started.exists() and time.monotonic() < deadline:
         time.sleep(0.05)

@@ -77,11 +77,16 @@ KERNEL_NOT_SWITCHED_OVER = (
 
 @pytest.fixture(scope="session")
 def kernel_base(tmp_path_factory):
-    """A project generated from the template, with W1-05's fixture ticket and files. Never run a hook in it."""
+    """A project generated from the template, with W1-05's fixture ticket and files. Never run a hook in it.
+
+    It also holds the orchestrator's ticket ``DAEO-zz91`` and a roster naming it as the coordination ticket, so the
+    orchestrator on it is the CTO (DEC-957, DEC-971 item 4; DEC-980).
+    """
     try:
-        return kernel_wiring.w1_05_project(tmp_path_factory.mktemp("w2-90-w1-05-kernel"))
+        project = kernel_wiring.w1_05_project(tmp_path_factory.mktemp("w2-90-w1-05-kernel"))
     except kernel_wiring.GenerationFailed as exc:
         pytest.fail(str(exc), pytrace=False)
+    return kernel_wiring.plant(project, support.coordination_files(), "the project's coordination ticket (DEC-980)")
 
 
 @pytest.fixture(scope="session")

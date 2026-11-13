@@ -1,0 +1,11 @@
+category: plan
+commit: cc9c94d42a54
+question: "In the Wave 2 triage, what is the difference between a row named in a ticket's KPIs and one that fits its paths and KPIs?"
+gold_answer: >-
+  "Named in W2-xx's KPIs" means the ticket card cites the row; "fits W2-xx's paths and KPIs" means the row lies inside
+  that ticket's allowed paths and subject, so its builder takes it in the same round and the test designer may cite it
+  (WAVE_2_TRIAGE.md, "How to read it").
+sources:
+  - path: docs/plan/WAVE_2_TRIAGE.md
+    heading: "**How to read it.** \"Named in W2-xx's KPIs\" means the ticket card cites the row. \"Fits W2-xx's paths and KPIs\" means the row lies inside that ticket's allowed paths and subject, and its builder takes it in the same round; the test designer may cite it. A row's state is re-checked against the code when its ticket picks it up (DEC-718); a row found already fixed is closed with the commit that fixed it. The owner may move any row (queued package Q-12). Revised after the owner's review of 2026-10-16 (DEC-720 to DEC-727): W2-M102 and W2-L233 come into W2-13; W2-I017 comes in, lite, through W2-49; EXP-003's rows split between W2-15a, W2-32 and W2-15b; the caching rows move to W2-48. Revision 3 (DEC-728): W2-M355, live clones under /tmp lost on reboot, moves from W2-14 to W2-50, the durable scratch root."
+    lines: [14, 14]

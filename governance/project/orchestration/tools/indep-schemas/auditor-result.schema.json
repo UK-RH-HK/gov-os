@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditor-result.schema.json",
+  "title": "The independent auditor's out/result.json (first version, W2-149; a brief may revise it with its own approval)",
+  "type": "object",
+  "required": ["misses"],
+  "properties": {
+    "misses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gold_wrong": {"type": "integer", "minimum": 0},
+        "question_ambiguous": {"type": "integer", "minimum": 0},
+        "retrieval_miss": {"type": "integer", "minimum": 0},
+        "answer_wrong": {"type": "integer", "minimum": 0},
+        "out_of_scope": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

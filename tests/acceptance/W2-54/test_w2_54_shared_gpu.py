@@ -1,17 +1,18 @@
 """Round 4, KPI success 5 on the real models (DEC-798, owner, 2026-10-19, P-W2-40 (b)): on the shared GPU Ollama,
 the same text read many times, after different texts and by two sessions at once, gets one vector; the shared runner
-is never moved to the CPU; the CPU-only embedder holds the model on the CPU.
+is never moved to the CPU; the query server holds the model on the GPU (DEC-1033 (2)(b), which replaced DEC-798's
+"the CPU-only embedder holds the model on the CPU"; DEC-1065 (1): no CPU embedder anywhere).
 
 **The lead runs these cases, in the lead's session, outside any sandbox** (README, "Round 4", "The cases on the shared
 GPU"). They need this machine's Ollama at its default address (``127.0.0.1:11434``) holding ``qwen3-embedding:0.6b``
 on the GPU, the real ``ollama`` executable where DEC-260 looks (``GOV_OLLAMA_BIN``, ``PATH``,
-``~/.local/ollama/bin/ollama``), ``sqlite_vec`` and ``gitleaks``. Neither address is set: the CPU embedder is at its
+``~/.local/ollama/bin/ollama``), ``sqlite_vec`` and ``gitleaks``. Neither address is set: the query server is at its
 default address, ``GOV_QUERY_OLLAMA_HOST``'s default (README, "The interfaces this KPI needs"). Inside a sandbox the
 shared server cannot be reached and the GPU is blocked, so nothing measured there is evidence about the GPU.
 
 Marked ``shared_gpu``: a run selects them only with ``-m shared_gpu`` (``conftest.py`` deselects them otherwise).
 Selected, they **fail, they do not skip**, when a prerequisite is missing or the shared server does not hold the model
-on the GPU. Each case prints what it saw (run with ``-s`` to see it): the CPU embedder's port and its ``size``.
+on the GPU. Each case prints what it saw (run with ``-s`` to see it): the query server's port and its ``size``.
 """
 
 from __future__ import annotations
@@ -34,11 +35,11 @@ def _models(address):
             or model.get("model") == S.EMBED_MODEL]
 
 
-def _on_the_gpu(when):
-    models = _models(S.SHARED_HOST_DEFAULT)
+def _on_the_gpu(when, address=S.SHARED_HOST_DEFAULT, who="the shared server"):
+    models = _models(address)
     assert models and all(model.get("size_vram") == model.get("size") and model.get("size", 0) > 0
                           for model in models), (
-        f"{when}, the shared server at {S.SHARED_HOST_DEFAULT} does not hold {S.EMBED_MODEL} wholly on the GPU "
+        f"{when}, {who} at {address} does not hold {S.EMBED_MODEL} wholly on the GPU "
         f"(size_vram equal to size): {models}")
     return models[0]
 
@@ -130,18 +131,24 @@ def test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whate
     _on_the_gpu("after the reads")
 
 
-def test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu(
+def test_shared_gpu_the_shared_runner_and_the_query_server_hold_the_model_on_the_gpu_at_one_revision(
         box, gpu_project):
     """After the index build and a read: the shared server's ``/api/ps`` reports the model with ``size_vram`` equal to
-    ``size``; the CPU embedder at its default address reports it with ``size_vram`` 0, and both list the model at one
-    revision (the digest of ``/api/tags``). Prints the CPU embedder's port and its size."""
+    ``size``; the query server at its default address reports it the same way, wholly on the GPU, and both list the
+    model at one revision (the digest of ``/api/tags``). Prints the query server's port and its size.
+
+    Rewrite-Reason: DEC-1033 (2)(b) replaced DEC-798: the query server is on the GPU and a question's vector is
+    accepted from any device. Before: ``test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_
+    embedder_holds_it_on_the_cpu`` required the query server to hold the model with ``size_vram`` 0 (DEC-798). The
+    placement is asserted (wholly on the GPU), not "any device": "any device" is what the code accepts, held by the
+    stand-in cases of ``test_w2_54_cpu_embedder.py``; this case reads the real machine, where DEC-1033 (2)(b) puts
+    the query server on the GPU and DEC-1065 (1) allows no CPU embedder, so a query server on the CPU (or split)
+    is the state this case exists to catch. Kept: the shared runner on the GPU before and after, one revision, the
+    printed line."""
     project, env = gpu_project
     shared = _on_the_gpu("after the index build")
     _search(box, project, env, QUESTION, "a read")
-    cpu = _models(S.QUERY_HOST_DEFAULT)
-    assert cpu and all(model.get("size_vram") == 0 and model.get("size", 0) > 0 for model in cpu), (
-        f"the CPU embedder at {S.QUERY_HOST_DEFAULT} does not hold {S.EMBED_MODEL} wholly on the CPU "
-        f"(size_vram 0): {cpu}")
+    query = _on_the_gpu("after the read", S.QUERY_HOST_DEFAULT, "the query server")
     shared = _on_the_gpu("after the read")
     digests = {}
     for address in (S.SHARED_HOST_DEFAULT, S.QUERY_HOST_DEFAULT):
@@ -152,7 +159,7 @@ def test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_emb
     assert digests[S.SHARED_HOST_DEFAULT] == digests[S.QUERY_HOST_DEFAULT] != [], \
         f"the two embedders list the model at two revisions: {digests}"
     port = S.QUERY_HOST_DEFAULT.rpartition(":")[2]
-    print(f"\nW2-54 shared GPU: the CPU embedder serves at {S.QUERY_HOST_DEFAULT} (port {port}); its {S.EMBED_MODEL} "
-          f"size {cpu[0]['size']} bytes ({cpu[0]['size'] / 2 ** 30:.2f} GiB), size_vram {cpu[0]['size_vram']}; the "
+    print(f"\nW2-54 shared GPU: the query server serves at {S.QUERY_HOST_DEFAULT} (port {port}); its {S.EMBED_MODEL} "
+          f"size {query['size']} bytes ({query['size'] / 2 ** 30:.2f} GiB), size_vram {query['size_vram']}; the "
           f"shared runner at {S.SHARED_HOST_DEFAULT}: size {shared['size']}, size_vram {shared['size_vram']}; "
           f"digest {digests[S.QUERY_HOST_DEFAULT]}")

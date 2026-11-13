@@ -19,6 +19,8 @@ from pathlib import Path
 
 import yaml
 
+from gov.util import frontmatter
+
 VERSION = "2.0.0"
 
 RECORD_PATHS = (".tickets", "docs")
@@ -75,20 +77,14 @@ _REQUIRED = re.compile(r"'(.+)' is a required property")
 def _frontmatter(text: str) -> tuple[dict | None, str | None]:
     """``(frontmatter, None)`` of a record; ``(None, None)`` when the file is no record (its first line is not
     ``---``); ``(None, why)`` when it opens with ``---`` and its frontmatter cannot be read."""
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None, None
     try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None, "its frontmatter has no closing '---' line"
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError as error:
-        return None, f"its frontmatter is not YAML ({str(error).splitlines()[0]})"
-    if not isinstance(front, dict):
+        return frontmatter.parse(text), None
+    except frontmatter.FrontmatterError as error:
+        if error.kind == frontmatter.UNCLOSED:
+            return None, "its frontmatter has no closing '---' line"
+        if error.kind == frontmatter.NOT_YAML:
+            return None, f"its frontmatter is not YAML ({str(error.error).splitlines()[0]})"
         return None, "its frontmatter is not a mapping"
-    return front, None
 
 
 def _instance(front: dict) -> str:

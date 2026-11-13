@@ -32,7 +32,7 @@ def test_a_ticket_with_only_external_ref_is_read_as_a_wave_2_ticket(tmp_path):
     fm = plan.ticket("W2-03a")
     assert "wbs_id" not in fm and fm["external-ref"] == "W2-03a"  # the fixture's own form
     res = build_and_run(tmp_path, plan)
-    # It matches the WBS row **W2-03a**, and it delivers its Contract item.
+    # It matches the fixture's WBS row of that ticket, and it delivers its Contract item.
     assert_passes(res, WAVE2_TICKETS, DELIVERED)
 
 
@@ -63,7 +63,8 @@ def test_a_wave_2_ticket_missing_from_the_wbs_table_fails_naming_it(tmp_path, fi
 
 @pytest.mark.parametrize("bad_id", ["W2-06ab", "W2-06A", "W2-6"])
 def test_a_malformed_id_is_not_taken_as_a_wave_2_ticket(tmp_path, bad_id):
-    """DEC-730: one lower-case letter suffix is a W2 id; W2-15ab, W2-15A, W2-1 are not.
+    """DEC-730: one lower-case letter suffix is a W2 id; the forms of ``bad_id`` (two letters, an upper-case letter,
+    a one-digit number) are not.
 
     A ticket carrying a malformed id cites a Contract id that does not exist: since it is not a Wave 2 ticket, the
     check of the ids Wave 2 tickets cite still passes.

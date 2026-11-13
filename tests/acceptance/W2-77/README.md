@@ -82,3 +82,39 @@ R8) and the lead's design note, before the implementation. No implementation was
   by its path; it must keep doing so).
 - `test_the_fixture_the_other_worktree_holds_the_entry_name_tree_and_the_clone_another` (the fixture's premise: the
   clone gets another entry name than `tree`) and `test_a_failed_clean_up_does_not_change_the_verdict`.
+
+## Revision for W2-115 (DAEO-emq1, td-3): the record's key set names `secrets_full_scan`
+
+Rewrite-Reason: DEC-966 item 4 (W2-115 S8: the nightly's record names the full secrets scan); PK-2 (a).
+`RECORD_KEYS` in `w2_77_support.py` ("the night's record as it is today") now names `secrets_full_scan` among the
+record's keys. The sets stay exact (no subset check), and `cleanup` still appears only on a failed removal. The four
+cases that compare against it:
+
+| Case | What it checks, with the revised key set |
+|---|---|
+| `test_w2_77_failed_removal.py::test_a_failed_clean_up_does_not_change_the_verdict` | the verdict stays green; the record's keys other than `cleanup` are exactly `RECORD_KEYS` |
+| `test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today` | the green envelope's result is exactly `RECORD_KEYS` and `record` |
+| `test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key` | the green record's keys are exactly `RECORD_KEYS`; no `cleanup` |
+| `test_w2_77_unchanged.py::test_a_red_night_s_envelope_exit_code_and_verdict_are_as_today` | the red envelope's details are exactly `RECORD_KEYS` and `record`; the red record's keys are exactly `RECORD_KEYS` |
+
+Red reason on a nightly without W2-115's S8: the record and the envelope lack `secrets_full_scan` (the key sets
+differ by it; the record cases say "lost ['secrets_full_scan']").
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 23 in the full run, 1 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: After its run, gov.close.nightly removes only its own clone, by its exact path (git worktree remove --force <that path>), and never runs a repo... | `test_w2_77_own_clone_only.py::test_the_night_removes_its_clone_by_its_exact_path_with_git_worktree_remove_force`, `test_w2_77_own_clone_only.py::test_the_night_runs_no_git_worktree_prune` | the ticket's words |
+| S2: A second worktree of the project whose folder is hidden or unreadable while the nightly runs (unmounted, permission-denied, moved and restored)... | `test_w2_77_hidden_worktree.py::test_a_worktree_hidden_while_the_night_runs_keeps_its_registration_its_admin_folder_and_its_staged_index` (2 of 2), `test_w2_77_batch.py::test_the_batch_keeps_a_hidden_worktree_s_registration_admin_folder_and_staged_index` | the ticket's words |
+| S3: If the removal of its own clone fails, the nightly removes only that clone's own administrative entry (by its exact name under the common git d... | `test_w2_77_batch.py::test_the_batch_s_record_carries_the_night_s_cleanup_when_the_clone_s_removal_fails`, `test_w2_77_own_clone_only.py::test_the_night_removes_its_clone_by_its_exact_path_with_git_worktree_remove_force`, `test_w2_77_failed_removal.py::test_the_fixture_the_other_worktree_holds_the_entry_name_tree_and_the_clone_another` | the ticket's words |
+| S4: Everything else the nightly does is unchanged: its selection, its runs, its record and its verdict [DEC-915, DEC-890] | `test_w2_77_unchanged.py::test_a_green_night_selects_and_runs_the_full_suite`, `test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today`, `test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key` | the ticket's words |
+| F1: Any repo-wide prune left in the nightly; another worktree's registration or index lost; a clone's failed removal hidden. | `test_w2_77_failure_line.py::test_no_prune_no_other_worktree_lost_and_the_failed_removal_not_hidden` | the ticket's words |

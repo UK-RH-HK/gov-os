@@ -1,0 +1,74 @@
+# The keys the template generator fills (DEC-1050 TPL-3): every {KEY} or {KEY: description} placeholder in the
+# kernel templates and in governance/project/facts.yaml's command forms. Filled from the ticket file, the run's
+# arguments, or facts.yaml (a `paths` name upper-cased is its key: {TREE} is paths.tree). {CMD:name} and
+# {STEP:name} are the other two families: a key of facts.yaml's `commands` and of its `steps`.
+keys:
+# the ticket
+- ID
+- W2
+- TITLE
+- TICKET_SUMMARY
+- PROFILE
+- PATHS
+- SOURCES
+- IMPL
+- EST
+- KPI_TABLE
+- NON_GOALS
+- DOD_REFS
+- UNIT_TEST_PATH
+- RECORD_PATH
+# the session and its run
+- ROLE
+- ROLE_TEMPLATE
+- ROLE_VERSION
+- WORKER_ROLE
+- IMPL_ROLE
+- RUN_KIND
+# the session's own tree: {TESTS_TREE} for a test designer, {TREE} for every other role (DEC-963 item 1); the
+# designer's command forms (where, accept, pytest_folder, unit_tests, EMPTY_HOME) are filled with it, never {TREE}
+- WRITE_TREE
+- BRANCH
+- HEAD
+- BASE
+- EFFORT
+- LEAD_NOTE
+- REPAIR
+- PART
+- ROWS
+- COMMANDS_TABLE
+- HARNESS_ALLOWED
+- DATE
+# the forms a command is filled with
+- SUBJECT
+- COMMIT_PATHS
+- QUESTION
+- FOLDER
+- COMMAND
+- BRIEF_FILE
+- EXIT_FILE
+- MESSAGE_FILE
+- NEXT
+# facts.yaml paths
+- MAIN
+- WORKTREES
+- TREE
+- TESTS_TREE
+- STORE_TREE
+- TOOLS
+- TICKET_FILE
+- REGISTER
+- SCRATCH
+- LEAD_RECORDS
+- BRIEFS
+- LOGS
+- CHECKPOINT_FILE
+- TESTS_READY
+- EMPTY_HOME
+- ACCEPTANCE_ROOT
+- ACCEPTANCE
+- ACCEPTANCE_README
+- PROBES
+- KNOWN_REDS
+- KERNEL
+- CONTRACT

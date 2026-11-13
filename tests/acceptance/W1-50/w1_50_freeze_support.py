@@ -59,6 +59,7 @@ OWNER_NAME = "owner"
 TICKET = guard_support.TICKET_ID
 ORCHESTRATOR_TICKET = guard_support.ORCHESTRATOR_TICKET_ID
 OWN_REL = "src/gov/guard/decide.py"       # inside the engineer ticket's allowed_paths
+ROSTER_REL = "governance/project/roster.yaml"   # its ``coordination_ticket`` names the CTO's ticket (DEC-971 item 4)
 
 # --------------------------------------------------------------------------
 # The marker (DEC-402), as pinned in w1_50_freeze_README.md
@@ -202,6 +203,13 @@ def freeze_sandbox(tmp_path):
 def freeze_project(tmp_path):
     """This test's own temporary git repository: W1-02's fixture project, the guard hook installed, nothing frozen."""
     project = pause_support.make_project(tmp_path / "freeze-project")
+    # The coordination ticket (DEC-957, DEC-971 item 4; DEC-980): the orchestrator on DAEO-zz91 is the CTO, the one
+    # session whose install the guard asks the owner about.
+    roster = project / ROSTER_REL
+    roster.parent.mkdir(parents=True, exist_ok=True)
+    roster.write_text(f"coordination_ticket: {ORCHESTRATOR_TICKET}\n", encoding="utf-8")
+    pause_support.git(project, "add", "--", ROSTER_REL)
+    pause_support.git(project, "commit", "-q", "-m", "the project's coordination ticket (DEC-971 item 4)")
     assert not os.path.lexists(flag(project)), "the fixture project starts with something at the flag's path"
     return project
 

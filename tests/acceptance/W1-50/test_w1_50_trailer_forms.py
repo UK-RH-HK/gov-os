@@ -121,7 +121,7 @@ def test_among_valid_commits_only_the_one_with_invalid_trailers_is_a_finding(pro
 
 
 def test_a_ticket_named_by_its_wbs_id_is_found(project, call):
-    """``Task: W1-90`` names DAEO-zz90, as ``GOV_TICKET=W1-90`` does for the guard."""
+    """``Task: <WBS>`` (the planted ticket's WBS id) names DAEO-zz90, as ``GOV_TICKET=<WBS>`` does for the guard."""
     by_wbs_id = support.trailer_arguments("Task: " + support.WBS, ROLE_DESIGNER)
     command = support.commit_with(support.NEW_TEST, *by_wbs_id)
     result, left = call(project, command, ORCHESTRATOR, TICKET)

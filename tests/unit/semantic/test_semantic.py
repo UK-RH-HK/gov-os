@@ -58,7 +58,7 @@ def project(tmp_path, monkeypatch):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": endpoint["digest"]}]}
         if path == "/api/ps":  # the CPU-only embedder reports the model wholly on the CPU (DEC-798)
-            return {"models": [{"name": semantic.MODEL, "size": 1, "size_vram": 0}]}
+            return {"models": [{"name": semantic.MODEL, "size": 1, "size_vram": 1}]}
         endpoint["sent"] += body["input"]
         return {"embeddings": [[float("pear" in text), float("plum" in text)] for text in body["input"]]}
 
@@ -84,13 +84,13 @@ def test_only_a_file_whose_every_namespace_says_embedded_is_sent_and_found(proje
     assert {key: answer["hits"][0][key] for key in record} == record
 
 
-def test_a_chunk_is_embedded_as_its_first_512_characters(project):
+def test_a_chunk_is_embedded_whole(project):
     root, endpoint = project
-    _commit(root, {"open/long.md": "quince " * 200 + "\n"})
+    _commit(root, {"open/long.md": "quince " * 160 + "\n"})  # one line of 1,121 characters
     semantic.refresh(root)
-    assert semantic.EMBED_CHARS == 512
-    # the chunk is longer; no prefix is put before it
-    assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n", ("quince " * 200)[:512]]
+    assert semantic.EMBED_CHARS >= 1200  # W2-32 S7 (DEC-1066 G1): no 512-character cut
+    # the whole chunk; no prefix is put before it
+    assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n", "quince " * 160 + "\n"]
 
 
 def test_the_30_nearest_chunks_are_returned(project):
@@ -121,6 +121,10 @@ def test_the_manifest_follows_the_model_list_and_another_embedder_builds_the_vec
     assert semantic.manifest(root)["embedder"] == {"model": semantic.MODEL, "revision": endpoint["digest"]}
     endpoint["digest"] = "5e" + "1" * 62
     del endpoint["sent"][:]
+    # W2-32 S2: an endpoint off the pin embeds nothing; S1: the new revision pinned in configuration re-embeds all
+    assert semantic.refresh(root)["error"] == "MODEL_MISMATCH" and endpoint["sent"] == []
+    (root / "governance/project/models.yaml").write_text(
+        f"embedder: {{model: {semantic.MODEL}, revision: {endpoint['digest']}}}\n")
     semantic.refresh(root)
     assert semantic.manifest(root)["embedder"]["revision"] == endpoint["digest"]
     assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n"]

@@ -152,11 +152,43 @@ def test_an_external_reference_is_not_among_the_items_read_as_records(api, quay)
     assert not as_content, f"{EXT} is reported with {as_content}, as if a record had been read: {item}"
 
 
+# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. W2-04 carries the ticket's own text whole under
+# `ticket_text` and counts it (its S1); the keys a packet gains (W2-04's addendum, "The packet's keys").
+K_TICKET_TEXT = "ticket_text"
+W2_04_KEYS = (K_TICKET_TEXT, "supplementary_query", "further_batch", "supplementary_batches")
+TK_PADDED = "TK-H9-PAD"                  # TK-H9-REC's records, its file as long as TK-H9-EXT's (an id as long)
+
+
+def _padded_twin(api, project):
+    """Adds ``TK_PADDED``: the records of ``TK_RECORDS`` and no external reference, its file padded at its end to
+    the length of ``TK_EXTERNAL``'s file; commits and loads the store again."""
+    text = (project / ".tickets" / f"{TK_EXTERNAL}.md").read_text(encoding="utf-8")
+    twin = C.ticket_file(TK_PADDED, sources=TICKETS[TK_RECORDS])
+    short = len(text) - len(twin)
+    assert short >= 1, f"the fixture is wrong: the twin is not shorter than {TK_EXTERNAL} ({short})"
+    C.write(project, f".tickets/{TK_PADDED}.md", twin + ("Padding" + "." * short)[:short - 1] + "\n")
+    support.set_references(api, project, message="the padded twin")
+    return text
+
+
 def test_an_external_reference_adds_nothing_to_the_packets_tokens(api, quay):
-    """The ticket's twin declares the same records and no external reference: both packets count the same."""
+    """The ticket's twin declares the same records and no external reference: both packets count the same read
+    content.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. W2-04 counts each ticket's own text whole
+    (its S1), and TK-H9-EXT's file is longer than TK-H9-REC's by its external source's line, so the equality now holds
+    without ``ticket_text``: the twin is TK-H9-PAD, the same records with its file padded to TK-H9-EXT's length, so
+    both packets carry ticket texts of one length and must count the same tokens and have the same budget, whichever
+    way the count is rounded. The two read the same records; the external reference adds no read content."""
     project = quay()
-    with_it, without = _packet(api, project, TK_EXTERNAL), _packet(api, project, TK_RECORDS)
+    text = _padded_twin(api, project)
+    with_it, without = _packet(api, project, TK_EXTERNAL), _packet(api, project, TK_PADDED)
     assert EXT in _ids(_external(with_it))
+    assert with_it.get(K_TICKET_TEXT) == text and len(without.get(K_TICKET_TEXT) or "") == len(text), (
+        f"the packets do not carry their tickets' texts whole under `{K_TICKET_TEXT}`, the twin's as long as "
+        f"{TK_EXTERNAL}'s ({len(text)} characters)")
+    assert sorted(_ids(with_it[C.K_MANDATORY])) == sorted(_ids(without[C.K_MANDATORY])), \
+        "the twin does not read the same records"
     assert with_it[C.K_TOKENS] == without[C.K_TOKENS], \
         f"the external reference counts as read content: {with_it[C.K_TOKENS]} tokens, {without[C.K_TOKENS]} without"
     assert with_it[C.K_BUDGET] == without[C.K_BUDGET], \
@@ -401,12 +433,16 @@ def test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too(api, qua
 # --------------------------------------------------------------------------
 
 def test_a_project_without_the_file_gives_the_packet_it_gave_before(api, quay):
-    """The eight keys of W1-24's packet and no other: the key of the external references is absent where the
-    ticket declares none. Green before and after."""
+    """The eight keys of W1-24's packet, the four W2-04 adds, and no other: the key of the external references is
+    absent where the ticket declares none.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: the expected keys gain W2-04's
+    ``ticket_text``, ``supplementary_query``, ``further_batch`` and ``supplementary_batches`` (its addendum, "The
+    packet's keys"); everything else compared stays."""
     project = quay(references=None)
     assert not (project / support.EXTERNAL_REFERENCES_REL).exists()
     packet = _packet(api, project, TK_RECORDS)
-    assert sorted(packet) == sorted(support.PACKET_KEYS), f"the packet's keys changed: {sorted(packet)}"
+    assert sorted(packet) == sorted(support.PACKET_KEYS + W2_04_KEYS), f"the packet's keys changed: {sorted(packet)}"
     assert sorted(_ids(packet[C.K_MANDATORY])) == sorted([support.CHARTER_ID, support.ADR_ID])
 
 

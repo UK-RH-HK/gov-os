@@ -72,6 +72,20 @@ def test_cap_45a_record_carries_contract_v4_2_item_text(contract):
     ), f"{RECORD}.md: body does not have the form of {SIBLING}.md"
 
 
+@pytest.mark.parametrize("cap_id", ["CAP-45", "CAP-45.a"])
+def test_cap_45_and_cap_45a_records_state_wave_w3_as_contract_yaml(contract, cap_id):
+    """DEC-1093 (1), W2-27-CIT-P §5.3: CAP-45.md and CAP-45.a.md each state `- **Wave:** W3`, once, and that is
+    contract.yaml's wave for the id (the records are DERIVED, DEC-614)."""
+    # Added-For: DEC-1093 (1) — A (i), the two derived records at W3, matching contract.yaml (the note's §5.3).
+    model, caps = contract
+    require_v42(model)
+    wave = caps["CAP-45"].get("wave") if cap_id == "CAP-45" else model.by_id()[cap_id].wave
+    assert str(wave) == "W3", f"contract.yaml has {cap_id} at {wave}, not W3 (DEC-1093 moves it)"
+    _, body = read_record(cap_id)
+    lines = re.findall(r"^- \*\*Wave:\*\* (\S+)$", body, re.MULTILINE)
+    assert lines == ["W3"], f"{cap_id}.md states Wave {lines}, not one W3 as contract.yaml"
+
+
 def test_every_capability_record_states_the_contracts_status():
     """DEC-750 item 5: every record's frontmatter status is the status both Contract files state (ACCEPTED)."""
     statuses = {source: contract_status(source) for source in ("yaml", "markdown")}
