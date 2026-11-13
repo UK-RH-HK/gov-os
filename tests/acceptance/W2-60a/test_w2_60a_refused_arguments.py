@@ -84,7 +84,7 @@ def test_a_prompt_that_names_them_as_words_is_launched(launch):
               "--fork-session, --continue or --resume here.")
     result = launch(s.ENGINEER, None, "-p", prompt)
     s.assert_launched(result)
-    assert result.args[-2:] == ["-p", prompt], "the prompt did not reach the CLI unchanged"
+    s.assert_passed_through(result, ("-p", prompt), "the prompt did not reach the CLI unchanged")
 
 
 # --------------------------------------------------------------------------
@@ -114,14 +114,14 @@ def test_no_chrome_is_not_refused(launch):
     arguments = ("--no-chrome", "-p", "Do the work.")
     result = launch(s.ENGINEER, None, *arguments)
     s.assert_launched(result)
-    assert tuple(result.args[-len(arguments):]) == arguments, "the arguments after -- did not reach the CLI unchanged"
+    s.assert_passed_through(result, arguments)
 
 
 def test_a_prompt_that_names_the_round_2_arguments_as_words_is_launched(launch):
     prompt = "Do not pass --fallback-model, --chrome, --ide or --system-prompt-snapshot here."
     result = launch(s.ENGINEER, None, "-p", prompt)
     s.assert_launched(result)
-    assert result.args[-2:] == ["-p", prompt], "the prompt did not reach the CLI unchanged"
+    s.assert_passed_through(result, ("-p", prompt), "the prompt did not reach the CLI unchanged")
 
 
 # --------------------------------------------------------------------------
@@ -186,7 +186,9 @@ TODAY = {
     "settings-not-json": (s.ENGINEER, s.T, (), _not_json, ("cannot be read",)),
     "held-out-malformed": (s.ENGINEER, s.T, (), _held_out, ("DEC-218",)),
     "research-two-folders": (s.RESEARCH, s.EXPERIMENT, (), _two_experiment_folders, ("DEC-242",)),
-    "orchestrator": (s.ORCHESTRATOR, s.T, (), None, ("not a worker role",)),
+    # Since W2-136 (DEC-1088 (5)) a launch of the orchestrator is a lead launch, refused for a ticket on no approved
+    # ready list ("no lead for ticket '<id>': no approved ready list can be read ..."); still no CLI start, no record.
+    "orchestrator": (s.ORCHESTRATOR, s.T, (), None, ("no lead for ticket",)),
     "unknown-role": ("w260a-no-such-role", s.T, (), None, ("not a worker role",)),
     "unknown-ticket": (s.ENGINEER, "DAEO-zz00", (), None, ("unknown ticket",)),
     "ticket-not-in-progress": (s.ENGINEER, s.CLOSED, (), None, ("not in_progress",)),

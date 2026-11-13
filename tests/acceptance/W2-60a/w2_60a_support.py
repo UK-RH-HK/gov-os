@@ -872,6 +872,31 @@ def assert_launched(result):
     return result
 
 
+APPEND_FLAG = "--append-system-prompt-file"
+
+
+def assert_passed_through(result, passed, message="the arguments after -- did not reach the CLI unchanged"):
+    """The caller's arguments after ``--`` (``passed``) reach the CLI unchanged, in order, as one contiguous run, once,
+    after the launcher's own flags; the last two arguments are the launcher's one
+    ``--append-system-prompt-file <TMPDIR>/role-<role>.md`` pair (the role file and the role template, placed after the
+    caller's arguments since the merge of W2-153, whose tests pin that pair as the last two arguments)."""
+    args, passed = list(result.args), list(passed)
+    n = len(passed)
+    tail = f"{message}\nargs: {args}\npassed: {passed}"
+    assert len(args) >= n + 2 and args[-2] == APPEND_FLAG, (
+        f"the last two arguments are not the launcher's {APPEND_FLAG} pair\n{tail}")
+    assert occurrences(args, APPEND_FLAG) == 1, f"{APPEND_FLAG} is passed more than once\n{tail}"
+    assert args[-1] == result.appended()["path"], f"the last argument is not the appended file's path\n{tail}"
+    assert args[-n - 2:-2] == passed, (
+        f"the caller's arguments are not the run just before the appended pair, unchanged and in order\n{tail}")
+    runs = sum(1 for index in range(len(args) - n + 1) if args[index:index + n] == passed)
+    assert runs == 1, f"the caller's arguments reach the CLI {runs} times, not once\n{tail}"
+    own = args[:-n - 2]
+    assert occurrences(own, "--session-id") == 1 and occurrences(own, "--settings") == 1, (
+        f"the launcher's own --session-id and --settings do not come before the caller's arguments\n{tail}")
+    return result
+
+
 def deny_rules(settings):
     rules = (settings.get("permissions") or {}).get("deny") or []
     return [str(rule) for rule in rules]

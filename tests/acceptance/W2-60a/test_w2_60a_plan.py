@@ -8,8 +8,9 @@ the plan naming the file".
 The interface (the ticket, the CTO at claim; DEC-1167 (2) narrows it to the default line only):
 ``gov launch --plan <role> <ticket>`` prints one line ``model <id>, effort <e>``, read from the role file's
 ``- **Launch default:**`` line, and exits 0. It starts nothing: no session, no launch record, no CLI run. A role file
-without the line refuses with ``LAUNCH_REFUSED`` naming the role file's path, exit 2. Nothing here reads a
-``Launch by criticality`` line (W2-184's).
+without the line, or with a malformed one, refuses with ``LAUNCH_REFUSED`` naming the role file's path, exit 1
+(P-6 (a), the CTO, recorded in the ticket: like every ``LAUNCH_REFUSED`` through ``gov``; 2 is kept for usage
+errors). Nothing here reads a ``Launch by criticality`` line (W2-184's).
 
 Each case plants its own project (``w2_60a_support.make_project``) with the role file it names committed, and the
 role's template copies under ``.claude/templates/`` (every launch needs its role's copy since the W2-153 merge), so a
@@ -121,15 +122,27 @@ def test_s12_the_plan_reads_the_role_file_as_it_is_now(sandbox, planted):
 # A role file without the line fails the plan, naming the file
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("role", (s.ENGINEER, s.RESEARCH))
-def test_s12_a_role_file_without_the_default_line_fails_the_plan_naming_the_file(sandbox, planted, role):
-    project, cli = planted({role: ""})
-    run = _plan(sandbox, project, role)
+def _assert_plan_refused(sandbox, cli, run, role, why):
+    """P-6 (a): the plan's refusal is ``LAUNCH_REFUSED`` naming the role file's path, exit 1, no model line, nothing
+    started."""
     said = run.stderr + "\n" + run.stdout
     rel = f"{PLAN_ROLES_REL}/{role}.md"
-    assert run.returncode == 2, f"the plan without a default line did not exit 2\n{run.describe()}"
+    assert run.returncode == 1, f"the plan {why} did not exit 1 (P-6 (a))\n{run.describe()}"
     assert "LAUNCH_REFUSED" in said, f"the plan's refusal does not say LAUNCH_REFUSED\n{run.describe()}"
     assert rel in said, f"the plan's refusal does not name the role file {rel}\n{run.describe()}"
     assert not any(line.startswith("model ") for line in run.stdout.splitlines()), (
         f"the refused plan still printed a model line\n{run.describe()}")
     _assert_nothing_started(sandbox, cli, run)
+
+
+@pytest.mark.parametrize("role", (s.ENGINEER, s.RESEARCH))
+def test_s12_a_role_file_without_the_default_line_fails_the_plan_naming_the_file(sandbox, planted, role):
+    project, cli = planted({role: ""})
+    _assert_plan_refused(sandbox, cli, _plan(sandbox, project, role), role, "without a default line")
+
+
+def test_s12_a_malformed_default_line_fails_the_plan_naming_the_file(sandbox, planted):
+    """The interface: a malformed default line fails the plan as a missing one does. ``model sonnet, effort high``:
+    an alias, not a ``claude-`` model id (W2-33's line form; the launch refuses it too)."""
+    project, cli = planted({s.ENGINEER: "- **Launch default:** model sonnet, effort high"})
+    _assert_plan_refused(sandbox, cli, _plan(sandbox, project, s.ENGINEER), s.ENGINEER, "with a malformed default line")
