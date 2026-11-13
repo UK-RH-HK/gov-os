@@ -331,6 +331,47 @@ A section's figures are the stand-in's. The section the lead adds for the real e
 **Set checks of these questions** (W2-81's visible sets, resolved by W2-81's builders against each built `HEAD`; counts
 by `set-checks`): path missing 0, heading on no line 0, heading on more than one line 0, unresolved 0, quota PASS (a source's `holds` line stands for the heading; the quota is W2-81's own, at least 10 questions with gold sources in each repository: python-app 11, rust-workspace 10, typescript-monorepo 10, legacy-docs 10, secret-history 10; it is not the R5 quota of S12's set).
 
+## Proof (a) with the real embedder (the lead's run outside the sandbox)
+
+The same five repositories, built again by W2-81's builders under `~/gov-os-runs/W2-88/proving-ground-real/` (outside
+this repository), taken through the same chain to A9 lite with **no stand-in**: the real embedder
+(`qwen3-embedding:0.6b`, revision `ac6da0dfba84`), the machine's one shared reranker (`Qwen3-Reranker-0.6B`), the code
+graph on (`code_intelligence` enabled) and A9's copy of Gov OS's `retrieval.yaml` (sha256 `53970c0c0a05`). Script
+`~/gov-os-runs/W2-88/proof_a_real.py`; figures in `~/gov-os-runs/W2-88/proof-a-real-results.json` and
+`proving-ground-real/<repository>-result.json`. Run on 2026-11-13 from 07:59 UTC on head `14c7ec15c8d8`; the only
+source change since then is L-1 (`b3f4e768f`, `src/gov/adopt/assess.py`: the assessment's no-route list and estimate),
+so every A9 figure below stands for the final code; the assessment's estimate column is the pre-L-1 one and the
+stand-in section above gives L-1's. The standard on every repository: gov pin `pin-797495bdfc70`, the 6,000-token
+bundle widened to sections, the pool on, departures 0. The figures are data and set no bar (DEC-954 Q9e).
+
+| repository | built / A9 commit | size | A9 time | per store (indexed/judged; chunks, vectors, nodes, edges) and the stage's peak RSS | scale (budget 2,000 ms) | measure (right e2e, wrong claims, hit@5) |
+|---|---|---|---|---|---|---|
+| python-app | `25caecc3c504` / `079086cacea1` | 22 files, 8,442 B | 33.7 s | record 1/1; lexical 33/33, 83 chunks; vectors 32/32, 83 vectors; code graph 9/9, 56 nodes, 6 edges; 75,026,432 B | lexical 2.2 ms, **vector scan 415.3 ms** (the first query: the embedder's load), retrieve 1,844.5 ms; no proposal | 11 q: 63.6 %, 4, 54.5 % |
+| rust-workspace | `70c95cdd69e0` / `73eba6cffb85` | 21 files, 8,100 B | 25.8 s | record 1/1; lexical 32/32, 76 chunks; vectors 32/32, 76 vectors; code graph 68 nodes, 4 edges; 75,022,336 B | lexical 1.6 ms, **vector scan 11.1 ms**, retrieve 541.7 ms; no proposal | 10 q: 70.0 %, 3, 60.0 % |
+| typescript-monorepo | `d23a8c0501bb` / `456869adb07a` | 24 files, 8,823 B | 26.0 s | record 1/1; lexical 35/35, 78 chunks; vectors 35/35, 78 vectors; code graph 54 nodes, 1 edge; 74,932,224 B | lexical 1.7 ms, **vector scan 10.1 ms**, retrieve 701.3 ms; no proposal | 10 q: 70.0 %, 3, 60.0 % |
+| legacy-docs | not finished | 18 files, 100,670,630 B | stopped at 3,720 s | A9 still embedding the two binaries' 94,222 chunks when the run's one-hour limit ended it; no record, no figures | none measured | none |
+| secret-history | `44b4fd5e36ae` / `4341bfede039` | 16 files, 6,851 B | 20.2 s | record 1/1; lexical 27/27, 66 chunks; vectors 27/27, 66 vectors; code graph 46 nodes, 5 edges; 75,091,968 B | lexical 1.5 ms, **vector scan 11.9 ms**, retrieve 768.1 ms; no proposal | 10 q: 100.0 %, 0, 100.0 % |
+
+Refused files on every finished repository: 0 in every store. Digests (record, lexical, vectors; code graph bytes
+reported, not compared): python-app `92d07043e83f`, `6c32697cf3ce`, `98b4307822dc`, 2,334,661 B; rust-workspace
+`59e599eb9422`, `c0d96b586b59`, `06c925ef951a`, 2,334,272 B; typescript-monorepo `e0212b70210d`, `694e4b2e9b2f`,
+`8c74d418a54f`, 2,335,188 B; secret-history `8a864e8c7a0e`, `8b0b74f2f33b`, `85eccb1333ca`, 2,332,800 B. Residuals
+named with their cause: on each repository the reader (no reader model runs in A9; the reader's grade is W2-27's first
+full run), and per question "forbidden path in the first five" (python-app 4, rust-workspace 3, typescript-monorepo 3)
+or "no gold path among the first five items" (1 each on python-app, rust-workspace and typescript-monorepo).
+
+**Legacy documents: the residual, and the finding it gave (L-1).** The run's A9 on legacy-docs did not end within the
+one-hour limit of the lead's run: the keyword index chunks the two 48 MiB binaries' bytes as text (94,222 chunks, held
+as `binary_held`, RV1-4) and the real embedder was still embedding them at 3,720 s. That run's assessment (pre-L-1)
+listed them only under `binary`, estimated 17 s and the plan wrote `NOTHING-TO-REFACTOR.md`: it did not say what the
+stores would take. L-1 (`b3f4e768f`) makes the assessment list a file over `FILE_LIMIT_BYTES` under no route
+(`over-limit`) whether text or binary, the plan propose its `over-limit` ticket, and the estimate count chunks
+(`estimate.chunks`, `EMBED_S_PER_CHUNK` = 0.04 s, a lower bound from this run): on legacy-docs it now gives 93,228
+chunks and 3,729 s, and one `over-limit` proposal for the owner (the stand-in section above). Legacy-docs' real vector
+scan and measure are therefore **not measured** here: a named residual whose cause is the two binaries, which the plan
+now proposes to move out of the embedded namespace; the A9 code is unchanged by L-1, so a re-run would take the same
+hour or more. The real repositories' proofs (b) and (c) are W2-88b's (DEC-1150 (1)).
+
 ## Proof (d): EXAMIN's copy is W2-27's live trial
 
 This ticket's proof record holds **no adoption run on EXAMIN's copy**: no stage of `gov adopt` was run by this ticket
@@ -346,7 +387,7 @@ A3's `--assessment`, A9 lite) on its clone at adoption, on W2-16's release; that
 | success 2 (the plan) | `adopt/refactor_plan.py` `plan` | built; its own unit tests |
 | success 3 (A9: stores, lists, coverage, never two at once) | `adopt/fabric.py` `a9`, `_stores`, `check_coverage`; `stages.a9` | built; stand-ins for the embedder and the code graph |
 | success 4 (the layout, four digests) | `store/layout.py`; `store/loader.py`; `rebuild/command.py` `digests_of` | built; its own unit tests |
-| success 5 (scale) | `fabric.scale`, `vector_scan`, `over`, `proposal` | built; no vector scan was measured here (no query embedder): null with its reason |
+| success 5 (scale) | `fabric.scale`, `vector_scan`, `over`, `proposal` | built; no vector scan in the sandbox (no query embedder): null with its reason; with the real embedder (the lead's run) measured on 4 of 5, 10.1 to 415.3 ms against 2,000 ms; legacy-docs not measured (named residual, L-1) |
 | success 6 (memory works, measured) | `fabric.load_questions`, `measure`; `--questions` | built; evidence side only, no reader model |
 | success 7, 8, 9 (the proofs) | this file | (a) and (d) written; the real-embedder re-run is the lead's |
 | success 10 (stale layout refused) | `store/layout.py` `check`; `loader.connect`; `rebuild/command.py` `_replace_stale` | built |
