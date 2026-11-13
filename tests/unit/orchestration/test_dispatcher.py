@@ -2986,3 +2986,72 @@ def test_dispatch_1_the_measured_load_is_recorded_a_pass_and_forgotten_when_the_
     held_slots(wp, 1)
     tick(wp, "--dry", DISPATCH_NOW=NOW + 180)
     assert json.loads((wp.d / "jobs-load.json").read_text()) == {}  # a dry pass writes nothing
+
+
+# ---- ACT-DISPATCH-NIGHTLY-SLOT-1 (incident 2026-11-13-0456): the nightly's own suite run is in the slots it holds ----
+NIGHTLY_SH = "/bin/bash /r/governance/project/orchestration/nightly/nightly.sh night"
+FDINFO_LOCKED = "pos:\t0\nflags:\t0100001\nmnt_id:\t82\nino:\t7\nlock:\t1: FLOCK  ADVISORY  WRITE 0 08:30:7 0 EOF\n"
+FDINFO_FREE = "pos:\t0\nflags:\t0100001\nmnt_id:\t82\nino:\t7\n"
+
+
+def plant_nightly(wp, *, marker_age_s=600, fdinfo=FDINFO_LOCKED, slot_file="gov-os-heavy-slot-1.lock",
+                  run_cwd=None, parent=None, script=NIGHTLY_SH):
+    """A planted nightly: nightly.sh (pid 900, in its clone) holding slot 1 on its fd 10 (a link to the slot file, its
+    fdinfo with or without the flock line); its suite run (pid 901, 20 min old) and an xdist worker of it (pid 902)."""
+    runs = wp.tmp / "runs" / "nightly"
+    clone = runs / "20261113-0404"
+    clone.mkdir(parents=True, exist_ok=True)
+    wp.env["DISPATCH_NIGHTLY_RUNS"] = str(runs)
+    slot = wp.tmp / "slots" / slot_file
+    slot.write_text("")
+    for sub in ("fd", "fdinfo"):
+        (wp.tmp / "proc" / "900" / sub).mkdir(parents=True, exist_ok=True)
+    (wp.tmp / "proc" / "900" / "fd" / "10").symlink_to(slot)
+    (wp.tmp / "proc" / "900" / "fdinfo" / "10").write_text(fdinfo)
+    marker = wp.orch / "NIGHTLY-RUNNING"
+    if marker_age_s is not None:
+        marker.write_text("nightly: running (a marker only, DEC-961)\n")
+        os.utime(marker, (NOW - marker_age_s, NOW - marker_age_s))
+    cwd = str(clone) if run_cwd is None else run_cwd
+    night = {"cmd": script, "cwd": str(clone), "pid": 900, "ppid": 1, "age_s": 1500}
+    suite = {"cmd": "python3 -m pytest tests -n auto -q -p no:cacheprovider", "cwd": cwd, "pid": 901,
+             "ppid": 900 if parent is None else parent, "age_s": 1200}
+    worker = {"cmd": "/usr/bin/python3 -u -c import sys;exec(eval(sys.stdin.readline()))", "cwd": cwd, "pid": 902,
+              "ppid": 901, "age_s": 1190}
+    leads(wp, 1, extra=[night, suite, worker])
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
+
+
+def test_nightly_slot_the_nightlys_suite_run_in_its_clone_under_its_held_slots_is_in_a_slot(wp):
+    plant_nightly(wp)
+    tick(wp)
+    s = status(wp)
+    assert s["outside_slot"] == [] and s["admit"], s.get("admit_reason")
+    assert "heavy steps outside a slot: none" in (wp.d / "status.txt").read_text()
+
+
+@pytest.mark.parametrize("case", ["no marker", "stale marker", "no lock held", "not a slot file", "outside the runs",
+                                  "not under nightly.sh", "the runs root itself"])
+def test_nightly_slot_each_missing_condition_leaves_the_run_outside_a_slot(wp, case):
+    kw = {"no marker": dict(marker_age_s=None),
+          "stale marker": dict(marker_age_s=360 * 60 + 1),
+          "no lock held": dict(fdinfo=FDINFO_FREE),
+          "not a slot file": dict(slot_file="other.lock"),
+          "outside the runs": dict(run_cwd=str(wp.wt / "W2-B")),
+          "not under nightly.sh": dict(script="/bin/bash /r/governance/project/orchestration/nightly/other.sh night"),
+          "the runs root itself": dict(run_cwd=str(wp.tmp / "runs" / "nightly"))}[case]
+    plant_nightly(wp, **kw)
+    tick(wp)
+    s = status(wp)
+    assert "pid 901" in " ".join(s["outside_slot"]) and not s["admit"] and "outside a slot" in s["admit_reason"]
+
+
+def test_nightly_slot_a_heavy_step_elsewhere_still_holds_starts_while_the_nightly_runs(wp):
+    plant_nightly(wp)
+    procs = json.loads(wp.procs.read_text())
+    procs.append({"cmd": "/usr/bin/python3 -P -m gov.context.context_check", "cwd": str(wp.wt / "W2-B"), "pid": 500,
+                  "ppid": 1, "age_s": 400})
+    wp.procs.write_text(json.dumps(procs))
+    tick(wp)
+    found = " ".join(status(wp)["outside_slot"])
+    assert "pid 500" in found and "pid 901" not in found and not status(wp)["admit"]
