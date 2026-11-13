@@ -36,12 +36,12 @@ kpis:
   - 'S8 The plan is recomputed from the current tickets on every run: an open ticket changed in flight (DEC-1088 (6)) changes the plan at the next run, with nothing cached between runs. Verify: a planted ticket edited between two runs [DEC-1088 (6)]'
   - 'S9 Enforcement at launch (DEC-1088 (5)(a)): gov launch refuses a lead (GOV_ROLE orchestrator with a GOV_TICKET) for a ticket that is not in the approved ready list''s batches, or whose waits (depends_on, needs, waits_on) are not met when checked at launch time against the current tickets; the refusal names what it waits for (the ticket, the path) and starts no session; a plan_override with its decision id lets it start, written in the launch log. The check is one function in src/gov/launch/plan_check.py that the launcher calls at its argument checks. Verify: unit tests with a planted ready list and tickets: not in a batch, a wait unmet, a wait met, and an override [DEC-1088 (5), DEC-899]'
   - 'S10 Never a gate elsewhere: no close, landing, claim, readiness or hook module imports or calls gov plan; only gov launch''s check (S9) and the CTO use it. Verify: a source scan [DEC-1052]'
-  - 'S11 Under 5 s on this repository''s open tickets: the median of five runs, measured by the CTO and recorded in the evidence [DEC-1052 basis (3)]'
+  - 'S11 Under 5 s on this repository''s open tickets: the median of five runs, measured by the CTO and recorded in the evidence. Verify: docs/changes/W2-136-evidence.md records five timed runs of gov plan on the open tickets with their median under 5 s (measured 0.81 s, 77 open tickets) [DEC-1052 basis (3)] [Verify clause added, DEC-1157 (12)]'
   failure:
-  - 'Two tickets whose writes overlap planned in the same batch without an override.'
-  - 'A plan that differs between two runs on the same tickets, or a stale plan after a ticket changed.'
-  - 'A file written without --ready.'
-  - 'A lead started for a ticket outside the approved batches or with an unmet wait, without a recorded override; a refusal that does not name what it waits for.'
+  - 'Two tickets whose writes overlap planned in the same batch without an override. Verify: a planted ticket store with two tickets whose allowed paths overlap and no override: gov plan never puts them in the same batch [Verify clause added, DEC-1157 (12)]'
+  - 'A plan that differs between two runs on the same tickets, or a stale plan after a ticket changed. Verify: gov plan run twice on a planted ticket store prints the same plan; a ticket changed between runs changes the plan [Verify clause added, DEC-1157 (12)]'
+  - 'A file written without --ready. Verify: gov plan without --ready on a planted store writes no file (the folder is unchanged) [Verify clause added, DEC-1157 (12)]'
+  - 'A lead started for a ticket outside the approved batches or with an unmet wait, without a recorded override; a refusal that does not name what it waits for. Verify: gov launch of a lead for a planted ticket outside the ready list, and one with an unmet wait, are each refused naming the ticket, path or id it waits for; with a plan_override they start and the override is logged [Verify clause added, DEC-1157 (12)]'
 profile: STANDARD
 sources:
 - DEC-1088

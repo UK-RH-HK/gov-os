@@ -297,8 +297,9 @@ def _ticket_file(project_root, name):
 def coordination_ticket(project_root):
     """``(ticket file, "")`` for the project's coordination ticket, or
     ``(None, why)`` when the key does not name one: the top-level key
-    ``coordination_ticket`` of ``governance/project/roster.yaml``, set at
-    adoption (DEC-971 item 4).  Never raises."""
+    ``coordination_ticket`` of ``governance/project/roster.yaml``, written
+    by ``gov adopt --lite --stage A0`` when ``tk`` is vendored, else set by
+    hand (DEC-971 item 4).  Never raises."""
     path = os.path.join(project_root, ROSTER)
     try:
         if not os.path.isfile(path):
@@ -336,7 +337,9 @@ def cto_install(project_root, session_role, subagent_type, ticket_id):
                 f"installs are refused in every session: the project's "
                 f"coordination ticket is not set ({why}). Set the top-level "
                 f"key '{COORDINATION_KEY}' in {ROSTER} to the id or WBS id "
-                f"of the coordination ticket in .tickets/ (set at adoption); "
+                f"of the coordination ticket in .tickets/, and start the "
+                f"CTO's session with GOV_TICKET (the variable that says which "
+                f"ticket a session is on) set to that ticket's id; "
                 f"until then {ESCALATE}")
         ar = acting_role(session_role, subagent_type)
         if ((session_role or "").strip() == "orchestrator"

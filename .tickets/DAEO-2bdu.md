@@ -333,3 +333,12 @@ This ticket keeps the code (engineer). Moved word for word: S17 (the adopt skill
 - **P-8, P-9:** F6's tuning-set citation check and F8's checker are residuals for W2-27's first full run (and W2-170 for F8's checker); no case here, no new ticket.
 - **P-10:** the engineer names the `retrieval.yaml` key for each `fabric.STANDARD` setting; the test designer aligns the plant in one narrow revision.
 - **The seams the engineer names (P-1, P-4, P-10)** are recorded in the lead's return and in `docs/changes/W2-88-evidence.md` if it is in the paths; the CTO copies them into this section at the next commit.
+
+## Interface additions (P-W2-88-B-1, the CTO's delegated decision, DEC-1157 (3), (12), 2026-11-13 05:35)
+
+- **B-1.1 (a) and B-1.3 (a):** a copy step in this ticket's `stages.py`/`fabric.py` (at A9 or beside MA) installs, byte for byte, the kernel's retrieval and discovery skills into the adopted repository's `.claude/skills/`, T-0/T-8 into its templates, and Gov OS's `governance/project/retrieval.yaml` as shipped; one commit; the record lists their sha256. A0 (`safety.py`) is not touched.
+- **B-1.2 (a):** S11/F7 read for the reranker and the bundle as the pin's constants (`rerank.MODEL`, `retrieve.BUNDLE_BUDGET`, the service socket): a `retrieval.yaml` carrying `rerank:` or `bundle:` is refused `CONFIG_INVALID` naming the key (fail-closed); their departure check is on the pin's constants and at `fabric.a9`; only the pool departs through `retrieval.yaml`. `src/gov/config/loader.py` is not widened.
+- **B-1.4 (a):** the standard's pool is the whole `pool:` block as Gov OS ships it; any key that differs is a departure named with its value.
+- **B-1.5 (a):** with the secrets scan not run (no gitleaks, or blobs over 16 MiB), MA still writes the assessment, writes no `NOTHING-TO-REFACTOR.md`, writes `PLAN.md` naming `secrets: not scanned (<reason>)` and the unscanned paths, and its result is not ok with `SECRETS_UNSCANNED`.
+- **The engineer's seams, accepted:** `fabric.RETRIEVE_BUDGET_MS = 2000` with `--budget-ms <N>` (the figure provisional, for the owner's reading); the sixth refused reason `not-indexed`; A9's question set only by `--questions <file>` (no default in code).
+- **Review round 1's other findings** (RV1-2 blocker; RV1-4 to RV1-8 minor) are fixes in the paths, as the lead triaged them.

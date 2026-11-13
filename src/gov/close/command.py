@@ -958,13 +958,27 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     collected = False
     for form, cmd, run_env, what in runs:
         junit = None
+        out_file, out_of_run = None, []
         if scope is not None:  # W2-66: every run keeps its JUnit XML
             junit = _scope_junit(root, scope, "regression" if ignore is not None else "acceptance", form)
             cmd = cmd + ["--junitxml", str(root / junit), "-o", "junit_family=xunit1"]
-        if told is None:
-            found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
-        else:
-            found, ran, results_of_run = _told_run(root, cmd, run_env, timeout, what, rel)
+        if form == "serial-afterwards":  # W2-154: the plugin names here the entries that are not in this run
+            import tempfile
+
+            handle, out_file = tempfile.mkstemp(prefix="gov-close-serial-out-", suffix=".txt")
+            os.close(handle)
+            run_env = {**run_env, serial_only.OUT_VARIABLE: out_file}
+        try:
+            if told is None:
+                found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
+            else:
+                found, ran, results_of_run = _told_run(root, cmd, run_env, timeout, what, rel)
+            if out_file is not None:  # empty where the plugin wrote nothing (a run cut short, or none out)
+                out_of_run = Path(out_file).read_text(encoding="utf-8").splitlines()
+        finally:
+            if out_file is not None:
+                Path(out_file).unlink(missing_ok=True)
+        if told is not None:
             told["results"].update(results_of_run.get("results", {}))
             told["rootdirs"].update(dict.fromkeys(results_of_run.get("results", {}), results_of_run.get("rootdir")))
             reds = [test for test, outcome in results_of_run.get("results", {}).items() if _ratchet.red(outcome)]
@@ -982,8 +996,9 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
                 run["workers"] = workers
                 if scope is not None:
                     run["distribution"] = scope["distribution"]
-            if form == "serial-afterwards":
-                run["cases"] = declared
+            if form == "serial-afterwards":  # W2-154: "cases" keeps the entries that ran
+                run["cases"] = [entry for entry in declared if entry not in out_of_run]
+                run["not_in_this_run"] = [entry for entry in declared if entry in out_of_run]
             if form == "serial":
                 run["note"] = (f"not parallel: the test runner of {sys.executable} has no parallel plugin "
                                "(pytest-xdist), so every case ran in one serial run")

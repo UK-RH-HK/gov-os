@@ -1,6 +1,6 @@
 ---
 id: DAEO-g29a
-status: in_progress
+status: closed
 deps: [DAEO-3r1j, DAEO-siiz]
 links: [DAEO-3r1j]
 created: 2026-10-31T23:05:58Z

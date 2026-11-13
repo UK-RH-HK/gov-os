@@ -1,6 +1,6 @@
 ---
 id: DAEO-xwro
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-rmhj]
 created: 2026-11-07T18:26:34Z

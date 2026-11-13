@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
@@ -19,7 +20,9 @@ import yaml
 from gov.adopt import lite_gates, project, safety
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
+from gov.guard import install
 from gov.retrieval.semantic import EMBEDDED
+from gov.tasks import tickets
 
 ACTIONS = ("KEEP", *MOVING, "RETIRE", "DELETE_FROM_ACTIVE_TREE")  # CAP-06.b
 EXECUTED = ("MOVE", "RENAME", "DELETE_FROM_ACTIVE_TREE")  # what an A6 batch does; none changes a file's content
@@ -87,15 +90,65 @@ def a9(run: Run) -> dict:
     return fabric.a9(run)
 
 
+def _coordination(root: Path) -> tuple[dict, dict]:
+    """A0's coordination ticket and roster key (W2-113, DEC-971 item 4, DEC-1052): the files to commit (path -> text)
+    and the record's new entries. The roster's key that names a ticket is kept; a roster without the key gets one
+    line, the rest as it was; no ``tk`` or a roster that cannot take the key creates and writes nothing, and the
+    record says so (the guard stays closed). Nothing is written here: the ticket's file is read back and committed."""
+    key, rel = install.COORDINATION_KEY, install.ROSTER
+    path, text, roster = root / rel, None, {}
+    if os.path.lexists(path):
+        try:
+            text = path.read_text(encoding="utf-8")
+            roster = yaml.safe_load(text) or {}
+        except (OSError, UnicodeDecodeError, yaml.YAMLError):
+            roster = None
+    nothing = {key: None, "roster": None}
+    if not isinstance(roster, dict):
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {rel} is not "
+                                               "a readable mapping; it is left as it is"}
+    if key in roster:
+        found, why = install.coordination_ticket(root)
+        if found is None:
+            return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {why}; "
+                                                   f"the key is left as it is"}
+        return {}, {key: str(roster[key]).strip(), "roster": rel,
+                    "coordination": f"kept the coordination ticket {rel} names; no ticket was created"}
+    if not (root / tickets.TK_REL).is_file():
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written because tk "
+                                               f"({tickets.TK_REL}) is missing"}
+    base = (text or "") + ("" if not text or text.endswith("\n") else "\n")
+    try:
+        ok = yaml.safe_load(f"{base}{key}: t-0000\n") == {**roster, key: "t-0000"}
+    except yaml.YAMLError:
+        ok = False
+    if not ok:
+        return {}, {**nothing, "coordination": f"no coordination ticket was created and no key written: {rel} cannot "
+                                               "take the key as one added line; it is left as it is"}
+    try:
+        ticket = tickets.create(root, f"{root.name} coordination")
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise refuse("COORDINATION_TICKET_FAILED", f"tk could not create the coordination ticket: {exc}") from None
+    file = root / tickets.TICKETS_REL / f"{ticket}.md"
+    lines = file.read_text(encoding="utf-8").split("\n")
+    file.unlink()  # committed with the stage's files, which the tool writes itself
+    lines.insert(lines.index("---", 1), "class: coordination")
+    return ({f"{tickets.TICKETS_REL}/{ticket}.md": "\n".join(lines), rel: f"{base}{key}: {ticket}\n"},
+            {key: ticket, "roster": rel,
+             "coordination": f"created the coordination ticket {ticket} and wrote the key {key} in {rel}"})
+
+
 def a0(run: Run) -> dict:
     head = resolve(run.root, "HEAD")
     ref = f"{REFS}/backup/{head[:12]}"
     existed = resolve(run.root, ref)
     setup = safety.setup(run.root)  # W2-23 S5: .gitleaks.toml and the .gov-runtime/ ignore line, in this commit
+    coordination, entries = _coordination(run.root)  # W2-113: the coordination ticket and the roster's key, in it too
     git(run.root, "update-ref", ref, head)
     try:
-        return run.finish({"baseline_commit": head, "backup_ref": ref, "tree": "clean", "set_up": sorted(setup)},
-                          setup, backup_ref=ref, set_up=sorted(setup))
+        return run.finish({"baseline_commit": head, "backup_ref": ref, "tree": "clean", "set_up": sorted(setup),
+                           **entries}, {**setup, **coordination}, backup_ref=ref, set_up=sorted(setup),
+                          coordination_ticket=entries[install.COORDINATION_KEY], roster=entries["roster"])
     except (OSError, GovError):
         if existed is None:
             git(run.root, "update-ref", "-d", ref)
