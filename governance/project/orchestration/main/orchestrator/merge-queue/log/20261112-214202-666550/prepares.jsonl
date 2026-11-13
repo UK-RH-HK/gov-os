@@ -1,0 +1,2 @@
+{"tree": "merged", "at": "c87a2d495c650f57b19a00ea006224aaffab7476", "rc": 0, "seconds": 44.8, "args": [], "finished": "2026-11-12 21:42:47"}
+{"tree": "W2-00-store-b", "at": "c87a2d495c650f57b19a00ea006224aaffab7476", "rc": 0, "seconds": 38.5, "args": ["--seed", "/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged"], "finished": "2026-11-12 21:56:55"}

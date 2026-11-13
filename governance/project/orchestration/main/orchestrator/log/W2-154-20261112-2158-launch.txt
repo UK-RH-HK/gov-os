@@ -1,0 +1,80 @@
+2026-11-12 21:58:02 admitted by the dispatcher; launching W2-154
+disk gate open: 771 GiB free, 61011747 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17807175680,
+  "sessions_live_memory_bytes": 1195823104,
+  "load_1m": 6.72,
+  "load_15m": 8.05,
+  "busy_cores_1m": 2.83,
+  "embedding_cpu_p95": {
+    "shared": 0.04,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.01,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 827051134976,
+    "free_inodes": 61011742
+  },
+  "sessions": [
+    {
+      "pid": 2685502,
+      "repository": "/home/usain/gov-os-worktrees/W2-160",
+      "ticket": "DAEO-fd0p",
+      "role": "orchestrator",
+      "live_memory_bytes": 239570944
+    },
+    {
+      "pid": 2731383,
+      "repository": "/home/usain/gov-os-worktrees/W2-160",
+      "ticket": "DAEO-fd0p",
+      "role": "engineer",
+      "live_memory_bytes": 236855296
+    },
+    {
+      "pid": 3559285,
+      "repository": "/home/usain/gov-os-worktrees/W2-172",
+      "ticket": "DAEO-p8tv",
+      "role": "orchestrator",
+      "live_memory_bytes": 269000704
+    },
+    {
+      "pid": 3986278,
+      "repository": "/home/usain/gov-os-worktrees/W2-172-tests",
+      "ticket": "DAEO-p8tv",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 450396160
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 4009555,
+    "repository": "/home/usain/gov-os-worktrees/W2-154",
+    "ticket": "DAEO-l4gf",
+    "role": "orchestrator",
+    "started": "2026-11-12T21:58:02+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 10622604
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 21:58:02 gate open; DAEO-l4gf registered as pid 4009555; starting W2-154

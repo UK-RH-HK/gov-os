@@ -1,0 +1,10 @@
+W2-88 (DAEO-2bdu): merge the acceptance tests (td-1, 144 cases, red on the base for stated reasons)
+
+The independent test designer's suite tests/acceptance/W2-88/ (head 32d52736964b), written from the KPI lines
+and the Interface (P-W2-88-IF-1 (a), DEC-1112 (3)) before any implementation. Its open questions P-1 to P-10
+and R1 are returned to the CTO as packages.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, DEC-078, DEC-388, DEC-694, DEC-957, CAP-44.b, CAP-44.f, CAP-44.g, CAP-17, CAP-19, CAP-20, DEC-016, DEC-1098, DEC-1099, DEC-1101, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

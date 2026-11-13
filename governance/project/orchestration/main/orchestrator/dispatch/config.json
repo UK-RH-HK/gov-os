@@ -5,11 +5,16 @@
   "query": true
  },
  "nightly_hold_from": "03:00",
- "nightly_hold_until": "05:30",
- "_nightly_hold_note": "DEC-1138 (3): landings held 03:00-05:30 for the nightly (restored from DEC-1049's empty window); lead starts held by tools/night_hold.sh",
+ "nightly_hold_until": "03:00",
+ "_nightly_hold_note": "DEC-1157: the night hold removed (an empty window; was DEC-1138 (3) 03:00-05:30); the nightly runs in its capped unit",
  "guard_harvest_s": 1000000000,
  "_guard_harvest_note": "DEC-1050 item 6: the guard harvest stops (interval 10^9 s); restore from config.json.pre-dec1050",
  "gpu_shared_floor_mib": 2048,
  "_gpu_shared_floor_note": "DEC-1084: 2,048 MiB from 11-06's readings (1,490-1,581 MiB shared, flat while dedicated ran 6.1-12.7 GB; the derived 1/16 of the card was 1,019); re-read on 2026-11-13",
- "max_leads": 5
+ "_max_leads_note": "DEC-1157: the 5-lead cap removed (was DEC-1138 / ACT-DISPATCH-1); memory (the forecast's memory term, the floor, the 5 GB hold, mem_guard, the OOM trip) admits each start; restore from config.json.pre-dec1157",
+ "cpu_band": [
+  0,
+  1000
+ ],
+ "_cpu_band_note": "DEC-1157: the CPU band removed (was 14-18, DEC-1038 (4), DEC-1032); real memory protects the machine"
 }

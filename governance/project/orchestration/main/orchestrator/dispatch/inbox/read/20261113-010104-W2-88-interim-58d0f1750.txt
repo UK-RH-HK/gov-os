@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result 58d0f1750: W2-88 (DAEO-2bdu) acceptance tests batch 1: assessment, plan, layout, A9 stores, standard, scale and measure, refresh, practice, memory sets, proofs, search again, paths

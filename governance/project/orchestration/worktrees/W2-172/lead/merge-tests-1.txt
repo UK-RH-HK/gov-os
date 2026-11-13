@@ -1,0 +1,11 @@
+Merge w2/W2-172-tests (DAEO-p8tv): the independent acceptance tests for the memory audit's driver and schedule, red
+
+161 cases (103 functions, ten files) from the KPI lines S1-S9, F1-F5 and the ticket's Interface (PKG-W2-172-IFACE-1 (a)),
+written by the independent test designer (td-1, Sonnet high, class C2) before the implementation: 160 failed, 1 skipped
+(F5 judges only w2/W2-172) on the base.
+
+Task: DAEO-p8tv
+Role: orchestrator
+Implements: DEC-1101, DEC-1125, DEC-1097, DEC-1038, DEC-1050, DEC-1073
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

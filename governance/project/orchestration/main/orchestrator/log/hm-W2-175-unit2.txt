@@ -1,0 +1,2 @@
+FAILED tests/unit/launch/test_runs.py::test_a_project_under_the_root_gets_no_folder_made_or_added
+1 failed, 3809 passed, 7 skipped, 2788 deselected, 6 warnings in 1458.77s (0:24:18)

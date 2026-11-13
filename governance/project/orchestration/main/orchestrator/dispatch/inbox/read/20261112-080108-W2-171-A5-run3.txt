@@ -1,0 +1,9 @@
+log: W2-171-A5-run3.json
+W2: W2-171
+status: (no status line)
+
+Addendum to the return above. It corrects the shared-base evidence line now that the integrate re-run has finished; everything else stands.
+
+evidence (corrected): the W2-96 shared-base evidence is weaker than the return claimed. I ran the four run2 cases alone on w2/integrate's head (2e235e4e5) and got "4 failed, 7 passed".
+- **Fail on integrate:** `r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]` and `r9_r12_ctrl_c_during_the_run_stops_it`.
+- **Passed on integrate in this one run:** `r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]` and `r9_r12_presses_until_go

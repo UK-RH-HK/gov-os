@@ -1,0 +1,7 @@
+log: W2-158-A5-run2.json
+W2: W2-158
+status: DONE. Land head 23acb63611bc. The review passed with no blocking findings; the only reds are a shared base red that also fails on w2/integrate.
+
+task: DAEO-8a3f (W2-158), `gov check --structural`, build run 2 (resumed after the usage stop)
+status: DONE. Land head 23acb63611bc. The review passed with no blocking findings; the only reds are a shared base red that also fails on w2/integrate.
+work_completed: Picked up from the checkpoint. Merged w2/integrate (0aec6e10c) into the branch at 491631121; the merge was clean and touched only tickets, the register and orchestration records. Rebuilt the store, ran lead_verify, checked its reds against w2/integrate, ran `gov accept`, and ran the STANDARD review (Opus, high) on 4916311219bd. Measure

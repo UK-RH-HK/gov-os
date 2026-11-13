@@ -1,0 +1,149 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 19:21:28)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+..........................................................s............. [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+....................F................................................... [ 26%]
+........................................................................ [ 28%]
+...........................F............................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+............sss......................................................... [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+................sss..................................................... [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.................................................                        [100%]
+=================================== FAILURES ===================================
+____________________ test_s1_the_period_is_the_files_value _____________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+machine = <w2_157_support.Machine object at 0x764e5101d4c0>
+
+    def test_s1_the_period_is_the_files_value(machine):
+        """``gpu_backstop_every_s`` is read from the file: at 1 s the readings are one period apart (not 0.1 s, not the
+        5 s of the script), and every other poll waits as long."""
+        machine.set_every(1)
+        machine.plant_smi([(1000, TOTAL_MIB)])
+        job = machine.start_job()
+        watch = machine.start_watch([job.pgid])
+        machine.wait_calls(3, watch=watch)
+        outcome = machine.watch_quietly(watch, job, polls=3)
+        assert outcome.result()["tripped"] is False, outcome.text()
+        times = [call["t"] for call in machine.smi_calls()]
+        gaps = [b - a for a, b in zip(times, times[1:])]
+>       assert len(gaps) >= 2 and all(0.8 <= gap <= 3.0 for gap in gaps[:2]), f"the gaps between readings are {gaps}"
+E       AssertionError: the gaps between readings are [1.080803632736206, 4.635947942733765]
+E       assert (2 >= 2 and False)
+E        +  where 2 = len([1.080803632736206, 4.635947942733765])
+E        +  and   False = all(<generator object test_s1_the_period_is_the_files_value.<locals>.<genexpr> at 0x764e526879f0>)
+
+tests/acceptance/W2-157/test_w2_157_limit.py:65: AssertionError
+__________ test_f4_the_branch_changes_only_the_tickets_allowed_paths ___________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-121b/pytest-of-usain/pytest-26/popen-gw1/test_f4_the_branch_changes_onl0')
+
+    def test_f4_the_branch_changes_only_the_tickets_allowed_paths(tmp_path):
+        """``git diff --name-only <merge-base with w2/integrate>...HEAD`` lists only paths matched by the ticket's
+        ``allowed_paths`` or under ``tests/acceptance/W2-157/``. It is green only when the branch is clean: a change to
+        any other path (a ticket file, another module, a test of another ticket) makes it fail, and it fails, naming the
+        gap, where ``w2/integrate`` does not resolve."""
+        env = {"PATH": support.SAFE_PATH, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": "/dev/null", "LC_ALL": "C",
+               "HOME": str(tmp_path)}
+    
+        def git(*args):
+            return subprocess.run(["git", "-C", str(ROOT), *args], env=env, capture_output=True, text=True, timeout=60)
+    
+        base = git("merge-base", "HEAD", "w2/integrate")
+        assert base.returncode == 0 and base.stdout.strip(), f"w2/integrate does not resolve: {base.stderr}"
+        diff = git("diff", "--name-only", f"{base.stdout.strip()}...HEAD")
+        assert diff.returncode == 0, f"git diff failed: {diff.stderr}"
+        patterns = allowed_paths()
+        assert patterns, f"no allowed_paths read from {TICKET}"
+        outside = [path for path in diff.stdout.splitlines()
+                   if not path.startswith(ACCEPTANCE) and not any(fnmatch.fnmatch(path, pattern) for pattern in patterns)]
+>       assert not outside, f"changed paths not matched by the ticket's allowed_paths {patterns}: {outside}"
+E       AssertionError: changed paths not matched by the ticket's allowed_paths ['src/gov/resources/backstop.py', 'src/gov/resources/command.py', 'src/gov/resources/config.py', 'tests/unit/resources/test_w2_157*', 'docs/changes/W2-157-evidence.md', 'docs/probes/DAEO-ozyt/**']: ['docs/probes/DAEO-ifgf/PR-DAEO-ifgf.md', 'src/gov/dispatch/config.py', 'src/gov/dispatch/heavy.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/procs.py', 'src/gov/dispatch/run.py', 'src/gov/dispatch/state.py', 'src/gov/dispatch/status.py', 'src/gov/resources/slots.py', 'tests/acceptance/W2-121b/README.md', 'tests/acceptance/W2-121b/conftest.py', 'tests/acceptance/W2-121b/test_b_s1_landing_batch.py', 'tests/acceptance/W2-121b/test_b_s2_closes.py', 'tests/acceptance/W2-121b/test_b_s3_nightly_hold.py', 'tests/acceptance/W2-121b/test_b_s4_heavy_steps.py', 'tests/acceptance/W2-121b/w2_121b_support.py', 'tests/unit/dispatch/test_w2_121b_config_default.py', 'tests/unit/dispatch/test_w2_121b_landing.py']
+E       assert not ['docs/probes/DAEO-ifgf/PR-DAEO-ifgf.md', 'src/gov/dispatch/config.py', 'src/gov/dispatch/heavy.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/procs.py', 'src/gov/dispatch/run.py', ...]
+
+tests/acceptance/W2-157/test_w2_157_nothing_else.py:116: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-121b/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1172030) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-20/test_w2_20_measured.py:183: S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+2 failed, 5080 passed, 7 skipped, 6 warnings in 705.09s (0:11:45)

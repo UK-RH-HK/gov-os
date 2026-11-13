@@ -1,0 +1,4 @@
+repo|.claude/skills/spec-writing/SKILL.md|null|6b81479132379c32ab6b6419dea65492250da231fbbbee4b911a22c516a0955c
+repo|.claude/skills/spec-writing/check_spec.py|null|b18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310
+repo|.claude/skills/spec-writing/imports.yaml|null|3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff
+repo|.claude/skills/spec-writing/spec-form.md|null|9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f

@@ -1,0 +1,128 @@
+# ACT-OPERATOR-HOURS-1 rehearsal. Parts 1 and 2: apply.sh on a stub crontab, then in the operator's dry-run form; part 3: the guard, the line as cron runs it; part 4: the real night_hold.py writer; part 5: crontab -n.
+# part 1: apply.sh on a stub crontab (a file) seeded with the live bytes at the build; HOME planted with ACT-OPERATOR-HOURS-2's after opcommon.py
+ok 1: apply.sh check: the stub crontab is the before
+ok 2: apply.sh verify before the apply: exit 3 'not applied'
+ok 3: apply.sh undo when the crontab is already the before: exit 0, nothing touched
+ok 4: apply.sh apply: the after crontab installed
+ok 5: the stub crontab is the after, byte for byte
+ok 6: apply.sh verify after the apply: exit 0
+ok 7: apply.sh apply when already the after: exit 0, nothing touched
+ok 8: check (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
+ok 9: check (exit 0, count 1): crontab -l | grep -c '^\*/10 \* \* \* \* h=\$(date +\\%H\\%M 2>/dev/null); .*operator_laun
+ok 10: check (exit 1, count 0): crontab -l | grep -c '^\*/10 0,8-23 '
+ok 11: check (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
+ok 12: check (exit 0, count 1): crontab -l | grep -c 'night-hold\.state\.json'
+ok 13: check (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh  # DEC-11
+ok 14: check (exit 0, count 1): crontab -l | grep -c '^0 8 \* \* \* bash .*/nightly/nightly_check\.sh  # DEC-1132 (4), ACT
+ok 15: check (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
+ok 16: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \* \* \* bash .*/nightly/nightly_cron\.sh$'
+ok 17: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/nightly_ch
+ok 18: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \* \* \* bash .*/nightly/runs_sweep\.sh$'
+ok 19: apply.sh undo over a crontab that is neither the after nor the before: exit 3, nothing touched
+ok 20: apply.sh undo
+ok 21: the undo restored the stub crontab byte for byte
+ok 22: apply.sh check after the undo: the before again
+ok 23: a crontab that moved since the build: check exits 3
+ok 24: apply.sh apply over a crontab that is neither the before nor the after: exit 3, nothing touched (the added line stays)
+ok 25: a frozen copy that does not hash as listed: apply exits 4, nothing touched
+ok 26: the before and the after differ in one line only: the operator's, the old line for the new one
+ok 27: the gate's hash is ACT-OPERATOR-HOURS-2's after opcommon.py (its list.txt, both rows: the install's and the repository's; its frozen copy hashes to it) and is written in apply.sh in full
+ok 28: the install's opcommon.py is absent: check and apply exit 7 naming ACT-OPERATOR-HOURS-2, the crontab untouched
+ok 29: the install's opcommon.py is ACT-OPERATOR-HOURS-2's before copy (the file as it is live today): check and apply exit 7 naming ACT-OPERATOR-HOURS-2, the crontab untouched
+ok 30: the install's opcommon.py is its after copy with a line added: check and apply exit 7 naming ACT-OPERATOR-HOURS-2, the crontab untouched
+ok 31: the install's opcommon.py is a link to its after copy: check and apply exit 7 naming ACT-OPERATOR-HOURS-2, the crontab untouched
+ok 32: the install's opcommon.py is a directory: check and apply exit 7 naming ACT-OPERATOR-HOURS-2, the crontab untouched
+ok 33: with the install's opcommon.py absent and the crontab already the after: verify exits 0, apply exits 7 (the gate comes first), undo exits 0 and restores the before (an undo never needs the gate)
+ok 34: with ACT-OPERATOR-HOURS-2's after copy in place: check 0, apply 0 (the after installed), undo 0 (the before back)
+# part 2: the operator's dry-run form: a clean environment (HOME planted, PATH, LANG), the crontab stubbed by a file, apply.sh run from an empty folder
+ok 35: the crontab seeded from the live one is the bundle's before, byte for byte
+ok 36: apply.sh check in the clean environment: exit 0
+ok 37: apply.sh apply in the clean environment: exit 0
+ok 38: the planted crontab is the bundle's after, byte for byte
+ok 39: the apply changed nothing in the working folder or the planted HOME (only the crontab file)
+ok 40: the manifest's check, run in the clean environment (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
+ok 41: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^\*/10 \* \* \* \* h=\$(date +\\%H\\%M 2>/dev/null); .*ope
+ok 42: the manifest's check, run in the clean environment (exit 1, count 0): crontab -l | grep -c '^\*/10 0,8-23 '
+ok 43: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
+ok 44: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c 'night-hold\.state\.json'
+ok 45: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh
+ok 46: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^0 8 \* \* \* bash .*/nightly/nightly_check\.sh  # DEC-113
+ok 47: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
+ok 48: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \* \* \* bash .*/nightly/nightly_
+ok 49: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/
+ok 50: the manifest's check, run in the clean environment (exit 0, count 1): crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \* \* \* bash .*/nightly/runs_sw
+ok 51: apply.sh verify in the clean environment: exit 0
+ok 52: apply.sh undo in the clean environment: exit 0
+ok 53: the undo restored the planted crontab byte for byte; the working folder and the planted HOME are as they were
+# part 3: the guard. The operator's line from the after table, exactly as cron runs it: five fields, the command with its \% unescaped, under /bin/sh -c.
+# Only three things differ from production: the clock (a stub `date` first in PATH, as `date` is called by name), and the two literal prefixes planted (the operator's folder, the CTO's scratch folder).
+ok 54: the after table holds the ACT's line once, active
+ok 55: the schedule is `*/10 * * * *`: every 10 minutes at every hour, every day
+ok 56: the line is under 900 characters (crontab -n refuses a command past about 1000)
+ok 57: the line names the operator's folder twice (launcher, log) and the scratch folder once (the state file)
+ok 58: holding true at 03:30 (state 5 s old): no launch
+ok 59: holding false at 03:30 (state 5 s old): launch
+ok 60: state file missing at 03:30: no launch
+ok 61: state file missing at 14:00: launch
+ok 62: malformed JSON at 03:30: no launch (as missing)
+ok 63: malformed JSON at 14:00: launch (as missing)
+ok 64: empty file at 03:30: no launch
+ok 65: not an object at 03:30: no launch
+ok 66: no `holding` key at 03:30: no launch
+ok 67: holding "false" (a string) at 03:30: no launch
+ok 68: holding null at 03:30: no launch
+ok 69: holding 0 at 03:30: no launch
+ok 70: holding "" at 03:30: no launch
+ok 71: a directory in its place at 03:30: no launch
+ok 72: holding false with other keys present at 03:30: launch
+ok 73: holding false, state dated 30 s in the future (clock skew), at 03:30: launch
+ok 74: holding false, state dated 2 minutes in the future, at 03:30: no launch (stale, F3)
+ok 75: holding false, state dated a day in the future, at 03:30: no launch (F3)
+ok 76: holding false, state 4 minutes old, at 03:30: launch
+ok 77: holding false, state 6 minutes old (the hold stopped looking), at 03:30: no launch
+ok 78: holding false, state an hour old, at 07:50: no launch
+ok 79: holding true, state 6 minutes old, at 03:30: no launch
+ok 80: holding true in a day-old file at 14:00: launch (the file is not read outside 02:10-08:00)
+ok 81: holding true at 01:00: launch (the hold is not in its window; the owner's 01:00-02:00 hour is back)
+ok 82: state missing at 00:00 and at 23:50: launch
+ok 83: 02:00, holding false: launch (the last launch before the margin)
+ok 84: 02:10, holding false: no launch (a 50-minute session would end after 03:00)
+ok 85: 02:50, holding false: no launch
+ok 86: 03:00, holding false: no launch (the hold has not made its first look yet: the file is the pre-03:00 one)
+ok 87: 03:10, holding false: launch (the hold has looked ten times; false then means the nightly has ended)
+ok 88: 03:10, holding true: no launch
+ok 89: 07:30 and 07:50, holding true (the hold has not released): no launch
+ok 90: 07:30, holding false (released at 07:30 at the latest): launch
+ok 91: 08:00, any state: launch (the hold's window is over)
+ok 92: `date` failing (it writes a message to standard error): no launch, nothing on either stream (F4)
+ok 93: `date` printing garbage (abc, empty, 12:30, 0a15, 2400x): no launch, nothing on either stream (F4)
+ok 94: control: the raw stub printing 1400 launches (so the cases above fail for the right reason)
+ok 95: all 144 ticks of a day, holding false, fresh: 138 launch, exactly the ticks outside 02:10-02:59 and 03:00
+ok 96: against the old line (00:00-00:50 and 08:00-23:50): nothing the old line ran is lost; 01:00-02:00 and 03:10-07:50 are added (holding false)
+ok 97: all 144 ticks of a day, holding true, fresh: 109 launch, exactly the ticks outside 02:10-07:59
+ok 98: against the old line, with the hold on (the whole night): the old ticks all stay, only 01:00-02:00 is added
+ok 99: all 144 ticks of a day, state missing: 109 launch, exactly the ticks outside 02:10-07:59
+ok 100: the same six cases under /bin/bash (a table with SHELL=/bin/bash): the same answers
+ok 101: the launch is `python3 -I operator_launch.py` with no arguments (the stub recorded one call)
+ok 102: the launcher's output is appended to the operator's log, as before
+ok 103: a skip prints nothing on stdout or stderr (cron has nothing to mail)
+ok 104: a missing state file prints no traceback (cron has nothing to mail)
+ok 105: /bin/sh -n accepts the command
+ok 106: an `h` already in the environment is overwritten by the line's own (03:30, state missing: still no launch)
+ok 107: the table's line holds exactly two %, both escaped (\%H\%M)
+# part 4: the real writer. night_hold.py's own step() in a planted folder, at fixed times, writes the file the guard reads (its fields, its timing, its values when it runs).
+ok 108: 02:59:30: the real writer's file says holding false, in_window false; it has `pid`, `at`, `holding`, `in_window`, `nightly`
+ok 109: the guard at 03:00 on that file (written at 02:59:30): no launch, the margin holds
+ok 110: 03:00:20: the real writer's first look inside the window: holding true
+ok 111: the guard at 03:10 and 03:30 on that file: no launch
+ok 112: 05:00 with the nightly's status line for today: the real writer releases, holding false, in_window true
+ok 113: the guard at 05:10 on that file: launch (the nightly has ended; the owner's 'until the nightly ends')
+ok 114: a night with no end by 06:00: holding true: no launch
+ok 115: 07:31, the nightly still not ended: the writer releases at 07:30 at the latest: holding false: launch
+ok 116: the writer stopped an hour ago (its file keeps its last content, `holding false`): no launch at 07:40, launch at 14:00
+# part 5: the table parses (crontab -n: syntax check, then bails out; never installs)
+ok 117: crontab -n on the after table: exit 0
+ok 118: control: the same table with the command padded past cron's limit is refused by crontab -n (so the check above can fail)
+ok 119: the live crontab is byte for byte what it was when the rehearsal began
+cases: 119
+failures: 0

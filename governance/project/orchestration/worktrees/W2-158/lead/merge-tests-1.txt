@@ -1,0 +1,6 @@
+W2-158 (DAEO-8a3f): merge the acceptance tests (td-1, 92590dae7) into the engineer's branch
+
+Task: DAEO-8a3f
+Role: orchestrator
+Implements: DEC-1052, DEC-1073, DEC-1119, DEC-1109, DAEO-q7lk, DAEO-neam
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

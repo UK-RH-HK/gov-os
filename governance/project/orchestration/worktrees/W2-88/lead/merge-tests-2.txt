@@ -1,0 +1,12 @@
+W2-88 (DAEO-2bdu): merge the tests' narrow revision (td-2: R1 (b), P-4, P-10, P-1's planted cases, residuals named)
+
+The independent test designer's revision of tests/acceptance/W2-88/ (head 587103e93736), per the CTO's decision on
+P-W2-88-TD-1 (DEC-1157 (3), (12)): the bare-A3 half dropped (Rewrite-Reason DEC-1156 (7), commit 9e585f890d96),
+check_coverage cases for F2, the lock read as a wait, the plant's retrieval.yaml keys aligned to the engineer's seams,
+the planted over-budget (S5) and low-measure (S6) cases, P-3/P-8/P-9 named as residuals. 152 cases, red on b482fc5bf
+for stated reasons (98 fail, 52 pass, 2 skip). Open: P-6 and P-W2-88-B-1 (loader keys), returned to the CTO.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, DEC-078, DEC-957, CAP-44.b, CAP-44.f, CAP-17, CAP-19, CAP-20, DEC-1098, DEC-1099, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

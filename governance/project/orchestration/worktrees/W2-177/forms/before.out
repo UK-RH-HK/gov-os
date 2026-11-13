@@ -1,0 +1,12 @@
+empty-home run 1: SIGINT-ignored-at-start: 0 | 7 failed, 2 passed in 424.63s (0:07:04)
+empty-home run 2: SIGINT-ignored-at-start: 0 | 7 failed, 2 passed in 424.53s (0:07:04)
+FORM empty-home: 0 of 2 runs all passed, 2 with a red (or skip)
+real-home run 1: SIGINT-ignored-at-start: 0 | 9 passed in 13.85s
+real-home run 2: SIGINT-ignored-at-start: 0 | 9 passed in 13.86s
+FORM real-home: 2 of 2 runs all passed, 0 with a red (or skip)
+setsid-bg run 1: SIGINT-ignored-at-start: 1 | 9 failed in 424.59s (0:07:04)
+setsid-bg run 2: SIGINT-ignored-at-start: 1 | 9 failed in 424.46s (0:07:04)
+FORM setsid-bg: 0 of 2 runs all passed, 2 with a red (or skip)
+bg-job run 1: SIGINT-ignored-at-start: 1 | 9 failed in 424.51s (0:07:04)
+bg-job run 2: SIGINT-ignored-at-start: 1 | 9 failed in 424.63s (0:07:04)
+FORM bg-job: 0 of 2 runs all passed, 2 with a red (or skip)

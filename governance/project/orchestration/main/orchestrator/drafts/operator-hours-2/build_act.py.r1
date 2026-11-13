@@ -1,0 +1,725 @@
+#!/usr/bin/env python3
+"""ACT-OPERATOR-HOURS-2: build the bundle, rehearse it, finalize the manifest, run the operator's own gates over it.
+
+    python3 build_act.py build      the bundle (before/after copies, list.txt, keep.txt, apply.sh, manifest.json) from the live
+                                    install and the main tree (read only) and this folder's code/
+    python3 build_act.py rehearse   rehearsal.log in the bundle (planted folders; never the live install, tree or crontab)
+    python3 build_act.py finalize   the manifest with the rehearsal's sha256 (only when the log ends `failures: 0`)
+    python3 build_act.py gates      validate_manifest, the files' hashes, the path rule, act_class.classify (read only)
+    python3 build_act.py all
+
+Nothing here writes anywhere but the bundle (acts/ACT-OPERATOR-HOURS-2/), this folder, and the planted folders under
+/home/usain/gov-os-runs/W2-00/operator-hours-2/ (the helper's own copy) or the system temp folder.
+"""
+import hashlib
+import json
+import os
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ORCH = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator")
+REPO = Path("/home/usain/Dynamic-Agentic-Engineering-OS")
+ACT = "ACT-OPERATOR-HOURS-2"
+BUNDLE = ORCH / "acts" / ACT
+LIVE_INST = Path("/home/usain/gov-os-operator/install")
+WORK = Path("/home/usain/gov-os-runs/W2-00/operator-hours-2")
+CLONE = WORK / "clone"
+CODE = HERE / "code"
+# the listed files, in apply order: the repository files, then the install's opcommon.py, APPROVED last
+REPO_FILES = ["governance/project/operator/opcommon.py",
+              "tests/unit/operator/test_act_operator_hours_2.py",
+              "tests/acceptance/W2-148/test_w2_148_gates.py",
+              "tests/acceptance/W2-148/README.md"]
+INST_PATH = "gov-os-operator/install/"
+DEC = "DEC-1141, DEC-1104, DEC-1138"
+
+
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+def shab(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def approved_after(approved_before: str, new_opcommon_sha: str) -> str:
+    out, hit = [], 0
+    for line in approved_before.splitlines():
+        s, _, name = line.partition("  ")
+        if name == "opcommon.py":
+            line, hit = f"{new_opcommon_sha}  opcommon.py", hit + 1
+        out.append(line)
+    assert hit == 1, "APPROVED must name opcommon.py once"
+    return "\n".join(out) + "\n"
+
+
+def build():
+    if BUNDLE.exists():
+        if (BUNDLE / "review.md").exists():
+            sys.exit(f"{BUNDLE} holds a review: a rebuild would make it stale; move it aside first")
+        shutil.rmtree(BUNDLE)
+    live_ap = (LIVE_INST / "APPROVED").read_text()
+    new_oc = CODE / "governance/project/operator/opcommon.py"
+    # the live install is what APPROVED says, and its opcommon.py is the tree's
+    for line in live_ap.splitlines():
+        s, _, name = line.partition("  ")
+        assert sha(LIVE_INST / name) == s, f"the live install is not as APPROVED says: {name}"
+    assert sha(LIVE_INST / "opcommon.py") == sha(REPO / REPO_FILES[0]), "the install's opcommon.py is not the tree's"
+    st = subprocess.run(["git", "status", "--porcelain", "--"] + REPO_FILES, cwd=REPO, capture_output=True, text=True).stdout
+    assert st.strip() == "", f"a listed repository file is not at the committed head: {st}"
+    after_ap = approved_after(live_ap, sha(new_oc))
+    rows = []     # (root, path, before bytes|None, after bytes|None)
+    for p in REPO_FILES:
+        b = (REPO / p).read_bytes() if (REPO / p).exists() else None
+        rows.append(("repo", p, b, (CODE / p).read_bytes()))
+    rows.append(("home", INST_PATH + "opcommon.py", (LIVE_INST / "opcommon.py").read_bytes(), new_oc.read_bytes()))
+    rows.append(("home", INST_PATH + "APPROVED", live_ap.encode(), after_ap.encode()))
+    lines, files, touched = [], {}, []
+    for root, p, b, a in rows:
+        for side, data in (("before", b), ("after", a)):
+            if data is not None:
+                f = BUNDLE / side / root / p
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_bytes(data)
+                files[f"{side}/{root}/{p}"] = shab(data)
+        bs, as_ = (shab(b) if b is not None else None), shab(a)
+        assert bs != as_, f"{p}: no change"
+        lines.append(f"{root}|{p}|{bs or 'null'}|{as_}")
+        touched.append({"root": root, "path": p, "before": bs, "after": as_})
+    (BUNDLE / "list.txt").write_text("\n".join(lines) + "\n")
+    keep = [l for l in live_ap.splitlines() if not l.endswith("  opcommon.py")]
+    (BUNDLE / "keep.txt").write_text("\n".join(keep) + "\n")
+    shutil.copy(HERE / "apply.sh", BUNDLE / "apply.sh")
+    (BUNDLE / "apply.sh").chmod(0o755)
+    write_manifest(None)
+    print(f"built {BUNDLE}: opcommon {sha(LIVE_INST / 'opcommon.py')[:12]} -> {sha(new_oc)[:12]}, "
+          f"APPROVED {sha(LIVE_INST / 'APPROVED')[:12]} -> {shab(after_ap.encode())[:12]}")
+
+
+def checks(new_oc, after_ap):
+    return [
+        {"cmd": f'sha256sum "$HOME/gov-os-operator/install/opcommon.py" | grep -c {new_oc}', "exit": 0, "count": 1},
+        {"cmd": f'sha256sum "$HOME/gov-os-operator/install/APPROVED" | grep -c {after_ap}', "exit": 0, "count": 1},
+        {"cmd": 'grep -c "^QUIET = " "$HOME/gov-os-operator/install/opcommon.py"', "exit": 1, "count": 0},
+        {"cmd": 'grep -c "^HOLD_FROM = (2, 10)$" "$HOME/gov-os-operator/install/opcommon.py"', "exit": 0, "count": 1},
+        {"cmd": 'grep -c "opcommon.py" "$HOME/gov-os-operator/install/APPROVED"', "exit": 0, "count": 1},
+    ]
+
+
+def write_manifest(rehearsal_sha):
+    rows = [l.split("|") for l in (BUNDLE / "list.txt").read_text().splitlines()]
+    touched = [{"root": r, "path": p, "before": None if b == "null" else b, "after": a} for r, p, b, a in rows]
+    files = {}
+    for side in ("before", "after"):
+        for f in sorted((BUNDLE / side).rglob("*")):
+            if f.is_file():
+                files[str(f.relative_to(BUNDLE))] = sha(f)
+    for n in ("apply.sh", "list.txt", "keep.txt"):
+        files[n] = sha(BUNDLE / n)
+    new_oc = [a for r, p, b, a in rows if p.endswith("install/opcommon.py")][0]
+    after_ap = [a for r, p, b, a in rows if p.endswith("install/APPROVED")][0]
+    m = {"act": ACT, "dec": DEC, "author": "cto", "claimed_class": "O", "touched": touched, "files": files,
+         "checks": checks(new_oc, after_ap), "commands": []}
+    if rehearsal_sha:
+        files["rehearsal.log"] = rehearsal_sha
+        m["rehearsal"] = {"log": "rehearsal.log", "sha256": rehearsal_sha}
+    (BUNDLE / "manifest.json").write_text(json.dumps(m, indent=1) + "\n")
+    return sha(BUNDLE / "manifest.json")
+
+
+# ---------------------------------------------------------------------------------------------------------- the rehearsal
+DRIVER = r'''
+import json, os, shutil, sys, time
+inst, cfgp, casesp = sys.argv[1], sys.argv[2], sys.argv[3]
+sys.path.insert(0, inst)
+sys.dont_write_bytecode = True
+import opcommon as oc
+s = oc.load_settings(cfgp)
+conf = json.load(open(cfgp))
+state = conf["state_path"]
+clock = conf["clock"]
+RAW = {"empty": "", "list": "[false]", "nokey": "{}", "null": '{"holding": null}', "zero": '{"holding": 0}',
+       "strfalse": '{"holding": "false"}', "one": '{"holding": 1}', "malformed": "{not json"}
+out = []
+for hm, kind in json.load(open(casesp)):
+    if os.path.isdir(state):
+        shutil.rmtree(state)
+    elif os.path.lexists(state):
+        os.unlink(state)
+    os.makedirs(os.path.dirname(state), exist_ok=True)
+    if kind == "dir":
+        os.mkdir(state)
+    elif kind != "missing":
+        if kind in ("true", "false", "stale"):
+            body = json.dumps({"pid": 1, "at": "x", "holding": kind == "true", "in_window": True, "nightly": "n"})
+        else:
+            body = RAW[kind]
+        with open(state, "w") as f:
+            f.write(body)
+        if kind == "stale":
+            t = time.time() - 400
+            os.utime(state, (t, t))
+    with open(clock, "w") as f:
+        f.write("2026-11-12T%s:00+00:00\n" % hm)
+    out.append(oc.holds(s))
+print(json.dumps(out))
+'''
+
+KINDS = ["true", "false", "missing", "stale", "malformed", "empty", "list", "nokey", "null", "zero", "strfalse", "one", "dir"]
+TIMES = ["00:00", "01:30", "02:05", "02:09", "02:10", "02:30", "03:00", "03:09", "03:10", "03:30", "05:10", "07:29", "07:30",
+         "07:45", "07:59", "08:00", "08:01", "14:00", "23:59"]
+
+
+def minutes(hm):
+    return int(hm[:2]) * 60 + int(hm[3:])
+
+
+def expected_hold(hm, kind):
+    """The owner's rule (DEC-1141 (6)), written out independently of the code under test."""
+    t = minutes(hm)
+    if t < 2 * 60 + 10 or t >= 8 * 60:
+        return False
+    if t < 3 * 60 + 10:
+        return True
+    return kind != "false"
+
+
+STUB_CLOCK_NOTE = "a clock file (the operator's own `clock` setting) fixed at each time; the state file planted at each case"
+
+
+class Log:
+    def __init__(self):
+        self.lines, self.n, self.fails = [], 0, 0
+
+    def case(self, ok, text):
+        self.n += 1
+        if not ok:
+            self.fails += 1
+        self.lines.append(f"{'ok' if ok else 'FAIL'} {self.n}: {text}")
+
+    def note(self, text):
+        self.lines.append(f"# {text}")
+
+
+def run(cmd, env=None, cwd=None, timeout=900):
+    return subprocess.run(cmd, capture_output=True, text=True, env=env, cwd=cwd, timeout=timeout)
+
+
+def tree_state(root):
+    out = {}
+    root = Path(root)
+    for p in sorted(root.rglob("*")):
+        if "__pycache__" in p.parts or p.name == "launch.lock":      # launch.lock: the swap's own lock file (it exists in the live log/)
+            continue
+        rel = str(p.relative_to(root))
+        if p.is_symlink():
+            out[rel] = ("link", os.readlink(p))
+        elif p.is_dir():
+            out[rel] = ("dir", stat.S_IMODE(p.stat().st_mode))
+        else:
+            out[rel] = ("file", sha(p), stat.S_IMODE(p.stat().st_mode))
+    return out
+
+
+def matrix(install, cfg_path, tmp):
+    cases = [[hm, k] for hm in TIMES for k in KINDS]
+    cp = tmp / "cases.json"
+    cp.write_text(json.dumps(cases))
+    dr = tmp / "driver.py"
+    dr.write_text(DRIVER)
+    r = run([sys.executable, "-I", "-B", str(dr), str(install), str(cfg_path), str(cp)])
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr)
+    return list(zip([tuple(c) for c in cases], json.loads(r.stdout)))
+
+
+def make_cfg(tmp, name, op, repo, home, scratch):
+    cfg = tmp / f"{name}.json"
+    cfg.write_text(json.dumps({"operator_root": str(op), "repo": str(repo), "home": str(home), "scratch": str(scratch),
+                               "clock": str(tmp / f"{name}.clock"), "state_path": str(scratch / "log/night-hold.state.json"),
+                               "poll_s": 0.1}))
+    (tmp / f"{name}.clock").write_text("2026-11-12T10:00:00+00:00\n")
+    return cfg
+
+
+def mutate(text, old, new):
+    assert text.count(old) == 1, (old, text.count(old))
+    return text.replace(old, new)
+
+
+def rehearse():
+    L = Log()
+    live_before = {p: sha(LIVE_INST / p) for p in ("APPROVED", "opcommon.py", "operator_run.py", "operator_launch.py")}
+    crontab_before = run(["crontab", "-l"]).stdout
+    tree_before = run(["git", "status", "--porcelain"], cwd=REPO).stdout
+    tmp = Path(tempfile.mkdtemp(prefix="hours2-"))
+    try:
+        try:
+            rehearse_in(L, tmp)
+        except BaseException:
+            print("\n".join(L.lines))
+            raise
+        L.case({p: sha(LIVE_INST / p) for p in live_before} == live_before,
+               "the live install (APPROVED, opcommon.py, operator_run.py, operator_launch.py) is byte for byte as it began")
+        L.case(run(["crontab", "-l"]).stdout == crontab_before, "the live crontab is byte for byte as it began")
+        L.case(run(["git", "status", "--porcelain"], cwd=REPO).stdout == tree_before,
+               "the live main tree's `git status --porcelain` is as it began (nothing written there)")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    head = ["# ACT-OPERATOR-HOURS-2 rehearsal. Part 1: apply.sh on planted folders (a planted HOME with a copy of the live install, a planted main tree).",
+            "# Part 2: G9 of the installed copy (the real opcommon.holds()) over a stub clock and a planted state file. Part 3: the real night_hold.py writer.",
+            "# Part 4: the real launcher. Part 5: does it bite (mutants). Part 6: the operator's own tests on a clone with the after files."]
+    text = head + L.lines + [f"cases: {L.n}", f"failures: {L.fails}"]
+    (BUNDLE / "rehearsal.log").write_text("\n".join(text) + "\n")
+    print("\n".join(l for l in text if l.startswith("FAIL")) or "no failing case")
+    print("\n".join(text[-2:]))
+
+
+def rehearse_in(L, tmp):
+    lst = [l.split("|") for l in (BUNDLE / "list.txt").read_text().splitlines()]
+    after = {(r, p): a for r, p, b, a in lst}
+    before = {(r, p): (None if b == "null" else b) for r, p, b, a in lst}
+    new_oc_sha = [a for r, p, b, a in lst if p.endswith("install/opcommon.py")][0]
+    new_ap_sha = [a for r, p, b, a in lst if p.endswith("install/APPROVED")][0]
+    old_ap_sha = [b for r, p, b, a in lst if p.endswith("install/APPROVED")][0]
+
+    # ------------------------------------------------------------------------------------------ the planted world
+    def world(name):
+        w = tmp / name
+        home, root = w / "home", w / "root"
+        op = home / "gov-os-operator"
+        shutil.copytree(LIVE_INST, op / "install", ignore=shutil.ignore_patterns("__pycache__"))
+        for d in ("log", "queue", "acts", "wall"):
+            (op / d).mkdir(parents=True, exist_ok=True)
+        for (r, p), b in before.items():
+            if r == "repo":
+                (root / p).parent.mkdir(parents=True, exist_ok=True)       # the folders exist in the real tree
+            if r == "repo" and b is not None:
+                (root / p).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(REPO / p, root / p)
+        b = root / ".gov-runtime/scratch/orchestrator/acts" / ACT
+        shutil.copytree(BUNDLE, b)
+        return home, root, op, b
+
+    def ap(w, step, extra_env=None):
+        home, root, op, b = w
+        env = {"HOME": str(home), "PATH": os.environ["PATH"], "LC_ALL": "C"}
+        env.update(extra_env or {})
+        r = run(["bash", str(b / "apply.sh"), step], env=env, cwd=str(root))
+        return r
+
+    def snap(w):
+        home, root, op, b = w
+        return (tree_state(op), tree_state(root / "governance"), tree_state(root / "tests"))
+
+    def listed_state(w, side):
+        home, root, op, b = w
+        out = []
+        for (r, p), v in (before if side == "before" else after).items():
+            f = (home if r == "home" else root) / p
+            h = sha(f) if f.is_file() else None
+            out.append(h == v)
+        return all(out)
+
+    L.note("part 1: apply.sh on planted folders")
+    w = world("w1")
+    home, root, op, bdir = w
+    s0 = snap(w)
+    r = ap(w, "check")
+    L.case(r.returncode == 0 and "ready to apply" in r.stdout, f"check on the before state: exit 0, \"ready to apply\" ({r.returncode})")
+    r = ap(w, "verify")
+    L.case(r.returncode == 3 and "not applied" in r.stderr, f"verify on the before state: exit 3 \"not applied\" ({r.returncode})")
+    r = ap(w, "undo")
+    L.case(r.returncode == 0 and "nothing to do" in r.stdout and snap(w) == s0, "undo on the before state: exit 0, nothing to do, nothing touched")
+    r = ap(w, "nonsense")
+    L.case(r.returncode == 2 and snap(w) == s0, "an unknown step: exit 2 (usage), nothing touched")
+    old_install = tmp / "old-install"
+    shutil.copytree(op / "install", old_install)
+    old_ap_text = (op / "install/APPROVED").read_text()
+    r = ap(w, "apply")
+    L.case(r.returncode == 0 and "state applied" in r.stdout and "own APPROVED check: ok" in r.stdout,
+           f"apply: exit 0, \"the install's own APPROVED check: ok\", \"state applied\" ({r.returncode}; {r.stderr.strip()[:100]})")
+    L.case(listed_state(w, "after"), "every listed file hashes as the after (the repository files and the install's opcommon.py and APPROVED)")
+    L.case(sha(op / "install/APPROVED") == new_ap_sha and sha(op / "install/opcommon.py") == new_oc_sha,
+           f"the installed APPROVED is {new_ap_sha[:12]} and opcommon.py {new_oc_sha[:12]}")
+    L.case(stat.S_IMODE((op / "install/opcommon.py").stat().st_mode) == 0o444 and stat.S_IMODE((op / "install/APPROVED").stat().st_mode) == 0o444,
+           "the install's two files are 0444 as the install's others are")
+    leftovers = [str(p) for p in list(op.rglob(".*act-operator-hours-2*")) + list(root.rglob(".*act-operator-hours-2*"))]
+    L.case(not leftovers, f"no temporary file left beside any written file ({leftovers})")
+    L.case(not (op / "install/__pycache__").exists(), "the install's own APPROVED check wrote no __pycache__ (python -I -B)")
+    oc_hashes = {l.split("  ")[1]: l.split("  ")[0] for l in (old_install / "APPROVED").read_text().splitlines()}
+    same = all(sha(op / "install" / n) == h for n, h in oc_hashes.items() if n != "opcommon.py")
+    L.case(same, "every other install file is byte for byte as it was (13 files)")
+    new_lines = (op / "install/APPROVED").read_text().splitlines()
+    old_lines = old_ap_text.splitlines()
+    L.case(len(new_lines) == len(old_lines) and [a for a, b in zip(new_lines, old_lines) if a != b] ==
+           [f"{new_oc_sha}  opcommon.py"], "APPROVED differs from the old in exactly one line: opcommon.py's")
+    r = ap(w, "verify")
+    L.case(r.returncode == 0 and "every listed file is the after" in r.stdout, f"verify on the after state: exit 0 ({r.returncode})")
+    s1 = snap(w)
+    r = ap(w, "apply")
+    L.case(r.returncode == 0 and "already in place" in r.stdout and snap(w) == s1, "apply again: exit 0, already in place, nothing touched")
+    r = ap(w, "check")
+    L.case(r.returncode == 3 and "already applied" in r.stderr, f"check on the after state: exit 3, already applied ({r.returncode})")
+    r = ap(w, "undo")
+    L.case(r.returncode == 0 and "state before (undone)" in r.stdout and "own APPROVED check: ok" in r.stdout, f"undo: exit 0, the install's own APPROVED check ok, \"state before (undone)\" ({r.returncode}; {r.stderr.strip()[:100]})")
+    L.case(listed_state(w, "before") and sha(op / "install/APPROVED") == old_ap_sha, "every listed file is the before again; APPROVED is the old one")
+    L.case(not (root / "tests/unit/operator/test_act_operator_hours_2.py").exists(), "the new test file is gone after the undo")
+    L.case(snap(w) == s0, "the install and the repository paths are byte for byte (hash, mode, listing) what they were before the apply")
+    r = ap(w, "check")
+    L.case(r.returncode == 0, "check again: exit 0 (ready)")
+
+    L.note("part 1b: a half-applied state is finished, and a moved file is never overwritten")
+    # a stop part way: the install folder not writable after the repository files are written
+    w2 = world("w2")
+    home2, root2, op2, b2 = w2
+    s_w2 = snap(w2)
+    os.chmod(op2 / "install", 0o555)
+    r = ap(w2, "apply")
+    os.chmod(op2 / "install", 0o755)
+    L.case(r.returncode == 5 and "could not write" in r.stderr, f"apply with the install folder not writable: stops, exit 5 ({r.returncode})")
+    L.case(not listed_state(w2, "before") and not listed_state(w2, "after") and sha(op2 / "install/opcommon.py") == before[("home", INST_PATH + "opcommon.py")],
+           "the repository files are written, the install is as it was: a half-applied state")
+    r = ap(w2, "check")
+    L.case(r.returncode == 3 and "partly before, partly after" in r.stderr, "check on that state: exit 3, named a half-applied state")
+    r = ap(w2, "apply")
+    L.case(r.returncode == 0 and "state applied" in r.stdout and listed_state(w2, "after"), f"apply finishes it (the files already after are left): exit 0, applied ({r.returncode})")
+    # half undone: put one repository file back by hand, then undo finishes
+    shutil.copy2(BUNDLE / "before/repo" / REPO_FILES[2], root2 / REPO_FILES[2])
+    r = ap(w2, "undo")
+    L.case(r.returncode == 0 and listed_state(w2, "before"), f"undo over a half state (one file already before) finishes: exit 0, every file before ({r.returncode})")
+    L.case(snap(w2) == s_w2, "…and the whole state is the one it began with, byte for byte")
+
+    def refusal(label, mutate_fn, steps=("check", "apply", "undo", "verify"), codes=None, base="before"):
+        """A planted change; each step refuses (exit 3, 4 or 6) and touches nothing."""
+        wx = world("x-" + re.sub(r"\W+", "-", label)[:40])
+        hx, rx, ox, bx = wx
+        if base == "after":
+            assert ap(wx, "apply").returncode == 0
+        undo = mutate_fn(wx)
+        sx = snap(wx)
+        res = {s: ap(wx, s).returncode for s in steps}
+        ok = all(res[s] in (codes or {}).get(s, (3, 4, 6)) for s in steps) and snap(wx) == sx
+        L.case(ok, f"{label}: {', '.join(f'{s} exit {c}' for s, c in res.items())}; nothing touched")
+        return wx
+
+    refusal("a repository file moved (the committed opcommon.py differs by one byte)",
+            lambda x: (x[1] / REPO_FILES[0]).write_text((x[1] / REPO_FILES[0]).read_text() + "# moved\n"))
+    # (undo over the before state is "nothing to do" and touches nothing, so exit 0 is allowed there)
+    ok_undo = {"undo": (0, 3, 4, 6)}
+    refusal("an install file other than opcommon.py moved (brief.md)",
+            lambda x: ((x[2] / "install/brief.md").chmod(0o644), (x[2] / "install/brief.md").write_text("moved\n")), codes=ok_undo)
+    refusal("a stray file in install/", lambda x: (x[2] / "install/stray.py").write_text("x\n"), codes=ok_undo)
+    refusal("the install's opcommon.py moved", lambda x: ((x[2] / "install/opcommon.py").chmod(0o644), (x[2] / "install/opcommon.py").write_text("# moved\n")))
+    refusal("after the apply, the new test file edited (undo and apply and check refuse)",
+            lambda x: (x[1] / REPO_FILES[1]).write_text("# edited\n"), base="after")
+    refusal("after the apply, the install's APPROVED edited",
+            lambda x: ((x[2] / "install/APPROVED").chmod(0o644), (x[2] / "install/APPROVED").write_text("moved\n")), base="after")
+    refusal("a tampered frozen copy (after/home/.../opcommon.py)",
+            lambda x: (x[3] / "after/home" / (INST_PATH + "opcommon.py")).write_text("# tampered\n"), codes={s: (4,) for s in ("check", "apply", "undo", "verify")})
+    refusal("a tampered frozen copy (before/repo/.../test_w2_148_gates.py)",
+            lambda x: (x[3] / "before/repo" / REPO_FILES[2]).write_text("# tampered\n"), codes={s: (4,) for s in ("check", "apply", "undo", "verify")})
+    busy = {s: (6,) for s in ("check", "apply")}
+    refusal("the operator's freeze held (install/act-in-progress.txt)", lambda x: (x[2] / "install/act-in-progress.txt").write_text("ACT-X 1 a run\n"),
+            steps=("check", "apply"), codes=busy)
+    refusal("the operator's journal present (log/journal.json)", lambda x: (x[2] / "log/journal.json").write_text("{}\n"), steps=("check", "apply"), codes=busy)
+    refusal("the operator's lock of a failed undo (log/operator.lock)", lambda x: (x[2] / "log/operator.lock").write_text("x\n"), steps=("check", "apply"), codes=busy)
+    refusal("a request waiting in queue/", lambda x: (x[2] / "queue/one.req").write_text("ACT-X " + "a" * 64 + "\n"), steps=("check", "apply"), codes=busy)
+    refusal("undo while the operator is busy (a request in queue/), after the apply",
+            lambda x: (x[2] / "queue/one.req").write_text("ACT-X " + "a" * 64 + "\n"), steps=("undo",), codes={"undo": (6,)}, base="after")
+    # a launch holding launch.lock
+    wl = world("w-lock")
+    sl = snap(wl)
+    hold = subprocess.Popen(["flock", "-x", str(wl[2] / "log/launch.lock"), "sleep", "30"], start_new_session=True)
+    try:
+        import time
+        time.sleep(0.5)
+        r = ap(wl, "apply")
+        L.case(r.returncode == 6 and "launch is running" in r.stderr and snap(wl) == sl, f"a launch holding log/launch.lock: apply exits 6 and touches nothing ({r.returncode})")
+    finally:
+        os.killpg(hold.pid, 15)
+        hold.wait()
+    r = ap(wl, "apply")
+    L.case(r.returncode == 0, "…and with the lock free the same apply goes through")
+
+    # ------------------------------------------------------------------------------------------ part 2
+    L.note("part 2: G9 of the installed copy (apply.sh's own result in the planted world), the real opcommon.holds() over " + STUB_CLOCK_NOTE)
+    new_home, new_root, new_op, _ = w2          # w2 was applied, undone, then applied again? make a clean applied world
+    wa = world("w-applied")
+    assert ap(wa, "apply").returncode == 0
+    ha, ra, opa, _ = wa
+    scratch = tmp / "scratch-a"
+    (scratch / "log").mkdir(parents=True)
+    cfg_new = make_cfg(tmp, "new", opa, ra, ha, scratch)
+    cfg_old = make_cfg(tmp, "old", opa, ra, ha, scratch)
+    res_new = matrix(opa / "install", cfg_new, tmp)
+    res_old = matrix(old_install, cfg_old, tmp)
+    bad = [(c, h) for c, h in res_new if (h != []) != expected_hold(*c)]
+    L.case(not bad, f"the installed G9 over {len(res_new)} (time, state) cases ({len(TIMES)} times x {len(KINDS)} states) agrees with the owner's rule written out separately: {len(bad)} disagree {bad[:2]}")
+    got = dict(res_new)
+
+    def held(hm, kind):
+        return got[(hm, kind)] != []
+
+    # the cases the owner's task names, one line each
+    L.case(all(not held("01:30", k) for k in KINDS), "01:30: no hold in any state (true, false, missing, stale, malformed, empty, list, no key, null, 0, \"false\", 1, a directory)")
+    L.case(all(not held("02:05", k) for k in KINDS), "02:05: no hold in any state (a launch at 02:05 may start; the file is not read)")
+    L.case(all(held("02:30", k) for k in KINDS) and "before the night hold" in got[("02:30", "false")][0],
+           "02:30: a hold in every state, even a fresh holding false (\"before the night hold\": a session cannot run into it)")
+    L.case(held("03:30", "true") and got[("03:30", "true")] == ["the night hold is on"], "03:30 holding true: hold, \"the night hold is on\"")
+    L.case(not held("03:30", "false"), "03:30 holding false (fresh): no hold")
+    L.case(held("03:30", "missing") and "FileNotFoundError" in got[("03:30", "missing")][0], "03:30 state file missing: hold (fail closed), reason names FileNotFoundError")
+    L.case(held("03:30", "stale") and "stale" in got[("03:30", "stale")][0], "03:30 stale (a holding false 400 s old): hold, reason \"stale\"")
+    L.case(held("03:30", "malformed") and "JSONDecodeError" in got[("03:30", "malformed")][0], "03:30 malformed JSON: hold, reason names JSONDecodeError")
+    L.case(all(held("03:30", k) for k in ("empty", "list", "nokey", "null", "zero", "strfalse", "one", "dir")),
+           "03:30 an empty file, [false], no key, null, 0, \"false\", 1 or a directory in its place: hold in each (only the boolean false releases)")
+    L.case(not held("05:10", "false") and held("05:10", "true"), "05:10 after the release (fresh false): no hold; a fresh true at 05:10: hold")
+    L.case(not held("07:45", "false") and held("07:45", "true") and held("07:45", "stale"), "07:45: false releases, true and a stale file hold")
+    L.case(all(not held("14:00", k) for k in KINDS) and all(not held("08:00", k) for k in KINDS) and all(not held("23:59", k) for k in KINDS),
+           "14:00, 08:00 and 23:59: no hold in any state (a leftover true never stops the operator in the day)")
+    L.case(held("02:10", "false") and not held("02:09", "true") and held("03:09", "false") and not held("03:10", "false") and held("03:10", "true")
+           and not held("07:59", "false") and held("07:59", "true") and not held("08:00", "true"),
+           "the edges: 02:09 free, 02:10 hold, 03:09 hold, 03:10 file decides, 07:59 file decides, 08:00 free")
+    L.case(all(not held("00:00", k) for k in KINDS), "00:00: no hold in any state")
+    # the same time table against the OLD install: what changes
+    old = dict(res_old)
+    L.case(all(old[("05:10", k)] != [] for k in KINDS) and all(old[("07:45", k)] != [] for k in KINDS) and all(old[("02:05", k)] != [] for k in KINDS),
+           "contrast, the OLD install over the same table: it holds at 02:05, 05:10 and 07:45 in every state (the quiet hours 02:00-07:30 and the window 03:50-08:00)")
+    L.case(all(old[("01:30", k)] == [] for k in KINDS) and all(old[("14:00", k)] == [] for k in KINDS) and all(old[("08:00", k)] == [] for k in KINDS),
+           "contrast: the old install holds nothing at 01:30, 14:00 or 08:00 (so the new one gives back 02:00-02:09 and 03:10-07:59 with the hold off, and nothing else)")
+    changed = sorted({c for c, h in res_new if (h != []) != (old[c] != [])})
+    L.case(all((c[1] == "false" and minutes("03:10") <= minutes(c[0]) < minutes("08:00")) or (minutes("02:00") <= minutes(c[0]) < minutes("02:10")) or
+               (c[1] != "false" and False) for c in changed),
+           f"every case where new and old differ is a time from 02:00 to 02:09 or a fresh holding false from 03:10 to 07:59 ({len(changed)} cases); no case turns from free to held")
+    # the other holds
+    sc = {"NIGHTLY-RUNNING": scratch / "NIGHTLY-RUNNING", "CLOSE-RUNNING": scratch / "CLOSE-RUNNING",
+          "log/act-in-progress.txt": scratch / "log/act-in-progress.txt", "install/act-in-progress.txt": opa / "install/act-in-progress.txt"}
+    for name, path in sc.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("planted\n")
+        hs = [h for c, h in matrix(opa / "install", cfg_new, tmp) if c in {("14:00", "false"), ("05:10", "false"), ("01:30", "true")}]
+        path.unlink()
+        L.case(all(h != [] for h in hs), f"the planted {name} still holds at 14:00, 05:10 (released) and 01:30: the other G9 holds are as before")
+
+    # ------------------------------------------------------------------------------------------ part 3
+    L.note("part 3: the real writer (night_hold.py's own step()) writes the file; the installed G9 reads it")
+    sys.path.insert(0, str(ORCH / "tools"))
+    sys.dont_write_bytecode = True
+    import hold_lib as H  # noqa: E402
+    import night_hold as NH  # noqa: E402
+    orch = tmp / "scratch-real"
+    for d in ("dispatch", "log/nightly"):
+        (orch / d).mkdir(parents=True, exist_ok=True)
+    (orch / "dispatch/ready.txt").write_text("")
+    (tmp / "wt").mkdir(exist_ok=True)
+    cfg_real = make_cfg(tmp, "real", opa, ra, ha, orch)
+    cfg = H.Cfg(str(orch), str(tmp / "wt"))
+    clock = {"t": datetime(2026, 11, 12, 2, 59, 30)}
+    nh = NH.NightHold(cfg, now=lambda: clock["t"], leads=lambda: [])
+    state = orch / "log/night-hold.state.json"
+    drv = tmp / "driver-real.py"
+    drv.write_text("import json, os, sys\nsys.path.insert(0, sys.argv[1]); sys.dont_write_bytecode = True\nimport opcommon as oc\n"
+                   "open(sys.argv[3], 'w').write('2026-11-12T%s:00+00:00\\n' % sys.argv[4])\nprint(json.dumps(oc.holds(oc.load_settings(sys.argv[2]))))\n")
+
+    def real_holds(hm):
+        r = run([sys.executable, "-I", "-B", str(drv), str(opa / "install"), str(cfg_real), str(tmp / "real.clock"), hm])
+        return json.loads(r.stdout)
+
+    nh.step()
+    L.case(json.loads(state.read_text())["holding"] is False and real_holds("02:59") != [] and real_holds("01:30") == [],
+           "02:59:30 the real writer's file: holding false; G9 at 02:59 holds (before the night hold), at 01:30 does not")
+    clock["t"] = datetime(2026, 11, 12, 3, 0, 20)
+    nh.step()
+    L.case(json.loads(state.read_text())["holding"] is True and real_holds("03:10") == ["the night hold is on"] and real_holds("03:30") == ["the night hold is on"],
+           "03:00:20 the writer's first look in its window: holding true; G9 holds at 03:10 and 03:30 (\"the night hold is on\")")
+    clock["t"] = datetime(2026, 11, 12, 5, 0, 0)
+    (Path(cfg.nightly) / "status.txt").write_text("2026-11-12 ran | planted: the night ended\n")
+    nh.step()
+    s2 = json.loads(state.read_text())
+    L.case(s2["holding"] is False and s2["in_window"] is True and real_holds("05:10") == [], "05:00 with today's status line: the writer releases (holding false); G9 at 05:10: no hold")
+    (Path(cfg.nightly) / "status.txt").unlink()
+    nh2 = NH.NightHold(cfg, now=lambda: clock["t"], leads=lambda: [])
+    clock["t"] = datetime(2026, 11, 12, 6, 0, 0)
+    nh2.step()
+    L.case(json.loads(state.read_text())["holding"] is True and real_holds("06:00") == ["the night hold is on"], "a night with no end by 06:00: holding true; G9 holds")
+    clock["t"] = datetime(2026, 11, 12, 7, 31, 0)
+    nh2.step()
+    L.case(json.loads(state.read_text())["holding"] is False and real_holds("07:40") == [], "07:31 the nightly not ended: the writer releases at 07:30 at the latest; G9 at 07:40: no hold")
+    t_old = datetime.now().timestamp() - 3600
+    os.utime(state, (t_old, t_old))
+    L.case(real_holds("07:40") != [] and real_holds("14:00") == [], "the writer stopped an hour ago (its file keeps `holding false`): G9 holds at 07:40 (stale), not at 14:00")
+
+    # ------------------------------------------------------------------------------------------ part 4
+    L.note("part 4: the real launcher from the installed copy (a stub claude, a stub clock, a queued request): held or taken")
+    sys.path.insert(0, str(CLONE / "tests/unit/operator"))
+    import test_w2_148_kit as K  # noqa: E402
+    bin_ = tmp / "bin"
+    bin_.mkdir()
+    (bin_ / "claude").write_text(K.STUB_CLAUDE)
+    (bin_ / "claude").chmod(0o755)
+    lw = world("w-launch")
+    assert ap(lw, "apply").returncode == 0
+    hl, rl, opl, _ = lw
+    lscratch = tmp / "scratch-l"
+    (lscratch / "log").mkdir(parents=True)
+    (tmp / "tx").mkdir()
+    lcfg = tmp / "launch.json"
+    lclock = tmp / "launch.clock"
+    lcfg.write_text(json.dumps({"operator_root": str(opl), "repo": str(rl), "home": str(hl), "scratch": str(lscratch),
+                                "transcripts": str(tmp / "tx"), "clock": str(lclock), "pings_log": str(tmp / "pings.log"),
+                                "push_cmd": ["/bin/true"], "poll_s": 0.1, "claude": str(bin_ / "claude")}))
+    lenv = {"HOME": str(hl), "PATH": f"{bin_}:{os.environ['PATH']}"}
+    lstate = lscratch / "log/night-hold.state.json"
+
+    def launch(hm, holding):
+        lclock.write_text(f"2026-11-12T{hm}:00+00:00\n")
+        if holding is None:
+            lstate.unlink(missing_ok=True)
+        else:
+            lstate.write_text(json.dumps({"pid": 1, "holding": holding}))
+        (opl / "queue").mkdir(exist_ok=True)
+        (opl / "queue/one.req").write_text("ACT-HR2-L " + "a" * 64 + "\n")
+        r = run([sys.executable, "-I", "-B", str(opl / "install/operator_launch.py"), "--config", str(lcfg)], env=lenv)
+        try:
+            out = json.loads(r.stdout.strip().splitlines()[-1])
+        except Exception:
+            out = {"result": "unreadable", "stderr": r.stderr[-200:]}
+        taken = not (opl / "queue/one.req").exists()
+        for f in list((opl / "queue").glob("*")):
+            if f.is_dir():
+                for g in f.iterdir():
+                    shutil.rmtree(g, ignore_errors=True) if g.is_dir() else g.unlink()
+            else:
+                f.unlink()
+        (opl / "log/session.json").unlink(missing_ok=True)
+        return out, taken
+
+    L.case(os.path.exists(opl / "install/APPROVED") and sha(opl / "install/APPROVED") == new_ap_sha, "the launcher runs from the applied install (APPROVED as the ACT leaves it)")
+    for hm, hd, want_held in (("01:30", None, False), ("02:05", None, False), ("02:30", False, True), ("03:30", True, True),
+                              ("03:30", None, True), ("05:10", False, False), ("07:45", False, False), ("14:00", None, False)):
+        out, taken = launch(hm, hd)
+        is_held = out.get("result") == "held" and out.get("gate") == "G9"
+        okc = is_held == want_held and (not is_held or not taken) and (is_held or taken) and out.get("approved_sha256") == new_ap_sha \
+            and out.get("result") != "refused"
+        state_txt = {None: "no file", True: "holding true", False: "holding false"}[hd]
+        L.case(okc, f"launcher at {hm}, {state_txt}: {'held at G9, the request stays in queue/' if want_held else 'no hold: the request taken and a session started (stub claude), result ' + str(out.get('result'))}"
+                    f" (got {out.get('result')}{'/' + str(out.get('gate')) if out.get('gate') else ''})")
+    out, taken = launch("02:30", False)
+    L.case("before the night hold" in str(out.get("reason")), f"the held line's reason at 02:30: \"{out.get('reason')}\"")
+    out, taken = launch("05:10", True)
+    L.case("the night hold is on" in str(out.get("reason")), f"the held line's reason at 05:10 with holding true: \"{out.get('reason')}\"")
+
+    # ------------------------------------------------------------------------------------------ part 5
+    L.note("part 5: does it bite? Each mutant of the installed opcommon.py, over the same table; the right code has 0 disagreements, each mutant at least 1")
+    base = (opa / "install/opcommon.py").read_text()
+    mutants = {
+        "the old quiet hours back (02:00 to 07:30 as a hold)": lambda t: mutate(t, "    if HOLD_FROM[0] * 60 + HOLD_FROM[1] <= t <",
+                                                                                "    if 120 <= t < 450:\n        out.append('quiet')\n    if HOLD_FROM[0] * 60 + HOLD_FROM[1] <= t <"),
+        "the state never read (hold from 03:10 to 07:59 always)": lambda t: mutate(t, "        out.extend(night_hold_reasons(s))", "        out.append('x')"),
+        "the state never read (no hold from 03:10 to 07:59 ever)": lambda t: mutate(t, "        out.extend(night_hold_reasons(s))", "        pass"),
+        "holding read as `== False`": lambda t: mutate(t, "    if holding is not False:", "    if holding == True:"),
+        "no age test": lambda t: mutate(t, "    if not age < s[\"night_hold_max_age_s\"]:", "    if False:"),
+        "an unreadable file is no hold (fail open)": lambda t: mutate(t, "        return [f\"the night hold's state cannot be read ({exc.__class__.__name__})\"]", "        return []"),
+        "the pre-hold margin from 02:20": lambda t: mutate(t, "HOLD_FROM = (2, 10)", "HOLD_FROM = (2, 20)"),
+        "the pre-hold margin from 02:00": lambda t: mutate(t, "HOLD_FROM = (2, 10)", "HOLD_FROM = (2, 0)"),
+        "the state read from 03:00": lambda t: mutate(t, "HOLD_READ_FROM = (3, 10)", "HOLD_READ_FROM = (3, 0)"),
+        "the state read to 07:30": lambda t: mutate(t, "HOLD_END = (8, 0)", "HOLD_END = (7, 30)"),
+        "the state read to 08:30": lambda t: mutate(t, "HOLD_END = (8, 0)", "HOLD_END = (8, 30)"),
+        "the old nightly window as the default": lambda t: mutate(t, "DEFAULT_NIGHTLY = None", "DEFAULT_NIGHTLY = \"03:50-08:00\""),
+        "the age limit 3000 s": lambda t: mutate(t, "NIGHT_HOLD_MAX_AGE_S = 300", "NIGHT_HOLD_MAX_AGE_S = 3000"),
+        "the NIGHTLY-RUNNING flag dropped": lambda t: mutate(t, "            out.append(\"the nightly runs (NIGHTLY-RUNNING)\")", "            pass"),
+    }
+    flag_cases = {("14:00", "false"), ("05:10", "false")}
+    for name, fn in mutants.items():
+        mdir = tmp / ("mut-" + re.sub(r"\W+", "-", name)[:30])
+        shutil.copytree(opa / "install", mdir, ignore=shutil.ignore_patterns("__pycache__"))
+        (mdir / "opcommon.py").chmod(0o644)
+        (mdir / "opcommon.py").write_text(fn(base))
+        mscratch = tmp / (mdir.name + "-s")
+        (mscratch / "log").mkdir(parents=True)
+        mcfg = make_cfg(tmp, mdir.name, opa, ra, ha, mscratch)
+        if "NIGHTLY-RUNNING" in name:
+            (mscratch / "NIGHTLY-RUNNING").write_text("planted\n")
+            m = matrix(mdir, mcfg, tmp)
+            diffs = sum(1 for c, h in m if c in flag_cases and h == [])       # expected: held by the flag
+        else:
+            m = matrix(mdir, mcfg, tmp)
+            diffs = sum(1 for c, h in m if (h != []) != expected_hold(*c))
+        L.case(diffs >= 1, f"mutant \"{name}\": {diffs} cases disagree with the rule (caught)")
+    L.case(len(bad) == 0, "the installed code itself: 0 disagreements over the same table (the control for the mutants)")
+
+    # ------------------------------------------------------------------------------------------ part 6
+    L.note("part 6: the operator's own tests (tests/unit/operator, tests/acceptance/W2-148) on a clone of the committed head with the ACT's repository files")
+    for (r, p), a in after.items():
+        if r == "repo":
+            assert sha(CLONE / p) == a, f"the clone's {p} is not the ACT's after file"
+    assert subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "governance/project/operator/operator_run.py"], cwd=CLONE).returncode == 0
+    L.case(True, "the clone's four repository files hash as the bundle's after copies; the clone's other files are the committed head's")
+    t = run([sys.executable, "-m", "pytest", "tests/unit/operator", "tests/acceptance/W2-148", "-q", "-p", "no:cacheprovider"], cwd=str(CLONE))
+    tail = [l for l in t.stdout.splitlines() if re.search(r"\d+ passed", l)]
+    summary = re.sub(r" in [0-9.]+s( \([0-9:]+\))?", "", tail[-1]).strip(" =") if tail else "no summary"
+    L.case(t.returncode == 0 and "failed" not in summary and "error" not in summary, f"pytest tests/unit/operator tests/acceptance/W2-148 on the clone: {summary}")
+    t2 = run([sys.executable, "-m", "pytest", "tests/unit/operator/test_act_operator_hours_2.py", "-q", "-p", "no:cacheprovider"], cwd=str(CLONE))
+    tail2 = [l for l in t2.stdout.splitlines() if re.search(r"\d+ passed", l)]
+    s2_ = re.sub(r" in [0-9.]+s( \([0-9:]+\))?", "", tail2[-1]).strip(" =") if tail2 else "no summary"
+    L.case(t2.returncode == 0, f"the new file alone: {s2_}")
+    # the new cases on the OLD opcommon.py (they must go red)
+    oldoc = tmp / "oldclone-oc.py"
+    oldoc.write_bytes((BUNDLE / "before/repo/governance/project/operator/opcommon.py").read_bytes())
+    target = CLONE / "governance/project/operator/opcommon.py"
+    keep_new = target.read_bytes()
+    try:
+        target.write_bytes(oldoc.read_bytes())
+        t3 = run([sys.executable, "-m", "pytest", "tests/unit/operator/test_act_operator_hours_2.py", "-q", "-p", "no:cacheprovider"], cwd=str(CLONE))
+    finally:
+        target.write_bytes(keep_new)
+    tail3 = [l for l in t3.stdout.splitlines() if re.search(r"\d+ (passed|failed)", l)]
+    s3 = re.sub(r" in [0-9.]+s( \([0-9:]+\))?", "", tail3[-1]).strip(" =") if tail3 else "no summary"
+    L.case(t3.returncode != 0 and "failed" in s3, f"the same new cases on the OLD opcommon.py go red: {s3}")
+    L.case(sha(target) == after[("repo", REPO_FILES[0])], "the clone's opcommon.py is the after file again")
+
+
+def finalize():
+    log = BUNDLE / "rehearsal.log"
+    if not log.read_text().rstrip().endswith("failures: 0"):
+        sys.exit("the rehearsal did not end with failures: 0: not finalized")
+    print(f"manifest sha256 {write_manifest(sha(log))}")
+
+
+def gates():
+    sys.path.insert(0, str(REPO / "governance/project/operator"))
+    sys.dont_write_bytecode = True
+    import act_class  # noqa: E402
+    import operator_run as orun  # noqa: E402
+    m = json.loads((BUNDLE / "manifest.json").read_text())
+    orun.validate_manifest(m)
+    print("validate_manifest: pass")
+    for rel, want in m["files"].items():
+        assert sha(BUNDLE / rel) == want, rel
+    print(f"files: {len(m['files'])} hash as the manifest says")
+    s = {"repo": str(REPO), "home": str(Path.home())}
+    texts = [("apply.sh", (BUNDLE / "apply.sh").read_text())] + [("a check", c["cmd"]) for c in m["checks"]]
+    for where, text in texts:
+        why = orun.live_path_refs(text, s)
+        print(f"path rule on {where}: {'pass' if why is None else why}")
+    v = act_class.classify(str(BUNDLE))
+    print(f"act_class.classify: class {v['class']}; hits {v['hits']}; why {v['why']}")
+    print(f"manifest sha256 {sha(BUNDLE / 'manifest.json')}")
+
+
+def all_():
+    build()
+    rehearse()
+    finalize()
+    gates()
+
+
+if __name__ == "__main__":
+    {"build": build, "rehearse": rehearse, "finalize": finalize, "gates": gates, "all": all_}[sys.argv[1]]()

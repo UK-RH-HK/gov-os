@@ -1,0 +1,4 @@
+SIGINT-ignored-at-start: 0
+heavy_slot: a landing or close waits first; waiting (2026-11-12 07:27:49)
+.............................                                            [100%]
+29 passed, 9 deselected in 23.24s

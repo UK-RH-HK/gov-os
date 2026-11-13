@@ -1,0 +1,12 @@
+log: W2-115-A5-run3.json
+W2: W2-115
+status: PACKAGES. FULL review round 1 at 569c2933d33c is a FAIL with one blocking finding (F-1, S4/F1): a red the change caused can be excused and the ticket closes. The fix round uses round 2, the last review round (DEC-1010), and needs the CTO's calls first (PK-3 to PK-5).
+
+task: DAEO-emq1 (W2-115), run 3 (resume after PK-1/PK-2), profile FULL, class C3
+
+status: PACKAGES. FULL review round 1 at 569c2933d33c is a FAIL with one blocking finding (F-1, S4/F1): a red the change caused can be excused and the ticket closes. The fix round uses round 2, the last review round (DEC-1010), and needs the CTO's calls first (PK-3 to PK-5).
+
+work_completed:
+- (1) Merged w2/integrate (0aec6e10c) into w2/W2-115 at 6831c6e3a. The merge was clean.
+- (2) Ran one test-design batch, td-3 (Opus, high, session 317184b3-07b6-4be9-b31c-1b3b7114ded0, $1.09):
+  - W1-39 `test_copy_creates_the

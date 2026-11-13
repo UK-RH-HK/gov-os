@@ -1,0 +1,2 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 00:10:59)
+gov accept: ACCEPT_NO_TESTS: ticket DAEO-qvff has no acceptance folder inside the project (declared: tests/acceptance/W2-111/)

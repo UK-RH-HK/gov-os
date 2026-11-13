@@ -1,0 +1,9 @@
+tree head: 25634cdde460
+........................................................................ [ 40%]
+........................................................................ [ 81%]
+...................s......s......                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-171/test_w2_171_f5_paths.py:53: F5 judges only the branch w2/W2-171; this is the branch w2/W2-172: not judged here
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:49: F5 judges only the branch w2/W2-170; this is the branch w2/W2-172: not judged here
+175 passed, 2 skipped in 90.74s (0:01:30)
+tree rc=0

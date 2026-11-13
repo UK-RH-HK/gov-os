@@ -1,0 +1,9 @@
+log: W2-37-A5-resume-dec1157.json
+W2: W2-37
+status: PACKAGES. The fix is built and the final probe passed (READY true from `verdict.py`). Two acceptance cases are still red because the change skill's files are outside the ticket's allowed paths (P-1, DEC-816), so `gov accept` fails and DoD-1 does not hold yet. The branch is clean at `65e8c076873d`; i
+
+task: DAEO-6n5k
+status: PACKAGES. The fix is built and the final probe passed (READY true from `verdict.py`). Two acceptance cases are still red because the change skill's files are outside the ticket's allowed paths (P-1, DEC-816), so `gov accept` fails and DoD-1 does not hold yet. The branch is clean at `65e8c076873d`; it lands once P-1 is applied.
+work_completed:
+- Merged w2/integrate into the branch with no conflicts (`64ccbd0cc`, Task DAEO-6n5k). After the merge only the ticket's own files differ from integrate.
+- Rebuilt the store. `gov accept` and lead_verify on the merged head gave 492

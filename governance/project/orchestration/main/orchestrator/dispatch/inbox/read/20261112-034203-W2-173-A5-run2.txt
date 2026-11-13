@@ -1,0 +1,8 @@
+log: W2-173-A5-run2.json
+W2: W2-173
+status: ESCALATION_BLOCKED (cause: the night hold, no new worker after 03:00 UTC before the nightly). The build part converged. The FULL review has not started: its brief is written but no reviewer has been launched. Nothing waits on a decision. Resume after the nightly from CHECKPOINT.md's NEXT line. The t
+
+The build part of W2-173 run 2 is done and verified, but I stopped before the FULL review because of the night hold. It was 03:40 UTC and the review needs a new worker. The review brief is written, so the resume can launch it straight away; I'm returning ESCALATION_BLOCKED for that reason.
+
+task: DAEO-qz4p (W2-173), run 2: the CTO's P-1 (a)
+status: ESCALATION_BLOCKED (cause: the night hold, no new worker after 03:00 UTC before the nightly). The build part converged. The FULL review has not started: its brief is written but no reviewer has been launched. Nothing waits on a decision. Resume afte

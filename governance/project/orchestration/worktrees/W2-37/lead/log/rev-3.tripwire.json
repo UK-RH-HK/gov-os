@@ -1,0 +1,24 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "head",
+   "before": "c03c38f82f48",
+   "after": "f96787c27c36"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M src/gov/adopt/fabric.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M tests/unit/adopt/test_w2_88_fabric.py"
+  }
+ ]
+}

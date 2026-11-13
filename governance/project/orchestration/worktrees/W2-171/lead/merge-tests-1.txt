@@ -1,0 +1,5 @@
+Merge w2/W2-171-tests into w2/W2-171: run 2's test-design batch (td-1, 439806e0f): S1-S8, F1-F5 on a planted world, fake gov and fake model
+
+Task: DAEO-k1e2
+Role: orchestrator
+Implements: DEC-1101, DEC-1125, DEC-1098, DEC-1097, DEC-1074, DEC-833, DEC-860, DEC-1118, DEC-1050, DEC-1073

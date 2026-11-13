@@ -1,0 +1,310 @@
+....................................................................... [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+.....................................................F.................. [ 53%]
+...........sss.......................................................... [ 55%]
+........................................................................ [ 56%]
+...............................sss...................................... [ 58%]
+........................................................................ [ 60%]
+...................F......................F.F.F......F.................. [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................F............................................... [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+...................F.................................................... [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+....................................ss.................................. [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+..........s............................................................. [ 95%]
+........................................................................ [ 97%]
+......................................................................[gw5] node down: Not properly terminated
+F.....................................                                   [100%]
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/dispatch/test_peaks.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_peaks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_peaks.py:7: in <module>
+    from conftest import GIB
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_returns.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_returns.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_returns.py:7: in <module>
+    from conftest import git
+E   ImportError: cannot import name 'git' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+______________ ERROR collecting tests/unit/dispatch/test_start.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_start.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_start.py:9: in <module>
+    from conftest import GIB, REPO, git
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_status.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_status.py:12: in <module>
+    from conftest import REPO, GIB
+E   ImportError: cannot import name 'REPO' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+=================================== FAILURES ===================================
+________________ test_the_twelve_sources_are_the_composition[] _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: engineer
+E           assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'
+E             
+E             Skipping 1377 identical leading characters in diff, use -v to show
+E               it_for}.
+E             + 
+E             + Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E             + 
+E             + Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957]....
+E             
+E             ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...research.md'}] == []
+E         
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+_ test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_170_world.World object at 0x74091909ecc0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-331/popen-gw0/test_f3_a_run_s_file_access_lo0')
+
+    def test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders(world, tmp_path):
+        # the default runs folder is ~/gov-os-runs: a planted home holds one, so the run needs it and finds it there
+        home = tmp_path / "home-with-runs"
+        shutil.copytree(world.launch, home / "gov-os-runs")
+        world.write_set(W.clean_specs(), selection=False)
+        done, entries = _logged_run(world, home, tmp_path / "preflight.log", "preflight", world.pf_flags(runs_dir=False))
+        assert done.returncode == 0, (done.stdout, done.stderr)
+        world.write_notes(2, {"q27": ("reject", "R1-WRONG")})
+        done2, entries2 = _logged_run(world, home, tmp_path / "void.log", "void", world.void_flags())
+        assert done2.returncode == 0, (done2.stdout, done2.stderr)
+        done3, entries3 = _logged_run(world, home, tmp_path / "declare.log", "declare", world.dc_flags())
+        assert done3.returncode == 0, (done3.stdout, done3.stderr)
+        every = entries + entries2 + entries3
+        reached = [p for _, p in every if W.at_or_under(p, W.TRUE_SETS) or W.at_or_under(p, W.TRUE_RUNS)]
+>       assert reached == [], reached
+E       AssertionError: ['/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-170', '/home/usain/gov-os-runs/W2-00/merge...t', '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/src/gov/memaudit/__pycache__/__main__.cpython-312.pyc', ...]
+E       assert ['/home/usain...312.pyc', ...] == []
+E         
+E         Left contains 79 more items, first extra item: '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-170'
+E         Use -v to get more diff
+
+tests/acceptance/W2-170/test_w2_170_s4_map.py:165: AssertionError
+__________________ test_s1_the_limit_and_period_are_the_files __________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x740911fa9220>
+
+    def test_s1_the_limit_and_period_are_the_files(rig):
+        rig.smi("1500, 24000", "1501, 24000")
+        rig.config(limit=1500, every=7)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.sleeps == [7] and result["reading"]["used_mib"] == 1501
+E       assert (True and [0.001, 0.002...6, 0.032, ...] == [7]
+E         
+E         At index 0 diff: 0.001 != 7
+E         Left contains 5201 more items, first extra item: 0.002
+E         Use -v to get more diff)
+
+tests/unit/resources/test_w2_157_backstop.py:201: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x740911f585c0>, position = 0
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x740911f591c0>, position = 1
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x740911f59a90>, position = 2
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_ test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x740918960b60>
+
+    def test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed(rig):
+        rig.smi("15900, 24000")
+        rig.config()
+        second = rig.job()
+        # gov runs in a session of its own; a job started with & shares its group, as the shell's $$ names it
+        shell = ("sleep 120 >/dev/null 2>&1 & exec " + sys.executable + " -c 'import sys; from gov.cli.main import main; "
+                 "sys.exit(main(sys.argv[1:]))' resources --json --backstop $$ " + str(second) + " --root " + str(rig.root))
+        child = subprocess.Popen(["sh", "-c", shell], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                                 start_new_session=True, env={**os.environ, **rig.env, "PYTHONPATH": str(REPO / "src")})
+        rig.groups.append(child)
+        own = child.pid
+        deadline = time.monotonic() + 40
+        while rig.state(child.pid) != "T" and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert rig.state(child.pid) == "T", "gov was never stopped"
+>       assert rig.state(rig.groups[0].pid) == "T"  # the second group was paused before the own group
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'R' == 'T'
+E         
+E         - T
+E         + R
+
+tests/unit/resources/test_w2_157_backstop.py:794: AssertionError
+_______ test_s3_a_partial_offload_line_written_since_the_start_trips_it ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x74b37e22b050>
+
+    def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
+        log = rig.tmp / "serve.log"
+        log.write_text("offloaded 1/9 layers to GPU\n")  # before the start: never counts
+        rig.smi("100, 24000", "100, 24000", "100, 24000")
+        rig.config(embedders=[(9, log)])
+        seen = []
+    
+        def append_after_first_reading(seconds):
+            seen.append(seconds)
+            if len(seen) == 1:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 33/33 layers to GPU\n")
+            if len(seen) == 2:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 20/33 layers to GPU\n")
+    
+        rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.smi_calls() == 3
+E       assert (True and 2 == 3)
+E        +  where 2 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x74b37e22b050>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:352: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/pytest-of-usain/pytest-331/popen-gw4/h11')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+_________________ tests/unit/resources/test_w2_157_backstop.py _________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+worker 'gw5' crashed while running 'tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log'
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2086191) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:46: F5 judges only the branch w2/W2-170; this is a detached HEAD: not judged here
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:88: F3 judges only the branch w2/W2-173; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:88: F4 judges only the branch w2/W2-173; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+11 failed, 4406 passed, 11 skipped, 6 warnings, 4 errors in 4834.50s (1:20:34)
+heavy_slot: all 3 slots taken; waiting (2026-11-12 10:54:20)

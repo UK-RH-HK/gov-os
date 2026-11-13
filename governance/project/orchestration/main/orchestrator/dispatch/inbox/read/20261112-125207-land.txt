@@ -1,0 +1,9 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-123004.out
+W2: (land batch)
+status: W2-11=dca382f3069f not landed (ejected: red)
+
+last output:
+repository_s_probe_records, tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed, tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record, tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+queue run exit 3
+W2-11: not landed (ejected: red)
+

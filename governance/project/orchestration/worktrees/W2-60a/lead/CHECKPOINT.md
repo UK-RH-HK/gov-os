@@ -1,32 +1,19 @@
-# W2-60a (DAEO-cv58) lead checkpoint, run 3 (round 3, the last) — FINAL, returned DONE (2026-10-31 08:45)
+# W2-60a (DAEO-cv58) lead checkpoint, run 4 (resume, build) — LAUNCH_BLOCKED, 2026-11-13 ~01:15
+task: DAEO-cv58
+decisions_applied: DEC-826, DEC-1052, DEC-313 (the launcher's main-checkout check, working as built)
 
-## State
-- Branch w2/W2-60a, head e1a3e2214266 (probe record) on 0e11b5db743d (checkpoint record, the probed head).
-  Tree clean. Tests worktree W2-60a-tests and branch w2/W2-60a-tests removed after merge.
-- Review 3: PASS (session 3c32abb2-c43a-41e3-96bd-43ac8f77e57b). Probe record docs/probes/DAEO-cv58/PR-DAEO-cv58.md.
+STATE: merge of w2/integrate IN PROGRESS in the tree (uncommitted, MERGE_HEAD 84cc42343ffb); launcher.py + 3 unit files resolved by engineer b11 (not yet git-added); 4 acceptance files still conflicted; no worker can launch | HEAD: 7ff4b82c9b3e | NEXT: once the main checkout's .claude/settings.local.json carries no permissions.additionalDirectories (CTO/owner, package P-1): LAUNCH_TICKET=DAEO-cv58 bash <tools>/launch_worker.sh --class C3 --model claude-opus-5-5 independent-test-designer high .gov-runtime/scratch/lead/briefs/b12-test-designer-merge.md | WAITING ON: package P-1 (launch refused), P-2 (S12 interface)
+Workers: b11-engineer-merge (session 469c7ca8-4478-4fe8-bc76-125ee95598e8, exit 0, done) · b12 test designer: launch refused by the launcher's dry run (DEC-313) · Rounds: review rounds spent (DEC-1010); narrow check (DEC-1154) still to run · Paths: briefs/b11-*, b12-*; log/b11-engineer-merge.*; backup of the resolved files in merge-r4/
 
-## Commits this run
-- 7bbfd34f85ba, cb8f1b6088ef, 22ceb1e241a0, 0c0b2549db06: test designer b8 (Rewrite-Reason DEC-951 ...).
-- 1b32b5b24d40: engineer b9 (items (i), (ii), builder tests, CIT-E).
-- a600fdfd2fe9: lead merge of w2/W2-60a-tests (Role: orchestrator).
-- 0e11b5db743d: lead gov checkpoint CP-DAEO-cv58-0011. e1a3e2214266: lead probe record.
-- trailer_gate: 28 commits, 28 judged, 0 lacking, 0 bad Implements.
+## Decisions taken (lead)
+- launcher.py: `git checkout --theirs` (integrate's) so the engineer could be launched; b11 re-applied W2-60a's side onto it.
+- Appended prompt: one --append-system-prompt-file <TMPDIR>/role-<role>.md = role file bytes + one blank line + .claude/templates/<stem>.md bytes, last after the caller's args; record gains template {path, sha256}. Lead launches: integrate's line unchanged.
 
-## Verification (head e1a3e2214266; selection scoped, core_changed [], unplaced [])
-- Rebuild 06:31-06:44 OK (held 47 min by the rebuild lock). gov.__file__ in this worktree.
-- Parallel: 366 failed, 7804 passed, 2 skipped, 2 errors (1256 s). 301 class (i); 2 W1-32 stderr-gone (class (i));
-  11 W2-90; 1 W2-56 env case; 47 W1-50 import-path (pass alone: flaky candidate, tests/unit/adapters/
-  test_portability.py:15 sys.path); 4 W1-33 guard cases (fixture lacks .claude/hooks/pretooluse.py: ACT 1; red alone;
-  not ours); 2 W1-05 errors (switch-over check on .claude/settings.json: ACT 1; red alone; not ours).
-- Serial: 1 entry (W1-05 latency), 4 failed 5 passed: all 4 on W2-90's list.
-- gov check: RED index-freshness + recovery-rebuild (two governance commits after the rebuild), RED mutation scope
-  (DAEO-tgk2's ticket, same on integrate); YELLOW decision citations (old commits), openspec absent.
-- collect-only: 17763/17765 collected (2 deselected). keyword_warn 0.
+## Then (after P-1)
+1. b12: TD resolves tests/acceptance/W2-50/w2_50_support.py, W2-58/{README.md,test_w2_58_launched_sessions.py,w2_58_support.py}; plants templates + open gate in tests/acceptance/W2-60a fixtures.
+2. lead: git add the 8 files; git commit (merge) with trailers.
+3. S12 pair (after P-2 answers the interface); gov accept; rebuild; lead_verify; narrow check of W2-60a's own diff since e1a3e2214266; probe record (rename old to -round-3.md).
 
-## Left
-- /tmp/gov-os-lead-W2-60a (75 MB, 10,882 inodes); worktree .gov-runtime 452 MB, 3,163 inodes (store + scratch).
-- From run 1: ~/gov-os-runs/P60-rules-probe, ~/gov-os-runs/W2-60a-fixture,
-  ~/.claude/projects/-tmp-gov-os-lead-W2-60a-rules-probe/.
-
-## What a resume must do: nothing; the orchestrator merges after W2-11's lines (W2-56 merges this back first).
-## Loop count: 1 implementer iteration this round, converged.
+## Evidence so far
+- tests/unit/launch W2-60a files (test_role, test_launch_record, test_runs, test_w1_28, test_w1_32): 95 passed, 11 deselected (lead, 01:06).
+- b11: tests/unit/launch 280 passed, 16 failed (all other tickets' fixtures with no role file: test_w2_136_plan_check.py:239 x3, test_w2_153_template.py:109 x5, :118 x5, test_w2_56.py:369 [0],[3], :413).

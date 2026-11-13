@@ -1,0 +1,9 @@
+log: W2-159-A5-run2.json
+W2: W2-159
+status: CHECKPOINTED. I stopped on the CTO's usage order (week usage at 97% at 09:31, DEC-1140 (5)-(6)). No worker is running. The code and tests are built and green on the ticket's own suites, but the last fix has not been through lead_verify, gov accept or the review, so this is not DONE.
+
+task: DAEO-6lid (W2-159), ticket lead, run 2 (build), resumed after run 1's packages
+status: CHECKPOINTED. I stopped on the CTO's usage order (week usage at 97% at 09:31, DEC-1140 (5)-(6)). No worker is running. The code and tests are built and green on the ticket's own suites, but the last fix has not been through lead_verify, gov accept or the review, so this is not DONE.
+work_completed:
+- Merged w2/integrate (e84e6c9cf) into w2/W2-159 as 9a07fa73d.
+- Ran the pair on Sonnet, high, C2, both building to the ticket's Interface (P-W2-159-1 (a), P-W2-159-2 (a)), plus the lead's readings in briefs

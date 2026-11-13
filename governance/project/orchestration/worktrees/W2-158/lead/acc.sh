@@ -1,0 +1,2 @@
+cd /home/usain/gov-os-worktrees/W2-158
+env HOME=/home/usain/gov-os-worktrees/W2-158/.gov-runtime/scratch/empty-home TMPDIR=/tmp/w2-158-lead PYTHONUSERBASE=/home/usain/.local PYTHONPATH=/home/usain/gov-os-worktrees/W2-158/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest tests/acceptance/W2-158 tests/unit/check/test_w2_158_structural.py -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit" "$@"

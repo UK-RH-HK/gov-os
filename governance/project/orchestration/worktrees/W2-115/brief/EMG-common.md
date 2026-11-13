@@ -58,4 +58,4 @@ hold for every one of them.
 - **Return:** the twelve fields first, as labelled lines: task, status, work_completed, files_changed, evidence,
   tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action; then any payload.
   Status DONE, PARTIAL or PACKAGES (a decision only the CTO or the owner can take, with your recommendation and
-  confidence). Refused twice for the same call: stop and say so; no third try.
+  confidence). Refused twice for the same call: stop and say so; no third try. It covers the same effect in another form: a session refused twice for an action does not reach it by another command, form, file or tool (DEC-1142 (9)). A reviewer's read-only probes are allowed at any hour, the quiet hours included (DEC-1144 (7)): write the script into your own `$TMPDIR` with Bash (`cat > "$TMPDIR/probe.py" <<'EOF' ... EOF`), never the Write tool (it asks for a path outside the worktree, and the quiet hours refuse that ask, DEC-991), and only read the repository; nothing under the evaluation sets.

@@ -1,0 +1,7 @@
+W2-178 (DAEO-7oxm): merge the acceptance tests (td-1, 8b67f1344) into the branch
+
+Task: DAEO-7oxm
+Role: orchestrator
+Implements: DEC-1101, DEC-820, DEC-1052, DEC-1120
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

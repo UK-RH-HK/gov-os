@@ -1,0 +1,8 @@
+log: W2-155-A5-run1.json
+W2: W2-155
+status: PACKAGES
+
+task: DAEO-ar89
+status: PACKAGES
+work_completed: I merged w2/integrate (fast-forward to 0ea583eb6), then profiled the warm real-model query path by stage. The measured call is `fusion.search(root, q, limit=None, refresh=False)`: 52 dev queries on fresh clones of a-dev and b-dev, after the three warm-up questions, run through heavy_slot.sh. The reranker accounts for 95% of the time, and I traced the gap to W2-32 S7. Every fix would change the results or a decided bound, so I made no fix and stopped at 23:59, 10 lead-minutes into the 2-hour box. The evidence and options are below.
+files_changed:

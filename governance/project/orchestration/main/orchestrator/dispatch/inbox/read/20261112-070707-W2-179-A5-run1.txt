@@ -1,0 +1,8 @@
+log: W2-179-A5-run1.json
+W2: W2-179
+status: DONE. The revised case is green in a clone under `~/gov-os-runs` and in a clone elsewhere, and a planted runs-folder entry outside the repository still fails it. The LITE review passed S1, F1 and F2 with no blocking finding. Verified head `996bffd9b4e6`.
+
+task: DAEO-c9n8 (W2-179): revise W2-170's F3 file-access case so it stops counting the repository's own files as runs-folder opens. Profile LITE, class C1, build run 1.
+status: DONE. The revised case is green in a clone under `~/gov-os-runs` and in a clone elsewhere, and a planted runs-folder entry outside the repository still fails it. The LITE review passed S1, F1 and F2 with no blocking finding. Verified head `996bffd9b4e6`.
+work_completed:
+- **Design.** One test designer (td-1) revised the case. A new helper `_true_root_opens` leaves out paths at or under the repository's own root. That ro

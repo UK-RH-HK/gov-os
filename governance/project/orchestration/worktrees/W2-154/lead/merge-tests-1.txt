@@ -1,0 +1,9 @@
+Merge w2/W2-154-tests (DAEO-l4gf): W2-154's acceptance tests for S1-S3, F1, F2 (td-1, 22ccf2150)
+
+Tests first (MR-3), written against the ticket's Interface I1-I4: 17 cases in tests/unit/close/test_serial_w2_154_*.py;
+11 red on the base for the missing behaviour, 6 green guards (F1's exit 4, an entry with a kept case, S2's opt-in).
+
+Task: DAEO-l4gf
+Role: orchestrator
+Implements: DEC-1112, DEC-1061, DEC-889, DEC-549, DEC-1109
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

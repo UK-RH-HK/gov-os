@@ -1,0 +1,9 @@
+log: W2-120-A5-run1.json
+W2: W2-120
+status: PACKAGES
+
+task: DAEO-i89t (W2-120)
+status: PACKAGES
+work_completed: I ran the interface check (DEC-1052) before starting the test designer, and it fails. The ticket does not say what a refusal prints or what exit code it returns. Built as written, S1 would also turn the live repo's hard-block skill checks red, and it needs files outside this ticket's paths. I made no tests worktree, wrote no brief and launched no worker. I wrote a checkpoint only, in scratch.
+files_changed: none committed. Scratch only: /home/usain/gov-os-worktrees/W2-120/.gov-runtime/scratch/lead/CHECKPOINT.md
+evidence: `gov links: 0 n

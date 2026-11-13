@@ -1,0 +1,33 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-159 (DAEO-6lid, STANDARD) at f08424c88fa0: pre-check passed
+W2-159: kernel gate at f08424c88fa0: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 17:39:09 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 17:39:09 merged W2-159 onto 1d0d8da0d550: 61fa4999f83b
+2026-11-12 18:46:35 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 18:46:42 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 18:46:46 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 18:46:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 18:46:47 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_a_partial_offload_line_written_since_the_start_trips_it
+2026-11-12 18:46:49 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log
+2026-11-12 18:46:49 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s1_below_then_above_the_limit_pauses_at_the_second_reading
+2026-11-12 18:46:50 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-12 18:50:40 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 95c957ae9dae: 4f459202189a; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-12 18:50:40 ADVANCED refs/heads/w2/integrate 95c957ae9dae -> 4f459202189a; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/4f459202189a.json
+2026-11-12 18:50:40 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 18:51:27 integration store promoted: the merged clone's stores at 4f459202189a into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-159: 8a0ee9903 W2-159 (DAEO-6lid): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 16 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+13 more)
+structural pass: authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 1d0d8da0d550)
+structural pass: links: NOTICE 1 new since 1d0d8da0d550109fe3346df88ef787f2c0ac5469 (1703 standing): UNKNOWN_ID tests/acceptance/W2-172 in DAEO-p8tv's acceptance_tests.path | .tickets/DAEO-p8tv.md:54 | orchestrator | write the tests at tests/acceptance/W2-17...
+structural pass: structural pass at 8a0ee990393c: NOTICE in mutation, authority, links (6 of 9 families ok), 16.8 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-185148-structural-notice.txt

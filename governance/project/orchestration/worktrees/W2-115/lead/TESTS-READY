@@ -1,1 +1,2 @@
-TESTS-READY W2-115 (DAEO-emq1): tests/acceptance/W2-115/ at 01ececd0b758, merged into w2/W2-115 at 13d518369dad; 77 cases; S1-S11, S13, F1-F4 red on f4f9c3204a10 for the README's reasons, F4 green by design; S12 untested (waits for its CIT-P, P4).
+TESTS-READY run 4: td-4 451a775fa merged at ce6a2addf362 (F-1: 4 cases, 1 red; F-3: 4 cases, 3 red, in test_w2_115_reds.py and test_w2_115_batch.py)
+TESTS-READY run 5: td-5 374cc59e9 + 4f8897e00 merged at 93d722a38 (B-5: 3 cases, 2 red on today's code: test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s, test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s; B-6, B-7 green guards; 88 cases)

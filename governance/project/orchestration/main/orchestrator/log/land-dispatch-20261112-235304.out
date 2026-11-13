@@ -1,0 +1,29 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-121b (DAEO-ifgf, FULL) at 6e10493a5f8e: pre-check passed
+W2-121b: kernel gate at 6e10493a5f8e: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 23:53:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 23:53:05 merged W2-121b onto 84cc42343ffb: c8f4e393327e
+2026-11-13 00:11:13 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 00:11:21 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 00:11:25 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 00:11:26 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 00:11:28 flaky candidate (passes alone, decides nothing): tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_two_ticks_started_together_run_one_pass
+2026-11-13 00:11:28 ADVANCED refs/heads/w2/integrate 84cc42343ffb -> c8f4e393327e; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/c8f4e393327e.json
+2026-11-13 00:11:28 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 00:16:49 integration store promoted: the merged clone's stores at c8f4e393327e into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-121b: a65961bc6 W2-121b (DAEO-ifgf): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 20 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+17 more)
+structural pass: authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 84cc42343ffb)
+structural pass: links: NOTICE 7 new since 84cc42343ffb66e19f039d5718c68fb3434014c2 (1724 standing): UNKNOWN_ID W2-3 in a test file | tests/acceptance/W2-121b/test_b_s1_landing_batch.py:91 | independent-test-designer | correct W2-3 or name the planted id as ... | UNKNOWN_ID W2-7 in a test file | tests/acceptance/W2-121b/test_b_s2_closes.py:27 | independent-test-designer | correct W2-7 or name the planted id as a stand-in | UNKNOWN_ID W2-8 in a test file | tests/acceptance/W2-121b/test_b_s2_closes.py:28 | independent-test-designer | correct W2-8 or name the planted id as a stand-in (+4 more)
+structural pass: structural pass at a65961bc6079: NOTICE in mutation, authority, links (6 of 9 families ok), 18.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261113-001707-structural-notice.txt

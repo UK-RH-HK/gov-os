@@ -1,0 +1,46 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "0ea583eb679a",
+   "after": "84cc42343ffb"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-160"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "0ea583eb679a",
+   "after": "84cc42343ffb"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-160"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-113-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-113/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-113-tests",
+   "change": "acceptance folder",
+   "folder": "W2-113"
+  }
+ ]
+}

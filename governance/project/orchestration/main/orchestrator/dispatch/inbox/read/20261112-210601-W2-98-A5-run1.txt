@@ -1,0 +1,7 @@
+log: W2-98-A5-run1.json
+W2: W2-98
+status: PACKAGES
+
+task: DAEO-wi46
+status: PACKAGES
+work_completed: I ran the interface check (DEC-1052) before starting the test pair. The ticket does not state three things the tests depend on: what "the skill's check" is (S1, S2, S3, F1, F2), what the import licence record and its check are (S5, F4), and how F3's "the validator names a missing Never section" can hold. Today's skill validator (`src/gov/check/skill_validator.py:62-130`) checks only the front matter, the token sizes and the gov commands, and that file is outside the ticket's paths. I wrote one proposal (P-W2-98-IF-1) and a checkpoint, then stopp

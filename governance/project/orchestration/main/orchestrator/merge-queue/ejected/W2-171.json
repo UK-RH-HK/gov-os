@@ -1,0 +1,19 @@
+{
+ "ticket": "W2-171",
+ "task": "DAEO-k1e2",
+ "branch": "w2/W2-171",
+ "commit": "90424b3f6c6fa6b08f477e4d9a3eb3e72ea261f8",
+ "requested_at": "2026-11-12 16:44:09",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T16:44:09.354894",
+ "reason": "red",
+ "failing": [
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record",
+  "tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository",
+  "tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-164409-411394",
+ "tested_on": "ae806c3fee2cfff25700595df4ea29fe48fb5598",
+ "ejected_at": "2026-11-12 17:05:52"
+}

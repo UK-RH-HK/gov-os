@@ -1,0 +1,42 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "5daa188c74fe",
+   "after": "6b7b5a42bcdd"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-146"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "f21df9875849",
+   "after": "6b7b5a42bcdd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-146"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b-tests",
+   "change": "head",
+   "before": "ab5799760013",
+   "after": "ed8aa49046b2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b-tests",
+   "change": "acceptance folder",
+   "folder": "W2-121b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "status line added",
+   "line": " M docs/changes/W2-157-evidence.md"
+  }
+ ]
+}

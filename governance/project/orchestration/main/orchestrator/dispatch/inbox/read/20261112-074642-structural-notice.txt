@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-073107.out
+Structural: after the landing of W2-121 (base 6c9a5bb525ee)
+status: structural pass at f3ad1f338403: NOTICE in mutation, links (7 of 9 families ok), 13.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 3 findings: .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 6c9a5bb525ee)
+links: NOTICE 5 new since 6c9a5bb525ee21f4168d456dcd503aaa4e4e766e (1614 standing): UNKNOWN_ID W2-901 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-901 or name the planted id... | UNKNOWN_ID W2-902 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-902 or name the planted id... | UNKNOWN_ID W2-903 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-903 or name the planted id... (+2 more)
+structural pass at f3ad1f338403: NOTICE in mutation, links (7 of 9 families ok), 13.3 s; a notice, not a refusal

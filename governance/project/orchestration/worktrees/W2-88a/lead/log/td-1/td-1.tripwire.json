@@ -1,0 +1,62 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-h4rh.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "8f5d7a1f55b1",
+   "after": "48ef8cf6603b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "head",
+   "before": "4a8634017353",
+   "after": "88923321806f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "acceptance folder",
+   "folder": "W2-146"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "acceptance folder",
+   "folder": "W2-159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "acceptance folder",
+   "folder": "W2-171"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "head",
+   "before": "80da3fbcca0d",
+   "after": "bf21edd96c89"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "status line added",
+   "line": "?? tests/unit/memaudit/test_driver.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "head",
+   "before": "ba27e4c0d536",
+   "after": "9ae9d851fa4b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "acceptance folder",
+   "folder": "W2-88a"
+  }
+ ]
+}

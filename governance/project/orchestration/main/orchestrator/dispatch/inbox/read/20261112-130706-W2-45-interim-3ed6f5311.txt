@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-45
+status: interim result 3ed6f5311: W2-45: runner semantics: time fields, CHECK_UNMEASURED, CHECK_TOOL_ABSENT, POLICY_TIER_TOO_LOW, CHECK_TIMED_OUT with the process group stopped

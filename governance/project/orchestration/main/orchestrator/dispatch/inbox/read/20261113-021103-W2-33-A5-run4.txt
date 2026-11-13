@@ -1,0 +1,12 @@
+log: W2-33-A5-run4.json
+W2: W2-33
+status: DONE. The head to land is `82da49202ab1549912678b1c118d5c172b76fd01`. Six W1-33 cases stay red until the copies ACT generates the three new agents.
+
+task: DAEO-lrre (W2-33), run 4 (resume)
+
+status: DONE. The head to land is `82da49202ab1549912678b1c118d5c172b76fd01`. Six W1-33 cases stay red until the copies ACT generates the three new agents.
+
+work_completed:
+- Merged w2/integrate at `aa3bfdc19` into the branch (`707d23b82`, no conflicts).
+- One independent test designer (td-4, Sonnet high, C2) revised exactly the two W1-33 cases in its own tests worktree (`4452d6b8c`, each with a Rewrite-Reason). I merged them in `54ba5bcd2`.
+  - Case 1 is now `test_the_research_role_file_body_is_unchanged`. It strips the seven Interface lines from resea

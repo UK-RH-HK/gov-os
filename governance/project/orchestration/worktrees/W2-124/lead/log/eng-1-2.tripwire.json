@@ -1,0 +1,265 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "1bc1893cc96d",
+   "after": "1ef597a43909"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-175"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "e538af6290ae",
+   "after": "1ef597a43909"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-175"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "e538af6290ae",
+   "after": "e395dd430b9e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-175"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "704166ab76e5",
+   "after": "1ef597a43909"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-175"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "head",
+   "before": "1d13922ef628",
+   "after": "799b2b65ff28"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "head",
+   "before": "1d13922ef628",
+   "after": "fc3474cb1886"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_f1_no_ok_over_a_partial_store.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_s2_nothing_to_embed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_s3_adoption_records_the_finding.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_s4_close_and_prepare_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/test_w2_124_s5_stores_not_built.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-124/w2_124_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "acceptance folder",
+   "folder": "W2-124"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "head",
+   "before": "4f5d52fe0f99",
+   "after": "9727d4526552"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W1-35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-11"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-128"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-142"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "head",
+   "before": "e1fea6fc2c24",
+   "after": "f5b148151bde"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W1-35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-11"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-128"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-142"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-148"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-173"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-96"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45",
+   "change": "head",
+   "before": "d1b1ec5f0350",
+   "after": "0bb73d9f26cf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45",
+   "change": "acceptance folder",
+   "folder": "W2-45"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

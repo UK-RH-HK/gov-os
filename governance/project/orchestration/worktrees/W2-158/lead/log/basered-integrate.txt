@@ -1,0 +1,491 @@
+FFFFFFFFFF..FFFFF.FF                                                     [100%]
+=================================== FAILURES ===================================
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x7cbe7e167600>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_______ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-15] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k1/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k1')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f0400>, signum = 15
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k1/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-1] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k2/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k2/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k2')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f1da0>, signum = 1
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k2/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_______ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-2] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k3/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k3/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k3')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f3b00>, signum = 2
+vanish = False
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k3/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_______ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-15] _______
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k4/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k4/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k4')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f0680>, signum = 15
+vanish = False
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k4/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_______ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-1] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k5/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k5/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k5')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f2d40>, signum = 1
+vanish = False
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r14_a_stopped_run_k5/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f3060>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_0/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[15] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_1/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_1')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f09a0>, signum = 15
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_1/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_1/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[1] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_2/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_2/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_2')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f0f40>, signum = 1
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_2/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r16_an_own_session_2/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7cbe7e1f16c0>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 4 == (128 + 2)
+E        +  where 4 = <Popen: returncode: 4 args: ['/usr/bin/python3', '/tmp/w2-158-lead/pytest-of...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals3] _____
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x7cbe7e211940>
+signals = (2, 15, 1)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 143 == (128 + 2)
+E        +  where 143 = <Popen: returncode: 143 args: ['/usr/bin/python3', '/tmp/w2-158-lead/pytest-...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur2/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur2/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur2')
+launch = <function planted.<locals>.launch at 0x7cbe7e212020>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur2/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur2/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[15-more1] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur3/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur3/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur3')
+launch = <function planted.<locals>.launch at 0x7cbe7e212480>, first = 15
+more = (2,)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur3/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur3/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[1-more2] _
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur4/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur4/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur4')
+launch = <function planted.<locals>.launch at 0x7cbe7e212b60>, first = 1
+more = (2,)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur4/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_a_signal_dur4/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x7cbe7e213060>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 4 == (128 + 2)
+E        +  where 4 = <Popen: returncode: 4 args: ['/usr/bin/python3', '/tmp/w2-158-lead/pytest-of...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds2] ________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti1/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_presses_unti1')
+launch = <function planted.<locals>.launch at 0x7cbe7e213a60>
+kinds = (2, 15, 1)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 143 == (128 + 2)
+E        +  where 143 = <Popen: returncode: 143 args: ['/usr/bin/python3', '/tmp/w2-158-lead/pytest-...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+
+project = (PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x7cbe7e2127a0>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_ctrl_c_durin0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-158-lead/pytest-of-usain/pytest-1/test_w2_96_r9_r12_ctrl_c_durin0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-15]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-1]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-2]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-15]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[False-1]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[15]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[1]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals3]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[15-more1]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[1-more2]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds2]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it
+17 failed, 3 passed in 795.65s (0:13:15)

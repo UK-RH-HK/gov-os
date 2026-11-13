@@ -1,0 +1,4 @@
+task: DAEO-l4gf
+decisions_applied: DEC-1052, DEC-1112, DEC-1061, DEC-889, DEC-549, DEC-1109, DEC-1154
+STATE: run 4 (resume, S4) DONE: head 7bcff333b595, tree clean; lead_verify GREEN (parallel 5203/0 failed, serial 2 entries 10/0); rv-1 PASS (0 blocking, 3 info), its record in log/rv-1.return.md (probe folder not in paths: the CTO commits it) | HEAD: 7bcff333b595 | NEXT: land (queue merges) | WAITING ON: none
+Workers: td-3, session 683dbf66-004a-4b23-8569-a63985ba0553, done exit 0 (ad4355943); rv-1, session a8944322-f55d-471d-9202-19e93496661e, done exit 0 (PASS) · Rounds: converged · Decisions taken: S4 (a) by the owner 2026-11-13 applied; w2/integrate merged f42c51629 · Open packages: none · Paths: briefs .gov-runtime/scratch/lead/briefs/{td-3,rv-1}.md; logs .gov-runtime/scratch/lead/log/{td-3.*,rv-1.*,rv-1.return.md,rebuild-4.txt,verify/}

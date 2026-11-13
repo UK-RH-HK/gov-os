@@ -1,0 +1,267 @@
+== w4-pl-a start 2026-11-13T07:53:26+00:00 load: 58.60 40.88 33.58 60/1307 5321
+heavy_slot: all 3 slots taken; waiting (2026-11-13 07:53:26)
+56: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+__ test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter] ___
+
+project = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-pl-a/pytest-of-usain/pytest-0/test_decision_p95_is_under_1000/project')
+write = <function write.<locals>._write at 0x7820ec596a20>
+name = 'engineer-allow-from-ticket-frontmatter'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+        ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+        decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+        (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+        beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            wall_rounds.append(support.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, per round (ms): 207.5; the bound is 100 ms (wall p95 per round, for information, ms: 634.3)
+E       assert 0.20752499999999996 < 0.1
+E        +  where 0.20752499999999996 = min([0.20752499999999996])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:83: AssertionError
+_____ test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket] ______
+
+project = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-pl-a/pytest-of-usain/pytest-0/test_decision_p95_is_under_1001/project')
+write = <function write.<locals>._write at 0x7820ec597ce0>
+name = 'engineer-deny-outside-the-ticket'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+        ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+        decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+        (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+        beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            wall_rounds.append(support.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, per round (ms): 220.7; the bound is 100 ms (wall p95 per round, for information, ms: 696.5)
+E       assert 0.22067800000000037 < 0.1
+E        +  where 0.22067800000000037 = min([0.22067800000000037])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:83: AssertionError
+________________ test_decision_p95_is_under_100_ms[frozen-deny] ________________
+
+project = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-pl-a/pytest-of-usain/pytest-0/test_decision_p95_is_under_1002/project')
+write = <function write.<locals>._write at 0x7820ec595620>, name = 'frozen-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+        ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+        decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+        (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+        beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            wall_rounds.append(support.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, per round (ms): 213.6; the bound is 100 ms (wall p95 per round, for information, ms: 624.7)
+E       assert 0.21360599999999952 < 0.1
+E        +  where 0.21360599999999952 = min([0.21360599999999952])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:83: AssertionError
+_______________ test_decision_p95_is_under_100_ms[no-role-deny] ________________
+
+project = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-pl-a/pytest-of-usain/pytest-0/test_decision_p95_is_under_1003/project')
+write = <function write.<locals>._write at 0x7820ec594ea0>
+name = 'no-role-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+        ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+        decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+        (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+        beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            wall_rounds.append(support.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, per round (ms): 223.6; the bound is 100 ms (wall p95 per round, for information, ms: 564.5)
+E       assert 0.22361000000000075 < 0.1
+E        +  where 0.22361000000000075 = min([0.22361000000000075])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:83: AssertionError
+____________ test_decision_p95_is_under_100_ms[test-designer-allow] ____________
+
+project = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-pl-a/pytest-of-usain/pytest-0/test_decision_p95_is_under_1004/project')
+write = <function write.<locals>._write at 0x7820ec5c4180>
+name = 'test-designer-allow'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: the CPU time of the hook process and its children over each call.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now
+        ``result.cpu_seconds``: user and system time of the hook and of every process it waited for (its forked
+        decision process, the git it runs), read from ``RUSAGE_CHILDREN`` before and after the call. The bound
+        (100 ms), the 40 samples, the 3 warm-up calls and the nearest-rank p95 are the same; the wall p95 is reported
+        beside it, for information only. A round that misses the bound is repeated, up to three rounds, as before.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            wall_rounds.append(support.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, per round (ms): 207.2; the bound is 100 ms (wall p95 per round, for information, ms: 639.5)
+E       assert 0.2071839999999998 < 0.1
+E        +  where 0.2071839999999998 = min([0.2071839999999998])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:83: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[frozen-deny]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+5 failed, 10 deselected in 36.63s
+== w4-pl-a exit 1 end 2026-11-13T07:55:03+00:00 load: 59.74 45.93 36.05 63/1311 7008

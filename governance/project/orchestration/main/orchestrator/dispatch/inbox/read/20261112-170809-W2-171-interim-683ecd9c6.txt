@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result 683ecd9c6: W2-171 (DAEO-k1e2): the probe record's probed_commit as the full id (the probe schema; the queue ejected it at 17:05 on W1-08, W1-26, W2-02)

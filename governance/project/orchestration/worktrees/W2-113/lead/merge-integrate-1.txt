@@ -1,0 +1,5 @@
+Merge w2/integrate into w2/W2-113 (DAEO-g29a): the ticket's PKG-3 (b) and readings (931281df5)
+
+Task: DAEO-g29a
+Role: orchestrator
+Implements: DEC-971, DEC-982

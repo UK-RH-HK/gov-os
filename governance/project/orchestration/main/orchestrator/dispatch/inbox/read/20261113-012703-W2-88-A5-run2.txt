@@ -1,0 +1,10 @@
+log: W2-88-A5-run2.json
+W2: W2-88
+status: PACKAGES. The tests are merged and red, and TESTS-READY is written. The build should not start until the CTO answers P-W2-88-TD-1. Its R1 decides how the engineer builds I2, and P-1, P-4 and P-10 each need an Interface seam or key before their cases can be finished.
+
+task: DAEO-2bdu (W2-88), run 2, run kind tests
+status: PACKAGES. The tests are merged and red, and TESTS-READY is written. The build should not start until the CTO answers P-W2-88-TD-1. Its R1 decides how the engineer builds I2, and P-1, P-4 and P-10 each need an Interface seam or key before their cases can be finished.
+work_completed:
+- Merged w2/integrate before my first commit. It was a fast-forward to 085b4391c, the CTO's Interface commit, and the CTO confirmed it.
+- Created the tests worktree.
+- Built td-1's brief. Its context packet came from `gov context --budget 60000`, because the def

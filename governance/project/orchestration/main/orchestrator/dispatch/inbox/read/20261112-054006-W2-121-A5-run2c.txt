@@ -1,0 +1,10 @@
+log: W2-121-A5-run2c.json
+W2: W2-121
+status: PACKAGES. Review round 1 is FAIL (2 blocking findings), and the verify has a 7th red that no ruling covers. There is nothing to land yet; DONE would be false.
+
+task: DAEO-cb2b (W2-121 part a): run 2c, resumed after P-W2-121-5
+status: PACKAGES. Review round 1 is FAIL (2 blocking findings), and the verify has a 7th red that no ruling covers. There is nothing to land yet; DONE would be false.
+work_completed:
+- Merged w2/integrate (2a35ec307, which holds the ruling 518772b5c) into w2/W2-121 at 1ec89f0efdbb. The merge was clean and in one command with the ticket trailer.
+- Ran the rebuild (ok) and lead_verify (RED: 7 of 3975 failed).
+- Launched the FULL review: an independent auditor on Opus 5.5 at high effort, class C2, projection $6. Its verdict is FAIL

@@ -1,0 +1,9 @@
+log: W2-11-A5-run8.json
+W2: W2-11
+status: PACKAGES. The move fixed W1-08 and both W1-26 checks, but W2-02's test_core_schema_is_green_on_this_repository is still red: core-schema finds a record by its `type: probe` wherever the file lies, and CITP-REVIEW-r2.md's front matter is not in the probe form. Fixing it changes the record's bytes, wh
+
+**W2-11 run 8 ends in PACKAGES.** The records are moved and three of the four checks pass, but W2-02's core-schema check is still red at the new head `24a22fe14b1b`. Fixing it means changing bytes in the round-2 review record, and this run was told to keep those bytes unchanged.
+
+```
+task: W2-11 (DAEO-k7hz) run 8, record run only: merge w2/integrate, move the two CIT-P review records to docs/changes/ (bytes unchanged), update the CIT-P's references, run the four probe-record checks and W2-11's copy cases, return the head
+status: PACKAGES. The move fixed W1-08 and both W1-26 checks, but W2-02's

@@ -1,0 +1,76 @@
+# kernel-approved.txt: the owner's approvals of kernel bytes, read by kernel_gate.py (owner, 2026-11-12, "item 5 (a)":
+# a kernel path needs the owner's approval before any merge; CAP-33; DECIDED-NOT-DONE row 173).
+#
+# Format, one entry per line (fields separated by spaces; the path has none):
+#   <sha256, 64 lowercase hex | DELETED> <repo-relative path> <DEC id> <free note>
+# A file added or modified under template/governance/kernel/ passes only when a line holds its exact sha256 (of its
+# bytes at the branch) AND its path; a deleted kernel file passes only on a line `DELETED <path> <DEC id> ...`.
+# '#' comments and blank lines are ignored; any other malformed line makes the gate exit 2, naming the line.
+#
+# ONLY the CTO (orchestrator) adds lines, each one when recording an owner approval in docs/DECISION_REGISTER.md,
+# with that approval's DEC id in field 3 and the commit (or source) in the note. Every hash below was computed from
+# git (git cat-file blob <commit>:<path> | sha256sum) on 2026-11-12, except the TEMPLATES-APPROVAL-1 rows, which carry
+# the table's own hash (each checked equal to the bytes at 1bf23a0b3e77).
+
+# DEC-1145: W2-146 at ebdbabd2e0d3, every kernel file it changes against merge-base(w2/integrate) 3556fd7d1825
+d22efa5ada515c8cd0132b8c4960e7aa4d34d4e3fe345b07f576cedfba0fc7be template/governance/kernel/schemas/path-map.schema.json DEC-1145 W2-146 at ebdbabd2e0d3
+
+# DEC-1141 (1): W2-11's kernel files at dca382f3069f (the 17 the merge 6f2234f40 changes against its first parent; the
+# same bytes at 6f2234f40)
+97e6d049d6f2478bfb02ee33263e9a99fb5b1e90bc8bce6dea611b4e422b2e4b template/governance/kernel/roles/orchestrator.md DEC-1141 (1) W2-11 at dca382f3069f
+acf766d0445c9488427c53e55f16118f713aee2ae6ef87e95c89e407f88198f4 template/governance/kernel/skills/audit/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+2af36b728573e930ff4c5ea689f3a66faff11d342aced19a6a1babbfe16dc982 template/governance/kernel/skills/change/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+6a5499008e9322dbc66cb1ac0a8a7597a222e619c89dd7acf75c75a1e6fc7a0a template/governance/kernel/skills/checkpoint/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+224b4d0b33aa1661357dae8099e2b7a9512dba54fceeca803e4b32578b181d0f template/governance/kernel/skills/discovery/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+eae3cb7d0f4e7139d5e30a631a33602b7f10781707141b480420ec71c8201707 template/governance/kernel/skills/orchestration/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+4b26908111e1808e9972024c125b9616f17d30a9e9ad7a1bbe99c2c1913664a1 template/governance/kernel/skills/orchestration/briefs-and-returns.md DEC-1141 (1) W2-11 at dca382f3069f
+1c252bf2b4a81be3201b5c5f5dc7ca1bc2f65e42ac602540df56da4cb4da7ce4 template/governance/kernel/skills/orchestration/incident-response.md DEC-1141 (1) W2-11 at dca382f3069f
+5de84e8f70e9e635caa21abcc4c46ae59eee16c9ef089a98f5153e3505f19074 template/governance/kernel/skills/orchestration/integration-queue.md DEC-1141 (1) W2-11 at dca382f3069f
+05a26bcfe17dfd466a111245e0f2f9bb938f23441b606dbce09223e192b27771 template/governance/kernel/skills/orchestration/nightly-sheriff.md DEC-1141 (1) W2-11 at dca382f3069f
+db0e4eb8e50020a5b30771c1c938c93af7427f81bdfafdb6635bcd14a718c1fc template/governance/kernel/skills/planning/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+8ca7aebd02f38ed97b48be2a1c269b4aa44a0e4d9274a5ac6f4c8b6188543542 template/governance/kernel/skills/qa-review/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+9eb57bc0ca379529fd43bc5fc682c7177d8ecc7782a1888e3dbd83ad07a70cca template/governance/kernel/skills/qa-review/scenarios.md DEC-1141 (1) W2-11 at dca382f3069f
+7a191d5b972529b2e34bd1a576759e9e97132d2913c8bcfefa811601bc4ec8a7 template/governance/kernel/skills/retrieval/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+e2a467de0722b16b08ab557a3accda5ae35e42199cb8c9660265436cd59fb29e template/governance/kernel/skills/test-design/SKILL.md DEC-1141 (1) W2-11 at dca382f3069f
+a1da42e665b425adbb5cfb06f2f02d22789f2bd2e36b932ac0a26c1e70d7bf01 template/governance/kernel/skills/test-design/test-kinds.md DEC-1141 (1) W2-11 at dca382f3069f
+fd5cb59d17f48a574a1c7b7645413d026b7c75c317c9690f5927f1435a649924 template/governance/kernel/templates/skill.md DEC-1141 (1) W2-11 at dca382f3069f
+
+# DEC-1139: the seven role templates at 4c0c73472fd8
+013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd template/governance/kernel/templates/role-cto.md DEC-1139 at 4c0c73472fd8
+6775f2d9b99ee96f10653a12da24a34cbf282da9312b37b4e714206ef333889b template/governance/kernel/templates/role-engineer.md DEC-1139 at 4c0c73472fd8
+4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9 template/governance/kernel/templates/role-lead.md DEC-1139 at 4c0c73472fd8
+5683e56fab5b7d44923557a4d7a54255ff7bb6c5e4ad88fd54e466ee5a822b5f template/governance/kernel/templates/role-product-spec.md DEC-1139 at 4c0c73472fd8
+fc41bfc1cf3bd5576080739b16cac992bb9ae912a6519b74b560b6d3af0c5799 template/governance/kernel/templates/role-research.md DEC-1139 at 4c0c73472fd8
+eff256eb02771c1edf8433dc563f190df56df509d2cc8076b91cd6e97bdb65b7 template/governance/kernel/templates/role-reviewer.md DEC-1139 at 4c0c73472fd8
+c1f449fbe338fc32ebc583e7e6ce57afb690bf4339cd7bf41b30a0f52fb8b990 template/governance/kernel/templates/role-test-designer.md DEC-1139 at 4c0c73472fd8
+
+# DEC-1142 (1): the context watch hook at 3b6c5cb79d39
+213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242 template/governance/kernel/hooks/context_watch.py DEC-1142 (1) at 3b6c5cb79d39
+
+# DEC-1147 (1) / DEC-1116 (1): W2-152's facts schema (the same bytes at 1bf23a0b3e77 and at w2/integrate c566caee2b99)
+3141d5da38d7a2a1dcf654f83354f4fc6f2ce16bb383c03d6a906e221bd6448c template/governance/kernel/schemas/facts.schema.json DEC-1147 (1) / DEC-1116 (1); W2-152, approved 11-10 within W2-128's set
+
+# DEC-1122 (1): ticket.md 1.0.1 at 0aa20ac0c (the TEMPLATES-APPROVAL-1 table's 1.0.1 row holds the same hash)
+bbfc068e58e20020483fa5019e4bfc88951f9b5b7b79c373185faf9a0231ab60 template/governance/kernel/templates/ticket.md DEC-1122 (1) at 0aa20ac0c
+
+# DEC-1116 (1): governance/project/orchestration/packages/LIFT-1/TEMPLATES-APPROVAL-1.md, the table's hashes (each equal
+# to the bytes at 1bf23a0b3e77). Left out: the ticket.md 1.0.0 row (fd97779d..., which the table says the 1.0.1 row
+# replaces) and governance/project/facts.yaml (not a kernel path; the table says the CTO approves it).
+004ce0fc8f09dcc89a8ecda0b0a0ef813737323719aac3e469a1eac6ee4cfe6d template/governance/kernel/templates/brief.md DEC-1116 (1) table, T-0 1.0.0
+91c4601e520cc64aeb1723416c6f3d8a96960dbc9ba7399d28961b9775a8cd25 template/governance/kernel/templates/keys.yaml DEC-1116 (1) table, the key list
+1de5fff0a9e33818b03294afc6d0d08d651c6c2b908c1cf9949e4e41fb9661ad template/governance/kernel/templates/checkpoint.md DEC-1116 (1) table, record template
+ae7982e60db9fbf7580f6ea8d3e7b977d76fd97538ad16091c8400899dc6ef7d template/governance/kernel/templates/decision-record.md DEC-1116 (1) table, record template
+2c8d46c21aa4b8f28451741bed15b9fb08bf9e9d6cef4857bf3aebbe0f5fa36f template/governance/kernel/templates/decision-package.md DEC-1116 (1) table, record template
+324669e6791ac12a8fa05ee537a6900f0ad47ee5229a0d4a5eeb65d91b373428 template/governance/kernel/templates/failure.md DEC-1116 (1) table, record template
+88a14217387f897a9deed6dc42cd0fd703e4fa41282330701baaa2da82809189 template/governance/kernel/templates/lesson.md DEC-1116 (1) table, record template
+9ec14b2ad4c233b4fb450046638617e0b2ad4689b8ff73cf795216b681234497 template/governance/kernel/templates/research.md DEC-1116 (1) table, record template
+18da2c0e761ae67cb9a03d9b9436ff1fec0856b4b3374402e3e502c92a38a196 template/governance/kernel/schemas/ticket.schema.json DEC-1116 (1) table, schema
+84ef434dfd391e936b81782f45e20169f7bdfd19288607118730403eda9a2631 template/governance/kernel/schemas/lesson.schema.json DEC-1116 (1) table, schema
+3a0b6c57d6d8e31c3ead750b06270ce1daedb56170691ad879140c12194a3ad2 template/governance/kernel/schemas/failure.schema.json DEC-1116 (1) table, schema
+1c6dbf370dbc0437b7ef7d7e42a62431088e7d6042908442541ed301c7cddec3 template/governance/kernel/schemas/research.schema.json DEC-1116 (1) table, schema
+66c094102c731f9e5e4504af393fca5954c5fe8afdcc93eeba9f457367233c5f template/governance/kernel/roles/engineer.md DEC-1116 (1) table, role line 5 (DEC-957)
+641a347b9b14101dde711f3550f087e714e404575f780be2a3cd91ff2925102d template/governance/kernel/skills/adopt/SKILL.md DEC-1148 (1) approved by its bytes at ef69b937a (w2/integrate)
+c2c8f0af783a7e605113e0154dcf143eca63a34221293a325e5553904aa9e3a6 template/governance/kernel/hooks/pretooluse.py DEC-1148 (1) approved by its bytes at ef69b937a (w2/integrate)
+3aaa82e5b53aa4809fdfd38d442f4f00320bde2d133b022849c35c30a14ddf9a template/governance/kernel/settings.json DEC-1148 (1) approved by its bytes at ef69b937a (w2/integrate)
+8dae63e8188b6b5498c1ce7fe36e2565dc38129ad0ff551ee16820ddb5567f83 template/governance/kernel/checks/secrets-indexing.yaml DEC-1148 (1) approved by its bytes at ef69b937a (w2/integrate)
+0e4105ef08727a8598feabcb929627d598cac4e2e74bcde0e0e81355b9bdf384 template/governance/kernel/schemas/test-map.schema.json DEC-1148 (1) approved by its bytes at ef69b937a (w2/integrate)

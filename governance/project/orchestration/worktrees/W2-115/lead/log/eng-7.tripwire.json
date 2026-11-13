@@ -1,0 +1,92 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "1d0d8da0d550",
+   "after": "95c957ae9dae"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M .tickets/DAEO-p8tv.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "feaf4cfa975d",
+   "after": "95c957ae9dae"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "93d722a38a79",
+   "after": "34601a7ba5a3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-13/test_w2_13_latency.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-13/test_w2_13_secrets.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-13/test_w2_13_unavailable.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-32/test_w2_32_s10_no_cpu_fallback.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/unit/rebuild/test_no_embeddings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/unit/rebuild/test_w2_116_integration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/unit/rebuild/test_w2_122_seed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "status line added",
+   "line": " M tests/unit/retrieval/test_w2_32_rebuild_cut.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "acceptance folder",
+   "folder": "W2-13"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "acceptance folder",
+   "folder": "W2-32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "head",
+   "before": "1d0d8da0d550",
+   "after": "95c957ae9dae"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

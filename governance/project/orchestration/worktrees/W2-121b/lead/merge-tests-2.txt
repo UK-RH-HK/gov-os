@@ -1,0 +1,9 @@
+W2-121b (DAEO-ifgf): merge the acceptance fixes (td-2, ed8aa4904)
+
+Two cases fixed to the ticket on the engineer's findings: the batch log's count (the stub counts all its
+arguments) and the midnight-crossing window's outside case (until before now). No other change.
+
+Task: DAEO-ifgf
+Role: orchestrator
+Implements: DEC-1007, DEC-1018
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

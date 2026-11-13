@@ -1,0 +1,19 @@
+Preparing worktree (detached HEAD 33b5651eb)
+HEAD is now at 33b5651eb W2-115 (DAEO-emq1): PK-5 (c), deferred with W2-115b (no widening)
+33b5651eb W2-115 (DAEO-emq1): PK-5 (c), deferred with W2-115b (no widening)
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2 failed, 95 passed in 7.64s
+base 33b5651eb exit 1
+Preparing worktree (detached HEAD ae806c3fe)
+HEAD is now at ae806c3fe W2-174, W2-27, W2-160, W2-45: the owner's item 4 (a1) and P1-J (a) widenings (DEC-1148 (2), (4))
+ae806c3fe W2-174, W2-27, W2-160, W2-45: the owner's item 4 (a1) and P1-J (a) widenings (DEC-1148 (2), (4))
+........................................................................ [ 74%]
+.........................                                                [100%]
+97 passed in 7.65s
+base ae806c3fe exit 0

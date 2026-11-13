@@ -1,0 +1,6 @@
+Merge w2/W2-180-tests (DAEO-weh2): W2-170's F5 case judges only w2/W2-170 and skips with its reason elsewhere; six planted cases (td-1, e3ff31fc5)
+
+Task: DAEO-weh2
+Role: orchestrator
+Implements: DEC-866, DEC-253, DEC-966, DEC-989
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

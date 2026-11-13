@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 151
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01FnPpW65MpCFzTFzyPrEt4a", "time": "2026-11-12T01:41:06.528Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS; set -e; O=.gov-runtime/scratch/orchestrator; B=$O/briefs python3 -c \" import json;p='$O/log/ticket-class.json';d=json.load(open(p));d['DAEO-k1e2']='C2';j", "rule": "the command names the sets root together with a shell variable after it, which is refused to this s

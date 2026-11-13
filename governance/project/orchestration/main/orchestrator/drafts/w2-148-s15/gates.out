@@ -1,0 +1,15 @@
+validate_manifest: pass
+files: 18 hash as the manifest says; no file in the bundle unlisted
+path rule on apply.sh: pass
+path rule on a check: pass
+path rule on a check: pass
+path rule on a check: pass
+path rule on a check: pass
+path rule on a check: pass
+act_class.classify (the bundle, the live table): class O; hits []
+  repo|governance/project/operator/class-rules.yaml: O (row operator-own)
+  home|gov-os-operator/install/class-rules.yaml: O (row operator-own)
+  home|gov-os-operator/install/APPROVED: O (row operator-own)
+act_class.classify_manifest (the HOURS-3 base's rows): class O
+act_class.classify_manifest (the bundle under its own after table): class O
+manifest sha256 a3df8ff6c3a49f0f6457eaf64e678b4790468540c707fe040448c45ff13356c5

@@ -1,0 +1,2 @@
+SIGINT-ignored-at-start: 0
+.F.FFF

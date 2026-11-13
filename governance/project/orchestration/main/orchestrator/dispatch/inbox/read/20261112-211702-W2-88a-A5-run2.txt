@@ -1,0 +1,8 @@
+log: W2-88a-A5-run2.json
+W2: W2-88a
+status: DONE
+
+task: DAEO-pg6i (W2-88a)
+status: DONE
+work_completed: This was the build run, resumed from CHECKPOINT. The acceptance tests were already merged and red at 1b8595b2b973, so TESTS-READY stood. I built the product-spec brief from `gov context DAEO-pg6i --role product-spec --budget 20000` and launched the worker ps-1 (Sonnet 5.5, high, C2). It wrote three things:
+- the kernel adopt skill's section `## A9: Wave 0 memory practice`: the seven steps of S17 in order, with a pointer to `docs/research/W2-88-memory-practice.md`. The Wave 3 sentence now reads "the full A9 …" so the skill does not contradic

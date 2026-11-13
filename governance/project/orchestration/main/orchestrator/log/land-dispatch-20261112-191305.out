@@ -1,0 +1,3 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-115 (DAEO-emq1, FULL) at ea6dc2c14727: W2-115: FULL ticket without a passing independent review record at ea6dc2c14727
+REFUSED before anything was queued: W2-115: FULL ticket without a passing independent review record at ea6dc2c14727

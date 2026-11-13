@@ -1,0 +1,205 @@
+# ACT-OPERATOR-HOURS-2 rehearsal. Part 1: apply.sh on planted folders (a planted HOME with a copy of the live install, a planted main tree).
+# Part 2: G9 of the installed copy (the real opcommon.holds()) over a stub clock and a planted state file. Part 3: the real night_hold.py writer.
+# Part 4: the real launcher. Part 5: does it bite (mutants). Part 6: the operator's own tests on a clone with the after files.
+# Part 7 (round 2): apply.sh's second stage, `exempt` (DEC-1136 (2)), in two clones of w2/integrate, one per allowed before of the path map, with W1-01 run on each.
+# part 1: apply.sh on planted folders
+ok 1: check on the before state: exit 0, "ready to apply" (0)
+ok 2: verify on the before state: exit 3 "not applied" (3)
+ok 3: undo on the before state: exit 0, nothing to do, nothing touched
+ok 4: an unknown step: exit 2 (usage), nothing touched
+ok 5: apply: exit 0, "the install's own APPROVED check: ok", "state applied" (0; )
+ok 6: every listed file hashes as the after (the repository files and the install's opcommon.py and APPROVED)
+ok 7: the installed APPROVED is 1e557c49be58 and opcommon.py 123e17e55811
+ok 8: the install's two files are 0444 as the install's others are
+ok 9: no temporary file left beside any written file ([])
+ok 10: the install's own APPROVED check wrote no __pycache__ (python -I -B)
+ok 11: every other install file is byte for byte as it was (13 files)
+ok 12: APPROVED differs from the old in exactly one line: opcommon.py's
+ok 13: verify on the after state: exit 0 (0)
+ok 14: apply again: exit 0, already in place, nothing touched
+ok 15: check on the after state: exit 3, already applied (3)
+ok 16: undo: exit 0, the install's own APPROVED check ok, "state before (undone)" (0; )
+ok 17: every listed file is the before again; APPROVED is the old one
+ok 18: the new test file is gone after the undo
+ok 19: the install and the repository paths are byte for byte (hash, mode, listing) what they were before the apply
+ok 20: check again: exit 0 (ready)
+# part 1b: a half-applied state is finished, and a moved file is never overwritten
+ok 21: apply with the install folder not writable: stops, exit 5 (5)
+ok 22: the repository files are written, the install is as it was: a half-applied state
+ok 23: check on that state: exit 3, named a half-applied state
+ok 24: apply finishes it (the files already after are left): exit 0, applied (0)
+ok 25: undo over a half state (one file already before) finishes: exit 0, every file before (0)
+ok 26: …and the whole state is the one it began with, byte for byte
+ok 27: a repository file moved (the committed opcommon.py differs by one byte): check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 28: an install file other than opcommon.py moved (brief.md): check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 29: a stray file in install/: check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 30: the install's opcommon.py moved: check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 31: after the apply, the new test file edited (undo and apply and check refuse): check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 32: after the apply, the install's APPROVED edited: check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 33: a tampered frozen copy (after/home/.../opcommon.py): check exit 4, apply exit 4, undo exit 4, verify exit 4; nothing touched
+ok 34: a tampered frozen copy (before/repo/.../test_w2_148_gates.py): check exit 4, apply exit 4, undo exit 4, verify exit 4; nothing touched
+ok 35: the operator's freeze held (install/act-in-progress.txt): check exit 6, apply exit 6; nothing touched
+ok 36: the operator's journal present (log/journal.json): check exit 6, apply exit 6; nothing touched
+ok 37: the operator's lock of a failed undo (log/operator.lock): check exit 6, apply exit 6; nothing touched
+ok 38: a request waiting in queue/: check exit 6, apply exit 6; nothing touched
+ok 39: undo while the operator is busy (a request in queue/), after the apply: undo exit 6; nothing touched
+ok 40: a launch holding log/launch.lock: apply exits 6 and touches nothing (6)
+ok 41: …and with the lock free the same apply goes through
+# part 2: G9 of the installed copy (apply.sh's own result in the planted world), the real opcommon.holds() over a clock file (the operator's own `clock` setting) fixed at each time; the state file planted at each case
+ok 42: the installed G9 over 247 (time, state) cases (19 times x 13 states) agrees with the owner's rule written out separately: 0 disagree []
+ok 43: 01:30: no hold in any state (true, false, missing, stale, malformed, empty, list, no key, null, 0, "false", 1, a directory)
+ok 44: 02:05: no hold in any state (a launch at 02:05 may start; the file is not read)
+ok 45: 02:30: a hold in every state, even a fresh holding false ("before the night hold": a session cannot run into it)
+ok 46: 03:30 holding true: hold, "the night hold is on"
+ok 47: 03:30 holding false (fresh): no hold
+ok 48: 03:30 state file missing: hold (fail closed), reason names FileNotFoundError
+ok 49: 03:30 stale (a holding false 400 s old): hold, reason "stale"
+ok 50: 03:30 malformed JSON: hold, reason names JSONDecodeError
+ok 51: 03:30 an empty file, [false], no key, null, 0, "false", 1 or a directory in its place: hold in each (only the boolean false releases)
+ok 52: 05:10 after the release (fresh false): no hold; a fresh true at 05:10: hold
+ok 53: 07:45: false releases, true and a stale file hold
+ok 54: 14:00, 08:00 and 23:59: no hold in any state (a leftover true never stops the operator in the day)
+ok 55: the edges: 02:09 free, 02:10 hold, 03:09 hold, 03:10 file decides, 07:59 file decides, 08:00 free
+ok 56: 00:00: no hold in any state
+ok 57: contrast, the OLD install over the same table: it holds at 02:05, 05:10 and 07:45 in every state (the quiet hours 02:00-07:30 and the window 03:50-08:00)
+ok 58: contrast: the old install holds nothing at 01:30, 14:00 or 08:00 (so the new one gives back 02:00-02:09 and 03:10-07:59 with the hold off, and nothing else)
+ok 59: every case where new and old differ is a time from 02:00 to 02:09 or a fresh holding false from 03:10 to 07:59 (33 cases); no case turns from free to held
+ok 60: the planted NIGHTLY-RUNNING still holds at 14:00, 05:10 (released) and 01:30: the other G9 holds are as before
+ok 61: the planted CLOSE-RUNNING still holds at 14:00, 05:10 (released) and 01:30: the other G9 holds are as before
+ok 62: the planted log/act-in-progress.txt still holds at 14:00, 05:10 (released) and 01:30: the other G9 holds are as before
+ok 63: the planted install/act-in-progress.txt still holds at 14:00, 05:10 (released) and 01:30: the other G9 holds are as before
+# part 3: the real writer (night_hold.py's own step()) writes the file; the installed G9 reads it
+ok 64: 02:59:30 the real writer's file: holding false; G9 at 02:59 holds (before the night hold), at 01:30 does not
+ok 65: 03:00:20 the writer's first look in its window: holding true; G9 holds at 03:10 and 03:30 ("the night hold is on")
+ok 66: 05:00 with today's status line: the writer releases (holding false); G9 at 05:10: no hold
+ok 67: a night with no end by 06:00: holding true; G9 holds
+ok 68: 07:31 the nightly not ended: the writer releases at 07:30 at the latest; G9 at 07:40: no hold
+ok 69: the writer stopped an hour ago (its file keeps `holding false`): G9 holds at 07:40 (stale), not at 14:00
+# part 4: the real launcher from the installed copy (a stub claude, a stub clock, a queued request): held or taken
+ok 70: the launcher runs from the applied install (APPROVED as the ACT leaves it)
+ok 71: launcher at 01:30, no file: no hold: the request taken and a session started (stub claude), result launched (got launched)
+ok 72: launcher at 02:05, no file: no hold: the request taken and a session started (stub claude), result launched (got launched)
+ok 73: launcher at 02:30, holding false: held at G9, the request stays in queue/ (got held/G9)
+ok 74: launcher at 03:30, holding true: held at G9, the request stays in queue/ (got held/G9)
+ok 75: launcher at 03:30, no file: held at G9, the request stays in queue/ (got held/G9)
+ok 76: launcher at 05:10, holding false: no hold: the request taken and a session started (stub claude), result launched (got launched)
+ok 77: launcher at 07:45, holding false: no hold: the request taken and a session started (stub claude), result launched (got launched)
+ok 78: launcher at 14:00, no file: no hold: the request taken and a session started (stub claude), result launched (got launched)
+ok 79: the held line's reason at 02:30: "before the night hold (02:10 to 03:09: no session starts that could run into it)"
+ok 80: the held line's reason at 05:10 with holding true: "the night hold is on"
+# part 5: does it bite? Each mutant of the installed opcommon.py, over the same table; the right code has 0 disagreements, each mutant at least 1
+ok 81: mutant "the old quiet hours back (02:00 to 07:30 as a hold)": 30 cases disagree with the rule (caught)
+ok 82: mutant "the state never read (hold from 03:10 to 07:59 always)": 7 cases disagree with the rule (caught)
+ok 83: mutant "the state never read (no hold from 03:10 to 07:59 ever)": 84 cases disagree with the rule (caught)
+ok 84: mutant "holding read as `== False`": 21 cases disagree with the rule (caught)
+ok 85: mutant "no age test": 7 cases disagree with the rule (caught)
+ok 86: mutant "an unreadable file is no hold (fail open)": 42 cases disagree with the rule (caught)
+ok 87: mutant "the pre-hold margin from 02:20": 13 cases disagree with the rule (caught)
+ok 88: mutant "the pre-hold margin from 02:00": 26 cases disagree with the rule (caught)
+ok 89: mutant "the state read from 03:00": 2 cases disagree with the rule (caught)
+ok 90: mutant "the state read to 07:30": 36 cases disagree with the rule (caught)
+ok 91: mutant "the state read to 08:30": 24 cases disagree with the rule (caught)
+ok 92: mutant "the old nightly window as the default": 5 cases disagree with the rule (caught)
+ok 93: mutant "the age limit 3000 s": 7 cases disagree with the rule (caught)
+ok 94: mutant "the NIGHTLY-RUNNING flag dropped": 2 cases disagree with the rule (caught)
+ok 95: the installed code itself: 0 disagreements over the same table (the control for the mutants)
+# part 6: the operator's own tests (tests/unit/operator, tests/acceptance/W2-148) on a clone of the committed head with the ACT's repository files
+ok 96: the clone's four repository files hash as the bundle's after copies; the clone's other files are the committed head's
+ok 97: pytest tests/unit/operator tests/acceptance/W2-148 on the clone: 507 passed
+ok 98: the new file alone: 86 passed
+ok 99: the same new cases on the OLD opcommon.py go red: 42 failed, 44 passed
+ok 100: the clone's opcommon.py is the after file again
+# part 7 (round 2, DEC-1136 (2)): the second commit. Two clones of w2/integrate (`git clone --no-hardlinks`), one per allowed before of the path map (the live map; the map ACT-EXAMIN-SETS-1, ACT-ACCEPTED-REDS-1 and ACT-PATHMAP-EXP-1 leave, applied here by their own apply.sh), HOME planted, the bundle copied in at its own path. Section 0's two blocks are run as the package prints them; W1-01 (tests/acceptance/W1-01, through heavy_slot.sh) is run on each.
+ok 101: the package holds the operator's three blocks (section 0: the apply and first commit, the exempt step and second commit; section 5: the undo of both commits), cut from the file the CTO reads
+ok 102: [live map] the clone's map is the allowed before (f4029cfb4942) and the clone is clean
+ok 103: [live map] apply.sh check: exit 0, ready to apply (0)
+ok 104: [live map] W1-01 before the ACT's commit: green (54 passed, 12 deselected)
+ok 105: [live map] exempt before the first commit: exit 3, HEAD is not the ACT's commit, the map and the tree untouched (3)
+ok 106: [live map] section 0's first block run as printed: exit 0, applied, verified, committed
+ok 107: [live map] the first commit: one parent, Role: owner, exactly the four repository paths, the tree clean afterwards
+ok 108: [live map] CONTROL, W1-01 after the first commit and before the entry: red, the one failure names the first commit and no other (1 failed, 53 passed, 12 deselected)
+ok 109: [live map] exempt-verify before the exempt step: exit 3 (the entry is not there) (3)
+ok 110: [live map] section 0's second block run as printed: exit 0, entry added, verified, committed
+ok 111: [live map] the second commit: on the first, its subject names the first's 12 digits, trailers Task, Implements (DEC-1136, DEC-1141), Role: owner
+ok 112: [live map] the second commit changes the path map only: 2 lines added, 0 removed
+ok 113: [live map] the map's mode is kept (644), no temporary file beside it, the tree is clean
+ok 114: [live map] the map parses; acceptance_exemptions is the old list plus the one entry (the full id, DEC-1141) at the end; every other key is equal
+ok 115: [live map] W1-01 after the second commit: green, the same as before the ACT (54 passed, 12 deselected)
+# information, not a gate: the close's gate (h) reader `gates.owner_listed` counts the first commit as owner-listed: False (it asks that the entry's decision text in the register names the commit by 8 or more digits; DEC-1141 cannot name an id that does not exist yet; W1-01 reads the list by full id and decision shape only)
+ok 116: [live map] exempt run again after the second commit: a no-op, exit 0, "already in place", the map and HEAD untouched (0)
+ok 117: [live map] exempt-verify after the second commit: exit 0 (also the committed map) (0)
+ok 118: [live map] exempt-undo after the second commit: refused, exit 3, nothing touched (3)
+ok 119: [live map] the undo of both commits (the package's block): exit 0, HEAD is the head before the ACT, the map is the allowed before, the tree is clean
+ok 120: [live map] after that undo the install's APPROVED is the old one and apply.sh check says ready again
+ok 121: [live map] PLANTED, exempt run twice before the second commit: the first adds the entry, the second is a no-op (exit 0, "already in place"), the map byte for byte the same
+ok 122: [live map] exempt-undo before the second commit: the entry taken out, the map is the allowed before again, the tree clean (0)
+ok 123: [live map] exempt-undo again: a no-op, exit 0 (0)
+ok 124: [live map] exempt again after the undo: adds the entry (0)
+ok 125: [live map] PLANTED, exempt refuses on another HEAD (an unrelated commit on top of the ACT's): exit 3, HEAD is not the ACT's commit, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERATOR)
+ok 126: [live map] PLANTED, exempt refuses when the ACT's commit is not Role: owner: exit 3, no single trailer Role: owner, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (it has no single trailer Role: owner), nor a)
+ok 127: [live map] PLANTED, exempt refuses when the subject does not start ACT-OPERATOR-HOURS-2:: exit 3, its subject does not start, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERATOR)
+ok 128: [live map] PLANTED, exempt refuses when the commit changes a fifth path: exit 3, exactly the ACT's repository paths, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (it does not change exactly the ACT's reposit)
+ok 129: [live map] PLANTED, exempt refuses when one of the four files is not the ACT's after file: exit 3, is not the ACT's after file, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its tests/acceptance/W2-148/README.md is not)
+ok 130: [live map] PLANTED, exempt refuses when HEAD is a merge commit: exit 3, no parent or has two, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (HEAD has no parent or has two), nor a commit)
+ok 131: [live map] PLANTED, exempt refuses on a map that is neither allowed before (a changed line, not committed): exit 3, neither allowed before, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is neither allowed before (sha256 c523819)
+ok 132: [live map] PLANTED, exempt refuses on the other allowed before when it is not committed (d50884e3633e in the working tree, HEAD has f4029cfb4942): exit 3, has changes that are not committed, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml has changes that are not committed; nothi)
+ok 133: [live map] PLANTED, exempt refuses on a map that is a link: exit 3, missing or a link, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is missing or a link; nothing touched)
+ok 134: [live map] the planted states are undone: the clone is clean again at the first commit
+ok 135: [live map] PLANTED, exempt refuses when the map's folder is not writable (nothing can be written): exit 5, the map untouched, no temporary file (5)
+ok 136: [live map] PLANTED, exempt refuses on the map ACT-EXAMIN-SETS-1 alone leaves (0ec1d20da86a, committed, so the tree is clean): exit 3, neither allowed before, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is neither allowed before (sha256 0ec1d20)
+ok 137: [live map] the undo after the first commit alone (`git reset --keep HEAD~1`, then `apply.sh undo`): HEAD is the head before the ACT, the install's APPROVED the old one, the tree clean, check ready (0)
+ok 138: [live map] PLANTED, exempt-verify on an entry moved up one place: exit 3 (3; the entry is not at the end of acceptance_exemptions, or the map differs elsewhe)
+ok 139: [live map] PLANTED, exempt-verify on an entry whose decision was changed: exit 3 (3)
+ok 140: [live map] PLANTED, exempt-verify on a map with another changed line: exit 3 (3)
+ok 141: [live map] PLANTED, the control: the good map verifies again, exit 0 (0)
+ok 142: [live map] stage 1 after both commits: check says already applied (exit 3), as in round 1 (3)
+ok 143: [live map] stage 1 after both commits: verify exit 0 (0)
+ok 144: [chain map] the chain applied by its own bundles' apply.sh in order and committed (manifests e8020292, b8df21d8, 9a945c99): the map is d50884e3633e
+ok 145: [chain map] the clone's map is the allowed before (d50884e3633e) and the clone is clean
+ok 146: [chain map] apply.sh check: exit 0, ready to apply (0)
+ok 147: [chain map] W1-01 before the ACT's commit: green (54 passed, 12 deselected)
+ok 148: [chain map] exempt before the first commit: exit 3, HEAD is not the ACT's commit, the map and the tree untouched (3)
+ok 149: [chain map] section 0's first block run as printed: exit 0, applied, verified, committed
+ok 150: [chain map] the first commit: one parent, Role: owner, exactly the four repository paths, the tree clean afterwards
+ok 151: [chain map] CONTROL, W1-01 after the first commit and before the entry: red, the one failure names the first commit and no other (1 failed, 53 passed, 12 deselected)
+ok 152: [chain map] exempt-verify before the exempt step: exit 3 (the entry is not there) (3)
+ok 153: [chain map] section 0's second block run as printed: exit 0, entry added, verified, committed
+ok 154: [chain map] the second commit: on the first, its subject names the first's 12 digits, trailers Task, Implements (DEC-1136, DEC-1141), Role: owner
+ok 155: [chain map] the second commit changes the path map only: 2 lines added, 0 removed
+ok 156: [chain map] the map's mode is kept (644), no temporary file beside it, the tree is clean
+ok 157: [chain map] the map parses; acceptance_exemptions is the old list plus the one entry (the full id, DEC-1141) at the end; every other key is equal
+ok 158: [chain map] W1-01 after the second commit: green, the same as before the ACT (54 passed, 12 deselected)
+# information, not a gate: the close's gate (h) reader `gates.owner_listed` counts the first commit as owner-listed: False (it asks that the entry's decision text in the register names the commit by 8 or more digits; DEC-1141 cannot name an id that does not exist yet; W1-01 reads the list by full id and decision shape only)
+ok 159: [chain map] exempt run again after the second commit: a no-op, exit 0, "already in place", the map and HEAD untouched (0)
+ok 160: [chain map] exempt-verify after the second commit: exit 0 (also the committed map) (0)
+ok 161: [chain map] exempt-undo after the second commit: refused, exit 3, nothing touched (3)
+ok 162: [chain map] the undo of both commits (the package's block): exit 0, HEAD is the head before the ACT, the map is the allowed before, the tree is clean
+ok 163: [chain map] after that undo the install's APPROVED is the old one and apply.sh check says ready again
+ok 164: [chain map] PLANTED, exempt run twice before the second commit: the first adds the entry, the second is a no-op (exit 0, "already in place"), the map byte for byte the same
+ok 165: [chain map] exempt-undo before the second commit: the entry taken out, the map is the allowed before again, the tree clean (0)
+ok 166: [chain map] exempt-undo again: a no-op, exit 0 (0)
+ok 167: [chain map] exempt again after the undo: adds the entry (0)
+ok 168: [chain map] PLANTED, exempt refuses on another HEAD (an unrelated commit on top of the ACT's): exit 3, HEAD is not the ACT's commit, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERATOR)
+ok 169: [chain map] PLANTED, exempt refuses when the ACT's commit is not Role: owner: exit 3, no single trailer Role: owner, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (it has no single trailer Role: owner), nor a)
+ok 170: [chain map] PLANTED, exempt refuses when the subject does not start ACT-OPERATOR-HOURS-2:: exit 3, its subject does not start, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERATOR)
+ok 171: [chain map] PLANTED, exempt refuses when the commit changes a fifth path: exit 3, exactly the ACT's repository paths, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (it does not change exactly the ACT's reposit)
+ok 172: [chain map] PLANTED, exempt refuses when one of the four files is not the ACT's after file: exit 3, is not the ACT's after file, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (its tests/acceptance/W2-148/README.md is not)
+ok 173: [chain map] PLANTED, exempt refuses when HEAD is a merge commit: exit 3, no parent or has two, the map untouched, no temporary file (3; exempt refused: HEAD is not the ACT's commit (HEAD has no parent or has two), nor a commit)
+ok 174: [chain map] PLANTED, exempt refuses on a map that is neither allowed before (a changed line, not committed): exit 3, neither allowed before, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is neither allowed before (sha256 aca7cfb)
+ok 175: [chain map] PLANTED, exempt refuses on the other allowed before when it is not committed (f4029cfb4942 in the working tree, HEAD has d50884e3633e): exit 3, has changes that are not committed, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml has changes that are not committed; nothi)
+ok 176: [chain map] PLANTED, exempt refuses on a map that is a link: exit 3, missing or a link, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is missing or a link; nothing touched)
+ok 177: [chain map] the planted states are undone: the clone is clean again at the first commit
+ok 178: [chain map] PLANTED, exempt refuses when the map's folder is not writable (nothing can be written): exit 5, the map untouched, no temporary file (5)
+ok 179: [chain map] PLANTED, exempt refuses on the map the chain leaves without ACT-PATHMAP-EXP-1 (5654eca4c139, committed, so the tree is clean): exit 3, neither allowed before, the map untouched, no temporary file (3; exempt refused: governance/project/path-map.yaml is neither allowed before (sha256 5654eca)
+ok 180: [chain map] the undo after the first commit alone (`git reset --keep HEAD~1`, then `apply.sh undo`): HEAD is the head before the ACT, the install's APPROVED the old one, the tree clean, check ready (0)
+ok 181: [chain map] PLANTED, exempt-verify on an entry moved up one place: exit 3 (3; the entry is not at the end of acceptance_exemptions, or the map differs elsewhe)
+ok 182: [chain map] PLANTED, exempt-verify on an entry whose decision was changed: exit 3 (3)
+ok 183: [chain map] PLANTED, exempt-verify on a map with another changed line: exit 3 (3)
+ok 184: [chain map] PLANTED, the control: the good map verifies again, exit 0 (0)
+ok 185: [chain map] stage 1 after both commits: check says already applied (exit 3), as in round 1 (3)
+ok 186: [chain map] stage 1 after both commits: verify exit 0 (0)
+ok 187: the live install (APPROVED, opcommon.py, operator_run.py, operator_launch.py) is byte for byte as it began
+ok 188: the live crontab is byte for byte as it began
+ok 189: the live main tree's four repository paths and the path map are as they began (their `git status --porcelain` and sha256: nothing written there; the rest of the tree is the CTO's own working tree and moves meanwhile)
+cases: 189
+failures: 0

@@ -10,6 +10,7 @@
 #      brief must not tell its engineer or test designer to run on Opus ("engineer ... Opus" or "every worker on Opus");
 #      a ticket with no class in the map is refused (the CTO sets it first)
 #   5. the ticket file exists and parses as YAML front matter
+#   6. the brief is gov brief's form, not the old common brief (build_lead_brief.py's "## Standing rules")
 # On success: appends "# <UTC HH:MM> <comment>" and the line "<W2> <ticket> <brief> <log>", and prints it.
 set -u
 ORCH=${ORCH:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator}
@@ -21,6 +22,7 @@ no() { echo "release_lead: REFUSED $W2: $1" >&2; exit 2; }
 b=$ORCH/briefs/$BRIEF
 [ -f "$b" ] || no "no brief $b"
 [ "$(wc -c < "$b")" -ge 2000 ] || no "the brief is empty or too short ($(wc -c < "$b") bytes): $b"
+grep -q "^## Standing rules (read first" "$b" && no "the brief is the old common-brief form (build_lead_brief.py); build it with: gov brief lead $ID --run <kind> --part <part.md>"
 [ -e "$ORCH/log/$LOG" ] && no "the log name is used: $ORCH/log/$LOG"
 grep -qE "^[^#].* $LOG\$" "$ORCH/dispatch/ready.txt" && no "a ready line already names $LOG"
 python3 -I - "$MAIN/.tickets/$ID.md" <<'PY' || no "the ticket $ID does not parse"

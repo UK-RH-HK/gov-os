@@ -1,0 +1,28 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-152 (DAEO-o5x1, STANDARD) at 2900a31d2681: pre-check passed
+W2-152: kernel gate at 2900a31d2681: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 19:15:09 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 19:15:09 merged W2-152 onto 48ef8cf6603b: 0a362c042c48
+2026-11-12 19:26:41 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 19:26:48 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 19:26:51 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 19:26:52 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 19:26:52 ADVANCED refs/heads/w2/integrate 48ef8cf6603b -> 0a362c042c48; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/0a362c042c48.json
+2026-11-12 19:26:52 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 19:32:59 integration store promoted: the merged clone's stores at 0a362c042c48 into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-152: afe7a873c W2-152 (DAEO-o5x1): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 16 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+13 more)
+structural pass: authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 48ef8cf6603b)
+structural pass: links: NOTICE 1 new since 48ef8cf6603b57dd8d3506875bd28e07737fb123 (1709 standing): UNLINKED_ID DEC-1052 in DAEO-o5x1's KPI brackets, not in its sources | .tickets/DAEO-o5x1.md:43 | orchestrator | add DEC-1052 to DAEO-o5x1's sources:
+structural pass: structural pass at afe7a873ca94 (the work tree differs from it at 1 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 14.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-193314-structural-notice.txt

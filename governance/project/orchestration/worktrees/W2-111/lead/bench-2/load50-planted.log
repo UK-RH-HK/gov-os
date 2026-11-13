@@ -1,0 +1,1086 @@
+== load50-planted start 2026-11-13T08:27:48+00:00 load: 82.25 59.79 39.06 87/1340 3893625
+FFFFFFFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+__ test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter] ___
+
+project = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_decision_p95_is_under_1000/project')
+write = <function write.<locals>._write at 0x7fd8bcd9f060>
+name = 'engineer-allow-from-ticket-frontmatter'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: its CPU time over each call, less a reference hook timed beside it.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone
+        was not the measure either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a
+        busy sibling thread slows the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now
+        judged by the CPU time of the hook and of every process it waited for (``result.cpu_seconds``, from
+        ``RUSAGE_CHILDREN``), less the CPU time of a reference hook (a trivial hook: a fresh interpreter that reads the
+        event and answers) called just before it, in the same round and the same CPU share. The round's figure is the
+        nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference calls' CPU times. It leaves out
+        what any hook costs (the interpreter's start and the event read, about 15 ms quiet, 21 ms loaded), so a hook
+        is judged on its work beyond that; the bound (100 ms), the 40 samples, the 3 warm-up calls and the p95 are the
+        same, and a round that misses the bound is repeated, up to three rounds, as before. The raw CPU p95, the
+        reference's median and the wall p95 are reported beside it, for information.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed "
+            "beside it, per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed beside it, per round (ms): 200.5, 198.3, 196.4; the bound is 100 ms (per round, for information, ms: raw CPU p95 222.3, 219.7, 217.7; reference median 21.8, 21.4, 21.3; wall p95 1148.3, 1151.7, 1215.2)
+E       assert 0.1964115000000035 < 0.1
+E        +  where 0.1964115000000035 = min([0.20046500000000078, 0.19832649999999674, 0.1964115000000035])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:118: AssertionError
+_____ test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket] ______
+
+project = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_decision_p95_is_under_1001/project')
+write = <function write.<locals>._write at 0x7fd8bcda49a0>
+name = 'engineer-deny-outside-the-ticket'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: its CPU time over each call, less a reference hook timed beside it.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone
+        was not the measure either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a
+        busy sibling thread slows the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now
+        judged by the CPU time of the hook and of every process it waited for (``result.cpu_seconds``, from
+        ``RUSAGE_CHILDREN``), less the CPU time of a reference hook (a trivial hook: a fresh interpreter that reads the
+        event and answers) called just before it, in the same round and the same CPU share. The round's figure is the
+        nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference calls' CPU times. It leaves out
+        what any hook costs (the interpreter's start and the event read, about 15 ms quiet, 21 ms loaded), so a hook
+        is judged on its work beyond that; the bound (100 ms), the 40 samples, the 3 warm-up calls and the p95 are the
+        same, and a round that misses the bound is repeated, up to three rounds, as before. The raw CPU p95, the
+        reference's median and the wall p95 are reported beside it, for information.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed "
+            "beside it, per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed beside it, per round (ms): 198.8, 204.6, 194.0; the bound is 100 ms (per round, for information, ms: raw CPU p95 220.4, 226.6, 215.2; reference median 21.6, 22.0, 21.2; wall p95 1160.5, 1240.2, 1148.4)
+E       assert 0.19402499999999634 < 0.1
+E        +  where 0.19402499999999634 = min([0.19882699999999076, 0.20461800000000352, 0.19402499999999634])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:118: AssertionError
+________________ test_decision_p95_is_under_100_ms[frozen-deny] ________________
+
+project = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_decision_p95_is_under_1002/project')
+write = <function write.<locals>._write at 0x7fd8bcda4c20>, name = 'frozen-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: its CPU time over each call, less a reference hook timed beside it.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone
+        was not the measure either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a
+        busy sibling thread slows the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now
+        judged by the CPU time of the hook and of every process it waited for (``result.cpu_seconds``, from
+        ``RUSAGE_CHILDREN``), less the CPU time of a reference hook (a trivial hook: a fresh interpreter that reads the
+        event and answers) called just before it, in the same round and the same CPU share. The round's figure is the
+        nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference calls' CPU times. It leaves out
+        what any hook costs (the interpreter's start and the event read, about 15 ms quiet, 21 ms loaded), so a hook
+        is judged on its work beyond that; the bound (100 ms), the 40 samples, the 3 warm-up calls and the p95 are the
+        same, and a round that misses the bound is repeated, up to three rounds, as before. The raw CPU p95, the
+        reference's median and the wall p95 are reported beside it, for information.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed "
+            "beside it, per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed beside it, per round (ms): 190.3, 191.9, 185.8; the bound is 100 ms (per round, for information, ms: raw CPU p95 211.7, 213.5, 207.7; reference median 21.4, 21.7, 21.9; wall p95 1076.2, 1147.9, 1092.9)
+E       assert 0.18578899999998555 < 0.1
+E        +  where 0.18578899999998555 = min([0.19029949999999118, 0.1918849999999992, 0.18578899999998555])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:118: AssertionError
+_______________ test_decision_p95_is_under_100_ms[no-role-deny] ________________
+
+project = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_decision_p95_is_under_1003/project')
+write = <function write.<locals>._write at 0x7fd8bcda5c60>
+name = 'no-role-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: its CPU time over each call, less a reference hook timed beside it.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone
+        was not the measure either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a
+        busy sibling thread slows the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now
+        judged by the CPU time of the hook and of every process it waited for (``result.cpu_seconds``, from
+        ``RUSAGE_CHILDREN``), less the CPU time of a reference hook (a trivial hook: a fresh interpreter that reads the
+        event and answers) called just before it, in the same round and the same CPU share. The round's figure is the
+        nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference calls' CPU times. It leaves out
+        what any hook costs (the interpreter's start and the event read, about 15 ms quiet, 21 ms loaded), so a hook
+        is judged on its work beyond that; the bound (100 ms), the 40 samples, the 3 warm-up calls and the p95 are the
+        same, and a round that misses the bound is repeated, up to three rounds, as before. The raw CPU p95, the
+        reference's median and the wall p95 are reported beside it, for information.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed "
+            "beside it, per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed beside it, per round (ms): 196.5, 202.0, 196.1; the bound is 100 ms (per round, for information, ms: raw CPU p95 217.8, 223.9, 217.6; reference median 21.2, 21.8, 21.5; wall p95 1040.4, 1114.8, 1077.6)
+E       assert 0.19605150000001004 < 0.1
+E        +  where 0.19605150000001004 = min([0.19654900000002584, 0.20204799999999068, 0.19605150000001004])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:118: AssertionError
+____________ test_decision_p95_is_under_100_ms[test-designer-allow] ____________
+
+project = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_decision_p95_is_under_1004/project')
+write = <function write.<locals>._write at 0x7fd8bcda6c00>
+name = 'test-designer-allow'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """The hook's own work, p95 under 100 ms: its CPU time over each call, less a reference hook timed beside it.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case measured the wall time of the hook process;
+        under load a wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency
+        cases with W2-106 and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone
+        was not the measure either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a
+        busy sibling thread slows the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now
+        judged by the CPU time of the hook and of every process it waited for (``result.cpu_seconds``, from
+        ``RUSAGE_CHILDREN``), less the CPU time of a reference hook (a trivial hook: a fresh interpreter that reads the
+        event and answers) called just before it, in the same round and the same CPU share. The round's figure is the
+        nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference calls' CPU times. It leaves out
+        what any hook costs (the interpreter's start and the event read, about 15 ms quiet, 21 ms loaded), so a hook
+        is judged on its work beyond that; the bound (100 ms), the 40 samples, the 3 warm-up calls and the p95 are the
+        same, and a round that misses the bound is repeated, up to three rounds, as before. The raw CPU p95, the
+        reference's median and the wall p95 are reported beside it, for information.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                assert result.cpu_seconds is not None, f"the call's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed "
+            "beside it, per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children per call, less the median CPU time of the reference hook timed beside it, per round (ms): 201.1, 195.9, 200.8; the bound is 100 ms (per round, for information, ms: raw CPU p95 222.7, 217.3, 222.4; reference median 21.7, 21.4, 21.6; wall p95 1153.7, 812.0, 849.6)
+E       assert 0.19592599999998583 < 0.1
+E        +  where 0.19592599999998583 = min([0.20105750000001876, 0.19592599999998583, 0.20083999999999946])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:118: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer] ________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Edit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Edit call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 210.2, 198.4, 194.2; the bound is 100 ms (per round, for information, ms: raw CPU p95 231.8, 219.8, 215.5; reference median 21.6, 21.4, 21.4; wall p95 of the call 833.5, 859.1, 767.9)
+E       assert 0.19417849999996406 < 0.1
+E        +  where 0.19417849999996406 = min([0.2101755000000196, 0.19835550000006208, 0.19417849999996406])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer] ________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Glob call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 211.5, 212.9, 218.3; the bound is 100 ms (per round, for information, ms: raw CPU p95 232.9, 234.5, 239.6; reference median 21.4, 21.5, 21.2; wall p95 of the call 922.7, 867.2, 816.6)
+E       assert 0.2115050000000025 < 0.1
+E        +  where 0.2115050000000025 = min([0.2115050000000025, 0.21294949999996504, 0.21834399999994503])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role] _________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Glob call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 203.2, 199.9, 207.3; the bound is 100 ms (per round, for information, ms: raw CPU p95 225.2, 221.0, 229.3; reference median 22.0, 21.1, 22.0; wall p95 of the call 1119.9, 850.8, 820.8)
+E       assert 0.19985000000001207 < 0.1
+E        +  where 0.19985000000001207 = min([0.20319949999999665, 0.19985000000001207, 0.2073314999999667])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer] ________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Grep call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 212.9, 212.1, 218.7; the bound is 100 ms (per round, for information, ms: raw CPU p95 234.1, 233.4, 240.0; reference median 21.2, 21.3, 21.2; wall p95 of the call 851.9, 927.0, 954.7)
+E       assert 0.2121450000000209 < 0.1
+E        +  where 0.2121450000000209 = min([0.2128904999999861, 0.2121450000000209, 0.21872599999991849])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role] _________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Grep call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 196.4, 206.5, 202.6; the bound is 100 ms (per round, for information, ms: raw CPU p95 217.8, 227.7, 224.3; reference median 21.4, 21.2, 21.7; wall p95 of the call 871.8, 855.6, 880.4)
+E       assert 0.196360999999996 < 0.1
+E        +  where 0.196360999999996 = min([0.196360999999996, 0.20650550000004841, 0.20260349999998084])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+____ test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer] ____
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'NotebookEdit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a NotebookEdit call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 199.4, 209.7, 195.2; the bound is 100 ms (per round, for information, ms: raw CPU p95 221.0, 230.9, 216.5; reference median 21.6, 21.2, 21.4; wall p95 of the call 834.1, 900.4, 863.9)
+E       assert 0.19519549999998276 < 0.1
+E        +  where 0.19519549999998276 = min([0.1993915000000186, 0.20969400000001315, 0.19519549999998276])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer] ________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Read-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Read call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 215.0, 220.0, 213.7; the bound is 100 ms (per round, for information, ms: raw CPU p95 236.7, 241.6, 235.2; reference median 21.7, 21.5, 21.5; wall p95 of the call 888.6, 885.3, 867.1)
+E       assert 0.21366100000005872 < 0.1
+E        +  where 0.21366100000005872 = min([0.2150379999999643, 0.22004000000003998, 0.21366100000005872])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role] _________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Read-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Read call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 212.2, 198.7, 209.7; the bound is 100 ms (per round, for information, ms: raw CPU p95 233.5, 219.9, 230.9; reference median 21.3, 21.2, 21.3; wall p95 of the call 994.5, 855.6, 802.6)
+E       assert 0.19870150000002695 < 0.1
+E        +  where 0.19870150000002695 = min([0.21216249999997672, 0.19870150000002695, 0.20965499999999793])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+_______ test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer] ________
+
+kernel_live = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Write-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). A CPU time alone was not the measure
+        either (round 1, 2026-11-13: it rises about 1.4 times when every CPU is busy, because a busy sibling thread slows
+        the same work; 3 of the 15 cases were red at load 20 and at 50). Each call is now judged by its CPU time: the
+        difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every PreToolUse
+        command registered for the tool and what each waited for, so it is the sum of their work (stricter than the wall
+        time of commands that run side by side, never looser); less the CPU time of a reference hook (a trivial hook: a
+        fresh interpreter that reads the event and answers) called just before it, in the same round and the same CPU
+        share. The round's figure is the nearest-rank p95 of the 40 calls' CPU times less the median of the 40 reference
+        calls' CPU times. It leaves out what any hook costs (the interpreter's start and the event read, about 15 ms
+        quiet, 21 ms loaded), once per call whatever the number of commands, so a hook is judged on its work beyond that;
+        the bound (100 ms), the 40 calls, the 3 warm-up calls and the p95 are the same, and a round that misses the
+        bound is repeated, up to three rounds, as before. The raw CPU p95, the reference's median and the wall p95 of the
+        call are reported beside it, for information.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            reference = _reference_cpu_seconds()
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before, reference
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        figures = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds, reference = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(cpu_seconds)
+                wall_samples.append(seconds)
+                reference_samples.append(reference)
+            cpu_p95 = support.p95(samples)
+            wall_p95 = support.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 CPU time of a {tool_name} call's PreToolUse hooks (the hooks and their children), less the median CPU "
+            "time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 of the call "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of a Write call's PreToolUse hooks (the hooks and their children), less the median CPU time of the reference hook timed beside it, per round (ms): 202.2, 197.2, 206.4; the bound is 100 ms (per round, for information, ms: raw CPU p95 224.1, 218.4, 227.7; reference median 21.9, 21.2, 21.4; wall p95 of the call 752.0, 770.0, 867.9)
+E       assert 0.19723299999995447 < 0.1
+E        +  where 0.19723299999995447 = min([0.20220999999997957, 0.19723299999995447, 0.2063594999999907])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:286: AssertionError
+_ test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95 _
+
+tmp_path = PosixPath('/tmp/claude-1000/w2-111-bench2/tmp/pytest-of-usain/pytest-1/test_a_test_designer_s_read_on0')
+
+    def test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95(tmp_path):
+        project, sandbox = support.designer_world(tmp_path)
+        refused = support.designer_read(project, sandbox, CHANGED)
+        assert refused.decision == "deny" and re.search(r"DEC-820 \(c\)", refused.stdout), (
+            f"the fixture is wrong: the test designer is not refused a file its ticket's branch changes, so the read "
+            f"does not take Policy 2 (c)'s path: {refused.describe()}"
+        )
+        for _ in range(WARM_UP):
+            support.designer_read(project, sandbox, ORDINARY)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = support.designer_read(project, sandbox, ORDINARY)
+                assert result.decision == "allow", f"the timed read was not allowed: {result.describe()}"
+                assert result.cpu_seconds is not None, f"the read's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = guard.p95(samples)
+            wall_p95 = guard.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children for a test designer's read on a branch with changes, less the "
+            "median CPU time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children for a test designer's read on a branch with changes, less the median CPU time of the reference hook timed beside it, per round (ms): 200.6, 200.4, 199.5; the bound is 100 ms (per round, for information, ms: raw CPU p95 216.4, 216.0, 215.3; reference median 15.8, 15.6, 15.8; wall p95 194.4, 194.2, 199.8)
+E       assert 0.19947949999999537 < 0.1
+E        +  where 0.19947949999999537 = min([0.20060200000003192, 0.20042799999998806, 0.19947949999999537])
+
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:96: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[frozen-deny]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]
+FAILED tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+15 failed in 1268.39s (0:21:08)
+== load50-planted exit 1 end 2026-11-13T08:50:58+00:00 load: 41.15 58.56 58.24 11/1169 3925596

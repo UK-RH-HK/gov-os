@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-235304.out
+Structural: after the landing of W2-121b (base 84cc42343ffb)
+status: structural pass at a65961bc6079: NOTICE in mutation, authority, links (6 of 9 families ok), 18.2 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 20 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+17 more)
+authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 84cc42343ffb)
+links: NOTICE 7 new since 84cc42343ffb66e19f039d5718c68fb3434014c2 (1724 standing): UNKNOWN_ID W2-3 in a test file | tests/acceptance/W2-121b/test_b_s1_landing_batch.py:91 | independent-test-designer | correct W2-3 or name the planted id as ... | UNKNOWN_ID W2-7 in a test file | tests/acceptance/W2-121b/test_b_s2_closes.py:27 | independent-test-designer | correct W2-7 or name the planted id as a stand-in | UNKNOWN_ID W2-8 in a test file | tests/acceptance/W2-121b/test_b_s2_closes.py:28 | independent-test-designer | correct W2-8 or name the planted id as a stand-in (+4 more)
+structural pass at a65961bc6079: NOTICE in mutation, authority, links (6 of 9 families ok), 18.2 s; a notice, not a refusal

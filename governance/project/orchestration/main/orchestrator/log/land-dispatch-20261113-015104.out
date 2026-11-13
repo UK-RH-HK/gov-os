@@ -1,0 +1,3 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-113 (DAEO-g29a, STANDARD) at f42f86309aba: pre-check passed
+REFUSED before anything was queued: approved in the queue but not in this landing: W2-154 (park them with tools/queue_park.py park, or name them)

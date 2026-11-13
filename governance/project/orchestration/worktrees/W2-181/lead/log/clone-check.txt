@@ -1,0 +1,22 @@
+=== w2/W2-157, clean (expect the real F4 passed) (HEAD: refs/heads/w2/W2-157 499543a836d3)
+heavy_slot: all 3 slots taken; waiting (2026-11-12 09:30:24)
+.......                                                                  [100%]
+7 passed, 2 deselected in 0.21s
+=== w2/W2-157 with src/gov/resources/slots_planted.py (expect the real F4 failed, naming it) (HEAD: refs/heads/w2/W2-157 e05b91d11c16)
+>       assert not outside, f"changed paths not matched by the ticket's allowed_paths {patterns}: {outside}"
+E       AssertionError: changed paths not matched by the ticket's allowed_paths ['src/gov/resources/backstop.py', 'src/gov/resources/command.py', 'src/gov/resources/config.py', 'tests/unit/resources/test_w2_157*', 'docs/changes/W2-157-evidence.md', 'docs/probes/DAEO-ozyt/**']: ['src/gov/resources/slots_planted.py']
+E       assert not ['src/gov/resources/slots_planted.py']
+
+tests/acceptance/W2-157/test_w2_157_nothing_else.py:140: AssertionError
+1 failed, 6 passed, 2 deselected in 0.22s
+=== w2/W2-121c with the same change (expect skipped, naming w2/W2-121c) (HEAD: refs/heads/w2/W2-121c e05b91d11c16)
+s......                                                                  [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-157/test_w2_157_nothing_else.py:131: F4 judges only the branch w2/W2-157; this is the branch w2/W2-121c: not judged here
+6 passed, 1 skipped, 2 deselected in 0.21s
+=== detached candidate merge of w2/W2-121c (expect skipped, detached HEAD) (HEAD: detached c500ad19c521)
+s......                                                                  [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-157/test_w2_157_nothing_else.py:128: F4 judges only the branch w2/W2-157; this is a detached HEAD: not judged here
+6 passed, 1 skipped, 2 deselected in 0.20s
+rc=0

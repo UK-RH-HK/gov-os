@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-124
+status: interim result 80ee394a8: W2-124 (DAEO-mb2t): the probe record (STANDARD review PASS at 7a3aecb38fb5; every revised case checked against a break of what it guards)

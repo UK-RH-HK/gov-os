@@ -1,0 +1,208 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 17:49:26)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+....................................................................F... [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+......sss............................................................... [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+.................F...................................................... [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+................................F....................................... [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+..............................sss....................................... [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+...................................F.................................... [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+...............................................                          [100%]
+=================================== FAILURES ===================================
+_ test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_on_the_path _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-45/pytest-of-usain/pytest-29/popen-gw5/test_the_environment_of_the_ru0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7bd8c9f80620>
+
+    def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_on_the_path(tmp_path, monkeypatch):
+        """Nothing but ``PYTHONPATH`` is set for the test run, and it is the project's ``src/`` alone: the caller's
+        is not passed on. Of the variables that speak to Python, the caller's are passed on only where they say
+        where installed packages are and where compiled files go (DEC-500)."""
+        seen = {}
+    
+        def fake_run(root, cmd, env, timeout=None):
+            seen.update(env)
+            return SimpleNamespace(returncode=0, stdout="1 passed in 0.01s\n", stderr="")
+    
+        for name in [name for name in os.environ if name.startswith("PYTHON")]:
+            monkeypatch.delenv(name)
+        places = {"PYTHONUSERBASE": "/base", "PYTHONPYCACHEPREFIX": "/compiled", "PYTHONDONTWRITEBYTECODE": "1"}
+        switches = {"PYTHONPATH": "/elsewhere", "PYTHONOPTIMIZE": "1", "PYTHONWARNINGS": "ignore",
+                    "PYTHONHOME": "/another", "PYTHONSTARTUP": "/a/file.py", "PYTHONNOUSERSITE": "1"}
+        for name, value in (places | switches).items():
+            monkeypatch.setenv(name, value)
+        monkeypatch.setattr("gov.close.command._started", fake_run)
+        before = {name: value for name, value in os.environ.items() if name not in switches}
+        _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
+>       assert seen == before | {"PYTHONPATH": str(tmp_path / "src")}
+E       AssertionError: assert {'AI_AGENT': ...sdk-cli', ...} == {'AI_AGENT': ...sdk-cli', ...}
+E         
+E         Omitting 59 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'PYTEST_ADDOPTS': '--timeout=600 --timeout-method=thread'}
+E         Use -v to get more diff
+
+tests/unit/close/test_run_and_record.py:99: AssertionError
+______________________ test_f3_the_test_hook_is_recorded _______________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+w = <test_w2_149_indep_launch.World object at 0x72f01b6d0890>
+
+    def test_f3_the_test_hook_is_recorded(w):
+        rc, plain, _ = w.launch(seed=1, dry=True)
+        assert rc == 0
+        m = json.loads((w.wall(plain) / "WALL.json").read_text())
+        log = (w.runs / "writer" / plain["run"] / "launch.log").read_text()
+        assert m["test_hook"] is False and "test_hook set" not in log
+        rc, hooked, _ = w.launch(seed=1, dry=True, extra={"GOV_INDEP_TEST_HOOK": w.hook("pass\n")})
+>       assert rc == 0
+E       assert 14 == 0
+
+tests/unit/orchestration/test_w2_149_indep_launch.py:950: AssertionError
+___ test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on ____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7bd8cab99430>
+
+    def test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on(rig):
+        rig.smi("15900, 24000")
+        rig.config()
+        named = rig.job()
+        other = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"], start_new_session=True)
+        rig.groups.append(other)
+        backstop.watch([named], rig.root, rig.env)
+>       assert rig.state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
+E       AssertionError: assert ('R' == 'T'
+E         
+E         - T
+E         + R)
+
+tests/unit/resources/test_w2_157_backstop.py:441: AssertionError
+_ test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_40_support.Project object at 0x7cdbfcc6f530>
+pushed = 'ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12'
+machine = <function machine.<locals>.make at 0x7cdbfc5be840>
+ci = <function ci.<locals>.run at 0x7cdbfc5be980>
+
+    def test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner(
+            project, pushed, machine, ci):
+        """``gov check`` itself reports the absent tool as YELLOW and ends with exit 0 (W1-26). The job does not
+        take that for green (DEC-494: never green; DEC-497 replaces "take the yellow")."""
+        done, statuses = _statuses(project, machine(openspec=False))
+>       assert done.returncode == 0 and statuses.get(OPENSPEC_CHECK) == "YELLOW", (
+            f"the fixture does not hold: gov check without openspec is not exit 0 with {OPENSPEC_CHECK} YELLOW: "
+            f"{statuses}\n{support.said(done)}")
+E       AssertionError: the fixture does not hold: gov check without openspec is not exit 0 with openspec-validate YELLOW: {'w1-40-g1': 'GREEN', 'w1-40-g2': 'GREEN', 'w1-40-g3': 'GREEN', 'openspec-validate': 'RED', 'skill-version': 'GREEN', 'readiness': 'GREEN'}
+E         exit 3
+E         --- stdout
+E         oducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "RED", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "w1-40-g1", "family": "schema/invariants", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "61f5ff73598bb86e"}}, {"id": "w1-40-g2", "family": "graph integrity", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "2c6c7f182e1b0573"}}, {"id": "w1-40-g3", "family": "retrieval regression", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "e720ac67030a9107"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "effa1fb1b598b109"}, "elapsed_s": 0.0, "time_limit_s": 60}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "f0baad50a8a767b3"}, "elapsed_s": 0.0, "time_limit_s": 60}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "ae6ca7bd3e4d1ef647d2085790c64ce8164f2e12", "check_version": "1.0.0", "inputs_hash": "bb182e6b43096fbb"}, "elapsed_s": 0.004, "time_limit_s": 60}], "time_limit_s": 60}}}
+E         
+E         --- stderr
+E         families with no registered check: index freshness, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: GREEN
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: RED
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: GREEN
+E           schema/invariants: GREEN
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert (3 == 0)
+E        +  where 3 = CompletedProcess(args=['gov', 'check', '--json'], returncode=3, stdout='{"ok": false, "command": "check", "result": {}...ion: GREEN\n  schema/invariants: GREEN\n  secrets indexing: YELLOW (no registered check)\n  skill regression: GREEN\n').returncode
+
+tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py:49: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-45/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3945469) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+4 failed, 4933 passed, 6 skipped, 6 warnings in 883.83s (0:14:43)

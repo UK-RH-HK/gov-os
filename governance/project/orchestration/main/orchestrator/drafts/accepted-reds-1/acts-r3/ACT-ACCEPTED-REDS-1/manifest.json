@@ -1,0 +1,38 @@
+{
+ "act": "ACT-ACCEPTED-REDS-1",
+ "dec": "DEC-1134, DEC-1125, DEC-757, DEC-862",
+ "author": "cto",
+ "claimed_class": "O",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/path-map.yaml",
+   "before": "1fe00f43d8ab564dc8383b859e9a6f93b9d01a40277557c0150364e520e6ff53",
+   "after": "e4281125cf0ecdd5e8af4edd9c8a2d43b8f4d4693ef05387250384dcb1ac3e47"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/path-map.yaml": "1fe00f43d8ab564dc8383b859e9a6f93b9d01a40277557c0150364e520e6ff53",
+  "after/repo/governance/project/path-map.yaml": "e4281125cf0ecdd5e8af4edd9c8a2d43b8f4d4693ef05387250384dcb1ac3e47",
+  "apply.sh": "4f55be7b72f0bfabfd2b4c26c743218986764a36cf508b17c3b53a9ab8481f55",
+  "list.txt": "17b359b1a7acf7c39db68d7f5b1bb32e284ce5ae95dc7c6fa7427d64a1758bf1",
+  "rehearsal.log": "52097d78c545f4f0bfe7b09369fd358124c97a52579376fd256c665914733bf1"
+ },
+ "checks": [
+  {
+   "cmd": "PYTHONPATH=src python3 -m gov.check.pathmap",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import yaml,sys; d=yaml.safe_load(open(\"governance/project/path-map.yaml\")); r=d[\"accepted_reds\"]; t=[\"tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95\",\"tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget\"]; sys.exit(0 if [e[\"test\"] for e in r]==t and all(e[\"decision\"]==\"DEC-1134\" and e[\"fixed_by\"]==\"W2-155\" and e[\"reason\"].strip() for e in r) and \"examin\" in d[\"evaluation_sets\"] else 1)'",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "52097d78c545f4f0bfe7b09369fd358124c97a52579376fd256c665914733bf1"
+ }
+}

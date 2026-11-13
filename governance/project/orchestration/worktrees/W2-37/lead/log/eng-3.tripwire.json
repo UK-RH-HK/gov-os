@@ -1,0 +1,49 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "82ddc705a41b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "82ddc705a41b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "03472cbf4506",
+   "after": "842a90615ea8"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "82ddc705a41b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37",
+   "change": "head",
+   "before": "64ccbd0cce44",
+   "after": "81f9d8c3d7bf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-37/test_w2_37_resume_findings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "acceptance folder",
+   "folder": "W2-37"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "acceptance folder",
+   "folder": "W2-88"
+  }
+ ]
+}

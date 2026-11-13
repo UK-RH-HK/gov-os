@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-080905.out
+Structural: after the landing of W2-157 (base d02e957ba35a)
+status: structural pass at e84e6c9cf7dc: NOTICE in mutation, links (7 of 9 families ok), 14.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 3 findings: .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since d02e957ba35a)
+links: NOTICE 1 new since d02e957ba35a204f5b76dac1f0ad5ce34b9b80d0 (1618 standing): UNKNOWN_ID tests/acceptance/W2-159 in DAEO-6lid's acceptance_tests.path | .tickets/DAEO-6lid.md:59 | orchestrator | write the tests at tests/acceptance/W2-15...
+structural pass at e84e6c9cf7dc: NOTICE in mutation, links (7 of 9 families ok), 14.3 s; a notice, not a refusal

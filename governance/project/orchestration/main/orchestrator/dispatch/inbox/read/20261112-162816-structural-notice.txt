@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-151606.out
+Structural: after the landing of W2-146 (base 1ef597a43909)
+status: structural pass at 235708808ce7 (the work tree differs from it at 2 tracked path(s): the working files were read): NOTICE in mutation, authority (8 of 10 families ok), 15.1 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 6 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+3 more)
+authority: NOTICE 1 finding: docs/changes/W2-176-CIT-P.md: the frontmatter is not valid YAML: mapping values are not allowed here in "<unicode string>", line 10, column 86: ... at 3b6c5c...
+pathmap: ok
+audit: ok
+skills: ok
+portability: ok [1 kernel role, skill, hook or .rulesync path(s) changed since 1ef597a43909]
+links: ok (0 new since 1ef597a43909dc1f284f6c443e57400c3cf9e4bf, 1688 standing)
+structural pass at 235708808ce7 (the work tree differs from it at 2 tracked path(s): the working files were read): NOTICE in mutation, authority (8 of 10 families ok), 15.1 s; a notice, not a refusal

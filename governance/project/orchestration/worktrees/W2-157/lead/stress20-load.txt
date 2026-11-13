@@ -1,0 +1,22 @@
+load: 7 busy loops on 1 CPUs (slot 3, cpus 13,14,15,16,17,18,19); pids 1444716 1444717 1444719 1444723 1444725 1444726 1444727
+run 1: exit 1; 15 s; 9 failed, 123 passed in 14.50s
+run 2: exit 1; 15 s; 5 failed, 127 passed in 14.30s
+run 3: exit 1; 17 s; 4 failed, 128 passed in 13.40s
+run 4: exit 1; 17 s; 4 failed, 128 passed in 15.74s
+run 5: exit 1; 19 s; 3 failed, 129 passed in 15.25s
+run 6: exit 1; 15 s; 4 failed, 128 passed in 14.41s
+run 7: exit 1; 19 s; 10 failed, 122 passed in 14.66s
+run 8: exit 1; 40 s; 4 failed, 128 passed in 35.69s
+run 9: exit 1; 14 s; 3 failed, 129 passed in 13.21s
+run 10: exit 1; 37 s; 2 failed, 130 passed in 32.89s
+run 11: exit 1; 17 s; 4 failed, 128 passed in 13.01s
+run 12: exit 1; 14 s; 3 failed, 129 passed in 12.58s
+run 13: exit 1; 16 s; 3 failed, 129 passed in 12.28s
+run 14: exit 1; 14 s; 3 failed, 129 passed in 13.70s
+run 15: exit 1; 18 s; 7 failed, 125 passed in 14.07s
+run 16: exit 1; 14 s; 5 failed, 127 passed in 13.75s
+run 17: exit 1; 15 s; 6 failed, 126 passed in 14.13s
+run 18: exit 1; 17 s; 4 failed, 128 passed in 13.34s
+run 19: exit 1; 39 s; 6 failed, 126 passed in 34.24s
+run 20: exit 1; 13 s; 5 failed, 127 passed in 12.36s
+done

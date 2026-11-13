@@ -1,7 +1,117 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-12 02:50 UTC: session `b2f0511f`; the owner sleeps until 08:00; next free id DEC-1142 (DEC-1141 `decee2eaf`)
-**Read the 01:10 block below too; this block replaces it where they differ.**
+## RESUME HERE — 2026-11-12 20:05 UTC (context 85 %): read `drafts/digest-0900-20261113-items.md` (the 09:00 digest's items).
+- **12:25 — HANDOVER TO THE FRESH CTO (the owner's order; session b2f0511f closes). READ THIS FIRST.**
+  - **State of integrate:** head 775b430cd. Today: nightly Node 22 (8f68e0c7c); W2-33 merged f6163461e + template d172bc71f + COPIES-6 36d1a151b (Role owner) -> W2-33 CLOSED 3ec28e859; HOURS-3 B 44a290a49 + d2431568a (owner), HOURS-3 A applied by the CTO (crontab every 10 min); S15-1 4be656e70 (owner) -> W2-148 CLOSED ae6537878; "until W2-56" line deleted from the 3 sources b88a76172 (the owner's recorded EXCEPTION (a) to the control-path rule: add "(the owner's exception (a), COPIES-8's review covers it)" to DEC-1163 (1) in the next register commit); DEC-1163 df9d442e8 (moved after DEC-1162 in 3ec28e859); ACT-LEADS-ADD-DIR-1 applied by the operator agent 008c4e6c0 (companion merged c0918f144); W2-182 (DAEO-5y8d) filed and widened (775b430cd). Next free id DEC-1164 (DEC-1164 is drafted, PROPOSED).
+  - **RUNNING (not stopped):** (1) the CTO's W2-111 form-B benchmark (`drafts/w2-111-bench/formB/bench.sh` -> bench.out, *.log, *.figs; its burners stop themselves by trap and timeout 1500 s): quiet 15/15 (at load 13), load20 14/15 (W2-57 RED: judged 172.5/138.8/104.0 ms vs 100, at measured load 20-37 with leads running), load20-planted 15/15 fail (good); load50 15/15 PASS (load 51-79), load50-planted 15/15 fail (good). BENCH ENDED 12:47 (burners stopped by its trap): so form B is red only for W2-57 at load 20-37 (1 of 15, all 3 rounds), green at load 50: a flaky margin on W2-57, not a load-proportional fault. Release W2-88a's land now (rename land.held-for-bench.txt -> land.txt). -> bring P-W2-111-MEASURE-1 back to the owner with the full figures (the owner chose (a) on run 2's figures, W2-57 76 ms at load 50; now W2-57 fails). Do NOT land W2-111 (DONE at 3da7242f4461) until the owner re-decides. (2) Leads: W2-88 run4b (11:14, critical path: resume + eng-3 relaunch + review round 2, the last), W2-37 resume (11:25: F1 (a) + P-1 change-skill section -> returns PACKAGES with a CIT-P for the owner), W2-182 run1 (11:48; started BEFORE its widening by W2-128 row 8 (line F): if its return lacks F, run 2 takes it). All three started BEFORE ACT-LEADS-ADD-DIR-1: they rely on settings.local.json additionalDirectories. (3) Helpers of the old session (they die with it; re-run if their file is missing): sandbox package -> drafts/sandbox-package-20261113.md (DONE 12:45, sent to the owner as a file: recommends (b) keep the sandbox and fix its frictions; NOTE DEC-1163 (9)'s cache ACT will NOT restore ranked search: the socket is refused too, only allowAllUnixSockets ranks; without the reranker hit@5 on the 138 drops 107 -> 95, MRR 0.5567 -> 0.4867; 399 sandboxed searches fell back unranked); review of ACT-DISPATCH-NIGHTLY-SLOT-1 -> reviews/act-dispatch-nightly-slot-1.md.
+  - **HELD LANDINGS:** `dispatch/land.held-for-bench.txt` = W2-88a=c79a20f1fa69 (pre-check passed, kernel gate ok, its CIT-P approved at ba400b94e738 = DEC-1163 (8)): rename to land.txt once the bench ends (load spoils the land's timing cases). W2-111 (3da7242f4461): held for the owner (above). Commit only between lands (the queue's 3-move limit).
+  - **REVIEWS:** COPIES-8 PASS (acts/ACT-CLAUDE-COPIES-8/review.md, manifest e2fc9815) and COPIES-7 PASS (acts/ACT-CLAUDE-COPIES-7/review.md, 78de1c5f): both yes lines given to the owner, not yet answered. DISPATCH-NIGHTLY-SLOT-1 (9ff4f275): review PASS 12:40 (reviews/act-dispatch-nightly-slot-1.md, class b, 0 blocking): copy it to acts/ACT-DISPATCH-NIGHTLY-SLOT-1/review.md, delete the bundle's two __pycache__ folders (F1: G1 would refuse them; the manifest sha256 is unchanged), then bring the owner `yes ACT-DISPATCH-NIGHTLY-SLOT-1 9ff4f275`; F2 (the builder retried a guard-crash refusal from a script file) and F3 (fails closed if the nightly's runs folder moves) are rows.
+  - **WAITING ON THE OWNER (each brought, unanswered):** (1) handover message 4 (the owner's operator starts the fresh CTO) then MESSAGE 5 (remove permissions.additionalDirectories) ONLY when the /proc check (acts/ACT-LEADS-ADD-DIR-1.package.md §5) prints no "NO add-dir" line, i.e. after W2-88 run4b, W2-37 and W2-182 runs end; push the owner then. (2) `yes ACT-CLAUDE-COPIES-8 e2fc9815` -> queue ~/gov-os-operator/queue/ACT-CLAUDE-COPIES-8.req ("ACT-CLAUDE-COPIES-8 <full sha256>", act-in-progress absent, no land running). (3) `yes ACT-CLAUDE-COPIES-7 78de1c5f` -> hand merge refs/heads/w2/W2-98 (head ab2d4fdc9e13: approval line written; kernel hashes in tools/kernel-approved.txt; gate ok; merge clean; Task: DAEO-wi46, one command), then queue COPIES-7 at once; then close W2-98. (4) `yes DEC-1164` (drafts/dec-1164-dif-supersede.md, sent to the owner as a file): record with its 30 marks in one commit, then the owner's operator's prompt edit (§4). (5) The context ceiling's scope: "add the supplementary cap" or "close-only" -> file the ticket (draft not yet written: a close-only key budgets.close_context_tokens in facts.yaml read by gov close's _build_context, command.py:261; plus, if chosen, the supplementary cap at 6,000 above the mandatory part in gov context). (6) The workers' sandbox decision (package from the helper; the sandbox-cache item waits on it: the reranker's Unix socket is refused even with ~/.cache/gov-os writable; only allowAllUnixSockets works; DEC-1114/W3-P28). (7) P-W2-111-MEASURE-1 again (above). (8) Later: W2-37's CIT-P (when its resume returns); W2-60a's merge after message 5 (its launch was LAUNCH_BLOCKED on P-1).
+  - **AFTER THE OWNER'S WALLED WORDING (committed 3ec28e859):** W2-93, W2-94, W2-15a can start (ACT-EXAMIN-WRITERS-INSTALL-1 applied ba27e4c0d): W2-93 waits for W2-81's merge; W2-94 by the walled writer (drafts/examin-sets/FOR-THE-OWNER.md order: the launch clone by exact path, then the writer launch; the owner's release step after).
+  - **OTHER OPEN:** nightly drift reds -> W2-182; W2-128 row 8 + W2-152 S10 red until W2-182 line F lands and COPIES-8 is applied; 4 W2-153/adapters reds until COPIES-8; the scoped gov close refuses CTO-committed probe records (VERDICT_NOT_REVIEWER): closes by DEC-953 practice; the main store lacked DEC-1150 (rebuild ran 11:45 in new_worktree; check gov context DAEO-pg6i).
+  - **Watchers:** stopped at 12:26 by the owner's order (sentinel_check, bare_watch, store_refresh_daily, usage_log, usage_lines, helper_watch, refused_starts, measure loop, inbox waiter) and the session crons deleted (the 09:00 morning package daily at 09:02, the 18:00 evening digest daily at 18:02): RE-ARM ALL in the fresh session (list in the 09:00 handover block below).
+- **12:25:** W2-33 CLOSED (3ec28e859), W2-148 CLOSED (ae6537878). HOURS-3 A applied. ACT-LEADS-ADD-DIR-1 applied by operator (008c4e6c0): owner pushed for MESSAGE 4 (fresh CTO); MESSAGE 5 after the leads started before 11:50 end (W2-88 run4b 11:14, W2-37 11:25, W2-182 ?) -> /proc check then push. W2-182 filed+released (DAEO-5y8d). LANDS HELD: dispatch/land.held-for-bench.txt (W2-88a=c79a20f1fa69) until the W2-111 formB bench ends (drafts/w2-111-bench/formB/). FORM B FAILS W2-57 at load 20-37 (judged 104-172 ms all 3 rounds): bring to the owner with the full bench (P-W2-111-MEASURE-1 basis changed). Reviews running: COPIES-8 + COPIES-7, DISPATCH-NIGHTLY-SLOT-1; sandbox package helper (drafts/sandbox-package-20261113.md). Owner pending: yes DEC-1164 (file sent), context-ceiling scope, sandbox decision.
+- **11:40 — OWNER'S OPERATOR SITTING (by hand): COPIES-6, then HOURS-3 Part B (2 commits), then S15-1.** log/act-in-progress.txt WRITTEN: NO commit, NO land, NO tracked edit in the main tree until all commit ids are reported. Done before it: nightly Node22 8f68e0c7c; W2-33 merged f6163461e + template d172bc71f; UNTIL line deleted b88a76172 (owner's exception (a), COPIES-8 review covers it); DEC-1163 df9d442e8 (W2-37 widened + F1); W2-88 run4b, W2-111 run3, W2-37 resume released; W2-88a hash in kernel-approved (gate ok, c79a20f1fa69).
+  - **AFTER THE SITTING, in order:** (1) remove log/act-in-progress.txt; (2) W2-33 checks (acceptance W2-33, W1-33, W1-38, W2-153, tests/unit/adapters, kernel gate) + close W2-33; (3) HOURS-3 Part A (`bash acts/ACT-OPERATOR-HOURS-3/apply.sh A check/apply/verify`, not at :x0); (4) S15: narrow re-judge of PR-DAEO-xafn.md S15 -> close W2-148; (5) commit: walled wording (`python3 -I drafts/new-tickets/walled-wording.py` from repo root) + file W2-182 (drafts/new-tickets/W2-182.md via tk create, then fill) + the context-ceiling ticket (after the owner's word on the supplementary cap) in one commit; start W2-93, W2-94, W2-15a, W2-182; (6) land.txt: W2-88a=c79a20f1fa69 (land.py --check first); (7) handover: companion commit on w2/W2-153 (test designer helper) -> hand merge -> queue ~/gov-os-operator/queue/ACT-LEADS-ADD-DIR-1.req ("ACT-LEADS-ADD-DIR-1 <full sha256>") with act-in-progress absent -> owner's messages 4 and 5 after the /proc check.
+  - **Helpers running:** COPIES-8 build (both forms), COPIES-7 build, sandbox-cache + dispatcher ACTs build, DEC-1164 DIF draft, W2-153 companion (test designer).
+- **09:55:** W2-88 LEAD DIED 09:49 (API 403 Cloudflare); eng-3 ALSO DIED ~09:55 (403); test session 10:00 OK = transient; part brief updated to relaunch eng-3 once. Resume brief briefs/W2-88-A5-run4b.part.md READY but gov brief REFUSES UNTIL_CLOSED W2-56 (kernel template role-lead.md:27, role-cto.md:21 line "until W2-56"): P1 to the owner (digest 38): (a) delete the line (CIT-P), or (b) reopen W2-56. W2-88 ready line commented out. On (a): edit both kernel templates, kernel-approved.txt hashes, commit, then gov brief lead DAEO-2bdu --run build --part briefs/W2-88-A5-run4b.part.md > briefs/W2-88-A5-run4b.md, release_lead W2-88 ... W2-88-A5-run4b.json.
+- **09:02:** W2-111 run 2 PACKAGES: P-W2-111-MEASURE-1 to the owner (digest item 37, pushed); on (a): next lead run merges w2/W2-111-tests (a5bf1c013) + gov accept, then re-run drafts/w2-111-bench/bench.sh, land.
+- **09:00 — HANDOVER STATE (for a fresh CTO; DEC-1140 (4), DEC-1161 (2)).** Digest SENT 08:58 (drafts/digest-0900-20261113.md, --mark done, owner pushed). Read the digest's section A (the owner's lines) and C (packages) first.
+  - **On the owner's lines:** (1) `yes NIGHTLY-NODE22 bdfdc24b` -> `git apply drafts/nightly-path-fix/node22.diff` in the main tree, commit (Task: DAEO-sdxk, Role: orchestrator, Implements: DEC-1159, DEC-781, Decided-by: owner), BEFORE 04:00. (2) `go W2-33` -> empty land.txt (queue held), `git merge --no-ff refs/heads/w2/W2-33` (head 82da49202ab1; re-check the head) with Task: DAEO-lrre in one command; `bash drafts/claude-copies-6/template-patch/apply.sh` + commit; push the owner READY; the owner's operator applies COPIES-6 (package §4); checks (W2-33 acceptance, W1-33, W1-38, W2-153, tests/unit/adapters, kernel gate); close W2-33; restore land.txt. (3) HOURS-3: the owner's operator applies Part B, then the CTO Part A (acts/ACT-OPERATOR-HOURS-3). (4) S15 after HOURS-3 B; then a narrow S15 re-judge on docs/probes/DAEO-xafn/PR-DAEO-xafn.md and close W2-148. (5) LEADS-ADD-DIR-1: the companion commit on W2-153's branch (acts/ACT-LEADS-ADD-DIR-1/companion-tests.diff + followup-tests.diff), merged by the CTO; the operator applies; the operator starts the fresh CTO (tmux, --add-dir ~/gov-os-worktrees --add-dir ~/gov-os-runs, --remote-control); remove permissions.additionalDirectories from .claude/settings.local.json only when the /proc check shows no "NO add-dir".
+  - **Leads:** W2-88 run 4 (critical path; review round 2 next; any package to the owner at once); W2-111 run 2 (its own load bench; then re-run drafts/w2-111-bench/bench.sh against its head, then land).
+  - **Owner decisions pending:** C1 D, E and the route for 5 drift reds; C8 CIT-Ps (W2-98, W2-88a); C9 W2-37 F1/P-1; C10; C12; C13; C14; C15; C16 (walled route).
+  - **Background loops to re-arm in a new session:** inbox_wait_quiet.sh, sentinel_check.sh, bare_watch.sh, store_refresh_daily.sh, usage_log.sh, usage_lines.sh, helper_watch.py, refused_starts.py, measure_week record loop.
+  - **Records:** next free id DEC-1163 (START-NEXT-SESSION.md still says DEC-1160: fix it at the next commit). Closes go by DEC-953 practice (tk close + closes/<W2>-<id>.md + one commit), commit only between lands.
+- **07:30:** DIGEST DRAFTED: drafts/digest-0900-20261113.md (A lines, B numbers, C1-C18); report-state countdown refreshed. At 09:00: status_block --countdown, the digest, status_block, --mark. Then the handover (C7 order).
+- **07:30:** ACT-LEADS-ADD-DIR-1 round-2 PASS (review.md in place; r1 moved to acts/ACT-LEADS-ADD-DIR-1.r1-b6923ccc/); owner line `yes ACT-LEADS-ADD-DIR-1 1781a708` at 09:00 (handover).
+- **07:27:** W2-56 CLOSED (1c02c490f). Merged-not-closed now: W2-61h, W2-32, W2-134, W2-138, W2-137, W2-136, W2-147, W2-145, W2-148, W2-116.
+- **07:25:** ACT-LEADS-ADD-DIR-1 rebuilt (1781a708); round-2 review running -> reviews/act-leads-add-dir-1-r2.md -> copy to acts/ACT-LEADS-ADD-DIR-1/review.md on PASS.
+- **07:21:** nightly fix NOT committed: class (b) amendment of ACT-NIGHTLY-RESTART-1 -> patch drafts/nightly-path-fix/node22.diff (bdfdc24b), check PASS (check.md); owner line `yes NIGHTLY-NODE22 bdfdc24b` (digest 34) -> on yes: git apply + commit (Role orchestrator, Implements DEC-1159 DEC-781, Decided-by owner) before 04:00. W2-111 bench DONE (3/15 red at load 20 and 50); run 2 RELEASED (test-design round 2, briefs/W2-111-A5-run2.md).
+- **07:12:** NIGHTLY RED 99 EXPLAINED (drafts/nightly-20261113-analysis.md): 94 = Node 18 on the nightly PATH (openspec absent -> RED since W2-45); fix in main tree UNCOMMITTED (nightly_cron.sh, nightly_restart.sh -> node v22.23.3; nightly_alone.py node_of) -> narrow check running (drafts/nightly-path-fix/check.md) -> on PASS commit (Role: orchestrator, Implements DEC-1159 DEC-781) BEFORE 04:00. Rest: digest item 34 (B,C,R revisions route + D, E owner). W2-111 bench: load20 3 FAIL (CPU time rises with load: SMT) -> W2-111 test-design round 2 after bench.
+- **06:55:** ACT-LEADS-ADD-DIR-1 review r1 FAIL (packaging F1/F2; acts/.../review-round-1.md); rebuild helper running, then round 2 review (fresh auditor) -> new yes line.
+- **06:45:** W2-142 CLOSED (829282dbd; adoption count first reading in its evidence, tools/adoption_count.py, re-run ~11-21). ACT-LEADS-ADD-DIR-1 review helper running (acts/ACT-LEADS-ADD-DIR-1/review.md).
+- **06:37:** W2-111 benchmark RUNNING (drafts/w2-111-bench/bench.sh -> bench.out, *.log, *.figs; quiet, load 20, load 50, planted at both; burners by -pgid). Helpers: W2-142 adoption count (tools/adoption_count.py -> log/adoption/20261113.*), W2-56 close review (drafts/w2-56-close/PR-DAEO-wnnz.md, incl. GOV_W2_56_REAL + gate (a)), nightly reds analysis.
+- **06:35:** deadman wake. NIGHTLY RED 99 (log/nightly/20261113-0404/run.txt; last night 15); many red-alone incl. W2-66 close cases: suspect W2-154 (landed 02:20). Analysis helper running -> drafts/nightly-20261113-analysis.md. S15 ACT review PASS (review.md written). STILL TO DO: W2-111 load-50 benchmark (run_real.sh in W2-111 worktree, slots free now), W2-56 close probe + real cases, W2-142 S3 reading, the 09:00 digest (items 1-32) + handover.
+- **05:36:** W2-88 run 3: review r1 FAIL (3 blockers); P-W2-88-B-1 decided by me (94132594a), run 4 RELEASED (fixes + round 2, the last). S15 ACT review running (acts/ACT-W2-148-S15-1). Nightly running.
+- **04:58:** deadman wake handled. Nightly RUNNING since 04:04 beside leads (cap 12 GiB, 16 workers, slots held 04:32). W2-113 CLOSED (cb208f943). W2-145 S7 recorded (335c8f3c5) + finding: sandboxed workers' searches unranked (read-only ~/.cache/gov-os), digest item 29. W2-148 S15 ACT helper running (acts/ACT-W2-148-S15-1). After the nightly (~05:30): W2-111 load-50 benchmark (run_real.sh in W2-111 worktree), W2-56 close probe + 4 GOV_W2_56_REAL cases. Still waiting on the owner: go W2-33, W2-98 CIT-P, HOURS-3 yes, W2-37 F1.
+- **03:26:** W2-33 hand-merge check DONE (log/hm-W2-33.out): merge clean, kernel gate ok, W2-33 acceptance 96/96, tests/unit 4530 passed + 2 failed (the W2-153 adapters cases the copies ACT fixes). HOLDING the merge for the owner's "go W2-33" (pushed 03:26) so integrate is never in the copies window during the nightly. On "go": git merge --no-ff refs/heads/w2/W2-33 (Task: DAEO-lrre trailer, one command), template-patch apply + commit, push READY, operator applies COPIES-6, checks, close W2-33, restore land.txt (W2-113 only). If no answer: at 09:00.
+- **02:35:** W2-33 DONE at 82da49202ab1 (narrow check PASS). land.txt HELD (moved to dispatch/land.held-for-w2-33.txt: W2-154 then W2-113) until the hand merge: after W2-154's land ends: hand merge W2-33 + template commit, push the owner READY, owner's operator applies COPIES-6, checks, close W2-33; then restore land.txt with W2-113 only.
+- **02:32:** operator ACT HOURS-3 review PASS (acts/ACT-OPERATOR-HOURS-3/review.md); package yes line fixed to 716da9dc; pushed the owner (Part B by the owner's operator first, then Part A by the CTO). Copies ACT: the owner said yes (02:20); hand-merge plan + operator message given.
+- **02:25 — STATE FOR A FRESH CONTEXT (session b2f0511f, context 85 %).** Owner decided tonight (recorded): DEC-1156 to DEC-1161 (no holds; emergency lifted; nightly beside leads + min 7.5 GiB; W2-33 CIT-P approved C0 Haiku low; P-W2-98-R2 (a); W2-60a P-1 at handover). NOT YET RECORDED: owner 02:20 **W2-141 (a)** (close as built, switch-on parked as a DECIDED-NOT-DONE row under DEC-1128 (2)) and **`yes ACT-CLAUDE-COPIES-6 85c9b1c7`** -> record both in DEC-1162 (commit BETWEEN lands only: my commits stopped W2-154's land once, the queue's 3-move limit).
+  - **W2-33 hand merge tonight (owner wants it):** (1) wait: the land of W2-154+W2-113 (land.txt has both; W2-154 alone started 01:54, may refuse; then both) and W2-33 run 4 DONE (its head 9ace61e8c has the W1-33 revisions and the approval line; lead w2-33-bc doing the narrow check); (2) CTO: hand merge w2/W2-33 into integrate (tools/hand_merge_check.sh, kernel gate passes: kernel-approved.txt has its 10 hashes), then the template commit: bash drafts/claude-copies-6/template-patch/apply.sh (read it) and commit (Role: orchestrator); (3) owner's operator applies COPIES-6 by hand (message given 02:25: acts/ACT-CLAUDE-COPIES-6.package.md §4, Role: owner); (4) CTO: checks (W2-33 acceptance, W1-33, W1-38, W2-153, tests/unit/adapters, kernel gate), close W2-33 (tk close + close record). Hold land.txt empty during it; leads not merging integrate meanwhile.
+  - **Closes overnight (owner: close each when ready):** CLOSED W2-91, W2-131, W2-13, W2-135, W2-133. Next: W2-141 (a) now (record + row), then W2-138 after W2-116; W2-134 after W2-61h; W2-147 after W2-136 (S10 revision decided mine, waits W2-128); W2-137 after W2-32 (fresh probe + closes with W2-15a); W2-145: S7 samples TAKEN 02:05 (no rerank_worker from pin; service pid 32310 holds gpu-0, watcher 31778 gpu-1; rerank.log since 11-12: 3583 MEMORY, 55 FALLBACK = sandboxed workers' read-only ~/.cache -> unranked (a finding for 09:00); gov status fallbacks 104, service_refusals 32) -> write into docs/changes/W2-145-evidence.md, then closes after W2-32/W2-137; W2-142 S3 adoption count reading; W2-56 close probe + 4 GOV_W2_56_REAL cases; W2-148 S15 option-2 ACT (CTO builds, owner yes); W2-116 pass 2 (lead, deps W2-60b/W2-33); W2-153 after W2-33 + copies. Report: drafts/closes-20261113.md. Update log/report-state.json lists as they close.
+  - **Running helpers:** operator ACT HOURS-3 review (manifest 716da9dc) -> on PASS write acts/ACT-OPERATOR-HOURS-3/review.md, push the owner the yes line; leads --add-dir ACT builder (drafts/leads-add-dir, for 09:00).
+  - **Leads:** W2-88 run 3 (critical), W2-33 run 4, W2-98 run 4, W2-37 resume, W2-111 (benchmark at ~05:30 after the nightly, mine), W2-60a waits handover, W2-155 done (option 5 applied; closes after W2-138, W2-145).
+  - **Nightly 04:00:** beside leads (60917fb0d, 9ad3bf742) + min 7.5 GiB (7840781dd). Compare against 11-12 05:00 reds in the digest.
+  - **09:00 digest:** drafts/digest-0900-20261113-items.md (items 1-25); then the handover (DEC-1140 (4), DEC-1161 (2): leads' --add-dir ACT, fresh CTO by the operator with --add-dir x2 + --remote-control, then remove additionalDirectories).
+- **02:10:** CLOSED overnight so far: W2-91 (1636c4c73), W2-131 (ba243869f, S4 live check), W2-13 (04f2ef40e), W2-135 + W2-133 (03472cbf4). LESSON: my commits moved integrate 3x during W2-154 land -> queue STOPPED (3-attempt limit); batch close commits BETWEEN lands. W2-113 landing (01:51); W2-154 re-queued (land.txt). Close check done: drafts/closes-20261113.md (19 rows). Operator ACT rehearsal done: manifest 716da9dc -> needs independent review then push. Copies ACT review PASS, pushed 02:00 (yes ACT-CLAUDE-COPIES-6 85c9b1c7). W2-155: 48k measured slower, reverted -> option 5 likely.
+- **01:56:** owner: close each merged-not-closed ticket as the check finds it ready (no list hold); push the owner only for one needing a decision. Watcher on drafts/closes-20261113.md ROW ... CLOSABLE NOW lines. Close form: governance/project/orchestration/closes/<W2>-<id>.md (W2-129 form) + tk close <id> + one commit per batch; update log/report-state.json merged_not_closed. Push the owner when the copies ACT review passes and when the operator ACT is ready; else 09:00.
+- **01:45:** Owner: close every merged-not-closed ticket that needs nothing more (16 open of the hand list of 21 + W2-116; W2-56, W2-153 to check). Close-check helper running (worktree W2-00-closecheck, report drafts/closes-20261113.md, stops new runs 03:45). Then: write close records (governance/project/orchestration/closes/<W2>-<id>.md, W2-129 form), tk close, commit in one batch; update log/report-state.json merged_not_closed. W2-88 run 3 build released (TD-1 decided a8b0a9a41). W2-154 landing.
+- **01:32:** NIGHTLY READY for 04:00: beside leads (60917fb0d, 9ad3bf742) + min 7.5 GiB (7840781dd), 3 narrow checks PASS. DEC-1160 (dac5dcf7b): W2-33 CIT-P approved, C0 Haiku low; kernel-approved.txt +10 (gate passes on w2/W2-33); W2-33 run 4 told (w2-33-bc) to write the approval line. W2-120 CLOSED. W2-60a LAUNCH_BLOCKED: P-1 (settings.local.json additionalDirectories) to the owner, P-2..P-4 decided (aa25fea54), its merge in progress in the worktree (do not touch; backup merge-r4/). W2-98 P-W2-98-R2 to the owner. Copies ACT helper (COPIES-6) and operator ACT rehearsal (bjupkceyd) running.
+- **01:15:** nightly beside leads COMMITTED 60917fb0d + 9ad3bf742 (F5/F2), review PASS x2; memory minimum (needs 12 GiB, 11.8 now) with the owner (a)/(b)/(c) -- if (a): NR_CAP_MIN_MB default 7680 in nightly_restart.sh:54 + narrow check + commit before 04:00. DIF/SNS committed fb96ea563. W2-120 queued. W2-33 DONE -> CIT-P to owner (pushed), run 4 (W1-33 revisions) running, copies ACT helper building (acts/ACT-CLAUDE-COPIES-6), then hand merge. ACT-OPERATOR-HOURS-3 built (yes line will change after the full rehearsal running in background), then independent review, then push the owner.
+- **00:45:** Owner 00:30: nightly (a) [draft built drafts/nightly-beside-leads, rehearsal 75/0, independent review RUNNING: on PASS commit after/ files to governance/project/orchestration/nightly/ + packages/ACT-NIGHTLY-RESTART-1/test_nightly_restart.sh, BEFORE 04:00]; DEC-1158 + DEC-1159 committed 75fcf97b0; W2-155 run 2 (option 1) released; §0 edit drafted (drafts/PROMPT-s0-dec1158.md) for the owner; DIF/SNS helper drafting (drafts/*.next.md); plan check stays parked (plan_check.py not in W2-60a paths); ACT-OPERATOR-HOURS-3 helper building.
+- **00:22:** W2-121b CLOSED (a65961bc6). W2-154 S4 (a): widened (df8ba7007), run 4 released. Plan check parked W3-P35. W2-111 tests DONE (benchmark pending, few-leads window). W2-155 PACKAGES to the owner. ACT-OPERATOR-HOURS-3 helper building (Part A crontab b, Part B G9 O); then independent review, push the owner ~01:30. Packages re-sent 00:20: nightly (a)/(b)/(c) [time-critical, 04:00], W2-155 PKG-1, ACT, emergency lift (DEC-1158 draft).
+- **23:58:** DEC-1157 (931281df5) APPLIED: config.json (no max_leads, cpu_band [0,1000], empty night window), night_hold.py stopped, heavy_slot.sh (wait log + PRIO_CAP 2, tested), tools/refused_starts.py running (bv3hh6yk0), tools/gate-config.json working_kb 786432 (was the old 2,140,236: DEC-1149 (2) miss). Released: W2-113 run 3 build, W2-60a run 4 (integrate merge in progress: 1 conflict for its engineer), W2-155 run 1. W2-121b queued behind W2-160. DIF sweep helper running -> drafts/dif-sweep-20261113.md. W2-154 S4 brought to the owner. Operator cron still reads night-hold state after 03:10 (ACT to the owner).
+- **23:33:** W2-181 CLOSED (319f9613e). Commit 085b4391c in the gap (W2-88 Interface, W2-33 W1-35 path, W2-111 claim); W2-88 and W2-33 leads told by SendMessage (w2-88-57, w2-33-a1). W2-160 landing. W2-113 tests DONE 91e9d55f6950: PKG-3 (A0 tk-missing default) PUSHED to the owner, (b) recommended; readings 1, 6, 7 confirmed by me. W2-111 worktree building (bvp639xb0): then brief (LITE test revision, C1) and release. Queue W2-121b after W2-160.
+- **23:27:** W2-88 PACKAGES (interface): P-W2-88-IF-1 (a) decided by me; run 2 RELEASED working from its package file. UNCOMMITTED in the main tree: .tickets/DAEO-2bdu.md (Interface) + .tickets/DAEO-lrre.md (W1-35 path): COMMIT at the next land gap (after W2-181), then tell W2-88 (merge integrate) and W2-33 (W1-35 revision).
+- **23:24:** W2-98 run 3 build started 23:20; W2-33 tests DONE (3df1ac2deb1b), run 3 build RELEASED. AT THE NEXT LAND GAP: add tests/acceptance/W1-35/test_w1_35_orchestration.py to DAEO-lrre paths (DEC-1156 (7): old-layout cases :205, :259-268, :353) and tell W2-33's lead; W2-33's land needs the copies ACT paired (W1-33/W1-38 kernel==generated). W2-88 started 23:18.
+- **23:20:** W2-160 DONE (54a64edbaa79, narrow check PASS) QUEUED behind W2-181; W2-154 DONE (ae1d68394752) land HELD for S4 (owner 09:00, or now). W2-88 RELEASED (line before W2-120). After W2-181+W2-160: claim W2-111, queue W2-121b.
+- **23:16:** W2-172 CLOSED (ccd6056b2). W2-88 claimed (32d10098b, with W2-181's review record); worktree building (brpo1aqsq); then `gov brief lead DAEO-2bdu --run tests --part briefs/W2-88-A5-run1.part.md`, release, and put its line BEFORE W2-120's (first free slot; cap 5 full: W2-154, W2-160, W2-33, W2-98, W2-113). W2-181 landing (from 23:15). After it: claim W2-111 (LITE test revision, deps closed), queue W2-121b=6e10493a5f8e. W2-155 refused by gov launch's plan check (waits_on W2-138/W2-145 merged, not closed): the owner's row 15. Inventory sent 23:00 (drafts/lead-delay-inventory-measure.md); owner to choose rows.
+- **22:56:** W2-181 narrow check PASS; record governance/project/orchestration/reviews/W2-181-fix-check.md (UNCOMMITTED: commit after the lands); W2-181=499543a836d3 in land.txt behind W2-172.
+- **22:52:** DEC-1156 committed (7d8c2d524): five packages decided; W2-181 unparked; W2-159 F4 to W2-160 run 3; standing (7) CTO fixes own-branch path cases + decided-behaviour revisions under a narrow check, (8) at night bring every lead-stopping decision until the owner says asleep. W2-172 narrow check PASS, record d23959592, LANDING since 22:50. Released: W2-160 run 3 (started 22:51), W2-33 run 2, W2-98 run 2, W2-113 run 2, W2-120 run 2 (cap 5: W2-120 waits). W2-181 narrow check running (pid 549720, briefs/W2-181-fix-check.md): on PASS commit its record on w2/W2-181 as docs/probes/DAEO-ywb5/PR-DAEO-ywb5.md (check the probe folder is in its paths!), queue after W2-172. W2-88: when W2-172 CLOSED, claim + worktree + brief (part ready) before 03:00, and give it the first free slot (comment W2-120 out if needed). The inventory helper writes drafts/lead-delay-inventory-measure.md: then the owner's table.
+- **22:35:** W2-172 run 3 DONE at 25634cdde460; narrow fix check (Opus, read-only) launched: on PASS commit its record as docs/probes/DAEO-p8tv/PR-DAEO-p8tv.md on w2/W2-172 (the older to -round-1.md), land.py --check W2-172, land.txt; then W2-88 when CLOSED (before 03:00).
+- **22:30:** W2-154 tests DONE (f6dbab76b), run 3 build RELEASED (S1-S3; S4 to the owner, item 18). W2-160 PACKAGES (review PASS; ROUTE-1 widening + W2-159 F4 red: item 17, owner). Leads: W2-172 run 3, W2-154 run 3.
+- **22:20:** W2-158 CLOSED (977b44852). Queue empty: next W2-172 after run 3 + narrow check.
+- **22:00:** W2-45 CLOSED (5199a07df). W2-154 interface committed (8107e7b69), run 2 RELEASED. W2-158=23acb63611bc QUEUED. W2-120 PACKAGES: P-W2-120-1 to the owner (digest item 16), its ready line commented out. Next after W2-158: W2-172 when its run 3 + narrow check pass.
+- **21:55:** W2-154 PACKAGES (interface): P-W2-154-1 (a) written into DAEO-l4gf (UNCOMMITTED in the main tree): after W2-45's land ends commit it, then `gov brief lead DAEO-l4gf --run tests --part briefs/W2-154-A5-run2.part.md` > briefs/W2-154-A5-run2.md, release_lead W2-154 ... W2-154-A5-run2.json; then queue W2-158.
+- **21:45:** W2-121b EJECTED 21:37 by W2-157's F4 (the sweep's Defect A; fix on parked W2-181: owner at 09:00, digest item 8/13). Queue: **W2-45=5e53394ce9bc landing (21:41)**, then W2-158 (`23acb63611bc`, no resources path). Claimed (cf4e4fa9f) W2-120 and W2-154 (C2): RELEASED 21:50 (logs W2-120-A5-run1.json, W2-154-A5-run1.json). W2-155 NOT startable (waits_on W2-138, W2-145). Sweep saved: drafts/ejection-sweep-20261112.md. Leads: W2-172 run 3 (critical), W2-160.
+- **Queue (one per batch, land.txt):** W2-115 queued at `cb4510513637` (fix check PASS committed as its probe record; pre-check
+  passes); then **W2-124 at `80ee394a89cb`** (DONE, review PASS, probe record committed; pre-check passes); then W2-158
+  (`git rev-parse --short=12 refs/heads/w2/W2-158`). **W2-121b REFUSED** at `b24361b5159e`: its review passed at
+  `dae1c10e0392` and the config default (DEC-1149 (2)) rode after it (DEC-802), so no passing record at head: a P1 package for
+  the 09:00 digest (options: a narrow check like P1-M (a); or land `4a8634017` without the default and move the line; the
+  owner decides). Every land: run `tools/kernel_gate.py --repo .. --branch refs/heads/w2/<W2>` first (land.py also does).
+- **Leads (ready.txt):** W2-172 run 2 (critical path; build), W2-88a run 2 (skill text + CIT-P: its CIT-P to the owner before
+  merge), W2-45 run 4 (F1 fix + W1-40), W2-160 run 1b (gov wait tests). W2-124 done.
+- **Background:** the dry-run helper (EXAMIN copy's first gov check) writes `/tmp/claude-1000/examin-dryrun/FINDINGS.md` for
+  the digest. The inbox waiter: re-arm after every item (`tools/inbox_wait_quiet.sh`).
+- **Tonight:** no new lead run after 03:00; the nightly at 04:00; push the owner only for a P1 blocking EXAMIN's path (e.g.
+  W2-172's final review failing). Runaway brake false trips: clear with the right projection (`spend.py clear`).
+- **To record next (after the running land):** DEC-1154, the owner's standing rule (20:10): a change the owner decided, added to a ticket after its review, gets a narrow independent check of that change without asking; the ticket lands on it (memory narrow-check-after-review). W2-121b's check launched 20:10 (`briefs/W2-121b-default-check.md`, log in W2-121b's lead log): on PASS commit its record as PR-DAEO-ifgf.md (older to -round-N), land.py --check, queue it tonight.
+- **21:45 free slots:** 3 free (W2-160, W2-172 run). Startable off-path (deps closed): W2-120, W2-154, W2-155 (W2-111 needs load-50 runs: not tonight). Claim them after W2-121b's land ends (a commit restarts it), before 03:00; each needs class C2, a probe folder, a worktree and an interface-check-first brief.
+- **21:40:** DEC-1155 recorded (06aad947f): P1-N (a), W2-172's paths gain W2-171's F5 test; W2-172 run 3 (conftest + F5 fix) running; then a narrow check, its record, the land. The sweep helper (both ejection defects) runs: its table into the 09:00 digest (item 13). W2-113 and W2-33 PACKAGES to 09:00. W2-121b landing (restarted by 06aad947f).
+- **21:30:** W2-172 EJECTED 21:19 (its conftest path hygiene vs the queue clone's `runs/` path; W2-171's F5 judging any branch). P1-N pushed to the owner (widen W2-172 by tests/acceptance/W2-171/test_w2_171_f5_paths.py: (a) recommended). W2-172 run 3 released (the conftest fix; F5 too if the owner says (a): then add the path to DAEO-p8tv, commit, tell the lead/relaunch). After run 3: narrow check (DEC-1154 practice), commit its record, land. W2-33 PACKAGES (to 09:00). W2-113 running. W2-121b landing (since ~21:25). W2-88 waits W2-172 CLOSED (probe folder committed 5fd8b2ac7; claim, worktree, brief part ready).
+- **21:25 PREPARED (uncommitted in the working tree):** probe folders in DAEO-2bdu, DAEO-lrre, DAEO-g29a; classes C2 in ticket-class.json; brief parts briefs/W2-88-A5-run1.part.md, W2-33-..., W2-113-.... When W2-172 is CLOSED: commit the three ticket edits, `tk start` the three and commit, new_worktree W2-88/W2-33/W2-113, `gov brief lead <id> --run tests --part <part>`, release_lead each; land.txt W2-121b=6e10493a5f8e.
+- **21:16:** W2-45 DONE (head 5e53394ce9bc, review round 2 PASS). Queue order: W2-172 (landing since ~21:02), W2-121b=6e10493a5f8e, W2-45=5e53394ce9bc, W2-158. When W2-172 is CLOSED (one commit batch): claim W2-88 (critical path) + W2-33 + W2-113 (deps closed; W2-33 on W2-27's list; W2-113 the adopted CTO), new_worktree each, class map, briefs (interface check first), release before 03:00. W2-98 waits for the owner (P-W2-98-IF-1).
+- **DONE 21:02:** W2-124 CLOSED; W2-129 closed (c8d43e595); W2-98 claimed and released (41a593e2c); W2-172 queued (land.txt). NEXT: W2-121b=6e10493a5f8e after W2-172; W2-88 when W2-172 is CLOSED.
+- **TONIGHT'S ORDER (21:00):** when W2-124's land ends: (1) commit the working tree: W2-129's close (record + .tickets/DAEO-q7lk.md, acceptance 156/0) and W2-98's ticket edit; `tk start DAEO-wi46`, commit, new_worktree W2-98, build its brief, release; (2) land.txt `W2-172=0c16d8afb0b5` (DONE, review PASS, pre-check passes; critical path); (3) then `W2-121b=6e10493a5f8e`; then W2-158. (4) When W2-172 is CLOSED: W2-88 can start (W2-129, W2-171, W2-172 closed): claim DAEO-2bdu, new_worktree W2-88, class C2/C3 per ticket-class.json, brief (FULL, interface check first), release before 03:00.
+- **After W2-124's land (in flight since 20:23):** write land.txt `W2-121b=6e10493a5f8e` (its narrow check PASS committed as its probe record, DEC-1154); commit W2-98's ticket edit (in the working tree), claim and start it (below). W2-172: review round 1 PASS at f706a77f5b7e (20:31): when its lead returns DONE, queue it next (critical path). The dry run's findings: `drafts/examin-dryrun-summary.md`.
+- **W2-98 next (20:30):** its ticket edit (CIT-P path, probe folder) is in the working tree; after W2-124's land: commit it, `tk start DAEO-wi46` and commit, `tools/new_worktree.sh W2-98`, build `briefs/W2-98-A5-run1.md` (`gov brief lead DAEO-wi46 --run tests --part briefs/W2-98-A5-run1.part.md`), release_lead. Also startable (deps closed): W2-33 (on W2-27's list), W2-113 (the adopted CTO), W2-120, W2-154, W2-155; W2-111 needs load 50 runs. DEC-1154 recorded.
+- **Records:** DEC-1144 to DEC-1153 recorded; next free id DEC-1154. ACT-P95-1 applied. Usage report only (DEC-1149 (3)).
+## (earlier) RESUME HERE — 2026-11-12 14:40 UTC: DEC-1144 recorded (`0e0fd6779`, P1-A to G). W2-11 merged by hand + COPIES-5 applied +
+CLOSED (`40579942a`). W2-179 CLOSED (`f0ef62f39`). Tickets: W2-157 reopened + claimed (fix lead released, `W2-157-A5-fix1`); W2-121b
+startable (slot line in, FULL, needs a slot); W2-93 widened (--sets-root). P1-G rule in LEAD-w2-common (`e538af629`). P1-B (b) cannot
+take effect (skip_known causes no skip; queue strips PYTEST_ADDOPTS) - told the owner. **W2-152:** already merged 11-09; its P2s
+decided (`1bc1893cc`); close HELD on P1-H (facts.schema.json kernel bytes merged 11-09 without CIT-P) - to the owner. Running: land
+W2-178 (then W2-158, W2-159, W2-171, one per batch); hand_merge_check W2-175 (`log/hm-W2-175-c.txt`) and W2-176 (`hm-W2-176-c.txt`)
+on the current head -> hand merges after W2-178 lands (hold commits during a land). The P1-D reviewer (`briefs/PATHMAP-CHAIN-r3-check.md`)
+refused twice by the memory gate: relaunch after the checks end. Owner: P1-C approval line for W2-146 outstanding.
+
+## RESUME HERE — 2026-11-12 05:35 UTC: session `b2f0511f`; the owner back at 08:00; next free id DEC-1142
+**This block replaces the 02:50 block below where they differ.**
+- **The nightly 20261112-0404 ended 05:00, red 15** (12 signal cases: W2-96 and W2-56's SIGINT; W2-170 F3 counts the nightly
+  clone under the runs folder, a test artefact; W1-19 and W2-13 latency). Night hold released.
+- **Five leads running (05:30):** W2-173 run 2c (unit cases routed, then the review), W2-121 part a run 2c (P-W2-121-5 ruled
+  518772b5c), W2-171 run 2 (Interface 00a9e4ed9), W2-177 run 1b (new: the six W2-96 reds, DAEO-1k7y), W2-157 run 1 (claimed).
+  Filed: W2-178 (DAEO-7oxm, the auditor's copy without hidden/dropped; after W2-173). W2-115 waits for PK-1 (owner, 08:00),
+  then one designer batch for PK-1 and PK-2 (a). W2-23 waits for P-W2-23-8.
+- **W2-176:** delta review READY (`reviews/W2-176-delta-review.md`; F1 the CTO reminder lost DND/report-state names: option (a)
+  amend S2, no new bytes; F2 decisions_carried rides with the approval edit). New bytes `213882efd7b8` for the owner.
+  **ACT-CONTEXT-WATCH-1 rebuilt** on them: manifest `5bdfa098`, rehearsal 0 failures; round 2 review running (pid 1138090,
+  log `~/gov-os-worktrees/W2-176/.gov-runtime/scratch/lead/log/ACT-CONTEXT-WATCH-1-review-r2.json`); round 1 kept as `.r1-c6dabb5e`.
+- **Filed:** ACT-OPERATOR-HOURS-1/2 packages and reviews (12119eb31). release_lead.sh refuses the old common-brief form now.
+- **The guard refused** removing the stale empty `.git/config.lock` (11-10 21:11; DEC-953 item 2): for the owner at 08:00.
+- **08:00 list:** `drafts/0800-list.md`.
 - **The owner (DEC-1141):** W2-11's K3 CIT-P approved `dca382f3069f`; W2-176's approval withdrawn (its cap): new bytes after the
   no-cap engineer (pid 3275711, log `~/gov-os-worktrees/W2-176/.gov-runtime/scratch/lead/log/W2-176-A2-nocap.json`) and a delta
   review; **no token cap for any session** (40 briefs fixed, originals `drafts/no-cap-20261112/briefs-before/`; register, DIF,
@@ -1326,151 +1436,162 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-11T03:25:07Z 4a1bf4c3c2913624dd1783bd879d3d31f31abd36b22d5c779bd045e988d0f22c
-git head: 3718f395caa1d90aacd57389247d8526f836e2fd
+generated: 2026-11-13T06:33:53Z fd026884930ac37134b26758b863f4a81275d0e9cbc7619a7c57ecbce544bdd7
+git head: 94132594a02ab39adad785b5f4b46612b5f00560
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
-  DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
-  DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
+  DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the memory line <- [DAEO-g0ip, DAEO-rd0g]
+  DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
-  DAEO-3r1j [in_progress] - W2-110 A product's CTO-only install rule
-  DAEO-52ku [in_progress] - W2-149 The independent sessions' launch script: a walled headless session per job from an approved brief
   DAEO-5ce2 [in_progress] - W2-140 W2-49's acceptance suite for Contract 4.3
   DAEO-5emz [in_progress] - W2-137 The shared reranker's request cap raised
   DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-8s85 [in_progress] - W2-153 The role template delivered at launch (W2-128's code half, part 2)
-  DAEO-a3u2 [in_progress] - W2-91 Full embeddings: the root files, the governance overlay and schemas/ <- [DAEO-jsg1]
-  DAEO-arrl [in_progress] - W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see <- [DAEO-ym8a]
-  DAEO-blwa [in_progress] - W2-122 Seeded rebuilds
-  DAEO-c4pb [in_progress] - W2-135 A cap per item in the bundle
-  DAEO-clon [in_progress] - W2-112 One reranker serves every session
+  DAEO-ar89 [in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget
   DAEO-cv58 [in_progress] - W2-60a The role, its skills and its model and effort loaded at launch; the launch record
   DAEO-drhj [in_progress] - W2-104 The skill evaluation harness
   DAEO-f58b [in_progress] - W2-116 The designers' store in the product <- [DAEO-ecac, DAEO-lrre]
   DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
   DAEO-ijf5 [in_progress] - W2-150 Memory's import closure free of the gates (E-2's four edges)
-  DAEO-jpr0 [in_progress] - W2-126 A machine-wide vector cache keyed by the text <- [DAEO-qzrq]
-  DAEO-k4wm [in_progress] - W2-133 A narrowed or gap-starting register item carries its own entry's id <- [DAEO-r8vq]
-  DAEO-k7hz [in_progress] - W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 <- [DAEO-g0ip]
-  DAEO-l78m [in_progress] - W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository
+  DAEO-lrre [in_progress] - W2-33 Wave 2 roles and typed handoff records <- [DAEO-g0ip]
   DAEO-m4rq [in_progress] - W2-134 The measure re-anchors in memory <- [DAEO-h2k3]
-  DAEO-n0wb [in_progress] - W2-92 The knowledge graph and the code graph as routes of plain-question retrieval <- [DAEO-s9qc, DAEO-ym8a]
-  DAEO-nqa2 [in_progress] - W2-90b W2-90's next round <- [DAEO-0mtg]
-  DAEO-o5x1 [in_progress] - W2-152 gov brief (W2-128's code half, part 1)
   DAEO-ongl [in_progress] - W2-139 CAP-45.a to Wave 3: the Contract edit (version 4.3)
-  DAEO-ouet [in_progress] - W2-96 The opaque acceptance runner
   DAEO-p3ln [in_progress] - W2-136 gov plan: the dependency map and the launch batches <- [DAEO-t8mp, DAEO-r30l]
-  DAEO-q7lk [in_progress] - W2-129 gov links: link integrity, cheap and incremental (DEC-1073 (5)(b)) <- [DAEO-n0wb, DAEO-arrl]
+  DAEO-pg6i [in_progress] - W2-88a The adopt skill's kernel text (a child of W2-88)
   DAEO-qskx [in_progress] - W2-142 Search again once in the kernel skills
-  DAEO-qzca [in_progress] - W2-151 MR-1 to MR-6 regenerated from contract.yaml
-  DAEO-qzrq [in_progress] - W2-123 Parallel requests on the embedding server
-  DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
-  DAEO-r8vq [in_progress] - W2-131 A register chunk carries its own entry's id
+  DAEO-qvff [in_progress] - W2-111 The hook-latency cases time the hook's own work <- [DAEO-nqa2]
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
-  DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
   DAEO-t8mp [in_progress] - W2-128 The templates (P1-7, R3-TEMPLATES §D) <- [DAEO-o5x1, DAEO-8s85]
-  DAEO-u4oz [in_progress] - W2-04 gov context bounded and reproducible <- [DAEO-g0ip, DAEO-ym8a]
-  DAEO-vhad [in_progress] - W1-01b A listed merge is exempt for its own changes
+  DAEO-wi46 [in_progress] - W2-98 The spec-writing skill for product-spec <- [DAEO-k7hz]
   DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
   DAEO-xafn [in_progress] - W2-148 The operator agent: ACTs applied by class from a queue, in a walled session
-  DAEO-xwro [in_progress] - W2-141 The guard: an engineer's search into its own acceptance folder
   DAEO-zi7s [in_progress] - W2-147 gov plan breaks a cycle only at a ticket inside it
-  DAEO-zpdj [in_progress] - W2-105 The template's install block removed
-  DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
-  DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS                                                                              3718f395c [w2/integrate]
-  /home/usain/gov-os-worktrees/D6-F-tests                                                                                 2761682a2 [w2/D6-F-tests]
-  /home/usain/gov-os-worktrees/EMG-queue                                                                                  04568e140 [emg/queue]
-  /home/usain/gov-os-worktrees/W2-00-d10r2-records                                                                        66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record                                                                               542865993 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a                                                                              f63c1d9b7 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b                                                                              3718f395c (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-104                                                                                     909d7ff0a [w2/W2-104]
-  /home/usain/gov-os-worktrees/W2-105                                                                                     fa653609c [w2/W2-105]
-  /home/usain/gov-os-worktrees/W2-11                                                                                      c9f99b28b [w2/W2-11]
-  /home/usain/gov-os-worktrees/W2-110                                                                                     d0ecd1bc8 [w2/W2-110]
-  /home/usain/gov-os-worktrees/W2-112-d10r2-tests                                                                         73e33d7b3 [w2/W2-112-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-122                                                                                     3fc448601 [w2/W2-122]
-  /home/usain/gov-os-worktrees/W2-123                                                                                     3de9bcf44 [w2/W2-123]
-  /home/usain/gov-os-worktrees/W2-128                                                                                     5cfa4b28f [w2/W2-128]
-  /home/usain/gov-os-worktrees/W2-128-tests                                                                               eb1c4fbb8 [w2/W2-128-tests]
-  /home/usain/gov-os-worktrees/W2-128-tpl101                                                                              0aa20ac0c [w2/W2-128-tpl101]
-  /home/usain/gov-os-worktrees/W2-128-w108-tests                                                                          a0957eb56 [w2/W2-128-w108-tests]
-  /home/usain/gov-os-worktrees/W2-129-d6                                                                                  0eb83d9ad [w2/W2-129-d6]
-  /home/usain/gov-os-worktrees/W2-129-d6-tests                                                                            7255284ac [w2/W2-129-d6-tests]
-  /home/usain/gov-os-worktrees/W2-129-f2                                                                                  c031faba0 [w2/W2-129-f2]
-  /home/usain/gov-os-worktrees/W2-129-f2-tests                                                                            d0d071353 [w2/W2-129-f2-tests]
-  /home/usain/gov-os-worktrees/W2-13                                                                                      5e5d74dde [w2/W2-13]
-  /home/usain/gov-os-worktrees/W2-136                                                                                     8245c1af9 [w2/W2-136]
-  /home/usain/gov-os-worktrees/W2-136-tests                                                                               543b69540 [w2/W2-136-tests]
-  /home/usain/gov-os-worktrees/W2-137                                                                                     f01d51a4e [w2/W2-137]
-  /home/usain/gov-os-worktrees/W2-137-tests                                                                               0cb8ba995 [w2/W2-137-tests]
-  /home/usain/gov-os-worktrees/W2-138                                                                                     8fa4dab8a [w2/W2-138]
-  /home/usain/gov-os-worktrees/W2-138-d10r2-tests                                                                         3e403a285 [w2/W2-138-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-138-tests                                                                               9a93f9338 [w2/W2-138-tests]
-  /home/usain/gov-os-worktrees/W2-139                                                                                     c0d6584e6 [w2/W2-139]
-  /home/usain/gov-os-worktrees/W2-140-tests                                                                               3fea21bb5 [w2/W2-140-tests]
-  /home/usain/gov-os-worktrees/W2-141                                                                                     7716610e2 [w2/W2-141]
-  /home/usain/gov-os-worktrees/W2-141-d6-tests                                                                            92b38e74e [w2/W2-141-d6-tests]
-  /home/usain/gov-os-worktrees/W2-141-tests                                                                               eb70ba840 [w2/W2-141-tests]
-  /home/usain/gov-os-worktrees/W2-142                                                                                     daf56805b [w2/W2-142]
-  /home/usain/gov-os-worktrees/W2-142-tests                                                                               510f3433b [w2/W2-142-tests]
-  /home/usain/gov-os-worktrees/W2-145                                                                                     1be3e47de [w2/W2-145]
-  /home/usain/gov-os-worktrees/W2-145-tests                                                                               aadce89d6 [w2/W2-145-tests]
-  /home/usain/gov-os-worktrees/W2-147                                                                                     fd4b2763f [w2/W2-147]
-  /home/usain/gov-os-worktrees/W2-147-tests                                                                               cf55a4880 [w2/W2-147-tests]
-  /home/usain/gov-os-worktrees/W2-148                                                                                     1af33c535 [w2/W2-148]
-  /home/usain/gov-os-worktrees/W2-148-f21                                                                                 0fe71aa8b [w2/W2-148-f21]
-  /home/usain/gov-os-worktrees/W2-148-f21-tests                                                                           51f0c70b0 [w2/W2-148-f21-tests]
-  /home/usain/gov-os-worktrees/W2-148-replay                                                                              24abf75a1 [w2/W2-148-replay]
-  /home/usain/gov-os-worktrees/W2-148-replay-tests                                                                        841c64944 [w2/W2-148-replay-tests]
-  /home/usain/gov-os-worktrees/W2-148-tests                                                                               fab2be2a2 [w2/W2-148-tests]
-  /home/usain/gov-os-worktrees/W2-149                                                                                     a929356ea [w2/W2-149]
-  /home/usain/gov-os-worktrees/W2-149-f11                                                                                 ee534d2bc [w2/W2-149-f11]
-  /home/usain/gov-os-worktrees/W2-149-sgx                                                                                 2f98aecbc [w2/W2-149-sgx]
-  /home/usain/gov-os-worktrees/W2-149-sgx-tests                                                                           be77be65a [w2/W2-149-sgx-tests]
-  /home/usain/gov-os-worktrees/W2-149-tests                                                                               8f456962f [w2/W2-149-tests]
-  /home/usain/gov-os-worktrees/W2-150                                                                                     892c6f851 [w2/W2-150]
-  /home/usain/gov-os-worktrees/W2-150-f1-tests                                                                            389b264df [w2/W2-150-f1-tests]
-  /home/usain/gov-os-worktrees/W2-150-tests                                                                               321d2bf4b [w2/W2-150-tests]
-  /home/usain/gov-os-worktrees/W2-151                                                                                     539437dff [w2/W2-151]
-  /home/usain/gov-os-worktrees/W2-152                                                                                     09fc68645 [w2/W2-152]
-  /home/usain/gov-os-worktrees/W2-152-tests                                                                               32b89d25a [w2/W2-152-tests]
-  /home/usain/gov-os-worktrees/W2-153                                                                                     f387de57b [w2/W2-153]
-  /home/usain/gov-os-worktrees/W2-153-d10r2-tests                                                                         a7d476c16 [w2/W2-153-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-153-tests                                                                               9a6f55c5a [w2/W2-153-tests]
-  /home/usain/gov-os-worktrees/W2-15a                                                                                     fd637510d [w2/W2-15a]
-  /home/usain/gov-os-worktrees/W2-20                                                                                      057926aa3 [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-20-1017                                                                                 1a54976c7 [w2/W2-20-1017]
-  /home/usain/gov-os-worktrees/W2-20-collect                                                                              a38809a33 [w2/W2-20-collect]
-  /home/usain/gov-os-worktrees/W2-20-tests                                                                                f12b7e00a [w2/W2-20-tests]
-  /home/usain/gov-os-worktrees/W2-27-citp                                                                                 33f72aab2 [w2/W2-27-citp]
-  /home/usain/gov-os-worktrees/W2-32-proto                                                                                f8a5fdade [w2/W2-32-proto]
-  /home/usain/gov-os-worktrees/W2-37                                                                                      38e74a5d9 [w2/W2-37]
-  /home/usain/gov-os-worktrees/W2-42a                                                                                     ce03bb8b3 [w2/W2-42a]
-  /home/usain/gov-os-worktrees/W2-42a-tests                                                                               6f4a6f3c9 [w2/W2-42a-tests]
-  /home/usain/gov-os-worktrees/W2-52                                                                                      2b922bf7d [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-55-f2                                                                                   2fe928a4c [w2/W2-55-f2]
-  /home/usain/gov-os-worktrees/W2-55-f2-tests                                                                             c5ed68d4e [w2/W2-55-f2-tests]
-  /home/usain/gov-os-worktrees/W2-56                                                                                      befa57695 [w2/W2-56]
-  /home/usain/gov-os-worktrees/W2-56-d10r2-tests                                                                          843777f66 [w2/W2-56-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-56-f                                                                                    1d5adb177 [w2/W2-56-f]
-  /home/usain/gov-os-worktrees/W2-56-f-tests                                                                              3ea3411e1 [w2/W2-56-f-tests]
-  /home/usain/gov-os-worktrees/W2-56-tests                                                                                85b28ef0f [w2/W2-56-tests]
-  /home/usain/gov-os-worktrees/W2-60a                                                                                     4d798caf1 [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61h-d10r2-tests                                                                         35396225e [w2/W2-61h-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-61h-q23-tests                                                                           53affe533 [w2/W2-61h-q23-tests]
-  /home/usain/gov-os-worktrees/W2-78                                                                                      8e7640b96 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-81                                                                                      e78e6af75 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-90b                                                                                     73c18fea1 [w2/W2-90b]
-  /home/usain/gov-os-worktrees/W2-91-tests                                                                                3191a7948 [w2/W2-91-tests]
-  /home/usain/gov-os-worktrees/W2-92-d6                                                                                   27d9ecaa3 [w2/W2-92-d6]
-  /home/usain/gov-os-worktrees/W2-92-d6-tests                                                                             cc6d5609f [w2/W2-92-d6-tests]
-  /home/usain/gov-os-worktrees/W2-92-proto                                                                                e884675b4 [w2/W2-92-proto]
-  /home/usain/gov-os-worktrees/W2-96-d10b                                                                                 bb71be1cf [w2/W2-96-d10b]
-  /home/usain/gov-os-worktrees/research-retrieval                                                                         a5c0c34f6 [w2/research-retrieval]
-  /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/scratchpad/int-check   b0eb21f1a (detached HEAD) prunable
-  /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/scratchpad/w153-check  f387de57b (detached HEAD) prunable
+  /home/usain/Dynamic-Agentic-Engineering-OS        94132594a [w2/integrate]
+  /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
+  /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
+  /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
+  /home/usain/gov-os-worktrees/W2-00-record         ae24d9087 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a        94132594a (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b        335c8f3c5 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-04                c77dc358d [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-05                52de591b8 [w2/W2-05]
+  /home/usain/gov-os-worktrees/W2-104               909d7ff0a [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-105               3341c7328 [w2/W2-105]
+  /home/usain/gov-os-worktrees/W2-11                6ba93fc8b [w2/W2-11]
+  /home/usain/gov-os-worktrees/W2-110               6a7862c03 [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-111               8b8b561fc [w2/W2-111]
+  /home/usain/gov-os-worktrees/W2-112-d10r2-tests   73e33d7b3 [w2/W2-112-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-113               f42f86309 [w2/W2-113]
+  /home/usain/gov-os-worktrees/W2-115               cb4510513 [w2/W2-115]
+  /home/usain/gov-os-worktrees/W2-120               1eec1209b [w2/W2-120]
+  /home/usain/gov-os-worktrees/W2-121               f45614f15 [w2/W2-121]
+  /home/usain/gov-os-worktrees/W2-121b              6e10493a5 [w2/W2-121b]
+  /home/usain/gov-os-worktrees/W2-122               3fc448601 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123               3de9bcf44 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-124               80ee394a8 [w2/W2-124]
+  /home/usain/gov-os-worktrees/W2-128               5cfa4b28f [w2/W2-128]
+  /home/usain/gov-os-worktrees/W2-128-tests         eb1c4fbb8 [w2/W2-128-tests]
+  /home/usain/gov-os-worktrees/W2-128-tpl101        0aa20ac0c [w2/W2-128-tpl101]
+  /home/usain/gov-os-worktrees/W2-128-w108-tests    a0957eb56 [w2/W2-128-w108-tests]
+  /home/usain/gov-os-worktrees/W2-129-d6            0eb83d9ad [w2/W2-129-d6]
+  /home/usain/gov-os-worktrees/W2-129-d6-tests      7255284ac [w2/W2-129-d6-tests]
+  /home/usain/gov-os-worktrees/W2-129-f2            c031faba0 [w2/W2-129-f2]
+  /home/usain/gov-os-worktrees/W2-129-f2-tests      d0d071353 [w2/W2-129-f2-tests]
+  /home/usain/gov-os-worktrees/W2-13                5e5d74dde [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-136               921441f8d [w2/W2-136]
+  /home/usain/gov-os-worktrees/W2-136-tests         543b69540 [w2/W2-136-tests]
+  /home/usain/gov-os-worktrees/W2-137               f01d51a4e [w2/W2-137]
+  /home/usain/gov-os-worktrees/W2-137-tests         0cb8ba995 [w2/W2-137-tests]
+  /home/usain/gov-os-worktrees/W2-138               8fa4dab8a [w2/W2-138]
+  /home/usain/gov-os-worktrees/W2-138-d10r2-tests   3e403a285 [w2/W2-138-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-138-tests         9a93f9338 [w2/W2-138-tests]
+  /home/usain/gov-os-worktrees/W2-139               c0d6584e6 [w2/W2-139]
+  /home/usain/gov-os-worktrees/W2-140-tests         3fea21bb5 [w2/W2-140-tests]
+  /home/usain/gov-os-worktrees/W2-141               7716610e2 [w2/W2-141]
+  /home/usain/gov-os-worktrees/W2-141-d6-tests      92b38e74e [w2/W2-141-d6-tests]
+  /home/usain/gov-os-worktrees/W2-141-tests         eb70ba840 [w2/W2-141-tests]
+  /home/usain/gov-os-worktrees/W2-142               daf56805b [w2/W2-142]
+  /home/usain/gov-os-worktrees/W2-142-tests         510f3433b [w2/W2-142-tests]
+  /home/usain/gov-os-worktrees/W2-145               1be3e47de [w2/W2-145]
+  /home/usain/gov-os-worktrees/W2-145-tests         aadce89d6 [w2/W2-145-tests]
+  /home/usain/gov-os-worktrees/W2-146               ebdbabd2e [w2/W2-146]
+  /home/usain/gov-os-worktrees/W2-147               fd4b2763f [w2/W2-147]
+  /home/usain/gov-os-worktrees/W2-147-tests         cf55a4880 [w2/W2-147-tests]
+  /home/usain/gov-os-worktrees/W2-148               1af33c535 [w2/W2-148]
+  /home/usain/gov-os-worktrees/W2-148-f21           0fe71aa8b [w2/W2-148-f21]
+  /home/usain/gov-os-worktrees/W2-148-f21-tests     51f0c70b0 [w2/W2-148-f21-tests]
+  /home/usain/gov-os-worktrees/W2-148-replay        24abf75a1 [w2/W2-148-replay]
+  /home/usain/gov-os-worktrees/W2-148-replay-tests  841c64944 [w2/W2-148-replay-tests]
+  /home/usain/gov-os-worktrees/W2-148-tests         fab2be2a2 [w2/W2-148-tests]
+  /home/usain/gov-os-worktrees/W2-149               a929356ea [w2/W2-149]
+  /home/usain/gov-os-worktrees/W2-149-f11           ee534d2bc [w2/W2-149-f11]
+  /home/usain/gov-os-worktrees/W2-149-sgx           2f98aecbc [w2/W2-149-sgx]
+  /home/usain/gov-os-worktrees/W2-149-sgx-tests     be77be65a [w2/W2-149-sgx-tests]
+  /home/usain/gov-os-worktrees/W2-149-tests         8f456962f [w2/W2-149-tests]
+  /home/usain/gov-os-worktrees/W2-150               892c6f851 [w2/W2-150]
+  /home/usain/gov-os-worktrees/W2-150-f1-tests      389b264df [w2/W2-150-f1-tests]
+  /home/usain/gov-os-worktrees/W2-150-tests         321d2bf4b [w2/W2-150-tests]
+  /home/usain/gov-os-worktrees/W2-151               539437dff [w2/W2-151]
+  /home/usain/gov-os-worktrees/W2-152               2900a31d2 [w2/W2-152]
+  /home/usain/gov-os-worktrees/W2-153               cd7efdc67 [w2/W2-153]
+  /home/usain/gov-os-worktrees/W2-153-d10r2-tests   a7d476c16 [w2/W2-153-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-153-tests         9a6f55c5a [w2/W2-153-tests]
+  /home/usain/gov-os-worktrees/W2-154               7bcff333b [w2/W2-154]
+  /home/usain/gov-os-worktrees/W2-155               8da607e3d [w2/W2-155]
+  /home/usain/gov-os-worktrees/W2-157               30e969875 [w2/W2-157]
+  /home/usain/gov-os-worktrees/W2-158               23acb6361 [w2/W2-158]
+  /home/usain/gov-os-worktrees/W2-159               f08424c88 [w2/W2-159]
+  /home/usain/gov-os-worktrees/W2-15a               fd637510d [w2/W2-15a]
+  /home/usain/gov-os-worktrees/W2-160               54a64edba [w2/W2-160]
+  /home/usain/gov-os-worktrees/W2-170               75a5af14b [w2/W2-170]
+  /home/usain/gov-os-worktrees/W2-171               683ecd9c6 [w2/W2-171]
+  /home/usain/gov-os-worktrees/W2-172               d23959592 [w2/W2-172]
+  /home/usain/gov-os-worktrees/W2-173               5cbd79b4e [w2/W2-173]
+  /home/usain/gov-os-worktrees/W2-175               4c0c73472 [w2/W2-175]
+  /home/usain/gov-os-worktrees/W2-176               3b6c5cb79 [w2/W2-176]
+  /home/usain/gov-os-worktrees/W2-177               21627697d [w2/W2-177]
+  /home/usain/gov-os-worktrees/W2-178               6056c4f98 [w2/W2-178]
+  /home/usain/gov-os-worktrees/W2-179               996bffd9b [w2/W2-179]
+  /home/usain/gov-os-worktrees/W2-180               21dc73cb5 [w2/W2-180]
+  /home/usain/gov-os-worktrees/W2-181               499543a83 [w2/W2-181]
+  /home/usain/gov-os-worktrees/W2-20                057926aa3 [w2/W2-20]
+  /home/usain/gov-os-worktrees/W2-20-1017           1a54976c7 [w2/W2-20-1017]
+  /home/usain/gov-os-worktrees/W2-20-collect        a38809a33 [w2/W2-20-collect]
+  /home/usain/gov-os-worktrees/W2-20-tests          f12b7e00a [w2/W2-20-tests]
+  /home/usain/gov-os-worktrees/W2-23                6f171066f [w2/W2-23]
+  /home/usain/gov-os-worktrees/W2-27-citp           33f72aab2 [w2/W2-27-citp]
+  /home/usain/gov-os-worktrees/W2-32-proto          f8a5fdade [w2/W2-32-proto]
+  /home/usain/gov-os-worktrees/W2-33                82da49202 [w2/W2-33]
+  /home/usain/gov-os-worktrees/W2-37                65e8c0768 [w2/W2-37]
+  /home/usain/gov-os-worktrees/W2-40                29753c768 [w2/W2-40]
+  /home/usain/gov-os-worktrees/W2-42a               ce03bb8b3 [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a-tests         6f4a6f3c9 [w2/W2-42a-tests]
+  /home/usain/gov-os-worktrees/W2-45                5e53394ce [w2/W2-45]
+  /home/usain/gov-os-worktrees/W2-52                a77ef5f20 [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-55-f2             2fe928a4c [w2/W2-55-f2]
+  /home/usain/gov-os-worktrees/W2-55-f2-tests       c5ed68d4e [w2/W2-55-f2-tests]
+  /home/usain/gov-os-worktrees/W2-56                befa57695 [w2/W2-56]
+  /home/usain/gov-os-worktrees/W2-56-d10r2-tests    843777f66 [w2/W2-56-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-56-f              1d5adb177 [w2/W2-56-f]
+  /home/usain/gov-os-worktrees/W2-56-f-tests        3ea3411e1 [w2/W2-56-f-tests]
+  /home/usain/gov-os-worktrees/W2-56-tests          85b28ef0f [w2/W2-56-tests]
+  /home/usain/gov-os-worktrees/W2-60a               7ff4b82c9 [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
+  /home/usain/gov-os-worktrees/W2-66c               400991361 [w2/W2-66c]
+  /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
+  /home/usain/gov-os-worktrees/W2-81                6e2003ff3 [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-88                e9720a4a4 [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88-tests          c3c5fdccd [w2/W2-88-tests]
+  /home/usain/gov-os-worktrees/W2-88a               c79a20f1f [w2/W2-88a]
+  /home/usain/gov-os-worktrees/W2-90b               cb0e69ba5 [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91-tests          3191a7948 [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92-d6             27d9ecaa3 [w2/W2-92-d6]
+  /home/usain/gov-os-worktrees/W2-92-d6-tests       cc6d5609f [w2/W2-92-d6-tests]
+  /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
+  /home/usain/gov-os-worktrees/W2-96-d10b           bb71be1cf [w2/W2-96-d10b]
+  /home/usain/gov-os-worktrees/W2-98                3a86f11c3 [w2/W2-98]
+  /home/usain/gov-os-worktrees/research-retrieval   a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

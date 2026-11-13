@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-33
+status: interim result d2aaff358: W2-33 (DAEO-lrre): the probe record: review round 1 PASS (7 findings, none blocking) and the narrow check PASS (3 rows); CIT-P §4 count reworded (N2)

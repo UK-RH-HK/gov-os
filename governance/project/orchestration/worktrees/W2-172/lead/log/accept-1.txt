@@ -1,0 +1,115 @@
+{
+  "ticket": "DAEO-p8tv",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 18,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 16,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 14,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 8,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-5",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 30,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-6",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 9,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-7",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 28,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-8",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 17,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-9",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 12,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 5,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-2",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-3",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 8,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-4",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 5,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-5",
+      "outcome": "pass",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 1,
+    "failed": 160,
+    "skipped": 0
+  }
+}

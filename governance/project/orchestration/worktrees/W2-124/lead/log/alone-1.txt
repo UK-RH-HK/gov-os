@@ -1,0 +1,69 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung] _
+
+box = Box(base=PosixPath('/tmp/w2-124-lead/pytest-of-usain/pytest-0/test_s1_hung_or_transient_fail0/box'), home=PosixPath('/...'), lock=PosixPath('/tmp/w2-124-lead/pytest-of-usain/pytest-0/test_s1_hung_or_transient_fail0/box/locks/rebuild.lock'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b886d49a750>
+mode = 'hung'
+
+    @pytest.mark.parametrize("mode", ["hung", "part-way-500"])
+    def test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic(box, monkeypatch, mode):
+        stand_in = support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: hung: the rebuild took 66 s: it waited out a real endpoint timeout
+E       assert 66.0978890430124 < 60
+
+/home/usain/gov-os-worktrees/W2-124/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+_ test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500] _
+
+box = Box(base=PosixPath('/tmp/w2-124-lead/pytest-of-usain/pytest-0/test_s1_hung_or_transient_fail1/box'), home=PosixPath('/...'), lock=PosixPath('/tmp/w2-124-lead/pytest-of-usain/pytest-0/test_s1_hung_or_transient_fail1/box/locks/rebuild.lock'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7b886d1e1d30>
+mode = 'part-way-500'
+
+    @pytest.mark.parametrize("mode", ["hung", "part-way-500"])
+    def test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic(box, monkeypatch, mode):
+        stand_in = support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: part-way-500: the rebuild took 61 s: it waited out a real endpoint timeout
+E       assert 61.4653551060037 < 60
+
+/home/usain/gov-os-worktrees/W2-124/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung]
+FAILED tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500]
+2 failed, 5 deselected in 127.83s (0:02:07)
+alone exit 1
+........................................................................ [ 76%]
+......................                                                   [100%]
+94 passed in 6.29s
+backstop alone exit 0

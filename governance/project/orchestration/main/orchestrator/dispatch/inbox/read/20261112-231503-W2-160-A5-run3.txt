@@ -1,0 +1,10 @@
+log: W2-160-A5-run3.json
+W2: W2-160
+status: DONE. The head to land is 54a64edbaa79. The code and tests were verified at 14c9e7a36; the only commit after it adds the probe record (docs only).
+
+task: DAEO-fd0p
+status: DONE. The head to land is 54a64edbaa79. The code and tests were verified at 14c9e7a36; the only commit after it adds the probe record (docs only).
+work_completed: Run 3 (resume), the work DEC-1156 (1) and (6) asked for:
+- Merged w2/integrate (70d0b5a8e, which brings 7d8c2d524) and read the ticket's "## Run 3" section.
+- ROUTE-1 (a): an engineer changed `tests/unit/session_watch/test_route.py:19` to assert the two-path tuple (eng-3, 2c2302c4b). The first engineer, eng-2, made no change: its gated pytest line was refused twice and it stopped.
+- W2-159's F4: a test designe

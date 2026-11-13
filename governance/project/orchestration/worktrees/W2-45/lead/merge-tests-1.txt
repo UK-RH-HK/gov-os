@@ -1,0 +1,5 @@
+Merge w2/W2-45-tests: the acceptance tests of W2-45 (S1 to S5), td-2 (README map)
+
+Task: DAEO-neam
+Role: orchestrator
+Implements: DEC-729

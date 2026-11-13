@@ -1,0 +1,6 @@
+== r3 start 2026-11-13T00:00:42+00:00 load: 12.67 11.69 10.29 25/1579 9
+heavy_slot: all 3 slots taken; waiting (2026-11-13 00:00:42)
+154: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+...............                                                          [100%]
+15 passed in 34.40s
+== r3 exit 0 end 2026-11-13T00:03:52+00:00 load: 10.64 12.67 11.02 3/1434 2933

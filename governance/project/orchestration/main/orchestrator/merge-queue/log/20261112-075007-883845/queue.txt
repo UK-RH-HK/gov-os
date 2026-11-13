@@ -1,0 +1,11 @@
+2026-11-12 07:50:07 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 07:50:08 merged W2-157 onto 2e235e4e58bc: c95d26278ab4
+2026-11-12 08:04:02 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 08:04:09 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 08:04:12 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 08:04:13 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 08:04:47 the integration store /home/usain/gov-os-worktrees/W2-00-store-a is at 5cdfb5ad2308, not at the head 2e235e4e58bc, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 08:04:47 seed of head-2e235e4e58bc-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-a
+2026-11-12 08:05:39 the head without the batch: a throwaway worktree head-2e235e4e58bc-0 at 2e235e4e58bc, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 08:05:39 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': 4}): owned: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+2026-11-12 08:05:39 EJECTED W2-157: red; failing: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths

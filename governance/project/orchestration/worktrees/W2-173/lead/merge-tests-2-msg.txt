@@ -1,0 +1,7 @@
+Merge w2/W2-173-tests (DAEO-qz4p): W2-149's planted checker notes and auditor classes in the fixed form, effort in COUNTS_KEYS (td-2, 009642705; the CTO's P-1 (a))
+
+Task: DAEO-qz4p
+Role: orchestrator
+Implements: DEC-1101, DEC-1120, DEC-1112, DEC-1113
+Rewrite-Reason: DEC-866, W2-173's S3 and S4 (the CTO's P-1 (a), 2026-11-12)
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

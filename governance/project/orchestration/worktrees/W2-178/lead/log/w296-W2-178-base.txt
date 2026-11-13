@@ -1,0 +1,534 @@
+.......FFF...FFFFFFF.FFF..F.FFFFF.                                       [100%]
+=================================== FAILURES ===================================
+___ test_w2_96_r14_an_unstopped_run_is_reported_as_its_results_say[-0-pass] ____
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_an_unstopped_ru0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_an_unstopped_ru0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_an_unstopped_ru0')
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae31e14c0>, tail = ''
+code = 0, outcome = 'pass'
+
+    @pytest.mark.parametrize("tail, code, outcome", [("", 0, "pass"), (f"    assert False, '{MARK}'\n", 3, "fail")])
+    def test_w2_96_r14_an_unstopped_run_is_reported_as_its_results_say(project, tmp_path, capsys, tail, code, outcome):
+        root, temp = project
+        test, pid = _racer(tmp_path, tail)
+        _plant(root, {"test_a.py": test})
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        out, err = capsys.readouterr()
+        result = json.loads(out)["result"]
+>       assert got == code and result["outcome"] == outcome and result["error_kind"] is None, result
+E       AssertionError: {'error_kind': 'crash', 'lines': [], 'outcome': 'error', 'ticket': 'DAEO-t001', ...}
+E       assert (4 == 0)
+
+tests/unit/accept/test_w2_96_review3.py:222: AssertionError
+____ test_w2_96_r14_an_unstopped_run_whose_entries_vanish_is_never_a_crash _____
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_an_unstopped_ru1/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_an_unstopped_ru1/tmpdir'))
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae329c440>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x760ae329cb30>
+
+    def test_w2_96_r14_an_unstopped_run_whose_entries_vanish_is_never_a_crash(project, capsys, monkeypatch):
+        root, temp = project
+        _plant(root, {"test_a.py": "def test_a(tmp_path):\n    for i in range(50):\n"
+                                   "        (tmp_path / f'f{i}').write_text('x')\n"})
+        unlink, rmdir = os.unlink, os.rmdir
+    
+        def first_unlink(name, *, dir_fd=None):
+            unlink(name, dir_fd=dir_fd)
+            if dir_fd is not None:  # the removal's own call: another process got there first
+                unlink(name, dir_fd=dir_fd)
+    
+        def first_rmdir(name, *, dir_fd=None):
+            rmdir(name, dir_fd=dir_fd)
+            if dir_fd is not None:
+                rmdir(name, dir_fd=dir_fd)
+    
+        monkeypatch.setattr(os, "unlink", first_unlink)
+        monkeypatch.setattr(os, "rmdir", first_rmdir)
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        monkeypatch.undo()
+        result = json.loads(capsys.readouterr().out)["result"]
+>       assert got == 0 and result["outcome"] == "pass" and result["error_kind"] is None, result
+E       AssertionError: {'error_kind': 'crash', 'lines': [], 'outcome': 'error', 'ticket': 'DAEO-t001', ...}
+E       assert (4 == 0)
+
+tests/unit/accept/test_w2_96_review3.py:249: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x760ae305a200>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_finished_run_cleans_up[-0-pass] _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0')
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ffb6e0>, tail = ''
+code = 0, outcome = 'pass'
+
+    @pytest.mark.parametrize("tail, code, outcome", [("", 0, "pass"), (f"    assert False, '{MARK}'\n", 3, "fail")])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_finished_run_cleans_up(project, tmp_path, capsys,
+                                                                                        tail, code, outcome):
+        root, temp = project
+        test, pid_file = _orphan(tmp_path, tail)
+        _plant(root, test)
+        before = _mine()
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        out, err = capsys.readouterr()
+        result = json.loads(out)["result"]
+>       assert got == code and result["outcome"] == outcome and result["error_kind"] is None, result  # the child's status
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: {'error_kind': 'crash', 'lines': [], 'outcome': 'error', 'ticket': 'DAEO-t001', ...}
+E       assert (4 == 0)
+
+tests/unit/accept/test_w2_96_review4.py:133: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_1/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_1')
+launch = <function planted.<locals>.launch at 0x760ae2eb54e0>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_1/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_1/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError
+_ test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound[None-hop] _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_process_that_0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_process_that_0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_process_that_0')
+launch = <function planted.<locals>.launch at 0x760ae2eb5a80>, kind = 'hop'
+stop = None
+
+    @pytest.mark.parametrize("kind", ["hop", "breed"])
+    @pytest.mark.parametrize("stop", [None, 15])
+    def test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound(project, tmp_path, launch, kind, stop):
+        root, temp = project
+        forker, pids, started = tmp_path / "w296_forker.py", tmp_path / "forked.pids", tmp_path / "started"
+        forker.write_text(FORKER[kind])
+        tail = "" if stop is None else f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n"
+        _plant(root, FORKING.format(forker=str(forker), pids=str(pids), tail=tail))
+        began = time.monotonic()
+        gov = launch(root, temp)
+        if stop is not None:
+            _wait_for(started)
+            gov.send_signal(stop)
+        out, _ = gov.communicate(timeout=60)
+        took = time.monotonic() - began
+>       assert gov.returncode == (0 if stop is None else 128 + stop), out
+E       AssertionError: b'{"ok": true, "command": "accept", "result": {"ticket": "DAEO-t001", "outcome": "error", "error_kind": "crash", "line...pped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}, "session": ""}
+E         '
+E       assert 4 == 0
+E        +  where 4 = <Popen: returncode: 4 args: ['/usr/bin/python3', '/tmp/w2-178-lead-W2-178-ba...>.returncode
+
+tests/unit/accept/test_w2_96_review4.py:178: AssertionError
+_ test_w2_96_r16_a_child_gov_had_before_the_run_is_neither_stopped_nor_reaped __
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_child_gov_had0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_child_gov_had0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_child_gov_had0')
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ed7500>
+
+    def test_w2_96_r16_a_child_gov_had_before_the_run_is_neither_stopped_nor_reaped(project, tmp_path, capsys):
+        root, temp = project
+        test, pid_file = _orphan(tmp_path)
+        _plant(root, test)
+        keeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        ended = subprocess.Popen([sys.executable, "-c", "raise SystemExit(7)"])
+        deadline = time.monotonic() + 30
+        while Path(f"/proc/{ended.pid}/stat").read_text().rsplit(")", 1)[-1].split()[0] != "Z":  # ended, not yet waited
+            assert time.monotonic() < deadline
+            time.sleep(0.02)
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        capsys.readouterr()
+        try:
+>           assert got == 0
+E           assert 4 == 0
+
+tests/unit/accept/test_w2_96_review4.py:202: AssertionError
+____________ test_w2_96_r16_the_subreaper_setting_ends_with_the_run ____________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_the_subreaper_s0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_the_subreaper_s0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_the_subreaper_s0')
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ed5e50>
+
+    def test_w2_96_r16_the_subreaper_setting_ends_with_the_run(project, tmp_path, capsys):
+        root, _ = project
+        _plant(root, "def test_a():\n    pass\n")
+        before = _subreaper()
+>       assert main(["accept", "DAEO-t001", "--json", "--root", str(root)]) == 0
+E       AssertionError: assert 4 == 0
+E        +  where 4 = main(['accept', 'DAEO-t001', '--json', '--root', '/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_the_subreaper_s0/proj'])
+
+tests/unit/accept/test_w2_96_review4.py:215: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"ok": true, "command": "accept", "result": {"ticket": "DAEO-t001", "outcome": "error", "error_kind": "crash", "lines": [], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}, "session": ""}
+______ test_w2_96_r16_without_the_subreaper_a_run_keeps_todays_behaviour _______
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_without_the_sub0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_without_the_sub0/tmpdir'))
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ec0ef0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x760ae2ec2ba0>
+
+    def test_w2_96_r16_without_the_subreaper_a_run_keeps_todays_behaviour(project, capsys, monkeypatch):
+        root, temp = project
+        _plant(root, "def test_a():\n    pass\n")
+        monkeypatch.setattr(runner, "_subreaper", lambda on: None)  # not Linux, or the call failed
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        result = json.loads(capsys.readouterr().out)["result"]
+>       assert got == 0 and result["outcome"] == "pass", result
+E       AssertionError: {'error_kind': 'crash', 'lines': [], 'outcome': 'error', 'ticket': 'DAEO-t001', ...}
+E       assert (4 == 0)
+
+tests/unit/accept/test_w2_96_review4.py:226: AssertionError
+_ test_w2_96_r16_a_descendant_that_survives_the_bound_does_not_stop_the_clean_up _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_descendant_th0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_descendant_th0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_descendant_th0')
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ed74a0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x760ae2ed5af0>
+
+    def test_w2_96_r16_a_descendant_that_survives_the_bound_does_not_stop_the_clean_up(project, tmp_path, capsys,
+                                                                                        monkeypatch):
+        root, temp = project
+        test, pid_file = _orphan(tmp_path, wait=60)  # it would write only long after the test ends it
+        _plant(root, test)
+        kill = os.kill
+        monkeypatch.setattr(runner, "REAP_SECONDS", 0.5)
+        monkeypatch.setattr(os, "kill", lambda pid, signum: None)  # a descendant no signal ends
+        began = time.monotonic()
+        got = main(["accept", "DAEO-t001", "--json", "--root", str(root)])
+        took = time.monotonic() - began
+        monkeypatch.undo()
+        capsys.readouterr()
+>       pid = int(pid_file.read_text())
+                  ^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_descendant_th0/orphan.pid')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r16_a_descendant_th0/orphan.pid'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_ test_w2_96_r8_an_unmapped_failed_or_errored_case_fails_the_run[def test_x():\n    assert False, 'PLANTED-LEAK-5c1e'\n] _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r8_an_unmapped_fail0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r8_an_unmapped_fail0/tmpdir'))
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ec0560>
+unmapped = "def test_x():\n    assert False, 'PLANTED-LEAK-5c1e'\n"
+
+    @pytest.mark.parametrize("unmapped", [
+        f"def test_x():\n    assert False, '{MARK}'\n",
+        f"import pytest\n\n@pytest.fixture\ndef broken():\n    raise RuntimeError('{MARK}')\n\n"
+        "def test_x(broken):\n    pass\n",
+    ])
+    def test_w2_96_r8_an_unmapped_failed_or_errored_case_fails_the_run(project, capsys, unmapped):
+        root, temp = project
+        _plant(root, ONE_LINE, {"test_a.py": "def test_a():\n    pass\n", "test_other.py": unmapped})
+        code, envelope, text = _accept(root, capsys)
+>       assert code == 3
+E       assert 4 == 3
+
+tests/unit/accept/test_w2_96_run2.py:77: AssertionError
+_________ test_w2_96_r8_unmapped_passed_and_skipped_cases_keep_a_pass __________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r8_unmapped_passed_0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r8_unmapped_passed_0/tmpdir'))
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ef2ea0>
+
+    def test_w2_96_r8_unmapped_passed_and_skipped_cases_keep_a_pass(project, capsys):
+        root, _ = project
+        other = "import pytest\n\ndef test_x():\n    pass\n\ndef test_y():\n    pytest.skip('s')\n"
+        _plant(root, ONE_LINE, {"test_a.py": "def test_a():\n    pass\n", "test_other.py": other})
+        code, envelope, _ = _accept(root, capsys)
+>       assert code == 0 and envelope["result"]["outcome"] == "pass"
+E       assert (4 == 0)
+
+tests/unit/accept/test_w2_96_run2.py:91: AssertionError
+__________ test_w2_96_r10_a_deep_tree_is_removed_without_a_crash[-0] ___________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r10_a_deep_tree_is_0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r10_a_deep_tree_is_0/tmpdir'))
+capsys = <_pytest.capture.CaptureFixture object at 0x760ae2ffb650>, tail = ''
+code = 0
+
+    @pytest.mark.parametrize("tail, code", [("", 0), ("    assert False\n", 3)])
+    def test_w2_96_r10_a_deep_tree_is_removed_without_a_crash(project, capsys, tail, code):
+        root, temp = project
+        _plant(root, ONE_LINE, {"test_a.py": DEEP + tail})
+        got, envelope, text = _accept(root, capsys)
+>       assert got == code, envelope
+E       AssertionError: {'command': 'accept', 'ok': True, 'result': {'error_kind': 'crash', 'lines': [], 'outcome': 'error', 'ticket': 'DAEO-t001', ...}, 'session': ''}
+E       assert 4 == 0
+
+tests/unit/accept/test_w2_96_run2.py:110: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x760ae2f520c0>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x760ae2ee7740>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+___ test_w2_96_r9_r12_a_case_whose_body_ends_early_leaves_no_planted_process ___
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose0')
+
+    def test_w2_96_r9_r12_a_case_whose_body_ends_early_leaves_no_planted_process(project, tmp_path):
+        """DEC-866 rewrite (incident 2026-11-10 00:43): a planted gov whose run blocks, and a helper using the reaping
+        whose body ends early by ``pytest.fail``: afterwards neither the planted gov nor the pytest group it started
+        has a live process, nor does the reaper. Checked by pid only."""
+        root, temp, started = _blocking(project, tmp_path)
+        seen: dict[str, int] = {}
+    
+        def body(launch):
+            gov = launch(root, temp)
+            _wait_for(started)
+            seen.update(gov=gov.pid, group=int(started.read_text()), reaper=launch.reaper)
+            assert gov.poll() is None and group_alive(seen["group"])  # the run blocks: both are alive here
+            pytest.fail("the case's body ends early")
+    
+        with pytest.raises(pytest.fail.Exception, match="ends early"):
+            with _planted(tmp_path / "w296_reap") as launch:
+>               body(launch)
+
+tests/unit/accept/test_w2_96_run2.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/accept/test_w2_96_run2.py:300: in body
+    _wait_for(started)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+__ test_w2_96_r9_r12_a_case_whose_process_is_killed_leaves_no_planted_process __
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose1/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose1/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose1')
+
+    def test_w2_96_r9_r12_a_case_whose_process_is_killed_leaves_no_planted_process(project, tmp_path):
+        """DEC-866 rewrite (incident 2026-11-10 00:43, the run's worker gone): the same, with the case's process killed
+        by SIGKILL while the run blocks, so that no finaliser of its own runs; the reaper alone stops what it planted."""
+        root, temp, started = _blocking(project, tmp_path)
+        script, out = tmp_path / "w296_holder.py", tmp_path / "holder_pids"
+        script.write_text(HOLDER)
+        env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]))
+        holder = subprocess.Popen([sys.executable, str(script), __file__, str(root), str(temp),
+                                   str(tmp_path / "w296_reap"), str(started), str(out)], env=env, stdin=subprocess.DEVNULL)
+        try:
+>           _wait_for(out)
+
+tests/unit/accept/test_w2_96_run2.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose1/holder_pids')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_case_whose1/holder_pids').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+_ test_w2_96_r9_r12_a_planted_tests_own_sessions_are_reaped_once_gov_can_no_longer _
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_planted_te0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_planted_te0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_planted_te0')
+
+    def test_w2_96_r9_r12_a_planted_tests_own_sessions_are_reaped_once_gov_can_no_longer(project, tmp_path):
+        """DEC-866 rewrite, round 2: a planted test's processes in sessions of their own, one under the other, while
+        gov is stopped (SIGSTOP) so that it can neither end nor reap its run; the case's body ends early. Afterwards no
+        group of theirs has a live process: the reaper finds them as descendants of what it recorded."""
+        root, temp = project
+        started, nested = tmp_path / "started", tmp_path / "nested"
+        _plant(root, ONE_LINE, {"test_a.py": NESTED.format(nested=str(nested), started=str(started))})
+        seen: dict[str, int] = {}
+        with pytest.raises(pytest.fail.Exception, match="ends early"):
+            with _planted(tmp_path / "w296_reap") as launch:
+                gov = launch(root, temp)
+>               _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_planted_te0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_planted_te0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________________ test_w2_96_r11_an_inherited_ignore_is_kept[2] _________________
+
+project = (PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/proj'), PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/tmpdir'))
+tmp_path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0')
+launch = <function planted.<locals>.launch at 0x760ae2ee6c00>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, launch, signum):
+        root, temp = project
+        started, go = tmp_path / "started", tmp_path / "go"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, ignore=(signum,))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/w2-178-lead-W2-178-base/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_an_unstopped_run_is_reported_as_its_results_say[-0-pass]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_an_unstopped_run_whose_entries_vanish_is_never_a_crash
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_finished_run_cleans_up[-0-pass]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound[None-hop]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_child_gov_had_before_the_run_is_neither_stopped_nor_reaped
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_the_subreaper_setting_ends_with_the_run
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_without_the_subreaper_a_run_keeps_todays_behaviour
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_descendant_that_survives_the_bound_does_not_stop_the_clean_up
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r8_an_unmapped_failed_or_errored_case_fails_the_run[def test_x():\n    assert False, 'PLANTED-LEAK-5c1e'\n]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r8_unmapped_passed_and_skipped_cases_keep_a_pass
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r10_a_deep_tree_is_removed_without_a_crash[-0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_case_whose_body_ends_early_leaves_no_planted_process
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_case_whose_process_is_killed_leaves_no_planted_process
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_planted_tests_own_sessions_are_reaped_once_gov_can_no_longer
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r11_an_inherited_ignore_is_kept[2]
+19 failed, 15 passed, 23 deselected in 491.99s (0:08:11)

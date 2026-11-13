@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-152
+status: interim result 4f5d52fe0: W2-152 (DAEO-o5x1): the lead's checkpoint at the round boundary (verified, probe record committed; the context ceiling and the re-probe to the CTO)

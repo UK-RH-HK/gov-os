@@ -83,6 +83,189 @@
 # 02:13 b2f0511f: W2-173 resume after the 02:00 network outage (workers done)
 # returned PACKAGES 02:40, retired b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run1b.md W2-173-A5-run1b.json
 # 02:13 b2f0511f: W2-121 part a run 2 again after the 02:00 network outage
-W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json
+# returned PACKAGES P-W2-121-5 (decided 03:20), retired 05:26 b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json
 # 02:46 b2f0511f: W2-173 run 2 (P-1 (a) decided 70e5840d9)
-W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json
+# returned at the night hold 03:42, retired 05:26 b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json
+# 05:06 b2f0511f: W2-173 run 2c (unit cases routed 518772b5c; the review; class C3)
+# returned DONE 05:40, land queued, retired b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run2c.md W2-173-A5-run2c.json
+# 05:06 b2f0511f: W2-121 part a run 2c (P-W2-121-5 ruled; re-verify, review; class C2)
+# returned PACKAGES P-W2-121-6/7 (decided 05:50), retired b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run2c.md W2-121-A5-run2c.json
+# 05:06 b2f0511f: W2-171 run 2 (Interface 00a9e4ed9; class C2)
+# returned PACKAGES 07:06 (PKG-W2-171-F5-1 decided), retired b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run2.md W2-171-A5-run2.json
+# 05:08 b2f0511f: W2-177 run 1 (claimed 83a3dd4ac; class C2)
+# pulled 05:12 (old brief form), b2f0511f: W2-177 DAEO-1k7y W2-177-A5-run1.md W2-177-A5-run1.json
+# 05:09 b2f0511f: W2-177 run 1 (gov brief form; claimed 83a3dd4ac; class C2)
+# returned PACKAGES 07:03 (P-W2-177-1/2 decided), retired b2f0511f: W2-177 DAEO-1k7y W2-177-A5-run1b.md W2-177-A5-run1b.json
+# 05:13 b2f0511f: W2-157 run 1 (claimed fbf97f2a0; class C2)
+# returned DONE 07:17, land queued 07:21, retired b2f0511f: W2-157 DAEO-ozyt W2-157-A5-run1.md W2-157-A5-run1.json
+# 05:41 b2f0511f: W2-121 part a run 3 (fix run, P-W2-121-7 (a); class C2)
+# returned DONE 07:09, land queued, retired b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run3.md W2-121-A5-run3.json
+# 05:43 b2f0511f: W2-179 run 1 (claimed; class C1)
+# returned DONE 07:07, land queued, retired b2f0511f: W2-179 DAEO-c9n8 W2-179-A5-run1.md W2-179-A5-run1.json
+# 05:55 NEXT, released 07:15 below
+# 07:04 b2f0511f: W2-177 run 2 (P-W2-177-1 (a): the supports' revision, then the FULL review; class C2)
+# returned DONE 08:49, lands after W2-180, retired b2f0511f: W2-177 DAEO-1k7y W2-177-A5-run2.md W2-177-A5-run2.json
+# 07:07 b2f0511f: W2-171 run 3 (the review; class C2)
+# returned PACKAGES 08:01 (PKG-W2-171-REV1-1 decided (a)), retired b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run3.md W2-171-A5-run3.json
+# 07:09 b2f0511f: W2-180 run 1 (claimed; before W2-171's land; class C1)
+# returned DONE 08:49, land queued alone 08:50, retired b2f0511f: W2-180 DAEO-weh2 W2-180-A5-run1.md W2-180-A5-run1.json
+# 07:14 b2f0511f: W2-178 run 1 (claimed; class C2)
+# returned DONE 08:40, land after W2-180, retired b2f0511f: W2-178 DAEO-7oxm W2-178-A5-run1.md W2-178-A5-run1.json
+# 07:49 b2f0511f: W2-159 run 1 (claimed; class C2)
+# returned PACKAGES 08:18 (P-W2-159-1/2 decided (a)), retired b2f0511f: W2-159 DAEO-6lid W2-159-A5-run1.md W2-159-A5-run1.json
+# 08:01 b2f0511f: W2-171 run 4 (review round 2, F-1/F-2 test-first; class C2)
+# returned DONE 09:37 (head 8d1bb1636458; probe record in its lead scratch, outside its paths), retired b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run4.md W2-171-A5-run4.json
+# 08:18 b2f0511f: W2-159 run 2 (Interface 2f26bab83; class C2)
+# CHECKPOINTED 09:37 at 97 % usage (resume after the reset), retired b2f0511f: W2-159 DAEO-6lid W2-159-A5-run2.md W2-159-A5-run2.json
+#LAND-AFTER-W2-180 (updated 10:55 b2f0511f), one per batch (row 171), in order: W2-11=6ba93fc8bf35 (by hand on the owner's word: the queue cannot land it before COPIES-5), W2-23=6f171066f650 (DONE 10:54, EXAMIN path; its temporary W1-41 path dropped after the land), W2-177=21627697ddc5, W2-179=996bffd9b4e6, W2-178=6056c4f98d0a, then W2-158=23acb63611bc (DONE 12:23, off-path), W2-159=f08424c88fa0 (12:47, off-path), W2-171=90424b3f6c6f (record run 5 DONE 12:52)
+# 08:42 b2f0511f: W2-158 run 1 (claimed; class C2)
+# CHECKPOINTED 09:35 at 97 % usage (resume after the reset), retired b2f0511f: W2-158 DAEO-8a3f W2-158-A5-run1.md W2-158-A5-run1.json
+# 08:51 b2f0511f: W2-181 run 1 (claimed; class C1)
+# CHECKPOINTED 09:35 at 97 % usage (resume after the reset), retired b2f0511f: W2-181 DAEO-ywb5 W2-181-A5-run1.md W2-181-A5-run1.json
+# 08:52 b2f0511f: W2-146 run 1 (claimed; interface first; class C2)
+# returned PACKAGES 09:22 (P-W2-146-1 (a)), retired b2f0511f: W2-146 DAEO-f6x3 W2-146-A5-run1.md W2-146-A5-run1.json
+# 09:23 b2f0511f: W2-146 run 2 (Interface 3556fd7d1; class C2)
+# CHECKPOINTED 10:01 (the 97 % hold), retired b2f0511f: W2-146 DAEO-f6x3 W2-146-A5-run2.md W2-146-A5-run2.json
+# 09:54 b2f0511f: W2-23 run 5 (P-W2-23-8 (a); EXAMIN's path; class C2)
+# returned DONE 10:54 (head 6f171066f650), land after W2-11, retired b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run5.md W2-23-A5-run5.json
+# 09:54 b2f0511f: W2-115 run 3 (PK-1 (a)+(c), PK-2 (a); class C3)
+# returned PACKAGES 11:18 (PK-3 (a), PK-4 row, PK-5 owner), retired b2f0511f: W2-115 DAEO-emq1 W2-115-A5-run3.md W2-115-A5-run3.json
+# 09:54 b2f0511f: W2-159 run 3 (off-path, a spare slot; class C2)
+# returned PACKAGES 12:47 (only the probe folder in its paths: done d5b63037d), retired b2f0511f: W2-159 DAEO-6lid W2-159-A5-run3.md W2-159-A5-run3.json
+# 09:54 b2f0511f: W2-158 run 2 (off-path, a spare slot; class C2)
+# returned DONE 12:23 (head 23acb63611bc), land in turn, retired b2f0511f: W2-158 DAEO-8a3f W2-158-A5-run2.md W2-158-A5-run2.json
+# 10:01 b2f0511f: W2-146 run 3 (after the reset; off-path spare slot; class C2)
+# returned DONE 11:54 (head ebdbabd2e0d3; CIT-P to the owner before the merge), retired b2f0511f: W2-146 DAEO-f6x3 W2-146-A5-run3.md W2-146-A5-run3.json
+# 11:20 b2f0511f: W2-115 run 4 (fix round, review round 2; class C3)
+# W2-115 DAEO-emq1 W2-115-A5-run4.md W2-115-A5-run4.json (returned PACKAGES 16:16; PK-6 to the owner)
+# 11:23 b2f0511f: W2-124 run 1 (claimed; adoption; class C2)
+# never ran 11:29 (the launcher's resource gate shut at 11:24, memory), retired b2f0511f: W2-124 DAEO-mb2t W2-124-A5-run1.md W2-124-A5-run1.json
+# 11:29 b2f0511f: W2-124 run 1b (re-listed after the gate-shut never-ran; class C2)
+# 11:50 b2f0511f: W2-124 run 1b released (the gate open)
+# returned PACKAGES 11:51 (P1 the CTO's; P2, P3 the owner's: widening), retired b2f0511f: W2-124 DAEO-mb2t W2-124-A5-run1b.md W2-124-A5-run1b.json
+# 12:48 b2f0511f: W2-171 run 5 (the probe record onto the branch; class C2)
+# returned DONE 12:52 (head 90424b3f6c6f, probe record on the branch), retired b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run5.md W2-171-A5-run5.json
+# 12:50 b2f0511f: W2-45 run 1 (claimed f29fa3652; off-path; class C2)
+# returned PACKAGES 12:55 (P-W2-45-1 accepted), retired b2f0511f: W2-45 DAEO-neam W2-45-A5-run1.md W2-45-A5-run1.json
+# 12:53 b2f0511f: W2-11 run 8 (record run; old-form brief because gov brief refuses the ticket, KPI_NO_VERIFY; release_lead.sh not used for that one check)
+# returned PACKAGES 12:59 (core schema reads type: probe; ruled 13:03), retired b2f0511f: W2-11 DAEO-k7hz W2-11-A5-run8.md W2-11-A5-run8.json
+# 12:55 b2f0511f: W2-45 run 2 (Interface accepted; class C2)
+# W2-45 DAEO-neam W2-45-A5-run2.md W2-45-A5-run2.json (returned PACKAGES 15:02; P-W2-45-2 is the owner's P1-J)
+# 13:03 b2f0511f: W2-11 run 9 (the review records' front matter to a body line; old-form brief, gov brief refuses the ticket)
+# returned DONE 13:03 (head 6ba93fc8bf35; the copy cases red until COPIES-5: a hand merge, the owner's decision), retired b2f0511f: W2-11 DAEO-k7hz W2-11-A5-run9.md W2-11-A5-run9.json
+# 13:55 b2f0511f: W2-152 resume (review round 2; old-form brief, gov brief refuses the ticket, KPI_NO_VERIFY; release_lead.sh not used for that one check)
+# W2-152 DAEO-o5x1 W2-152-A5-resume-1112.md W2-152-A5-resume-1112.json  (returned PACKAGES 14:28; decided; close held on P1-H)
+# 13:56 b2f0511f: W2-124 run 2 (Interface, P2 (b); class C2)
+# W2-124 DAEO-mb2t W2-124-A5-run2.md W2-124-A5-run2.json (returned PACKAGES 16:16; P4 to the owner)
+# 14:29 W2-157 reopened for the backstop hang fix (DEC-1144 (2)), C2
+# W2-157 DAEO-ozyt W2-157-A5-fix1.md W2-157-A5-fix1.json (gate shut 14:41, never ran; relaunched as fix1b, DEC-1146)
+# 14:58 W2-121b run 1 (K9 decided, DEC-1144 (5)), C2 FULL
+# W2-121b DAEO-ifgf W2-121b-A5-run1.md W2-121b-A5-run1.json (returned PACKAGES 15:03; P-W2-121b-1 accepted)
+# 14:59 W2-157 fix relaunched after the gate refusal (DEC-1146)
+# W2-157 DAEO-ozyt W2-157-A5-fix1b.md W2-157-A5-fix1b.json (returned DONE 17:46: the hang fixed, head 30e969875de4; land after W2-159)
+# 15:15 W2-121b run 1b: the Interface accepted, test design
+# W2-121b DAEO-ifgf W2-121b-A5-run1b.md W2-121b-A5-run1b.json (returned DONE 15:47, tests)
+# 15:47 W2-121b run 2: the build
+# W2-121b DAEO-ifgf W2-121b-A5-run2.md W2-121b-A5-run2.json (returned DONE 18:46, head 4a8634017)
+# 16:17 W2-124 run 2b: the fix round (P4 with the owner)
+# W2-124 DAEO-mb2t W2-124-A5-run2b.md W2-124-A5-run2b.json (returned DONE 18:00, fix round green at 461d03775bcc)
+# 16:43 W2-45 run 3: the two revisions (DEC-1148 (4)), merge, verify, review
+# W2-45 DAEO-neam W2-45-A5-run3.md W2-45-A5-run3.json (returned PACKAGES 18:48: P-W2-45-3 (a) and -5 (a) the CTO; P-W2-45-4 the owner)
+# 17:16 W2-115 run 5: P1-K (a), the fallback dropped (DEC-1150 (2)); no land before the owner's green-base answer
+# W2-115 DAEO-emq1 W2-115-A5-run5.md W2-115-A5-run5.json (returned DONE 19:00, head ea6dc2c14727; land after W2-27's green-base line)
+# 17:48 W2-172 run 1: EXAMIN's critical path (W2-171 closed 17:38)
+# W2-172 DAEO-p8tv W2-172-A5-run1.md W2-172-A5-run1.json (returned PACKAGES 18:04: the Interface, accepted)
+# 18:00 W2-124 run 3: P1-L (a), the 13 files revised, each case keeping its guard
+# W2-124 DAEO-mb2t W2-124-A5-run3.md W2-124-A5-run3.json (returned DONE 19:52, head 7a3aecb38fb5; the probe folder to add, then its record and the land)
+# 18:23 W2-172 run 1b: Interface accepted, test design (critical path)
+# W2-172 DAEO-p8tv W2-172-A5-run1b.md W2-172-A5-run1b.json (returned PACKAGES 19:08: tests red at 80da3fbcca0d; TESTS-1 decided)
+# 18:52 W2-121b run 3: the template default (DEC-1149 (2)), short
+# W2-121b DAEO-ifgf W2-121b-A5-run3.md W2-121b-A5-run3.json (returned PACKAGES 19:06: config.py not in its paths; the edit after W2-157 lands)
+# 18:56 W2-160 run 1: gov wait, on EXAMIN's path (DEC-1148 (2))
+# W2-160 DAEO-fd0p W2-160-A5-run1.md W2-160-A5-run1.json (returned PACKAGES 19:13: PKG-W2-160-IFACE-1, the command.py widening with the owner)
+# 18:56 W2-88a run 1: the adopt skill's kernel text (DEC-1150 (1))
+# W2-88a DAEO-pg6i W2-88a-A5-run1.md W2-88a-A5-run1.json (returned DONE 19:36, tests red at 1b8595b2b973)
+# 19:10 W2-172 run 2: the build (critical path; TESTS-1 decided in the brief)
+# W2-172 DAEO-p8tv W2-172-A5-run2.md W2-172-A5-run2.json (returned DONE 20:32, head 0c16d8afb0b5; land next, critical path)
+# 19:12 W2-121b run 3b: the default line, config.py now in its paths
+# W2-121b DAEO-ifgf W2-121b-A5-run3b.md W2-121b-A5-run3b.json (returned DONE 19:38, head b24361b51)
+# 19:36 W2-88a run 2: the skill text and its CIT-P (DEC-1150 (1))
+# W2-88a DAEO-pg6i W2-88a-A5-run2.md W2-88a-A5-run2.json (returned DONE 21:17: the CIT-P to the owner at 09:00)
+# 19:53 W2-45 run 4: the F1 fix and W1-40's revision (DEC-1153 (1))
+# W2-45 DAEO-neam W2-45-A5-run4.md W2-45-A5-run4.json (returned DONE 21:16, head 5e53394ce9bc; land after W2-121b)
+# 19:53 W2-160 run 1b: gov wait, the widening in (DEC-1153 (2))
+# W2-160 DAEO-fd0p W2-160-A5-run1b.md W2-160-A5-run1b.json (returned DONE 20:26, tests red at 9c507d513)
+# 20:26 W2-160 run 2: the build of gov wait and the helper watch
+# W2-160 DAEO-fd0p W2-160-A5-run2.md W2-160-A5-run2.json  # PACKAGES 22:24: ROUTE-1 and KNOWN-1 to the owner (09:00)
+# 21:01 W2-98 run 1: the spec-writing skill (W2-27's dependency list)
+# W2-98 DAEO-wi46 W2-98-A5-run1.md W2-98-A5-run1.json (returned PACKAGES 21:06: P-W2-98-IF-1 to the owner at 09:00)
+# 21:21 W2-33 run 1 (deps closed; a free slot)
+# W2-33 DAEO-lrre W2-33-A5-run1.md W2-33-A5-run1.json (returned PACKAGES 21:26: its Interface and a widening to the owner at 09:00)
+# 21:22 W2-113 run 1 (deps closed; a free slot)
+# W2-113 DAEO-g29a W2-113-A5-run1.md W2-113-A5-run1.json (returned PACKAGES 21:27: PKG-1 Interface + PKG-2 the split child, to the owner at 09:00)
+# 21:26 W2-172 run 3: the conftest path-hygiene fix after the 21:19 ejection
+# W2-172 DAEO-p8tv W2-172-A5-run3.md W2-172-A5-run3.json  # DONE 22:26 at 25634cdde460; narrow fix check running (briefs/W2-172-fix-check.md)
+# 21:43 W2-120 run 1 (C2, STANDARD): skill validator front matter; free slot
+# W2-120 DAEO-i89t W2-120-A5-run1.md W2-120-A5-run1.json  # returned PACKAGES 21:49: P-W2-120-1 to the owner (09:00)
+# 21:43 W2-154 run 1 (C2, STANDARD): close serial plugin + nightly count; free slot
+# W2-154 DAEO-l4gf W2-154-A5-run1.md W2-154-A5-run1.json  # returned PACKAGES 21:47: P-W2-154-1 (a) decided; run 2 after W2-45's land (ticket commit)
+# 21:57 W2-154 run 2: P-W2-154-1 (a) interface committed 8107e7b69; tests from step 1
+# W2-154 DAEO-l4gf W2-154-A5-run2.md W2-154-A5-run2.json  # DONE 22:24 (tests); run 3 build released
+# 22:24 W2-154 run 3 build (S1-S3; S4 to the owner)
+# W2-154 DAEO-l4gf W2-154-A5-run3.md W2-154-A5-run3.json  # DONE 23:15 at ae1d68394752; land held for S4 (owner 09:00: a closed ticket cannot be widened)
+# 22:50 W2-160 run 3: DEC-1156 decided (7d8c2d524)
+# W2-160 DAEO-fd0p W2-160-A5-run3.md W2-160-A5-run3.json  # DONE 23:15 at 54a64edbaa79; queued behind W2-181
+# 22:50 W2-33 run 2: DEC-1156 decided (7d8c2d524)
+# W2-33 DAEO-lrre W2-33-A5-run2.md W2-33-A5-run2.json  # DONE 23:20 (tests 3df1ac2deb1b); run 3 build released
+# 22:50 W2-98 run 2: DEC-1156 decided (7d8c2d524)
+# W2-98 DAEO-wi46 W2-98-A5-run2.md W2-98-A5-run2.json  # DONE 23:17 (tests 6c2c3ed93bee); run 3 build released
+# 22:50 W2-113 run 2: DEC-1156 decided (7d8c2d524)
+#  W2-113 DAEO-g29a W2-113-A5-run2.md W2-113-A5-run2.json  # DONE 23:29 (tests 91e9d55f6950); build waits for the owner: PKG-3 (pushed 23:33)
+# 22:50 W2-120 run 2: DEC-1156 decided (7d8c2d524)
+# W2-88 DAEO-2bdu W2-88-A5-run1.md W2-88-A5-run1.json  # PACKAGES 23:22: P-W2-88-IF-1 (a) decided by the CTO; run 2 released
+# W2-120 DAEO-i89t W2-120-A5-run2.md W2-120-A5-run2.json  # DONE 23:28 (tests fdce323721f2); run 3 build released
+# 23:16 W2-88 run 1 (critical path; W2-172 closed)
+# 23:17 W2-98 run 3 build
+# W2-98 DAEO-wi46 W2-98-A5-run3.md W2-98-A5-run3.json  # PACKAGES 01:14: P-W2-98-R2 (round 2 FAIL F1-F3) to the owner
+# 23:20 W2-33 run 3 build
+# W2-33 DAEO-lrre W2-33-A5-run3.md W2-33-A5-run3.json  # DONE 01:03 at d2aaff358a91; run 4: W1-33 revisions; then CIT-P (owner) + copies ACT + hand merge
+# 23:23 W2-88 run 2 tests (P-W2-88-IF-1 (a))
+# W2-88 DAEO-2bdu W2-88-A5-run2.md W2-88-A5-run2.json  # PACKAGES 01:27 (tests 381ef458a565): P-W2-88-TD-1 decided by the CTO; run 3 build
+# 23:28 W2-120 run 3 build
+# W2-120 DAEO-i89t W2-120-A5-run3.md W2-120-A5-run3.json  # DONE 00:55 at 1eec1209bd0a; queued
+# 23:32 W2-111 run 1 (LITE test revision, C1)
+# W2-111 DAEO-qvff W2-111-A5-run1.md W2-111-A5-run1.json  # DONE 00:13 (tests 8b8b561fc426); the load-50 benchmark (the CTO, a window with few leads) before its land
+# 23:44 W2-113 run 3 build (PKG-3 (b), DEC-1157)
+# W2-113 DAEO-g29a W2-113-A5-run3.md W2-113-A5-run3.json  # DONE 01:33 at f42f86309aba; queued
+# 23:45 W2-60a run 4 build (merge held until W2-33, DEC-1157 (15)); integrate merge in progress, one conflict
+# W2-60a DAEO-cv58 W2-60a-A5-run4.md W2-60a-A5-run4.json  # never ran 23:57: LAUNCH_NO_TEMPLATE (old tree); template copied untracked; run4b
+# 23:48 W2-155 run 1 (LITE, merged waits count as met, DEC-1157)
+# W2-155 DAEO-ar89 W2-155-A5-run1.md W2-155-A5-run1.json  # PACKAGES 00:00: PKG W2-155-1 (the owner: DEC-1067 (f) bound / DEC-1068)
+# 23:57 W2-60a run 4b (template placed untracked for the launch)
+# W2-60a DAEO-cv58 W2-60a-A5-run4b.md W2-60a-A5-run4b.json  # ESCALATION_BLOCKED 00:00: could not rm the untracked template; CTO committed it (7ff4b82c9); run4c
+# 00:01 W2-60a run 4c (template committed on the branch)
+# W2-60a DAEO-cv58 W2-60a-A5-run4c.md W2-60a-A5-run4c.json  # LAUNCH_BLOCKED 01:16: P-1 (settings.local.json additionalDirectories) to the owner; P-2..P-4 decided (aa25fea54)
+# 00:17 W2-154 run 4: S4 (a) (the owner, 2026-11-13)
+# W2-154 DAEO-l4gf W2-154-A5-run4.md W2-154-A5-run4.json  # DONE 01:23 at 7bcff333b595; queued
+# 00:34 W2-155 run 2: option 1 (DEC-1159 (2)), option 5 the fallback
+# W2-155 DAEO-ar89 W2-155-A5-run2.md W2-155-A5-run2.json  # PACKAGES 01:52: option 1 slower (0.76-0.79 vs 0.55-0.57 s), reverted; option 5 applied by the fallback of DEC-1159 (2); closes after W2-138, W2-145
+# 01:04 W2-33 run 4: two W1-33 revisions (DEC-1156 (7))
+# W2-33 DAEO-lrre W2-33-A5-run4.md W2-33-A5-run4.json  # DONE 02:10 at 82da49202ab1; hand merge with ACT-CLAUDE-COPIES-6 after W2-154 lands
+# 01:28 W2-88 run 3 build (critical path; TD-1 decided)
+# W2-88 DAEO-2bdu W2-88-A5-run3.md W2-88-A5-run3.json  # PACKAGES 05:28: review r1 FAIL; P-W2-88-B-1 decided by the CTO; run 4
+# 01:36 W2-98 run 4: P-W2-98-R2 (a), the owner
+# W2-98 DAEO-wi46 W2-98-A5-run4.md W2-98-A5-run4.json  # DONE 02:37 at 3a86f11c3981; CIT-P to the owner; then a copies ACT for .claude/skills/spec-writing and a hand merge
+# 01:37 W2-37 resume: held since 10-31 (W2-03 closed), DEC-1157
+# W2-37 DAEO-6n5k W2-37-A5-resume-dec1157.md W2-37-A5-resume-dec1157.json  # PACKAGES 03:02: final probe PASS at 65e8c076873d; P-1 (change-skill section: DEC-816 paths, kernel bytes CIT-P + copies) and F1 (owner) at 09:00
+# 05:28 W2-88 run 4: B-1 decided; fixes + round 2 (critical path)
+# W2-88 DAEO-2bdu W2-88-A5-run4.md W2-88-A5-run4.json  # ended 09:49 on an API 403 (Cloudflare), not the work; resumed as run4b
+# 07:21 W2-111 run 2: test-design round 2 (the CTO's benchmark: CPU time not load-independent, 3 of 15 red at load 20 and 50; re-choose the measure within the ticket, DEC-1157 (12))
+# W2-111 DAEO-qvff W2-111-A5-run2.md W2-111-A5-run2.json  # PACKAGES 08:58: P-W2-111-MEASURE-1 (form B, DEC-906) to the owner
+# 11:14 W2-88 run 4b: resume after the API 403 (09:49), relaunch eng-3 once; then review round 2, the last (critical path); briefs free after b88a76172
+W2-88 DAEO-2bdu W2-88-A5-run4b.md W2-88-A5-run4b.json
+# 11:22 W2-111 run 3: land form B (P-W2-111-MEASURE-1 (a), DEC-1163 (3)); then the CTO's benchmark, then the land
+# W2-111 DAEO-qvff W2-111-A5-run3.md W2-111-A5-run3.json  # DONE 11:37 at 3da7242f4461; the CTO benchmark (formB) then the land
+# 11:23 W2-37 resume: F1 (a) and P-1 (the change skill's impact section, CIT-P to the owner), DEC-1163 (7)
+W2-37 DAEO-6n5k W2-37-A5-resume-dec1163.md W2-37-A5-resume-dec1163.json
+# 11:47 W2-182 run 1: the nightly's drift reds by test revision (DEC-1163 (6)); merge integrate first (its ticket's reads line)
+W2-182 DAEO-5y8d W2-182-A5-run1.md W2-182-A5-run1.json

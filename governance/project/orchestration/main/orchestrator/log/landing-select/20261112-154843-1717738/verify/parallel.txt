@@ -1,0 +1,213 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 15:52:11)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+......................................F................................. [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+..........s............................................................. [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+...............................s.ss..................................... [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+................................................................s.s.s... [ 68%]
+........................................................................ [ 70%]
+.............................................F.F........................ [ 71%]
+........................................................................ [ 73%]
+.............................F.......................................... [ 74%]
+......F...........................................F..................... [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-176-CIT-P.md'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/changes/W2-176-CIT-P.md', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}]
+E       assert [{'code': 'SC...76-CIT-P.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-176-CIT-P.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7fb7886e7b00>, position = 0
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7fb7886e5dc0>, position = 2
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_______ test_s3_a_partial_offload_line_written_since_the_start_trips_it ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7d4ab3ae3ef0>
+
+    def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
+        log = rig.tmp / "serve.log"
+        log.write_text("offloaded 1/9 layers to GPU\n")  # before the start: never counts
+        rig.smi("100, 24000", "100, 24000", "100, 24000")
+        rig.config(embedders=[(9, log)])
+        seen = []
+    
+        def append_after_first_reading(seconds):
+            seen.append(seconds)
+            if len(seen) == 1:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 33/33 layers to GPU\n")
+            if len(seen) == 2:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 20/33 layers to GPU\n")
+    
+        rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.smi_calls() == 3
+E       assert (True and 2 == 3)
+E        +  where 2 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7d4ab3ae3ef0>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:352: AssertionError
+___ test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on ____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7d4ab33a1fd0>
+
+    def test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on(rig):
+        rig.smi("15900, 24000")
+        rig.config()
+        named = rig.job()
+        other = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"], start_new_session=True)
+        rig.groups.append(other)
+        backstop.watch([named], rig.root, rig.env)
+>       assert rig.state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
+E       AssertionError: assert ('R' == 'T'
+E         
+E         - T
+E         + R)
+
+tests/unit/resources/test_w2_157_backstop.py:441: AssertionError
+_______ test_s1_below_then_above_the_limit_pauses_at_the_second_reading ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x75017e0358e0>
+
+    def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
+        rig.smi("15800, 24000", "15900, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env)
+        assert result["tripped"] is True and result["paused"] == [job]
+        assert rig.smi_calls() == 2  # the first reading did not trip, the second did
+        assert rig.state(rig.groups[0].pid) == "T"
+        assert result["reading"] == {"used_mib": 15900, "total_mib": 24000}
+        assert "15900" in result["reason"] and "15872" in result["reason"]
+>       assert rig.sleeps == [5]
+E       assert [0.001, 0.002...6, 0.032, ...] == [5]
+E         
+E         At index 0 diff: 0.001 != 5
+E         Left contains 4465 more items, first extra item: 0.002
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:175: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/landing-select/20261112-154843-1717738/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1820935) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+6 failed, 4597 passed, 7 skipped, 6 warnings in 766.42s (0:12:46)

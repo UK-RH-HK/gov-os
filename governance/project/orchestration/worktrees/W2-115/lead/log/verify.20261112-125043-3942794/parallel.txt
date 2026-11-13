@@ -1,0 +1,604 @@
+bringing up nodes...
+bringing up nodes...
+
+...............................................F....F.F................. [  1%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+................................................F...........F........... [  6%]
+...........................F................F........................... [  7%]
+...........................................F............................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+.............F.......................................................... [ 15%]
+..........................F.........F................................... [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+..............................................F......................... [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+......................sss............................................... [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+.....................F.................................................. [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................sss............................................. [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+....................................................................F... [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+..........F........................................................F.... [ 87%]
+............................F........................................... [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.......................................................                  [100%]
+=================================== FAILURES ===================================
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x76e581186840>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+___ test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land ___
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+own_new_test = <test_w2_115_batch.OwnNewTest object at 0x742a6cd29340>
+
+    def test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land(own_new_test):
+        """F-3 (S6, F3): A's red is a test A itself adds; no build without one candidate turns it green (without A it
+        is absent). Once confirmed with A alone, A is the culprit: named in the close records, not closed, its work not
+        on ``main``; B and C land on the same run. Not refused as unexplained."""
+        batch = own_new_test
+        assert batch.project.ticket_status(A) != "closed", f"the culprit closed\n{batch.run.describe()}"
+        assert not support.is_ancestor(batch.project, batch.commits[A]), "the culprit's work landed on main"
+        for ticket in (B, C):
+>           assert batch.landed(ticket), f"{ticket} did not land\n{batch.run.describe()}"
+E           AssertionError: PROJ-b1b1 did not land
+E             gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/w2_115_batch_own_new_test0/project --json
+E             exit code: 3
+E             stdout:
+E             {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands", "details": {"base": "6efdcba71601a61b8a8d34c396517285e06a8163", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": ["PROJ-aaaa"], "landed": [], "land_commit": null, "reds": ["tests/unit/widget/test_w2_115_added.py::test_w2_115_added"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/w2_115_batch_own_new_test0/project/.gov-runtime/close/batch/20261112T123357Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register", "tests/unit/widget/test_w2_115_added.py"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/unit/widget/test_w2_115_added.py::test_w2_115_added": ["PROJ-aaaa"]}}}}
+E             
+E             stderr:
+E             RUN_INCOMPLETE: the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands
+E             
+E           assert False
+E            +  where False = landed('PROJ-b1b1')
+E            +    where landed = <test_w2_115_batch.OwnNewTest object at 0x742a6cd29340>.landed
+
+tests/acceptance/W2-115/test_w2_115_batch.py:154: AssertionError
+____ test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found ____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+own_new_test = <test_w2_115_batch.OwnNewTest object at 0x742a6cd29340>
+
+    def test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found(own_new_test):
+        """F-3 (S6, F3): no commit on ``main`` ever held A's new test, and no revert was made."""
+        batch = own_new_test
+>       assert batch.project.head() != batch.base, f"nothing landed\n{batch.run.describe()}"
+E       AssertionError: nothing landed
+E         gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/w2_115_batch_own_new_test0/project --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands", "details": {"base": "6efdcba71601a61b8a8d34c396517285e06a8163", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": ["PROJ-aaaa"], "landed": [], "land_commit": null, "reds": ["tests/unit/widget/test_w2_115_added.py::test_w2_115_added"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/w2_115_batch_own_new_test0/project/.gov-runtime/close/batch/20261112T123357Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register", "tests/unit/widget/test_w2_115_added.py"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/unit/widget/test_w2_115_added.py::test_w2_115_added": ["PROJ-aaaa"]}}}}
+E         
+E         stderr:
+E         RUN_INCOMPLETE: the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands
+E         
+E       assert '6efdcba71601a61b8a8d34c396517285e06a8163' != '6efdcba71601a61b8a8d34c396517285e06a8163'
+E        +  where '6efdcba71601a61b8a8d34c396517285e06a8163' = head()
+E        +    where head = <w2_115_support.Smart object at 0x742a6b234d40>.head
+E        +      where <w2_115_support.Smart object at 0x742a6b234d40> = <test_w2_115_batch.OwnNewTest object at 0x742a6cd29340>.project
+E        +  and   '6efdcba71601a61b8a8d34c396517285e06a8163' = <test_w2_115_batch.OwnNewTest object at 0x742a6cd29340>.base
+
+tests/acceptance/W2-115/test_w2_115_batch.py:175: AssertionError
+____ test_a_red_the_head_without_the_change_does_not_have_refuses_the_close ____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x742a6b543240>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_the_head_without_th0/sa...xPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_the_head_without_th0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_the_head_without_th0')
+
+    def test_a_red_the_head_without_the_change_does_not_have_refuses_the_close(make_project, sandbox, tmp_path):
+        """F1, S4: a red the head without the change does not have is the change's: the close does not close; the red
+        ran again alone and once on the head without the change, where it passed."""
+        told = tmp_path / "project-told"
+        reds = {BB_WIDGET.split("::")[0]: support.telling("test_bb_reads_the_widget", told, support.WIDGET_NOT_BROKEN)}
+        project, run = _caused(make_project, sandbox, reds, [], {support.WIDGET: "# the widget, CHANGED BROKEN\n"})
+        _assert_caused(project, run, BB_WIDGET)
+        runs = project.told_runs("test_bb_reads_the_widget")
+        head, base = support.head_side(runs), support.base_side(runs)
+        assert len(head) == 2 and not any(r["ok"] for r in head), f"the red was not run again alone: {len(head)} runs"
+>       assert len(base) == 1 and base[0]["ok"], f"the red was not run once on the head without the change: {base}"
+E       AssertionError: the red was not run once on the head without the change: []
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:207: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x76e5811867a0>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x76e581185ee0>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_ test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x742a6b4fc5e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_an_untrailered_comm0/sa...xPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_an_untrailered_comm0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_an_untrailered_comm0')
+
+    def test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused(make_project, sandbox, tmp_path):
+        """F-1 (S4, F1): the green base G is an ancestor of HEAD, so reds are judged against G. The engineer's commit
+        without a ``Task:`` trailer breaks W2-bb's widget test after G; the ticket's trailered work follows. The red is
+        the change's: refused with RED_CAUSED, marked caused in the close record, no repair ticket opened for it, and
+        the test ran and passed on G (not on the untrailered commit, where it is already red)."""
+        project, before, run = _green_base_then_slip(make_project, sandbox, tmp_path,
+                                                     slip="# the widget, CHANGED BROKEN\n",
+                                                     work="# the widget, CHANGED BROKEN, and more\n")
+>       _assert_red_caused(project, before, run, BB_WIDGET)
+
+tests/acceptance/W2-115/test_w2_115_reds.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w2_115_support.Smart object at 0x742a6c09b710>
+before = {'PROJ-aaaa', 'PROJ-bbbb', 'PROJ-cccc', 'PROJ-dddd', 'PROJ-eeee', 'PROJ-ffff', ...}
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register"]}}}\n', stderr='', seconds=2.3602557979902485)
+node = 'tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget'
+
+    def _assert_red_caused(project, before, run, node):
+        """Refused with RED_CAUSED naming ``node``; the ticket stays open; a close record, when the refused close writes
+        one, marks ``node`` caused (today's refused close writes none; README, reading 7); no repair ticket names it;
+        on the head without the change it ran and passed (the base it was judged against)."""
+        said = support.assert_refused(run, RED_CAUSED)
+        assert node in said, f"the refusal does not name the caused red {node}\n{run.describe()}"
+        assert project.ticket_status() == "in_progress", "the ticket closed with a red its change caused"
+        if (project.root / "docs" / "close" / support.TICKET / f"CL-{support.TICKET}.md").is_file():
+            entry = support.red_entry(project.record(), node)
+            assert entry.get("caused") is True, f"the close record does not mark the red as the change's: {entry}"
+        repairs = [p.name for p in (project.root / ".tickets").glob("*.md")
+                   if p.stem not in before and node in p.read_text(encoding="utf-8")]
+        assert not repairs, f"a repair ticket was opened for a red the change caused: {repairs}"
+        base = support.base_side(project.told_runs(node.split("::")[1]))
+>       assert base and all(r["ok"] for r in base), \
+            f"the red was not judged against a base where it passes (runs without the change: {base})"
+E       AssertionError: the red was not judged against a base where it passes (runs without the change: [])
+E       assert ([])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:284: AssertionError
+_ test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_project = <function make_project.<locals>.make at 0x742a6b5baf20>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_a_trailered_commit_0/sa...xPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_a_trailered_commit_0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw2/test_a_red_a_trailered_commit_0')
+
+    def test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused(make_project, sandbox, tmp_path):
+        """F-1's control (S4, F1): the same history, but the untrailered commit is green and the ticket's trailered
+        commit breaks the test: still refused with RED_CAUSED, marked caused, no repair ticket."""
+        project, before, run = _green_base_then_slip(make_project, sandbox, tmp_path,
+                                                     slip="# the widget, tidied\n",
+                                                     work="# the widget, CHANGED BROKEN\n")
+>       _assert_red_caused(project, before, run, BB_WIDGET)
+
+tests/acceptance/W2-115/test_w2_115_reds.py:305: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w2_115_support.Smart object at 0x742a6eb3dd90>
+before = {'PROJ-aaaa', 'PROJ-bbbb', 'PROJ-cccc', 'PROJ-dddd', 'PROJ-eeee', 'PROJ-ffff', ...}
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register"]}}}\n', stderr='', seconds=2.1900394530093763)
+node = 'tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget'
+
+    def _assert_red_caused(project, before, run, node):
+        """Refused with RED_CAUSED naming ``node``; the ticket stays open; a close record, when the refused close writes
+        one, marks ``node`` caused (today's refused close writes none; README, reading 7); no repair ticket names it;
+        on the head without the change it ran and passed (the base it was judged against)."""
+        said = support.assert_refused(run, RED_CAUSED)
+        assert node in said, f"the refusal does not name the caused red {node}\n{run.describe()}"
+        assert project.ticket_status() == "in_progress", "the ticket closed with a red its change caused"
+        if (project.root / "docs" / "close" / support.TICKET / f"CL-{support.TICKET}.md").is_file():
+            entry = support.red_entry(project.record(), node)
+            assert entry.get("caused") is True, f"the close record does not mark the red as the change's: {entry}"
+        repairs = [p.name for p in (project.root / ".tickets").glob("*.md")
+                   if p.stem not in before and node in p.read_text(encoding="utf-8")]
+        assert not repairs, f"a repair ticket was opened for a red the change caused: {repairs}"
+        base = support.base_side(project.told_runs(node.split("::")[1]))
+>       assert base and all(r["ok"] for r in base), \
+            f"the red was not judged against a base where it passes (runs without the change: {base})"
+E       AssertionError: the red was not judged against a base where it passes (runs without the change: [])
+E       assert ([])
+
+tests/acceptance/W2-115/test_w2_115_reds.py:284: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x76e5811854e0>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 75094.357079837, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+________________ test_the_twelve_sources_are_the_composition[] _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: engineer
+E           assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'
+E             
+E             Skipping 1377 identical leading characters in diff, use -v to show
+E               it_for}.
+E             + 
+E             + Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E             + 
+E             + Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957]....
+E             
+E             ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...research.md'}] == []
+E         
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-emq1/PR-...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]
+E       assert [{'at': '$', ...perty)', ...}] == []
+E         
+E         Left contains one more item: {'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-emq1/PR-DAEO-...sing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x70ca68583420>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 75277.055582186, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x70ca685eaac0>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 75341.982510797, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x731228fb7560>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x731228fb7560>
+schema = PosixPath('/home/usain/gov-os-worktrees/W2-115/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-0mtg-PR-DAEO-0mtg': {'commissioned_by': 'orchestrator', 'implementer_session': "unknown (the engineer's log was...lementer_session': '8f696f48-3724-45bd-8ef2-dcc024b3ff5f', 'judged_by': 'orchestrator', 'judgement': 'pass', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-52/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-emq1-PR-DAEO-emq1-round-1.json::$: 'implementer_session' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x731228f8fec0>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md': [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]}
+E       assert not {'docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md': [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_s...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 1 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-emq1/PR-DAEO-emq1-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}])
+E       assert not [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-emq1/PR-DAEO...ing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-115/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3265138) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+17 failed, 4568 passed, 6 skipped, 6 warnings in 945.38s (0:15:45)

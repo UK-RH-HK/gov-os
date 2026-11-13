@@ -1,0 +1,12 @@
+clone /home/usain/gov-os-runs/W2-179/clone at 4a9d5d0748343351b60d6de38cdb6e5ddd07dbd4
+OK | /home/usain/gov-os-runs/W2-179/clone | merged | expected pass | got pass (rc 0) | 1 passed, 9 deselected in 0.65s
+OK | /home/usain/gov-os-runs/W2-179/clone | planted-outside | expected fail | got fail (rc 1) | 1 failed, 9 deselected in 0.62s
+E       AssertionError: ['/home/usain/gov-os-runs/W2-179/planted-outside/x.txt']
+OK | /home/usain/gov-os-runs/W2-179/clone | planted-own | expected pass | got pass (rc 0) | 1 passed, 9 deselected in 0.62s
+clone /tmp/w2-179-else/clone at 4a9d5d0748343351b60d6de38cdb6e5ddd07dbd4
+OK | /tmp/w2-179-else/clone | merged | expected pass | got pass (rc 0) | 1 passed, 9 deselected in 0.58s
+OK | /tmp/w2-179-else/clone | planted-outside | expected fail | got fail (rc 1) | 1 failed, 9 deselected in 0.58s
+E       AssertionError: ['/home/usain/gov-os-runs/W2-179/planted-outside/x.txt']
+OK | /tmp/w2-179-else/clone | planted-own | expected pass | got pass (rc 0) | 1 passed, 9 deselected in 0.59s
+OK | /home/usain/gov-os-runs/W2-179/clone | pre-revision | expected fail | got fail (rc 1) | 1 failed, 9 deselected in 0.59s
+E       AssertionError: ['/home/usain/gov-os-runs/W2-179/clone/tests/acceptance/W2-170', '/home/usain/gov-os-runs/W2-179/clone/src/gov/__pycac...n/gov-os-runs/W2-179/clone/src/gov/memaudit/__init__.py', '/home/usain/gov-os-runs/W2-179/clone/src/gov/memaudit', ...]

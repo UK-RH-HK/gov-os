@@ -1,0 +1,7 @@
+log: W2-113-A5-run1.json
+W2: W2-113
+status: PACKAGES
+
+task: DAEO-g29a
+status: PACKAGES
+work_completed: I stopped the tests run at the interface check (DEC-1052), before any worker started. Identity and worktree are as expected (orchestrator, DAEO-g29a, w2/W2-113 at 5fd8b2ac7437). There was no checkpoint, so this is a fresh run. S1, F1 and F3 assume that adoption creates a coordination ticket, but no adoption step does. The ticket doesn't say which stage should create it or write the key, so a test designer can't write S1/F1/F3 and an engineer can't build them. I also found that DEC-996 (1) already approved splitting W2-113, and the child ticket w

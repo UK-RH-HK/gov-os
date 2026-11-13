@@ -1,0 +1,201 @@
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] 
+AssertionError: assert 0 == (128 + 2)  +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+project = (PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7b443018e700>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] 
+AssertionError: assert False  +  where False = exists()  +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] 
+AssertionError: assert 0 == (128 + 2)  +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+launch = <function planted.<locals>.launch at 0x7b4430f0d620>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+
+=== tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_ctrl
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 78434.941946364, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+=== tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[] 
+AssertionError: engineer assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'      Skipping 1377 identical leading characters in diff, use -v to show     it_for}.   +    + Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: engineer
+E           assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'
+E             
+E             Skipping 1377 identical leading characters in diff, use -v to show
+E               it_for}.
+E             + 
+E             + Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E             + 
+E             + Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957]....
+E             
+E             ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+
+=== tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition 
+AssertionError: assert [{'code': 'SO...research.md'}] == []      Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governan
+def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...research.md'}] == []
+E         
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+
+=== tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r14_a_stopp
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 78566.769392455, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+=== tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] 
+subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r16_an_own_
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-115...>
+endtime = 78631.701529937, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-115/pytest-of-usain/pytest-65/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+

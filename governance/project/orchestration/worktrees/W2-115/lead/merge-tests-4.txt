@@ -1,0 +1,7 @@
+W2-115 (DAEO-emq1): merge the td-4 acceptance cases (F-1: reds judged against the green base when an ancestor; F-3: a culprit's own new test blamed once confirmed alone)
+
+Task: DAEO-emq1
+Role: orchestrator
+Implements: DEC-988, DEC-989, DEC-979, DEC-1002, DEC-983
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

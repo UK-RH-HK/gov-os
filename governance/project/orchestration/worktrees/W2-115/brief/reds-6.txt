@@ -1,0 +1,63 @@
+head b5ae48b88654
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+___ test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land ___
+tests/acceptance/W2-115/test_w2_115_batch.py:154: in test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land
+    assert batch.landed(ticket), f"{ticket} did not land\n{batch.run.describe()}"
+E   AssertionError: PROJ-b1b1 did not land
+E     gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115-reds5/pytest-of-usain/pytest-0/w2_115_batch_own_new_test0/project --json
+E     exit code: 3
+E     stdout:
+E     {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands", "details": {"base": "ce8b4fb4868f106bd2aabe67e0be937bc32f19b8", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": ["PROJ-aaaa"], "landed": [], "land_commit": null, "reds": ["tests/unit/widget/test_w2_115_added.py::test_w2_115_added"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115-reds5/pytest-of-usain/pytest-0/w2_115_batch_own_new_test0/project/.gov-runtime/close/batch/20261112T125211Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register", "tests/unit/widget/test_w2_115_added.py"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/unit/widget/test_w2_115_added.py::test_w2_115_added": ["PROJ-aaaa"]}}}}
+E     
+E     stderr:
+E     RUN_INCOMPLETE: the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands
+E     
+E   assert False
+E    +  where False = landed('PROJ-b1b1')
+E    +    where landed = <test_w2_115_batch.OwnNewTest object at 0x7d4c37e47a40>.landed
+____ test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found ____
+tests/acceptance/W2-115/test_w2_115_batch.py:175: in test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found
+    assert batch.project.head() != batch.base, f"nothing landed\n{batch.run.describe()}"
+E   AssertionError: nothing landed
+E     gov gov.close.batch run PROJ-aaaa PROJ-b1b1 PROJ-c1c1 --root /tmp/gov-os-lead-W2-115-reds5/pytest-of-usain/pytest-0/w2_115_batch_own_new_test0/project --json
+E     exit code: 3
+E     stdout:
+E     {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands", "details": {"base": "ce8b4fb4868f106bd2aabe67e0be937bc32f19b8", "candidates": ["PROJ-aaaa", "PROJ-b1b1", "PROJ-c1c1"], "culprits": ["PROJ-aaaa"], "landed": [], "land_commit": null, "reds": ["tests/unit/widget/test_w2_115_added.py::test_w2_115_added"], "flaky": [], "clone": {"path": ".gov-runtime/close/clone", "reused": true, "replaced": null}, "folder": "/tmp/gov-os-lead-W2-115-reds5/pytest-of-usain/pytest-0/w2_115_batch_own_new_test0/project/.gov-runtime/close/batch/20261112T125211Z", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-b1/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-c1/", "tests/acceptance/W2-cc/", "tests/acceptance/W2-ff/", "tests/acceptance/W2-rr/test_rr_records.py::test_rr_reads_the_register", "tests/unit/widget/test_w2_115_added.py"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 7, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "explains": {"tests/unit/widget/test_w2_115_added.py::test_w2_115_added": ["PROJ-aaaa"]}}}}
+E     
+E     stderr:
+E     RUN_INCOMPLETE: the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands
+E     
+E   assert 'ce8b4fb4868f106bd2aabe67e0be937bc32f19b8' != 'ce8b4fb4868f106bd2aabe67e0be937bc32f19b8'
+E    +  where 'ce8b4fb4868f106bd2aabe67e0be937bc32f19b8' = head()
+E    +    where head = <w2_115_support.Smart object at 0x7d4c37e47350>.head
+E    +      where <w2_115_support.Smart object at 0x7d4c37e47350> = <test_w2_115_batch.OwnNewTest object at 0x7d4c37e47a40>.project
+E    +  and   'ce8b4fb4868f106bd2aabe67e0be937bc32f19b8' = <test_w2_115_batch.OwnNewTest object at 0x7d4c37e47a40>.base
+____ test_a_red_the_head_without_the_change_does_not_have_refuses_the_close ____
+tests/acceptance/W2-115/test_w2_115_reds.py:207: in test_a_red_the_head_without_the_change_does_not_have_refuses_the_close
+    assert len(base) == 1 and base[0]["ok"], f"the red was not run once on the head without the change: {base}"
+E   AssertionError: the red was not run once on the head without the change: []
+E   assert (0 == 1)
+E    +  where 0 = len([])
+_ test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused _
+tests/acceptance/W2-115/test_w2_115_reds.py:296: in test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused
+    _assert_red_caused(project, before, run, BB_WIDGET)
+tests/acceptance/W2-115/test_w2_115_reds.py:284: in _assert_red_caused
+    assert base and all(r["ok"] for r in base), \
+E   AssertionError: the red was not judged against a base where it passes (runs without the change: [])
+E   assert ([])
+_ test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused _
+tests/acceptance/W2-115/test_w2_115_reds.py:305: in test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused
+    _assert_red_caused(project, before, run, BB_WIDGET)
+tests/acceptance/W2-115/test_w2_115_reds.py:284: in _assert_red_caused
+    assert base and all(r["ok"] for r in base), \
+E   AssertionError: the red was not judged against a base where it passes (runs without the change: [])
+E   assert ([])
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-115/test_w2_115_batch.py::test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land
+FAILED tests/acceptance/W2-115/test_w2_115_batch.py::test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_the_head_without_the_change_does_not_have_refuses_the_close
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused
+5 failed in 9.38s
+exit 1

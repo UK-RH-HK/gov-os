@@ -1,0 +1,88 @@
+# The CTO's ready list (DEC-1007). Restarted under DEC-1039 by session debdb3f7 at 19:29: the infrastructure fixes only (emergency, freeze in force).
+# Parked: ready.parked-by-stop-1821.txt, ready.parked-by-freeze.txt.
+# W2-112 returned PACKAGES 21:17 (P-W2-112-F9 with the owner); its resume waits for the answer.
+# W2-112 r3 STOPPED by the owner (DEC-1051), resumes after the refactoring and the re-pins.
+# 11-11 15:50, session 8ddb8b14 (DEC-1126 (2): usage (A) ended; DEC-1128 (6): the memory audit before 11-23): W2-170 first; its brief by gov brief (code)
+# 11-11 17:58, session b40cba91 (the owner: READY-AFTER-LIFT-1 approved; W2-170 first, then batches 1-3, at most 3 leads until ACT A): W2-170 relaunched on its Interface (a new log; the old one returned PACKAGES 15:20)
+# W2-170 DAEO-61vm W2-170-A5-tests2.md W2-170-A5-tests2.json  (done 18:30)
+# 11-11 18:20, session b40cba91: batch 1 Track B (BATCH-PREP §4), hand-built briefs with gov brief's refusal recorded (DEC-1130 (1)); at most 3 leads until ACT A: W2-81 land and W2-105 tests wait for a free slot (briefs in briefs/)
+# W2-04 and W2-11 refused 18:08/18:11: LAUNCH_NO_TEMPLATE (branches before W2-153's role templates). W2-04 fast-forwarded to integrate, W2-81 merged integrate (76c9b5cd1); W2-11's merge conflicts (a kernel template and a W1-35 acceptance file): off the list until resolved by role
+# W2-04 r6b died at launch 18:15 (its brief file was empty: a refused gov brief left a 0-byte file the copy skipped); r6c on the hand-built brief
+# done 18:40: W2-04 review DONE (READY, probe c77dc358d); next: its close (CTO)
+# W2-04 DAEO-u4oz W2-04-A5-r6c-review.md W2-04-A5-r6c-review.json
+# returned 18:38 PACKAGES: README map (designer W2-81-A1 launched 18:58) and the W1-01 exemption (owner, P1); a new land run after both
+# W2-81 DAEO-l78m W2-81-A5-r5b-land.md W2-81-A5-r5b-land.json
+# 18:35 b40cba91: W2-170's build run (tests DONE 18:30 at 79a8fb87f19e; Interface readings 5-8 at 9e40aa184)
+# returned 19:27 DONE: W2-170 DAEO-61vm W2-170-A5-build.md W2-170-A5-build.json
+# 19:10 b40cba91: batch 1 second wave, W2-66c tests (worktree on a fresh branch from integrate; hand-built brief, DEC-1130 (1))
+# returned 19:27 DONE: W2-66c DAEO-btcs W2-66c-A5-r2-tests.md W2-66c-A5-r2-tests.json
+# ===== 11-11 19:30 b40cba91: THE ORDER (the owner, 19:20: unblockers first, long poles early, cheap closes, every slot used,
+# nothing that waits on a known red). The dispatcher does not enforce max_leads yet (ACT A will): only ONE live lead line at a
+# time below; each '#NEXT' line is uncommented by the CTO when its trigger holds and a lead slot frees.
+# NEXT 1 RELEASED 19:50 (brief 98 KB, no slot left):
+# returned 20:34 PACKAGES (P-MEMAUDIT (a), P-ACCEPT-MAP decided): W2-05 DAEO-0z8c W2-05-A5-r7-fix.md W2-05-A5-r7-fix.json
+# returned 21:34 DONE (land via land.txt at once): W2-05 DAEO-0z8c W2-05-A5-r8-land.md W2-05-A5-r8-land.json
+# NEXT 2 RELEASED 19:40 (exemption 7b5c3cb94fd9; README 294f3e84b + 4009d597a; brief re-filled):
+# returned 19:54 DONE, merged: W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
+# NEXT 3 RELEASED 20:05 (fixes 19ac51dd9; brief rebuilt, slots filled; template present):
+# returned 20:24 DONE (land via land.txt; README map pass next): W2-105 DAEO-zpdj W2-105-A5-r4-tests.md W2-105-A5-r4-tests.json
+# W2-175 (DEC-1137 (2), before EXAMIN's copy; W2-27 depends on it), RELEASED 20:05 (claimed 7709021ad; worktree on integrate; brief by gov brief):
+# returned 20:42 PACKAGES (P-1 brake cleared, P-2 (a) scope amended): W2-175 DAEO-wahn W2-175-A5-run1.md W2-175-A5-run1.json
+# returned 21:07 DONE (review 1 READY; waits the owner's template approval, DEC-1116): W2-175 DAEO-wahn W2-175-A5-run2.md W2-175-A5-run2.json
+#NEXT 4 (after W2-11's merge by its designer; the long pole, 4-6 h): W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json   [re-filled brief]
+# NEXT 5 RELEASED 19:58 (DEC-1138: cap five; exemption in; brief ready; its merge conflicts are resolved by a designer inside the run, drafts/w2-90b/RESOLUTION.md):
+# 19:47 REFUSED LAUNCH_NO_TEMPLATE (branch not merged); a designer merges first (W2-90b-A1-merge), then relist as r2b:
+# NEXT 5b RELEASED 21:00 (pre-merge b3ed3f88d, merge cb0e69ba5, template present):
+# returned 21:20 DONE (land via land.txt): W2-90b DAEO-nqa2 W2-90b-A5-r2b-land.md W2-90b-A5-r2b-land.json
+#NEXT 6 (after W2-149 closes): W2-173 DAEO-qz4p W2-173-A5-run1.md W2-173-A5-run1.json
+#NEXT 7 (after W2-81 and W2-11 close): W2-98 DAEO-wi46 W2-98-A5-run1.md W2-98-A5-run1.json ; W2-93 DAEO-6y0x W2-93-A5-run1.md W2-93-A5-run1.json (+ the owner's EXAMIN route)
+#NEXT 8 (after the owner's EXAMIN-SETS route): W2-94 DAEO-g87r W2-94-A5-run1.md W2-94-A5-run1.json
+# NEXT 9 RELEASED 20:50 (claimed 8fc771dc0; paths cut to experiments/EXP-002; worktree from integrate; research run brief):
+# returned 21:20 DONE (land via land.txt): W2-40 DAEO-6ox0 W2-40-A5-run1.md W2-40-A5-run1.json
+# Beside the leads (workers within the gate, not lead slots): W2-105 test fixes (designer), W2-11 merge (designer), W2-112 and
+# W2-149 probes (reviewers), W2-148 probe record (from its READY reviews if valid), then their closes by DEC-953; W2-81 README (running).
+# 19:35 b40cba91: W2-170's FULL review run (build DONE 19:27 at 5795081004a8)
+# returned 19:43 PACKAGES (RV1; reading 9 decided, the fix run below)
+# W2-170 DAEO-61vm W2-170-A5-review.md W2-170-A5-review.json
+# returned 20:25 DONE, merged: W2-170 DAEO-61vm W2-170-A5-fix.md W2-170-A5-fix.json
+# 21:59 b2f0511f: W2-11 r6 resume (restore c174e2c7f, designer c96136eb6 DONE; pre-release check: role-lead.md present, brief 98861 bytes, brace tokens only the key table, log name unused)
+# returned (log exists), retired 00:59 b2f0511f: W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json
+# 22:12 b2f0511f: W2-23 run 1 (claimed 219307d1d; DoR by hand; gov brief lead --run build with its part; pre-release check: role-lead.md present, brief 11478 bytes, brace tokens only the key table, log name unused)
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run1.md W2-23-A5-run1.json
+# 22:19 b2f0511f: W2-23 run 2 (resume: run 1 PACKAGES answered in the ticket; gov brief --run resume)
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run2.md W2-23-A5-run2.json
+# 22:38 b2f0511f: W2-11 r7 resume (r6 PACKAGES decided b9dc19fca/9c0f0fd22; hand-built brief, gov brief KPI_NO_VERIFY; brake cleared, log name unused)
+# returned (log exists), retired 00:59 b2f0511f: W2-11 DAEO-k7hz W2-11-A5-r7-resume.md W2-11-A5-r7-resume.json
+# 23:06 b2f0511f: DEC-1140 (owner: the 80 % brake lifted for the week, up to five leads, EXAMIN first): W2-110 and W2-52 resumes (hand-built, KPI_NO_VERIFY), W2-115 run 1 (claimed); pre-release checks done
+# returned (log exists), retired 00:59 b2f0511f: W2-52 DAEO-siiz W2-52-A5-resume-1111.md W2-52-A5-resume-1111.json
+# returned (log exists), retired 00:59 b2f0511f: W2-115 DAEO-emq1 W2-115-A5-run1.md W2-115-A5-run1.json
+# 23:22 b2f0511f: W2-176 run 1 (DEC-1140 (1)(b); claimed fefc01a93; pre-release checks done)
+# returned (log exists), retired 00:59 b2f0511f: W2-176 DAEO-ktiw W2-176-A5-run1.md W2-176-A5-run1.json
+# 23:25 b2f0511f: W2-23 run 3 (run 2's packages decided in the ticket; class C2 by RUBRIC-2)
+# returned (log exists), retired 00:59 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run3.md W2-23-A5-run3.json
+# 23:35 b2f0511f: W2-110 resume (merge-back done by the CTO; class C3)
+# returned (log exists), retired 00:59 b2f0511f: W2-110 DAEO-3r1j W2-110-A5-resume-1111.md W2-110-A5-resume-1111.json
+# 23:57 b2f0511f: W2-115 run 2 (run 1's P1-P5 decided; the queue lines split to W2-115b; S17 waits for its CIT-P)
+# returned (log exists), retired 00:59 b2f0511f: W2-115 DAEO-emq1 W2-115-A5-run2.md W2-115-A5-run2.json
+# 00:25 b2f0511f: W2-52 run 6 (P-9 (a) decided; one test-design batch; the old probe holds)
+# returned (log exists), retired 00:59 b2f0511f: W2-52 DAEO-siiz W2-52-A5-r6.md W2-52-A5-r6.json
+# 00:35 b2f0511f: W2-110 run (P-W2-110-5 (a): W2-105's fixture roster by a test designer)
+# returned (log exists), retired 01:58 b2f0511f: W2-110 DAEO-3r1j W2-110-A5-r2.md W2-110-A5-r2.json
+# 00:47 b2f0511f: W2-176 run 2 (run 1's P1-P4 decided; review round 2 the last)
+# returned (log exists), retired 01:58 b2f0511f: W2-176 DAEO-ktiw W2-176-A5-run2.md W2-176-A5-run2.json
+# 00:51 b2f0511f: W2-23 run 4 (P-W2-23-7 (a): round 2 on S3, the last)
+# returned (log exists), retired 01:58 b2f0511f: W2-23 DAEO-kmcr W2-23-A5-run4.md W2-23-A5-run4.json
+# 01:36 b2f0511f: W2-121 run 1 (DEC-1140 (5); claimed; class C2)
+# returned (log exists), retired 01:58 b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run1.md W2-121-A5-run1.json
+# 01:36 b2f0511f: W2-173 run 1 (DEC-1140 (5); claimed; class C3)
+# returned (log exists), retired 01:58 b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run1.md W2-173-A5-run1.json
+# 01:41 b2f0511f: W2-171 run 1 (DEC-1140 (5); the slot W2-121's packages freed; class C2)
+# returned (log exists), retired 01:58 b2f0511f: W2-171 DAEO-k1e2 W2-171-A5-run1.md W2-171-A5-run1.json
+# 01:58 b2f0511f: W2-121 part a run 2 (split and Interface decided aafa67f74; class C2)
+# returned (killed by the 02:00 network outage), retired 02:15 b2f0511f: W2-121 DAEO-cb2b W2-121-A5-run2.md W2-121-A5-run2.json
+# 02:13 b2f0511f: W2-173 resume after the 02:00 network outage (workers done)
+# returned PACKAGES 02:40, retired b2f0511f: W2-173 DAEO-qz4p W2-173-A5-run1b.md W2-173-A5-run1b.json
+# 02:13 b2f0511f: W2-121 part a run 2 again after the 02:00 network outage
+#HELD-NIGHT W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json
+# 02:46 b2f0511f: W2-173 run 2 (P-1 (a) decided 70e5840d9)
+W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json

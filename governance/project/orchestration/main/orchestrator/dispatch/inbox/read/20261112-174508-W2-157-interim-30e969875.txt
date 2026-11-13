@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-157
+status: interim result 30e969875: W2-157 (DAEO-ozyt): probe record of the reopened fix's STANDARD review (pass at 21cc8215c4e8, READY by verdict.ready); residual rows FR-14 to FR-17

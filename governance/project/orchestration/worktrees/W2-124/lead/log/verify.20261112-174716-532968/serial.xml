@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="18.269" timestamp="2026-11-12T17:46:53.108088+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-13.test_w2_13_latency" name="test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget" time="18.128"><failure message="AssertionError: the command did not succeed&#10;gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-27/w2-13-lexical-a-dev0/a-dev&#10;exit code: 1&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;REBUILD_FAILED&quot;, &quot;message&quot;: &quot;rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.&quot;, &quot;details&quot;: {&quot;store&quot;: &quot;semantic&quot;, &quot;reason&quot;: &quot;EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.&quot;, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.&quot;}}}}}&#10;&#10;stderr:&#10;EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.">box = &lt;w2_13_support.Box object at 0x7a9615086f60&gt;
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x7a9614fefc50&gt;, _basetemp=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-27'), _retention_count=3, _retention_policy='failed')
+
+    def test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget(box, tmp_path_factory):
+&gt;       roots = _tiers(box, tmp_path_factory, "lexical")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-13/test_w2_13_latency.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-13/test_w2_13_latency.py:36: in _tiers
+    box.rebuild(root)
+tests/acceptance/W2-13/w2_13_support.py:340: in rebuild
+    result = self.gov("rebuild", "--json", "--root", str(root), host=host, env=env, timeout=timeout).result()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_13_support.Run object at 0x7a9615150e00&gt;
+
+    def result(self):
+        """The envelope's result of a call that succeeded."""
+&gt;       assert self.returncode == 0, f"the command did not succeed\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command did not succeed
+E       gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-27/w2-13-lexical-a-dev0/a-dev
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+tests/acceptance/W2-13/w2_13_support.py:211: AssertionError</failure></testcase></testsuite></testsuites>

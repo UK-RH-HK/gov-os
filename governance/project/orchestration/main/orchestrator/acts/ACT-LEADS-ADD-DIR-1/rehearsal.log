@@ -1,0 +1,130 @@
+ACT-LEADS-ADD-DIR-1 rehearsal, 2026-11-13 06:57:36 UTC; slot 1, CPUs 0,1,2,3,4,5
+--- A. the bundle and the clone
+clone HEAD 829282dbd530 on w2/integrate; main tree head 829282dbd530
+ok   A0 the clone's launcher is the frozen before (the bundle is not stale)
+ok   A0b the main tree's launcher (read only) is the frozen before
+ok   A0c before/ and after/ hash as list.txt says
+     state before (sha256 023623ac6ac8)
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/dispatch/launch_now.sh (sha256 023623ac6ac8)
+ok   A2 verify refused before the apply (exit 3)
+     state before (sha256 023623ac6ac8); nothing to undo
+ok   A3 undo before the apply says nothing to undo (exit 0)
+--- B. the existing suites on the BEFORE launcher (the baseline)
+     223 passed, 3 skipped, 10 deselected in 389.73s (0:06:29)
+ok   B1 the three files that read the launcher (before, no companion): exit 0
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import re, sys... (exit 1)
+     fresh lead: --add-dir values are ''
+ok   check 2 as written: bash <<'EOF'... (exit 1)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 1)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+--- C. the sequencing: the plain apply WITHOUT the companion turns two existing W2-153 tests red (check 3 refuses it)
+     state applied (sha256 54345463a67b)
+ok   C1 plain apply (exit 0)
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import re, sys... (exit 0)
+     launch_now.sh: the lead line adds its own tests worktree and the runs root, makes the tests folder empty when absent, keeps an existing one, and a refused start makes nothing
+ok   check 2 as written: bash <<'EOF'... (exit 0)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 1)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+     FAILED tests/unit/launch/test_w2_153_template.py::test_the_dispatchers_lead_form_is_otherwise_the_same_command
+     FAILED tests/acceptance/W2-153/test_w2_153_dispatch.py::test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag
+     2 failed, 221 passed, 3 skipped, 10 deselected in 328.09s (0:05:28)
+ok   C2 the existing suites with the ACT and no companion are red, as check 3 says (the two named tests): exit 1
+     state before (sha256 023623ac6ac8)
+ok   C3 undo (exit 0)
+ok   C4 undone byte for byte
+--- D. the companion (tolerant of the --add-dir line), then the plain apply
+ok   D0 companion-tests.diff applies to the clone (exit 0)
+      M tests/acceptance/W2-153/test_w2_153_dispatch.py
+      M tests/unit/launch/test_w2_153_template.py
+the old launcher with the companion:
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import re, sys... (exit 1)
+     fresh lead: --add-dir values are ''
+ok   check 2 as written: bash <<'EOF'... (exit 1)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 0)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+     223 passed, 3 skipped, 10 deselected in 290.55s (0:04:50)
+ok   D1 the existing suites, old launcher + companion: exit 0
+     state applied (sha256 54345463a67b)
+ok   D2 plain apply (exit 0)
+ok   D3 the launcher is the frozen after, byte for byte
+ok   D4 the mode is kept (755)
+ok   D5 the apply changed the one listed file and wrote nothing else (git status: the launcher and the two companion files)
+ok   D6 no temp file left beside the launcher
+     state applied (sha256 54345463a67b)
+ok   D7 check: state applied (exit 0)
+ok   D8 verify (exit 0)
+     state applied (sha256 54345463a67b); nothing to do
+ok   D9 apply again changes nothing (exit 0)
+--- E. every manifest check, exactly as written, with bash -c, on the applied clone
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import re, sys... (exit 0)
+     launch_now.sh: the lead line adds its own tests worktree and the runs root, makes the tests folder empty when absent, keeps an existing one, and a refused start makes nothing
+ok   check 2 as written: bash <<'EOF'... (exit 0)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 0)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+     223 passed, 3 skipped, 10 deselected in 229.75s (0:03:49)
+ok   E1 the existing suites, ACT applied + companion: exit 0
+ok   E2 check 1 refuses a RUNS line that is not <home>/gov-os-runs (exit 1)
+ok   E3 check 1 refuses a TESTS line that is not <home>/gov-os-worktrees/$W2-tests (exit 1)
+ok   E4 the launcher is the frozen after again
+--- F. the follow-up tests (the new behaviour, committed after the apply)
+ok   F0 followup-tests.diff applies (exit 0)
+     225 passed, 3 skipped, 10 deselected in 89.06s (0:01:29)
+ok   F1 the suites with the follow-up tests, ACT applied: exit 0
+     state before (sha256 023623ac6ac8)
+ok   F2 undo (to show the follow-up tests are real) (exit 0)
+     FAILED tests/unit/launch/test_w2_153_template.py::test_the_dispatchers_lead_form_adds_its_tests_tree_and_the_runs_root
+     FAILED tests/unit/launch/test_w2_153_template.py::test_the_dispatchers_lead_form_leaves_an_existing_tests_tree_alone
+     2 failed, 223 passed, 3 skipped, 10 deselected in 92.29s (0:01:32)
+ok   F3 the follow-up tests are red on the old launcher (the two new tests): exit 1
+     state applied (sha256 54345463a67b)
+ok   F4 apply again (exit 0)
+ok   F5 the follow-up taken back out (companion only again)
+--- G. a dry run of the lead line with a planted W2 (W2-PLANT), stub claude and gov, in a temporary bed
+     the lead's argv (the bed's root shown as <bed>):
+       -p
+       --model
+       claude-opus-5-5
+       --effort
+       high
+       --output-format
+       json
+       --permission-mode
+       acceptEdits
+       --allowedTools
+       Bash
+       Read
+       Edit
+       Write
+       Grep
+       Glob
+       --settings
+       {"env":{"GOV_ROLE":"orchestrator","GOV_TICKET":"DAEO-plant","CLAUDE_CODE_SUBAGENT_MODEL":"claude-opus-5-5"}}
+       --add-dir
+       <bed>/trees/W2-PLANT-tests
+       --add-dir
+       <bed>/runs
+       --append-system-prompt-file
+       <bed>/trees/W2-PLANT/.claude/templates/role-lead.md
+ok   G1 the planted lead's line carries --add-dir <W2-PLANT-tests> --add-dir <runs root>, once each
+ok   G2 W2-PLANT-tests made, empty
+ok   G3 the lead's own step (git worktree add) takes the empty folder
+ok   G4 no LAUNCH_NO_TESTS_DIR
+--- H. undo, and the trees
+     state before (sha256 023623ac6ac8)
+ok   H1 undo (exit 0)
+ok   H2 undone byte for byte
+     state before (sha256 023623ac6ac8)
+ok   H3 check: state before (exit 0)
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is neither the frozen before nor the frozen after (sha256 bc040f260eed)
+ok   H4 apply refuses a launcher changed since the freeze (state other, untouched) (exit 3)
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is not as this ACT left it (sha256 bc040f260eed); a later change is not overwritten
+ok   H5 undo refuses it too (exit 3)
+ok   H6 the main tree's launcher is unchanged
+ok   H7 the main tree's tracked governance/tests/src status unchanged
+=== 62 ok, 0 failed
+failures: 0

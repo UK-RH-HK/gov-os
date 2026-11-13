@@ -1,0 +1,218 @@
+SIGINT-ignored-at-start: 0
+.F.FFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7a8411dfb420>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_a_signal_dur0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x7a8411e4c720>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r9_r12_ctrl_c_durin0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x7a8411e4cae0>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x7a8411e4de40>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r16_an_own_session_0/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError
+________________ test_w2_96_r11_an_inherited_ignore_is_kept[2] _________________
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0')
+launch = <function planted.<locals>.launch at 0x7a8411e4f9c0>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, launch, signum):
+        root, temp = project
+        started, go = tmp_path / "started", tmp_path / "go"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, ignore=(signum,))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________________ test_w2_96_r11_an_inherited_ignore_is_kept[15] ________________
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig1/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig1')
+launch = <function planted.<locals>.launch at 0x7a8411e4ff60>, signum = 15
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, launch, signum):
+        root, temp = project
+        started, go = tmp_path / "started", tmp_path / "go"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, ignore=(signum,))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig1/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig1/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________________ test_w2_96_r11_an_inherited_ignore_is_kept[1] _________________
+
+project = (PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig2/proj'), PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig2/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig2')
+launch = <function planted.<locals>.launch at 0x7a8411e5c220>, signum = 1
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, launch, signum):
+        root, temp = project
+        started, go = tmp_path / "started", tmp_path / "go"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, ignore=(signum,))
+>       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig2/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-launch-dhjdaakr/claude-1000/pytest-of-usain/pytest-0/test_w2_96_r11_an_inherited_ig2/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r11_an_inherited_ignore_is_kept[2]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r11_an_inherited_ignore_is_kept[15]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r11_an_inherited_ignore_is_kept[1]
+7 failed, 2 passed in 424.63s (0:07:04)

@@ -1,0 +1,22 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-173 (DAEO-qz4p, FULL) at 5cbd79b4e45b: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 05:50:04 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 05:50:04 merged W2-173 onto 3eeb5cb2e98e: 6a5d5321ba1a
+2026-11-12 05:50:04 run skipped: the merged code is identical to 5cbd79b4e45b867c7efd98f99bfaaa44dd32e522, W2-173's approved commit, which its lead tested; governance paths left out of the comparison: .tickets/DAEO-1k7y.md, .tickets/DAEO-c9n8.md, .tickets/DAEO-cb2b.md, .tickets/DAEO-ozyt.md, .tickets/DAEO-qz4p.md, governance/project/orchestration/packages/ACT-CONTEXT-WATCH-1.md, governance/project/orchestration/packages/ACT-OPERATOR-HOURS-1.md, governance/project/orchestration/packages/ACT-OPERATOR-HOURS-2.md, governance/project/orchestration/packages/DECIDED-NOT-DONE.md, governance/project/orchestration/reviews/ACT-CONTEXT-WATCH-1-review-r2.md, governance/project/orchestration/reviews/ACT-CONTEXT-WATCH-1-review.md, governance/project/orchestration/reviews/ACT-OPERATOR-HOURS-1-review.md, governance/project/orchestration/reviews/ACT-OPERATOR-HOURS-2-review.md, governance/project/orchestration/reviews/W2-176-delta-review.md (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)
+2026-11-12 05:50:04 ADVANCED refs/heads/w2/integrate 3eeb5cb2e98e -> 6a5d5321ba1a; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/6a5d5321ba1a.json
+2026-11-12 05:50:04 integration store not promoted: the merged clone's stores were not rebuilt at the landed commit 6a5d5321ba1a (the run was skipped, or its last rebuild was at None); its normal refresh runs apart
+queue run exit 0
+CLOSED W2-173: 0d2f38901 W2-173 (DAEO-qz4p): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 2 findings: .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/ | .tickets/DAEO-qz4p.md: implementer allowed_paths pattern 'tests/acceptance/W2-149/w2_149_support.py' covers tests/acceptance/
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 3eeb5cb2e98e)
+structural pass: links: ok (0 new since 3eeb5cb2e98e1c4fa2508f73efadfb2d9eb3f697, 1614 standing)
+structural pass: structural pass at 0d2f389019f2: NOTICE in mutation (8 of 9 families ok), 15.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-055021-structural-notice.txt

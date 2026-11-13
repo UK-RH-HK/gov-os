@@ -1,0 +1,7 @@
+log: W2-177-A5-run2.json
+W2: W2-177
+status: DONE
+
+task: DAEO-1k7y (W2-177), run 2
+status: DONE
+work_completed: Did the CTO's 07:06 order in sequence. (1) Merged w2/integrate (c62b66bb4) into w2/W2-177 (ee18860f7). (2) Ran one independent test designer, td-1 (Sonnet, high, C2), in W2-177-tests. It revised `w2_96_support._popen` and `w2_56_support.start_launch` so SIGINT, SIGTERM and SIGHUP are set to ignored when the case names them and to default otherwise (8f40881d9, with a Rewrite-Reason naming DAEO-1k7y and DEC-866). I merged it at 7cde9429e. (3) Ran the rebuild, lead_verify on 7cde9429e, and gov accept. (4) Ran the FULL review (independen

@@ -58,4 +58,4 @@ hold for every one of them.
 - **Return:** the twelve fields first, as labelled lines: task, status, work_completed, files_changed, evidence,
   tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action; then any payload.
   Status DONE, PARTIAL or PACKAGES (a decision only the CTO or the owner can take, with your recommendation and
-  confidence). Refused twice for the same call: stop and say so; no third try.
+  confidence). Refused twice for the same call: stop and say so; no third try. It covers the same effect in another form: a session refused twice for an action does not reach it by another command, form, file or tool (DEC-1142 (9)).

@@ -1,0 +1,310 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "7651610c4a19",
+   "after": "085b4391ccf1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-111",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33",
+   "change": "head",
+   "before": "3df1ac2deb1b",
+   "after": "aa8b0fc0f67d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33",
+   "change": "status line gone",
+   "line": " M template/governance/kernel/roles/orchestrator.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/roles/ticket-lead.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-35/test_w1_35_orchestration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/.gov-owner"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/alembic"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/arq"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/check-jsonschema"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/copier"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/coverage"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/coverage-3.12"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/coverage3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/dotenv"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/f2py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/fastapi"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/gitleaks"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/hf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/httpx"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/lefthook"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/mako-render"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/numpy-config"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/ollama"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/owner-ping"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/py.test"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyproj"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-decrypt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-encrypt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-keygen"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-priv2pub"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-sign"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pyrsa-verify"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/pytest"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/python"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/rulesync"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/tiny-agents"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/tk"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/uv"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/uvicorn"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-path-5o4aaye1/tmphk_2ndqv/uvx"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? gov-rebuild-19-vph7h4oe.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/.gov-cbm-base"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_red_when_description_exce0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_red_when_description_exce0/sandbox/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_red_when_description_excecurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_red_when_frontmatter_remocurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_red_when_version_missingcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_skill_regression_green_wicurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w1-35-built0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w1-35-built0/sandbox/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w1-35-builtcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "acceptance folder",
+   "folder": "W1-35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88/w2_88_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "acceptance folder",
+   "folder": "W2-88"
+  }
+ ]
+}

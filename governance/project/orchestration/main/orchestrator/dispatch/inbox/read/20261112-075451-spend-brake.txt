@@ -1,0 +1,8 @@
+log: spend.jsonl
+W2: W2-171
+Brake: runaway (DEC-1091)
+status: W2-171 has spent 19.64 USD since 2026-11-12 06:06, past twice its projection (9.50 USD, brake at 19.00)
+
+New launches for W2-171 stop (launch_worker.sh refuses while /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/brake/W2-171.json exists) until the CTO clears it:
+  python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/spend.py clear W2-171 [--projection-usd <more>] --note '<why>'
+Record only: never an alarm to the owner (DEC-1089 (3)).

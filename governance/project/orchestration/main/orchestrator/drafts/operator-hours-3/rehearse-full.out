@@ -1,0 +1,137 @@
+# part 1: apply.sh A on a stub crontab (a `crontab` on PATH that reads and writes a file, `-l` and `<file>` as cron's), seeded with the live bytes at the build
+ok 1: A check on the before: exit 0, ready (0)
+ok 2: A verify before the apply: exit 3, not applied (3)
+ok 3: A undo on the before: exit 0, nothing to do, untouched
+ok 4: an unknown step (A exempt) or no part (check): exit 2, usage, untouched
+ok 5: A apply: exit 0, the stub crontab is the after byte for byte (0)
+ok 6: A verify after the apply: exit 0 (0)
+ok 7: A apply again: exit 0, already in place, untouched
+ok 8: A check on the after: exit 3, already applied (3)
+ok 9: the manifest's Part A check (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
+ok 10: the manifest's Part A check (exit 0, count 1): crontab -l | grep -c '^\*/10 \* \* \* \* /usr/bin/python3 -I .*/gov-os-operator/install/operator_launch\.py >>
+ok 11: the manifest's Part A check (exit 1, count 0): crontab -l | grep -c 'night-hold\.state\.json'
+ok 12: the manifest's Part A check (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
+ok 13: the manifest's Part A check (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh  # DEC-1132 (4), ACT-NIGHTLY-
+ok 14: the manifest's Part A check (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
+ok 15: the before and the after differ in line 7 only (the operator's line); the six other lines and the final newline are the same
+ok 16: the new line is `*/10 * * * * ` then the old line's launcher command and log redirect byte for byte, then the comment citing DEC-1157 (2) and ACT-OPERATOR-HOURS-3
+ok 17: the new line's command reads no state file and no clock (no `night-hold`, no `date`), and has no `%` and no quote
+ok 18: the real crontab -n (by standard input, as apply.sh installs it) accepts the after and the before
+ok 19: control: the real crontab given this bundle's long file path refuses it (it cuts the name at about 100 characters), so apply.sh uses standard input
+ok 20: the new line as cron runs it (02:30-like, no state file): the launcher runs and appends to operator-launch.out (no time window, no state read)
+ok 21: the new line as cron runs it (05:30-like, the stale holding false the stopped night hold left): the launcher runs and appends to operator-launch.out (no time window, no state read)
+ok 22: the new line as cron runs it (a fresh holding true): the launcher runs and appends to operator-launch.out (no time window, no state read)
+ok 23: three runs, three launcher lines appended (3)
+ok 24: A undo: exit 0, the before byte for byte (0)
+ok 25: A check after the undo: ready again
+ok 26: a crontab that moved since the build: check, apply, undo, verify each exit 3, untouched ({'check': 3, 'apply': 3, 'undo': 3, 'verify': 3})
+ok 27: a tampered frozen after copy: A apply exit 4, untouched (4)
+ok 28: Part A ignores Part B's rows (a tampered Part B frozen copy does not stop A apply); with no install in HOME at all
+ok 29: A apply in a clean environment from an empty folder: the after, nothing else written
+# part 2: apply.sh B stage 1 on planted folders (a planted HOME with a copy of the live install, a planted main tree with the four before files)
+ok 30: B check on the before: exit 0, ready (0)
+ok 31: B verify before: exit 3 (3)
+ok 32: B undo on the before: exit 0, nothing to do, untouched
+ok 33: B apply: exit 0, the install's own APPROVED check ok (0; )
+ok 34: every Part B file hashes as the after; APPROVED ff3579ff5abd, opcommon.py c7ec467c5691
+ok 35: the install's two files are 0444
+ok 36: no temporary file left, no __pycache__ in the install
+ok 37: the thirteen other install files are byte for byte as they were
+ok 38: APPROVED differs in exactly one line: opcommon.py's
+ok 39: B verify after: exit 0 (0)
+ok 40: B apply again: already in place, untouched
+ok 41: B check on the after: exit 3, already applied
+ok 42: the manifest's Part B check (exit 0, count 1): sha256sum "$HOME/gov-os-operator/install/opcommon.py" | grep -c c7ec467c569126d803046ad7ca0e883d19d6
+ok 43: the manifest's Part B check (exit 0, count 1): sha256sum "$HOME/gov-os-operator/install/APPROVED" | grep -c ff3579ff5abd13f54c8c5b844db5baa23d97f83
+ok 44: the manifest's Part B check (exit 1, count 0): grep -c "^HOLD_FROM = \|night_hold_reasons\|NIGHT_HOLD_MAX_AGE_S" "$HOME/gov-os-operator/install/opc
+ok 45: the manifest's Part B check (exit 0, count 1): grep -c "the nightly runs (NIGHTLY-RUNNING)" "$HOME/gov-os-operator/install/opcommon.py"
+ok 46: the manifest's Part B check (exit 0, count 1): grep -c "opcommon.py" "$HOME/gov-os-operator/install/APPROVED"
+ok 47: B undo: exit 0, every file the before, APPROVED the old one (0)
+ok 48: the install and the repository paths are byte for byte (hash, mode, listing) what they were
+ok 49: B apply with the install folder not writable: stops, exit 5, a half state (5)
+ok 50: B check names the half state: exit 3
+ok 51: a second B apply finishes it (0)
+ok 52: B undo: the whole state as it began
+ok 53: a repository file moved (opcommon.py one line longer): check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 54: an install file other than opcommon.py moved (brief.md): check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 55: a stray file in install/: check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 56: after the apply, the install's APPROVED edited: check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 57: a tampered frozen copy (after/home/.../opcommon.py): check exit 4, apply exit 4, undo exit 4, verify exit 4; nothing touched
+ok 58: the operator's freeze held (install/act-in-progress.txt): check exit 6, apply exit 6; nothing touched
+ok 59: the operator's journal present: check exit 6, apply exit 6; nothing touched
+ok 60: a request waiting in queue/: check exit 6, apply exit 6; nothing touched
+ok 61: a launch holding log/launch.lock: B apply exit 6, untouched (6)
+# part 3: G9 of the installed copy (apply.sh B's own result), the real opcommon.holds(), over a clock file and a planted night-hold state file per case
+ok 62: the installed G9 over 160 (time, state) cases (20 times x 8 states: true, false, missing, stale, malformed, empty, "false", a directory): no hold in any
+ok 63: contrast, the OLD install (ACT-OPERATOR-HOURS-2's, live today) over the same table agrees with its rule written out separately (02:10-03:09 always, 03:10-07:59 unless a fresh false): 0 disagree
+ok 64: every case that changes turns from held to free (88 cases, all in 02:10-07:59); none turns from free to held
+ok 65: the old install held at 02:30 in every state and at 05:10 with no state file (as tonight: the night hold stopped, its file stale): the night's lost hours
+ok 66: the planted NIGHTLY-RUNNING still holds at 01:30, 02:30, 05:10 and 14:00
+ok 67: the planted CLOSE-RUNNING still holds at 01:30, 02:30, 05:10 and 14:00
+ok 68: the planted log/act-in-progress.txt still holds at 01:30, 02:30, 05:10 and 14:00
+ok 69: the planted install/act-in-progress.txt still holds at 01:30, 02:30, 05:10 and 14:00
+ok 70: an explicit nightly_window still holds inside it and not outside
+ok 71: a clock that cannot be read still holds
+# part 4: the real launcher (operator_launch.py) from the applied copy, a stub claude, a clock file, a queued request
+ok 72: launcher at 02:30, no state file: the request taken, a session started (got launched)
+ok 73: launcher at 03:30, a fresh holding true: the request taken, a session started (got launched)
+ok 74: launcher at 05:10, the stale holding false the stopped night hold leaves: the request taken, a session started (got launched)
+ok 75: launcher at 07:45, no state file: the request taken, a session started (got launched)
+ok 76: launcher at 14:00, no state file: the request taken, a session started (got launched)
+ok 77: launcher at 05:30, a fresh NIGHTLY-RUNNING: held at G9 (NIGHTLY-RUNNING), the request stays in queue/ (got held/G9)
+# part 5: does it bite? Each mutant of the installed opcommon.py over the same table (expected: no hold anywhere; the flag mutant: the flag at 05:10)
+ok 78: mutant "the old code (ACT-OPERATOR-HOURS-2's opcommon.py, live today)": 88 cases disagree (caught)
+ok 79: mutant "a hold from 02:10 to 03:09 put back": 32 cases disagree (caught)
+ok 80: mutant "the old quiet hours 02:00-07:30 put back": 88 cases disagree (caught)
+ok 81: mutant "the old nightly window as the default": 48 cases disagree (caught)
+ok 82: mutant "the NIGHTLY-RUNNING hold dropped": 16 cases disagree (caught)
+ok 83: mutant "the CTO's act-in-progress hold dropped": 160 cases disagree (caught)
+# part 6: the operator's own tests on a clone (`git clone --no-hardlinks` of w2/integrate's head) with the four after files, through heavy_slot.sh, TMPDIR outside the repository and ~/gov-os-runs, PYTHONUSERBASE=/home/usain/.local, -p no:cacheprovider
+# the clone's head: aa3bfdc19b9d
+ok 84: with the four after files: tests/unit/operator tests/acceptance/W2-148: 654 passed
+ok 85: the revised G9 tests alone (the unit file, the two S13 acceptance tests): 238 passed
+ok 86: the revised unit file on the OLD opcommon.py goes red: 145 failed, 87 passed
+ok 87: control: the OLD unit file (ACT-OPERATOR-HOURS-2's rule) on the NEW opcommon.py goes red, so it must change with it: 38 failed, 48 passed
+ok 88: the clone's files are the after files again
+# part 7 (DEC-1136 (2)): the second commit. A clone of w2/integrate (`git clone --no-hardlinks`), HOME planted (a copy of the live install, the git identity), the bundle copied in at its own path. Section 0's two Part B blocks and section 5's undo block are run as the package prints them (the repository root substituted); W1-01 (tests/acceptance/W1-01, through heavy_slot.sh) before the ACT, between the two commits (the control) and after them.
+ok 89: the package holds the three blocks (section 0: Part B's apply and first commit; the exempt step and second commit; section 5: the undo of both commits)
+ok 90: the clone's map is the allowed before (805bd918d467), the clone clean at a8b0a9a41f14
+ok 91: B check: ready (0)
+ok 92: W1-01 before the ACT: green (54 passed, 12 deselected)
+ok 93: B exempt before the first commit: exit 3, untouched (3)
+ok 94: section 0's first Part B block run as printed: exit 0, applied, verified, committed
+ok 95: the first commit: one parent, the trailers Task: DAEO-sdxk, Implements: DEC-1157, Role: owner, exactly the four repository paths, the tree clean
+ok 96: CONTROL, W1-01 between the two commits: red, the one failure names the first commit and no other (1 failed, 53 passed, 12 deselected; ['94c7798b2119'])
+ok 97: B exempt-verify before the exempt step: exit 3 (3)
+ok 98: section 0's second Part B block run as printed: exit 0, entry added, verified, committed
+ok 99: the second commit: on the first, its subject names the first's 12 digits, trailers Task, Implements (DEC-1136, DEC-1157), Role: owner
+ok 100: the second commit changes the path map only: 2 lines added, 0 removed
+ok 101: the map's mode kept (644), no temporary file, the tree clean
+ok 102: the map parses; acceptance_exemptions is the old list plus the one entry (the full id, DEC-1157) at the end; every other key equal
+ok 103: W1-01 after the second commit: green, as before the ACT (54 passed, 12 deselected)
+ok 104: B exempt again after the second commit: a no-op, exit 0
+ok 105: B exempt-verify after the second commit: exit 0 (0)
+ok 106: B exempt-undo after the second commit: refused, exit 3, untouched
+ok 107: B verify after both commits: exit 0 (0)
+ok 108: section 5's undo block run as printed: exit 0, HEAD the head before the ACT, the map the allowed before, the tree clean, APPROVED the old one
+ok 109: B check after that undo: ready again
+ok 110: PLANTED, B exempt run twice before the second commit: the second a no-op
+ok 111: PLANTED, B exempt-undo before the second commit: the map the allowed before again
+ok 112: PLANTED, B exempt refuses on another HEAD (an unrelated commit on top): exit 3, the map untouched (3; B exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERAT)
+ok 113: PLANTED, B exempt refuses when the ACT's commit is not Role: owner: exit 3, the map untouched (3; B exempt refused: HEAD is not the ACT's commit (it has no single trailer Role: owner), nor)
+ok 114: PLANTED, B exempt refuses when the subject does not start ACT-OPERATOR-HOURS-3: (HOURS-2's subject): exit 3, the map untouched (3; B exempt refused: HEAD is not the ACT's commit (its subject does not start with ACT-OPERAT)
+ok 115: PLANTED, B exempt refuses when the commit changes a fifth path: exit 3, the map untouched (3; B exempt refused: HEAD is not the ACT's commit (it does not change exactly the ACT's repos)
+ok 116: PLANTED, B exempt refuses when one of the four files is not the ACT's after file: exit 3, the map untouched (3; B exempt refused: HEAD is not the ACT's commit (its tests/acceptance/W2-148/README.md is n)
+ok 117: PLANTED, B exempt refuses on a map that is not the allowed before (a changed line, not committed): exit 3, the map untouched (3; B exempt refused: governance/project/path-map.yaml is not the allowed before (sha256 6d89b)
+ok 118: PLANTED, B exempt refuses on a map that is a link: exit 3, the map untouched (3; B exempt refused: governance/project/path-map.yaml is missing or a link; nothing touched)
+ok 119: PLANTED, B exempt refuses when the map's folder is not writable: exit 5, the map untouched (5; mktemp: failed to create file via template '/tmp/claude-1000/-home-usain-Dynamic-Agentic-E)
+ok 120: PLANTED, B exempt refuses when the map moved since the build (committed, the tree clean): exit 3, the map untouched (3; B exempt refused: governance/project/path-map.yaml is not the allowed before (sha256 219be)
+ok 121: the undo after the first commit alone (`git reset --keep <first>~1`, then `apply.sh B undo`): HEAD before the ACT, APPROVED the old one, tree clean, check ready
+ok 122: PLANTED, exempt-verify on an entry moved up one place: exit 3 (3)
+ok 123: PLANTED, exempt-verify on an entry whose decision was changed: exit 3 (3)
+ok 124: PLANTED, the control: the good map verifies, exit 0 (0)
+ok 125: the live install (APPROVED, opcommon.py, operator_run.py, operator_launch.py) is byte for byte as it began
+ok 126: the live crontab is byte for byte as it began
+ok 127: the live main tree's four repository paths and the path map are as they began (status and sha256)
+cases: 127
+failures: 0

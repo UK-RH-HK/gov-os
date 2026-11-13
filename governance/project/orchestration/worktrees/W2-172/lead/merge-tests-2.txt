@@ -1,0 +1,11 @@
+Merge w2/W2-172-tests (DAEO-p8tv): the test designer's revision for PKG-W2-172-TESTS-1 (TD-2 (b), TD-1 (b), GATE-1 (a))
+
+td-2 (Sonnet high, class C2), commit 5193add3965d: RN-NAME judged by a STARTS.log line naming the audit, not by the
+folder; one retry case added (a refused run is not a start and the same date can be retried); the README's notes state
+the CTO's three answers. Rewrite-Reason: PKG-W2-172-TESTS-1 TD-2 (b).
+
+Task: DAEO-p8tv
+Role: orchestrator
+Implements: DEC-1101, DEC-1125, DEC-1097, DEC-1038, DEC-1050, DEC-1073
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

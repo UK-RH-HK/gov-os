@@ -1,0 +1,7 @@
+log: helper-watch.log
+Helper: worker ended with an error
+status: launched worker PATHMAP-CHAIN-r3-check (pid 411051, /home/usain/gov-os-worktrees/W2-176/.gov-runtime/scratch/lead/log) ended with exit 1
+last: no error in its JSON result
+
+file: /home/usain/gov-os-worktrees/W2-176/.gov-runtime/scratch/lead/log/PATHMAP-CHAIN-r3-check.json
+Check it and resume it (SendMessage to the agent id, or a fresh session from its brief).

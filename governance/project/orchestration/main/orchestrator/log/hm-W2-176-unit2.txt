@@ -1,0 +1,4 @@
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+FAILED tests/unit/launch/test_runs.py::test_a_project_under_the_root_gets_no_folder_made_or_added
+3 failed, 3902 passed, 7 skipped, 2788 deselected, 6 warnings in 1579.71s (0:26:19)

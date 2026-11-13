@@ -1,0 +1,10 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-212201.out
+W2: (land batch)
+status: W2-121b=6e10493a5f8e not landed (ejected: red)
+
+last output:
+ounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+2026-11-12 21:37:22 EJECTED W2-121b: red; failing: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+queue run exit 3
+W2-121b: not landed (ejected: red)
+

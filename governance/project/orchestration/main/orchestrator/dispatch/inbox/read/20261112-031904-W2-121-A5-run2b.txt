@@ -1,0 +1,7 @@
+log: W2-121-A5-run2b.json
+W2: W2-121
+status: PACKAGES. The build is done and our own suites are green. lead_verify is RED on 6 cases outside this ticket. They are not in skip_known.json, so I cannot call them known, and I cannot fix them within allowed_paths.
+
+task: DAEO-cb2b (W2-121 part a: `gov dispatch tick` and `gov dispatch status`), build run 2, retried after the 02:00 outage
+status: PACKAGES. The build is done and our own suites are green. lead_verify is RED on 6 cases outside this ticket. They are not in skip_known.json, so I cannot call them known, and I cannot fix them within allowed_paths.
+work_completed: The killed attempt had launched no worker and written no checkpoint. I wrote the interface reading for the points the ticket leaves open (`briefs/interface-1.md`) and briefs td-1 and eng-1, then launched both at 02:24 under C2 (Sonnet, h

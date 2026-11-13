@@ -1,0 +1,5 @@
+W2-23 (DAEO-kmcr): merge the acceptance tests' R2-1 case (d3dfb5796, td-5: a folder citation ending a question, flat and nested, and a glob with ? inside; P-W2-23-8 (a)) into the build
+
+Task: DAEO-kmcr
+Role: orchestrator
+Implements: DEC-729, DEC-1052, DEC-954, DEC-315, DEC-1112

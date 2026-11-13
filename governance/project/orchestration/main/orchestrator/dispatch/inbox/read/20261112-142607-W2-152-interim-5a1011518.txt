@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-152
+status: interim result 5a1011518: W2-152 (DAEO-o5x1): the probe record of review round 2 (READY on 09fc68645c0c; the merged head e25bdca86bc1 verified: accept 67/67, scoped run green but for integrate's own reds)

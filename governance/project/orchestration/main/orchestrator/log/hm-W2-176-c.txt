@@ -1,0 +1,6 @@
+merged W2-176 3b6c5cb79d39 onto e538af6290ae: 9e754d179416
+tests/unit/hooks: 196 passed, 1 skipped, 36 deselected in 28.80s
+  FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+  FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+tests/unit: 2 failed, 3944 passed, 7 skipped, 2788 deselected, 6 warnings in 1431.00s (0:23:50)
+hand_merge_check W2-176: exit 1

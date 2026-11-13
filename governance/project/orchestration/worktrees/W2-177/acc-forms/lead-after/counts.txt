@@ -1,0 +1,12 @@
+fg run 1: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 23.27s
+fg run 2: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 23.11s
+fg run 3: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 23.17s
+FORM fg: 3 of 3 runs all passed, 0 with a red (or skip)
+setsid-bg run 1: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 22.72s
+setsid-bg run 2: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 22.45s
+setsid-bg run 3: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 23.02s
+FORM setsid-bg: 3 of 3 runs all passed, 0 with a red (or skip)
+bg-job run 1: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 21.81s
+bg-job run 2: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 21.68s
+bg-job run 3: SIGINT-ignored-at-start: 1 | 29 passed, 9 deselected in 21.87s
+FORM bg-job: 3 of 3 runs all passed, 0 with a red (or skip)

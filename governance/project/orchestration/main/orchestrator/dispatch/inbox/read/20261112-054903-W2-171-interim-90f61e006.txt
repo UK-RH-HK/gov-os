@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result 90f61e006: W2-171: the judged reader run, FIGURES.json, misses.jsonl, the regression pool, its import and the class counts (S3, S5-S8, F1, F2)

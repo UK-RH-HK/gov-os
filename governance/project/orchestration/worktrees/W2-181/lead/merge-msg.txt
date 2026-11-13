@@ -1,0 +1,7 @@
+Merge w2/W2-181-tests (DAEO-ywb5): W2-157's F4 case judges only w2/W2-157, six planted cases
+
+Task: DAEO-ywb5
+Role: orchestrator
+Implements: DEC-866, DEC-253, DEC-966, DEC-989
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

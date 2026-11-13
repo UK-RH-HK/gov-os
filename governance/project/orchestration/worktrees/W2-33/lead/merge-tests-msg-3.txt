@@ -1,0 +1,5 @@
+Merge w2/W2-33-tests (DAEO-lrre): W1-35's three old-layout cases revised for the ticket lead's own file and the nine-file roles folder (td-3)
+
+Task: DAEO-lrre
+Role: orchestrator
+Rewrite-Reason: DEC-1156 (3), DEC-957 Q2: the ticket lead has its own role file; the roles folder grows to nine

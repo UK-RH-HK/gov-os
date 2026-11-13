@@ -1,0 +1,50 @@
+FFFFFF.                                                                  [100%]
+=================================== FAILURES ===================================
+E   AssertionError: gov is stopped (the own group 2532233 was paused) but the named group 2532229 is still not paused (state S): the own group was paused before the other groups
+      command: sh -c /usr/bin/python3 /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause0/scripts/job.py /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause0/jobs run & echo $! > /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause0/work/shared-job.pid; exec /usr/bin/python3 -m gov.cli.main resources --backstop $$ 2532229 2532230 --root /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause0/project --json
+      exit: None
+      stdout: 
+      stderr: 
+    assert False
+     +  where False = settle(stopped)
+     +    where stopped = <w2_157_support.Job object at 0x73e0562a0530>.stopped
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:79: AssertionError: gov is stopped (the own group 2532233 was paused) but the named group 2532229 is still not paused (state S): the own group was paused before the other groups
+E   AssertionError: gov is stopped (the own group 2532552 was paused) but the named group 2532545 is still not paused (state S): the own group was paused before the other groups
+      command: sh -c /usr/bin/python3 /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause1/scripts/job.py /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause1/jobs run & echo $! > /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause1/work/shared-job.pid; exec /usr/bin/python3 -m gov.cli.main resources --backstop 2532544 $$ 2532545 --root /tmp/pytest-of-usain/pytest-239/test_s4_the_own_group_is_pause1/project --json
+      exit: None
+      stdout: 
+      stderr: 
+    assert False
+     +  where False = settle(stopped)
+     +    where stopped = <w2_157_support.Job object at 0x73e0562a51c0>.stopped
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:79: AssertionError: gov is stopped (the own group 2532552 was paused) but the named group 2532545 is still not paused (state S): the own group was paused before the other groups
+E   AssertionError: gov is stopped but the log holds 0 TRIP lines, not one (the TRIP line is written before the own group is paused): ['2026-11-12 06:41:09 start: limit 15872 MiB; every 0.1 s; groups 2532910 2532911 2532913; skipped (ended) none; embedders none']
+    assert 0 == 1
+     +  where 0 = len([])
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:85: AssertionError: gov is stopped but the log holds 0 TRIP lines, not one (the TRIP line is written before the own group is paused): ['2026-11-12 06:41:09 start: limit 15872 MiB; every 0.1 s; groups 2532910 2532911 2532913; skipped (ended) none; embedders none']
+E   AssertionError: the second group 2532916 kept running although gov is stopped (state S): the SIGSTOP to the shared group froze the backstop before it paused the second group
+    assert False
+     +  where False = settle(stopped)
+     +    where stopped = <w2_157_support.Job object at 0x73e056272150>.stopped
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:153: AssertionError: the second group 2532916 kept running although gov is stopped (state S): the SIGSTOP to the shared group froze the backstop before it paused the second group
+E   AssertionError: gov is stopped but the log holds 0 TRIP lines, not one (the TRIP line is written before the own group is paused): ['2026-11-12 06:41:14 start: limit 15872 MiB; every 0.1 s; groups 2533170; skipped (ended) none; embedders none']
+    assert 0 == 1
+     +  where 0 = len([])
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:85: AssertionError: gov is stopped but the log holds 0 TRIP lines, not one (the TRIP line is written before the own group is paused): ['2026-11-12 06:41:14 start: limit 15872 MiB; every 0.1 s; groups 2533170; skipped (ended) none; embedders none']
+E   AssertionError: gov is stopped (the own group 2533178 was paused) but the named group 2533177 is still not paused (state S): the own group was paused before the other groups
+      command: sh -c /usr/bin/python3 /tmp/pytest-of-usain/pytest-239/test_s4_a_group_that_has_ended0/scripts/job.py /tmp/pytest-of-usain/pytest-239/test_s4_a_group_that_has_ended0/jobs run & echo $! > /tmp/pytest-of-usain/pytest-239/test_s4_a_group_that_has_ended0/work/shared-job.pid; exec /usr/bin/python3 -m gov.cli.main resources --backstop 2533176 $$ 2533177 --root /tmp/pytest-of-usain/pytest-239/test_s4_a_group_that_has_ended0/project --json
+      exit: None
+      stdout: 
+      stderr: 
+    assert False
+     +  where False = settle(stopped)
+     +    where stopped = <w2_157_support.Job object at 0x73e056270680>.stopped
+/home/usain/gov-os-worktrees/W2-157/tests/acceptance/W2-157/test_w2_157_own_group.py:79: AssertionError: gov is stopped (the own group 2533178 was paused) but the named group 2533177 is still not paused (state S): the own group was paused before the other groups
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s4_the_own_group_is_paused_last_after_every_other_group_the_trip_line_and_the_item[first]
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s4_the_own_group_is_paused_last_after_every_other_group_the_trip_line_and_the_item[middle]
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s4_the_own_group_is_paused_last_after_every_other_group_the_trip_line_and_the_item[last]
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s4_a_job_sharing_the_backstops_group_and_a_second_group_named_after_it_are_both_paused
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s1_the_own_group_named_alone_is_paused_after_the_trip_line_and_the_item
+FAILED tests/acceptance/W2-157/test_w2_157_own_group.py::test_s4_a_group_that_has_ended_is_skipped_beside_the_own_group_which_is_still_paused_last
+6 failed, 1 passed in 21.08s

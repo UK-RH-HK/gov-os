@@ -1,0 +1,4 @@
+{"tree": "merged", "at": "a1ed2903b48fe4b9ffda5bda6214871171371854", "rc": 0, "seconds": 34.0, "args": [], "finished": "2026-11-12 07:11:42"}
+{"tree": "head-03393ee51250-0", "at": "03393ee51250a0c9147c2b047817e2c917b0a70f", "rc": 0, "seconds": 68.4, "args": ["--seed", "/home/usain/gov-os-worktrees/W2-00-store-b"], "finished": "2026-11-12 07:27:21"}
+{"tree": "alt", "at": "9c5672d77e33f51522763fb2215a57a68c0c567d", "rc": 0, "seconds": 64.4, "args": [], "finished": "2026-11-12 07:28:28"}
+{"tree": "alt", "at": "e43f853d7ec88ce2307bc40fd4e0f74f96636d98", "rc": 0, "seconds": 38.6, "args": [], "finished": "2026-11-12 07:29:07"}

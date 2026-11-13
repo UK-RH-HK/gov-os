@@ -1,0 +1,7 @@
+log: W2-124-A5-run3.json
+W2: W2-124
+status: DONE. Head 7a3aecb38fb5 is verified and the STANDARD review passed it. The probe record is written but not committed, because docs/probes/DAEO-mb2t/ is not in allowed_paths.
+
+task: DAEO-mb2t (W2-124), run 3 (resume → build/verify/review), P1-L (a)
+status: DONE. Head 7a3aecb38fb5 is verified and the STANDARD review passed it. The probe record is written but not committed, because docs/probes/DAEO-mb2t/ is not in allowed_paths.
+work_completed: I resumed from the checkpoint and briefed the test designer (td-2, Sonnet high, C2) with what each of the 20 red cases in the 13 files guards. td-2 revised the 20 cases in one commit, bb6a068bd, with `Rewrite-Reason: DEC-1027 C`. I merged the tests (08b4cd8fb) and w2/integrate 95c957ae9 (7a3aecb38, both sides kept). Then I ran 

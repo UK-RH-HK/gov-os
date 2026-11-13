@@ -1,0 +1,9 @@
+log: W2-160-A5-run2.json
+W2: W2-160
+status: PACKAGES
+
+I'm returning PACKAGES: the build is done and the review passed with no blocking findings, but lead_verify is red on two W2-159 tests that this ticket's paths don't let me fix. Two CTO decisions are needed before it can land.
+
+task: DAEO-fd0p
+status: PACKAGES
+work_completed: Build run (resume). The engineer eng-1 (claude-sonnet-5-5, high, C2) built `gov wait` (`src/gov/wait/`), the helper watch (`src/gov/session_watch/helper_watch.py`), the `helper-watch` action in `session_watch/command.py`, the `wait` line in `check/commands.py`, 20 unit tests and the evidence file. I ran the rebuild, lead_v

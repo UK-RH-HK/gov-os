@@ -1,0 +1,16 @@
+{
+ "ticket": "W2-157",
+ "task": "DAEO-ozyt",
+ "branch": "w2/W2-157",
+ "commit": "e1fea6fc2c24178cd23fa53ba82a1b52f7207682",
+ "requested_at": "2026-11-12 07:50:07",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T07:50:07.838486",
+ "reason": "red",
+ "failing": [
+  "tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-075007-883845",
+ "tested_on": "2e235e4e58bc261fd865b1cf10203aaf27b0e80e",
+ "ejected_at": "2026-11-12 08:05:39"
+}

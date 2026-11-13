@@ -1,0 +1,10 @@
+log: W2-124-A5-run2.json
+W2: W2-124
+status: PACKAGES. 20 earlier tests in 13 files turn red under S1's rule and need your decision (P4), as P3 asked. Separately, the fix-round engineer (eng-2) was refused at launch twice by the resource gate (memory, DEC-1088 (5)), so I stopped there under DEC-1142 (9).
+
+task: DAEO-mb2t (W2-124), run 2 (build)
+status: PACKAGES. 20 earlier tests in 13 files turn red under S1's rule and need your decision (P4), as P3 asked. Separately, the fix-round engineer (eng-2) was refused at launch twice by the resource gate (memory, DEC-1088 (5)), so I stopped there under DEC-1142 (9).
+work_completed:
+- Merged w2/integrate into w2/W2-124 (1d13922ef). There were no conflicts in adopt/stages.py.
+- `gov context` refuses this ticket (CONTEXT_OVER_CEILING, 17598 of 6000 tokens), so I wrote the worker briefs by hand to the ticket's Interface plus P2 (b).
+- The test designer (td

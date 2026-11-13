@@ -1,0 +1,64 @@
+ACT-CLAUDE-COPIES-6 rehearsal; base: integrate with w2/W2-33 707d23b82932 merged; rulesync 24.0.0
+portability on the base (W2-33 merged, no copies): exit 1; 9 findings: SOURCE_DIFFERS 6, SOURCE_MISSING 3
+the 9 role sources composed by compose(), in both trees; the two trees' sources byte-equal
+rulesync's other output that differs from the tree (not written; as in ACT-CLAUDE-COPIES-5): ['.claude/settings.json']
+portability in the generation clone after the copies: exit 0; findings []
+portability on template/ (as an adopted project, no rulesync): 0 subagents findings; others: RULESYNC_VERSION_UNKNOWN 1, TEMPLATE_COPY_MISSING 8
+generation clone: 26 files changed or new: .claude/agents/engineer.md, .claude/agents/independent-auditor.md, .claude/agents/independent-test-designer.md, .claude/agents/orchestrator.md, .claude/agents/product-spec.md, .claude/agents/qa-engineer.md, .claude/agents/research.md, .claude/agents/senior-engineer.md, .claude/agents/ticket-lead.md, .rulesync/subagents/engineer.md, .rulesync/subagents/independent-auditor.md, .rulesync/subagents/independent-test-designer.md, .rulesync/subagents/orchestrator.md, .rulesync/subagents/product-spec.md, .rulesync/subagents/qa-engineer.md, .rulesync/subagents/research.md, .rulesync/subagents/senior-engineer.md, .rulesync/subagents/ticket-lead.md, template/.rulesync/subagents/engineer.md, template/.rulesync/subagents/independent-auditor.md, template/.rulesync/subagents/independent-test-designer.md, template/.rulesync/subagents/product-spec.md, template/.rulesync/subagents/qa-engineer.md, template/.rulesync/subagents/research.md, template/.rulesync/subagents/senior-engineer.md, template/.rulesync/subagents/ticket-lead.md
+the ACT: 18 files (.claude/agents, .rulesync/subagents); the CTO's template commit: 8 files (template/.rulesync/subagents, which the class rules give no ACT row)
+the template commit's folder written: 8 files, its list.txt sha256 05997d305a0ac61eaac0be7e5d60cf247d57340b12d1eaf3c9efa6e4d03c6a1e
+the before-bytes are integrate's and equal on integrate with W2-33 merged (12 changed, 6 new)
+--- rehearsal on integrate with W2-33 merged (the tree after the hand merge's merge commit); HOME planted
+ok   the CTO's template commit (rehearsal-merged): apply.sh check, apply, commit: exit 0
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended: the copies are the stale ones): exit 1
+ok   check 2 before the apply (green: W2-33's kernel role files and the template sources after the CTO's commit): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 18 files): exit 0
+ok   check 2 (sha256sum -c, 18 files): exit 0
+ok   the changed set equals the touched list (18 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   portability after the undo: exit 1; 9 findings: SOURCE_DIFFERS 6, SOURCE_MISSING 3 (the window's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- plain integrate (W2-33 not merged): apply.sh check
+ok   apply.sh check passes on plain integrate (W2-33 changes none of the files): exit 0
+ok   check 2 is red on plain integrate (the kernel role files are not W2-33's yet): exit 1
+ok   check 2 is red after the merge commit without the CTO's template commit (the order is held): exit 1
+ok   check changed nothing
+--- the gated runs, one folder per run through the heavy-job gate: the window (W2-33's merge commit alone: the state CIT-P section 4 counts), then the landed tree (the merge, the CTO's template commit and the ACT)
+window tests/acceptance/W2-153: exit 1; 43 passed, 23 failed
+window tests/unit/adapters: exit 1; 100 passed, 2 failed
+window tests/acceptance/W1-38: exit 1; 26 passed, 16 failed
+window tests/acceptance/W1-33: exit 1; 106 passed, 6 failed
+window tests/acceptance/W2-33: exit 0; 96 passed, 0 failed
+window tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+window tests/acceptance/W2-128: exit 0; 121 passed, 0 failed
+ok   landed tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   landed tests/unit/adapters: exit 0; 102 passed, 0 failed
+ok   landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   landed tests/acceptance/W1-33: exit 1; 110 passed, 2 failed
+ok   landed tests/acceptance/W2-33: exit 0; 96 passed, 0 failed
+ok   landed tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+ok   landed tests/acceptance/W2-128: exit 0; 121 passed, 0 failed
+     red on the landed tree: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one (expected: the roster pinned at the five roles plus research (:86-90); the ACT adds the three new roles' agents, as CIT-P section 4 says; W2-33's run 4 revises the case)
+     red on the landed tree: tests/acceptance/W1-33/test_w1_33_kernel_role_files.py::test_the_research_role_file_is_unchanged (expected: pins research.md at W1-46's hash (:149-155); W2-33 changes research.md; the CTO's revision (DEC-1156 (7)))
+red in the window: 47; made green by the ACT: 46; red after: 2; new red brought by the ACT: ['tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one']
+ok   python3 -m gov.adapters.portability on the landed tree: exit 0; findings []
+--- the by-hand steps literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "85c9b1c71e07603a1bfeeeeac283079f370c083baa8736c3cc82b9bef6e7d8c8", "touched": 18, "failures": 0}
+exit=0

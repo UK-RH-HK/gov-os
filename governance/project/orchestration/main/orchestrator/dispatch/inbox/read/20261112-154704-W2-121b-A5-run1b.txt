@@ -1,0 +1,9 @@
+log: W2-121b-A5-run1b.json
+W2: W2-121b
+status: DONE. The tests run is complete: the acceptance tests are merged into w2/W2-121b at 3476e8628 and `gov accept` shows them all red (48 failed, 0 passed, exit 3). The next step is the build run.
+
+task: DAEO-ifgf (W2-121b), gov dispatch part b, FULL. This was the tests run (run 1b, a resume after P-W2-121b-1 (a) was accepted).
+status: DONE. The tests run is complete: the acceptance tests are merged into w2/W2-121b at 3476e8628 and `gov accept` shows them all red (48 failed, 0 passed, exit 3). The next step is the build run.
+work_completed:
+- Read the checkpoint and the ticket. The Interface section is now in the ticket, so the DEC-1052 interface check passes, and docs/probes/DAEO-ifgf/ is now in allowed_paths.
+- `gov context DAEO-ifgf --role independent-test-designer` refuses this ticke

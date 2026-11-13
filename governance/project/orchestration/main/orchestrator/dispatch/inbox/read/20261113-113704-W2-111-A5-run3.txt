@@ -1,0 +1,9 @@
+log: W2-111-A5-run3.json
+W2: W2-111
+status: DONE. The head to land is `3da7242f4461`. The 15 cases pass, the auditor's verdict is PASS, and the tree is clean.
+
+task: DAEO-qvff (W2-111), run 3 (tests: merge form B after the owner's decision)
+status: DONE. The head to land is `3da7242f4461`. The 15 cases pass, the auditor's verdict is PASS, and the tree is clean.
+work_completed:
+- **Test designer td-3** (fresh session, Sonnet 5.5, high, class C1, `d5d8db67`, exit 0) added DEC-1163 (3) to each of the three READMEs, in two places: where the README names the measure, and after "This lowers what is judged by that much". It changed nothing else. Its brief said a refusal is reported, never worked around, and it reported no refusals.
+- **Merge:** I merged `w2

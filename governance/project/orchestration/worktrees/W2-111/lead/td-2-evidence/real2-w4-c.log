@@ -1,0 +1,46 @@
+== w4-c start 2026-11-13T07:51:10+00:00 load: 50.64 31.02 29.78 61/1321 217
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95 _
+
+tmp_path = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w4-c/pytest-of-usain/pytest-0/test_a_test_designer_s_read_on0')
+
+    def test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95(tmp_path):
+        project, sandbox = support.designer_world(tmp_path)
+        refused = support.designer_read(project, sandbox, CHANGED)
+        assert refused.decision == "deny" and re.search(r"DEC-820 \(c\)", refused.stdout), (
+            f"the fixture is wrong: the test designer is not refused a file its ticket's branch changes, so the read "
+            f"does not take Policy 2 (c)'s path: {refused.describe()}"
+        )
+        for _ in range(WARM_UP):
+            support.designer_read(project, sandbox, ORDINARY)
+        rounds = []
+        wall_rounds = []
+        for _ in range(ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(SAMPLES):
+                result = support.designer_read(project, sandbox, ORDINARY)
+                assert result.decision == "allow", f"the timed read was not allowed: {result.describe()}"
+                assert result.cpu_seconds is not None, f"the read's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            rounds.append(guard.p95(samples))
+            wall_rounds.append(guard.p95(wall_samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children for a test designer's read on a branch with changes, per round "
+            "(ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (wall p95 per round, for information, ms: "
+            + ", ".join(f"{value * 1000:.1f}" for value in wall_rounds) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children for a test designer's read on a branch with changes, per round (ms): 111.6, 114.0, 116.6; the bound is 100 ms (wall p95 per round, for information, ms: 325.9, 317.9, 349.9)
+E       assert 0.11159800000000075 < 0.1
+E        +  where 0.11159800000000075 = min([0.11159800000000075, 0.11400399999999422, 0.11660100000000284])
+
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:63: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+1 failed, 4 passed, 10 deselected in 111.42s (0:01:51)
+== w4-c exit 1 end 2026-11-13T07:53:14+00:00 load: 58.60 39.97 33.17 61/1319 4980

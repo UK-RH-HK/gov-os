@@ -1,0 +1,85 @@
+ok 1: nothing planted: quiet, exit 0
+ok 2: a lead in the dispatcher's status: busy, named
+ok 3: a planted lead process in a ticket worktree: busy
+ok 4: the integration store's worktree and the nightly's own clone are not 'something else'
+ok 5: a planted pytest run: busy
+ok 6: a grep that only names pytest is not a test run
+ok 7: a held heavy slot: busy, named
+ok 8: a held rebuild lock: busy
+ok 9: a released slot or lock is quiet again (the probe let go)
+ok 10: CLOSE-RUNNING present: busy
+ok 11: NIGHTLY-RUNNING present: busy
+ok 12: MEASURE-RUNNING present: busy
+ok 13: log/act-in-progress.txt present: busy
+ok 14: the operator's commit freeze present: busy
+ok 15: a stale dispatcher status: busy (leads cannot be counted)
+ok 16: the CTO's dispatch/OFF present: busy
+ok 17: 150 rg processes: busy
+ok 18: load 3.4: busy
+ok 19: --no-load leaves the load out
+ok 20: an untracked file in the main tree: busy
+FAIL 21: beside: lead (1: 1 lead(s) running: W2-999)
+FAIL 22: beside: lead processes (1: a process works in /home/usain/gov-os-worktrees/W2-999
+a job script runs: bash heavy_slot.sh python3
+a job script runs: bash rebuild_slot.sh tree
+a job script runs: bash launch_worker.sh --class)
+FAIL 23: beside: slot (1: heavy slot 2 is held)
+FAIL 24: beside: load (load 9.0 (the bar is 3))
+ok 25: --beside-leads: CLOSE-RUNNING present is still busy
+ok 26: --beside-leads: NIGHTLY-RUNNING present is still busy
+ok 27: --beside-leads: MEASURE-RUNNING present is still busy
+ok 28: --beside-leads: log/act-in-progress.txt present is still busy
+ok 29: --beside-leads: a landing, the merge queue and a close are still busy
+FAIL 30: beside: status landing (0: quiet)
+ok 31: --beside-leads: the operator's commit freeze is still busy
+ok 32: --beside-leads: a dirty main tree is still busy
+ok 33: --beside-leads: a stale dispatcher status is still busy
+FAIL 34: beside a lead: exit (2)
+FAIL 35: beside a lead: the nightly did not run (2026-11-13 00:30:48 nightly night: NOT STARTED by nightly_restart.sh: something else was running until the latest start 00:30: 1 lead(s) running: W2-999;
+2026-11-13 00:30:48 NOT STARTED by nightly_restart.sh: something else was running until the latest start 00:30: 1 lead(s) running: W2-999;)
+FAIL 36: beside a lead: OFF written
+FAIL 37: beside a slot (2)
+ok 38: an ACT in progress: refused
+ok 39: past the latest start: refused, nothing run
+ok 40: no user scope: the cap cannot be applied, so the nightly does not run
+ok 41: code that differs from its commit: refused
+ok 42: 11.4 GiB available (cap would be 8.4 GiB, under 9): refused
+ok 43: 40000000 kB available: cap 12288 MB, 16 workers
+ok 44: 20000000 kB available: cap 12288 MB, 16 workers
+ok 45: 13000000 kB available: cap 9623 MB, 12 workers
+ok 46: a lead that ends: the wrapper waited, then started the run
+ok 47: the scope's memory.max is 12 GiB (12884901888)
+ok 48: the scope's memory.swap.max is 0
+ok 49: memory.oom.group is 1 (the kernel kills the whole run)
+ok 50: the run's processes carry oom_score_adj 500
+FAIL 51: OFF during/after
+ok 52: cron's bare environment (env -i): the wrapper finds the user bus itself and runs the capped scope
+ok 53: the CTO's own dispatch/OFF is respected and never removed by the wrapper
+after/test_nightly_restart.sh: line 183: /proc/2334652/cmdline: No such file or directory
+after/test_nightly_restart.sh: line 183: /proc/2335556/cmdline: No such file or directory
+after/test_nightly_restart.sh: line 183: /proc/2335557/cmdline: No such file or directory
+after/test_nightly_restart.sh: line 183: /proc/2335559/cmdline: No such file or directory
+ok 54: a 600 MB hog in a 200 MB cap: the run ended, with a non-zero exit
+ok 55: the wrapper says the memory cap killed the run (exit 137, the whole run)
+ok 56: the hog's sibling process died with it (the whole run, not a part)
+ok 57: the marker NIGHTLY-RUNNING and dispatch/OFF are gone after the kill
+ok 58: the test's own session is alive
+ok 59: every shared-server process seen before the hog is still alive after it
+ok 60: run.txt's last line says what stopped the run
+ok 61: no gov-nightly unit is left loaded or failed
+ok 62: MemAvailable under the trip-wire's floor: the watchdog stops the run's scope within seconds
+ok 63: the watchdog's stop leaves no NIGHTLY-RUNNING
+ok 64: the run's time limit (RuntimeMaxSec) stops a hang
+ok 65: 500 rg processes during the run: one inbox item, and the run goes on to its end (the tripwire stops nothing)
+ok 66: the item names the count and is a P1
+ok 67: F8: a stale dispatch/OFF (its pid is dead) is removed and logged, and the night runs
+ok 68: F8: no dispatch/OFF is left after that run
+ok 69: F8: a dispatch/OFF whose token names a live pid is kept, and the night is refused
+ok 70: F9: a scope that fails after the probe leaves a NOT STARTED run.txt that names the scope failure
+ok 71: F9: no dispatch/OFF is left after the failed scope
+ok 72: F9: a run that wrote its own run.txt and exited 1 is left as it wrote it (no NOT STARTED line)
+ok 73: F10: a probe scope whose memory.max is not the 64M it was given: the night is refused, nothing run
+ok 74: F11: quiet_check leaves the main tree's index alone (GIT_OPTIONAL_LOCKS=0), tree touched or not
+ok 75: F11, the control: a plain git status does rewrite that index, so the case above shows something
+cases: 75
+failures: 10

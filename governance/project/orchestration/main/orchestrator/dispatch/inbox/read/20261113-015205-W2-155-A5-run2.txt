@@ -1,0 +1,11 @@
+log: W2-155-A5-run2.json
+W2: W2-155
+status: PACKAGES
+
+I applied option 1, then reverted it. Once applied, it made the warm query slower, not faster, so I stopped at 87 of the 120 lead-minutes. The owner needs to choose again (package W2-155-2).
+
+task: DAEO-ar89 (W2-155), run 2, build
+status: PACKAGES
+work_completed:
+- **Merge:** merged w2/integrate into the branch (25fc5f5c8), which brings in the DEC-1159 record.
+- **GPU reading:** one request at the worst shape the new bound allows, 2 pairs of 24,000 characters (48,000 padded), sent at 00:37 with the GPU at 0 % and no other request in the service log. It peaked at 9,639 MiB from 8,255 (+1,384 Mi

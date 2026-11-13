@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result 8d1bb1636: Merge w2/W2-171-tests into w2/W2-171: review round 2's test-design batch (td-2, b8a05585e): B-1 the VERDICT interval from the counts, B-2 measure --kept never prints a faulted attempt

@@ -1,0 +1,6 @@
+---
+task: DAEO-2bdu
+decisions_applied: [DEC-1052, DEC-1112, DEC-1150, DEC-957, DEC-1099, DEC-1157, DEC-1156, DEC-1010, DEC-136]
+---
+STATE: run 4: td-6 merged 15ad055adbb5 (README row success-5); tests worktree+branch removed; TESTS-READY written; rebuild-4 ok; lead_verify (pid 456433), accept-4 and rv-2 (round 2, the last, pid 458674) running on 15ad055adbb5 | HEAD: 15ad055adbb5 | NEXT: wait log/verify/verify.exit and log/rv-2.exit; read accept-4.txt; pass -> write docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-2.md and commit; return DONE with the head; fail -> triage in the return (no third round) | WAITING ON: lead_verify, rv-2, accept-4
+Workers: rv-2 (running, pid 458674) · td-6 (done, session 70729993, DONE, e5900cc9b91f) · eng-3 (exit 1 API 403 after both commits, session 18a2ad97) · td-5, td-4, td-3, eng-2, eng-1, td-2, rv-1 done · Rounds: review round 1 FAIL; round 2 in progress (the last) · Decisions taken: no eng-3b (its work committed; verification covers its missing report); no real-embedder re-run of legacy-docs (A9 code unchanged by L-1; >1 h; named residual in the evidence) · Open packages: none · Paths: briefs/rv-2.md, td-6.md; log/accept-3.txt, accept-4.txt, rebuild-4.txt, verify/

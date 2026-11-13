@@ -1,0 +1,8 @@
+log: W2-158-A5-run1.json
+W2: W2-158
+status: CHECKPOINTED. I stopped because the CTO said to (week usage reached 97% at 09:31, DEC-1140 (5)-(6)). No worker is running. The code and tests are merged into w2/W2-158, the W2-158 suites pass, and the rebuild is done. lead_verify, the review and landing have not been done.
+
+task: DAEO-8a3f (W2-158), `gov check --structural`, build run 1
+status: CHECKPOINTED. I stopped because the CTO said to (week usage reached 97% at 09:31, DEC-1140 (5)-(6)). No worker is running. The code and tests are merged into w2/W2-158, the W2-158 suites pass, and the rebuild is done. lead_verify, the review and landing have not been done.
+work_completed:
+- I read the Interface from the ticket's Interface line and the CTO's reference `structural_pass.py`, and wrote it as readings L1-L10 in `briefs/interface.md`. Both workers wrote to the same readings. The main points: no built-in commands

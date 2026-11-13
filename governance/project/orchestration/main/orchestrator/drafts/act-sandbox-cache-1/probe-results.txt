@@ -1,0 +1,5 @@
+claude 2.1.323 (Claude Code)
+A = the launcher's block as built (W2-56); B = A + allowWrite ~/.cache/gov-os; C = B + allowAllUnixSockets (refused by W2-56 S9/F4, DEC-1114)
+A {"ranked": false, "error": "OSError: [Errno 30] Read-only file system: '/home/usain/.cache/gov-os'"}
+B {"ranked": false, "error": "PermissionError: [Errno 1] Operation not permitted"}
+C {"ranked": true, "scores": [5.375, -9.5], "device": "cuda:0"}

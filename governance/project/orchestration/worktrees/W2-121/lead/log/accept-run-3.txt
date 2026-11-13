@@ -1,0 +1,28 @@
+........................................................................ [ 28%]
+.................................F...................................... [ 57%]
+........................................................................ [ 86%]
+...................................                                      [100%]
+=================================== FAILURES ===================================
+_ test_s4_an_item_already_in_the_inbox_counts_as_written_even_after_it_is_deleted _
+
+project = <w2_121_support.Project object at 0x7307494a1880>
+
+    def test_s4_an_item_already_in_the_inbox_counts_as_written_even_after_it_is_deleted(project):
+        p = project
+        entry = p.add_ticket(901)
+        p.finish_session(entry)
+        planted = p.plant_item(f"{entry.log}.return.txt", entry.log, entry.w2, status="DONE")
+        passes(p, 2)
+        assert [i.path for i in p.items()] == [planted], [i.text for i in p.items()]
+        planted.unlink()
+        passes(p, 2)
+>       assert p.all_items() == []
+E       AssertionError: assert [Item(path=Po...:31+00:00\n')] == []
+E         
+E         Left contains one more item: Item(path=PosixPath('/tmp/pytest-of-usain/pytest-235/test_s4_an_item_already_in_the0/project/.gov-runtime/dispatch/inb...01-A5-run.json\nW2: W2-901\nstatus: DONE\nkind: return\nticket: DAEO-a901\nexit: 0\ntime: 2026-11-12T06:29:31+00:00\n')
+E         Use -v to get more diff
+
+tests/acceptance/W2-121/test_s4_items_once_ever.py:77: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-121/test_s4_items_once_ever.py::test_s4_an_item_already_in_the_inbox_counts_as_written_even_after_it_is_deleted
+1 failed, 250 passed in 127.92s (0:02:07)

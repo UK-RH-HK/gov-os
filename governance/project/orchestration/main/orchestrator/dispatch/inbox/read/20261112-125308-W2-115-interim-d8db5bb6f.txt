@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-115
+status: interim result d8db5bb6f: W2-115 (DAEO-emq1): the round-1 probe record names its implementer sessions (probe.schema.json's required implementer_session)

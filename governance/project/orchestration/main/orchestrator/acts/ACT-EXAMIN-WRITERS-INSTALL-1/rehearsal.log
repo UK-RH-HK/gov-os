@@ -1,0 +1,163 @@
+--- 0. set-up (2026-11-12T16:22:48Z)
+main tree head 5daa188c74fe95d2d92a789c4013a23e9fd16ff6 (read only); status sha256 bcf32e01a511
+clone head 5daa188c74fe95d2d92a789c4013a23e9fd16ff6
+ok   S1 the clone's head is the main tree's head
+ok   S2 the clone holds neither brief and no examin-sets folder
+ok   S3 the bundle's frozen copies hash as approved (DEC-1143 (1))
+ok   S4 the drafts the owner approved hash as the frozen copies
+planted list: 21 lines, sha256 b0a91856fc96, mode 400, folder 700
+--- A. before the ACT
+     state before (list sha256 b0a91856fc96, 21 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   A1 check by the path map's sets root (~/gov-os-eval under the planted HOME): state before (exit 0)
+ok   A1b it says state before and names the path map
+     state before (list sha256 b0a91856fc96, 21 lines; sets root from the argument)
+ok   A2 check with the sets root as the argument: state before (exit 0)
+     not applied: state before
+ok   A3 verify refuses before the apply (exit 3)
+     refused: nothing to undo, state before (list sha256 b0a91856fc96, 21 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval)); nothing touched
+ok   A4 undo refuses: nothing to undo (exit 3)
+ok   A5 the list is byte for byte as planted
+     indep_launch: refused 10 brief
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": null, "set": "examin", "round": 1, "commit": "5daa188c74fe95d2d92a789c4013a23e9fd16ff6", "brief_sha256": null, "approved_sha256": "b0a91856fc96c5a2aab8f9d6f1c071f005cf05c7ff90bcbbe48f4c88290caf15", "se
+ok   A6 a dry launch under EXAMIN-writer.md before the ACT is refused 10 (the brief is not in the commit) (exit 10)
+--- B. apply
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   B1 apply: state applied (exit 0)
+ok   B1b it says state applied
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   B2 verify (exit 0)
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   B3 check: state applied (exit 0)
+ok   B4 both files are the frozen copies byte for byte
+ok   B5 the list is the planted list plus lines.txt, byte for byte
+ok   B6 the list stays 0400 and its folder 0700
+ok   B7 no temp file left beside the list or the briefs
+     parse_approved: 6 template lines, 12 brief lines; ours: [('d37834e08c86', 'writer', 'governance/project/indep-briefs/examin-sets/EXAMIN-writer.md'), ('57820503b569', 'writer', 'governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md')]
+ok   B8 the launch script's parse_approved reads both lines as (sha256, writer, path); 6 template, 12 brief lines
+     refused: already applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval)); nothing touched
+ok   B9 a second apply is refused (exit 3)
+ok   B9b the list is unchanged by the refused apply
+--- C. the operator's commit (in the clone, the line exactly as the bundle gives it)
+ok   C1 the commit is made
+     A	governance/project/indep-briefs/examin-sets/EXAMIN-writer.md
+     A	governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md
+ok   C2 it holds exactly the two files, both A
+ok   C3 the three trailers are there
+ok   C4 the committed blobs hash as approved
+ok   C5 the path map check passes with the two briefs tracked (indep-briefs namespace) (exit 0)
+--- D. dry launches under both briefs at the commit (planted sets root; --seed 17 --dry; no session starts)
+     indep_launch: dry 0
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": "20261112T162252Z-examin-r1", "set": "examin", "round": 1, "commit": "e65e81cb4b7d33e1edf0e32403509670f7e03ada", "brief_sha256": "d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f", "app
+ok   D1 [examin] the launch script accepts the brief and builds the wall (exit 0)
+ok   D1b [examin] its counts line says dry
+ok   D2 [examin] the wall's brief.md is the approved brief byte for byte
+     WALL.json: model claude-sonnet-5-5, effort high, result_schema writer-result.schema.json, budget 8, timeout 3600, set examin, selection {'changed': 0, 'sample': 200, 'overlap': 0}, tree files 4152
+ok   D3 [examin] WALL.json: the brief's front matter resolved (sonnet, effort high, writer schema, its budget and timeout)
+ok   D4 [examin] the wall's tree is built and leaves governance/project/indep-briefs out
+     indep_launch: dry 0
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": "20261112T162253Z-adoption-proving-ground-r1", "set": "adoption-proving-ground", "round": 1, "commit": "e65e81cb4b7d33e1edf0e32403509670f7e03ada", "brief_sha256": "57820503b56948bf9e6ebe41abb2182c9a81d
+ok   D1 [adoption-proving-ground] the launch script accepts the brief and builds the wall (exit 0)
+ok   D1b [adoption-proving-ground] its counts line says dry
+ok   D2 [adoption-proving-ground] the wall's brief.md is the approved brief byte for byte
+     WALL.json: model claude-sonnet-5-5, effort high, result_schema writer-result.schema.json, budget 15, timeout 5400, set adoption-proving-ground, selection {'changed': 0, 'sample': 0, 'overlap': 0}, tree files 4152
+ok   D3 [adoption-proving-ground] WALL.json: the brief's front matter resolved (sonnet, effort high, writer schema, its budget and timeout)
+ok   D4 [adoption-proving-ground] the wall's tree is built and leaves governance/project/indep-briefs out
+     indep_launch: refused 10 brief
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": null, "set": "examin", "round": 1, "commit": "e65e81cb4b7d33e1edf0e32403509670f7e03ada", "brief_sha256": null, "approved_sha256": "27347bd847c7a526773a69c320ec39373c1b7198274b3de3952ffac8777b8151", "se
+ok   D5 EXAMIN's path with PROVING-GROUND's sha256 is refused 10 (exit 10)
+     indep_launch: refused 10 brief
+     {"act": "ACT-INDEP-WALLS-1", "kind": "checker", "run": null, "set": "examin", "round": 1, "commit": "e65e81cb4b7d33e1edf0e32403509670f7e03ada", "brief_sha256": null, "approved_sha256": "27347bd847c7a526773a69c320ec39373c1b7198274b3de3952ffac8777b8151", "s
+ok   D6 EXAMIN-writer.md under --kind checker is refused 10 (its line gives writer) (exit 10)
+ok   D7 the dry launches left the list unchanged
+--- E. undo
+     state before (list sha256 b0a91856fc96, 21 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   E1 undo: state before (exit 0)
+ok   E2 the list is byte for byte the planted list (sha256 b0a91856fc96)
+ok   E3 both files are gone and the examin-sets folder with them
+      D governance/project/indep-briefs/examin-sets/EXAMIN-writer.md
+      D governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md
+ok   E4 the clone's status is exactly the two removals (D)
+     state before (list sha256 b0a91856fc96, 21 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   E5 check: state before (exit 0)
+     not applied: state before
+ok   E6 verify refuses after the undo (exit 3)
+ok   E7 the list stays 0400; no temp file left
+     indep_launch: refused 10 brief
+     {"act": "ACT-INDEP-WALLS-1", "kind": "writer", "run": null, "set": "examin", "round": 1, "commit": "e65e81cb4b7d33e1edf0e32403509670f7e03ada", "brief_sha256": null, "approved_sha256": "b0a91856fc96c5a2aab8f9d6f1c071f005cf05c7ff90bcbbe48f4c88290caf15", "se
+ok   E8 after the undo a dry launch under EXAMIN-writer.md at the commit is refused 10 (no line in the list) (exit 10)
+--- F. refusals (each from the planted list and the clone at its first head; each must touch nothing)
+     state other: the list /tmp/claude-1000/ewi-tmp/work/sr-nolist/indep-walls/APPROVED does not exist (a new list is never created)
+ok   F1 the list missing: check is state other (exit 3)
+ok   F1b it says the list does not exist
+     refused: state other: the list /tmp/claude-1000/ewi-tmp/work/sr-nolist/indep-walls/APPROVED does not exist (a new list is never created); nothing touched
+ok   F1c the list missing: apply refuses (exit 3)
+ok   F1d no list was created and no brief written
+     refused: state other: /tmp/claude-1000/ewi-tmp/work/sr-nowalls/indep-walls is not a folder (a list is never created); nothing touched
+ok   F1e the indep-walls folder missing: apply refuses (exit 3)
+ok   F1f nothing created under that root
+     state other: files: EXAMIN-writer.md exact, PROVING-GROUND-writer.md absent; list: EXAMIN line 0 exact/0 naming it/0 parsed, PROVING-GROUND line 0/0/0
+ok   F2 one file already present (byte-exact): check is state other (exit 3)
+     refused: state other: files: EXAMIN-writer.md exact, PROVING-GROUND-writer.md absent; list: EXAMIN line 0 exact/0 naming it/0 parsed, PROVING-GROUND line 0/0/0; nothing touched
+ok   F2b one file already present: apply refuses (exit 3)
+ok   F2c the list is unchanged, the other file not written, the present one unchanged
+     refused: state other: files: EXAMIN-writer.md other, PROVING-GROUND-writer.md exact; list: EXAMIN line 0 exact/0 naming it/0 parsed, PROVING-GROUND line 0/0/0; nothing touched
+ok   F2d both files present, one with a byte added: apply refuses (exit 3)
+ok   F2e the list is unchanged
+     state other: files: EXAMIN-writer.md absent, PROVING-GROUND-writer.md absent; list: EXAMIN line 1 exact/1 naming it/1 parsed, PROVING-GROUND line 0/0/0
+ok   F3 one line already present: check is state other (exit 3)
+     refused: state other: files: EXAMIN-writer.md absent, PROVING-GROUND-writer.md absent; list: EXAMIN line 1 exact/1 naming it/1 parsed, PROVING-GROUND line 0/0/0; nothing touched
+ok   F3b one line already present: apply refuses (exit 3)
+ok   F3c the list is unchanged and no brief written
+     refused: state other: files: EXAMIN-writer.md absent, PROVING-GROUND-writer.md absent; list: EXAMIN line 0 exact/0 naming it/0 parsed, PROVING-GROUND line 0/1/1; nothing touched
+ok   F3d the PROVING-GROUND line in another spelling (tabs, which the parser reads): apply refuses (exit 3)
+ok   F3e the list is unchanged
+     state before (list sha256 d33d01f0d91b, 22 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   F3f a comment naming a brief's path is not a line: check is state before (exit 0)
+     refused: state other: the list does not end in a newline; nothing touched
+ok   F4 the list does not end in a newline: apply refuses (exit 3)
+ok   F4b the list is unchanged
+     refused: state other: the list /tmp/claude-1000/ewi-tmp/work/home/gov-os-eval/indep-walls/APPROVED is a link; nothing touched
+ok   F5 the list is a link: apply refuses (exit 3)
+ok   F5b the linked file is unchanged
+     the frozen copy does not hash as listed: after/repo/governance/project/indep-briefs/examin-sets/EXAMIN-writer.md
+ok   F6 a tampered frozen copy: apply exits 4 (exit 4)
+ok   F6b nothing touched
+     refused: state other: the sets root /tmp/claude-1000/ewi-tmp/work/no-such-root is not a folder (the argument); nothing touched
+ok   F7 a sets root that does not exist: apply refuses (exit 3)
+     refused: the sets root must be an absolute path: home/gov-os-eval
+ok   F7b a relative sets root: refused 9 (exit 9)
+     refused: the sets root is named, never a folder under it
+ok   F7c a folder under the sets root named instead of the root: refused 9 (exit 9)
+     refused: run from the repository's top folder (no governance/project/path-map.yaml or governance/project/orchestration/tools/indep_launch.py here)
+ok   F8 not run from the repository's top folder: refused 9 (exit 9)
+ok   F8b nothing touched
+     mktemp: failed to create file via template ‘/tmp/claude-1000/ewi-tmp/work/home/gov-os-eval/indep-walls/.APPROVED.act-ewi.XXXXXX’: Permission denied
+     failed: the new list could not be built beside the old; nothing touched
+ok   F9 the list's folder not writable: apply exits 5 (exit 5)
+ok   F9b nothing touched, no temp file, no brief folder
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   F10 apply, then a later line is appended after ours (exit 0)
+     state before (list sha256 e32ee84c956d, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   F10b undo removes exactly our two lines (exit 0)
+ok   F10c every other line byte-identical: the planted list plus the later two lines
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   F11 apply, then EXAMIN-writer.md is changed (exit 0)
+     refused: state other: files: EXAMIN-writer.md other, PROVING-GROUND-writer.md exact; list: EXAMIN line 1 exact/1 naming it/1 parsed, PROVING-GROUND line 1/1/1; nothing touched
+ok   F11b undo refuses (a later change is not overwritten) (exit 3)
+     not applied: files: EXAMIN-writer.md other, PROVING-GROUND-writer.md exact; list: EXAMIN line 1 exact/1 naming it/1 parsed, PROVING-GROUND line 1/1/1
+ok   F11c verify refuses (exit 3)
+ok   F11d nothing touched: the list as applied, the PROVING-GROUND file still there
+     state applied (list sha256 27347bd847c7, 23 lines; sets root from the path map's sets_root_hidden.root (~/gov-os-eval))
+ok   F12 apply, then the EXAMIN line appended a second time (exit 0)
+     refused: state other: files: EXAMIN-writer.md exact, PROVING-GROUND-writer.md exact; list: EXAMIN line 2 exact/2 naming it/2 parsed, PROVING-GROUND line 1/1/1; nothing touched
+ok   F12b undo refuses a line present twice (exit 3)
+ok   F12c nothing touched
+--- G. the live files (read only)
+ok   G1 the main tree's head is unchanged
+ok   G2 the main tree's status is unchanged
+ok   G3 the main tree holds no examin-sets folder
+ok   G4 the approved drafts are unchanged
+
+checks run: 92
+REHEARSAL PASS
+failures: 0

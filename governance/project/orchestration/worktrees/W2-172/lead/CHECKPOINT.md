@@ -1,0 +1,4 @@
+STATE: run 3 done: lead_verify GREEN at 25634cdde460 (5154 tests, 0 failed, 8 skipped); gov accept 163 passed; returning DONE | HEAD: 25634cdde460 | NEXT: land run: confirm head == 25634cdde460 and git status --short empty, return DONE | WAITING ON: none (CTO narrow check, DEC-1154/1155)
+Workers: td-3 done (ce3269f3b1b4, session 93037803) · td-4 done (c6f7b9d6eb1c, session b32cd50e), merged 25634cdde; tests worktree and branch removed · earlier td-1, td-2, eng-1, rev-1 done · Rounds: fix batches converged; no new review round (CTO's narrow check follows, DEC-1154/1155) · Decisions taken: W2-171 F5 included per DEC-1155 (1) (ticket allowed_paths line 27) · Open packages: none · Paths: briefs/td-3.md, td-4.md; log/td-3/, log/proof3/, log/verify/ (25634cdde run, GREEN), log/accept-3.txt, log/rebuild-3.txt, log/rebuild-4.txt
+task: DAEO-p8tv
+decisions_applied: DEC-1052, DEC-1065, DEC-1073, DEC-1101, DEC-1125, DEC-1097, DEC-1038, DEC-1050, DEC-1155

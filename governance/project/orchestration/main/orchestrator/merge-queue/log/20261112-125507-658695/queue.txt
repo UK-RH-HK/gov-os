@@ -1,0 +1,15 @@
+2026-11-12 12:55:07 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 12:55:07 merged W2-23 onto f2e310aa2355: 0e9d50e3a74a
+2026-11-12 13:10:24 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 13:10:31 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 13:10:34 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 13:10:34 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 13:10:35 the integration store /home/usain/gov-os-worktrees/W2-00-store-b is at f7085136de3c, not at the head f2e310aa2355, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 13:10:35 seed of head-f2e310aa2355-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-b
+2026-11-12 13:11:23 the head without the batch: a throwaway worktree head-f2e310aa2355-0 at f2e310aa2355, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 13:11:24 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-12 13:11:25 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-12 13:14:12 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto f7085136de3c: b5a0394e3183; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-12 13:14:12 ADVANCED refs/heads/w2/integrate f7085136de3c -> b5a0394e3183; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/b5a0394e3183.json
+2026-11-12 13:14:12 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 13:23:45 integration store promoted: the merged clone's stores at b5a0394e3183 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

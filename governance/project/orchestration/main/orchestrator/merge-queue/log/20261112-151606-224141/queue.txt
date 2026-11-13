@@ -1,0 +1,25 @@
+2026-11-12 15:16:06 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 15:16:06 merged W2-146 onto 1ef597a43909: 7b5a99ae988a
+2026-11-12 15:38:04 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 15:38:11 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 15:38:18 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 15:38:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 15:38:19 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first]
+2026-11-12 15:38:20 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle]
+2026-11-12 15:44:24 the head without the batch: a throwaway worktree head-1ef597a43909-0 at 1ef597a43909 with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 15:44:29 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_core_schema_is_green_on_this_repository_with_w1_43_untouched
+2026-11-12 15:44:34 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-12 15:50:02 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+2026-11-12 15:50:02 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
+2026-11-12 15:50:03 merged W2-146 onto 5daa188c74fe: 6b7b5a42bcdd
+2026-11-12 16:14:43 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 16:14:49 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 16:14:52 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 16:14:53 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 16:20:27 the head without the batch: a throwaway worktree head-5daa188c74fe-1 at 5daa188c74fe with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 16:20:33 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_core_schema_is_green_on_this_repository_with_w1_43_untouched
+2026-11-12 16:20:43 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-12 16:26:05 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+2026-11-12 16:26:05 ADVANCED refs/heads/w2/integrate 5daa188c74fe -> 6b7b5a42bcdd; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/6b7b5a42bcdd.json
+2026-11-12 16:26:05 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 16:28:00 integration store promoted: the merged clone's stores at 6b7b5a42bcdd into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

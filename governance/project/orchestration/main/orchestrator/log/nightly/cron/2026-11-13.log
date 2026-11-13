@@ -1,0 +1,125 @@
+== 2026-11-13 04:04:21 nightly_cron: start
+code: governance/project/orchestration/nightly at dbb0891e8, tree cfdae0052a14
+rotate: done
+2026-11-13 04:04:21 nightly night: estimate {"estimate_s": 2756, "parallel_s": 1175, "serial_s": 1289, "setup_s": 41, "effective_workers": 11.6, "margin": 1.1, "runs": ["history", "history", "history"]}
+latest start 07:14
+head cb208f9434d7
+seed: seeded (copy): vectors only, 28535 vectors from /home/usain/gov-os-worktrees/W2-00-store-a at cb208f9434d7 in 1.7 s
+secrets full scan: off by configuration (DEC-1045)
+clone rebuilt
+gate: OPEN full-run leads=1 load=20.0/10.1 nproc=20 have=17195540kB need=11336652kB
+heavy-job slots held: 3 of 3 (waited 1702 s)
+the suites' thread budget and CPU sets: the gate's, for the slots held (1,2,3)
+heavy-job slots released after the suites
+parallel exit 1 in 1406 s: 100 failed, 13305 passed, 69 skipped, 1 xfailed, 6 warnings, 2 errors in 1312.57s (0:21:52)
+serial exit 1 in 1430 s: 2 failed, 134 passed, 48 deselected, 1 warning in 1327.80s (0:22:07)
+serial: 136 cases run
+red-alone tests/acceptance/W2-02/test_w2_02_record_types.py::test_a_close_record_that_names_no_ticket_is_refused: 1 error in 1.28s
+red-alone tests/acceptance/W1-32/test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones: 1 failed in 1.06s
+red-alone tests/acceptance/W1-18/test_w1_18_on_demand_start.py::test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_starts_nothing: 1 failed in 0.33s
+red-alone tests/acceptance/W2-02/test_w2_02_record_types.py::test_the_close_record_gov_close_writes_passes_core_schema: 1 error in 0.98s
+passes-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search
+passes-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[no-connection-within-connect-s]
+red-alone tests/acceptance/W1-26/test_w1_26_command.py::test_exit_0_when_all_checks_green: 1 failed in 36.02s
+red-alone tests/acceptance/W1-26/test_w1_26_command.py::test_warning_yellow_does_not_change_exit_code: 1 failed in 29.33s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[caused_red-no_close_yaml]: 1 failed in 1.85s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[caused_red-close_strict]: 1 failed in 1.88s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[failing_acceptance-no_close_yaml]: 1 failed in 1.83s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[failing_acceptance-close_strict]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[green-no_close_yaml]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[green-close_strict]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[shared_core-no_close_yaml]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[shared_core-close_strict]: 1 failed in 1.83s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[unowned_red-no_close_yaml]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[unowned_red-close_strict]: 1 failed in 1.88s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[unplaced-no_close_yaml]: 1 failed in 1.86s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_gives_the_recorded_verdict[unplaced-close_strict]: 1 failed in 1.88s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_still_runs_the_full_regression_on_a_shared_core_change[no_close_yaml]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-115/test_w2_115_strict.py::test_the_strict_close_still_runs_the_full_regression_on_a_shared_core_change[close_strict]: 1 failed in 1.79s
+red-alone tests/acceptance/W1-30/test_w1_30_close.py::test_close_succeeds_on_green_standard_ticket: 1 failed in 3.79s
+red-alone tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_acceptance_tests: 1 failed in 3.79s
+red-alone tests/acceptance/W1-30/test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail: 1 failed in 3.71s
+red-alone tests/acceptance/W1-30/test_w1_30_close.py::test_regression_failure_blocks_close: 1 failed in 3.71s
+red-alone tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_packet_hash: 1 failed in 3.80s
+red-alone tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_tests_and_deviations: 1 failed in 3.72s
+red-alone tests/acceptance/W2-66/test_w2_66_moved_files.py::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_moved_files.py::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_moved_files.py::test_a_file_moved_into_the_shared_core_runs_the_full_regression: 1 failed in 1.80s
+red-alone tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir: 1 failed in 0.17s
+red-alone tests/acceptance/W2-136/test_w2_136_never_a_gate.py::test_s10_no_module_of_gov_outside_plan_and_launch_imports_or_calls_gov_plan: 1 failed in 0.77s
+red-alone tests/acceptance/W2-66/test_w2_66_nightly.py::test_a_red_a_scoped_close_since_the_last_green_night_left_out_is_a_p1_package_with_the_map_corrected: 1 failed in 1.82s
+red-alone tests/acceptance/W2-123/test_w2_123_retry.py::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built: 1 failed in 5.16s
+red-alone tests/acceptance/W2-66/test_w2_66_retention.py::test_every_test_run_of_the_close_is_given_the_retention_option[acceptance]: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_retention.py::test_every_test_run_of_the_close_is_given_the_retention_option[parallel]: 1 failed in 1.83s
+red-alone tests/acceptance/W2-66/test_w2_66_retention.py::test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays[parallel]: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_retention.py::test_the_refused_close_s_evidence_names_the_option: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_retention.py::test_a_passed_close_names_the_option_in_its_result_and_its_record: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_scoped_close_passes: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_a_one_module_change_is_stated_scoped_never_full: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_base_is_the_last_fully_green_commit: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_record_only_commits_since_the_base_are_inside_the_change: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_head_and_the_tree_are_stated: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_own_suite_runs_and_is_named: 1 failed in 1.88s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_unit_tests_run_and_are_named: 1 failed in 2.11s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_a_suite_whose_ticket_paths_overlap_the_change_runs_and_is_named_with_why[W1-bb]: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W2-cc]: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_selection_keeps_the_full_runs_form_so_a_bare_conftest_import_still_collects: 1 failed in 1.97s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_record_reading_set_runs_on_a_scoped_close_and_is_named: 1 failed in 1.96s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_every_close_files_run_and_are_named: 1 failed in 1.83s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_serial_cases_of_the_selected_suites_run_alone_and_only_those: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_record_says_which_serial_cases_ran: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block: 1 failed in 1.78s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_the_junit_xml_holds_every_case_run_and_no_case_left_out: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_scoped_selection.py::test_a_scoped_close_states_its_settings_defaults: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression: 1 failed in 1.87s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed]: 1 failed in 1.83s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed-longer]: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close: 1 failed in 1.84s
+red-alone tests/acceptance/W1-36/test_w1_36_check_integration/TestAuditReproGovCheck.py::test_yellow_alone_does_not_make_gov_check_fail: no tests ran in 0.00s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_red_the_renamed_coupled_file_catches_refuses_the_close: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_a_gone_coupling_target_the_change_does_not_reach_widens_nothing: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_unresolved_targets.py::test_selected_targets_that_resolve_change_nothing: 1 failed in 1.83s
+passes-alone tests/acceptance/W2-121/test_s1_lock_off_status.py::test_s1_status_runs_no_pass_and_writes_nothing
+red-alone tests/acceptance/W2-77/test_w2_77_batch.py::test_the_batch_keeps_a_hidden_worktree_s_registration_admin_folder_and_staged_index: 1 failed in 5.51s
+red-alone tests/acceptance/W2-77/test_w2_77_batch.py::test_the_batch_s_record_carries_the_night_s_cleanup_when_the_clone_s_removal_fails: 1 failed in 5.62s
+red-alone tests/acceptance/W2-66/test_w2_66_declared_folders.py::test_the_overlap_rule_selects_a_ticket_s_declared_folder: 1 failed in 1.90s
+red-alone tests/acceptance/W2-66/test_w2_66_declared_folders.py::test_the_own_suite_is_the_closing_ticket_s_declared_folder: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_deselected_cases.py::test_a_case_left_out_by_deselection_is_named_with_why: 1 failed in 1.91s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_a_refused_close_states_its_evidence_and_says_scoped: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_every_failing_test_is_named_with_its_failure_text_kept: 1 failed in 1.89s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_every_skip_is_named_with_its_reason_and_counted: 1 failed in 1.93s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip: 1 failed in 1.87s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_a_refused_close_names_every_suite_it_left_out: 1 failed in 1.84s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_a_passed_close_names_its_skips_in_the_result_and_the_record: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_evidence.py::test_a_full_close_names_every_suite_it_ran_and_its_junit_xml_holds_every_case: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_a_changed_helper_selects_every_suite_that_imports_it_directly_or_through_another_helper: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_a_declared_coupling_selects_its_suites_and_names_why: 1 failed in 1.83s
+red-alone tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_a_record_only_commit_widens_nothing: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_scoped_close: 1 failed in 1.79s
+red-alone tests/acceptance/W2-57/test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone: 1 failed in 3.24s
+red-alone tests/acceptance/W2-66/test_w2_66_followed_couplings.py::test_the_record_reading_set_reads_the_pre_close_gate_s_own_check_result: 1 failed in 1.85s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_change_under_the_shared_core_runs_the_full_regression: 1 failed in 1.82s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_change_to_the_path_map_runs_the_full_regression: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_change_to_the_test_map_runs_the_full_regression: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_shared_core_change_in_the_ticket_s_own_commit_runs_the_full_regression: 1 failed in 1.87s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_changed_file_no_mapping_places_runs_the_full_regression: 1 failed in 1.79s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_missing_test_map_runs_the_full_regression: 1 failed in 1.79s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_test_map_that_cannot_be_read_runs_the_full_regression[not-yaml]: 1 failed in 1.76s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_without_a_record_of_a_green_commit_the_base_is_unknown_and_the_run_is_full: 1 failed in 1.79s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_green_record_naming_no_commit_of_the_history_leaves_the_base_unknown[no-such-commit]: 1 failed in 1.78s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_red_night_is_no_base: 1 failed in 1.79s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_full_runs_the_full_regression_and_the_record_says_so: 1 failed in 1.77s
+red-alone tests/acceptance/W2-66/test_w2_66_full_widening.py::test_a_passed_full_close_is_the_base_of_the_next_scoped_close: 1 failed in 1.86s
+red-alone tests/acceptance/W2-66/test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit[parallel]: 1 failed in 1.80s
+red-alone tests/acceptance/W2-66/test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit[serial-afterwards]: 1 failed in 1.78s
+red-alone tests/acceptance/W2-66/test_w2_66_limits.py::test_without_pytest_timeout_the_close_does_not_pass_silently: 1 failed in 1.81s
+red-alone tests/acceptance/W2-66/test_w2_66_limits.py::test_the_distribution_mode_is_one_setting_and_the_runs_follow_it: 1 failed in 1.78s
+accepted-red tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+accepted-red tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget
+verdict: red 99
+duration: estimate 2756 s, actual 4914 s (setup 64 s, lock wait 1702 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261113-0404
+2026-11-13 05:26:15 done
+== 2026-11-13 05:26:16 nightly_cron: end, exit 0

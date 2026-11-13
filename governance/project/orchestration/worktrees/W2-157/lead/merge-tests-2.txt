@@ -1,0 +1,5 @@
+W2-157 (DAEO-ozyt): merge the L5b acceptance cases (td-2, c4107a6d6cee: the backstop's own group paused last; review round 1's FR-1, FR-2)
+
+Task: DAEO-ozyt
+Role: orchestrator
+Implements: DEC-1067, DEC-1068, DEC-1073

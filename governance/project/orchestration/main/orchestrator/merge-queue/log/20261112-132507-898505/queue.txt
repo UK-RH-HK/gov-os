@@ -1,0 +1,13 @@
+2026-11-12 13:25:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 13:25:08 merged W2-177 onto 1846f727480e: e7e5a6028136
+2026-11-12 13:40:09 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 13:40:16 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 13:40:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 13:40:20 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 13:40:22 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed
+2026-11-12 13:40:50 the head without the batch: a throwaway worktree head-1846f727480e-0 at 1846f727480e with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 13:40:51 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-12 13:40:52 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-12 13:40:52 ADVANCED refs/heads/w2/integrate 1846f727480e -> e7e5a6028136; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/e7e5a6028136.json
+2026-11-12 13:40:52 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 13:47:33 integration store promoted: the merged clone's stores at e7e5a6028136 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

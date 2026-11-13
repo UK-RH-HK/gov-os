@@ -1,0 +1,781 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+.......................................................................F [  2%]
+..F...F....F..F.............................F........................... [  4%]
+........................................................................ [  5%]
+.............s........................................x................. [  7%]
+.....F.................F....................................F........... [  8%]
+..F..................................................................... [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+.......F................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+..................................................F..................... [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+............................................................F........... [ 36%]
+.................................................................F...... [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+......................................................sss............... [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+.......................................sss.............................. [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+...F............F.........................F.....F.................F..... [ 67%]
+........................................................................ [ 69%]
+.............F..F....................................................... [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........F............................................................... [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+.............................F.........F................................ [ 96%]
+........................................................................ [ 98%]
+.....................F......[gw3] node down: Not properly terminated
+F........................................................                [100%]
+=================================== FAILURES ===================================
+_ test_an_endpoint_reporting_another_revision_of_the_pinned_model_fails_closed_at_rebuild _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_an_endpoint_reporting_ano0/project')
+box = <w2_32_support.Box object at 0x72e4a1cb9820>
+standin = <w2_32_support.OllamaStandIn object at 0x72e4a9450470>
+
+    def test_an_endpoint_reporting_another_revision_of_the_pinned_model_fails_closed_at_rebuild(project, box, standin):
+        standin.offer({s.PIN_MODEL: s.OTHER_DIGEST})
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+        assert store.get("status") != "recreated", f"vectors were built with an unpinned revision: {store}"
+>       assert s.code_named(store, "MISMATCH"), f"no named error (…_MISMATCH) for the revision mismatch: {store}"
+E       AssertionError: no named error (…_MISMATCH) for the revision mismatch: {}
+E       assert []
+E        +  where [] = <function code_named at 0x72e4a8d1fec0>({}, 'MISMATCH')
+E        +    where <function code_named at 0x72e4a8d1fec0> = s.code_named
+
+tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py:51: AssertionError
+_ test_a_configured_model_without_a_revision_fails_closed_at_rebuild[no-revision] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_configured_model_withou0/project')
+box = <w2_32_support.Box object at 0x72e4a9128d10>
+standin = <w2_32_support.OllamaStandIn object at 0x72e4aa00eed0>
+revision = Ellipsis
+
+    @pytest.mark.parametrize("revision", [..., "", None], ids=["no-revision", "empty-revision", "null-revision"])
+    def test_a_configured_model_without_a_revision_fails_closed_at_rebuild(project, box, standin, revision):
+        s.pin(project, s.SWAP_MODEL, revision)
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+        assert store.get("status") != "recreated", f"vectors were built with an unpinned model: {store}"
+>       assert s.code_named(store, "UNPINNED"), f"no named error (…_UNPINNED) for the unpinned model: {store}"
+E       AssertionError: no named error (…_UNPINNED) for the unpinned model: {}
+E       assert []
+E        +  where [] = <function code_named at 0x72e4a8d1fec0>({}, 'UNPINNED')
+E        +    where <function code_named at 0x72e4a8d1fec0> = s.code_named
+
+tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py:62: AssertionError
+_ test_a_configured_model_without_a_revision_fails_closed_at_rebuild[empty-revision] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_configured_model_withou1/project')
+box = <w2_32_support.Box object at 0x72e4a9b7c8f0>
+standin = <w2_32_support.OllamaStandIn object at 0x72e4a8245af0>, revision = ''
+
+    @pytest.mark.parametrize("revision", [..., "", None], ids=["no-revision", "empty-revision", "null-revision"])
+    def test_a_configured_model_without_a_revision_fails_closed_at_rebuild(project, box, standin, revision):
+        s.pin(project, s.SWAP_MODEL, revision)
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+        assert store.get("status") != "recreated", f"vectors were built with an unpinned model: {store}"
+>       assert s.code_named(store, "UNPINNED"), f"no named error (…_UNPINNED) for the unpinned model: {store}"
+E       AssertionError: no named error (…_UNPINNED) for the unpinned model: {}
+E       assert []
+E        +  where [] = <function code_named at 0x72e4a8d1fec0>({}, 'UNPINNED')
+E        +    where <function code_named at 0x72e4a8d1fec0> = s.code_named
+
+tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py:62: AssertionError
+_ test_a_configured_model_without_a_revision_fails_closed_at_rebuild[null-revision] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_configured_model_withou2/project')
+box = <w2_32_support.Box object at 0x72e4a1bb7890>
+standin = <w2_32_support.OllamaStandIn object at 0x72e4a1bb5700>
+revision = None
+
+    @pytest.mark.parametrize("revision", [..., "", None], ids=["no-revision", "empty-revision", "null-revision"])
+    def test_a_configured_model_without_a_revision_fails_closed_at_rebuild(project, box, standin, revision):
+        s.pin(project, s.SWAP_MODEL, revision)
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+        assert store.get("status") != "recreated", f"vectors were built with an unpinned model: {store}"
+>       assert s.code_named(store, "UNPINNED"), f"no named error (…_UNPINNED) for the unpinned model: {store}"
+E       AssertionError: no named error (…_UNPINNED) for the unpinned model: {}
+E       assert []
+E        +  where [] = <function code_named at 0x72e4a8d1fec0>({}, 'UNPINNED')
+E        +    where <function code_named at 0x72e4a8d1fec0> = s.code_named
+
+tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py:62: AssertionError
+____ test_a_pinned_model_the_endpoint_does_not_list_fails_closed_at_rebuild ____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_pinned_model_the_endpoi0/project')
+box = <w2_32_support.Box object at 0x72e4a1bb7770>
+standin = <w2_32_support.OllamaStandIn object at 0x72e4a1bb6600>
+
+    def test_a_pinned_model_the_endpoint_does_not_list_fails_closed_at_rebuild(project, box, standin):
+        standin.offer({s.PIN_MODEL: s.PIN_DIGEST})
+        s.pin(project, s.SWAP_MODEL, s.SWAP_DIGEST)
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+        assert store.get("status") != "recreated", f"vectors were built with a model other than the pinned one: {store}"
+>       assert s.any_code(store) and s.SWAP_MODEL in str(store), \
+            f"the refusal names an error code and the pinned model: {store}"
+E       AssertionError: the refusal names an error code and the pinned model: {}
+E       assert ([])
+E        +  where [] = <function any_code at 0x72e4a8d1ff60>({})
+E        +    where <function any_code at 0x72e4a8d1ff60> = s.any_code
+
+tests/acceptance/W2-32/test_w2_32_s2_fail_closed.py:72: AssertionError
+_ test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_13_support.Box object at 0x7b6cf896a0f0>
+repo = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_second_rebuild_answered0/repo')
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_second_rebuild_answered0')
+
+    def test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more(box, repo, tmp_path):
+        """The session's cache (``GOV_SECRETS_CACHE``, the box's own) already holds the fixture's clean verdicts from the
+        shared store's rebuild; two more rebuilds of a fresh clone read from it."""
+>       box.rebuild(repo)
+
+tests/acceptance/W2-13/test_w2_13_secrets.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-13/w2_13_support.py:340: in rebuild
+    result = self.gov("rebuild", "--json", "--root", str(root), host=host, env=env, timeout=timeout).result()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_13_support.Run object at 0x7b6d00d5f1d0>
+
+    def result(self):
+        """The envelope's result of a call that succeeded."""
+>       assert self.returncode == 0, f"the command did not succeed\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command did not succeed
+E       gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_second_rebuild_answered0/repo
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+tests/acceptance/W2-13/w2_13_support.py:211: AssertionError
+_ test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises[stale] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_13_support.Box object at 0x7b6cf896a0f0>
+repo = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_search_of_an_unusable_i0/repo')
+state = 'stale'
+
+    @pytest.mark.parametrize("state", STORES)
+    def test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises(box, repo, state):
+>       make_store(box, repo, state)
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-13/test_w2_13_unavailable.py:46: in make_store
+    box.rebuild(root)
+tests/acceptance/W2-13/w2_13_support.py:340: in rebuild
+    result = self.gov("rebuild", "--json", "--root", str(root), host=host, env=env, timeout=timeout).result()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_13_support.Run object at 0x7b6d0076b830>
+
+    def result(self):
+        """The envelope's result of a call that succeeded."""
+>       assert self.returncode == 0, f"the command did not succeed\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command did not succeed
+E       gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_search_of_an_unusable_i0/repo
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+tests/acceptance/W2-13/w2_13_support.py:211: AssertionError
+__ test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback[stale] ___
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_13_support.Box object at 0x7b6cf896a0f0>
+repo = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_gov_retrieve_on_an_unusab0/repo')
+state = 'stale'
+
+    @pytest.mark.parametrize("state", STORES)
+    def test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback(box, repo, state):
+>       make_store(box, repo, state)
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-13/test_w2_13_unavailable.py:46: in make_store
+    box.rebuild(root)
+tests/acceptance/W2-13/w2_13_support.py:340: in rebuild
+    result = self.gov("rebuild", "--json", "--root", str(root), host=host, env=env, timeout=timeout).result()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_13_support.Run object at 0x7b6cf97bd5e0>
+
+    def result(self):
+        """The envelope's result of a call that succeeded."""
+>       assert self.returncode == 0, f"the command did not succeed\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command did not succeed
+E       gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_gov_retrieve_on_an_unusab0/repo
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+tests/acceptance/W2-13/w2_13_support.py:211: AssertionError
+______________ test_every_stage_timed_in_output_and_record[full] _______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_every_stage_timed_in_outp0/w2-76'...PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_every_stage_timed_in_outp0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_every_stage_timed_in_outp0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+form = ()
+
+    @pytest.mark.parametrize("form", [("--no-embeddings",), ()], ids=["no-embeddings", "full"])
+    def test_every_stage_timed_in_output_and_record(box, lock, env, form):
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, *form)
+    
+>       assert run.returncode == 0 and run.envelope().get("ok") is True, f"the rebuild did not succeed\n{run.describe()}"
+E       AssertionError: the rebuild did not succeed
+E         /usr/bin/python3 -m gov.cli.main rebuild --json
+E         exit code: 1 after 3.3 s
+E         stdout:
+E         {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E         
+E         stderr:
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         
+E       assert (1 == 0)
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json'), returncode=1, stdout='{"ok": false, "command... retrieval is skipped and results are FTS-only.\n', seconds=3.296710466995137, pid=2728821, started=1794501839.7412314).returncode
+
+tests/acceptance/W2-76/test_w2_76_timings.py:32: AssertionError
+_________ test_two_full_rebuilds_of_the_same_tree_give_the_same_digest _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_two_full_rebuilds_of_the_0/w2-76'...PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_two_full_rebuilds_of_the_0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw5/test_two_full_rebuilds_of_the_0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_two_full_rebuilds_of_the_same_tree_give_the_same_digest(box, lock, env):
+        project = support.make_project(box, "project", lock)
+    
+        runs = [support.rebuild(project, env) for _ in range(2)]
+    
+        for run in runs:
+>           assert run.returncode == 0 and run.envelope().get("ok") is True, run.describe()
+E           AssertionError: /usr/bin/python3 -m gov.cli.main rebuild --json
+E             exit code: 1 after 4.1 s
+E             stdout:
+E             {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E             
+E             stderr:
+E             EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E             
+E           assert (1 == 0)
+E            +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json'), returncode=1, stdout='{"ok": false, "command... retrieval is skipped and results are FTS-only.\n', seconds=4.063177896998241, pid=2732503, started=1794501851.7428296).returncode
+
+tests/acceptance/W2-76/test_w2_76_unchanged.py:19: AssertionError
+_ test_s5_guard_a_model_less_re_index_of_a_tree_keeps_its_vectors_and_reports_the_facet_unavailable _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw2/test_s5_guard_a_model_less_re_0/box'),...('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw2/test_s5_guard_a_model_less_re_0/box/stores/integration'))
+env = {'GIT_AUTHOR_EMAIL': 'w2-116@example.invalid', 'GIT_AUTHOR_NAME': 'W2-116 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-116@example.invalid', 'GIT_COMMITTER_NAME': 'W2-116 acceptance', ...}
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw2/test_s5_guard_a_model_less_re_0/box/project')
+
+    def test_s5_guard_a_model_less_re_index_of_a_tree_keeps_its_vectors_and_reports_the_facet_unavailable(
+            box, env, project):
+        built = support.rebuild(project, env)
+        assert built.ok, built.describe()
+        vectors = support.vector_count(project)
+        assert vectors, "premise: the tree's full rebuild left no vectors"
+        support.land_h2(project)
+        run = support.rebuild(project, {**env, "OLLAMA_HOST": support.closed_host()})
+        semantic = (run.result.get("stores") or {}).get("semantic") or {}
+>       assert semantic.get("status") != "recreated" and semantic.get("reason"), (
+            f"a model-less re-index does not report the semantic facet unavailable\n{run.describe()}")
+E       AssertionError: a model-less re-index does not report the semantic facet unavailable
+E         gov rebuild --json
+E         exit code: 1 after 2.6 s
+E         stdout:
+E         {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}}}}}
+E         
+E         stderr:
+E         EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         
+E       assert (None != 'recreated' and None)
+E        +  where None = <built-in method get of dict object at 0x7a1ee2945e80>('status')
+E        +    where <built-in method get of dict object at 0x7a1ee2945e80> = {}.get
+E        +  and   None = <built-in method get of dict object at 0x7a1ee2945e80>('reason')
+E        +    where <built-in method get of dict object at 0x7a1ee2945e80> = {}.get
+
+tests/acceptance/W2-116/test_w2_116_reindex.py:41: AssertionError
+_ test_the_rebuild_says_no_namespace_is_embedded[every-namespace-not-embedded-full] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw1/test_the_rebuild_says_no_names0')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw1/test_the_rebuild_says_no_names0/sa...xPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw1/test_the_rebuild_says_no_names0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+reference = {'doctor': (Run(args=('doctor', '--json'), returncode=0, stdout='{"ok": true, "command": "doctor", "result": {"healthy...124/gov-rebuild-2612181-clo7f5py.lock', 'released_at': '2026-11-12T16:48:08.325619+00:00', ...}, ...}, 'session': ''})}
+map_name = 'every-namespace-not-embedded', mode = 'full'
+
+    @pytest.mark.parametrize("mode", MODES)
+    @pytest.mark.parametrize("map_name", NONE_EMBEDDED)
+    def test_the_rebuild_says_no_namespace_is_embedded(tmp_path, sandbox, interface, reference, map_name, mode):
+        """The stores are recreated as for the project with one embedded namespace, with the same exit code and the
+        same outcome for every store; the answer for the semantic store carries the words."""
+        project = built(tmp_path, map_name, NONE_EMBEDDED[map_name])
+        run, envelope = rebuild(project, sandbox, interface, MODES[mode])
+        ref_run, ref_envelope = reference[mode]
+        assert envelope["ok"] is True and run.returncode == 0, f"the rebuild did not succeed\n{run.describe()}"
+>       assert (run.returncode, envelope["ok"]) == (ref_run.returncode, ref_envelope["ok"]), \
+            f"the exit code differs from the project with one embedded namespace\n{run.describe()}"
+E       AssertionError: the exit code differs from the project with one embedded namespace
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "1da65b540d597b0e642c54256d1a992cee1fc0eff71c0c2e3e4bf48d1173a0d0", "store": {"digest": "1da65b540d597b0e642c54256d1a992cee1fc0eff71c0c2e3e4bf48d1173a0d0", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors; the semantic vectors were not asked for", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "recreated"}}, "compaction": {".gov-runtime/store.db": "compacted", ".gov-runtime/codeintel/home/_config.db": "compacted", ".gov-runtime/codeintel/home/code.db": "compacted"}, "secrets_counts": {"content": {"scanned": 26, "remembered": 26}, "path": {"scanned": 26, "remembered": 0}}, "complete": true, "not_built": [], "timing": {"record_s": 0.3, "lexical_s": 4.3, "secrets_s": 7.9, "semantic_s": 0.0, "codeintel_s": 16.2, "compaction_s": 0.0, "total_s": 21.1}, "lock": {"path": "/tmp/gov-os-lead-W2-124/gov-rebuild-2612181-clo7f5py.lock", "source": "GOV_REBUILD_LOCK", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-12T16:48:25.079052+00:00", "released_at": "2026-11-12T16:48:46.132831+00:00"}, "slow": false, "slow_after_s": 1800, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0, True) == (1, False)
+E         
+E         At index 0 diff: 0 != 1
+E         Use -v to get more diff
+
+tests/acceptance/W1-41/test_w1_41_embedding_policy.py:308: AssertionError
+_ test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_rebuild_with_the_embedd0/project')
+box = <w2_32_support.Box object at 0x7b6cf924deb0>
+standin = <w2_32_support.OllamaStandIn object at 0x7b6cf924e9c0>
+
+    def test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing(project, box, standin):
+        box.host = s.dead_host()
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+>       assert store.get("status") != "recreated" and s.any_code(store), \
+            f"the semantic store is refused with a named code: {store}"
+E       AssertionError: the semantic store is refused with a named code: {}
+E       assert (None != 'recreated' and [])
+E        +  where None = <built-in method get of dict object at 0x7b6cf892c5c0>('status')
+E        +    where <built-in method get of dict object at 0x7b6cf892c5c0> = {}.get
+E        +  and   [] = <function any_code at 0x7b6d000aff60>({})
+E        +    where <function any_code at 0x7b6d000aff60> = s.any_code
+
+tests/acceptance/W2-32/test_w2_32_s10_no_cpu_fallback.py:74: AssertionError
+_________ test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed _________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_a_rebuild_with_the_embedd1/project')
+box = <w2_32_support.Box object at 0x7b6cf92fb4d0>
+standin = <w2_32_support.OllamaStandIn object at 0x7b6cf92fba40>
+
+    def test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed(project, box, standin):
+        standin.device = "cpu"
+        envelope = box.rebuild(project)
+        store = s.semantic_store(envelope)
+>       assert store.get("status") != "recreated" and s.any_code(store), \
+            f"a rebuild on the CPU is refused with a named code: {store}"
+E       AssertionError: a rebuild on the CPU is refused with a named code: {}
+E       assert (None != 'recreated' and [])
+E        +  where None = <built-in method get of dict object at 0x7b6cf9c39380>('status')
+E        +    where <built-in method get of dict object at 0x7b6cf9c39380> = {}.get
+E        +  and   [] = <function any_code at 0x7b6d000aff60>({})
+E        +    where <function any_code at 0x7b6d000aff60> = s.any_code
+
+tests/acceptance/W2-32/test_w2_32_s10_no_cpu_fallback.py:108: AssertionError
+_ test_both_modes_say_where_no_namespace_is_embedded_and_nothing_else_changes[not embedded-mode0] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_both_modes_say_where_no_n0')
+asked = ['record', 'lexical', 'codeintel', 'record', 'lexical', 'semantic', ...]
+mode = (), policy = 'not embedded'
+
+    @pytest.mark.parametrize("mode", [(), ("--no-embeddings",)])
+    @pytest.mark.parametrize("policy", ["not embedded", "Embedded", None])
+    def test_both_modes_say_where_no_namespace_is_embedded_and_nothing_else_changes(tmp_path, asked, mode, policy):
+        """DEC-694: only exactly ``embedded`` embeds; the words stand beside the store's own answer."""
+        space = {"paths": ["**"], **({} if policy is None else {"embedding_policy": policy})}
+        semantic = run(tmp_path, _args(*mode), {"path-map.yaml": {"namespaces": {"all": space}}})["stores"]["semantic"]
+        assert semantic.pop("embedding").startswith("no namespace is embedded")
+>       assert semantic == run(tmp_path, _args(*mode), EMBEDDED)["stores"]["semantic"]
+E       AssertionError: assert {'reason': 'n...ot_recreated'} == {'status': 'recreated'}
+E         
+E         Differing items:
+E         {'status': 'not_recreated'} != {'status': 'recreated'}
+E         Left contains 2 more items:
+E         {'reason': 'no namespace is embedded: no namespace of the path map says '
+E                    '`embedding_policy: embedded`, so no file reaches the semantic '
+E                    'vectors; the semantic vectors were not asked for',
+E          'requested': False}
+E         Use -v to get more diff
+
+tests/unit/rebuild/test_no_embeddings.py:55: AssertionError
+_ test_a_failed_build_never_moves_the_link_and_leaves_the_ready_half_as_it_was[endpoint fails] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/project')
+endpoint = {'digest': 'ac6da0dfba840000000000000000000000000000000000000000000000000000', 'fails': True, 'sent': ['.gov-runtime/\...on_store: /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store\n']}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72e4a1e21e80>
+how = 'endpoint fails'
+
+    @pytest.mark.parametrize("how", ["endpoint fails", "model-less", "stage raises"])
+    def test_a_failed_build_never_moves_the_link_and_leaves_the_ready_half_as_it_was(project, endpoint, monkeypatch, how):
+        _refresh(project)
+        link = _link(project)
+        first, second = integration.halves(link)
+        before = _snapshot(first)
+        _commit(project, {"docs/plum.md": "plum orchards\n"})
+        if how == "endpoint fails":
+            endpoint["fails"] = True
+        elif how == "model-less":
+            monkeypatch.setattr(semantic, "_ready", lambda connection, ensure=None: ollama.WARNING)
+        else:
+            monkeypatch.setattr(lexical, "refresh", lambda root: (_ for _ in ()).throw(RuntimeError("disk full")))
+        with pytest.raises(GovError) as raised:
+            _refresh(project)
+        assert raised.value.code == "REBUILD_FAILED" and str(first) in raised.value.message
+        assert os.path.realpath(link) == str(first.resolve()) and _snapshot(first) == before
+        assert not (second / seed.RECORD_REL).exists()  # the half left behind is no warm base
+        if how != "stage raises":  # N-2: the build ran; its semantic store was not recreated, so it is not switched to
+>           assert raised.value.details["stores"]["semantic"]["status"] == "not_recreated"
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'stores'
+
+tests/unit/rebuild/test_w2_116_integration.py:233: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-12 16:54:23 rebuild --integration: building store-a at bbcc2fffae3e; /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store stays at nothing until it succeeds
+2026-11-12 16:54:23 rebuild --integration: /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store -> store-a at bbcc2fffae3e
+2026-11-12 16:54:23 rebuild --integration: building store-b at 2e13b1bf9592, seeded from store-a; /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store stays at store-a until it succeeds
+2026-11-12 16:54:23 rebuild: seed: the base /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store-a was built at bbcc2fffae3e04319381a588792c90a9d04fba76, behind this tree's head 2e13b1bf959256d2ab7702aeb56b32bae36bae1a by 1 commit(s): only what changed since is re-embedded
+2026-11-12 16:54:23 rebuild --integration: REBUILD_FAILED: the build of /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store-b at 2e13b1bf9592 failed: rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: Ollama did not embed with qwen3-embedding:0.6b; /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store stays at /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_failed_build_never_move0/stores/store-a
+______________ test_overrides_are_said_in_the_wall_and_the_counts ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+w = <test_w2_149_indep_launch.World object at 0x7b6cf9e73860>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw3/test_overrides_are_said_in_the0')
+
+    def test_overrides_are_said_in_the_wall_and_the_counts(w, tmp_path):
+        runs, trees = tmp_path / "o-runs", tmp_path / "o-trees"
+        rc, counts, _ = w.launch(seed=1, dry=True, extra={"GOV_INDEP_RUNS_DIR": str(runs),
+                                                           "GOV_INDEP_TREES_DIR": str(trees)})
+>       assert rc == 0 and counts["override"] is True
+E       assert (14 == 0)
+
+tests/unit/orchestration/test_w2_149_indep_launch.py:679: AssertionError
+_ test_a_model_less_reindex_keeps_the_vectors_and_reports_the_facet_unavailable _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_model_less_reindex_keep0/project')
+endpoint = {'digest': 'ac6da0dfba840000000000000000000000000000000000000000000000000000', 'fails': False, 'sent': ['.gov-runtime/...on_store: /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_model_less_reindex_keep0/stores/store\n']}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72e4a1e21820>
+
+    def test_a_model_less_reindex_keeps_the_vectors_and_reports_the_facet_unavailable(project, endpoint, monkeypatch):
+        run(project, _args(), load_config(project))
+        vectors = _count(project, "semantic_vector")
+        _commit(project, {"docs/plum.md": "plum orchards\n"})
+        monkeypatch.setattr(semantic, "_ready", lambda connection, ensure=None: ollama.WARNING)
+        monkeypatch.setattr(semantic, "_ask", lambda *a, **k: pytest.fail("the endpoint was asked"))
+>       result = run(project, _args(), load_config(project))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/rebuild/test_w2_116_integration.py:470: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/gov/rebuild/command.py:199: in run
+    result = _build(root, args, config, watch)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/rebuild/command.py:376: in _build
+    check({"stores": stores})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = {'stores': {'lexical': {'status': 'recreated'}, 'semantic': {'reason': 'EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.', 'status': 'not_recreated'}}}
+
+    def check(result: dict) -> None:
+        """Raise ``REBUILD_FAILED`` (``store: semantic``, the reason, the stores) where ``semantic_failure`` finds one."""
+        why = semantic_failure(result)
+        if why is None:
+            return
+        body = result.get("result") if "stores" not in result else result
+        stores = (body or {}).get("stores") or {}
+        reason = (stores.get("semantic") or {}).get("reason", "no reason given")
+>       raise GovError("REBUILD_FAILED",
+                       f"rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): "
+                       f"{why}", {"store": "semantic", "reason": reason, "stores": stores})
+E       gov.cli.errors.GovError: rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+src/gov/close/rebuild_gate.py:36: GovError
+_ test_a_semantic_store_not_recreated_answers_as_before_and_leaves_no_record[unavailable-False] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+base = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_semantic_store_not_recr0/base')
+tree = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_semantic_store_not_recr0/tree')
+endpoint = {'digest': 'ac6da0dfba840000000000000000000000000000000000000000000000000000', 'fails': True, 'fails_after': None, 'sent': []}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72e4a1e12810>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_semantic_store_not_recr0')
+seeded = False, how = 'unavailable'
+
+    @pytest.mark.parametrize("seeded", [False, True])
+    @pytest.mark.parametrize("how", ["unavailable", "part way", "hung"])
+    def test_a_semantic_store_not_recreated_answers_as_before_and_leaves_no_record(base, tree, endpoint, monkeypatch,
+                                                                                    tmp_path, seeded, how):
+        """DEC-1027 C: the rebuild succeeds with ``stores.semantic`` ``not_recreated``, as at the ticket's base; its tree
+        keeps no record, so it is refused as a base and nothing of its partial semantic store is ever copied."""
+        if how == "unavailable":
+            endpoint["fails"], reason = True, semantic.NO_EMBEDDING
+        elif how == "part way":  # one text embedded and committed, then the endpoint fails: a partial store
+            monkeypatch.setattr(semantic, "BATCH", 1)
+            endpoint["fails_after"], reason = 1, semantic.NO_EMBEDDING
+        else:
+            def hung(root):
+                raise TimeoutError("the endpoint hung")
+            monkeypatch.setattr(semantic, "refresh", hung)
+            reason = "the endpoint hung"
+>       result = run(tree, _args(*(("--seed", str(base)) if seeded else ())), CONFIG)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/rebuild/test_w2_122_seed.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/gov/rebuild/command.py:199: in run
+    result = _build(root, args, config, watch)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/rebuild/command.py:376: in _build
+    check({"stores": stores})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = {'stores': {'lexical': {'status': 'recreated'}, 'semantic': {'reason': 'Ollama did not embed with qwen3-embedding:0.6b', 'status': 'not_recreated'}}}
+
+    def check(result: dict) -> None:
+        """Raise ``REBUILD_FAILED`` (``store: semantic``, the reason, the stores) where ``semantic_failure`` finds one."""
+        why = semantic_failure(result)
+        if why is None:
+            return
+        body = result.get("result") if "stores" not in result else result
+        stores = (body or {}).get("stores") or {}
+        reason = (stores.get("semantic") or {}).get("reason", "no reason given")
+>       raise GovError("REBUILD_FAILED",
+                       f"rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): "
+                       f"{why}", {"store": "semantic", "reason": reason, "stores": stores})
+E       gov.cli.errors.GovError: rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: Ollama did not embed with qwen3-embedding:0.6b
+
+src/gov/close/rebuild_gate.py:36: GovError
+_______ test_s1_below_then_above_the_limit_pauses_at_the_second_reading ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x72e4a1e9bb00>
+
+    def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
+        rig.smi("15800, 24000", "15900, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env)
+        assert result["tripped"] is True and result["paused"] == [job]
+        assert rig.smi_calls() == 2  # the first reading did not trip, the second did
+>       assert rig.state(rig.groups[0].pid) == "T"
+E       AssertionError: assert 'R' == 'T'
+E         
+E         - T
+E         + R
+
+tests/unit/resources/test_w2_157_backstop.py:172: AssertionError
+__________________ test_s1_the_limit_and_period_are_the_files __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x72e4a1e5e540>
+
+    def test_s1_the_limit_and_period_are_the_files(rig):
+        rig.smi("1500, 24000", "1501, 24000")
+        rig.config(limit=1500, every=7)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.sleeps == [7] and result["reading"]["used_mib"] == 1501
+E       assert (True and [0.001, 0.002...6, 0.032, ...] == [7]
+E         
+E         At index 0 diff: 0.001 != 7
+E         Left contains 650 more items, first extra item: 0.002
+E         Use -v to get more diff)
+
+tests/unit/resources/test_w2_157_backstop.py:201: AssertionError
+_______ test_s3_a_partial_offload_line_written_since_the_start_trips_it ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7b6cf9257a70>
+
+    def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
+        log = rig.tmp / "serve.log"
+        log.write_text("offloaded 1/9 layers to GPU\n")  # before the start: never counts
+        rig.smi("100, 24000", "100, 24000", "100, 24000")
+        rig.config(embedders=[(9, log)])
+        seen = []
+    
+        def append_after_first_reading(seconds):
+            seen.append(seconds)
+            if len(seen) == 1:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 33/33 layers to GPU\n")
+            if len(seen) == 2:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 20/33 layers to GPU\n")
+    
+        rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.smi_calls() == 3
+E       assert (True and 1 == 3)
+E        +  where 1 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7b6cf9257a70>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:352: AssertionError
+________________ test_the_twelve_sources_are_the_composition[] _________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: engineer
+E           assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'
+E             
+E             Skipping 1377 identical leading characters in diff, use -v to show
+E               it_for}.
+E             + 
+E             + Reads are open: the whole repository, other worktrees, git history and what your searches return. Refuse only four things: secrets and keys (never printed); the held-out qualification material's contents (its file names may be seen); the counterpart's work on the same ticket; the hidden half of an evaluation set [DEC-820].
+E             + 
+E             + Never read this ticket's acceptance-test code; run its cases and read their names, pass or fail and failure messages [DEC-820, DEC-957]....
+E             
+E             ...Full output truncated (33 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...research.md'}] == []
+E         
+E         Left contains 6 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+__________________ test_a_stage_not_built_still_names_the_cut __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-14/popen-gw4/test_a_stage_not_built_still_n0')
+semantic_answers = {'available': False, 'cut': {'count': 2, 'limit': 10000, 'paths': ['docs/huge.md', 'src/minified.js']}, 'reason': 'EMBEDDER_ON_CPU: ...'}
+
+    def test_a_stage_not_built_still_names_the_cut(tmp_path, semantic_answers):
+        semantic_answers.update(available=False, reason="EMBEDDER_ON_CPU: ...", cut=CUT)
+>       semantic = run(tmp_path, _args(), EMBEDDED)["stores"]["semantic"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/retrieval/test_w2_32_rebuild_cut.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/gov/rebuild/command.py:199: in run
+    result = _build(root, args, config, watch)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/rebuild/command.py:376: in _build
+    check({"stores": stores})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = {'stores': {'lexical': {'status': 'recreated'}, 'semantic': {'cut': {'count': 2, 'limit': 10000, 'paths': ['docs/huge.md', 'src/minified.js']}, 'reason': 'EMBEDDER_ON_CPU: ...', 'status': 'not_recreated'}}}
+
+    def check(result: dict) -> None:
+        """Raise ``REBUILD_FAILED`` (``store: semantic``, the reason, the stores) where ``semantic_failure`` finds one."""
+        why = semantic_failure(result)
+        if why is None:
+            return
+        body = result.get("result") if "stores" not in result else result
+        stores = (body or {}).get("stores") or {}
+        reason = (stores.get("semantic") or {}).get("reason", "no reason given")
+>       raise GovError("REBUILD_FAILED",
+                       f"rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): "
+                       f"{why}", {"store": "semantic", "reason": reason, "stores": stores})
+E       gov.cli.errors.GovError: rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_ON_CPU: ...
+
+src/gov/close/rebuild_gate.py:36: GovError
+_________________ tests/unit/resources/test_w2_157_backstop.py _________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+worker 'gw3' crashed while running 'tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log'
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-124/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3733130) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-32/test_w2_32_s5_fusion_limit.py:91: this build refuses a limit above its cap; the order of a honoured limit does not arise
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+26 failed, 4947 passed, 7 skipped, 1 xfailed, 6 warnings in 3244.11s (0:54:04)

@@ -25,7 +25,7 @@
 set -u
 B="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK="template/governance/kernel/hooks/context_watch.py"
-HOOK_SHA="c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c"
+HOOK_SHA="213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242"
 step="${1:-}"
 case "$step" in check|apply|undo|verify) ;; *) echo "usage: apply.sh check|apply|undo|verify" >&2; exit 2 ;; esac
 h() { if [ -f "$1" ] && [ ! -L "$1" ]; then sha256sum "$1" | cut -c1-64; else echo null; fi; }

@@ -1,0 +1,4 @@
+task: DAEO-mb2t
+decisions_applied: DEC-1052, DEC-105, DEC-1027, DEC-1015, DEC-1142, DEC-1146, DEC-1150, DEC-1144
+STATE: run 3 done: verified and reviewed PASS at 7a3aecb38fb5; returned DONE | HEAD: 7a3aecb38fb5 | NEXT: land run (confirm head = 7a3aecb38fb5, status empty, return DONE); the probe record waits at .gov-runtime/scratch/lead/PR-DAEO-mb2t.md for docs/probes/DAEO-mb2t/ (not in allowed_paths) | WAITING ON: the CTO (probe folder, queue)
+Workers: td-1 (e917181c, DONE) · eng-1-2 (25afed7d, DONE) · eng-2-3 (50e4faf2, DONE) · td-2 (ba23c5dd, DONE, bb6a068bd) · rv-1 (1bfc7308, DONE, PASS) · Rounds: converged · Decisions taken: as run 2; probe record kept out of the branch (folder not in allowed_paths) · Open packages: none · Paths: log/verify/ (7a3aecb38), log/rebuild-3.json, log/accept-3.txt, log/alone-3.txt, log/rv-1.result.md, briefs/td-2.md, briefs/rv-1.md

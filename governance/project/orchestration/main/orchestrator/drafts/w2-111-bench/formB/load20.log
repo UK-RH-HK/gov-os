@@ -1,0 +1,56 @@
+== load20 start 2026-11-13T11:50:18+00:00 load: 20.17 13.96 10.27 61/1412 454238
+heavy_slot: all 3 slots taken; waiting (2026-11-13 11:50:18)
+..............F                                                          [100%]
+=================================== FAILURES ===================================
+_ test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95 _
+
+tmp_path = PosixPath('/tmp/claude-1000/w2-111-bench-b/tmp/pytest-of-usain/pytest-0/test_a_test_designer_s_read_on0')
+
+    def test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95(tmp_path):
+        project, sandbox = support.designer_world(tmp_path)
+        refused = support.designer_read(project, sandbox, CHANGED)
+        assert refused.decision == "deny" and re.search(r"DEC-820 \(c\)", refused.stdout), (
+            f"the fixture is wrong: the test designer is not refused a file its ticket's branch changes, so the read "
+            f"does not take Policy 2 (c)'s path: {refused.describe()}"
+        )
+        for _ in range(WARM_UP):
+            support.designer_read(project, sandbox, ORDINARY)
+            reference_cpu_seconds()
+        rounds = []
+        figures = []
+        for _ in range(ROUNDS):
+            samples = []
+            wall_samples = []
+            reference_samples = []
+            for _ in range(SAMPLES):
+                reference_samples.append(reference_cpu_seconds())
+                result = support.designer_read(project, sandbox, ORDINARY)
+                assert result.decision == "allow", f"the timed read was not allowed: {result.describe()}"
+                assert result.cpu_seconds is not None, f"the read's CPU time was not measured: {result.describe()}"
+                samples.append(result.cpu_seconds)
+                wall_samples.append(result.seconds)
+            cpu_p95 = guard.p95(samples)
+            wall_p95 = guard.p95(wall_samples)
+            reference = statistics.median(reference_samples)
+            rounds.append(cpu_p95 - reference)
+            figures.append((cpu_p95, reference, wall_p95))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 CPU time of the hook and its children for a test designer's read on a branch with changes, less the "
+            "median CPU time of the reference hook timed beside it, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms (per round, for information, ms: raw CPU p95 "
+            + ", ".join(f"{cpu * 1000:.1f}" for cpu, _, _ in figures) + "; reference median "
+            + ", ".join(f"{ref * 1000:.1f}" for _, ref, _ in figures) + "; wall p95 "
+            + ", ".join(f"{wall * 1000:.1f}" for _, _, wall in figures) + ")"
+        )
+E       AssertionError: p95 CPU time of the hook and its children for a test designer's read on a branch with changes, less the median CPU time of the reference hook timed beside it, per round (ms): 172.5, 138.8, 104.0; the bound is 100 ms (per round, for information, ms: raw CPU p95 201.6, 163.4, 131.0; reference median 29.1, 24.6, 27.0; wall p95 505.5, 330.2, 331.9)
+E       assert 0.10404599999998965 < 0.1
+E        +  where 0.10404599999998965 = min([0.1724504999999965, 0.13884249999999554, 0.10404599999998965])
+
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:96: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+1 failed, 14 passed in 149.85s (0:02:29)
+== load20 exit 1 end 2026-11-13T12:04:46+00:00 load: 37.59 31.08 22.41 30/1375 562877

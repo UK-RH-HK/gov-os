@@ -1,0 +1,61 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "24a22fe14b1b",
+   "after": "6ba93fc8bf35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45",
+   "change": "head",
+   "before": "74d2b5e5523e",
+   "after": "3ed6f53118d1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/test_s1_decision_checker_scale.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/test_s2_not_green.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/test_s3_absent_tool.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/test_s4_tier_coverage.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/test_s5_timeout.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-45/w2_45_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "acceptance folder",
+   "folder": "W2-45"
+  }
+ ]
+}

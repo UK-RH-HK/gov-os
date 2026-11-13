@@ -1,0 +1,16 @@
+ok template/governance/kernel/roles/engineer.md c94f98d7fc17 DEC-1160
+ok template/governance/kernel/roles/independent-auditor.md 4b4a5f947206 DEC-1160
+ok template/governance/kernel/roles/independent-test-designer.md 890c91f577c8 DEC-1160
+ok template/governance/kernel/roles/orchestrator.md 08ba69e63d51 DEC-1160
+ok template/governance/kernel/roles/product-spec.md bb9a46da12c7 DEC-1160
+ok template/governance/kernel/roles/qa-engineer.md 40fd68fdadf3 DEC-1160
+ok template/governance/kernel/roles/research.md f9bc3b721b56 DEC-1160
+ok template/governance/kernel/roles/senior-engineer.md 243e8b8422ec DEC-1160
+ok template/governance/kernel/roles/ticket-lead.md 0c93598c82da DEC-1160
+merged W2-33 82da49202ab1 onto 82ddc705a41b: 016779d42875
+tests/acceptance/W2-33: 96 passed in 2.39s
+  FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+  FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+tests/unit: 2 failed, 4530 passed, 7 skipped, 2908 deselected, 6 warnings in 1876.31s (0:31:16)
+hand_merge_check W2-33: exit 1
+exit 1

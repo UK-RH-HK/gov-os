@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-p8tv: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-172/.gov-runtime/scratch/lead/log/W2-172-fix-check.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-172/.gov-runtime/scratch/lead/log/W2-172-fix-check.json; spend recorded (projection 4)

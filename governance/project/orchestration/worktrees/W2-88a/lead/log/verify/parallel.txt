@@ -1,0 +1,235 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 20:25:12)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+................................................s....................... [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+............................................sss......................... [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+....................sss................................................. [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+.............................................................F.......... [ 70%]
+.....F..F............................................................... [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.......Fatal Python error: Aborted
+
+Thread 0x00007b3d2abfd6c0 (most recent call first):
+  File "/usr/lib/python3.12/selectors.py", line 415 in select
+  File "/usr/lib/python3.12/socketserver.py", line 235 in serve_forever
+  File "/usr/lib/python3.12/threading.py", line 1010 in run
+  File "/usr/lib/python3.12/threading.py", line 1073 in _bootstrap_inner
+  File "/usr/lib/python3.12/threading.py", line 1030 in _bootstrap
+
+Thread 0x00007b3d2bbff6c0 (most recent call first):
+  File "/usr/lib/python3.12/selectors.py", line 415 in select
+  File "/usr/lib/python3.12/socketserver.py", line 235 in serve_forever
+  File "/usr/lib/python3.12/threading.py", line 1010 in run
+  File "/usr/lib/python3.12/threading.py", line 1073 in _bootstrap_inner
+  File "/usr/lib/python3.12/threading.py", line 1030 in _bootstrap
+
+Thread 0x00007b3d387ff6c0 (most recent call first):
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 534 in read
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 567 in from_io
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1160 in _thread_receiver
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 341 in run
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 411 in _perform_spawn
+
+Current thread 0x00007b3d3948c080 (most recent call first):
+  File "/usr/lib/python3.12/ssl.py", line 535 in load_default_certs
+  File "/usr/lib/python3.12/ssl.py", line 713 in create_default_context
+  File "/usr/lib/python3.12/http/client.py", line 827 in _create_https_context
+  File "/usr/lib/python3.12/urllib/request.py", line 1386 in __init__
+  File "/usr/lib/python3.12/urllib/request.py", line 593 in build_opener
+  File "/home/usain/gov-os-worktrees/W2-88a/src/gov/resources/backstop.py", line 87 in _partial_models
+  File "/home/usain/gov-os-worktrees/W2-88a/src/gov/resources/backstop.py", line 188 in watch
+  File "/home/usain/gov-os-worktrees/W2-88a/tests/unit/resources/test_w2_157_backstop.py", line 388 in test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/python.py", line 166 in pytest_pyfunc_call
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/python.py", line 1720 in runtest
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 179 in pytest_runtest_call
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 245 in <lambda>
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 353 in from_call
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 244 in call_and_report
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 137 in runtestprotocol
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/runner.py", line 118 in pytest_runtest_protocol
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/home/usain/.local/lib/python3.12/site-packages/xdist/remote.py", line 227 in run_one_test
+  File "/home/usain/.local/lib/python3.12/site-packages/xdist/remote.py", line 206 in pytest_runtestloop
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/main.py", line 372 in _main
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/main.py", line 318 in wrap_session
+  File "/home/usain/.local/lib/python3.12/site-packages/_pytest/main.py", line 365 in pytest_cmdline_main
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/home/usain/.local/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/home/usain/.local/lib/python3.12/site-packages/xdist/remote.py", line 427 in <module>
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1291 in executetask
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 341 in run
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 411 in _perform_spawn
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 389 in integrate_as_primary_thread
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1273 in serve
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1806 in serve
+  File "<string>", line 8 in <module>
+  File "<string>", line 1 in <module>
+
+Extension modules: yaml._yaml, pvectorc (total: 2)
+[gw3] node down: Not properly terminated
+F..............................................                          [100%]
+=================================== FAILURES ===================================
+_______ test_s3_a_partial_offload_line_written_since_the_start_trips_it ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7b3d2d42e270>
+
+    def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
+        log = rig.tmp / "serve.log"
+        log.write_text("offloaded 1/9 layers to GPU\n")  # before the start: never counts
+        rig.smi("100, 24000", "100, 24000", "100, 24000")
+        rig.config(embedders=[(9, log)])
+        seen = []
+    
+        def append_after_first_reading(seconds):
+            seen.append(seconds)
+            if len(seen) == 1:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 33/33 layers to GPU\n")
+            if len(seen) == 2:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 20/33 layers to GPU\n")
+    
+        rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.smi_calls() == 3
+E       assert (True and 2 == 3)
+E        +  where 2 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7b3d2d42e270>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:352: AssertionError
+_______ test_s1_below_then_above_the_limit_pauses_at_the_second_reading ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7514871867b0>
+
+    def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
+        rig.smi("15800, 24000", "15900, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env)
+        assert result["tripped"] is True and result["paused"] == [job]
+        assert rig.smi_calls() == 2  # the first reading did not trip, the second did
+>       assert rig.state(rig.groups[0].pid) == "T"
+E       AssertionError: assert 'R' == 'T'
+E         
+E         - T
+E         + R
+
+tests/unit/resources/test_w2_157_backstop.py:172: AssertionError
+__________________ test_s1_the_limit_and_period_are_the_files __________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x751486d8ade0>
+
+    def test_s1_the_limit_and_period_are_the_files(rig):
+        rig.smi("1500, 24000", "1501, 24000")
+        rig.config(limit=1500, every=7)
+        result = backstop.watch([rig.job()], rig.root, rig.env)
+>       assert result["tripped"] and rig.sleeps == [7] and result["reading"]["used_mib"] == 1501
+E       assert (True and [7, 0.001, 0....8, 0.016, ...] == [7]
+E         
+E         Left contains 2261 more items, first extra item: 0.001
+E         Use -v to get more diff)
+
+tests/unit/resources/test_w2_157_backstop.py:201: AssertionError
+_________________ tests/unit/resources/test_w2_157_backstop.py _________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+worker 'gw3' crashed while running 'tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log'
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-88a/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2447112) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+4 failed, 5083 passed, 7 skipped, 6 warnings in 2893.19s (0:48:13)

@@ -1,0 +1,74 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-2bdu.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-lrre.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-113-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-113/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-113-tests",
+   "change": "acceptance folder",
+   "folder": "W2-113"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "head",
+   "before": "32d10098b0b7",
+   "after": "e8b9db4d2462"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-120/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-120/test_w2_120_i2_keys.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-120/test_w2_120_i3_copies.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-120/test_w2_120_i4_vendored.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-120/w2_120_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-120-tests",
+   "change": "acceptance folder",
+   "folder": "W2-120"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-33-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-98",
+   "change": "head",
+   "before": "6c2c3ed93bee",
+   "after": "61b4de632827"
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+Merge w2/W2-45-tests (run 4): S1 on a history with merges, S5 group stopped, W1-40 revision
+
+td-4 (independent test designer): 100015249 (S1 merges, S5 group stopped on interrupt and huge limit),
+11f2e8165 (W1-40 line 49 RED and non-zero exit, Rewrite-Reason P-W2-45-1 item 5; DEC-1153 (1)).
+
+Task: DAEO-neam
+Role: orchestrator
+Implements: DEC-729
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

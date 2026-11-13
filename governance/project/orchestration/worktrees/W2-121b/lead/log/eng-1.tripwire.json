@@ -1,0 +1,45 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M docs/changes/W2-176-CIT-P.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "f39289d3a379",
+   "after": "42dfec7d2967"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "head",
+   "before": "3476e862881a",
+   "after": "ab5799760013"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line added",
+   "line": " M src/gov/rebuild/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line added",
+   "line": " M tests/unit/rebuild/test_w2_124_semantic.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "head",
+   "before": "9727d4526552",
+   "after": "2900a31d2681"
+  }
+ ]
+}

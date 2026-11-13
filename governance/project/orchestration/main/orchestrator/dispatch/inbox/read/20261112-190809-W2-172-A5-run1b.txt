@@ -1,0 +1,9 @@
+log: W2-172-A5-run1b.json
+W2: W2-172
+status: PACKAGES. The tests are written, merged into w2/W2-172 at 80da3fbcca0d and fail as they should, and TESTS-READY is written. Three points in the Interface need the CTO's answer before the build run, and one of them (GATE-1) blocks the engineer's cron wrapper.
+
+task: DAEO-p8tv (W2-172), tests run 1b (a resume after PKG-W2-172-IFACE-1 (a))
+status: PACKAGES. The tests are written, merged into w2/W2-172 at 80da3fbcca0d and fail as they should, and TESTS-READY is written. Three points in the Interface need the CTO's answer before the build run, and one of them (GATE-1) blocks the engineer's cron wrapper.
+work_completed:
+- Checked the ticket's Interface (DEC-1052): it is in the ticket, with O1-O4 answered.
+- Made the tests worktree and branch, and built the test designer's brief td-1.md from a head, `gov context`'s packet and a tail. `gov context` refused

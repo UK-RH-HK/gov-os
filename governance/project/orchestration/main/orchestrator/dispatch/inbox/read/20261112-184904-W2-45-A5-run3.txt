@@ -1,0 +1,10 @@
+log: W2-45-A5-run3.json
+W2: W2-45
+status: PACKAGES. Three packages: P-W2-45-3 (review round 1 failed on F1, major, S1), P-W2-45-4 (a third older test, W1-40, still expects openspec YELLOW), P-W2-45-5 (the probe folder is not in allowed_paths).
+
+task: DAEO-neam (W2-45), run 3 (resume, then build, then review)
+status: PACKAGES. Three packages: P-W2-45-3 (review round 1 failed on F1, major, S1), P-W2-45-4 (a third older test, W1-40, still expects openspec YELLOW), P-W2-45-5 (the probe folder is not in allowed_paths).
+work_completed:
+- **R1 and R2 applied as the owner decided** (P-W2-45-2 (a), DEC-1148 (4)). One test designer, td-3 (session cda3ed04), made both revisions:
+  - `2363c200d`: W2-95 `_others()` now leaves out `elapsed_s` as well as `provenance`.
+  - `a0b5e70a5`: test_ci_command line 80 now expects `"RED"`, and line 73's comme

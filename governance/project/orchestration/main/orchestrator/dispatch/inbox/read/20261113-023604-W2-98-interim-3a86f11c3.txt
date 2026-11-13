@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-98
+status: interim result 3a86f11c3: W2-98 (DAEO-wi46): the narrow independent check of the P-W2-98-R2 (a) fix (PASS on f0259229e2b5, rows N1-N4) in the probe record; the CIT-P's sha rows re-written at the new head

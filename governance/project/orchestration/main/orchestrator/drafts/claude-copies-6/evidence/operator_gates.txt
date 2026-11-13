@@ -1,0 +1,3 @@
+validate_manifest: pass
+path_rule: pass
+hash mismatches: [] ; unnamed on disk: []

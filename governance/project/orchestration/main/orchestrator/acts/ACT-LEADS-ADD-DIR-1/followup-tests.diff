@@ -1,0 +1,34 @@
+diff -ru b/tests/unit/launch/test_w2_153_template.py c/tests/unit/launch/test_w2_153_template.py
+--- b/tests/unit/launch/test_w2_153_template.py	2026-11-13 01:50:28.637664601 +0000
++++ c/tests/unit/launch/test_w2_153_template.py	2026-11-13 01:50:28.640038977 +0000
+@@ -201,6 +201,30 @@
+     ]
+ 
+ 
++def test_the_dispatchers_lead_form_adds_its_tests_tree_and_the_runs_root(tmp_path):
++    """DEC-1161 (2) (ACT-LEADS-ADD-DIR-1): the lead line passes --add-dir for the lead's own tests worktree and the
++    runs root, before the template flag, and makes the tests folder, empty, when nothing is there (the CLI drops a
++    missing --add-dir); no other folder is added."""
++    done, record = _launch_now(tmp_path, with_template=True)
++    assert done.returncode == 0, done.stderr
++    argv = record.read_text(encoding="utf-8").splitlines()
++    added = [argv[i + 1] for i, arg in enumerate(argv[:-1]) if arg == "--add-dir"]
++    assert added == [str(tmp_path / "trees/W9-1-tests"), "/home/usain/gov-os-runs"]
++    assert argv.index("--add-dir") < argv.index("--append-system-prompt-file")
++    tests = tmp_path / "trees/W9-1-tests"
++    assert tests.is_dir() and not any(tests.iterdir())
++
++
++def test_the_dispatchers_lead_form_leaves_an_existing_tests_tree_alone(tmp_path):
++    tests = tmp_path / "trees/W9-1-tests"
++    tests.mkdir(parents=True)
++    (tests / "kept.txt").write_text("kept\n", encoding="utf-8")
++    done, record = _launch_now(tmp_path, with_template=True)
++    assert done.returncode == 0, done.stderr
++    assert sorted(p.name for p in tests.iterdir()) == ["kept.txt"]
++    assert str(tests) in record.read_text(encoding="utf-8").splitlines()
++
++
+ def test_the_dispatchers_lead_form_refuses_without_the_template(tmp_path):
+     done, record = _launch_now(tmp_path, with_template=False)
+     assert done.returncode != 0 and not record.exists()

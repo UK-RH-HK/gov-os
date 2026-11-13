@@ -1,0 +1,2 @@
+lead_verify: started pid 1602976 (its own process group); folder /home/usain/gov-os-worktrees/W2-88a/.gov-runtime/scratch/lead/log/verify
+lead_verify: wait with: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-88a/.gov-runtime/scratch/lead/log/verify/verify.exit

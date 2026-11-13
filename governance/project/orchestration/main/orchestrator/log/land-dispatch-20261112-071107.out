@@ -1,0 +1,20 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-121 (DAEO-cb2b, FULL) at f45614f15619: pre-check passed
+W2-179 (DAEO-c9n8, LITE) at 996bffd9b4e6: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 07:11:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 07:11:08 merged W2-121, W2-179 onto 03393ee51250: a1ed2903b48f
+2026-11-12 07:26:00 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 07:26:07 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 07:26:10 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 07:26:11 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 07:26:12 the integration store /home/usain/gov-os-worktrees/W2-00-store-b is at fa338ddb5f6e, not at the head 03393ee51250, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 07:26:12 seed of head-03393ee51250-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-b
+2026-11-12 07:27:21 the head without the batch: a throwaway worktree head-03393ee51250-0 at 03393ee51250, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 07:27:22 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows
+2026-11-12 07:27:23 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 07:29:07 EJECTED W2-121: red: no single ticket explains tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows (fail closed); failing: tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows
+2026-11-12 07:29:07 EJECTED W2-179: red: no single ticket explains tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows (fail closed); failing: tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows
+queue run exit 3
+W2-121: not landed (ejected: red: no single ticket explains tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows (fail closed))
+W2-179: not landed (ejected: red: no single ticket explains tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows (fail closed))

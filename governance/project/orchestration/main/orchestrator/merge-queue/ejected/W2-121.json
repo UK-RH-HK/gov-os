@@ -1,0 +1,16 @@
+{
+ "ticket": "W2-121",
+ "task": "DAEO-cb2b",
+ "branch": "w2/W2-121",
+ "commit": "f45614f1561959496f51e06e122351843af06663",
+ "requested_at": "2026-11-12 07:11:07",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T07:11:07.930816",
+ "reason": "red: no single ticket explains tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows (fail closed)",
+ "failing": [
+  "tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-071108-059969",
+ "tested_on": "03393ee51250a0c9147c2b047817e2c917b0a70f",
+ "ejected_at": "2026-11-12 07:29:07"
+}

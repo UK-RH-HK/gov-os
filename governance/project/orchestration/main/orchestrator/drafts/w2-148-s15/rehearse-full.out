@@ -1,0 +1,97 @@
+# part 1: apply.sh on planted folders (a planted HOME with a copy of the live install, a planted main tree with the before class-rules.yaml)
+ok 1: check on the before: exit 0, ready, the install as built (0; )
+ok 2: verify before: exit 3, not applied (3)
+ok 3: undo on the before: exit 0, nothing to do, untouched
+ok 4: an unknown step (exempt) or none: exit 2, usage, untouched
+ok 5: apply: exit 0, the install's own APPROVED check ok (0; )
+ok 6: every listed file hashes as the after: class-rules.yaml 38ac2f2decce (both), APPROVED c0a44fbca9d8
+ok 7: the install's two files are 0444; the repository file keeps its mode
+ok 8: no temporary file left, no __pycache__ in the install
+ok 9: the thirteen other install files are byte for byte as they were
+ok 10: APPROVED differs in exactly one line: class-rules.yaml's
+ok 11: verify after: exit 0 (0)
+ok 12: apply again: already in place, untouched
+ok 13: check on the after: exit 3, already applied
+ok 14: the manifest's check (exit 0, count 1): sha256sum "$HOME/gov-os-operator/install/class-rules.yaml" | grep -c 38ac2f2decce660a9e190c85038b7175dcbae0e0c
+ok 15: the manifest's check (exit 0, count 1): sha256sum "$HOME/gov-os-operator/install/APPROVED" | grep -cE "^(c0a44fbca9d86eae2120795eb6393aa7a0ceb47b7d08d
+ok 16: the manifest's check (exit 0, count 1): grep -c "^38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4  class-rules.yaml$" "$HOME/gov-os-o
+ok 17: the manifest's check (exit 0, count 1): cd "$HOME/gov-os-operator/install" && python3 -I -B -c 'import sys; sys.path.insert(0, "."); import act_class 
+ok 18: the manifest's check (exit 0, count 1): sha256sum governance/project/operator/class-rules.yaml | grep -c 38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce7
+ok 19: the manifest's checks wrote no __pycache__ into the install
+ok 20: undo: exit 0, every file the before (0)
+ok 21: the install and the repository file are byte for byte (hash, mode, listing) what they were
+ok 22: the bite: on the before, every manifest check is red (5 of 5 red)
+ok 23: apply with the install folder not writable: stops, exit 5, a half state (5)
+ok 24: check names the half state: exit 3
+ok 25: a second apply finishes it (0)
+ok 26: undo: the whole state as it began
+ok 27: the repository's class-rules.yaml moved (one line longer): check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 28: an install file other than the two moved (brief.md): check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 29: a stray file in install/: check exit 3, apply exit 3, undo exit 0, verify exit 3; nothing touched
+ok 30: APPROVED neither base's (edited): check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 31: after the apply, the install's class-rules.yaml edited: check exit 3, apply exit 3, undo exit 3, verify exit 3; nothing touched
+ok 32: a tampered frozen copy (after/home/.../class-rules.yaml): check exit 4, apply exit 4, undo exit 4, verify exit 4; nothing touched
+ok 33: a tampered frozen copy of the other base (alt/hours3/after/.../APPROVED): check exit 4, apply exit 4, undo exit 4, verify exit 4; nothing touched
+ok 34: the operator's freeze held (install/act-in-progress.txt): check exit 6, apply exit 6; nothing touched
+ok 35: the operator's journal present: check exit 6, apply exit 6; nothing touched
+ok 36: a request waiting in queue/: check exit 6, apply exit 6; nothing touched
+ok 37: a launch holding log/launch.lock: apply exit 6, untouched (6)
+ok 38: apply in a clean environment from an empty folder: the after, nothing else written
+ok 39: and its undo: the before
+# part 2: the ACT-OPERATOR-HOURS-3 base (the install after its Part B) and the order with that ACT
+ok 40: check on the HOURS-3 base: exit 0, names the base (0; )
+ok 41: apply on the HOURS-3 base: exit 0, every file the alt after (0)
+ok 42: HOURS-3's opcommon.py kept; APPROVED 3744df3a637f
+ok 43: on the HOURS-3 base, the manifest's check: sha256sum "$HOME/gov-os-operator/install/class-rules.yaml" | grep -c 38ac2f2decce660a9e190
+ok 44: on the HOURS-3 base, the manifest's check: sha256sum "$HOME/gov-os-operator/install/APPROVED" | grep -cE "^(c0a44fbca9d86eae2120795eb
+ok 45: on the HOURS-3 base, the manifest's check: grep -c "^38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4  class-rules.ya
+ok 46: on the HOURS-3 base, the manifest's check: cd "$HOME/gov-os-operator/install" && python3 -I -B -c 'import sys; sys.path.insert(0, "."
+ok 47: on the HOURS-3 base, the manifest's check: sha256sum governance/project/operator/class-rules.yaml | grep -c 38ac2f2decce660a9e190c850
+ok 48: verify on the HOURS-3 base: exit 0 (0)
+ok 49: undo on the HOURS-3 base: the HOURS-3 install byte for byte (0)
+ok 50: HOURS-3 Part B first, then this ACT: both apply (exit 0, 0); this ACT verifies; HOURS-3's own verify then exits 3 (its keep.txt pins the old class-rules.yaml): verify HOURS-3 BEFORE applying this ACT
+ok 51: undo in reverse order (this ACT, then HOURS-3 B): both exit 0, the live base again (0, 0)
+ok 52: this ACT first: HOURS-3's own B check then refuses (exit 3, 'moved: install/class-rules.yaml'), nothing touched: HOURS-3 would need a rebuild; so HOURS-3 Part B goes first
+# part 3: the rule's effect: act_class (the applied install's copy against the old) on paths and on every bundle on the machine
+ok 53: the rows: the old 21 in order, one new row home-settings straight after settings
+ok 54: every other row, the hits and the version are equal
+ok 55: the settings row: its list rule, else and control unchanged; its match loses only the home line
+ok 56: home-settings: {root: home, path: .claude/settings*.json}, class b, control true, no list rule
+ok 57: over 204 (root, path) pairs (every row's globs instantiated, edge names, every path any bundle on the machine names): the 5 that change are all home .claude/settings*.json, settings (list) to home-settings (b): .claude/settings.json, .claude/settings.local.json, .claude/settingsX.json, .claude/settingsb.json, .claude/settingsx.json
+ok 58: classify_manifest, the home settings.json, Read(**) added to permissions.deny (the reviewer's FR-1 plant): old table (a), new table (b)
+ok 59: classify_manifest, the home settings.local.json, a deny addition: old table (a), new table (b)
+ok 60: classify_manifest, the home settings.json, an allow addition: old table (b), new table (b)
+ok 61: classify_manifest, the repository's settings.json, a deny addition (still (a), with S15's replay): old table (a), new table (a)
+ok 62: classify_manifest, the repository's settings.local.json, a deny addition: old table (a), new table (a)
+ok 63: classify_manifest, the repository's settings.json, an allow addition: old table (b), new table (b)
+ok 64: every bundle under acts/ (35) classified with both tables: none lower; 0 higher
+# part 4: the operator's own tests on a clone (`git clone --no-hardlinks` of w2/integrate's head) with the after file, through heavy_slot.sh, TMPDIR outside the repository and ~/gov-os-runs, PYTHONUSERBASE=/home/usain/.local, -p no:cacheprovider
+# the clone's head: 335c8f3c5dd1
+ok 65: the clone's class-rules.yaml is the before
+ok 66: the probe on the BEFORE table goes red (the reviewer's FR-1 reproduced: the home deny addition applied as (a)): 1 failed
+ok 67: the clone's class-rules.yaml is the after
+ok 68: the probe on the AFTER table goes green (the code votes (b): refused at G6 without the owner's yes, the home file untouched): 1 passed
+ok 69: with the after file: tests/unit/operator tests/acceptance/W2-148: 507 passed
+ok 70: the clone's only change is class-rules.yaml (the probe removed, the tests wrote nothing into the tree)
+# part 5: the package's blocks as printed, in a `git clone --no-hardlinks` of w2/integrate's head with a planted HOME (a copy of the live install)
+ok 71: the package holds three blocks that start in the main tree: the apply and commit, the undo before the commit, the undo after it (3)
+# the clone's head: 335c8f3c5dd1
+ok 72: block 1 (check, apply, verify, status, add, commit, log) as printed: exit 0 (0; )
+ok 73: one new commit on the head, one parent
+ok 74: the commit changes exactly governance/project/operator/class-rules.yaml
+ok 75: its blob is the after
+ok 76: the subject starts ACT-W2-148-S15-1:, the trailers Task: DAEO-sdxk, Implements: DEC-1142, Role: owner (['Task: DAEO-sdxk', 'Implements: DEC-1142', 'Role: owner'])
+ok 77: the planted install is the after; the clone's tree is clean
+ok 78: the landing check (S16) over the commit, with the after table beside it: no item (Role: owner) ([])
+ok 79: control: the same tree committed without Role: owner is flagged P1 by the landing check (row operator-own), so the trailer matters
+ok 80: block 3 (the undo after the commit) as printed: exit 0 (0; )
+ok 81: its commit: on the ACT's commit, class-rules.yaml only, the same three trailers
+ok 82: after it: the tree's and the committed class-rules.yaml are the before, the install's two files the before, the tree clean
+ok 83: apply.sh check: ready to apply again (0)
+ok 84: block 2 (the undo before the commit) as printed, after an apply: exit 0, the install and the tree the before, nothing staged, no commit (0; )
+ok 85: block 2 (the undo before the commit) as printed, after an apply and the git add: exit 0, the install and the tree the before, nothing staged, no commit (0; )
+ok 86: the live install (every file, hash and mode) is as it began
+ok 87: the live crontab is byte for byte as it began
+ok 88: the live main tree's class-rules.yaml and path map are as they began (status and sha256)
+cases: 88
+failures: 0

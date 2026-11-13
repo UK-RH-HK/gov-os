@@ -1,0 +1,146 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+...............................................................s........ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+.s...................................................................... [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+................................................sss..................... [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+.....................sss.................F.............................. [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+......................................................s................. [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+..............................................................           [100%]
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/dispatch/test_peaks.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_peaks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_peaks.py:7: in <module>
+    from conftest import GIB
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_returns.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_returns.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_returns.py:7: in <module>
+    from conftest import git
+E   ImportError: cannot import name 'git' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+______________ ERROR collecting tests/unit/dispatch/test_start.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_start.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_start.py:9: in <module>
+    from conftest import GIB, REPO, git
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_status.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_status.py:12: in <module>
+    from conftest import REPO, GIB
+E   ImportError: cannot import name 'REPO' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+=================================== FAILURES ===================================
+__________________ test_f8_the_schemas_hashes_are_in_the_wall __________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+w = <test_w2_149_indep_launch.World object at 0x7cbeb4ec1b20>
+
+    def test_f8_the_schemas_hashes_are_in_the_wall(w):
+        rc, counts, _ = w.launch(seed=1, dry=True)
+>       assert rc == 0
+E       assert 14 == 0
+
+tests/unit/orchestration/test_w2_149_indep_launch.py:985: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1061963) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/acceptance/W2-157/test_w2_157_nothing_else.py:128: F4 judges only the branch w2/W2-157; this is a detached HEAD: not judged here
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+1 failed, 4876 passed, 9 skipped, 6 warnings, 4 errors in 723.31s (0:12:03)

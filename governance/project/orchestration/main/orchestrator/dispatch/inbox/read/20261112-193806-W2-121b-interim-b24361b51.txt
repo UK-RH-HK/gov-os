@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-121b
+status: interim result b24361b51: W2-121b (DAEO-ifgf): probe record note, S5 as an accepted change in a resume (DEC-802)

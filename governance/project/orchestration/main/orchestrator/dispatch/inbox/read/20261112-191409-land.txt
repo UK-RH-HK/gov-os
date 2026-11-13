@@ -1,0 +1,9 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-191305.out
+W2: (land batch)
+status: W2-115=ea6dc2c14727 no outcome in the output (refused or stopped)
+
+last output:
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-115 (DAEO-emq1, FULL) at ea6dc2c14727: W2-115: FULL ticket without a passing independent review record at ea6dc2c14727
+REFUSED before anything was queued: W2-115: FULL ticket without a passing independent review record at ea6dc2c14727
+

@@ -1,0 +1,15 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "status line added",
+   "line": " M src/gov/close/batch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "head",
+   "before": "3e89b0f75b98",
+   "after": "63130cf2d28a"
+  }
+ ]
+}

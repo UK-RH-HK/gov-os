@@ -1,0 +1,6 @@
+W2-160 (DAEO-fd0p): merge td-1's acceptance tests (66: S1-S4, F1-F3), red before the build
+
+Task: DAEO-fd0p
+Role: orchestrator
+Implements: DEC-1079, DEC-1073, DEC-1112, DEC-495
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

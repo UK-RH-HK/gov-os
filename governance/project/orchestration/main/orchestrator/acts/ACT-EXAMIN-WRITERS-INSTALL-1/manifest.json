@@ -1,0 +1,72 @@
+{
+ "act": "ACT-EXAMIN-WRITERS-INSTALL-1",
+ "dec": "DEC-1143, DEC-1130",
+ "author": "cto",
+ "claimed_class": "O",
+ "class_rows": [
+  "walled-sessions"
+ ],
+ "applied_by": "the owner's operator, by hand (apply.sh check, apply, verify; then the commit line)",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/indep-briefs/examin-sets/EXAMIN-writer.md",
+   "before": null,
+   "after": "d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f"
+  },
+  {
+   "root": "repo",
+   "path": "governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md",
+   "before": null,
+   "after": "57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-eval/indep-walls/APPROVED",
+   "before": "live, unread by the CTO (neither line present)",
+   "after": "the same bytes plus lines.txt appended at the end",
+   "lines_sha256": "9b2aa04ce704bb89a023e8ef9d707b9d1db5978a3d5610d221fb807087317df5",
+   "note": "the sets root is apply.sh's argument, else the path map's sets_root_hidden.root (~/gov-os-eval); a missing list is refused"
+  }
+ ],
+ "files": {
+  "after/repo/governance/project/indep-briefs/examin-sets/EXAMIN-writer.md": "d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f",
+  "after/repo/governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md": "57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c",
+  "apply.sh": "a1ada5b045562a0c0ef3edc10d81fd39376ca83cb2eb16abbd1e265ab06061b2",
+  "list.txt": "ce2f9a7ea18489949f7f23a5a19520a3d27eb0eb5b3589a522963cd9c00e921c",
+  "lines.txt": "9b2aa04ce704bb89a023e8ef9d707b9d1db5978a3d5610d221fb807087317df5",
+  "README.md": "28235df482a6c7709fae21830515746ca827532d922f2652f4cee5934a21b70f",
+  "rehearse.sh": "738d173706cfcb44448b6040dbca7ccdd253896bc0c1532f367b7342cd7ea6d8",
+  "rehearsal.log": "28be05f4c6149914b3a32a513ddbb1cc049ec1130ce503a17696c5f1ec66a6e7"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "28be05f4c6149914b3a32a513ddbb1cc049ec1130ce503a17696c5f1ec66a6e7",
+  "script": "rehearse.sh",
+  "result": "92 checks, failures: 0"
+ },
+ "commit": "git add governance/project/indep-briefs/examin-sets/ && git commit -m \"ACT-EXAMIN-WRITERS-INSTALL-1: the two walled writer briefs as the owner approved them (DEC-1143 (1)), and their lines in the walls' approved list\" --trailer \"Task: DAEO-sdxk\" --trailer \"Implements: DEC-1143, DEC-1130\" --trailer \"Role: owner\"",
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\nd37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f  governance/project/indep-briefs/examin-sets/EXAMIN-writer.md\n57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c  governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "bash .gov-runtime/scratch/orchestrator/acts/ACT-EXAMIN-WRITERS-INSTALL-1/apply.sh verify",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "PYTHONPATH=src python3 -m gov.check.pathmap",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "git show --name-status --format= HEAD -- governance/project/indep-briefs/examin-sets/ | grep -c '^A'",
+   "exit": 0,
+   "count": 2
+  }
+ ],
+ "commands": []
+}

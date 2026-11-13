@@ -1,0 +1,94 @@
+{
+  "ticket": "DAEO-wi46",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 24,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 9,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 5,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 11,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-5",
+      "outcome": "fail",
+      "passed": 1,
+      "failed": 10,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-6",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 10,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 11,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-2",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 9,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-3",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 12,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-4",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 7,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-5",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 9,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 1,
+    "failed": 93,
+    "skipped": 0
+  }
+}

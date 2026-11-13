@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result b8a05585e: W2-171 (DAEO-k1e2) tests round 2: B-1 the VERDICT interval from the counts, B-2 measure --kept never prints a faulted attempt

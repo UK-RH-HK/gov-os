@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 165
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01HHo9pgP5VYy1tUnFGswU56", "time": "2026-11-12T14:44:45.869Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-176/0287f28b-cf6b-4180-ad43-a3576b120d94.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-176", "tool": "Bash", "form": "cd $TMPDIR/r3clone && A=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts; for act in ACT-EXAMIN-SETS-1 ACT-ACCEPTED-REDS-1 ACT-PATHMAP-EXP-1; do python3 -I -c 'import ", "rule": "the call reads files whose names another command gives at run time, from a listing whose start the guard cannot pl

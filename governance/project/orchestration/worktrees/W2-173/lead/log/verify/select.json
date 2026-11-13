@@ -3,8 +3,8 @@
  "why_full": [],
  "core_changed": [],
  "unplaced": [],
- "base": "dac438772ddcb1f0c15f093628f0179378cf2f26",
- "head": "b6d2f6f906681ecf0e1bc57761fef9e0403b16d4",
+ "base": "00a9e4ed9cfb373a5cf64fff82f4aa355ec05a66",
+ "head": "d375644986c5256e90886625bf9d2513396959cd",
  "governance_left_out": [
   "governance/project/orchestration/tools/indep-schemas/checker-result.schema.json",
   "governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json",
@@ -13,6 +13,7 @@
  ],
  "changed": [
   "docs/changes/W2-173-evidence.md",
+  "tests/acceptance/W2-149/w2_149_support.py",
   "tests/acceptance/W2-173/README.md",
   "tests/acceptance/W2-173/conftest.py",
   "tests/acceptance/W2-173/test_w2_173_classes.py",
@@ -21,6 +22,7 @@
   "tests/acceptance/W2-173/test_w2_173_stopped.py",
   "tests/acceptance/W2-173/test_w2_173_unchanged.py",
   "tests/acceptance/W2-173/w2_173_support.py",
+  "tests/unit/orchestration/test_w2_149_indep_launch.py",
   "tests/unit/orchestration/test_w2_173_indep_launch.py"
  ],
  "selected": [
@@ -35,6 +37,8 @@
      "ticket": "DAEO-qz4p",
      "paths": [
       "docs/changes/W2-173-evidence.md",
+      "tests/acceptance/W2-149/w2_149_support.py",
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -50,6 +54,13 @@
       "tests/acceptance/W2-173/test_w2_173_unchanged.py",
       "tests/acceptance/W2-173/w2_173_support.py"
      ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W2-149/w2_149_support.py",
+     "paths": [
+      "tests/acceptance/W2-149/w2_149_support.py"
+     ]
     }
    ]
   },
@@ -62,6 +73,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -80,6 +92,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -98,6 +111,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -116,6 +130,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -134,6 +149,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -152,6 +168,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -170,6 +187,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -188,6 +206,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -206,6 +225,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -224,6 +244,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -242,6 +263,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -260,6 +282,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -278,6 +301,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -296,6 +320,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -314,6 +339,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -332,6 +358,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -350,6 +377,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -368,6 +396,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -386,6 +415,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -404,6 +434,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -422,6 +453,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -440,6 +472,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -458,6 +491,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -476,6 +510,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -494,6 +529,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -512,6 +548,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -530,6 +567,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -548,6 +586,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -566,6 +605,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -584,6 +624,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -602,6 +643,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -620,6 +662,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -638,6 +681,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -656,6 +700,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -674,6 +719,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -692,6 +738,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -710,6 +757,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -728,6 +776,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -746,6 +795,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -764,6 +814,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -782,6 +833,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -800,6 +852,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -818,6 +871,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -836,6 +890,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -854,6 +909,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -872,6 +928,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -890,6 +947,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -908,6 +966,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -926,6 +985,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -944,6 +1004,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -962,6 +1023,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -980,6 +1042,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -998,6 +1061,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1016,6 +1080,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1034,6 +1099,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1052,6 +1118,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1070,6 +1137,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1088,6 +1156,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1106,6 +1175,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1124,6 +1194,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1142,6 +1213,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1160,6 +1232,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1178,6 +1251,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1196,6 +1270,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1214,6 +1289,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1232,6 +1308,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1250,6 +1327,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1268,6 +1346,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1286,6 +1365,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1304,6 +1384,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1322,6 +1403,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1340,6 +1422,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1358,6 +1441,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1376,6 +1460,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1394,6 +1479,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1412,6 +1498,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1430,6 +1517,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1448,6 +1536,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1466,6 +1555,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1484,6 +1574,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1502,6 +1593,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1520,6 +1612,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1538,6 +1631,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1556,6 +1650,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1574,6 +1669,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1592,6 +1688,7 @@
     {
      "reason": "TEST_CHANGED",
      "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py",
       "tests/unit/orchestration/test_w2_173_indep_launch.py"
      ]
     },
@@ -1602,11 +1699,30 @@
    ]
   },
   {
+   "target": "tests/acceptance/W2-149/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-52ku",
+     "paths": [
+      "tests/unit/orchestration/test_w2_149_indep_launch.py"
+     ]
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W2-149/w2_149_support.py"
+     ]
+    }
+   ]
+  },
+  {
    "target": "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
    "why": [
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W2-149/w2_149_support.py",
       "tests/acceptance/W2-173/conftest.py",
       "tests/acceptance/W2-173/test_w2_173_classes.py",
       "tests/acceptance/W2-173/test_w2_173_effort.py",
@@ -1625,6 +1741,7 @@
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W2-149/w2_149_support.py",
       "tests/acceptance/W2-173/conftest.py",
       "tests/acceptance/W2-173/test_w2_173_classes.py",
       "tests/acceptance/W2-173/test_w2_173_effort.py",
@@ -1643,6 +1760,7 @@
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W2-149/w2_149_support.py",
       "tests/acceptance/W2-173/README.md",
       "tests/acceptance/W2-173/conftest.py",
       "tests/acceptance/W2-173/test_w2_173_classes.py",
@@ -2181,7 +2299,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-145",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-147",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-148",
-  "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-149",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-150",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-152",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-153",
@@ -2192,6 +2309,7 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-49",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-50",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-51",
+  "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-52",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-53",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-54/test_w2_54_audit_report.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-173/tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",
@@ -3383,7 +3501,6 @@
   "tests/acceptance/W2-145/",
   "tests/acceptance/W2-147/",
   "tests/acceptance/W2-148/",
-  "tests/acceptance/W2-149/",
   "tests/acceptance/W2-150/",
   "tests/acceptance/W2-152/",
   "tests/acceptance/W2-153/",
@@ -3394,6 +3511,7 @@
   "tests/acceptance/W2-49/",
   "tests/acceptance/W2-50/",
   "tests/acceptance/W2-51/",
+  "tests/acceptance/W2-52/",
   "tests/acceptance/W2-53/",
   "tests/acceptance/W2-54/test_w2_54_audit_report.py",
   "tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",

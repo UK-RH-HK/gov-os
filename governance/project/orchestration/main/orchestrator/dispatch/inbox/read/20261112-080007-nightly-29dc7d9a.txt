@@ -1,0 +1,3 @@
+log: nightly/status.txt
+Nightly: 2026-11-12
+status: 2026-11-12 ran | verdict: red 15 duration: estimate 3554 s, actual 3352 s (setup 44 s, lock wait 0 s) head 9bbef27f1d05

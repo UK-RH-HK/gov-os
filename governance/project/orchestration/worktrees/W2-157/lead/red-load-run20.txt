@@ -1,0 +1,121 @@
+F..F.....................................F.............................. [ 54%]
+.................................................F........F.             [100%]
+=================================== FAILURES ===================================
+_______ test_s1_below_then_above_the_limit_pauses_at_the_second_reading ________
+
+rig = <test_w2_157_backstop.Rig object at 0x7d60c1653e90>
+
+    def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
+        rig.smi("15800, 24000", "15900, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env, max_polls=5)
+        assert result["tripped"] is True and result["paused"] == [job]
+        assert rig.smi_calls() == 2  # the first reading did not trip, the second did
+>       assert rig.state(rig.groups[0].pid) == "T"
+E       AssertionError: assert 'R' == 'T'
+E         
+E         - T
+E         + R
+
+tests/unit/resources/test_w2_157_backstop.py:224: AssertionError
+__________________ test_s1_the_limit_and_period_are_the_files __________________
+
+rig = <test_w2_157_backstop.Rig object at 0x7d60c14ff320>
+
+    def test_s1_the_limit_and_period_are_the_files(rig):
+        rig.smi("1500, 24000", "1501, 24000")
+        rig.config(limit=1500, every=7)
+        result = backstop.watch([rig.job()], rig.root, rig.env, max_polls=5)
+>       assert result["tripped"] and rig.sleeps == [7] and result["reading"]["used_mib"] == 1501
+E       assert (True and [7, 0.001, 0....8, 0.016, ...] == [7]
+E         
+E         Left contains 3548 more items, first extra item: 0.001
+E         Use -v to get more diff)
+
+tests/unit/resources/test_w2_157_backstop.py:253: AssertionError
+_______ test_s3_a_partial_offload_line_written_since_the_start_trips_it ________
+
+rig = <test_w2_157_backstop.Rig object at 0x7d60c13f2780>
+
+    def test_s3_a_partial_offload_line_written_since_the_start_trips_it(rig):
+        log = rig.tmp / "serve.log"
+        log.write_text("offloaded 1/9 layers to GPU\n")  # before the start: never counts
+        rig.smi("100, 24000", "100, 24000", "100, 24000")
+        rig.config(embedders=[(9, log)])
+        seen = []
+    
+        def append_after_first_reading(seconds):
+            seen.append(seconds)
+            if len(seen) == 1:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 33/33 layers to GPU\n")
+            if len(seen) == 2:
+                with log.open("a") as handle:
+                    handle.write("llm: offloaded 20/33 layers to GPU\n")
+    
+        rig.mp.setattr(backstop.time, "sleep", append_after_first_reading)
+        result = backstop.watch([rig.job()], rig.root, rig.env, max_polls=6)
+>       assert result["tripped"] and rig.smi_calls() == 3
+E       assert (True and 2 == 3)
+E        +  where 2 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7d60c13f2780>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:404: AssertionError
+_ test_the_bound_ends_a_watch_that_never_trips_after_exactly_that_many_polls[2] _
+
+rig = <test_w2_157_backstop.Rig object at 0x7d60c1492270>, bound = 2
+
+    @pytest.mark.parametrize("bound", [1, 2, 5])
+    def test_the_bound_ends_a_watch_that_never_trips_after_exactly_that_many_polls(rig, bound):
+        rig.smi("100, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env, max_polls=bound)
+        assert result == {"tripped": False, "reason": None, "reading": None, "paused": [], "skipped": [],
+                          "log": str(rig.log), "inbox_item": None}  # the result has no new key
+>       assert rig.smi_calls() == bound and rig.sleeps == [5] * (bound - 1)  # no sleep after the last poll
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert (2 == 2 and [5, 0.001, 0....8, 0.016, ...] == [5]
+E        +  where 2 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7d60c1492270>.smi_calls
+E         
+E         Left contains 7240 more items, first extra item: 0.001
+E         Use -v to get more diff)
+
+tests/unit/resources/test_w2_157_backstop.py:1013: AssertionError
+_______ test_the_default_has_no_bound_and_polls_on_until_the_group_ends ________
+
+rig = <test_w2_157_backstop.Rig object at 0x7d60c1492d20>
+
+    def test_the_default_has_no_bound_and_polls_on_until_the_group_ends(rig):
+        parameter = inspect.signature(backstop.watch).parameters["max_polls"]
+        assert parameter.kind is inspect.Parameter.KEYWORD_ONLY and parameter.default is None
+        rig.smi("100, 24000")
+        rig.config()
+        job = rig.job()
+        polls = []
+    
+        def end_at_the_ninth(seconds):
+            polls.append(seconds)
+            if len(polls) > 50:
+                raise AssertionError("runaway: the group was never ended")
+            if len(polls) == 9:
+                rig.groups[0].kill()
+                rig.groups[0].wait()
+    
+        rig.mp.setattr(backstop.time, "sleep", end_at_the_ninth)
+        result = backstop.watch([job], rig.root, rig.env)  # no bound: it ends only because the group ended
+>       assert result["tripped"] is False and rig.smi_calls() == 9 and len(polls) == 9
+E       assert (False is False and 4 == 9)
+E        +  where 4 = smi_calls()
+E        +    where smi_calls = <test_w2_157_backstop.Rig object at 0x7d60c1492d20>.smi_calls
+
+tests/unit/resources/test_w2_157_backstop.py:1069: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/resources/test_w2_157_backstop.py::test_s1_below_then_above_the_limit_pauses_at_the_second_reading
+FAILED tests/unit/resources/test_w2_157_backstop.py::test_s1_the_limit_and_period_are_the_files
+FAILED tests/unit/resources/test_w2_157_backstop.py::test_s3_a_partial_offload_line_written_since_the_start_trips_it
+FAILED tests/unit/resources/test_w2_157_backstop.py::test_the_bound_ends_a_watch_that_never_trips_after_exactly_that_many_polls[2]
+FAILED tests/unit/resources/test_w2_157_backstop.py::test_the_default_has_no_bound_and_polls_on_until_the_group_ends
+5 failed, 127 passed in 12.36s

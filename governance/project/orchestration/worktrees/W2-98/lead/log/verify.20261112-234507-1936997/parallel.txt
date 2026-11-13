@@ -1,0 +1,148 @@
+bringing up nodes...
+bringing up nodes...
+
+..........................................F............................. [  1%]
+........................................................................ [  2%]
+.....F............................F..................................... [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+...............................................s........................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+...................................sss.................................. [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+..............sss....................................................... [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+............................                                             [100%]
+=================================== FAILURES ===================================
+_____ test_the_skill_carries_one_version_in_all_four_places[spec-writing] ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'spec-writing'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/spec-writing/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-98')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/spec-writing/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+________________ test_the_claude_copy_matches_the_kernel_source ________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_claude_copy_matches_the_kernel_source():
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): .claude/skills/ is generated by it, not by this ticket."""
+        source = _source()
+        found = differences(source, s.REPO_ROOT / ".claude/skills" / s.SKILL_NAME, generated=True)
+>       assert not found, f".claude/skills/{s.SKILL_NAME} differs from the kernel source: {found}"
+E       AssertionError: .claude/skills/spec-writing differs from the kernel source: ['/home/usain/gov-os-worktrees/W2-98/.claude/skills/spec-writing does not exist']
+E       assert not ['/home/usain/gov-os-worktrees/W2-98/.claude/skills/spec-writing does not exist']
+
+tests/acceptance/W2-98/test_w2_98_copies.py:91: AssertionError
+______ test_the_adapter_check_finds_no_generated_drift_in_the_real_skill _______
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_adapter_check_finds_no_generated_drift_in_the_real_skill():
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): the .claude/skills/ copy is generated by it."""
+        if shutil.which("rulesync") is None and not os.environ.get("RULESYNC_BIN"):
+            pytest.skip("rulesync is not installed: the adapter check cannot compare the generated copy")
+        _source()
+        findings = _real_findings()
+        generated = [f for f in _naming_the_skill(findings) if f["code"].startswith("GENERATED_")]
+>       assert not generated, f"the adapter check names the skill's generated copy: {generated}"
+E       AssertionError: the adapter check names the skill's generated copy: [{'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/spec-writing/SKILL.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/spec-writing/check_spec.py'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/spec-writing/imports.yaml'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/spec-writing/spec-form.md'}]
+E       assert not [{'code': 'GENERATED_DIFFERS', 'file': '.claude/skills/spec-writing/SKILL.md', 'message': 'is not what rulesync genera...RS', 'file': '.claude/skills/spec-writing/spec-form.md', 'message': 'is not what rulesync generates from its sources'}]
+
+tests/acceptance/W2-98/test_w2_98_copies.py:125: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-98/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1237831) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+3 failed, 5130 passed, 7 skipped, 6 warnings in 885.69s (0:14:45)

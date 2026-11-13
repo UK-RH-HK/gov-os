@@ -1,0 +1,29 @@
+== collect-only (latency ids)
+15
+collect: SAME 15 ids
+== hygiene vs 085b4391c (pre-revision)
+ 6 files changed, 401 insertions(+), 23 deletions(-)
+tests/acceptance/W1-02/README.md
+tests/acceptance/W1-02/test_w1_02_guard_hook.py
+tests/acceptance/W1-05/README.md
+tests/acceptance/W1-05/test_w1_05_live_hooks.py
+tests/acceptance/W2-57/README.md
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py
+no skip/xfail/flaky added
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:18:LATENCY_BOUND_S = 0.100
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:67:LATENCY_BOUND_S = 0.100
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:41:LATENCY_BOUND_S = 0.100
+== gov accept
+accept rc=1
+gov accept: ACCEPT_NO_TESTS: ticket DAEO-qvff has no acceptance folder inside the project (declared: tests/acceptance/W2-111/)
+== scoped run (the 15 latency cases)
+5.57 6.43 4.38 5/1382 142386
+scoped rc=0
+5.75 6.35 4.46 7/1398 153669
+...............                                                          [100%]
+15 passed in 47.61s
+== whole three files (scoped, DEC-968)
+files rc=0
+......................                                                   [100%]
+22 passed, 72 deselected in 14.98s
+VERIFY-3-END

@@ -1,0 +1,170 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+..............s......................................................... [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+......................................................F................. [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+......................................sss............................... [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+.............................................................sss........ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+.................F.....F................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+......................................................................F. [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+___________ test_f5_the_branch_changes_only_paths_the_ticket_allows ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_f5_the_branch_changes_only_paths_the_ticket_allows():
+        if _git("rev-parse", "--verify", "--quiet", "w2/integrate^{commit}").returncode != 0:
+            pytest.skip("F5 needs the w2/integrate reference, absent in this repository: not judged here")
+        if not TICKET.is_file():
+            pytest.skip("F5 needs the ticket file .tickets/DAEO-k1e2.md, absent here: not judged here")
+        front = yaml.safe_load(TICKET.read_text(encoding="utf-8").split("\n---", 1)[0].removeprefix("---\n"))
+        allowed = list(front["allowed_paths"])
+        allowed.append(str(front["acceptance_tests"]["path"]).rstrip("/") + "/**")
+        base = _git("merge-base", "HEAD", "w2/integrate")
+        assert base.returncode == 0, base.stderr
+        diff = _git("-c", "core.quotePath=false", "diff", "--name-only", "--no-renames", f"{base.stdout.strip()}...HEAD")
+        assert diff.returncode == 0, diff.stderr
+        from gov.close.select import match
+        outside = [p for p in diff.stdout.splitlines() if p and not any(match(p, a) for a in allowed)]
+>       assert outside == [], outside
+E       AssertionError: ['docs/changes/W2-172-evidence.md', 'governance/project/orchestration/tools/memaudit_cron.sh', 'tests/acceptance/W2-17...acceptance/W2-172/conftest.py', 'tests/acceptance/W2-172/fake_crontab.py', 'tests/acceptance/W2-172/gate_stub.py', ...]
+E       assert ['docs/change...stub.py', ...] == []
+E         
+E         Left contains 23 more items, first extra item: 'docs/changes/W2-172-evidence.md'
+E         Use -v to get more diff
+
+tests/acceptance/W2-171/test_w2_171_f5_paths.py:41: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7a0605ccf200>, position = 2
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['R', 'R'] == ['T', 'T']
+E         
+E         At index 0 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+___ test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on ____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7a033dad2600>
+
+    def test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on(rig):
+        rig.smi("15900, 24000")
+        rig.config()
+        named = rig.job()
+        other = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"], start_new_session=True)
+        rig.groups.append(other)
+        backstop.watch([named], rig.root, rig.env)
+>       assert rig.state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
+E       AssertionError: assert ('R' == 'T'
+E         
+E         - T
+E         + R)
+
+tests/unit/resources/test_w2_157_backstop.py:441: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-lead-W2-172/pytest-of-usain/pytest-0/popen-gw1/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-172/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1656019) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:49: F5 judges only the branch w2/W2-170; this is the branch w2/W2-172: not judged here
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+4 failed, 4923 passed, 7 skipped, 6 warnings in 1060.08s (0:17:40)

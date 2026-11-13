@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-193505.out
+Structural: after the landing of W2-40 (base f1bb8550e6ac)
+status: structural pass at 2a9c4c3dac0a: NOTICE in mutation, authority, links (6 of 9 families ok), 16.2 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 16 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+13 more)
+authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since f1bb8550e6ac)
+links: NOTICE 11 new since f1bb8550e6ac26e6dc51fb423ba8079537f07c1a (1699 standing): UNLINKED_ID W2-H052 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-H052 to DAEO-6ox0's sources: | UNLINKED_ID W2-L316 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L316 to DAEO-6ox0's sources: | UNLINKED_ID W2-L328 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L328 to DAEO-6ox0's sources: (+8 more)
+structural pass at 2a9c4c3dac0a: NOTICE in mutation, authority, links (6 of 9 families ok), 16.2 s; a notice, not a refusal

@@ -1,0 +1,29 @@
+{
+ "act": "ACT-P95-1",
+ "dec": "DEC-1149 (pending the owner's yes), DEC-1138 (4), DEC-1133 (5), DEC-947",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "home",
+   "path": ".gov-os/machine/gate.json",
+   "before": "9a705321b7921758ff35e2f78a2133b482f329a4a38a82df108e4506b6db4547",
+   "after": "dc1a1368fec937e0f4d21285aeb7e4f727ee1fe7df3b1aa7f9ec88ce8c0bee27"
+  }
+ ],
+ "files": {
+  "before/home/.gov-os/machine/gate.json": "9a705321b7921758ff35e2f78a2133b482f329a4a38a82df108e4506b6db4547",
+  "after/home/.gov-os/machine/gate.json": "dc1a1368fec937e0f4d21285aeb7e4f727ee1fe7df3b1aa7f9ec88ce8c0bee27",
+  "apply.sh": "8353390b29a8c8bfaa0c46c05da01525362de1506e877def1ec82f8dd14725a2",
+  "list.txt": "44f9dfa833f36280acf65e69f5139bdf15511774be6fefee2446b7ea98b94eba",
+  "rehearsal.log": "a2a9f4ea70e97c0f53ced3d6a2ae3d22be416200f7df1296165bd2d15fb6b964"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -c 'import json,os; v=json.load(open(os.path.expanduser(\"~/.gov-os/machine/gate.json\")))[\"working_size_bytes\"][\"value\"]; assert v==805306368'"
+  },
+  {
+   "cmd": "cd /home/usain/Dynamic-Agentic-Engineering-OS && PYTHONPATH=src python3 -m gov.cli.main resources --check --json"
+  }
+ ]
+}

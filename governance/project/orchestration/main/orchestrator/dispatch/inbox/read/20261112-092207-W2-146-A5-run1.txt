@@ -1,0 +1,9 @@
+log: W2-146-A5-run1.json
+W2: W2-146
+status: PACKAGES
+
+I stopped at the interface check, as the brief requires. The ticket DAEO-f6x3 has no `## Interface` section, so I started no worker and wrote no code. The status is PACKAGES with one interface proposal you can accept in one line.
+
+task: DAEO-f6x3
+status: PACKAGES
+work_completed: Ran the start-up checks (orchestrator, DAEO-f6x3; tree /home/usain/gov-os-worktrees/W2-146 on w2/W2-146; no checkpoint, so a fresh start). Read the ticket, `src/gov/retrieval/lexical.py` (`ID_SHAPE`, `ids_in`, `whole_id`, `kept_out`, and the places that call `ids_in`), `src/gov/retrieve/command.py` (`_nowhere`, `_state

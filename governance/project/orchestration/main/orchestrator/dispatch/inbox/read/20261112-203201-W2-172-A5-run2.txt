@@ -1,0 +1,10 @@
+log: W2-172-A5-run2.json
+W2: W2-172
+status: DONE. The head to land is 0c16d8afb0b5d8844bf8f9d4cdf9cc0e2d03b3dd and `git status --short` is empty. The probe record is docs/probes/DAEO-p8tv/PR-DAEO-p8tv.md (review round 1 PASSED with 0 blocking findings; the probed commit is f706a77f5b7e).
+
+task: DAEO-p8tv (W2-172)
+status: DONE. The head to land is 0c16d8afb0b5d8844bf8f9d4cdf9cc0e2d03b3dd and `git status --short` is empty. The probe record is docs/probes/DAEO-p8tv/PR-DAEO-p8tv.md (review round 1 PASSED with 0 blocking findings; the probed commit is f706a77f5b7e).
+work_completed:
+- Resumed from CHECKPOINT. The CTO's answers to PKG-W2-172-TESTS-1 (GATE-1 (a), TD-1 (b), TD-2 (b)) were already in the main tree's ticket copy.
+- Found two test cases that contradicted TD-2 (b): they expected `RN-NAME` from the audit folder alone, with no `STARTS.log` line.
+- Ran two workers in parallel:

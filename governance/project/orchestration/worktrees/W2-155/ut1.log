@@ -1,0 +1,406 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 00:52:12)
+94: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+..................................................FFFFFF.FFFFFFFFFFF.... [ 12%]
+..F.F.....F............................................................. [ 25%]
+........................................................................ [ 38%]
+.........F...................................ss......................... [ 51%]
+........................................................................ [ 64%]
+........................................................................ [ 77%]
+........................................................................ [ 90%]
+..................................................                       [100%]
+=================================== FAILURES ===================================
+______________ test_searches_starting_together_start_one_service _______________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b40e52e0>
+
+    def test_searches_starting_together_start_one_service(home, monkeypatch):
+        monkeypatch.setenv("STANDIN_LOAD_S", "1")  # a slow load widens the race
+        results = in_threads(8, lambda number: ask(f"q{number}", ["a", "bbb", "cc"]))
+        for number, (ranked, outcome) in enumerate(results):
+>           assert outcome == {"by": "service", "device": "cuda:0", "reason": None}
+E           AssertionError: assert {'by': 'unava...t permitted)'} == {'by': 'servi...reason': None}
+E             
+E             Differing items:
+E             {'by': 'unavailable'} != {'by': 'service'}
+E             {'reason': 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)'} != {'reason': None}
+E             {'device': None} != {'device': 'cuda:0'}
+E             Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:192: AssertionError
+___________ test_twenty_concurrent_callers_each_get_their_own_scores ___________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h1')
+
+    def test_twenty_concurrent_callers_each_get_their_own_scores(home):
+        ask("warm", ["x"])
+        texts = {number: ["t" * (number + 1), "u" * (40 - number), "v" * 7] for number in range(20)}
+        results = in_threads(20, lambda number: ask(f"question {number:02d}", texts[number]))
+        for number, (ranked, outcome) in enumerate(results):
+>           assert outcome["by"] == "service"
+E           AssertionError: assert 'unavailable' == 'service'
+E             
+E             - service
+E             + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:203: AssertionError
+______________________ test_the_socket_is_the_users_alone ______________________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h2')
+
+    def test_the_socket_is_the_users_alone(home):
+        ask("q", ["a"])
+        folder, sock = home / rerank.CACHE_REL, home / rerank.CACHE_REL / rerank.SOCKET
+>       assert stat.S_ISSOCK(sock.stat().st_mode) and stat.S_IMODE(sock.stat().st_mode) == 0o600
+                             ^^^^^^^^^^^
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h2/.cache/gov-os/rerank.sock')
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h2/.cache/gov-os/rerank.sock'
+
+/usr/lib/python3.12/pathlib.py:842: FileNotFoundError
+______ test_ties_keep_the_given_order_and_the_answers_match_the_reference ______
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h3')
+
+    def test_ties_keep_the_given_order_and_the_answers_match_the_reference(home):
+        # DEC-1048 (5): compared with the stand-in model's own scores (the reference), no longer a private reranker's
+        texts = ["same", "four", "a longer text", "tied"]
+        ranked, outcome = ask("q", texts)
+>       assert outcome["by"] == "service"
+E       AssertionError: assert 'unavailable' == 'service'
+E         
+E         - service
+E         + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:221: AssertionError
+_______ test_the_service_ends_after_its_idle_time_and_removes_its_socket _______
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b4172180>
+
+    def test_the_service_ends_after_its_idle_time_and_removes_its_socket(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_IDLE_S", "1")
+        ask("q", ["a"])
+>       [pid] = _pids(home, SERVICE)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:229: ValueError
+____________ test_a_service_stopped_with_sigterm_removes_its_socket ____________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h5')
+
+    def test_a_service_stopped_with_sigterm_removes_its_socket(home):
+        ask("q", ["a"])
+>       [pid] = _pids(home, SERVICE)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:236: ValueError
+_ test_below_its_gpu_share_the_service_does_not_start_and_the_search_goes_on_unranked _
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b4173e60>
+
+    def test_below_its_gpu_share_the_service_does_not_start_and_the_search_goes_on_unranked(home, monkeypatch):
+        # DEC-1048 (5): no private reranker follows the refusal; the order given, named
+        monkeypatch.setenv("STANDIN_GPU_FREE", str(4 * GIB))
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+        assert rerank.rerank("q", candidates) == candidates
+        outcome = rerank.last_outcome()
+>       assert outcome["by"] == "unavailable" and "too little free memory" in outcome["reason"]
+E       AssertionError: assert ('unavailable' == 'unavailable'
+E         
+E           unavailable and 'too little free memory' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:266: AssertionError
+__ test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named __
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b4172900>
+
+    def test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named(home, monkeypatch):
+        monkeypatch.delenv("STANDIN_GPU_FREE")  # torch sees no GPU at all; nothing hides it
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
+        assert rerank.rerank("q", candidates) == candidates
+        outcome = rerank.last_outcome()
+        assert outcome["by"] == "unavailable" and outcome["device"] is None
+>       assert "could not be read" in (home / rerank.CACHE_REL / rerank.LOG).read_text()  # the service's refusal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'could not be read' in '2026-11-13T00:53:50+0000\tFALLBACK\tthe shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)\tunranked\n'
+E        +  where '2026-11-13T00:53:50+0000\tFALLBACK\tthe shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)\tunranked\n' = read_text()
+E        +    where read_text = ((PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h7') / '.cache/gov-os') / 'rerank.log').read_text
+E        +      where '.cache/gov-os' = rerank.CACHE_REL
+E        +      and   'rerank.log' = rerank.LOG
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:279: AssertionError
+______ test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu[False] _______
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b4172360>
+allow_cpu = False
+
+    @pytest.mark.parametrize("allow_cpu", [False, True])
+    def test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu(home, monkeypatch, allow_cpu):
+        monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "-1")
+        if allow_cpu:  # DEC-1048 (5): the old opt-out opens no CPU path anywhere
+            monkeypatch.setenv("GOV_RERANK_ALLOW_CPU", "1")
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
+        ranked = rerank.rerank("q", candidates)
+        outcome = rerank.last_outcome()
+>       assert "the GPU is hidden from it" in outcome["reason"] and _service_never_loaded(home)
+E       AssertionError: assert ('the GPU is hidden from it' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:294: AssertionError
+______________ test_the_service_holds_every_gpu_slot_for_its_life ______________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h9')
+
+    def test_the_service_holds_every_gpu_slot_for_its_life(home):
+        # DEC-1048 (5), W2-145 S3: the first slot by the slot rule, then every other one; all go with the process
+>       assert ask("q", ["a"])[1]["by"] == "service"
+E       AssertionError: assert 'unavailable' == 'service'
+E         
+E         - service
+E         + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:322: AssertionError
+____ test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release _____
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b41727e0>
+
+    def test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "10")
+        fds = _hold_slots(home)
+        threading.Timer(1.0, os.close, (fds[1],)).start()  # an older tree's private reranker ends
+        try:
+            ranked, outcome = ask("q", ["a", "bb"])
+        finally:
+            os.close(fds[0])  # the other ends too
+        released = time.monotonic()
+>       assert outcome["by"] == "service" and pairs(ranked) == expected("q", ["a", "bb"])
+E       AssertionError: assert ('unavailable' == 'service'
+E         
+E         - service
+E         + unavailable)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:340: AssertionError
+____ test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked ____
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b40e6ed0>
+
+    def test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
+        fds = _hold_slots(home)
+        try:
+            began = time.monotonic()
+            results = in_threads(4, lambda number: (rerank.rerank(f"q{number}", [{"n": 0, "text": "a"}]),
+                                                    rerank.last_outcome()))
+            took = time.monotonic() - began
+        finally:
+            for fd in fds:
+                os.close(fd)
+        for ranked, outcome in results:
+            assert ranked == [{"n": 0, "text": "a"}] and outcome["by"] == "unavailable"
+            # DEC-1048 (5): the service's refusal named, by the search that started it ("no GPU slot freed within its
+            # wait") and by those that waited for it (its REFUSED line, "no GPU slot free within 1 s")
+>           assert "no GPU slot free" in outcome["reason"]
+E           AssertionError: assert 'no GPU slot free' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)'
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:360: AssertionError
+_____________ test_a_killed_service_is_replaced_by_the_next_search _____________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h12')
+
+    def test_a_killed_service_is_replaced_by_the_next_search(home):
+        ask("q", ["a"])
+>       [first] = _pids(home, SERVICE)
+        ^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:372: ValueError
+____ test_a_service_killed_mid_request_leaves_the_search_unranked_and_named ____
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h13')
+
+    def test_a_service_killed_mid_request_leaves_the_search_unranked_and_named(home):
+        # DEC-1048 (5): the order given, never a private reranker's scores
+        ask("warm", ["a"])
+>       [pid] = _pids(home, SERVICE)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:383: ValueError
+_____________ test_a_service_that_does_not_answer_in_time_is_left ______________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b3d38a10>
+
+    def test_a_service_that_does_not_answer_in_time_is_left(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_TIMEOUT_S", "1")
+        ask("warm", ["a"])
+        began = time.monotonic()
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+        ranked = rerank.rerank("hang", candidates)
+        outcome = rerank.last_outcome()
+        assert time.monotonic() - began < 1 + 1  # DEC-1048 (5), W2-145 S4: the time limit plus 1 s, no other wait
+>       assert outcome["by"] == "unavailable" and "timed out" in outcome["reason"]
+E       AssertionError: assert ('unavailable' == 'unavailable'
+E         
+E           unavailable and 'timed out' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:403: AssertionError
+____ test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked ____
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h15')
+
+    def test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked(home):
+        # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (64, DEC-1090 (2)), so the service's own cap is
+        # reached only by a request made past rerank.rerank: the default reranker's scorer, asked directly. The guard
+        # stays: the service refuses the over-cap request, and (DEC-1048 (5)) the scorer scores nothing, named.
+        texts = ["x"] * (rerank_service.MAX_TEXTS + 1)
+        values = rerank.default_reranker()("q", texts)
+        outcome = rerank.last_outcome()
+>       assert outcome["by"] == "unavailable" and "refused the request" in outcome["reason"]
+E       AssertionError: assert ('unavailable' == 'unavailable'
+E         
+E           unavailable and 'refused the request' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:414: AssertionError
+____________ test_a_search_s_requests_never_reach_the_service_s_cap ____________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h16')
+
+    def test_a_search_s_requests_never_reach_the_service_s_cap(home):
+        # DEC-1067 (f): a pool larger than the service's cap goes in requests of at most the client's cap, each under it
+        assert rerank.MAX_REQUEST_TEXTS == 64 < rerank_service.MAX_TEXTS  # DEC-1090 (2): the cap raised from 16
+        texts = ["x" * (number % 7 + 1) for number in range(rerank_service.MAX_TEXTS + 1)]
+        ranked, outcome = ask("q", texts)
+>       assert outcome["by"] == "service" and outcome["reason"] is None and not fallbacks(home)
+E       AssertionError: assert ('unavailable' == 'service'
+E         
+E         - service
+E         + unavailable)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:424: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+>           assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+E           AssertionError: assert 'unavailable' == 'service'
+E             
+E             - service
+E             + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:563: AssertionError
+____ test_a_service_that_cannot_start_leaves_the_search_unranked_and_named _____
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h18')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b3d3ae70>
+
+    def test_a_service_that_cannot_start_leaves_the_search_unranked_and_named(home, monkeypatch):
+        # DEC-1048 (5): no private reranker after the service's failure; one FALLBACK line, "unranked"
+        monkeypatch.setenv("STANDIN_FAIL", SERVICE)
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+        assert rerank.rerank("q", candidates) == candidates
+        outcome = rerank.last_outcome()
+        assert outcome["by"] == "unavailable" and outcome["device"] is None
+>       assert "ended before it listened (exit 1)" in outcome["reason"]
+E       AssertionError: assert 'ended before it listened (exit 1)' in 'the shared reranker did not answer (PermissionError: [Errno 1] Operation not permitted)'
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:584: AssertionError
+______________________ test_the_bundle_names_who_reranked ______________________
+
+home = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/h24')
+tmp_path = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/test_the_bundle_names_who_rera0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b3d38f50>
+
+    @pytest.mark.skipif(shutil.which("gitleaks") is None, reason="gitleaks is not on PATH")
+    def test_the_bundle_names_who_reranked(home, tmp_path, monkeypatch):
+        from gov import store
+        from gov.retrieval import lexical, semantic
+        from gov.retrieval.retrieve import retrieve
+    
+        git = ["git", "-C", str(tmp_path), "-c", "user.name=unit", "-c", "user.email=unit@example.invalid"]
+        subprocess.run([*git, "init", "-q"], check=True)
+        (tmp_path / "governance/project").mkdir(parents=True)
+        path_map = yaml.safe_load((REPO / "governance/project/path-map.yaml").read_text(encoding="utf-8"))
+        path_map["namespaces"] = {"notes": {**next(iter(path_map["namespaces"].values())), "paths": ["**"]}}
+        path_map.pop("decision_register", None)
+        (tmp_path / "governance/project/path-map.yaml").write_text(yaml.safe_dump(path_map), encoding="utf-8")
+        shutil.copy2(REPO / "template/.gitleaks.toml", tmp_path / ".gitleaks.toml")
+        (tmp_path / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
+        for number in (1, 2):
+            (tmp_path / f"note{number}.md").write_text(f"# Note {number}\n\nThe heron ledger {number}.\n", encoding="utf-8")
+        subprocess.run([*git, "add", "-A"], check=True)
+        subprocess.run([*git, "commit", "-q", "-m", "fixture"], check=True)
+        lexical.refresh(tmp_path)
+        store.load(tmp_path)
+        monkeypatch.setattr(semantic, "search", lambda *_args, **_kwargs: {"available": True, "reason": None, "hits": []})
+    
+        bundle = retrieve(tmp_path, "heron ledger")
+>       assert bundle["merge"]["reranked"] and bundle["rerank"] == {"by": "service", "device": "cuda:0", "reason": None}
+E       assert (False)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:675: AssertionError
+__________________ test_the_ranked_route_adds_no_rerank_work ___________________
+
+root = PosixPath('/tmp/gov-launch-t6q0frtj/claude-1000/w2-155-eng/pytest-of-usain/pytest-0/test_the_ranked_route_adds_no_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d87b38dc5f0>
+
+    def test_the_ranked_route_adds_no_rerank_work(root, monkeypatch):
+        monkeypatch.setattr(semantic, "search", _semantic(root))
+        calls = []
+    
+        def score(query, texts):
+            calls.append(texts)
+            return [0.0] * len(texts)
+    
+        lexical_answer = lexical.search(root, "lantern keeper tide", refresh=False)
+        assert len([entry for entry in lexical_answer["ranked"] if not entry["exact"]]) == lexical.TOP_K
+        answer = fusion.search(root, "lantern keeper tide", limit=None, refresh=False, reranker=lambda: score)
+        # one rerank of at most RERANK_TOP, in requests of at most 16 texts (DEC-1067 (f))
+>       assert all(len(texts) <= 16 for texts in calls)
+E       assert False
+E        +  where False = all(<generator object test_the_ranked_route_adds_no_rerank_work.<locals>.<genexpr> at 0x7d87b434df20>)
+
+tests/unit/retrieval/test_w2_13_rerank_work.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_searches_starting_together_start_one_service
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_twenty_concurrent_callers_each_get_their_own_scores
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_socket_is_the_users_alone
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_ties_keep_the_given_order_and_the_answers_match_the_reference
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_ends_after_its_idle_time_and_removes_its_socket
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_stopped_with_sigterm_removes_its_socket
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_below_its_gpu_share_the_service_does_not_start_and_the_search_goes_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu[False]
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_holds_every_gpu_slot_for_its_life
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_killed_service_is_replaced_by_the_next_search
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_killed_mid_request_leaves_the_search_unranked_and_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_that_does_not_answer_in_time_is_left
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_search_s_requests_never_reach_the_service_s_cap
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_service_that_cannot_start_leaves_the_search_unranked_and_named
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_bundle_names_who_reranked
+FAILED tests/unit/retrieval/test_w2_13_rerank_work.py::test_the_ranked_route_adds_no_rerank_work
+21 failed, 531 passed, 2 skipped, 399 deselected in 1019.40s (0:16:59)

@@ -1,0 +1,9 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-073107.out
+W2: (land batch)
+status: W2-157=e1fea6fc2c24 not landed (ejected: red); W2-121=f45614f15619 CLOSED
+
+last output:
+or name the planted id... | UNKNOWN_ID W2-903 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-903 or name the planted id... (+2 more)
+structural pass: structural pass at f3ad1f338403: NOTICE in mutation, links (7 of 9 families ok), 13.3 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-074642-structural-notice.txt
+

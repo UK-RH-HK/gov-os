@@ -1,0 +1,4 @@
+2026-11-12 11:24:04 admitted by the dispatcher; launching W2-124
+disk gate open: 795 GiB free, 63141404 inodes free
+gov resources: RESOURCE_GATE_SHUT: the resource gate is shut: memory: reading 17576775680, limit 18562437120
+2026-11-12 11:24:05 LAUNCH_GATE_SHUT: gov resources --check ended with exit 3; W2-124 is not launched (DEC-1133 (3))

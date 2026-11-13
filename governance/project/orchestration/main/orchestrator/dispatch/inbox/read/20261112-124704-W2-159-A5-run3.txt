@@ -1,0 +1,12 @@
+log: W2-159-A5-run3.json
+W2: W2-159
+status: PACKAGES
+
+I'm returning PACKAGES for W2-159. The code is built, verified and reviewed (round 2 PASS, READY), and the probe record is committed. One blocking item remains, a one-line ticket edit that only you can make: until `docs/probes/DAEO-6lid/**` is in the ticket's allowed_paths, the F4 acceptance case is red at the head because of the probe record.
+
+```
+task: DAEO-6lid (W2-159)
+status: PACKAGES
+work_completed: Run 3 resumed at 680bdce1f526.
+ - Rebuild done. lead_verify red only on the 10 W2-96 base reds.
+ - gov accept: 84 passed, but failure-4 read "fail" because F4 had no case (the test designer's

@@ -1,0 +1,7 @@
+TESTS-READY DAEO-p8tv (W2-172)
+merge: 80da3fbcca0d775459eef24000ff40a8e773f40e (Merge w2/W2-172-tests, tests d7eab6d65b9d by td-1)
+suite: tests/acceptance/W2-172/ (161 cases, 103 functions, ten files; README.md maps each KPI line to node ids)
+red: gov accept W2-172 = fail; S1-S9 and F1-F4 all red (0 passed, 160 failed); F5 1 passed (only the suite's own paths on w2/W2-172)
+record: .gov-runtime/scratch/lead/log/accept-1.txt
+open: PKG-W2-172-TD-1 (--force in the digest), PKG-W2-172-TD-2 (RN-NAME after a refusal's COUNTS.json), PKG-W2-172-GATE-1 (--gate-cmd <exe> vs `gov resources --check`)
+revision: f706a77f5 (Merge w2/W2-172-tests, td-2 5193add3965d: PKG-W2-172-TESTS-1 TD-2 (b) Rewrite-Reason; RN-NAME by STARTS.log, one retry case added)

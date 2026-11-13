@@ -1,0 +1,4 @@
+Merge w2/W2-33-tests into w2/W2-33 (DAEO-lrre): td-4's two W1-33 revisions at 4452d6b8c (research.md's body without the every-role-file lines; the agents roster at nine), DEC-1156 (3), (7)
+
+Task: DAEO-lrre
+Role: orchestrator

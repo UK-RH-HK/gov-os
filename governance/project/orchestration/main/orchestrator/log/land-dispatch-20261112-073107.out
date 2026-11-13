@@ -1,0 +1,35 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-157 (DAEO-ozyt, STANDARD) at e1fea6fc2c24: pre-check passed
+W2-121 (DAEO-cb2b, FULL) at f45614f15619: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 07:31:07 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 07:31:08 merged W2-157, W2-121 onto 6c9a5bb525ee: 4ebb49a6f36c
+2026-11-12 07:44:18 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 07:44:25 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 07:44:31 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 07:44:31 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 07:44:32 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed
+2026-11-12 07:44:33 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-12 07:44:53 the head without the batch: a throwaway worktree head-6c9a5bb525ee-0 at 6c9a5bb525ee with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 07:44:54 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': 4}): owned: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+2026-11-12 07:44:54 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 07:46:28 EJECTED W2-157: red; failing: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+2026-11-12 07:46:28 merged W2-121 onto 6c9a5bb525ee: 787b097ac95d
+2026-11-12 07:46:28 run skipped: the merged code is identical to f45614f1561959496f51e06e122351843af06663, W2-121's approved commit, which its lead tested; governance paths left out of the comparison: .tickets/DAEO-1k7y.md, .tickets/DAEO-7oxm.md, .tickets/DAEO-k1e2.md, .tickets/DAEO-ozyt.md, .tickets/DAEO-weh2.md, governance/project/orchestration/packages/ACT-MORNING-SEQUENCE-20261112.md, governance/project/orchestration/packages/ACT-OPERATOR-HOURS-2.md, governance/project/orchestration/packages/DECIDED-NOT-DONE.md, governance/project/orchestration/reviews/ACT-OPERATOR-HOURS-2-review-r2.md (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)
+2026-11-12 07:46:28 ADVANCED refs/heads/w2/integrate 6c9a5bb525ee -> 787b097ac95d; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/787b097ac95d.json
+2026-11-12 07:46:28 integration store not promoted: the merged clone's stores were not rebuilt at the landed commit 787b097ac95d (the run was skipped, or its last rebuild was at 4ebb49a6f36c); its normal refresh runs apart
+queue run exit 3
+W2-157: not landed (ejected: red)
+CLOSED W2-121: f3ad1f338 W2-121 (DAEO-cb2b): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 3 findings: .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 6c9a5bb525ee)
+structural pass: links: NOTICE 5 new since 6c9a5bb525ee21f4168d456dcd503aaa4e4e766e (1614 standing): UNKNOWN_ID W2-901 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-901 or name the planted id... | UNKNOWN_ID W2-902 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-902 or name the planted id... | UNKNOWN_ID W2-903 in a test file | tests/acceptance/W2-121/test_s10_plan_ready_list.py:21 | independent-test-designer | correct W2-903 or name the planted id... (+2 more)
+structural pass: structural pass at f3ad1f338403: NOTICE in mutation, links (7 of 9 families ok), 13.3 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-074642-structural-notice.txt

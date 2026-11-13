@@ -1,0 +1,19 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-121b (DAEO-ifgf, FULL) at 6e10493a5f8e: pre-check passed
+W2-121b: kernel gate at 6e10493a5f8e: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 21:22:01 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 21:22:02 merged W2-121b onto 5fd8b2ac7437: 4ae8efc44446
+2026-11-12 21:36:15 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 21:36:22 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 21:36:25 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 21:36:26 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 21:36:27 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-12 21:36:27 the integration store /home/usain/gov-os-worktrees/W2-00-store-b is at 06aad947ff4f, not at the head 5fd8b2ac7437, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 21:36:28 seed of head-5fd8b2ac7437-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-b
+2026-11-12 21:37:20 the head without the batch: a throwaway worktree head-5fd8b2ac7437-0 at 5fd8b2ac7437, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 21:37:22 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+2026-11-12 21:37:22 EJECTED W2-121b: red; failing: tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths
+queue run exit 3
+W2-121b: not landed (ejected: red)

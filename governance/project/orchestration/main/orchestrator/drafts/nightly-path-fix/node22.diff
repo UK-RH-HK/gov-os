@@ -1,0 +1,62 @@
+diff --git a/governance/project/orchestration/nightly/nightly_alone.py b/governance/project/orchestration/nightly/nightly_alone.py
+index 177929403..809b01cf8 100644
+--- a/governance/project/orchestration/nightly/nightly_alone.py
++++ b/governance/project/orchestration/nightly/nightly_alone.py
+@@ -18,6 +18,21 @@ clone, out = Path(sys.argv[1]), Path(sys.argv[2])
+ accepted = {e["test"] for e in (yaml.safe_load((clone / "governance/project/path-map.yaml").read_text())
+                                 .get("accepted_reds") or [])}
+ failing = []
++
++
++def node_of(case):
++    """The case's pytest id. Without a `file` attribute (junit_family xunit2), the classname is the module's dotted
++    path followed by any test classes: the longest prefix that is a file in the clone is the module, the rest the
++    classes (a class-based case, e.g. W1-36's TestAuditReproGovCheck, was re-run under a path that does not exist)."""
++    if case.get("file"):
++        return f"{case.get('file')}::{case.get('name')}"
++    parts = case.get("classname", "").split(".")
++    for cut in range(len(parts), 0, -1):
++        if (clone / ("/".join(parts[:cut]) + ".py")).is_file():
++            return "::".join(["/".join(parts[:cut]) + ".py", *parts[cut:], case.get("name")])
++    return f"{'/'.join(parts)}.py::{case.get('name')}"
++
++
+ for name in ("parallel.xml", "serial.xml"):
+     path = out / name
+     if not path.is_file():
+@@ -25,8 +40,7 @@ for name in ("parallel.xml", "serial.xml"):
+         continue
+     for case in ET.parse(path).iter("testcase"):
+         if case.find("failure") is not None or case.find("error") is not None:
+-            file = case.get("file") or (case.get("classname", "").replace(".", "/") + ".py")
+-            failing.append(f"{file}::{case.get('name')}")
++            failing.append(node_of(case))
+ env = {k: v for k, v in os.environ.items() if k not in ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")}
+ env["PYTHONPATH"] = str(clone / "src")
+ reds = flaky = 0
+diff --git a/governance/project/orchestration/nightly/nightly_cron.sh b/governance/project/orchestration/nightly/nightly_cron.sh
+index 668a09adc..dcc9098dc 100644
+--- a/governance/project/orchestration/nightly/nightly_cron.sh
++++ b/governance/project/orchestration/nightly/nightly_cron.sh
+@@ -18,7 +18,7 @@ LOGDIR=$ORCH/log/nightly/cron
+ PING=$HERE/ping_gate.sh
+ export HOME=/home/usain
+ export LANG=C.UTF-8
+-export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
++export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+ mkdir -p "$LOGDIR"
+ exec >> "$LOGDIR/$(date +%F).log" 2>&1
+ echo "== $(date '+%F %T') nightly_cron: start"
+diff --git a/governance/project/orchestration/nightly/nightly_restart.sh b/governance/project/orchestration/nightly/nightly_restart.sh
+index 8ba7a33cb..39e37c617 100644
+--- a/governance/project/orchestration/nightly/nightly_restart.sh
++++ b/governance/project/orchestration/nightly/nightly_restart.sh
+@@ -34,7 +34,7 @@ ORCH=${NR_ORCH:-$REPO/.gov-runtime/scratch/orchestrator}
+ REL=governance/project/orchestration/nightly
+ export HOME=/home/usain
+ export LANG=C.UTF-8
+-export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
++export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+ # cron has neither: the user manager's bus is reached by its path
+ export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+ export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}

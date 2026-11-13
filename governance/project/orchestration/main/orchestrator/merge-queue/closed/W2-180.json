@@ -1,0 +1,12 @@
+{
+ "ticket": "W2-180",
+ "task": "DAEO-weh2",
+ "branch": "w2/W2-180",
+ "commit": "21dc73cb5dc0ea85818dbae82fcbcb02ee91d046",
+ "requested_at": "2026-11-12 08:50:08",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T08:50:08.372401",
+ "merge": "f13387929b27a064b2a7648d05ee264e653313ee",
+ "record": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/f13387929b27.json",
+ "landed_at": "2026-11-12 12:26:25"
+}

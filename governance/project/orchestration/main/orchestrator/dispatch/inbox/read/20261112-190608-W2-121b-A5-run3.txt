@@ -1,0 +1,9 @@
+log: W2-121b-A5-run3.json
+W2: W2-121b
+status: PACKAGES
+
+I stopped before doing any work. The engineer's one-line change can't be made because the ticket doesn't allow writes to `src/gov/resources/config.py`. The branch is unchanged at the verified, reviewed head `4a8634017`. I did not merge w2/integrate, so landing that head as it stands is still possible.
+
+task: DAEO-ifgf
+status: PACKAGES
+work_completed: Resume run 3. Read the checkpoint and the ticket's widened section (DEC-1149 (2)). Before launching the engineer I checked the ticket's paths. The ticket's `allowed_paths` list `src/gov/dispatch/**`, `tests/unit/dispatch/test_w2_121b*`, `src/gov/r

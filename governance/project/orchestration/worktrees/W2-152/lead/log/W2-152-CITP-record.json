@@ -1,0 +1,1 @@
+launch_worker: REFUSED: the launcher's dry run refuses:   File "/home/usain/gov-os-worktrees/W2-152/src/gov/launch/launcher.py", line 256, in _check_ticket     raise _refuse(f"ticket '{ticket_id}' is a ticket of another role ('{ticket.get('role')}'), not of '{role}'") gov.cli.errors.GovError: ticket 'DAEO-o5x1' is a ticket of another role ('engineer'), not of 'product-spec' 

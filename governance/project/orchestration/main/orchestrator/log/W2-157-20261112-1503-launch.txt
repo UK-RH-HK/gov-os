@@ -1,0 +1,96 @@
+2026-11-12 15:03:08 admitted by the dispatcher; launching W2-157
+disk gate open: 788 GiB free, 62516802 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17237733376,
+  "sessions_live_memory_bytes": 1303031808,
+  "load_1m": 3.77,
+  "load_15m": 5.58,
+  "busy_cores_1m": 3.63,
+  "embedding_cpu_p95": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.01
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 845569777664,
+    "free_inodes": 62512901
+  },
+  "sessions": [
+    {
+      "pid": 185366,
+      "repository": "/home/usain/gov-os-worktrees/W2-115",
+      "ticket": "DAEO-emq1",
+      "role": "independent-auditor",
+      "live_memory_bytes": 304373760
+    },
+    {
+      "pid": 246236,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "orchestrator",
+      "live_memory_bytes": 279642112
+    },
+    {
+      "pid": 2477353,
+      "repository": "/home/usain/gov-os-worktrees/W2-115",
+      "ticket": "DAEO-emq1",
+      "role": "orchestrator",
+      "live_memory_bytes": 256839680
+    },
+    {
+      "pid": 818276,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "engineer",
+      "live_memory_bytes": 462176256
+    }
+  ],
+  "cleared": [
+    {
+      "pid": 1038317,
+      "repository": "/home/usain/gov-os-worktrees/W2-121b",
+      "ticket": "DAEO-ifgf",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    },
+    {
+      "pid": 3559402,
+      "repository": "/home/usain/gov-os-worktrees/W2-45",
+      "ticket": "DAEO-neam",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    }
+  ],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "working_size_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1062083,
+    "repository": "/home/usain/gov-os-worktrees/W2-157",
+    "ticket": "DAEO-ozyt",
+    "role": "orchestrator",
+    "started": "2026-11-12T15:03:08+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 8319469
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 15:03:08 gate open; DAEO-ozyt registered as pid 1062083; starting W2-157

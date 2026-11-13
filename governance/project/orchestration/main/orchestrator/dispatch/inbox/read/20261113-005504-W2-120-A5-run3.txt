@@ -1,0 +1,9 @@
+log: W2-120-A5-run3.json
+W2: W2-120
+status: DONE. The verified head to land is 1eec1209bd0a. All 32 acceptance cases pass under `gov accept` and lead_verify is GREEN. STANDARD profile, so there was no review round and there is no probe record.
+
+task: DAEO-i89t (W2-120), run 3 (build)
+status: DONE. The verified head to land is 1eec1209bd0a. All 32 acceptance cases pass under `gov accept` and lead_verify is GREEN. STANDARD profile, so there was no review round and there is no probe record.
+work_completed:
+- **Engineer (eng-1, Sonnet 5.5 high, C2):** built Interface I1 to I4 in `src/gov/check/skill_validator.py` and wrote the unit file `tests/unit/check/test_w2_120_skill_validator.py`, test-first, committed as dd6305c80d6a. That left 31 acceptance cases passing and 1 failing.
+- **The 1 failure was a defect in the test, not the code.** M

@@ -1,0 +1,6 @@
+W2-88a (DAEO-pg6i): merge the acceptance tests (td-1, 9ae9d851fa4b), red on the base
+
+Task: DAEO-pg6i
+Role: orchestrator
+Implements: DEC-1150, DEC-996, DEC-995, DEC-1098, DEC-1130, CAP-33
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

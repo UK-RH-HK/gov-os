@@ -1,0 +1,88 @@
+2026-11-12 16:12:05 admitted by the dispatcher; launching W2-121b
+disk gate open: 785 GiB free, 62295056 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 15803756544,
+  "sessions_live_memory_bytes": 1535324160,
+  "load_1m": 8.39,
+  "load_15m": 18.62,
+  "busy_cores_1m": 6.45,
+  "embedding_cpu_p95": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 842495832064,
+    "free_inodes": 62295056
+  },
+  "sessions": [
+    {
+      "pid": 1062083,
+      "repository": "/home/usain/gov-os-worktrees/W2-157",
+      "ticket": "DAEO-ozyt",
+      "role": "orchestrator",
+      "live_memory_bytes": 296259584
+    },
+    {
+      "pid": 1618001,
+      "repository": "/home/usain/gov-os-worktrees/W2-157",
+      "ticket": "DAEO-ozyt",
+      "role": "engineer",
+      "live_memory_bytes": 349663232
+    },
+    {
+      "pid": 185366,
+      "repository": "/home/usain/gov-os-worktrees/W2-115",
+      "ticket": "DAEO-emq1",
+      "role": "independent-auditor",
+      "live_memory_bytes": 251375616
+    },
+    {
+      "pid": 246236,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "orchestrator",
+      "live_memory_bytes": 385470464
+    },
+    {
+      "pid": 2477353,
+      "repository": "/home/usain/gov-os-worktrees/W2-115",
+      "ticket": "DAEO-emq1",
+      "role": "orchestrator",
+      "live_memory_bytes": 252555264
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "working_size_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 2130060,
+    "repository": "/home/usain/gov-os-worktrees/W2-121b",
+    "ticket": "DAEO-ifgf",
+    "role": "orchestrator",
+    "started": "2026-11-12T16:12:05+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 8692398
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 16:12:05 gate open; DAEO-ifgf registered as pid 2130060; starting W2-121b

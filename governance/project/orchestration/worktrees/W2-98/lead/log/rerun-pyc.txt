@@ -1,0 +1,12 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 00:55:21)
+....................................F.F................................. [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 70%]
+........................................................................ [ 93%]
+..................F.                                                     [100%]
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-98/test_w2_98_copies.py::test_the_claude_copy_matches_the_kernel_source
+FAILED tests/acceptance/W2-98/test_w2_98_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[spec-writing]
+3 failed, 305 passed, 73 deselected in 60.06s (0:01:00)
+exit=1

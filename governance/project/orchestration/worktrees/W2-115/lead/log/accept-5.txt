@@ -1,0 +1,17 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 12:33:38)
+{
+  "ticket": "DAEO-emq1",
+  "outcome": "error",
+  "error_kind": "crash",
+  "lines": [],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  }
+}

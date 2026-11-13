@@ -1,0 +1,185 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+.............s.......................................................... [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+..................sss................................................... [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+...........sss.......................................................... [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+...........................F............................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+.......................................................F................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+............s........................................................... [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+............................................................s........... [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................                                                 [100%]
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/dispatch/test_peaks.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_peaks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_peaks.py:7: in <module>
+    from conftest import GIB
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_returns.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_returns.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_returns.py:7: in <module>
+    from conftest import git
+E   ImportError: cannot import name 'git' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+______________ ERROR collecting tests/unit/dispatch/test_start.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_start.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_start.py:9: in <module>
+    from conftest import GIB, REPO, git
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_status.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_status.py:12: in <module>
+    from conftest import REPO, GIB
+E   ImportError: cannot import name 'REPO' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+=================================== FAILURES ===================================
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/pytest-of-usain/pytest-746/popen-gw0/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+__________ test_f4_the_branch_changes_only_the_tickets_allowed_paths ___________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-746/popen-gw1/test_f4_the_branch_changes_onl0')
+
+    def test_f4_the_branch_changes_only_the_tickets_allowed_paths(tmp_path):
+        """``git diff --name-only <merge-base with w2/integrate>...HEAD`` lists only paths matched by the ticket's
+        ``allowed_paths`` or under ``tests/acceptance/W2-157/``. It is green only when the branch is clean: a change to
+        any other path (a ticket file, another module, a test of another ticket) makes it fail, and it fails, naming the
+        gap, where ``w2/integrate`` does not resolve."""
+        env = {"PATH": support.SAFE_PATH, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": "/dev/null", "LC_ALL": "C",
+               "HOME": str(tmp_path)}
+    
+        def git(*args):
+            return subprocess.run(["git", "-C", str(ROOT), *args], env=env, capture_output=True, text=True, timeout=60)
+    
+        base = git("merge-base", "HEAD", "w2/integrate")
+        assert base.returncode == 0 and base.stdout.strip(), f"w2/integrate does not resolve: {base.stderr}"
+        diff = git("diff", "--name-only", f"{base.stdout.strip()}...HEAD")
+        assert diff.returncode == 0, f"git diff failed: {diff.stderr}"
+        patterns = allowed_paths()
+        assert patterns, f"no allowed_paths read from {TICKET}"
+        outside = [path for path in diff.stdout.splitlines()
+                   if not path.startswith(ACCEPTANCE) and not any(fnmatch.fnmatch(path, pattern) for pattern in patterns)]
+>       assert not outside, f"changed paths not matched by the ticket's allowed_paths {patterns}: {outside}"
+E       AssertionError: changed paths not matched by the ticket's allowed_paths ['src/gov/resources/backstop.py', 'src/gov/resources/command.py', 'src/gov/resources/config.py', 'tests/unit/resources/test_w2_157*', 'docs/changes/W2-157-evidence.md', 'docs/probes/DAEO-ozyt/**']: ['docs/probes/DAEO-ifgf/PR-DAEO-ifgf-round-2.md', 'docs/probes/DAEO-ifgf/PR-DAEO-ifgf.md', 'src/gov/dispatch/config.py', 'src/gov/dispatch/heavy.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/procs.py', 'src/gov/dispatch/run.py', 'src/gov/dispatch/state.py', 'src/gov/dispatch/status.py', 'src/gov/resources/slots.py', 'tests/acceptance/W2-121b/README.md', 'tests/acceptance/W2-121b/conftest.py', 'tests/acceptance/W2-121b/test_b_s1_landing_batch.py', 'tests/acceptance/W2-121b/test_b_s2_closes.py', 'tests/acceptance/W2-121b/test_b_s3_nightly_hold.py', 'tests/acceptance/W2-121b/test_b_s4_heavy_steps.py', 'tests/acceptance/W2-121b/w2_121b_support.py', 'tests/unit/dispatch/test_w2_121b_config_default.py', 'tests/unit/dispatch/test_w2_121b_landing.py']
+E       assert not ['docs/probes/DAEO-ifgf/PR-DAEO-ifgf-round-2.md', 'docs/probes/DAEO-ifgf/PR-DAEO-ifgf.md', 'src/gov/dispatch/config.py', 'src/gov/dispatch/heavy.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/procs.py', ...]
+
+tests/acceptance/W2-157/test_w2_157_nothing_else.py:116: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3473177) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W2-20/test_w2_20_measured.py:183: S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+2 failed, 5269 passed, 9 skipped, 6 warnings, 4 errors in 811.67s (0:13:31)

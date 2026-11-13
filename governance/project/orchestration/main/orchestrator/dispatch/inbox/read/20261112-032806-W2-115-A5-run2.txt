@@ -1,0 +1,8 @@
+log: W2-115-A5-run2.json
+W2: W2-115
+status: PACKAGES. The smart close is built, and its acceptance suite passes at 048abe062626 (`gov accept`: 77 passed, 0 failed). The lead's scoped verify is still red, though. Two of its reds come from outputs this ticket must produce, and they clash with closed specs outside its allowed paths (PK-1, PK-2).
+
+task: DAEO-emq1 (W2-115), lead, run 2 (build): `gov close`, the smart close
+status: PACKAGES. The smart close is built, and its acceptance suite passes at 048abe062626 (`gov accept`: 77 passed, 0 failed). The lead's scoped verify is still red, though. Two of its reds come from outputs this ticket must produce, and they clash with closed specs outside its allowed paths (PK-1, PK-2). The FULL review was not started because the night hold began at 03:00.
+work_completed:
+- Merged w2/integrate (f4f9c3204). Rebuilt the store. Built the worker contexts: `gov context` refused at its 6000-token ceiling

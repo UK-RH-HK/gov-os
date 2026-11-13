@@ -1,0 +1,10 @@
+log: W2-171-A5-run2.json
+W2: W2-171
+status: PACKAGES. One package, PKG-W2-171-F5-1. Verify 2 at c103e26bea80 is RED by 7 of 4249: the 6 shared W2-96 signal reds (P-W2-121-5) and W2-170's F5 path test. That F5 test is red only because it judges this branch against W2-170's paths. Every W2-171 case is green.
+
+I've verified the build except for one red I can't fix in my paths and that isn't in skip_known.json, so this run returns PACKAGES with one question for the CTO.
+
+task: DAEO-k1e2 (W2-171), ticket lead, run 2 (build)
+status: PACKAGES. One package, PKG-W2-171-F5-1. Verify 2 at c103e26bea80 is RED by 7 of 4249: the 6 shared W2-96 signal reds (P-W2-121-5) and W2-170's F5 path test. That F5 test is red only because it judges this branch against W2-170's paths. Every W2-171 case is green.
+work_completed:
+- Merged w2/integrate twice: 8d87ac134 (brings in the ticket's Interface, 00a9e4ed9), then 87724

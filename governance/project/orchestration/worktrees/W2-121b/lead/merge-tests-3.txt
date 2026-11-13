@@ -1,0 +1,9 @@
+W2-121b (DAEO-ifgf): merge the S2 wrapper-close cases (td-3, 7143cabd7)
+
+Review round 1's RV1 as described behaviour: a close under a shell wrapper blocks the landing of its ticket
+(bash/sh x W2 id/ticket id, 4 cases, red on ab5799760).
+
+Task: DAEO-ifgf
+Role: orchestrator
+Implements: DEC-1014
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-115
+status: interim result ea6dc2c14: W2-115 (DAEO-emq1): probe record notes run 5's accepted fix riding a resume (P1-K (a), DEC-802; no round 3)

@@ -1,0 +1,2 @@
+# root|path|before sha256|after sha256
+home|.gov-os/machine/gate.json|9a705321b7921758ff35e2f78a2133b482f329a4a38a82df108e4506b6db4547|dc1a1368fec937e0f4d21285aeb7e4f727ee1fe7df3b1aa7f9ec88ce8c0bee27

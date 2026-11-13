@@ -1,0 +1,46 @@
+{
+  "ticket": "DAEO-ifgf",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 10,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 11,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 13,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 14,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 0,
+    "failed": 48,
+    "skipped": 0
+  }
+}
+exit=3

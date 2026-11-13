@@ -1,0 +1,1 @@
+TESTS-READY W2-157 (DAEO-ozyt): merge commit 15db0ce13 (w2/W2-157-tests 196c43ee6f66, td-1); tests/acceptance/W2-157/, 109 cases; gov accept W2-157 red before the code: 108 failed, 1 passed (failure-4), rc 3 (.gov-runtime/scratch/lead/accept-red.txt). 2026-11-12.

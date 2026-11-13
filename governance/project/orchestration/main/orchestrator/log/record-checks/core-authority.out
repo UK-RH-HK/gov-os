@@ -3,8 +3,27 @@
     "code": "FRONTMATTER_UNREADABLE",
     "ids": [],
     "paths": [
-      "governance/project/orchestration/packages/P1-W2-11-BRIEFS.md"
+      "governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md"
     ],
-    "message": "governance/project/orchestration/packages/P1-W2-11-BRIEFS.md: the frontmatter is not valid YAML: mapping values are not allowed here in \"<unicode string>\", line 1, column 27: status: ANSWERED (DEC-1137: (c) and the small ticket) ^"
+    "message": "governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here in \"<unicode string>\", line 5, column 122: ... ard refused creating that folder: \"a reviewer or auditor writes ... ^"
+  },
+  {
+    "code": "FRONTMATTER_UNREADABLE",
+    "ids": [],
+    "paths": [
+      "governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md"
+    ],
+    "message": "governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not allowed here in \"<unicode string>\", line 5, column 59: ... T-1 (class (b)); the owner's yes: \"The 04:00 nightly: (a), start ... ^"
+  },
+  {
+    "code": "GATE_NOT_AUTHORISING",
+    "ids": [
+      "W2-176-CIT-P",
+      "owner, 2026-11-12, \"W2-176's CIT-P approved at 3b6c5cb79d39\" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242; the earlier approval of 3a580a4b4d42 (the 200,000 cap) withdrawn (DEC-1141 (2)); merged by hand at 3430341c4 (DEC-1141 (4))"
+    ],
+    "paths": [
+      "docs/changes/W2-176-CIT-P.md"
+    ],
+    "message": "W2-176-CIT-P cites owner, 2026-11-12, \"W2-176's CIT-P approved at 3b6c5cb79d39\" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242; the earlier approval of 3a580a4b4d42 (the 200,000 cap) withdrawn (DEC-1141 (2)); merged by hand at 3430341c4 (DEC-1141 (4)), which is no accepted gate of its CIT"
   }
 ]

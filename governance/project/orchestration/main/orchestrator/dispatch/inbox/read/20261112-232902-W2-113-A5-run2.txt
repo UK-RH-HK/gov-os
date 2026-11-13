@@ -1,0 +1,7 @@
+log: W2-113-A5-run2.json
+W2: W2-113
+status: DONE. The acceptance tests are merged into w2/W2-113 at 91e9d55f6950 and are red for the reasons stated. One package (PKG-3) has to be answered before the build run starts.
+
+task: DAEO-g29a (W2-113), run 2, run kind tests
+status: DONE. The acceptance tests are merged into w2/W2-113 at 91e9d55f6950 and are red for the reasons stated. One package (PKG-3) has to be answered before the build run starts.
+work_completed: I merged w2/integrate into the branch. It was a fast-forward to 4d2773584a8f and brings in 7d8c2d524, DEC-1156. I read the ticket again; I1-I3 are stated, so the interface check passed. I made the tests worktree and built td-1's brief with `gov context --budget 9000`, because the default ceiling refused the packet. The test designer (Sonnet 5.5, high, C

@@ -1,0 +1,235 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+.......F................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+......................F................................................. [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+............................s........................................... [ 51%]
+.............................................................ss......... [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+.............................................sss........................ [ 84%]
+........................................................................ [ 86%]
+............................F........................................... [ 87%]
+........................................................................ [ 89%]
+.....................F..F............................................... [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+..............................................                           [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_UNKNOWN_TYPE', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'", 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_UNKNOWN_TYPE', 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'"}]
+E       assert [{'code': 'SC...type': 'bug'}] == []
+E         
+E         Left contains one more item: {'code': 'SCHEMA_UNKNOWN_TYPE', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'", 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+__________ test_an_interrupted_run_stops_its_child_and_leaves_nothing __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-177/pytest-of-usain/pytest-0/popen-gw2/test_an_interrupted_run_stops_0')
+
+    def test_an_interrupted_run_stops_its_child_and_leaves_nothing(tmp_path):
+        """SIGINT to gov alone, while a planted test sleeps: the child is stopped, nothing is left, nothing shown."""
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+>           run = started.interrupt()
+                  ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:1523: in interrupt
+    return self.send(signal.SIGINT, wait_s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-96/w2_96_support.py:1528: in send
+    return self.finish(wait_s, f"signal {int(signum)}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x74e20f6d1be0>, wait_s = 60.0
+after = 'signal 2'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signal 2
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+_ test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends[a-second-press-once-the-removal-began] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-177/pytest-of-usain/pytest-0/popen-gw2/test_r9_a_ctrl_c_during_the_cl0')
+presses = 'a-second-press-once-the-removal-began'
+
+    @pytest.mark.parametrize("presses", list(CLEAN_UP_PRESSES))
+    def test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends(tmp_path, presses):
+        """A planted test leaves 20,000 files in its temporary folder, then sleeps. SIGINT to gov alone ends the run;
+        further presses (SIGINT, or SIGTERM, SIGHUP and SIGINT in turn) arrive during the clean-up, the revised form's
+        second once the planted files begin to disappear. When gov ends, the given TMPDIR is empty, no marker
+        anywhere, the child gone, and the exit code is 130."""
+        files = support.second_file("many_sleep", "test_qzv96leak_many", extra=support.MANY)
+        project = support.Project(tmp_path, files, support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+            schedule = CLEAN_UP_PRESSES[presses]
+            if any(delay == ON_REMOVAL for delay, _ in schedule):
+>               run = _press_on_removal(started, schedule, sleeping)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:193: in _press_on_removal
+    run = started.finish(60.0, f"signals {sent}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x74e20db5b0b0>, wait_s = 60.0
+after = 'signals [2, 2]'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signals [2, 2]
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+_ test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal[SIGINT] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-177/pytest-of-usain/pytest-0/popen-gw2/test_r12_a_signal_that_ends_th0')
+case = 'SIGINT'
+
+    @pytest.mark.parametrize("case", list(EXIT_AFTER))
+    def test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal(tmp_path, case):
+        """SIGTERM twice a few milliseconds apart, SIGHUP the same, or one SIGINT, while the child runs: the return
+        code is 143, 129 or 130, never a negative one; the given TMPDIR is empty and the child and grandchild gone."""
+        schedule, expected = EXIT_AFTER[case]
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+>           run = started.send_all(schedule)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:1541: in send_all
+    run = self.finish(wait_s, f"signals {sent}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x74e20dbba630>, wait_s = 60.0
+after = 'signals [2]'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signals [2]
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+__ test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored __
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-177/pytest-of-usain/pytest-0/popen-gw2/test_premise_r11_a_process_sta0')
+
+    def test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored(tmp_path):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README)
+        script = ("import signal, sys; sys.stdout.write(' '.join(str(int(signal.getsignal(s) == signal.SIG_IGN)) "
+                  "for s in (signal.SIGHUP, signal.SIGINT, signal.SIGTERM)))")
+        for signum, expected in ((HUP, "1 0 0"), (INT, "0 1 0"), (TERM, "0 0 1")):
+            tmpdir = tmp_path / f"premise-tmp-{int(signum)}"
+            tmpdir.mkdir()
+            process = project._popen([sys.executable, "-c", script], project.root, tmpdir, ignore=(signum,))
+            stdout, stderr = process.communicate(timeout=60)
+>           assert (process.returncode, stdout) == (0, expected), f"signal {int(signum)}: {stdout!r} {stderr[-2000:]}"
+E           AssertionError: signal 1: '1 1 0' 
+E           assert (0, '1 1 0') == (0, '1 0 0')
+E             
+E             At index 1 diff: '1 1 0' != '1 0 0'
+E             Use -v to get more diff
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:384: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-177/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2677492) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+5 failed, 3923 passed, 6 skipped, 6 warnings in 670.66s (0:11:10)

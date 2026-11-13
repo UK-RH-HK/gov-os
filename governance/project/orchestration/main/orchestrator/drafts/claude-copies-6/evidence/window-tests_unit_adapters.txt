@@ -1,0 +1,42 @@
+........................................................................ [ 70%]
+..........F.........F.........                                           [100%]
+=================================== FAILURES ===================================
+________________ test_the_twelve_sources_are_the_composition[] _________________
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: engineer
+E           assert '---\nname: e...other host.\n' == '---\nname: e...other host.\n'
+E             
+E             Skipping 2607 identical leading characters in diff, use -v to show
+E               neer.
+E             - - **Version:** 1.1.0
+E             - - **Launch default:** model claude-sonnet-5-5, effort high
+E             - - **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
+E             - - **Skills:** test-driven-development, systematic-debugging, verification-before-completion, retrieval...
+E             
+E             ...Full output truncated (25 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...eer.md'}, ...] == []
+E         
+E         Left contains 9 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2 failed, 100 passed, 40 deselected in 3.84s
+heavy_slot: all 3 slots taken; waiting (2026-11-13 01:15:31)

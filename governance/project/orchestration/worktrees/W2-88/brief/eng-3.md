@@ -1,0 +1,50 @@
+Step 0, before any work: the sandbox check in /home/usain/gov-os-worktrees/W2-88/.gov-runtime/scratch/brief/EMG-d4b-launched.md, reported first in your return (launch_worker.sh).
+
+You are a fresh Engineer. Ticket: DAEO-2bdu (W2-88, "Memory for any repository"), profile FULL, class C2, run 4. Your predecessor (eng-2) fixed review round 1's findings and package P-W2-88-B-1; the acceptance suite is at 198 passed. Your job is **one narrow fix, L-1** (below), then proof (a) again. You work only in the ticket's worktree `/home/usain/gov-os-worktrees/W2-88` (branch `w2/W2-88`, head 89576e801a02 at your start). You never read the acceptance tests.
+
+Your budget: about 1 hour (est. 40 LOC with your unit tests). Commit in two batches (the fix; then the evidence).
+
+## Step 0, before any work (report it first in your return)
+The sandbox check in the launcher's step-0 file beside this brief. Then `printenv GOV_ROLE GOV_TICKET` (expect `engineer`, `DAEO-2bdu`) and `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-88`, `w2/W2-88`). If anything differs, stop and say so.
+
+## Your allowed paths (write only these)
+src/gov/adopt/assess.py, src/gov/adopt/refactor_plan.py, src/gov/adopt/fabric.py, src/gov/adopt/command.py, src/gov/adopt/project.py, src/gov/adopt/stages.py, src/gov/adopt/memory_sets.py, src/gov/rebuild/command.py, src/gov/store/layout.py, src/gov/store/loader.py, docs/changes/W2-88-evidence.md, tests/unit/adopt/test_w2_88*, tests/unit/rebuild/test_w2_88*. A change you need outside these paths: do not make it; return it as a package.
+
+## What you read
+- The ticket file `/home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-2bdu.md` (S1, S2, `## Interface`), the interface below (from `/home/usain/gov-os-worktrees/W2-88/.gov-runtime/scratch/lead/briefs/run4b-interface.md`), `src/gov/adopt/assess.py`, `src/gov/adopt/refactor_plan.py`, `src/gov/retrieval/chunking.py`, and `docs/changes/W2-88-evidence.md`.
+- **Never read `tests/acceptance/W2-88/`** (the counterpart's work, DEC-820); you may run it through `gov accept` and see its results. Never open the evaluation sets' root or any hidden or memory-verdict folder. Search with the Read and Grep tools only (no `gov retrieve`, DEC-1065); search again once in your own, different words, then answer from both or say "not found".
+
+## The interface for run 4's last fix, L-1 (binding; stated by the lead, DEC-1052; the lead's own finding from proof (a) with the real embedder)
+
+**The finding.** On W2-81's legacy-documents repository (two tracked binary files of 48 MiB each), the assessment lists both files only under `binary` and leaves them out of `no_route` and out of the time estimate (`estimate.index_seconds` 17 s), so the plan writes `NOTHING-TO-REFACTOR.md`. But the keyword index chunks a binary's bytes as text (94,222 chunks), A9 lists them indexed (`binary_held`, RV1-4, decided), and the real embedder had not finished those chunks after 3,720 s. The assessment and the plan must say what the stores will take (S1's estimated index time; S2's "files over the chunker's limit" blocker).
+
+- **L-1a (S1, S2).** A tracked file (not a link) whose size is over `assess.FILE_LIMIT_BYTES` (1,048,576) is in the assessment's `no_route` as `{path, reason: "over-limit"}` whether it is text or binary; a binary over the limit is listed both in `binary` and in `no_route`. The plan then proposes its `over-limit` ticket for it, exactly as for a text file over the limit (so a repository whose only finding is such a binary gets no `NOTHING-TO-REFACTOR.md`). A binary at or under the limit stays only in `binary` (no proposal, as today). A text file with a line over `LINE_LIMIT` stays `over-limit` as today.
+- **L-1b (S1).** The estimate counts the chunks the keyword index will make, binaries included: the assessment gains `estimate.chunks` = the sum over tracked files (not links) of `ceil(size / (gov.retrieval.chunking.MAX_CHARS - gov.retrieval.chunking.OVERLAP_CHARS))` (1,080 characters a chunk); and `estimate.index_seconds = round(estimate.chunks * assess.EMBED_S_PER_CHUNK + code_files * assess.GRAPH_S_PER_FILE)`, with `assess.EMBED_S_PER_CHUNK = 0.04` (its source stated beside it: legacy-docs' 94,222 chunks unfinished after 3,720 s with the real embedder, a lower bound, 2026-11-13, the lead's proof run; also consistent with the ticket's 2,521 files in 7 to 45 min). `EMBED_S_PER_FILE` is no longer used for the estimate. `estimate.disk_bytes` and the peak-RSS estimate are unchanged.
+- **Plant:** MA on a planted repository with one tracked binary of 2 MiB (e.g. `assets/big.bin`, a NUL byte in its first 8,000 bytes) and nothing else to refactor: the binary is in `binary` and in `no_route` with `over-limit`; the plan holds one `over-limit` proposal naming it and no `NOTHING-TO-REFACTOR.md`; a binary of 4 KiB in an otherwise identical repository: only in `binary`, no proposal. Two repositories alike but for that binary's size (2 MiB vs 4 KiB): the first's `estimate.chunks` is at least `2 * 1048576 / 1200` larger than the second's and its `estimate.index_seconds` is larger.
+
+## The work
+1. **The fix** (one commit, unit tests first in `tests/unit/adopt/test_w2_88_run4.py` or a new `tests/unit/adopt/test_w2_88_l1.py`): L-1a and L-1b exactly as stated. Update `assess.py`'s module text where it states the no-route rule and the estimate.
+2. **The evidence** (one commit): in `docs/changes/W2-88-evidence.md`, add L-1 to the seams' item 8 (the rule, `estimate.chunks`, `EMBED_S_PER_CHUNK` and its source); then re-run proof (a) with the stand-in exactly as your predecessor did (`/home/usain/gov-os-runs/W2-88/proof_a.py`, output under `~/gov-os-runs/W2-88/proving-ground/`, one process per repository; `render_evidence.py` if it serves) and rewrite proof (a)'s figures from that run: legacy-docs should now show the two large binaries under no route (`over-limit`), one `over-limit` proposal, and an estimate in the order of the chunks. Do not touch the section heading the lead will add, `## Proof (a) with the real embedder (the lead's run outside the sandbox)`, if it exists; leave room for it after proof (a)'s stand-in section. If the sandbox refuses a write under `~/gov-os-runs/W2-88/`, stop that part, say so (one refusal of the form; never a second).
+
+## How to run (every pytest through the heavy slot)
+`mkdir -p /home/usain/gov-os-worktrees/W2-88/.gov-runtime/scratch/empty-home`; use a subfolder of the sandbox's own `$TMPDIR` as `TMPDIR` (`/tmp` is read-only in the sandbox). From `/home/usain/gov-os-worktrees/W2-88`:
+- unit tests: `env HOME=/home/usain/gov-os-worktrees/W2-88/.gov-runtime/scratch/empty-home PYTHONUSERBASE=/home/usain/.local PYTHONPATH=/home/usain/gov-os-worktrees/W2-88/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest tests/unit/adopt tests/unit/rebuild tests/unit/store -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"`
+- the acceptance suite, results only: `env PYTHONUSERBASE=/home/usain/.local PYTHONPATH=/home/usain/gov-os-worktrees/W2-88/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh gov accept W2-88 --root /home/usain/gov-os-worktrees/W2-88` (the lead merges the test designer's L-1 cases between your batches; keep `git status` clean between batches).
+- A resource gate's refusal is a wait (DEC-1146). Never `-x`.
+
+## Machine, commands, commits
+- 3 GB and 150,000 files outside the tracked tree; clean up temp trees; no clone or copy of this repository. Measure your scratch before you return (`du -s --inodes`, `du -sh`).
+- Write files with the Write and Edit tools and absolute paths. No shell variable as a write target; no here-document, no backticks, no `bash -c '…'`; no long inline `python3 -c` with braces; anything longer goes in a script under `/home/usain/gov-os-worktrees/W2-88/.gov-runtime/scratch/eng/`, written with the Write tool. **Refused twice for the same call: stop and say so** (DEC-1142 (9)). On an authentication error, return `AUTH_REQUIRED`.
+- Before each commit, check `/home/usain/Dynamic-Agentic-Engineering-OS/.git/hooks` holds no `pre-commit` file. Never `--no-verify`, `core.hooksPath`, amend, rebase, reset, merge or push.
+- `git commit -m "<subject>" --trailer "Task: DAEO-2bdu" --trailer "Role: engineer" --trailer "Implements: DEC-954, DEC-078, CAP-44.b, CAP-44.g" --trailer "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" -- <your paths>`. DEC-1052 goes in `discoveries`, not `Implements:`.
+
+## Never
+Never run `gov close`, `gov pause`, `gov rebuild` or `gov adopt` against this worktree, the main tree or any real repository (under `~/gov-os-runs/W2-88/proving-ground/` it is the work); never touch `~/gov-os-workbench/examin/`; never ask or notify the owner; install nothing; never write `.gov-runtime/**` outside `.gov-runtime/scratch/**`; never write a ticket file, the register, a plan file or a kernel file.
+
+## Return
+One message, your last. The twelve fields first, each a labelled line; then: L-1a and L-1b and where each is built (path:line), your unit tests' counts, `gov accept`'s counts and any red line with the reason you see, proof (a)'s legacy-docs figures (no route, proposals, estimate), the sandbox check, read refusals met, scratch figures, your commits (12-digit hashes and subjects).
+
+```
+task: / status: (DONE | PACKAGES | ESCALATION | ESCALATION_BLOCKED | LAUNCH_BLOCKED | AUTH_REQUIRED, with one line why) / work_completed: / files_changed: / evidence: / tests: / discoveries: / risks: / lessons: / proposed_decisions: / unresolved: / recommended_next_action:
+```
+Refused twice for the same call: stop and say so.

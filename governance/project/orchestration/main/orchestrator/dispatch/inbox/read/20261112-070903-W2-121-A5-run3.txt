@@ -1,0 +1,11 @@
+log: W2-121-A5-run3.json
+W2: W2-121
+status: DONE. The head to land is `f45614f15619` (f45614f1561959496f51e06e122351843af06663). `git status --short` is empty.
+
+task: DAEO-cb2b (W2-121 part a), run 3, the fix run (P-W2-121-7 (a))
+status: DONE. The head to land is `f45614f15619` (f45614f1561959496f51e06e122351843af06663). `git status --short` is empty.
+work_completed:
+- (1) Merged w2/integrate (4500e87e4) into w2/W2-121 as c6ca85d07.
+- (2) Test-design batch td-2 (Sonnet, high, C2) wrote F-1 to F-5 as behaviours (5045148c8, db682531d). They are merged as 696d32a93, and TESTS-READY names it.
+- (3) Engineer eng-3 (Sonnet, high, C2) fixed F-1 to F-4 and F-6 (2f7ecb2a2).
+- One acceptance case was still red: an item planted by hand, once deleted, was written

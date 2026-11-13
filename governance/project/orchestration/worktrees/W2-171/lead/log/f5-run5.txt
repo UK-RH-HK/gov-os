@@ -1,0 +1,22 @@
+90424b3f6c6f
+heavy_slot: all 3 slots taken; waiting (2026-11-12 12:49:41)
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /home/usain/gov-os-worktrees/W2-171
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.13.0, xdist-3.8.0, timeout-2.4.0, testmon-2.2.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tests/acceptance/W2-171/test_w2_171_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows PASSED [ 12%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows SKIPPED [ 25%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_the_planted_paths_are_outside_and_inside_the_ticket_s_paths PASSED [ 37%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_planted_w2_170_branch_with_a_change_outside_its_paths_fails PASSED [ 50%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_planted_w2_170_branch_with_a_change_inside_its_paths_passes PASSED [ 62%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_planted_other_ticket_branch_with_the_same_change_is_skipped_with_its_reason PASSED [ 75%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_planted_candidate_merge_on_a_detached_head_is_skipped_with_its_reason PASSED [ 87%]
+tests/acceptance/W2-170/test_w2_170_f5_paths.py::test_f5_planted_integrate_branch_itself_is_skipped_with_its_reason PASSED [100%]
+
+- generated xml file: /home/usain/gov-os-worktrees/W2-171/.gov-runtime/scratch/lead/log/f5-run5.xml -
+========================= 7 passed, 1 skipped in 0.34s =========================
+exit=0

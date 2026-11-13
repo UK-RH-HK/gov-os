@@ -1,0 +1,7 @@
+log: W2-33-A5-run3.json
+W2: W2-33
+status: DONE. Head to land: `d2aaff358a91`. It was verified at `1221ee0e4feb`; the one commit after it adds only records (the probe record, and a reworded count in the CIT-P).
+
+task: DAEO-lrre (W2-33), run 3, build
+status: DONE. Head to land: `d2aaff358a91`. It was verified at `1221ee0e4feb`; the one commit after it adds only records (the probe record, and a reworded count in the CIT-P).
+work_completed: The ticket's own acceptance tests pass, 96/96. The full suite has 47 reds, all named below; 46 of them clear only when the copies ACT runs. The kernel roles folder now holds nine role files: the six existing ones plus `ticket-lead.md`, `qa-engineer.md` and `senior-engineer.md`. There is no `independent-reviewer.md`. Each file carries the Interface's lines word for wor

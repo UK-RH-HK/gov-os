@@ -1,0 +1,8 @@
+log: W2-111-A5-run1.json
+W2: W2-111
+status: DONE. The tests are merged on w2/W2-111 at `8b8b561fc426` and TESTS-READY is written. The quiet-machine run and the load-50 run (S2/F3) are still pending: they are the CTO's benchmark. `gov accept` refuses with ACCEPT_NO_TESTS (see risks).
+
+task: DAEO-qvff (W2-111), run 1, kind tests, profile LITE
+status: DONE. The tests are merged on w2/W2-111 at `8b8b561fc426` and TESTS-READY is written. The quiet-machine run and the load-50 run (S2/F3) are still pending: they are the CTO's benchmark. `gov accept` refuses with ACCEPT_NO_TESTS (see risks).
+work_completed:
+- Interface check (DEC-1052): the ticket allows two measures. I chose the CPU-time form: the user and system time of the hook and its children, taken from the `RUSAGE_CHILDREN` difference around each synchronous call. It counts the hook, its forked decision process and the git 

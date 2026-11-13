@@ -1,0 +1,58 @@
+{
+ "act": "ACT-CLAUDE-COPIES-7",
+ "dec": "DEC-315, DEC-1112 (3), DEC-1156 (3), CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/spec-writing/SKILL.md",
+   "before": null,
+   "after": "6b81479132379c32ab6b6419dea65492250da231fbbbee4b911a22c516a0955c"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/spec-writing/check_spec.py",
+   "before": null,
+   "after": "b18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/spec-writing/imports.yaml",
+   "before": null,
+   "after": "3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/spec-writing/spec-form.md",
+   "before": null,
+   "after": "9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f"
+  }
+ ],
+ "files": {
+  "after/repo/.claude/skills/spec-writing/SKILL.md": "6b81479132379c32ab6b6419dea65492250da231fbbbee4b911a22c516a0955c",
+  "after/repo/.claude/skills/spec-writing/check_spec.py": "b18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310",
+  "after/repo/.claude/skills/spec-writing/imports.yaml": "3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff",
+  "after/repo/.claude/skills/spec-writing/spec-form.md": "9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f",
+  "list.txt": "91269f5686db56038b4d15f1951b139eeac75e5ed4eb009148ad04737f27292b",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "c20b94369c6232a70ccebdf02e0fbaf4bcf51a169f61e124d7b770508423bbb8"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "c20b94369c6232a70ccebdf02e0fbaf4bcf51a169f61e124d7b770508423bbb8"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n6b81479132379c32ab6b6419dea65492250da231fbbbee4b911a22c516a0955c  .claude/skills/spec-writing/SKILL.md\nb18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310  .claude/skills/spec-writing/check_spec.py\n3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff  .claude/skills/spec-writing/imports.yaml\n9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f  .claude/skills/spec-writing/spec-form.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d  .rulesync/skills/spec-writing/SKILL.md\nb18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310  .rulesync/skills/spec-writing/check_spec.py\n3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff  .rulesync/skills/spec-writing/imports.yaml\n9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f  .rulesync/skills/spec-writing/spec-form.md\n34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d  template/.rulesync/skills/spec-writing/SKILL.md\nb18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310  template/.rulesync/skills/spec-writing/check_spec.py\n3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff  template/.rulesync/skills/spec-writing/imports.yaml\n9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f  template/.rulesync/skills/spec-writing/spec-form.md\n34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d  template/governance/kernel/skills/spec-writing/SKILL.md\nb18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310  template/governance/kernel/skills/spec-writing/check_spec.py\n3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff  template/governance/kernel/skills/spec-writing/imports.yaml\n9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f  template/governance/kernel/skills/spec-writing/spec-form.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

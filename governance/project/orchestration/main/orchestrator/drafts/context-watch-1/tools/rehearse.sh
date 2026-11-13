@@ -1,6 +1,6 @@
 #!/bin/bash
 # ACT-CONTEXT-WATCH-1's rehearsal, as the operator will run it: a --no-hardlinks clone of w2/integrate (the main tree's head),
-# W2-176 merged in the clone only (git merge --no-ff --no-edit 3a580a4b4d42), a planted HOME, the clean environment of the
+# W2-176 merged in the clone only (git merge --no-ff --no-edit 3b6c5cb79d39), a planted HOME, the clean environment of the
 # operator's dry run (PATH, LANG, TMPDIR, HOME planted, PYTHONDONTWRITEBYTECODE; nothing GOV_*), every manifest check run
 # EXACTLY as written with `bash -c` from the clone, the plain apply (no option). The pytest runs go one folder at a time
 # through the heavy-slot gate with the user's own HOME (the planted one hides the user-site pytest) and are parsed from
@@ -17,9 +17,9 @@ PH=$D/tmp/home
 ACT=$ORCH/acts/ACT-CONTEXT-WATCH-1
 LOG=$D/rehearsal.log
 HEAVY=$ORCH/tools/heavy_slot.sh
-W2176=3a580a4b4d42
+W2176=3b6c5cb79d39
 HOOK=template/governance/kernel/hooks/context_watch.py
-HOOK_SHA=c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c
+HOOK_SHA=213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242
 RELS=(.claude/settings.json .rulesync/hooks.jsonc)
 mkdir -p "$D/tmp"
 : > "$LOG"
@@ -141,7 +141,7 @@ echo "--- F. every manifest check exactly as written, then portability"
 run_check 0 0 -
 run_check 1 0 6
 run_check 2 0 -
-run_check 3 0 7
+run_check 3 0 8
 run_check 4 0 -
 portab "F1 adapter-portability after the apply: no findings (settings.json is what rulesync generates from the source)" 0
 cp -p "$CL/.rulesync/hooks.jsonc" "$D/tmp/hooks.jsonc.keep"
@@ -154,7 +154,7 @@ portab "F2 the all-tools form (matcher \"*\") in the source is a finding: HOOKS_
 cp -p "$D/tmp/hooks.jsonc.keep" "$CL/.rulesync/hooks.jsonc"
 cmp -s "$CL/.rulesync/hooks.jsonc" "$ACT/after/repo/.rulesync/hooks.jsonc" && ok "F3 the source is the frozen after again" || bad "F3 the source differs"
 
-echo "--- G. the registered command, run on planted PostToolUse events (a worker at 90 % of a 200,000 window)"
+echo "--- G. the registered command, run on planted PostToolUse events (a worker at 90 % of its model's 1,000,000 window; no cap)"
 REGCMD=$(cd "$CL" && python3 -I -c "import json; print(json.load(open('.claude/settings.json'))['hooks']['PostToolUse'][0]['hooks'][0]['command'])")
 [ "$REGCMD" = "$AFTER_CMD" ] && ok "G0 the command in the applied settings is the frozen one" || bad "G0 command differs"
 PR=$D/tmp/g-proj; rm -rf "${PR:?}"; mkdir -p "$PR"; ln -s "$CL/template" "$PR/template"  # a planted project: the clone's hook by its template path, its own state folder
@@ -163,7 +163,7 @@ import json,sys
 tokens=int(sys.argv[1]); line={'type':'assistant','message':{'model':'claude-opus-5-5','usage':{'input_tokens':1,'cache_creation_input_tokens':0,'cache_read_input_tokens':tokens-1}}}
 open(sys.argv[2],'w').write(json.dumps({'type':'user','message':{'content':'x'}})+'\n'+json.dumps(line)+'\n')" "$1" "$2"; }
 ev() { printf '%s' "{\"hook_event_name\":\"PostToolUse\",\"session_id\":\"g1\",\"transcript_path\":\"$1\",\"cwd\":\"$PR\",\"tool_name\":\"Bash\"}"; }
-mk 180000 "$D/tmp/g-t90.jsonl"; mk 80000 "$D/tmp/g-t40.jsonl"
+mk 900000 "$D/tmp/g-t90.jsonl"; mk 400000 "$D/tmp/g-t40.jsonl"
 gcall() { (cd "$CL" && penv env CLAUDE_PROJECT_DIR="$PR" GOV_ROLE=engineer GOV_TICKET=W2-9 bash -c "$REGCMD" < "$1") > "$OUT" 2> "$OUT.err"; return $?; }
 ev "$D/tmp/g-t90.jsonl" > "$D/tmp/g-e90.json"
 gcall "$D/tmp/g-e90.json"; rc=$?
@@ -211,7 +211,7 @@ expect_exit "I6 apply again" 0 bash "$ACT/apply.sh" apply
 expect_exit "I7 verify" 0 bash "$ACT/apply.sh" verify
 portab "I8 adapter-portability after the re-apply: no findings" 0
 run_check 1 0 6
-run_check 3 0 7
+run_check 3 0 8
 expect_exit "I9 undo, the hook file still in place" 0 bash "$ACT/apply.sh" undo
 R0=${RELS[0]}; R1=${RELS[1]}
 printf '\n' >> "$CL/$R0"

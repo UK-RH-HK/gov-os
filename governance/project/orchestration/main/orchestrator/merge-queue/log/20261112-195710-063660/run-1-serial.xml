@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="17.248" timestamp="2026-11-12T20:19:47.678357+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-57.test_w2_57_designer_read_p95" name="test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95" time="16.923"><failure message="AssertionError: p95 of a test designer's read on a branch with changes, per round (ms): 147.1, 166.3, 153.8; the bound is 100 ms&#10;assert 0.1471115029999055 &lt; 0.1&#10; +  where 0.1471115029999055 = min([0.1471115029999055, 0.16628964900155552, 0.1537696259911172])">tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-616/test_a_test_designer_s_read_on0')
+
+    def test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95(tmp_path):
+        project, sandbox = support.designer_world(tmp_path)
+        refused = support.designer_read(project, sandbox, CHANGED)
+        assert refused.decision == "deny" and re.search(r"DEC-820 \(c\)", refused.stdout), (
+            f"the fixture is wrong: the test designer is not refused a file its ticket's branch changes, so the read "
+            f"does not take Policy 2 (c)'s path: {refused.describe()}"
+        )
+        for _ in range(WARM_UP):
+            support.designer_read(project, sandbox, ORDINARY)
+        rounds = []
+        for _ in range(ROUNDS):
+            samples = []
+            for _ in range(SAMPLES):
+                result = support.designer_read(project, sandbox, ORDINARY)
+                assert result.decision == "allow", f"the timed read was not allowed: {result.describe()}"
+                samples.append(result.seconds)
+            rounds.append(guard.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 of a test designer's read on a branch with changes, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds) + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 of a test designer's read on a branch with changes, per round (ms): 147.1, 166.3, 153.8; the bound is 100 ms
+E       assert 0.1471115029999055 &lt; 0.1
+E        +  where 0.1471115029999055 = min([0.1471115029999055, 0.16628964900155552, 0.1537696259911172])
+
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:52: AssertionError</failure></testcase></testsuite></testsuites>

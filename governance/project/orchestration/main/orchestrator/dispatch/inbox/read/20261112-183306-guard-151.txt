@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 152
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01WspUTuB6F4z9XyVBh9KFt1", "time": "2026-11-12T05:02:44.789Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "python3 - <<'EOF' p='.tickets/DAEO-qz4p.md'; s=open(p).read() a=\"- tests/unit/orchestration/test_w2_173*\\n\" s=s.replace(a, a+\"- tests/unit/orchestration/test_w2_149_indep_launch.py # W2-149's two unit", "rule": "a catastrophic delete: /home/usain/Dynamic-Agentic-Engineering-OS/.git/config.lock is (or is ins

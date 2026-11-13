@@ -1,0 +1,56 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b-tests",
+   "change": "head",
+   "before": "1ef597a43909",
+   "after": "a60ee938c2bb"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b-tests",
+   "change": "acceptance folder",
+   "folder": "W2-121b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "head",
+   "before": "1d13922ef628",
+   "after": "c3e57a2c87f6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": " M src/gov/adopt/stages.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": " M src/gov/rebuild/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": "?? src/gov/close/rebuild_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": "?? tests/unit/adopt/test_w2_124_semantic_finding.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": "?? tests/unit/rebuild/test_w2_124_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "status line gone",
+   "line": "?? tests/unit/rebuild/test_w2_124_semantic.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "acceptance folder",
+   "folder": "W2-124"
+  }
+ ]
+}

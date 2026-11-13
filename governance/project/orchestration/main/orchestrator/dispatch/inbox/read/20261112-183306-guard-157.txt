@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 158
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01CmdgAT8vd5W7mshAMFCxwE", "time": "2026-11-12T06:42:36.352Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-157/71777e66-34d9-4fc1-9259-75f870e88b36.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-157", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-157; cat >> tests/unit/resources/test_w2_157_backstop.py <<'EOF' # ---- L5b: the backstop's own group, when named, is paused last -----------------------------------", "rule": "the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, config/secrets*, a file under a .secrets fold

@@ -1,0 +1,37 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget ____
+
+box = <w2_13_support.Box object at 0x757b86df5fd0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x757b87440920>, _basetemp=PosixPath('/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-13'), _retention_count=3, _retention_policy='failed')
+
+    def test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget(box, tmp_path_factory):
+>       roots = _tiers(box, tmp_path_factory, "lexical")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-13/test_w2_13_latency.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-13/test_w2_13_latency.py:36: in _tiers
+    box.rebuild(root)
+tests/acceptance/W2-13/w2_13_support.py:340: in rebuild
+    result = self.gov("rebuild", "--json", "--root", str(root), host=host, env=env, timeout=timeout).result()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_13_support.Run object at 0x757b88861e20>
+
+    def result(self):
+        """The envelope's result of a call that succeeded."""
+>       assert self.returncode == 0, f"the command did not succeed\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the command did not succeed
+E       gov rebuild --json --root /tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-13/w2-13-lexical-a-dev0/a-dev
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the semantic store, which was asked for and not recreated (store: semantic): semantic store not_recreated: EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "details": {"store": "semantic", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}}}}
+E       
+E       stderr:
+E       EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+
+tests/acceptance/W2-13/w2_13_support.py:211: AssertionError
+1 failed in 43.39s

@@ -1,0 +1,13 @@
+integrate head: 6c9a5bb525ee21f4168d456dcd503aaa4e4e766e
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r11_an_inherited_ignore_is_kept[2]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_an_unstopped_run_is_reported_as_its_results_say[-0-pass]
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_an_unstopped_run_whose_entries_vanish_is_never_a_crash
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_finished_run_cleans_up[-0-pass]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_process_that_keeps_forking_is_ended_within_the_bound[None-hop]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_child_gov_had_before_the_run_is_neither_stopped_nor_reaped
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_the_subreaper_setting_ends_with_the_run
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_without_the_subreaper_a_run_keeps_todays_behaviour
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_a_descendant_that_survives_the_bound_does_not_stop_the_clean_up
+19 failed, 15 passed, 23 deselected in 491.74s (0:08:11)

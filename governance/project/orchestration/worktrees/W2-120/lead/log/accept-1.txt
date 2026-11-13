@@ -1,0 +1,24 @@
+{
+  "ticket": "DAEO-i89t",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "fail",
+      "passed": 4,
+      "failed": 28,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 4,
+    "failed": 28,
+    "skipped": 0
+  }
+}

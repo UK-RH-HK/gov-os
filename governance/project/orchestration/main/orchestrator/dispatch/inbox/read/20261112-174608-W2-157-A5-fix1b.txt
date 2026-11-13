@@ -1,0 +1,12 @@
+log: W2-157-A5-fix1b.json
+W2: W2-157
+status: DONE
+
+task: DAEO-ozyt (W2-157)
+status: DONE
+work_completed: The hang is fixed. The head to land is **30e969875de4**; the code was verified and reviewed at 21cc8215c4e8, and the only commit after it adds the probe record. In order:
+- Merged w2/integrate into the branch (13ab2c9fe, clean, base 5d915dc6c).
+- eng-4 (Sonnet, high, C2) made the three fixes the ticket asks for:
+  - a group whose members are all zombies now counts as ended (read from `/proc`, group ids only);
+  - `watch(..., *, max_polls=None)`: the command's behaviour is unchanged, and every unit-test call passes a bound;
+  - every child a

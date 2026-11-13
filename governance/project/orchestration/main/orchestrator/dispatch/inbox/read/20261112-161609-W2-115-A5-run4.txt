@@ -1,0 +1,12 @@
+log: W2-115-A5-run4.json
+W2: W2-115
+status: PACKAGES. Review round 2 failed on R2-1 (blocking, fails open). The flaw sits in the fallback that PK-3 (a) itself states, so the CTO has to decide it. There is no round 3 (DEC-1010).
+
+task: DAEO-emq1 (W2-115), run 4: the fix round and review round 2, the last
+status: PACKAGES. Review round 2 failed on R2-1 (blocking, fails open). The flaw sits in the fallback that PK-3 (a) itself states, so the CTO has to decide it. There is no round 3 (DEC-1010).
+work_completed: 
+- (1) Merged w2/integrate into the branch (1a3664a20).
+- (2) td-4 wrote F-1 and F-3 as described behaviours (DEC-136): 8 new cases, 4 of them red on the old code. Merged at ce6a2addf; TESTS-READY written.
+- (3) Engineers:
+  - eng-4 was refused at launch by the memory gate (LAUNCH_REFUSED) and never ran.
+  - eng-5 

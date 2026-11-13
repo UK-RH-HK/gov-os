@@ -1,0 +1,332 @@
+FF.FF.F....FFFFFF.......                                                 [100%]
+=================================== FAILURES ===================================
+_ test_s1_i1_i2_an_entry_whose_every_case_the_optin_list_leaves_out_is_not_in_the_run _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s1_i1_i2_an_entry_whose_e0')
+
+    def test_s1_i1_i2_an_entry_whose_every_case_the_optin_list_leaves_out_is_not_in_the_run(tmp_path):
+        """S1: A's every case is left out by the opt-in list. I1, I2: the run does not stop (exit 0), says
+        ``gov_close_serial_only: not in this run: <A>``, writes A to the file ``GOV_CLOSE_SERIAL_ONLY_OUT`` names, and
+        A's cases ran nowhere (not in this run, not in the parallel run either)."""
+        root = _plant(tmp_path, (A,))
+        serial = support.run_plugin(root, tmp_path / "w", given=(A,), name="serial")
+>       assert serial.code == 0, "an entry the opt-in list leaves out stopped the serial phase:\n" + serial.describe()
+E       AssertionError: an entry the opt-in list leaves out stopped the serial phase:
+E         exit 4
+E         --- stdout
+E         
+E         2 deselected in 0.00s
+E         
+E         --- stderr
+E         ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py
+E         
+E         
+E         --- out file: []
+E         --- ran: []
+E       assert 4 == 0
+E        +  where 4 = <close.test_serial_w2_154_support.Run object at 0x7704a932dd90>.code
+
+tests/unit/close/test_serial_w2_154_plugin.py:66: AssertionError
+_ test_s1_i2_the_run_goes_on_with_the_entries_that_ran_and_names_only_the_one_that_is_out _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s1_i2_the_run_goes_on_wit0')
+
+    def test_s1_i2_the_run_goes_on_with_the_entries_that_ran_and_names_only_the_one_that_is_out(tmp_path):
+        """S1 (an edge): A (out) and C (one case, kept) given together: exit 0, C's case runs serially, only A is named
+        as not in this run."""
+        root = _plant(tmp_path, (A, C))
+        serial = support.run_plugin(root, tmp_path / "w", given=(A, C), name="serial")
+>       assert serial.code == 0, serial.describe()
+E       AssertionError: exit 4
+E         --- stdout
+E         
+E         2 deselected in 0.00s
+E         
+E         --- stderr
+E         ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py
+E         
+E         
+E         --- out file: []
+E         --- ran: []
+E       assert 4 == 0
+E        +  where 4 = <close.test_serial_w2_154_support.Run object at 0x7704a91de480>.code
+
+tests/unit/close/test_serial_w2_154_plugin.py:81: AssertionError
+_ test_s1_i2_the_close_states_the_entry_that_is_not_in_the_run_and_counts_a_serial_run_of_no_case _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s1_i2_the_close_states_th0')
+
+    def test_s1_i2_the_close_states_the_entry_that_is_not_in_the_run_and_counts_a_serial_run_of_no_case(tmp_path):
+        """S1, I2: through the close's test run, with A the only given entry: no finding; the serial run it states is a
+        run of 0 cases whose ``not_in_this_run`` is ``[A]`` and whose ``cases`` do not list A; the other case ran in
+        the parallel phase; A's cases ran nowhere."""
+        root = _plant(tmp_path, (A,))
+        findings, counts, stated = _close_run(root, tmp_path)
+>       assert findings == [], "the close made a finding of an entry its opt-in list leaves out: " + str(findings)
+E       AssertionError: the close made a finding of an entry its opt-in list leaves out: ['the serial run afterwards of the declared cases of tests exited 4: ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py']
+E       assert ['the serial ...it/test_a.py'] == []
+E         
+E         Left contains one more item: 'the serial run afterwards of the declared cases of tests exited 4: ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py'
+E         Use -v to get more diff
+
+tests/unit/close/test_serial_w2_154_plugin.py:104: AssertionError
+_ test_s1_i2_the_close_states_the_ones_that_ran_in_cases_and_the_one_that_is_out_apart _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s1_i2_the_close_states_th1')
+
+    def test_s1_i2_the_close_states_the_ones_that_ran_in_cases_and_the_one_that_is_out_apart(tmp_path):
+        """S1, I2: A (out) and C (kept) declared: ``cases`` keeps only C, ``not_in_this_run`` names only A, the serial
+        run counts C's one case, and there is no finding."""
+        root = _plant(tmp_path, (A, C))
+        findings, counts, stated = _close_run(root, tmp_path)
+>       assert findings == [], findings
+E       AssertionError: ['the serial run afterwards of the declared cases of tests exited 4: ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py']
+E       assert ['the serial ...it/test_a.py'] == []
+E         
+E         Left contains one more item: 'the serial run afterwards of the declared cases of tests exited 4: ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py'
+E         Use -v to get more diff
+
+tests/unit/close/test_serial_w2_154_plugin.py:122: AssertionError
+_ test_f1_with_an_entry_that_is_out_given_too_the_one_that_names_no_case_still_stops_the_run _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_f1_with_an_entry_that_is_0')
+
+    def test_f1_with_an_entry_that_is_out_given_too_the_one_that_names_no_case_still_stops_the_run(tmp_path):
+        """F1 (an edge, I1): B and A given together: the run stops with exit 4 for B ("no case is named by the entry"
+        names B); A, which the opt-in list explains, is not what the run stops on."""
+        root = _plant(tmp_path, (A, B))
+        serial = support.run_plugin(root, tmp_path / "w", given=(A, B), name="serial")
+        assert serial.code == 4, serial.describe()
+        message = [line for line in serial.text.splitlines() if support.NO_CASE in line]
+        assert message and B in " ".join(message), serial.describe()
+>       assert A not in " ".join(message), "the run stops on an entry its opt-in list explains:\n" + serial.describe()
+E       AssertionError: the run stops on an entry its opt-in list explains:
+E         exit 4
+E         --- stdout
+E         
+E         2 deselected in 0.00s
+E         
+E         --- stderr
+E         ERROR: no case is named by the entry of tests/acceptance/serial-only.txt: tests/unit/test_a.py, tests/unit/test_empty.py
+E         
+E         
+E         --- out file: []
+E         --- ran: []
+E       assert 'tests/unit/test_a.py' not in 'ERROR: no c...est_empty.py'
+E         
+E         'tests/unit/test_a.py' is contained here:
+E           only.txt: tests/unit/test_a.py, tests/unit/test_empty.py
+E         ?           ++++++++++++++++++++
+
+tests/unit/close/test_serial_w2_154_plugin.py:151: AssertionError
+_ test_s3_i3_a_serial_phase_that_ran_five_cases_reports_them_and_is_not_red_from_that_step _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that0')
+
+    def test_s3_i3_a_serial_phase_that_ran_five_cases_reports_them_and_is_not_red_from_that_step(tmp_path):
+        """S3: the stub runs 5 cases (``serial.xml`` with 5 ``<testcase>``, ``s_exit`` 0): ``serial: 5 cases run``."""
+        night = support.run_nightly(tmp_path, entries=ENTRIES, s_exit=0, cases=5)
+>       assert night.stated(r"serial: 5 cases run\b"), "no 'serial: 5 cases run' line:\n" + night.describe()
+E       AssertionError: no 'serial: 5 cases run' line:
+E         exit 2
+E         --- run.txt
+E         2026-11-12 22:22:33 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert []
+E        +  where [] = stated('serial: 5 cases run\\b')
+E        +    where stated = <close.test_serial_w2_154_support.Night object at 0x7704a91dd460>.stated
+
+tests/unit/close/test_serial_w2_154_nightly.py:30: AssertionError
+_ test_f2_s3_i3_a_serial_phase_that_ran_no_case_is_red_though_its_junit_file_is_green _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_f2_s3_i3_a_serial_phase_t0')
+
+    def test_f2_s3_i3_a_serial_phase_that_ran_no_case_is_red_though_its_junit_file_is_green(tmp_path):
+        """F2, S3: the stub runs none (``serial.xml`` green with no ``<testcase>``, ``s_exit`` 0): the final verdict is
+        ``verdict: red serial: 0 cases run``, after the verdict ``nightly_alone.py`` gave, and the red night pings P1.
+        Green there is the failure."""
+        night = support.run_nightly(tmp_path, entries=ENTRIES, s_exit=0, cases=0)
+>       assert night.stated(r"serial: 0 cases run\b"), "no 'serial: 0 cases run' line:\n" + night.describe()
+E       AssertionError: no 'serial: 0 cases run' line:
+E         exit 2
+E         --- run.txt
+E         2026-11-12 22:22:33 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert []
+E        +  where [] = stated('serial: 0 cases run\\b')
+E        +    where stated = <close.test_serial_w2_154_support.Night object at 0x7704a91f2540>.stated
+
+tests/unit/close/test_serial_w2_154_nightly.py:41: AssertionError
+_ test_s3_i3_a_serial_phase_that_ended_with_exit_4_is_red_though_its_junit_file_is_green _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that1')
+
+    def test_s3_i3_a_serial_phase_that_ended_with_exit_4_is_red_though_its_junit_file_is_green(tmp_path):
+        """S3: the stub ends with exit 4 (a usage error at collection), its JUnit file green: the final verdict is
+        ``verdict: red serial: collection error, exit 4`` and the night pings P1."""
+>       _collection_error(tmp_path, 4)
+
+tests/unit/close/test_serial_w2_154_nightly.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that1')
+exit_code = 4
+
+    def _collection_error(tmp_path, exit_code):
+        night = support.run_nightly(tmp_path, entries=ENTRIES, s_exit=exit_code, cases=5)
+>       assert night.verdict() == f"verdict: red serial: collection error, exit {exit_code}", \
+            "a serial phase that ended in a collection error does not read red:\n" + night.describe()
+E       AssertionError: a serial phase that ended in a collection error does not read red:
+E         exit 2
+E         --- run.txt
+E         2026-11-12 22:22:33 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert None == 'verdict: red serial: collection error, exit 4'
+E        +  where None = verdict()
+E        +    where verdict = <close.test_serial_w2_154_support.Night object at 0x7704a91f0980>.verdict
+
+tests/unit/close/test_serial_w2_154_nightly.py:51: AssertionError
+_ test_s3_i3_a_serial_phase_that_ended_with_exit_2_is_red_though_its_junit_file_is_green _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that2')
+
+    def test_s3_i3_a_serial_phase_that_ended_with_exit_2_is_red_though_its_junit_file_is_green(tmp_path):
+        """S3: the same with exit 2 (an interrupted run): ``verdict: red serial: collection error, exit 2``."""
+>       _collection_error(tmp_path, 2)
+
+tests/unit/close/test_serial_w2_154_nightly.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that2')
+exit_code = 2
+
+    def _collection_error(tmp_path, exit_code):
+        night = support.run_nightly(tmp_path, entries=ENTRIES, s_exit=exit_code, cases=5)
+>       assert night.verdict() == f"verdict: red serial: collection error, exit {exit_code}", \
+            "a serial phase that ended in a collection error does not read red:\n" + night.describe()
+E       AssertionError: a serial phase that ended in a collection error does not read red:
+E         exit 2
+E         --- run.txt
+E         2026-11-12 22:22:33 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert None == 'verdict: red serial: collection error, exit 2'
+E        +  where None = verdict()
+E        +    where verdict = <close.test_serial_w2_154_support.Night object at 0x7704a91f33e0>.verdict
+
+tests/unit/close/test_serial_w2_154_nightly.py:51: AssertionError
+_ test_s3_i3_a_serial_phase_that_ended_with_failures_only_is_not_a_collection_error _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_that3')
+
+    def test_s3_i3_a_serial_phase_that_ended_with_failures_only_is_not_a_collection_error(tmp_path):
+        """S3 (an edge): exit 1 is a run with failing cases, not a collection error ("neither 0 nor 1"); the count
+        is still reported and this step adds no red line."""
+        night = support.run_nightly(tmp_path, entries=ENTRIES, s_exit=1, cases=5)
+>       assert night.stated(r"serial: 5 cases run\b"), night.describe()
+E       AssertionError: exit 2
+E         --- run.txt
+E         2026-11-12 22:22:34 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert []
+E        +  where [] = stated('serial: 5 cases run\\b')
+E        +    where stated = <close.test_serial_w2_154_support.Night object at 0x7704a91f3e60>.stated
+
+tests/unit/close/test_serial_w2_154_nightly.py:71: AssertionError
+_ test_s3_i3_a_serial_phase_with_nothing_declared_reads_0_declared_and_is_not_red _
+
+tmp_path = PosixPath('/tmp/w2-154-lead/pytest-of-usain/pytest-0/test_s3_i3_a_serial_phase_with0')
+
+    def test_s3_i3_a_serial_phase_with_nothing_declared_reads_0_declared_and_is_not_red(tmp_path):
+        """S3: ``ENTRIES`` empty: ``serial: 0 declared``, the phase skipped, not red, and not today's exit 2 with
+        "no serial-only entry read"."""
+        night = support.run_nightly(tmp_path, entries="", s_exit=0, cases=None)
+>       assert night.stated(r"serial: 0 declared\b"), "no 'serial: 0 declared' line:\n" + night.describe()
+E       AssertionError: no 'serial: 0 declared' line:
+E         exit 2
+E         --- run.txt
+E         2026-11-12 22:22:34 nightly night: estimate {"estimate_s": 600}
+E         latest start 01:59
+E         head ce7df2792367
+E         the secrets switch cannot be read (DEC-1045)
+E         
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'secrets_switch'
+E         
+E         --- pings: ["P1 NIGHTLY-NOT-RUN | the secrets switch cannot be read (DEC-1045) | the orchestrator's package follows"]
+E       assert []
+E        +  where [] = stated('serial: 0 declared\\b')
+E        +    where stated = <close.test_serial_w2_154_support.Night object at 0x7704a92a4380>.stated
+
+tests/unit/close/test_serial_w2_154_nightly.py:80: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/close/test_serial_w2_154_plugin.py::test_s1_i1_i2_an_entry_whose_every_case_the_optin_list_leaves_out_is_not_in_the_run
+FAILED tests/unit/close/test_serial_w2_154_plugin.py::test_s1_i2_the_run_goes_on_with_the_entries_that_ran_and_names_only_the_one_that_is_out
+FAILED tests/unit/close/test_serial_w2_154_plugin.py::test_s1_i2_the_close_states_the_entry_that_is_not_in_the_run_and_counts_a_serial_run_of_no_case
+FAILED tests/unit/close/test_serial_w2_154_plugin.py::test_s1_i2_the_close_states_the_ones_that_ran_in_cases_and_the_one_that_is_out_apart
+FAILED tests/unit/close/test_serial_w2_154_plugin.py::test_f1_with_an_entry_that_is_out_given_too_the_one_that_names_no_case_still_stops_the_run
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_s3_i3_a_serial_phase_that_ran_five_cases_reports_them_and_is_not_red_from_that_step
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_f2_s3_i3_a_serial_phase_that_ran_no_case_is_red_though_its_junit_file_is_green
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_s3_i3_a_serial_phase_that_ended_with_exit_4_is_red_though_its_junit_file_is_green
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_s3_i3_a_serial_phase_that_ended_with_exit_2_is_red_though_its_junit_file_is_green
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_s3_i3_a_serial_phase_that_ended_with_failures_only_is_not_a_collection_error
+FAILED tests/unit/close/test_serial_w2_154_nightly.py::test_s3_i3_a_serial_phase_with_nothing_declared_reads_0_declared_and_is_not_red
+11 failed, 13 passed, 4 deselected in 6.60s

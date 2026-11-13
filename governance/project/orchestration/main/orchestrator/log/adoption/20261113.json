@@ -1,0 +1,106 @@
+{
+ "window_since": "2026-11-07",
+ "scanned": 1188,
+ "scanned_by_kind": {
+  "top": 996,
+  "sub": 192
+ },
+ "per_day": {
+  "2026-11-07": 52,
+  "2026-11-08": 61,
+  "2026-11-09": 209,
+  "2026-11-10": 183,
+  "2026-11-11": 211,
+  "2026-11-12": 412,
+  "2026-11-13": 60
+ },
+ "per_role": {
+  "engineer": 163,
+  "auditor": 53,
+  "reviewer": 149,
+  "lead": 133,
+  "test-designer": 207,
+  "product-spec": 42,
+  "unknown": 380,
+  "orchestrator": 41,
+  "research": 20
+ },
+ "ran_retrieve_by_role": {
+  "orchestrator": 4,
+  "engineer": 4,
+  "unknown": 3,
+  "product-spec": 1,
+  "reviewer": 5,
+  "research": 1,
+  "test-designer": 5,
+  "lead": 14
+ },
+ "count1_searched_again": "14/37",
+ "count2_twice_before_phrase": "1/3",
+ "threshold_hook_package": true,
+ "sessions": {
+  "ran_retrieve": [
+   "-home-usain-Dynamic-Agentic-Engineering-OS/8ddb8b14-0dce-4faa-9cb0-7150fcce200d",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/8ddb8b14-0dce-4faa-9cb0-7150fcce200d/subagents/agent-a318ba0ac6abe59a6",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a18c09e9c5b99787e",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a1cffecc3bb1fb7de",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a6d4f4fa2e01e69d7",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a7ef4ee2acee1b0d3",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a8c3d64eb01931a37",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a8dffac909787e9d0",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-ab1a79318de050f9e",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-ac40793e8a885ef3e",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-ad23304020b32f7a3",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea/subagents/agent-abc500fe0ac2fd7e8",
+   "-home-usain-gov-os-worktrees-W2-05/231ce824-8f91-4689-876d-ce792d9e375b",
+   "-home-usain-gov-os-worktrees-W2-05/ec9459d7-e5b1-4775-9307-29839e32f117",
+   "-home-usain-gov-os-worktrees-W2-11-tests/28feb2ce-1002-4c21-9577-54ce6d06514a",
+   "-home-usain-gov-os-worktrees-W2-11/47d6cc7e-6f01-4d84-9a21-53d54017806d",
+   "-home-usain-gov-os-worktrees-W2-11/b74a70ad-de15-4bdd-9844-315da9f1ff89",
+   "-home-usain-gov-os-worktrees-W2-110-tests/67ac8693-1729-488c-9721-45024d9c7075",
+   "-home-usain-gov-os-worktrees-W2-113/8caa5b15-4db5-48e9-96d3-fa196cd51b32",
+   "-home-usain-gov-os-worktrees-W2-113/ff402fff-9327-4b72-8081-98c7f4c6d2cf",
+   "-home-usain-gov-os-worktrees-W2-115/8b780f7d-d267-414d-9333-a445dc99da55",
+   "-home-usain-gov-os-worktrees-W2-120/c71579aa-432d-405d-8ff4-b8b8612e06a3",
+   "-home-usain-gov-os-worktrees-W2-121b/df4bc0bd-7fcd-4321-839a-609c6e0d5c7f",
+   "-home-usain-gov-os-worktrees-W2-128/7c045064-8ea3-4813-92a7-043f33382eb6",
+   "-home-usain-gov-os-worktrees-W2-152/fb9cc834-6f0e-42af-8afa-3b1133f4b09a",
+   "-home-usain-gov-os-worktrees-W2-154/b9a3523e-9d28-4e82-8634-c6fc5f1213a6",
+   "-home-usain-gov-os-worktrees-W2-155/a8055ec1-96a3-4e4e-8f87-898d53448d77",
+   "-home-usain-gov-os-worktrees-W2-160/18e89edf-9c01-49db-a299-b50882718c78",
+   "-home-usain-gov-os-worktrees-W2-160/b75ef8be-7617-4b22-bd4f-1abe24ef1d2e",
+   "-home-usain-gov-os-worktrees-W2-170/1616eea1-fbd3-4f25-a021-7fa88f895ef2",
+   "-home-usain-gov-os-worktrees-W2-176/a397213b-eaf3-4a22-948c-e79d905dc4d3",
+   "-home-usain-gov-os-worktrees-W2-33/6fedaa37-0024-4de0-9d6f-8988d33596b2",
+   "-home-usain-gov-os-worktrees-W2-45/0c29a5ed-92a0-42d9-a27b-3ddba5875d85",
+   "-home-usain-gov-os-worktrees-W2-52-tests/558ecffe-1cdc-410b-919d-e9d5cafa336a",
+   "-home-usain-gov-os-worktrees-W2-88-tests/14a25e4c-7bf8-41a6-85d1-f237607a30bd"
+  ],
+  "searched_again": [
+   "-home-usain-Dynamic-Agentic-Engineering-OS/8ddb8b14-0dce-4faa-9cb0-7150fcce200d",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a6d4f4fa2e01e69d7",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a8c3d64eb01931a37",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a8dffac909787e9d0",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-ab1a79318de050f9e",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-ad23304020b32f7a3",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea",
+   "-home-usain-gov-os-worktrees-W2-11-tests/28feb2ce-1002-4c21-9577-54ce6d06514a",
+   "-home-usain-gov-os-worktrees-W2-11/47d6cc7e-6f01-4d84-9a21-53d54017806d",
+   "-home-usain-gov-os-worktrees-W2-113/8caa5b15-4db5-48e9-96d3-fa196cd51b32",
+   "-home-usain-gov-os-worktrees-W2-115/8b780f7d-d267-414d-9333-a445dc99da55",
+   "-home-usain-gov-os-worktrees-W2-154/b9a3523e-9d28-4e82-8634-c6fc5f1213a6",
+   "-home-usain-gov-os-worktrees-W2-155/a8055ec1-96a3-4e4e-8f87-898d53448d77"
+  ],
+  "phrase_after_retrieve": [
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a7ef4ee2acee1b0d3",
+   "-home-usain-Dynamic-Agentic-Engineering-OS/b2f0511f-891b-4874-8930-6d34ca5972ea/subagents/agent-abc500fe0ac2fd7e8"
+  ],
+  "twice_first": [
+   "-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec"
+  ]
+ }
+}

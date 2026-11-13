@@ -3,16 +3,16 @@
 - **For:** the owner's yes, then the owner's operator **by hand** tonight (the operator agent does not run 01:00-08:00); class (b)
   by the rule table. About two minutes in the main tree, **after W2-176 has merged** (section 3).
 - **By:** an ACT-preparation helper of the CTO (Sonnet, high; RUBRIC-2, class C1). **Nothing live was changed or started:** no commit,
-  no stage, no live settings, no `~/.claude`. Built and rehearsed in clones (section 6). **Not yet independently reviewed** (section 7).
+  no stage, no live settings, no `~/.claude`. Built and rehearsed in clones (section 6). **Round 1 READY on the withdrawn bytes; round 2 rebuilt on W2-176's no-cap bytes** (section 7).
 - **Under:** DEC-1140 (1)(b) (the owner's order of 11-11: a session that hands over before compaction, live for the CTO's, the leads'
-  and the workers' sessions); DEC-1118 (A) (leads and workers hand over by 200,000 tokens); DEC-315 (class (b): `.claude/` and
+  and the workers' sessions); DEC-1141 (3) (no token cap for any session: each uses its model's full window and compacts; it replaced DEC-1118 (A)); DEC-315 (class (b): `.claude/` and
   `.rulesync/`); CAP-33 (W2-176's CIT-P, section 5: this registration is the ACT that follows the owner's approval). The manifest's
   `dec` names them.
 - **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/context-watch-1/` (the bundle is `acts/ACT-CONTEXT-WATCH-1/`; the tools in
   `tools/`, the rehearsal `tools/rehearse.sh`).
 
 ## 0. Class: (b) by the table; by your operator's hand tonight. Your yes first
-**The yes line: `yes ACT-CONTEXT-WATCH-1 487c93c1`** (the first 8 digits of the manifest's sha256 in section 3).
+**The yes line: `yes ACT-CONTEXT-WATCH-1 5bdfa098`** (the first 8 digits of the manifest's sha256 in section 3).
 
 I read `governance/project/operator/class-rules.yaml` first and ran the operator's own `act_class.py` (read only) on the bundle:
 
@@ -27,7 +27,7 @@ morning from the same bytes.
 
 ## 1. What changes, and why
 W2-176 (merged first) adds `template/governance/kernel/hooks/context_watch.py`: a PostToolUse hook that, once per context window at 85 %
-of the session's window (the CTO's session: its model's window; every lead and worker: at most 200,000), injects a note telling the
+of the session's window (every session, the CTO, a lead, a worker or a helper: its own model's window; no cap, DEC-1141), injects a note telling the
 session to write its checkpoint, update its files and begin its compaction summary with the read-first line. It stops nothing and sets no
 threshold. Without a registration it never runs. This ACT is the registration, and nothing else:
 
@@ -52,7 +52,7 @@ two sources have equal matcher lists and the check stays green (F1, I4, I8). Thr
 
 - **(a) Apply now with `Bash` (built; recommended).** Cost: the reminder is evaluated after each Bash call only, not after a Read, Edit
   or Grep. Every session of every role runs Bash all the time (tests, git, `gov`), and a reminder at 85 % only needs one call in the
-  last 15 % of the window (30,000 tokens of a 200,000 window; 150,000 of the CTO's 1,000,000); a long run of Read and Edit calls with no
+  last 15 % of the window (150,000 tokens of a 1,000,000 window; 30,000 of a 200,000 one); a long run of Read and Edit calls with no
   Bash call delays it to the next Bash call. The hook itself is unchanged.
 - **(b) Defer for all tools.** All tools needs one change to `src/gov/adapters/portability.py` (excuse a matcher superset for a lifted
   event, or make the template's source carry the same list), a ticket with its own tests (`tests/unit/gitenv/test_hooks_lifted.py` pins
@@ -74,11 +74,11 @@ transcript or anything else goes wrong, it says nothing and the tool call goes o
 at its template path. Registered while it is absent, every Bash call would run a missing script: the pinned interpreter exits 2 with
 `can't open file '.../context_watch.py'`, a blocking error shown on each call (rehearsal B6). So `apply.sh check` **and** `apply`
 refuse (exit 6, nothing touched) unless `template/governance/kernel/hooks/context_watch.py` exists and its sha256 is the one the owner
-approves in W2-176's CIT-P (section 2): **`c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c`** (rehearsal B1, B2, C5,
+approves in W2-176's CIT-P (section 2): **`213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242`** (rehearsal B1, B2, C5,
 C6). `undo` and `verify` need no such file. W2-176's own merge is the CTO's and the queue's; the operator checks it in section 5's first
 step (the hook file's sha256) and stops if it is not there.
 
-`manifest.json` sha256: **`487c93c13e1b6ee2f223c5386fbb5cc38101737be200e94e4583aeb52350e58f`** (sha8 `487c93c1`).
+`manifest.json` sha256: **`5bdfa0981808513db3d9fceeb30f13ba11ea72ea28528ef40664bfe9a931da5a`** (sha8 `5bdfa098`).
 
 | File | sha256 (first 16) |
 |---|---|
@@ -86,7 +86,7 @@ step (the hook file's sha256) and stops if it is not there.
 | `after/repo/.claude/settings.json` | `2a319ea4284a9184` |
 | `before/repo/.rulesync/hooks.jsonc` | `43b51cd7c5794401` (the live file at the build) |
 | `after/repo/.rulesync/hooks.jsonc` | `fbd5ddff1a4d1b0f` |
-| `apply.sh`, `list.txt`, `rehearsal.log` | `620fbbe0dd08b95c`, `dc0c123e3cce8035`, `7818755bc72449d8`; in the manifest's `files` |
+| `apply.sh`, `list.txt`, `rehearsal.log` | `4dbab4f1debc1a81`, `dc0c123e3cce8035`, `0fae594e8661a09b`; in the manifest's `files` |
 
 The after copy of `settings.json` is what `rulesync generate` writes from the after source (with the held-out step), not a hand edit:
 adapter-portability reads it as drift-free.
@@ -104,7 +104,7 @@ with its comment lines stripped); 1 the registration (the events in order; `Post
 each), count 6; 2 the hook file is there as the approved bytes; 3 the hook's behaviour as the registration runs it (the interpreter with
 `-E`, planted project and transcript, a worker: 50 % and 84 % silent; 85 % one `additionalContext` with `READ FIRST:` and "not a stop",
 no decision key; the next call none; a fall to 40 % re-arms; a subagent's event, a missing transcript, a cut assistant line and an empty
-event all silent, exit 0), count 7; 4 the two files are tracked. **Check 1 is red on the old files** (rehearsal C).
+event all silent, exit 0; 180,000 tokens silent: no cap), count 8; 4 the two files are tracked. **Check 1 is red on the old files** (rehearsal C).
 
 **Undo:** `bash $A/apply.sh undo` puts both files back byte for byte (section 5), then a commit with the same trailers. Sessions that
 loaded the new hooks keep running the hook until they restart (section 8); it is harmless without effect on the file.
@@ -115,13 +115,13 @@ portability, on the applied state (section 6, H).
 
 ## 5. The operator's steps: the message
 > **ACT-CONTEXT-WATCH-1 (DEC-1140 (1)(b)): register W2-176's context watch as a PostToolUse hook (matcher Bash).**
-> Class (b), by hand, **after W2-176 has merged**: your yes first: **`yes ACT-CONTEXT-WATCH-1 487c93c1`**. In the main tree, about two minutes:
+> Class (b), by hand, **after W2-176 has merged**: your yes first: **`yes ACT-CONTEXT-WATCH-1 5bdfa098`**. In the main tree, about two minutes:
 > ```
 > cd /home/usain/Dynamic-Agentic-Engineering-OS
 > test -z "$(git status --porcelain)" && test ! -e .git/MERGE_HEAD && echo clean     # expect: clean
-> sha256sum template/governance/kernel/hooks/context_watch.py   # expect c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c (W2-176 merged)
+> sha256sum template/governance/kernel/hooks/context_watch.py   # expect 213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242 (W2-176 merged)
 > A=.gov-runtime/scratch/orchestrator/acts/ACT-CONTEXT-WATCH-1
-> sha256sum $A/manifest.json     # expect 487c93c13e1b6ee2f223c5386fbb5cc38101737be200e94e4583aeb52350e58f
+> sha256sum $A/manifest.json     # expect 5bdfa0981808513db3d9fceeb30f13ba11ea72ea28528ef40664bfe9a931da5a
 > bash $A/apply.sh check         # exit 0: "state before; template/governance/kernel/hooks/context_watch.py in place as approved"
 > bash $A/apply.sh apply         # exit 0
 > bash $A/apply.sh verify        # exit 0
@@ -140,7 +140,7 @@ watch the first session that passes 85 % for one `Context watch:` note.
 
 ## 6. The rehearsal (`rehearsal.log`; 97 ok lines, `failures: 0`)
 As the operator will run it (`tools/rehearse.sh`): a `--no-hardlinks` clone of `w2/integrate` (the main tree's head at the build), then
-`git merge --no-ff --no-edit 3a580a4b4d42` (W2-176) **in the clone only**, a planted HOME, the clean environment of the operator's dry
+`git merge --no-ff --no-edit 3b6c5cb79d39` (W2-176) **in the clone only**, a planted HOME, the clean environment of the operator's dry
 run, each manifest check run exactly as written with `bash -c`, the plain `apply.sh apply` with no option. The pytest runs go **one
 folder per run** through the heavy-slot gate (`heavy_slot.sh env TMPDIR=<outside the repository> PYTHONUSERBASE=... PYTHONPATH=<clone>/src
 python3 -m pytest <folder> -q -p no:cacheprovider -o tmp_path_retention_policy=failed`), each parsed from pytest's own summary line
@@ -151,16 +151,16 @@ python3 -m pytest <folder> -q -p no:cacheprovider -o tmp_path_retention_policy=f
   a tree without the file exits 2 with `can't open file`** (B6).
 - **C** W2-176 merged in the clone: the hook file is the approved sha256; the merge left both files as the frozen before; a hook file
   with one extra line: `check` and `apply` refuse (6); then `check` exit 0; check 1 red on the old files.
-- **D** baseline on the merged clone, before the apply: adapter-portability no findings; `tests/unit/hooks` 166 passed, 1 skipped.
+- **D** baseline on the merged clone, before the apply: adapter-portability no findings; `tests/unit/hooks` 196 passed, 1 skipped.
 - **E** the plain apply: both files the frozen after byte for byte, modes kept (644), `git status` exactly the two (12 and 8 lines added,
   none removed), no temp file left, `verify` 0, `check` refused after, a second `apply` changes nothing.
-- **F** the five checks as written (counts 6 and 7); adapter-portability after the apply: **no findings**; the same with matcher `*` in the
+- **F** the five checks as written (counts 6 and 8); adapter-portability after the apply: **no findings**; the same with matcher `*` in the
   source: **`HOOKS_MATCHER_DIFFERS`** (F2, the reason for section 1's decision).
-- **G** the registered command run on planted PostToolUse events (a worker, `GOV_ROLE` engineer, a transcript at 90 % of a 200,000
-  window): **one `additionalContext`** (exit 0, no stderr; it holds `READ FIRST:` and the not-a-stop sentence), **none on the second call**,
+- **G** the registered command run on planted PostToolUse events (a worker, `GOV_ROLE` engineer, a transcript at 90 % of its model's 1,000,000
+  window; no cap): **one `additionalContext`** (exit 0, no stderr; it holds `READ FIRST:` and the not-a-stop sentence), **none on the second call**,
   one more after a fall to 40 %, none for a subagent's event; the hook wrote one file, the session's marker under
   `.gov-runtime/scratch/context_watch/`.
-- **H** the tests on the applied state: W2-176's two unit files **65 passed**; `tests/unit/hooks` **166 passed, 1 skipped**;
+- **H** the tests on the applied state: W2-176's two unit files **95 passed**; `tests/unit/hooks` **196 passed, 1 skipped**;
   `tests/acceptance/W1-29` **42 passed**; `W1-49` **71 passed, 1 skipped**; `W2-62` **43 passed**; and the suites that read settings,
   hooks sources and portability: `tests/unit/adapters` 94, `tests/unit/gitenv` 61, `tests/acceptance/W2-05` 30, `W2-59` 48, `W2-65` 14,
   `W2-106` 26 passed; the tests left exactly the two applied files modified.
@@ -185,11 +185,13 @@ python3 -m pytest <folder> -q -p no:cacheprovider -o tmp_path_retention_policy=f
   section 1 (the documentation as read there).
 
 ## 7. The review, residuals
-- **Not independently reviewed.** The CTO may start the independent auditor (a fresh read-only session; it should run section 5's `check`
-  and the five checks in its own clone, and read section 1's matcher decision first).
-- **R8 of W2-176** (the window's marker is made before the reminder text is built; a failure building it, only possible with a partial copy
-  of the hooks folder, spends that window's reminder silently) is a recorded row of W2-176, not an entry criterion here: `apply.sh`
-  requires the approved bytes of the hook file, and the hooks folder is whole in a merged tree.
+- **Round 1** (`reviews/ACT-CONTEXT-WATCH-1-review.md`): READY on the hook bytes `c6dabb5eed39`, which the owner then withdrew
+  (DEC-1141: they carried the token cap). **Round 2 (2026-11-12, after the nightly):** the only change is the hook's approved
+  sha256, now `213882efd7b8` (W2-176 at `3b6c5cb79d39`: the cap removed, R8 fixed at `4dec7ec3c72c`; its delta review READY,
+  findings F1 and F2 rows), and the rehearsal's merge of that head. The two settings files and their before and after bytes are as round 1; check 2 (the hash) and check 3 (the behaviour, now
+  against the model's 1,000,000 window, count 8, with a 180,000-token case silent: no cap) changed. **Round 2's review: READY**
+  (`reviews/ACT-CONTEXT-WATCH-1-review-r2.md`; F1 this text, fixed; F2 round 1's record filed as `reviews/ACT-CONTEXT-WATCH-1-review.md`).
+- **R8 of W2-176** is fixed in the hook itself (the text is built before the window's marker); it is no longer a residual here.
 - `template/.rulesync/hooks.jsonc` and the template's `settings.json` do not carry the registration: adopted projects get the hook file
   from the kernel but no registration until W2-08 or the follow-up of option (b).
 
@@ -206,6 +208,5 @@ python3 -m pytest <folder> -q -p no:cacheprovider -o tmp_path_retention_policy=f
 - **The pinned interpreter form.** The command is the PreCompact line's form, so a session without `gov` pinned gets exit 1 with a one-line
   message on each Bash call (non-blocking), as the Stop and PreCompact hooks do today. A plain `python3` line would avoid that and run on an
   unpinned interpreter; I kept the repository's own form so the three hooks behave alike.
-- **The 1M-window models:** a lead or worker is reminded against 200,000 (DEC-1118 (A)), the CTO against its model's window (DEC-1140 (4)).
-  A CTO session on a 1M model is reminded at 850,000 tokens.
+- **The 1M-window models:** every session is reminded against its own model's window (DEC-1141 (3)): a session on a 1M model at 850,000 tokens.
 - **The marker files** live under `.gov-runtime/scratch/context_watch/` (ignored by git); they are removed when usage falls below 50 %.

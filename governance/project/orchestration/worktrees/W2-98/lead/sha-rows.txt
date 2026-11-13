@@ -1,0 +1,12 @@
+| `.rulesync/skills/spec-writing/SKILL.md` | absent | `34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d` | 105 |
+| `.rulesync/skills/spec-writing/check_spec.py` | absent | `2d34686f58840ef3cbba216dd863575d16a9210dc6f170c88a75ea9cb3fdbe09` | 250 |
+| `.rulesync/skills/spec-writing/imports.yaml` | absent | `3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff` | 5 |
+| `.rulesync/skills/spec-writing/spec-form.md` | absent | `8f541045645498f9bdc247d5acdda93240a9c7e7696aeac1d39f532163103696` | 147 |
+| `template/.rulesync/skills/spec-writing/SKILL.md` | absent | `34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d` | 105 |
+| `template/.rulesync/skills/spec-writing/check_spec.py` | absent | `2d34686f58840ef3cbba216dd863575d16a9210dc6f170c88a75ea9cb3fdbe09` | 250 |
+| `template/.rulesync/skills/spec-writing/imports.yaml` | absent | `3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff` | 5 |
+| `template/.rulesync/skills/spec-writing/spec-form.md` | absent | `8f541045645498f9bdc247d5acdda93240a9c7e7696aeac1d39f532163103696` | 147 |
+| `template/governance/kernel/skills/spec-writing/SKILL.md` | absent | `34500d5ed3694abce258ee73616bc2832cc169ff0083c66e46b9c82453c8637d` | 105 |
+| `template/governance/kernel/skills/spec-writing/check_spec.py` | absent | `2d34686f58840ef3cbba216dd863575d16a9210dc6f170c88a75ea9cb3fdbe09` | 250 |
+| `template/governance/kernel/skills/spec-writing/imports.yaml` | absent | `3ddd0e1ab98d22585922395b0915014db4f048994be757b8283422986f9f9cff` | 5 |
+| `template/governance/kernel/skills/spec-writing/spec-form.md` | absent | `8f541045645498f9bdc247d5acdda93240a9c7e7696aeac1d39f532163103696` | 147 |

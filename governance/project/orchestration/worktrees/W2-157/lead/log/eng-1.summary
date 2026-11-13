@@ -1,0 +1,1 @@
+launch_worker engineer DAEO-ozyt: session exit 1; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-157/.gov-runtime/scratch/lead/log/eng-1.json; spend recorded (projection 5)

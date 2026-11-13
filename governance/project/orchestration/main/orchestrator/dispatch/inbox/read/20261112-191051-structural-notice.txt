@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-185308.out
+Structural: after the landing of W2-157 (base ba27e4c0d536)
+status: structural pass at 8f5d7a1f55b1 (the work tree differs from it at 6 tracked path(s): the working files were read): NOTICE in mutation, authority (7 of 9 families ok), 15.1 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 16 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+13 more)
+authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since ba27e4c0d536)
+links: ok (0 new since ba27e4c0d5369a8281b0db32eb3eaf2bebef50b1, 1706 standing)
+structural pass at 8f5d7a1f55b1 (the work tree differs from it at 6 tracked path(s): the working files were read): NOTICE in mutation, authority (7 of 9 families ok), 15.1 s; a notice, not a refusal

@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-032606.out
+Structural: after the landing of W2-113 (base 82ddc705a41b)
+status: structural pass at cb208f9434d7: NOTICE in mutation, authority, links (6 of 9 families ok), 15.1 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 31 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+28 more)
+authority: NOTICE 2 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 82ddc705a41b)
+links: NOTICE 4 new since 82ddc705a41b89f4304cef1e5768031a154e9884 (1727 standing): UNLINKED_ID DEC-1156 in DAEO-g29a's KPI brackets, not in its sources | .tickets/DAEO-g29a.md:38 | orchestrator | add DEC-1156 to DAEO-g29a's sources: | UNLINKED_ID DEC-995 in DAEO-g29a's KPI brackets, not in its sources | .tickets/DAEO-g29a.md:38 | orchestrator | add DEC-995 to DAEO-g29a's sources: | UNLINKED_ID DEC-996 in DAEO-g29a's KPI brackets, not in its sources | .tickets/DAEO-g29a.md:38 | orchestrator | add DEC-996 to DAEO-g29a's sources: (+1 more)
+structural pass at cb208f9434d7: NOTICE in mutation, authority, links (6 of 9 families ok), 15.1 s; a notice, not a refusal

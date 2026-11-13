@@ -1,0 +1,96 @@
+2026-11-12 16:18:05 admitted by the dispatcher; launching W2-124
+disk gate open: 785 GiB free, 62327610 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17093742592,
+  "sessions_live_memory_bytes": 1388183552,
+  "load_1m": 7.92,
+  "load_15m": 15.23,
+  "busy_cores_1m": 7.31,
+  "embedding_cpu_p95": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 842873991168,
+    "free_inodes": 62327608
+  },
+  "sessions": [
+    {
+      "pid": 1062083,
+      "repository": "/home/usain/gov-os-worktrees/W2-157",
+      "ticket": "DAEO-ozyt",
+      "role": "orchestrator",
+      "live_memory_bytes": 298004480
+    },
+    {
+      "pid": 1618001,
+      "repository": "/home/usain/gov-os-worktrees/W2-157",
+      "ticket": "DAEO-ozyt",
+      "role": "engineer",
+      "live_memory_bytes": 506413056
+    },
+    {
+      "pid": 2130060,
+      "repository": "/home/usain/gov-os-worktrees/W2-121b",
+      "ticket": "DAEO-ifgf",
+      "role": "orchestrator",
+      "live_memory_bytes": 277753856
+    },
+    {
+      "pid": 2140086,
+      "repository": "/home/usain/gov-os-worktrees/W2-121b",
+      "ticket": "DAEO-ifgf",
+      "role": "engineer",
+      "live_memory_bytes": 306012160
+    }
+  ],
+  "cleared": [
+    {
+      "pid": 246236,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    },
+    {
+      "pid": 2477353,
+      "repository": "/home/usain/gov-os-worktrees/W2-115",
+      "ticket": "DAEO-emq1",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    }
+  ],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "working_size_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 2189192,
+    "repository": "/home/usain/gov-os-worktrees/W2-124",
+    "ticket": "DAEO-mb2t",
+    "role": "orchestrator",
+    "started": "2026-11-12T16:18:05+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 8724860
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 16:18:06 gate open; DAEO-mb2t registered as pid 2189192; starting W2-124

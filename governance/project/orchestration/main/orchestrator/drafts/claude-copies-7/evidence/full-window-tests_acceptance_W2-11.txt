@@ -1,0 +1,31 @@
+...........s............................................................ [ 36%]
+........................................................................ [ 72%]
+....................F..................................                  [100%]
+=================================== FAILURES ===================================
+_____ test_the_skill_carries_one_version_in_all_four_places[spec-writing] ______
+
+name = 'spec-writing'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/spec-writing/SKILL.md'
+root = PosixPath('/tmp/claude-1000/act-copies-7-360720/build/window-full')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/spec-writing/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[spec-writing]
+1 failed, 197 passed, 1 skipped in 5.93s

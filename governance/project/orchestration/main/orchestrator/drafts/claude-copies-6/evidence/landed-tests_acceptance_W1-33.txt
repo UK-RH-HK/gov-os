@@ -1,0 +1,39 @@
+..........................F............................................. [ 64%]
+.............F..........................                                 [100%]
+=================================== FAILURES ===================================
+__________ test_there_is_one_definition_per_role_and_the_research_one __________
+
+    def test_there_is_one_definition_per_role_and_the_research_one():
+        found = support.live_support.agent_definitions()
+        wanted = set(support.ROLES + (support.RESEARCH,))
+>       assert set(found) == wanted, f"the definitions under .claude/agents/ are {sorted(found)}"
+E       AssertionError: the definitions under .claude/agents/ are ['engineer', 'independent-auditor', 'independent-test-designer', 'orchestrator', 'product-spec', 'qa-engineer', 'research', 'senior-engineer', 'ticket-lead']
+E       assert {'engineer', ...ngineer', ...} == {'engineer', ...', 'research'}
+E         
+E         Extra items in the left set:
+E         'ticket-lead'
+E         'senior-engineer'
+E         'qa-engineer'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:89: AssertionError
+___________________ test_the_research_role_file_is_unchanged ___________________
+
+    def test_the_research_role_file_is_unchanged():
+        """Green before implementation; it must stay green."""
+        files = sorted(path.name for path in (support.REPO_ROOT / support.ROLES_DIR_REL).glob("research*"))
+        assert files == ["research.md"], f"the kernel holds another research role file: {files}"
+>       assert support.sha256(support.role_file_rel(support.RESEARCH)) == support.RESEARCH_ROLE_FILE_SHA256, (
+            "template/governance/kernel/roles/research.md is not the file W1-46 placed"
+        )
+E       AssertionError: template/governance/kernel/roles/research.md is not the file W1-46 placed
+E       assert 'f9bc3b721b56...2733793b9d1cd' == '60f9092f3743...3d775c933e678'
+E         
+E         - 60f9092f37430a096eeb932907b5814661585afaf38c52a045c3d775c933e678
+E         + f9bc3b721b568bf80210f2f438dce5d18954eb24a986b75d6c82733793b9d1cd
+
+tests/acceptance/W1-33/test_w1_33_kernel_role_files.py:153: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one
+FAILED tests/acceptance/W1-33/test_w1_33_kernel_role_files.py::test_the_research_role_file_is_unchanged
+2 failed, 110 passed, 2 deselected in 13.15s

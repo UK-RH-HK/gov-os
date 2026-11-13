@@ -1,0 +1,22 @@
+load: 6 busy loops on 1 CPUs (slot 1, cpus 0,1,2,3,4,5); pids 2274294 2274295 2274296 2274297 2274298 2274299
+run 1: exit 0; 12 s; 133 passed in 11.26s
+run 2: exit 0; 15 s; 133 passed in 11.53s
+run 3: exit 0; 12 s; 133 passed in 11.19s
+run 4: exit 0; 11 s; 133 passed in 10.62s
+run 5: exit 0; 16 s; 133 passed in 11.67s
+run 6: exit 0; 11 s; 133 passed in 11.10s
+run 7: exit 0; 16 s; 133 passed in 11.94s
+run 8: exit 0; 13 s; 133 passed in 12.22s
+run 9: exit 0; 13 s; 133 passed in 12.49s
+run 10: exit 0; 17 s; 133 passed in 12.11s
+run 11: exit 0; 14 s; 133 passed in 13.57s
+run 12: exit 0; 18 s; 133 passed in 13.59s
+run 13: exit 0; 15 s; 133 passed in 14.59s
+run 14: exit 0; 17 s; 133 passed in 12.71s
+run 15: exit 0; 13 s; 133 passed in 12.75s
+run 16: exit 0; 13 s; 133 passed in 12.41s
+run 17: exit 0; 16 s; 133 passed in 11.55s
+run 18: exit 0; 13 s; 133 passed in 12.45s
+run 19: exit 0; 18 s; 133 passed in 13.58s
+run 20: exit 0; 15 s; 133 passed in 14.02s
+done

@@ -1,0 +1,9 @@
+Round 3 of the path-map chain on the live map 30233a092a4b (after ACT-OPERATOR-HOURS-2's commit 6b8634d2c), 2026-11-12.
+ACT-EXAMIN-SETS-1   manifest sha256 2f814211320cf13edc8cce0eee84bae84a6402cee0b2e6fa6ea8069b52404ba7 (sha8 2f814211)  30233a092a4b -> 1fe00f43d8ab
+ACT-ACCEPTED-REDS-1 manifest sha256 9c20e5e3c737f422319ebf6286e8f5d2ddaf2cec4c6ab69de9cf9d58775e8b11 (sha8 9c20e5e3)  1fe00f43d8ab -> e4281125cf0e
+ACT-PATHMAP-EXP-1   manifest sha256 b26fe623d7a685ec7083a224e5f21af4a51503bae4d836d020df32290b73ff5c (sha8 b26fe623)  e4281125cf0e -> 805bd918d467
+rehearsal chain: rehearsal.r3.log, 193 checks, failures 0, two runs byte-equal (sha256 52097d78c545f4f0bfe7b09369fd358124c97a52579376fd256c665914733bf1);
+tests/acceptance/W1-01 in the chain's end state: 54 passed, 12 deselected (both runs; the count is kept out of the hashed log); section 5 of REDS as written: script exit 0.
+Round 2 bundles kept: acts/ACT-EXAMIN-SETS-1.r2-e8020292, acts/ACT-ACCEPTED-REDS-1.r2-b8df21d8, acts/ACT-PATHMAP-EXP-1.r2-9a945c99 (each with its review).
+The queued bundles acts/ACT-*/ are the round 3 ones (no review.md yet: a new review is needed).
+Builders: examin-sets/tools/build_r3.py, rehearse_r3.sh, run_section5_r3.sh, apply_r3.sh.tpl; pathmap-exp-1/insert_exp.py (new: round 2's one-line replacement written down).

@@ -1,0 +1,28 @@
+{
+ "head": "6a5d5321ba1a139781f863b0f9e4f45d90edc4a7",
+ "base": "3eeb5cb2e98e1c4fa2508f73efadfb2d9eb3f697",
+ "skipped": "the merged code is identical to 5cbd79b4e45b867c7efd98f99bfaaa44dd32e522, W2-173's approved commit, which its lead tested; governance paths left out of the comparison: .tickets/DAEO-1k7y.md, .tickets/DAEO-c9n8.md, .tickets/DAEO-cb2b.md, .tickets/DAEO-ozyt.md, .tickets/DAEO-qz4p.md, governance/project/orchestration/packages/ACT-CONTEXT-WATCH-1.md, governance/project/orchestration/packages/ACT-OPERATOR-HOURS-1.md, governance/project/orchestration/packages/ACT-OPERATOR-HOURS-2.md, governance/project/orchestration/packages/DECIDED-NOT-DONE.md, governance/project/orchestration/reviews/ACT-CONTEXT-WATCH-1-review-r2.md, governance/project/orchestration/reviews/ACT-CONTEXT-WATCH-1-review.md, governance/project/orchestration/reviews/ACT-OPERATOR-HOURS-1-review.md, governance/project/orchestration/reviews/ACT-OPERATOR-HOURS-2-review.md, governance/project/orchestration/reviews/W2-176-delta-review.md (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)",
+ "tickets": [
+  {
+   "ticket": "W2-173",
+   "task": "DAEO-qz4p",
+   "commit": "5cbd79b4e45b867c7efd98f99bfaaa44dd32e522",
+   "merge": "6a5d5321ba1a139781f863b0f9e4f45d90edc4a7"
+  }
+ ],
+ "selection": {
+  "targets": [],
+  "core_changed": [],
+  "unplaced": []
+ },
+ "counts": null,
+ "flaky": [],
+ "unowned": [],
+ "ejected": [],
+ "trace_base": null,
+ "record_rerun": null,
+ "cleared_by_results": [],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-055004-045401",
+ "started": "2026-11-12 05:50:04",
+ "finished": "2026-11-12 05:50:04"
+}

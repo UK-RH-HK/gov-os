@@ -1,0 +1,9 @@
+log: W2-111-A5-run2.json
+W2: W2-111
+status: PACKAGES. The new measure is at a5bf1c0131b8 on w2/W2-111-tests and is **not merged**. In the benchmark every case gives the same verdict quiet, at load ~20 and at 50+, and the planted hook fails every case at both loads. But the measure judges a little less than the hook's whole work, so it needs t
+
+task: DAEO-qvff (W2-111), run 2 (tests, round 2)
+status: PACKAGES. The new measure is at a5bf1c0131b8 on w2/W2-111-tests and is **not merged**. In the benchmark every case gives the same verdict quiet, at load ~20 and at 50+, and the planted hook fails every case at both loads. But the measure judges a little less than the hook's whole work, so it needs the CTO's ruling against "lowering nothing" (DEC-979 D2 (a), the ticket's body) before it lands.
+work_completed:
+- Wrote the td-2 brief and launched a fresh independent test designer (claude-sonnet-5-5, high, C1). Session a7f96658, exit 0.
+- **

@@ -1,0 +1,9 @@
+log: W2-177-A5-run1b.json
+W2: W2-177
+status: PACKAGES. The six unit reds are fixed and green, including in the lead verify's own start form. Two follow-ups are outside this ticket's paths and need the CTO: P-W2-177-1 and P-W2-177-2.
+
+task: DAEO-1k7y (W2-177)
+status: PACKAGES. The six unit reds are fixed and green, including in the lead verify's own start form. Two follow-ups are outside this ticket's paths and need the CTO: P-W2-177-1 and P-W2-177-2.
+work_completed:
+- **Two causes found, both shown in counts:**
+  - (A) `gov accept`'s runner built its child's environment without `PYTHONUSERBASE` (`src/gov/accept/runner.py:539`). pytest is installed in `/home/usain/.local`, so under an empty HOME the child can't start pytest and the planted test never runs. This explains cases 2, 4, 5 and 6 (the 60 s waits) and the R11 unit 

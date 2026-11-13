@@ -1,0 +1,3 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log
+Landing check (OPERATOR-AGENT-1 §3, S16) after the landing d172bc71f81c..b88a76172d42 on w2/integrate: commit b88a76172d42 (Kernel templates: the "until W2-56" line deleted from role-lead.md (c731503e), role-cto.md (dbcc9d8c) and the orchestrat) touches template/governance/kernel/templates/role-cto.md,template/governance/kernel/templates/role-lead.md: a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+status: P1

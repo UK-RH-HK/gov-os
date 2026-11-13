@@ -1,0 +1,11 @@
+log: W2-113-A5-run3.json
+W2: W2-113
+status: DONE. The verified head is 6542b7ec525b. The head to land is f42f86309aba, which adds only the probe record. The review passed with 0 blocking findings.
+
+task: DAEO-g29a (W2-113), run 3, build
+status: DONE. The verified head is 6542b7ec525b. The head to land is f42f86309aba, which adds only the probe record. The review passed with 0 blocking findings.
+work_completed:
+- Merged w2/integrate into the branch (159abfe06c3b), which brought in PKG-3 (b) and the confirmed readings (931281df5).
+- td-2 revised exactly the two `tk`-missing cases to PKG-3 (b), with `Rewrite-Reason: DEC-1157 (15)`. I merged that at 6542b7ec5 between the engineer's batches and rewrote TESTS-READY.
+- eng-1 built I1-I3 (a322b1f94):
+  - A0 creates `<folder> coordination` with `

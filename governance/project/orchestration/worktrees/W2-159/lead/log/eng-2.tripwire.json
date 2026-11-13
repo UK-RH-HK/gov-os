@@ -1,0 +1,86 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f1720d3d8e26",
+   "after": "243ef7b7682b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "f7962d3661d1",
+   "after": "243ef7b7682b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "1f626332fde0",
+   "after": "243ef7b7682b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146",
+   "change": "status line added",
+   "line": " M src/gov/retrieval/lexical.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146",
+   "change": "status line added",
+   "line": " M src/gov/retrieve/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146",
+   "change": "status line added",
+   "line": " M template/governance/kernel/schemas/path-map.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146",
+   "change": "status line added",
+   "line": "?? tests/unit/retrieval/test_w2_146_id_forms.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146",
+   "change": "status line added",
+   "line": "?? tests/unit/retrieve/test_w2_146_stop.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-146/test_w2_146_reader.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-146/test_w2_146_schema.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-146/test_w2_146_stop.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-146/w2_146_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-146-tests",
+   "change": "acceptance folder",
+   "folder": "W2-146"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-158-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "head",
+   "before": "268a2fadc181",
+   "after": "680bdce1f526"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-181-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "act": "ACT-CLAUDE-COPIES-8",
+ "dec": "DEC-1052, DEC-1163, DEC-315, CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/agents/orchestrator.md",
+   "before": "d46907b92776244721dceca7d8f8b33ec7352bde113068c54a638d3da3d7200c",
+   "after": "20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-cto.md",
+   "before": "013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd",
+   "after": "dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-lead.md",
+   "before": "4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9",
+   "after": "c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/orchestrator.md",
+   "before": "ef15ea7d3ea78b674f4e4480e521c43db4ad43eb8bcbc7a8be66f83f582d266c",
+   "after": "5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/agents/orchestrator.md": "d46907b92776244721dceca7d8f8b33ec7352bde113068c54a638d3da3d7200c",
+  "after/repo/.claude/agents/orchestrator.md": "20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f",
+  "before/repo/.claude/templates/role-cto.md": "013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd",
+  "after/repo/.claude/templates/role-cto.md": "dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789",
+  "before/repo/.claude/templates/role-lead.md": "4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9",
+  "after/repo/.claude/templates/role-lead.md": "c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799",
+  "before/repo/.rulesync/subagents/orchestrator.md": "ef15ea7d3ea78b674f4e4480e521c43db4ad43eb8bcbc7a8be66f83f582d266c",
+  "after/repo/.rulesync/subagents/orchestrator.md": "5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba",
+  "list.txt": "5cb83c688e4edcea21c06887425eefa2ef3b37f4541a6c40f53e93ebaae0710c",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "f96e1d8b35d0242edee5c9331b43cc88a58708d4202a7f9a1f80a7048afc314c"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "f96e1d8b35d0242edee5c9331b43cc88a58708d4202a7f9a1f80a7048afc314c"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f  .claude/agents/orchestrator.md\ndbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789  .claude/templates/role-cto.md\nc731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799  .claude/templates/role-lead.md\n5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba  .rulesync/subagents/orchestrator.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n8c86a7fd487e71598a9bd0e75a174b6ba3cc88262821bdb2e750478162358862  .claude/agents/engineer.md\nbf89c543781cb12a1c433d08efb049851e37b668cd76d84456baa9532557e5f2  .claude/agents/independent-auditor.md\n9e8dbe81037a50e64306f44f3a5b739fb25c9ebb8b7febb25b0cf430af5c51c1  .claude/agents/independent-test-designer.md\n5a8dc025046c847d2b65116ea6486c40d046cf6c0680cd32b5164b86fd0530f6  .claude/agents/product-spec.md\n87753e15adfdeac756722a7846e6e2d882a0cc2be1bafc245564eaefac50882e  .claude/agents/qa-engineer.md\n7be836dfae00e37606c76e8f996c8ab24e1f41d537930ad55fb47da0f2a4b999  .claude/agents/research.md\neefcc736bdd4c626b7d91f2ee52c91cb324c130f89015046b96b8e1ff10ee098  .claude/agents/senior-engineer.md\n496868c9c996daf80545ffd6d526fef66d5f27998b973720629c3214f4290ad9  .claude/agents/ticket-lead.md\na93908b72aa56df25136db30fba5cf03d270c17d4740ce1868d386cc24b52357  .rulesync/subagents/engineer.md\nb6892aaff0a58832e2278624f1aee802765409ebffb9af53bfb3b0b8ebd21a71  .rulesync/subagents/independent-auditor.md\n4cc9f1f7bd5c34d24bec9581c2c3d3a950af928400b55c17f16824df7ec2054d  .rulesync/subagents/independent-test-designer.md\n08caa400e1aaaea870a8f0a1568570b8cb8f4296f9760511592f2fbdc7c19917  .rulesync/subagents/product-spec.md\n5f41e7bc74071d57bab55e26726c20ea55048316704dcc47c1e465be553249d3  .rulesync/subagents/qa-engineer.md\n7c90fcd0eec69e7a8ef55a21c90d0667f65780df17957907fd66da4e02ef2605  .rulesync/subagents/research.md\n84e1ffd16eeea88d1735fecd5be598e59301c83ddaa6dc2ae56d72b1a0e5c70e  .rulesync/subagents/senior-engineer.md\n8e7dc98b499bc2271b797079afeab5cd2b8712a503dc63c52ade8870b1b758f9  .rulesync/subagents/ticket-lead.md\na93908b72aa56df25136db30fba5cf03d270c17d4740ce1868d386cc24b52357  template/.rulesync/subagents/engineer.md\nb6892aaff0a58832e2278624f1aee802765409ebffb9af53bfb3b0b8ebd21a71  template/.rulesync/subagents/independent-auditor.md\n4cc9f1f7bd5c34d24bec9581c2c3d3a950af928400b55c17f16824df7ec2054d  template/.rulesync/subagents/independent-test-designer.md\n5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba  template/.rulesync/subagents/orchestrator.md\n08caa400e1aaaea870a8f0a1568570b8cb8f4296f9760511592f2fbdc7c19917  template/.rulesync/subagents/product-spec.md\n5f41e7bc74071d57bab55e26726c20ea55048316704dcc47c1e465be553249d3  template/.rulesync/subagents/qa-engineer.md\n7c90fcd0eec69e7a8ef55a21c90d0667f65780df17957907fd66da4e02ef2605  template/.rulesync/subagents/research.md\n84e1ffd16eeea88d1735fecd5be598e59301c83ddaa6dc2ae56d72b1a0e5c70e  template/.rulesync/subagents/senior-engineer.md\n8e7dc98b499bc2271b797079afeab5cd2b8712a503dc63c52ade8870b1b758f9  template/.rulesync/subagents/ticket-lead.md\nc94f98d7fc17b60bfbea3d3bb2fcf7e2d84d698490e3e4464ece957c15f5b423  template/governance/kernel/roles/engineer.md\n4b4a5f947206517e167d6b39c9531d3fa7a96476b1d0658ea52e84277a92746c  template/governance/kernel/roles/independent-auditor.md\n890c91f577c8b934761cbc95a079fbbc50f4201f60f1f7ef52471afb16014fce  template/governance/kernel/roles/independent-test-designer.md\n08ba69e63d51adeb901ef8998f6dc2a21490dff9b326c69a603fafbf14d47d10  template/governance/kernel/roles/orchestrator.md\nbb9a46da12c7b34208cc1f6fcc37f523821783530d3faf8675032502ebf74e43  template/governance/kernel/roles/product-spec.md\n40fd68fdadf35df679a14842f86e6b51ce849eec65d241cf6fca04f63b362f3a  template/governance/kernel/roles/qa-engineer.md\nf9bc3b721b568bf80210f2f438dce5d18954eb24a986b75d6c82733793b9d1cd  template/governance/kernel/roles/research.md\n243e8b8422eca053c7da99f108941d736962e4437bbc0c507fc98feadc25f415  template/governance/kernel/roles/senior-engineer.md\n0c93598c82daf3f5401c9d5c3293a00144a40565682fd878f289926593b355af  template/governance/kernel/roles/ticket-lead.md\ndbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789  template/governance/kernel/templates/role-cto.md\nc731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799  template/governance/kernel/templates/role-lead.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

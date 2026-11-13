@@ -1,0 +1,12 @@
+2026-11-12 08:09:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 08:09:05 merged W2-157 onto d02e957ba35a: de92a0223520
+2026-11-12 08:25:07 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 08:25:14 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 08:25:16 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 08:25:17 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 08:25:17 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle]
+2026-11-12 08:25:18 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last]
+2026-11-12 08:32:33 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 2f26bab83f99: 74217e844efc; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-12 08:32:33 ADVANCED refs/heads/w2/integrate 2f26bab83f99 -> 74217e844efc; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/74217e844efc.json
+2026-11-12 08:32:33 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 08:33:16 integration store promoted: the merged clone's stores at 74217e844efc into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)

@@ -1,0 +1,1582 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "head",
+   "before": "696d32a93e34",
+   "after": "f1f950479641"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_draw_of_a_smaller_size_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/XCHECK-r2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q03.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q04.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q05.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q06.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q07.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q08.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q09.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q10.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q11.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q12.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q13.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q14.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q15.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q16.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q17.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q18.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q19.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q20.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q21.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q22.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q23.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q24.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q25.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q26.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q27.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q28.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q29.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q30.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q31.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q32.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q33.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q34.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q35.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q36.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q37.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q38.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q39.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q40.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-audit-20261111/selection.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v03.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v04.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v05.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v06.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v07.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v08.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v09.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v10.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v11.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v12.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v13.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v14.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v15.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v16.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v17.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v18.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v19.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v20.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v21.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v22.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v23.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v24.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v25.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v26.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v27.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v28.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v29.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v30.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v31.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v32.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v33.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v34.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v35.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v36.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v37.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v38.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v39.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/fixtures/evaluation/memory-retrieval/visible/v40.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/governance/project/path-map.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261001/FIGURES.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/.ledger.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/DECLARATION.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/DROPS.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/PREFLIGHT.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/USED"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/.measure.err.tmp"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/.measure.txt.tmp"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/.n"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/.n.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00001.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00002.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00003.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00004.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00005.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00006.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00007.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00008.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00009.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00010.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00011.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00012.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00013.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00014.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00015.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00016.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00017.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00018.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00019.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/kept/00020.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/attempt-1/ms"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/.n"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/.n.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00001.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00002.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00003.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00004.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00005.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00006.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00007.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00008.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00009.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00010.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00011.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00012.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00013.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00014.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00015.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00016.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00017.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00018.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00019.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00020.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00021.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00022.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00023.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00024.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00025.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00026.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00027.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00028.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00029.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00030.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00031.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00032.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00033.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00034.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00035.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00036.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00037.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00038.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00039.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/kept/00040.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/measure-memory-retrieval-visible-20261112T063210583912Z.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/measure.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/measure.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/control-1/ms"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/gov.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/ledger.jsonl"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/sets/runs/memory-audit-20261111/probe.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/share/pin-0123456789ab/bin/calls.jsonl"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/share/pin-0123456789ab/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/share/pin-0123456789ab/bin/plan.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_mor0/store.db"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_fall_of_3_points_or_morcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_pool_of_300_is_measuredcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_pool_of_900_is_a_seededcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_a_set_that_changed_since_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_no_search_precedes_the_decurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_children_get_the_envicurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_shared_servers_are_recurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/XCHECK-r2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q03.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q04.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q05.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q06.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q07.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q08.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q09.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q10.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q11.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q12.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q13.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q14.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q15.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q16.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q17.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q18.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q19.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q20.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q21.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q22.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q23.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q24.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q25.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q26.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q27.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q28.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q29.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q30.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q31.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q32.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q33.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q34.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q35.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q36.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q37.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q38.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q39.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/hidden/q40.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/fixtures/evaluation/memory-audit-20261111/selection.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/governance/project/path-map.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/DECLARATION.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/DROPS.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/PREFLIGHT.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/USED"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/ledger.jsonl"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/sets/runs/memory-audit-20261111/probe.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/share/pin-0123456789ab/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/share/pin-0123456789ab/bin/plan.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_control_set_folder_remo0/store.db"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179",
+   "change": "head",
+   "before": "3eeb5cb2e98e",
+   "after": "4a9d5d074834"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "head",
+   "before": "3eeb5cb2e98e",
+   "after": "3c1981b03b90"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-170/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-170/test_w2_170_s4_map.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/declare.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/home-with-runs/gov-os-runs/indep/AUDITS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/home-with-runs/gov-os-runs/indep/SEEDS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/preflight.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/void.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/bin/gov-unpinned"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/launch-log/indep/AUDITS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/launch-log/indep/SEEDS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/pins/pin-0123456789ab/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/pins/plain/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/repo/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/XCHECK-r2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/dropped/q27.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q03.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q04.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q05.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q06.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q07.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q08.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q09.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q10.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q11.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q12.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q13.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q14.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q15.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q16.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q17.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q18.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q19.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q20.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q21.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q22.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q23.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q24.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q25.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q26.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q28.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q29.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q30.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q31.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q32.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q33.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q34.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q35.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q36.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q37.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q38.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q39.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-audit-20261111/hidden/q40.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-pool/hidden/memory-audit-20261101-q01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/fixtures/evaluation/memory-pool/hidden/memory-audit-20261101-q02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/governance/project/path-map.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/runs/memory-audit-20261111/DECLARATION.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/runs/memory-audit-20261111/DROPS.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/runs/memory-audit-20261111/PREFLIGHT.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/runs/memory-audit-20261111/USED"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/sets/runs/memory-audit-20261111/ledger.jsonl"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/store.db"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_lo0/world1/world.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f3_a_run_s_file_access_locurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-homecurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/bin/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/bin/gov-unpinned"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/launch-log/indep/AUDITS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/launch-log/indep/SEEDS.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/pins/pin-0123456789ab/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/pins/plain/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/repo/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/sets/fixtures/evaluation/memory-pool/hidden/memory-audit-20261101-q01.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/sets/fixtures/evaluation/memory-pool/hidden/memory-audit-20261101-q02.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/sets/governance/project/path-map.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/store.db"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standard0/w/world.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/w2-170-template-standardcurrent"
+  }
+ ]
+}

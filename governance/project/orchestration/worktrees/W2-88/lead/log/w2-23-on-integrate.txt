@@ -1,0 +1,26 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 05:13:31)
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-13/test_s6_every_kernel_hook_exit0')
+
+    def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_path):
+        pair = _pair(tmp_path)
+        events = support.kernel_hook_events()
+        scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
+        reached = {name for name in scripts if any(name in command for _, command in events)}
+>       assert reached == scripts and len(scripts) == 6, \
+            f"the settings' hook command lines do not reach the six kernel hooks: {sorted(scripts - reached)}"
+E       AssertionError: the settings' hook command lines do not reach the six kernel hooks: ['context_watch.py']
+E       assert ({'posttooluse...agentstop.py'} == {'context_wat...stop.py', ...}
+E         
+E         Extra items in the right set:
+E         'context_watch.py'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-23/test_w2_23_space.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+1 failed in 0.18s
+rc=1

@@ -1,0 +1,6 @@
+TESTS-READY W2-120 (DAEO-i89t) run 3
+merge commit: 1eec1209bd0a (merge of w2/W2-120-tests c63335672f81 into w2/W2-120: the I3 gov check case's envelope fix)
+earlier: run 2 merge fdce323721f2 (merge of w2/W2-120-tests e8b9db4d2462: the suite, 32 cases, I1-I4)
+suite: tests/acceptance/W2-120/ (32 cases; I1-I4)
+gov accept W2-120 on fdce323721f2: outcome fail (red as required): success-1 passed 4, failed 28, skipped 0; unmapped 0
+log: .gov-runtime/scratch/lead/log/accept-1.txt

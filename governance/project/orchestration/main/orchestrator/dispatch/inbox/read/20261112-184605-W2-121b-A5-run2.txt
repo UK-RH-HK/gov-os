@@ -1,0 +1,8 @@
+log: W2-121b-A5-run2.json
+W2: W2-121b
+status: DONE. Head to land is `4a8634017`: the verified head `dae1c10e0392` plus the probe record commit, which touches only docs. The tree is clean. The review passes S1 to S4 at its second and last round.
+
+task: DAEO-ifgf (W2-121b), gov dispatch part b (landing). Build run 2: build, verify, FULL review, probe record.
+status: DONE. Head to land is `4a8634017`: the verified head `dae1c10e0392` plus the probe record commit, which touches only docs. The tree is clean. The review passes S1 to S4 at its second and last round.
+work_completed:
+- **Build.** The engineer (eng-1, Sonnet high, C2) built part b in `ab5799760` and got 46 of 48 acceptance cases green. It argued the other two cases were wrong against the ticket, and I checked both: the stub counts all its arguments, so the log says 4, not 2; an

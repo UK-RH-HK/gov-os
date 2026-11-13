@@ -1,0 +1,122 @@
+ACT-CLAUDE-COPIES-7 rehearsal; base: integrate with w2/W2-98 3a86f11c3981 merged; rulesync 24.0.0
+the twelve sources (kernel, root .rulesync, template/.rulesync; 4 files each) at the CIT-P section 3 hashes (approved at 3a86f11c3981)
+portability on the base (W2-98 merged, no copies): exit 1; 15 findings: GENERATED_DIFFERS 4, SOURCE_DIFFERS 6, SOURCE_MISSING 3, TEMPLATE_COPY_DIFFERS 2; of them spec-writing's: GENERATED_DIFFERS 4
+  the others are ACT-CLAUDE-COPIES-6's and -8's window (neither applied on integrate): SOURCE_DIFFERS 6, SOURCE_MISSING 3, TEMPLATE_COPY_DIFFERS 2
+compose() for the 6 roles with a source on the base gives ACT-CLAUDE-COPIES-6's after bytes (-8's for the orchestrator; the other 3 need COPIES-6's front matter; portability exit 0 on the fully landed tree covers them): W2-98 changes no role composition, so no role source is in this ACT
+rulesync's other output that differs from the tree (not written; as in ACT-CLAUDE-COPIES-5 and -6): ['.claude/settings.json']
+portability in the generation clone after the copies: exit 1; spec-writing findings []; the others unchanged: True
+portability on template/ (as an adopted project, no rulesync): 0 spec-writing findings; others: RULESYNC_VERSION_UNKNOWN 1, TEMPLATE_COPY_MISSING 8
+generation clone: 4 files new: .claude/skills/spec-writing/SKILL.md, .claude/skills/spec-writing/check_spec.py, .claude/skills/spec-writing/imports.yaml, .claude/skills/spec-writing/spec-form.md
+the generation writes nothing under template/ or .rulesync/: no template patch, no CTO template commit; the root and template .rulesync copies are W2-98's own (its merge brings them)
+  .claude/skills/spec-writing/SKILL.md: rulesync's rendering of the kernel file (5812 bytes, kernel 5823)
+  .claude/skills/spec-writing/check_spec.py: byte-equal to the kernel file
+  .claude/skills/spec-writing/imports.yaml: byte-equal to the kernel file
+  .claude/skills/spec-writing/spec-form.md: byte-equal to the kernel file
+the before-bytes are integrate's and equal on integrate with W2-98 merged (0 changed, 4 new)
+check 1: the 4 copies; check 2: the 12 sources; no live HOME path in either
+--- rehearsal on integrate with W2-98 merged (the tree after the hand merge's merge commit); HOME planted
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended: the copies are absent): exit 1
+ok   check 2 before the apply (green: W2-98's twelve sources at the approved bytes): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 4 files): exit 0
+ok   check 2 (sha256sum -c, 12 files): exit 0
+ok   the changed set equals the touched list (4 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply: exit 1; spec-writing findings []; the 11 others (COPIES-6's and -8's window) unchanged
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   portability after the undo: exit 1; 15 findings: GENERATED_DIFFERS 4, SOURCE_DIFFERS 6, SOURCE_MISSING 3, TEMPLATE_COPY_DIFFERS 2 (the base's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- plain integrate (W2-98 not merged)
+ok   apply.sh check passes on plain integrate (the four copies are absent there as on the merged tree): exit 0
+ok   check 2 is red on plain integrate (W2-98's sources are absent: the order is held): exit 1
+ok   check changed nothing
+--- the merged tree with ACT-CLAUDE-COPIES-6 and then ACT-CLAUDE-COPIES-8 applied by their own apply.sh (both queued, neither applied on integrate at build time); HOME planted
+ok   ACT-CLAUDE-COPIES-6: apply.sh check, apply, commit: exit 0
+ok   ACT-CLAUDE-COPIES-8: apply.sh check, apply, commit: exit 0
+ok   portability before this ACT: exit 1; 4 findings, all spec-writing's: GENERATED_DIFFERS 4
+ok   apply.sh check: exit 0
+ok   check 2 before the apply: exit 0
+ok   apply.sh apply: exit 0
+ok   check 1: exit 0
+ok   check 2: exit 0
+ok   the changed set equals the touched list
+ok   portability on the fully landed tree: exit 0; findings []
+--- the other order: this ACT on the merged tree, then ACT-CLAUDE-COPIES-6 and -8
+ok   this ACT: apply.sh check, apply, commit: exit 0
+ok   ACT-CLAUDE-COPIES-6 after it: apply.sh check, apply, commit: exit 0
+ok   ACT-CLAUDE-COPIES-8 after it: apply.sh check, apply, commit: exit 0
+ok   check 1: exit 0
+ok   check 2: exit 0
+ok   portability: exit 0; findings []
+ok   the tree clean after the three ACTs' commits
+ok   the four copies are the same bytes in either order
+--- the gated runs, one folder per run through the heavy-job gate: on the merged tree (W2-98's merge alone, then with this ACT), and on the merged tree with COPIES-6 and -8 (without, then with this ACT)
+merged window tests/acceptance/W2-98: exit 1; 500 passed, 2 failed
+merged window tests/unit/adapters: exit 1; 100 passed, 2 failed
+merged window tests/acceptance/W1-33: exit 1; 106 passed, 6 failed
+merged window tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+merged window tests/acceptance/W2-153: exit 1; 53 passed, 13 failed
+merged window tests/acceptance/W2-11: exit 1; 197 passed, 1 failed, 1 skipped
+ok   merged landed tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+ok   merged landed tests/unit/adapters: exit 1; 100 passed, 2 failed
+ok   merged landed tests/acceptance/W1-33: exit 1; 106 passed, 6 failed
+ok   merged landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   merged landed tests/acceptance/W2-153: exit 1; 53 passed, 13 failed
+ok   merged landed tests/acceptance/W2-11: exit 0; 199 passed, 0 failed, 1 skipped
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[spec-writing]
+     merged: made green by the ACT: tests/acceptance/W2-98/test_w2_98_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill
+     merged: made green by the ACT: tests/acceptance/W2-98/test_w2_98_copies.py::test_the_claude_copy_matches_the_kernel_source
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[engineer]
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[independent-auditor]
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[independent-test-designer]
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[orchestrator]
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[product-spec]
+     merged: red after the ACT: tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[engineer-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-auditor-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-test-designer-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[product-spec-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[research-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[engineer-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-auditor-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-test-designer-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[orchestrator-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[product-spec-.rulesync]
+     merged: red after the ACT: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[research-.rulesync]
+     merged: red after the ACT: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+     merged: red after the ACT: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+merged: red in the window: 24; made green by the ACT: 3; red after: 21; new red brought by the ACT: []
+full window tests/acceptance/W2-98: exit 1; 500 passed, 2 failed
+full window tests/unit/adapters: exit 0; 102 passed, 0 failed
+full window tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+full window tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+full window tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+full window tests/acceptance/W2-11: exit 1; 197 passed, 1 failed, 1 skipped
+ok   full landed tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+ok   full landed tests/unit/adapters: exit 0; 102 passed, 0 failed
+ok   full landed tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+ok   full landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   full landed tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   full landed tests/acceptance/W2-11: exit 0; 199 passed, 0 failed, 1 skipped
+     full: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[spec-writing]
+     full: made green by the ACT: tests/acceptance/W2-98/test_w2_98_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill
+     full: made green by the ACT: tests/acceptance/W2-98/test_w2_98_copies.py::test_the_claude_copy_matches_the_kernel_source
+full: red in the window: 3; made green by the ACT: 3; red after: 0; new red brought by the ACT: []
+--- the by-hand steps literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 1; spec-writing findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "78de1c5fe9198ea3a3982e7d8557397b5b5ddce8682e2f85b9b6cfc5c4f1fb02", "touched": 4, "failures": 0}

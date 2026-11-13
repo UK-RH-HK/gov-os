@@ -1,0 +1,9 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-210102.out
+W2: (land batch)
+status: W2-172=0c16d8afb0b5 not landed (ejected: red)
+
+last output:
+t_once, tests/acceptance/W2-172/test_w2_172_s9_cron_gate.py::test_s9_the_gate_is_asked_before_measure_judge_and_pool_and_before_nothing_else, tests/acceptance/W2-172/test_w2_172_s9_cron_gate.py::test_s9_without_a_gate_command_no_gate_is_asked, tests/acceptance/W2-171/test_w2_171_f5_paths.py::test_f5_the_branch_changes_only_paths_the_ticket_allows
+queue run exit 3
+W2-172: not landed (ejected: red)
+

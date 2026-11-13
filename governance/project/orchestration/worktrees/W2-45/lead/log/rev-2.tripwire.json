@@ -1,0 +1,16 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "a46ebf1bebfe",
+   "after": "41a593e2c6bf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "a2f28ccf319e",
+   "after": "41a593e2c6bf"
+  }
+ ]
+}

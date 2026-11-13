@@ -1,0 +1,83 @@
+{
+ "act": "ACT-OPERATOR-HOURS-1",
+ "dec": "DEC-1141, DEC-1104, DEC-1138",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "crontab",
+   "path": "crontab",
+   "before": "c613d523f7edb4ee1214f2b5c495727c67c060db702e090cf7718c3b9db690c7",
+   "after": "88cf08b165a184a23681b610ea07490c7c60559c6125fdba359db2a083d7c880"
+  }
+ ],
+ "files": {
+  "before/crontab/crontab": "c613d523f7edb4ee1214f2b5c495727c67c060db702e090cf7718c3b9db690c7",
+  "after/crontab/crontab": "88cf08b165a184a23681b610ea07490c7c60559c6125fdba359db2a083d7c880",
+  "apply.sh": "3ca208016bbe157a2a1b72fdd5434424262935e54ef9be6c0a8d5937744c074c",
+  "list.txt": "46d347eda4ce5cd6e02c65a5e4ad4dd6867f88f8b1f751a2afe7ac7b54ef9d39",
+  "rehearsal.log": "866325d9177ab46172324766e7565429ddaa9cc2e6e8e576ba3cd6015aafea13"
+ },
+ "checks": [
+  {
+   "cmd": "crontab -l | grep -v '^#' | grep -c .",
+   "exit": 0,
+   "count": 4
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\*/10 \\* \\* \\* \\* h=\\$(date +\\\\%H\\\\%M 2>/dev/null); .*operator_launch\\.py .*# DEC-1141 (6), ACT-OPERATOR-HOURS-1 '",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\*/10 0,8-23 '",
+   "exit": 1,
+   "count": 0
+  },
+  {
+   "cmd": "crontab -l | grep -c 'operator_launch\\.py'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c 'night-hold\\.state\\.json'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^0 4 \\* \\* \\* /usr/bin/bash .*/nightly/nightly_restart\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^0 8 \\* \\* \\* bash .*/nightly/nightly_check\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\* \\* \\* \\* \\* /usr/bin/bash .*/dispatch/run_tick\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \\* \\* \\* bash .*/nightly/nightly_cron\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/nightly_check\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \\* \\* \\* bash .*/nightly/runs_sweep\\.sh$'",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "866325d9177ab46172324766e7565429ddaa9cc2e6e8e576ba3cd6015aafea13"
+ }
+}

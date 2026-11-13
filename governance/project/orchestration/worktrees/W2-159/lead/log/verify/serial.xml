@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.895" timestamp="2026-11-12T12:29:43.165751+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-07.test_w1_07_help" name="test_help_answers_in_under_300_ms" time="2.789" /></testsuite></testsuites>

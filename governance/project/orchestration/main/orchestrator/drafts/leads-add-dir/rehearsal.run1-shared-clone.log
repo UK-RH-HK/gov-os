@@ -1,0 +1,77 @@
+ACT-LEADS-ADD-DIR-1 rehearsal, 2026-11-13 01:52:02 UTC; slot 3, CPUs 13,14,15,16,17,18,19
+--- A. the bundle and the clone
+clone HEAD 5bac674cbcdf on w2/integrate; main tree head 03472cbf4506
+ok   A0 the clone's launcher is the frozen before (the bundle is not stale)
+ok   A0b the main tree's launcher (read only) is the frozen before
+ok   A0c before/ and after/ hash as list.txt says
+     state before (sha256 023623ac6ac8)
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/dispatch/launch_now.sh (sha256 023623ac6ac8)
+ok   A2 verify refused before the apply (exit 3)
+     state before (sha256 023623ac6ac8); nothing to undo
+ok   A3 undo before the apply says nothing to undo (exit 0)
+--- B. the existing suites on the BEFORE launcher (the baseline)
+     223 passed, 3 skipped, 10 deselected in 98.79s (0:01:38)
+ok   B1 the three files that read the launcher (before, no companion): exit 0
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys... (exit 1)
+     fresh lead: --add-dir values are ''
+ok   check 2 as written: bash <<'EOF'... (exit 1)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 1)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+ok   check 5 as written: ! grep -q -- '--add-dir' /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/o... (exit 0)
+--- C. the sequencing: the plain apply WITHOUT the companion turns two existing W2-153 tests red (check 3 refuses it)
+     state applied (sha256 54345463a67b)
+ok   C1 plain apply (exit 0)
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys... (exit 0)
+     launch_now.sh: the lead line adds its own tests worktree and the runs root, makes the tests folder empty when absent, keeps an existing one, and a refused start makes nothing
+ok   check 2 as written: bash <<'EOF'... (exit 0)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 1)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+ok   check 5 as written: ! grep -q -- '--add-dir' /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/o... (exit 0)
+     FAILED tests/unit/launch/test_w2_153_template.py::test_the_dispatchers_lead_form_is_otherwise_the_same_command
+     FAILED tests/acceptance/W2-153/test_w2_153_dispatch.py::test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag
+     2 failed, 221 passed, 3 skipped, 10 deselected in 111.12s (0:01:51)
+ok   C2 the existing suites with the ACT and no companion are red, as check 3 says (the two named tests): exit 1
+     state before (sha256 023623ac6ac8)
+ok   C3 undo (exit 0)
+ok   C4 undone byte for byte
+--- D. the companion (tolerant of the --add-dir line), then the plain apply
+ok   D0 companion-tests.diff applies to the clone (exit 0)
+      M governance/project/operator/opcommon.py
+      M tests/acceptance/W2-148/README.md
+      M tests/acceptance/W2-148/test_w2_148_gates.py
+      M tests/acceptance/W2-153/test_w2_153_dispatch.py
+      M tests/unit/launch/test_w2_153_template.py
+      M tests/unit/operator/test_act_operator_hours_2.py
+the old launcher with the companion:
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys... (exit 1)
+     fresh lead: --add-dir values are ''
+ok   check 2 as written: bash <<'EOF'... (exit 1)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 0)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+ok   check 5 as written: ! grep -q -- '--add-dir' /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/o... (exit 0)
+     223 passed, 3 skipped, 10 deselected in 108.67s (0:01:48)
+ok   D1 the existing suites, old launcher + companion: exit 0
+     state applied (sha256 54345463a67b)
+ok   D2 plain apply (exit 0)
+ok   D3 the launcher is the frozen after, byte for byte
+ok   D4 the mode is kept (755)
+FAIL D5 git status:  M governance/project/operator/opcommon.py  M governance/project/orchestration/tools/dispatch/launch_now.sh  M tests/acceptance/W2-148/README.md  M tests/acceptance/W2-148/test_w2_148_gates.py  M tests/acceptance/W2-153/test_w2_153_dispatch.py  M tests/unit/launch/test_w2_153_template.py  M tests/unit/operator/test_act_operator_hours_2.py
+ok   D6 no temp file left beside the launcher
+     state applied (sha256 54345463a67b)
+ok   D7 check: state applied (exit 0)
+ok   D8 verify (exit 0)
+     state applied (sha256 54345463a67b); nothing to do
+ok   D9 apply again changes nothing (exit 0)
+--- E. every manifest check, exactly as written, with bash -c, on the applied clone
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys... (exit 0)
+     launch_now.sh: the lead line adds its own tests worktree and the runs root, makes the tests folder empty when absent, keeps an existing one, and a refused start makes nothing
+ok   check 2 as written: bash <<'EOF'... (exit 0)
+ok   check 3 as written: grep -q '_without_add_dirs(ours\["argv"\])' tests/acceptance/W2-153/test_w2_153_dispatch.p... (exit 0)
+ok   check 4 as written: python3 -I -c 'import sys... (exit 0)
+ok   check 5 as written: ! grep -q -- '--add-dir' /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/o... (exit 0)
+rehearsal exit 143

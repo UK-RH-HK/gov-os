@@ -1,0 +1,86 @@
+2026-11-12 21:44:02 admitted by the dispatcher; launching W2-120
+disk gate open: 772 GiB free, 61156264 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 16163328000,
+  "sessions_live_memory_bytes": 716951552,
+  "load_1m": 16.27,
+  "load_15m": 9.02,
+  "busy_cores_1m": 13.65,
+  "embedding_cpu_p95": {
+    "shared": 0.04,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 828118728704,
+    "free_inodes": 61149113
+  },
+  "sessions": [
+    {
+      "pid": 2685502,
+      "repository": "/home/usain/gov-os-worktrees/W2-160",
+      "ticket": "DAEO-fd0p",
+      "role": "orchestrator",
+      "live_memory_bytes": 238583808
+    },
+    {
+      "pid": 2731383,
+      "repository": "/home/usain/gov-os-worktrees/W2-160",
+      "ticket": "DAEO-fd0p",
+      "role": "engineer",
+      "live_memory_bytes": 233504768
+    },
+    {
+      "pid": 3559285,
+      "repository": "/home/usain/gov-os-worktrees/W2-172",
+      "ticket": "DAEO-p8tv",
+      "role": "orchestrator",
+      "live_memory_bytes": 244862976
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": [
+      {
+        "slot": 1,
+        "kind": "test",
+        "pid": 3791228,
+        "command_pid": 3821167,
+        "tree": "/tmp/pytest-of-usain/pytest-760/popen-gw3/test_s4_the_nightly_is_read_fi0/project/.gov-runtime/close/clone",
+        "cpus": "0-1",
+        "threads": 2,
+        "workers": 1,
+        "command": "/usr/bin/python3 -c import subprocess, sys\nwith open(sys.argv[1], 'w') as log:\n    sys.exit(subprocess.run(sys.argv[3:], cwd=sys.argv[2], stdout=log, stderr=subprocess.STDOUT).returncode)\n /tmp/pytest-of-usain/pytest-760/popen-gw3/test_s4_the_nightly_is_read_fi0/project/.gov-runtime/close/scoped/t/a",
+        "started": "2026-11-12T21:44:03+00:00"
+      }
+    ]
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 3820749,
+    "repository": "/home/usain/gov-os-worktrees/W2-120",
+    "ticket": "DAEO-i89t",
+    "role": "orchestrator",
+    "started": "2026-11-12T21:44:03+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 10538627
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 21:44:03 gate open; DAEO-i89t registered as pid 3820749; starting W2-120

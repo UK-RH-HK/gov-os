@@ -1,0 +1,8 @@
+log: W2-172-A5-run3.json
+W2: W2-172
+status: DONE, head 25634cdde460. The full suite is green, and the W2-172 acceptance suite passes from a clone under a `gov-os-runs/` folder like the queue's.
+
+task: DAEO-p8tv (W2-172), run 3 (resume, fix after the merge queue ejected the branch at 21:19)
+status: DONE, head 25634cdde460. The full suite is green, and the W2-172 acceptance suite passes from a clone under a `gov-os-runs/` folder like the queue's.
+work_completed: Two test-designer revision batches, both Sonnet 5.5 at high effort, class C2.
+  - **td-3** fixed `conftest.clean_paths`. It no longer checks the repository's own location (`W.SRC`) or the interpreter path. It still refuses any path the test world builds that holds a sets-root word. The step-line and argv greps now skip only the 

@@ -1,0 +1,268 @@
+== w3-pl-b start 2026-11-13T07:47:04+00:00 load: 27.70 21.56 27.82 30/1246 5056
+heavy_slot: all 3 slots taken; waiting (2026-11-13 07:47:04)
+23: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer] ________
+
+kernel_live = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-s...ixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-sandbox0/systmp'))
+name = 'Edit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now the call's CPU
+        time: the difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every
+        PreToolUse command registered for the tool and what each waited for, so it is the sum of their work (stricter than
+        the wall time of commands that run side by side, never looser). The bound (100 ms), the 40 calls, the 3 warm-up
+        calls and the nearest-rank p95 are the same; the wall p95 is reported beside it, for information. A round that
+        misses the bound is repeated, up to three rounds, as before.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+>               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Edit was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=2 stdout='' stderr="/usr/bin/python3: can't open file '/home/usain/gov-os-worktrees/W2-111-tests/.gov-runtime/scratch/td/plant_launch.py': [Errno 2] No such file or directory")
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:246: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer] ________
+
+kernel_live = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-s...ixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now the call's CPU
+        time: the difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every
+        PreToolUse command registered for the tool and what each waited for, so it is the sum of their work (stricter than
+        the wall time of commands that run side by side, never looser). The bound (100 ms), the 40 calls, the 3 warm-up
+        calls and the nearest-rank p95 are the same; the wall p95 is reported beside it, for information. A round that
+        misses the bound is repeated, up to three rounds, as before.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+>               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Glob was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=2 stdout='' stderr="/usr/bin/python3: can't open file '/home/usain/gov-os-worktrees/W2-111-tests/.gov-runtime/scratch/td/plant_launch.py': [Errno 2] No such file or directory")
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:246: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role] _________
+
+kernel_live = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-s...ixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now the call's CPU
+        time: the difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every
+        PreToolUse command registered for the tool and what each waited for, so it is the sum of their work (stricter than
+        the wall time of commands that run side by side, never looser). The bound (100 ms), the 40 calls, the 3 warm-up
+        calls and the nearest-rank p95 are the same; the wall p95 is reported beside it, for information. A round that
+        misses the bound is repeated, up to three rounds, as before.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+>               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Glob was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=2 stdout='' stderr="/usr/bin/python3: can't open file '/home/usain/gov-os-worktrees/W2-111-tests/.gov-runtime/scratch/td/plant_launch.py': [Errno 2] No such file or directory")
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:246: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer] ________
+
+kernel_live = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-s...ixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now the call's CPU
+        time: the difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every
+        PreToolUse command registered for the tool and what each waited for, so it is the sum of their work (stricter than
+        the wall time of commands that run side by side, never looser). The bound (100 ms), the 40 calls, the 3 warm-up
+        calls and the nearest-rank p95 are the same; the wall p95 is reported beside it, for information. A round that
+        misses the bound is repeated, up to three rounds, as before.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+>               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Grep was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=2 stdout='' stderr="/usr/bin/python3: can't open file '/home/usain/gov-os-worktrees/W2-111-tests/.gov-runtime/scratch/td/plant_launch.py': [Errno 2] No such file or directory")
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:246: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role] _________
+
+kernel_live = PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-s...ixPath('/tmp/gov-launch-9cb5nkn8/claude-1000/w2-111-td2-w3-pl-b/pytest-of-usain/pytest-0/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        Rewrite-Reason: DEC-979 (W2-111, P-LATENCY-1; DEC-906). The case timed the wall clock of the call; under load a
+        wall clock times the scheduler's queue, not the hook (2026-10-31: red 8, 0, 1 of the 11 latency cases with W2-106
+        and 0, 0, 5 without, at loads of 15 to 30; green alone on a quiet machine). The sample is now the call's CPU
+        time: the difference of ``RUSAGE_CHILDREN`` (user and system) before and after one call, which waits for every
+        PreToolUse command registered for the tool and what each waited for, so it is the sum of their work (stricter than
+        the wall time of commands that run side by side, never looser). The bound (100 ms), the 40 calls, the 3 warm-up
+        calls and the nearest-rank p95 are the same; the wall p95 is reported beside it, for information. A round that
+        misses the bound is repeated, up to three rounds, as before.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            cpu_before = _children_cpu_seconds()
+            result, seconds = support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+            return result, seconds, _children_cpu_seconds() - cpu_before
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        wall_rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            wall_samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds, cpu_seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+>               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Grep was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=2 stdout='' stderr="/usr/bin/python3: can't open file '/home/usain/gov-os-worktrees/W2-111-tests/.gov-runtime/scratch/td/plant_launch.py': [Errno 2] No such file or directory")
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:246: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+FAILED tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]
+5 failed, 10 deselected in 9.71s
+== w3-pl-b exit 1 end 2026-11-13T07:47:38+00:00 load: 29.19 22.50 27.94 34/1281 6271

@@ -9,6 +9,9 @@ For each ticket (default commit: the head of w2/<W2>, its lead's final, verified
      independent-test-designer (or Role: owner), else a refusal naming the commits; gitleaks on the ticket's change (not
      run when governance/project/secrets.yaml says scan: off, DEC-1045, and named; a value other than on or off
      refuses); every changed YAML file parses; the disk gate is open;
+  1b. the kernel gate (owner, 2026-11-12, "item 5 (a)"): tools/kernel_gate.py on each commit against w2/integrate;
+     a kernel file whose bytes are not in tools/kernel-approved.txt (or a gate error) stops the landing, exit 1,
+     before anything is enqueued (run by --check too);
   2. enqueue and approve it (the CTO approves until the three layers start);
 then one queue run (merge_queue.py run: Q-1, DEC-1050: each red traced once each way against the head without the
 batch, no baseline clone, 3 rounds only for the cases tools/load_sensitive.txt names; --base, the old nightly
@@ -55,6 +58,9 @@ BASE_WHY = ("the head without the batch, once each way, the same failure; 3 roun
 STRUCTURAL = ORCH / "tools/structural_pass.py"  # R1-21 (DEC-1052): the structural pass after a landing, a notice only
 STRUCTURAL_BOUND = 150  # s: the whole pass (each check is bounded at 50 s inside it; measured 8.5 s on 11-03)
 INBOX = ORCH / "dispatch/inbox"  # the dispatcher's inbox: the same item form (log:, a kind line, status:)
+# The kernel gate (owner, 2026-11-12, "item 5 (a)"): a kernel path needs the owner's approval before any merge
+KERNEL_GATE = Path(os.path.dirname(os.path.abspath(__file__))) / "kernel_gate.py"
+KERNEL_GATE_BOUND = 120  # s
 
 
 def sh(cmd, **kw):
@@ -178,6 +184,17 @@ def precheck(w2, tid, profile, commit):
     return bad, review
 
 
+def kernel_gate(commit, root=None):
+    """(exit code, output) of kernel_gate.py for the commit to be queued against w2/integrate; fails closed: a gate
+    that cannot run or does not end is exit 2."""
+    try:
+        r = sh([sys.executable, str(KERNEL_GATE), "--repo", str(root or ROOT), "--branch", commit],
+               timeout=KERNEL_GATE_BOUND)
+        return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
+    except Exception as e:
+        return 2, f"the kernel gate could not run: {type(e).__name__}: {e}"
+
+
 def close_record(w2, tid, profile, landed, rec, review, base_why=None, g1=0):
     base_why = base_why or BASE_WHY
     sel = rec.get("selection") or {}
@@ -296,6 +313,12 @@ def main():
     if bad:
         print("REFUSED before anything was queued: " + "; ".join(bad), flush=True)
         sys.exit(2)
+    for i in items:  # the kernel gate (owner, 2026-11-12, "item 5 (a)"), on the commit to be queued, before any enqueue
+        rc, out = kernel_gate(i["commit"])
+        print(f"{i['w2']}: kernel gate at {i['commit'][:12]}: exit {rc}\n{out}", flush=True)
+        if rc:
+            sys.exit(f"{i['w2']}: kernel gate refused (exit {rc}): a kernel path needs the owner's approval before any "
+                     f"merge; nothing was queued")
     print(f"reds traced: {BASE_WHY}", flush=True)
     if a.check:
         return

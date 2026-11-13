@@ -1,0 +1,6 @@
+W2-159 (DAEO-6lid): merge the F4 acceptance case (td-2, 9254a220dfbc; 85 cases)
+
+Task: DAEO-6lid
+Role: orchestrator
+Implements: DEC-1110
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

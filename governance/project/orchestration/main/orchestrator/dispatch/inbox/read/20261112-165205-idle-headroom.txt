@@ -1,0 +1,4 @@
+log: dispatch.log
+Idle: headroom
+status: the gate is open and 4 of 5 leads run, but no ready line is startable (4 line(s) in ready.txt); waiting for other reasons: W2-121b DAEO-ifgf (running), W2-124 DAEO-mb2t (running), W2-157 DAEO-ozyt (running), W2-45 DAEO-neam (running)
+The standing rule: never idle while unblocked work remains (DEC-1110 (1), DEC-1109 (3)); ready.txt is the CTO's list.

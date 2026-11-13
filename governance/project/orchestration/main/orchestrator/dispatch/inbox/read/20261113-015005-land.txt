@@ -1,0 +1,11 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-012405.out
+W2: (land batch)
+status: W2-154=7bcff333b595 not landed (still approved)
+
+last output:
+n onto 1636c4c739a5: 17746d2c48b6; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-13 01:49:53 STOPPED: refs/heads/w2/integrate moved during each of 3 attempts; nothing advanced by this step, entries kept
+merge queue: stopped: refs/heads/w2/integrate moved during each of 3 attempts; entries kept
+queue run exit 4
+W2-154: not landed (still approved)
+

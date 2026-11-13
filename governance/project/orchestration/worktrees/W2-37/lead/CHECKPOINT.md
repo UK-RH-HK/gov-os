@@ -1,74 +1,15 @@
-# Lead checkpoint: DAEO-6n5k (W2-37, `gov impact`)
+STATE: build run (DEC-1163 resume): F1 done and merged (acc+unit with code graph at 96498443f: 160 passed, 2 skill reds); skill-section worker ps-4e (engineer role; product-spec refused by launcher: ticket role engineer) refused by the resource gate (load 20.5/20, a wait, DEC-1146); relaunch when gate_check.py is open (wait_gate.sh) | HEAD: 96498443f | NEXT: relaunch ps-4e (same brief), wait_for log/ps-4e-2.exit; then write the CIT-P in scratch changes/W2-37-CIT-P.md; independent review; rebuild + lead_verify; gov accept; narrow check | WAITING ON: ps-4e (pid 543519)
 
-The resumed lead wrote this on 2026-10-19, after the owner's DEC-801 to DEC-809.
-- **Branch.** `w2/W2-37`, stacked on the held W2-03. `w2/W2-03` is at `9a3e3456`, merged at `4d79565e`.
-- **Head.** `2ff873b2c5fa5295f32cfe9299745c0c2b188e54`, the head the last reviewer probed.
-- **Commits.** Nothing is committed after it.
+task: DAEO-6n5k
+decisions_applied: DEC-1163, DEC-1157, DEC-1083, DEC-812, DEC-1010
 
-## RESUME HERE
-
-**State: PACKAGES, returned to the owner.** The second and last review (DEC-413) failed on A and B, both fail-open cases in ordinary work. There is no third round without the owner.
-
-### Commits since `4d79565e`
-
-| Commit | What | Role and session |
-|---|---|---|
-| `bb630e54` | acceptance tests | independent-test-designer |
-| `cfface91` | CP-0002 | orchestrator |
-| `2234049f` | gov impact | engineer, session 95a6e9ea-8399-43d2-a23d-448732a6d6d7 |
-| `6b5640b0` | CP-0004, probed by review 1 | orchestrator |
-| `59ea2993` | CP-0007, the round boundary | orchestrator |
-| `ac4983f8` | test batch for F1, F2, F3, F6 and F8 | independent-test-designer, with Rewrite-Reason |
-| `fd9c8f23` | the fixes | engineer, session b658f614-efea-46bf-aeca-1d047c7066b2 |
-| `2ff873b2` | CP-0010, the hold; probed by review 2 | orchestrator |
-
-### Reviews
-
-| Review | Session | Probed | Judgement | Draft record |
-|---|---|---|---|---|
-| 1 | 606bdff7-6e36-41ce-a19e-9dd9357e8407 | `6b5640b0` | fail | `probes/PR-DAEO-6n5k-round-1.md` |
-| 2 | 895b39f4-5a54-448f-b934-fbbcfab8803d | `2ff873b2` | fail | `probes/PR-DAEO-6n5k-round-2.md` |
-
-### Round-2 findings (DEC-809 classification)
-
-| Finding | Ordinary work | Consequence |
-|---|---|---|
-| A | yes | fails open |
-| B | yes (narrow) | fails open |
-| C | yes | other |
-| D | no | fails open, so a row |
-| E | yes | other |
-
-The re-probes of F1, F2, F3, F6 and F8 are all sound.
-
-### What is waiting on the owner
-- **P-A/B:** A and B. Recommended: option 2, fold them into the held ticket's resume.
-- **P-1:** the change skill's routing.
-- **P-2:** the depth per radius (W2-L319).
-- **P-3, P-5, P-6:** the owner readings.
-- **P-4:** the close command's governance prefixes.
-- **P-7:** the command lists.
-- **DEC-779:** the guard does not see `gov` command writes (F5).
-
-### Verification at `fd9c8f23`
-- **W2-37:** 3 failed, the expected P-1 ×2 and P-2; 93 passed.
-- **W1-32:** red on `impact`, which is P-7.
-- **W1-42:** the 2 accepted reds.
-- **W1-05 p95 and W1-46 setup:** load-sensitive; each passed when run alone.
-- **Everything else green.** Unit tests: 2179 passed, 1 skipped.
-- **gov check:** secrets-indexing is red (UTF-8, from W2-03's test text). context-reproducibility is red (a 60 s timeout, W2-54's).
-
-## For the resume lead (after W2-03 closes)
-
-1. **Merge.** Merge W2-03's closed state and `w2/integrate` into this branch. The merge commits carry `Task: DAEO-6n5k` and `Role: orchestrator`. Never use `-s ours`, and never drop the ticket's side.
-2. **Fix round, if the owner takes option 2.** A test batch for A and B (independent-test-designer, Rewrite-Reason), then an engineer.
-   - **A:** `--compare` uses the proposal as the store holds it, or refuses to say `matches: true` while the CIT-P file differs from HEAD.
-   - **B:** the register named by the path map, differing from HEAD, makes `graphs.record` `stale`, even when HEAD has no entries.
-3. **Riding along (DEC-802):**
-   - F4: check the `--out` stem against existing ids.
-   - C: carry the proposal's `complete` and gaps in the compare result.
-   - E: give refusal messages that name the real cause.
-4. **Verify and probe.** One full rebuild, every suite again, then a fresh probe of the resumed head with the DEC-801 paragraph in its brief.
-5. **Wave 3 rows:** D, F5 and F7.
-
-Loop count: held by the lead (DEC-096).
+Workers: td-4 (9de98af5-9145-4ce9-b759-4f61b8a18a75, done 202fbf723) · eng-4 (8c68b398-91ee-4e8f-a821-c1e3538553ac, done 000fd9a52; walk/affected left unchanged: residual)
+Rounds: in progress
+Decisions taken:
+- Merge of w2/integrate 0c266d752 (carries df9d442e8, the widened ticket).
+- Skill files sha256 before (both template copies): 2af36b728573e930ff4c5ea689f3a66faff11d342aced19a6a1babbfe16dc982; root .rulesync same; .claude e22fd92f...
+- docs/changes/ is not in the ticket's paths: the CIT-P is written in scratch (changes/W2-37-CIT-P.md) and returned in full.
+Open packages:
+- CIT-P for the change skill's impact section (owner's approval line), after ps-4 and its review.
+- tests/conftest.py _CBM_SUITES lacks W2-37 (CTO's file).
+Paths: briefs/{td-4,eng-4}.md; log/eng-4.json; /home/usain/gov-os-worktrees/W2-37-tests/.gov-runtime/scratch/lead/log/td-4.json

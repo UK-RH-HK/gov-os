@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-005604.out
+Structural: after the landing of W2-120 (base 9ad3bf74290f)
+status: structural pass at fb16eb54350b (the work tree differs from it at 2 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 15.6 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 23 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+20 more)
+authority: NOTICE 2 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 9ad3bf74290f)
+links: NOTICE 8 new since 9ad3bf74290f4c7447b079a002c94b708561f450 (1722 standing): UNKNOWN_ID tests/acceptance/W2-33 in DAEO-lrre's acceptance_tests.path | .tickets/DAEO-lrre.md:73 | orchestrator | write the tests at tests/acceptance/W2-33 ... | UNLINKED_ID DEC-1156 in DAEO-i89t's KPI brackets, not in its sources | .tickets/DAEO-i89t.md:31 | orchestrator | add DEC-1156 to DAEO-i89t's sources: | UNLINKED_ID W2-L097 in DAEO-i89t's KPI brackets, not in its sources | .tickets/DAEO-i89t.md:31 | orchestrator | add W2-L097 to DAEO-i89t's sources: (+5 more)
+structural pass at fb16eb54350b (the work tree differs from it at 2 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 15.6 s; a notice, not a refusal

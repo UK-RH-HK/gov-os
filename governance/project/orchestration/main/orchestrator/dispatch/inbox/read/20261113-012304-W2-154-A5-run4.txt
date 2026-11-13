@@ -1,0 +1,11 @@
+log: W2-154-A5-run4.json
+W2: W2-154
+status: DONE. Head to land: 7bcff333b595 (git status --short is empty).
+
+task: DAEO-l4gf (W2-154), run 4 (resume): S4
+status: DONE. Head to land: 7bcff333b595 (git status --short is empty).
+work_completed:
+- Merged w2/integrate into the branch (f42c51629). This brought in df8ba7007, which adds tests/acceptance/serial-only.txt to the ticket's paths for S4 only.
+- One test designer (td-3, Sonnet high, C2) restored W1-16's ui_off entry with a Rewrite-Reason (ad4355943). I merged it from the tests worktree (7bcff333b), then removed the tests worktree and branch.
+- Rebuilt the code index, then ran lead_verify once: GREEN.
+- A narrow independent check of the S4 change si

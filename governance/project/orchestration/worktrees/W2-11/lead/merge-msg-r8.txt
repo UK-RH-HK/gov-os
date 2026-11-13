@@ -1,0 +1,6 @@
+W2-11 (DAEO-k7hz): merge w2/integrate into w2/W2-11 (run 8: brings f2e310aa2, the CIT-P review records' place in docs/changes/ in the ticket's paths)
+
+Task: DAEO-k7hz
+Role: orchestrator
+Implements: DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

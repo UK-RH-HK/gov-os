@@ -1,0 +1,106 @@
+{
+ "act": "ACT-W2-148-S15-1",
+ "dec": "DEC-1142 (4), DEC-1104",
+ "author": "cto",
+ "claimed_class": "O",
+ "what": "the home ~/.claude/settings*.json a fixed class (b) in the operator's rule table (a new row home-settings; the settings row keeps the repository's settings only), in the repository's source and the install's copy, with APPROVED's one line; W2-148 S15 then passes as written (DEC-1142 (4))",
+ "applied_by": "the owner's operator, by hand (class (O): the operator's own rule table and install, DEC-1104 (4))",
+ "steps": "bash apply.sh check|apply|verify|undo, then the owner's one commit of governance/project/operator/class-rules.yaml",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/operator/class-rules.yaml",
+   "before": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+   "after": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/class-rules.yaml",
+   "before": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+   "after": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/APPROVED",
+   "before": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+   "after": "c0a44fbca9d86eae2120795eb6393aa7a0ceb47b7d08d9c3452f1d943d6a8694"
+  }
+ ],
+ "alt_base": {
+  "why": "the same change on the install after ACT-OPERATOR-HOURS-3 Part B (its opcommon.py and APPROVED); apply.sh picks the base by the install's APPROVED",
+  "list": "alt/hours3/list.txt",
+  "keep": "alt/hours3/keep.txt",
+  "touched": [
+   {
+    "root": "repo",
+    "path": "governance/project/operator/class-rules.yaml",
+    "before": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+    "after": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4"
+   },
+   {
+    "root": "home",
+    "path": "gov-os-operator/install/class-rules.yaml",
+    "before": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+    "after": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4"
+   },
+   {
+    "root": "home",
+    "path": "gov-os-operator/install/APPROVED",
+    "before": "ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114",
+    "after": "3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815"
+   }
+  ]
+ },
+ "files": {
+  "before/home/gov-os-operator/install/APPROVED": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+  "before/home/gov-os-operator/install/class-rules.yaml": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+  "before/repo/governance/project/operator/class-rules.yaml": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+  "after/home/gov-os-operator/install/APPROVED": "c0a44fbca9d86eae2120795eb6393aa7a0ceb47b7d08d9c3452f1d943d6a8694",
+  "after/home/gov-os-operator/install/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "after/repo/governance/project/operator/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "alt/hours3/after/home/gov-os-operator/install/APPROVED": "3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815",
+  "alt/hours3/after/home/gov-os-operator/install/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "alt/hours3/after/repo/governance/project/operator/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "alt/hours3/before/home/gov-os-operator/install/APPROVED": "ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114",
+  "alt/hours3/before/home/gov-os-operator/install/class-rules.yaml": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+  "alt/hours3/before/repo/governance/project/operator/class-rules.yaml": "0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1",
+  "alt/hours3/keep.txt": "2ed5eb2bcaad6fa0763236af5413418e04396e57d9e609442a9c8b5791ddb833",
+  "alt/hours3/list.txt": "e748867302e57f2cfddf37427ca99891dda83213badbf20921b29f947964ec9f",
+  "apply.sh": "964b79c8f0db7f92ccf81d4e64db96ed4713c554f4c783a00700a68c1c2c4381",
+  "list.txt": "f3d8f9d465c788629e2bfecec243bf0e748a37b00e74f8db4e45a9b4e5d80497",
+  "keep.txt": "fdb313c94aeec21e57f16906e18cd7183c5f7acae14dfc280e62a6454aed1fea",
+  "rehearsal.log": "e2c33b032303fa83bf0c909637868f2a775dd9bc72ba8caac9322ace827f6fee"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/class-rules.yaml\" | grep -c 38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/APPROVED\" | grep -cE \"^(c0a44fbca9d86eae2120795eb6393aa7a0ceb47b7d08d9c3452f1d943d6a8694|3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815) \"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"^38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4  class-rules.yaml$\" \"$HOME/gov-os-operator/install/APPROVED\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "cd \"$HOME/gov-os-operator/install\" && python3 -I -B -c 'import sys; sys.path.insert(0, \".\"); import act_class as a; r = a.load_rules(); h = a.row_for(r, \"home\", \".claude/settings.json\"); l = a.row_for(r, \"home\", \".claude/settings.local.json\"); p = a.row_for(r, \"repo\", \".claude/settings.json\"); print(h[\"id\"], h.get(\"class\"), l[\"id\"], l.get(\"class\"), p[\"id\"], \"list\" if \"list\" in p else p.get(\"class\"))' | grep -c \"^home-settings b home-settings b settings list$\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum governance/project/operator/class-rules.yaml | grep -c 38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "e2c33b032303fa83bf0c909637868f2a775dd9bc72ba8caac9322ace827f6fee"
+ }
+}

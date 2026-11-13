@@ -1,0 +1,41 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-179 (DAEO-c9n8, LITE) at 996bffd9b4e6: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 13:49:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 13:49:05 merged W2-179 onto 2fd7ad9259e4: 8a36a2622ea4
+2026-11-12 14:02:46 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 14:02:53 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 14:02:56 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 14:02:57 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 14:03:36 the integration store /home/usain/gov-os-worktrees/W2-00-store-b is at 6f2234f4027e, not at the head 2fd7ad9259e4, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 14:03:36 seed of head-2fd7ad9259e4-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-b
+2026-11-12 14:04:35 the head without the batch: a throwaway worktree head-2fd7ad9259e4-0 at 2fd7ad9259e4, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 14:04:36 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-12 14:04:37 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-12 14:04:37 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
+2026-11-12 14:04:37 merged W2-179 onto a2a74f22f678: fc618e4ef9be
+2026-11-12 14:18:40 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 14:18:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 14:18:50 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 14:18:50 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 14:18:52 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first]
+2026-11-12 14:19:44 the head without the batch: a throwaway worktree head-a2a74f22f678-1 at a2a74f22f678 with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 14:19:45 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-12 14:19:46 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-12 14:19:46 ADVANCED refs/heads/w2/integrate a2a74f22f678 -> fc618e4ef9be; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/fc618e4ef9be.json
+2026-11-12 14:19:46 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 14:22:16 integration store promoted: the merged clone's stores at fc618e4ef9be into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-179: f0ef62f39 W2-179 (DAEO-c9n8): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 6 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+3 more)
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: NOTICE 13 findings: differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md | differs from its composition of template/governance/kernel/templates/role-reviewer.md and template/governance/kernel/roles/independent-auditor.md | differs from its composition of template/governance/kernel/templates/role-test-designer.md and template/governance/kernel/roles/independent-test-designer.md (+10 more) [32 kernel role, skill, hook or .rulesync path(s) changed since 2fd7ad9259e4]
+structural pass: links: NOTICE 62 new since 2fd7ad9259e49d165fbcb6c3eda5337c054c61e9 (1619 standing): UNKNOWN_ID tests/acceptance/W2-115 in DAEO-emq1's acceptance_tests.path | .tickets/DAEO-emq1.md:91 | orchestrator | write the tests at tests/acceptance/W2-11... | UNKNOWN_ID tests/acceptance/W2-124 in DAEO-mb2t's acceptance_tests.path | .tickets/DAEO-mb2t.md:47 | orchestrator | write the tests at tests/acceptance/W2-12... | UNLINKED_ID CAP-24 in 99dd5ca5235d's Implements: (product-spec), not in DAEO-k7hz's sources | .tickets/DAEO-k7hz.md:67 | orchestrator | add CAP-24 to DAEO-k7... (+59 more)
+structural pass: structural pass at f0ef62f39314: NOTICE in mutation, portability, links (7 of 10 families ok), 14.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-142230-structural-notice.txt

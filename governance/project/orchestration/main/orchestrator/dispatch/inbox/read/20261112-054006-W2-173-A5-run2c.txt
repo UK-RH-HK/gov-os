@@ -1,0 +1,11 @@
+log: W2-173-A5-run2c.json
+W2: W2-173
+status: DONE
+
+task: DAEO-qz4p (W2-173), run 2c (resumed after run 2 stopped at the night hold)
+status: DONE
+work_completed:
+- Merged w2/integrate into w2/W2-173 at `00c540b67`. This brought in the CTO's `518772b5c`: W2-149's unit file added to the paths, and DEC-866 and DEC-105 added to the sources.
+- Engineer eng-2 (Opus, high, C3) changed only W2-149's two unit cases, exactly as run 2's evidence states (`d37564498`):
+  - `test_checker_delivers_its_notes`: the notes are in checker.md §6's form, and its asserts read that text and its sha256.
+  - `test_auditor_delivers_its_classes_and_the_audit_is_logged`: m

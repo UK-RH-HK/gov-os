@@ -1,0 +1,40 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 18:09:20)
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s _
+tests/acceptance/W2-115/test_w2_115_reds.py:344: in test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s
+    _assert_red_caused(project, before, run, BB_KNOWN, green_base=False)
+tests/acceptance/W2-115/test_w2_115_reds.py:279: in _assert_red_caused
+    said = support.assert_refused(run, RED_CAUSED)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-115/w2_115_support.py:411: in assert_refused
+    assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: the command was not refused
+E   gov close PROJ-aaaa --json
+E   exit code: 0
+E   stdout:
+E   {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close": "scoped", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "commit": "9c28216422d00f55bd8d4a9668ff2de158046f5d", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 3, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "review": {"verdict": "READY", "record": null}, "reds": [{"test": "tests/acceptance/W2-bb/test_bb_known.py::test_bb_known", "failure_type": "AssertionError", "caused": false, "reason": "red alone with AssertionError (1/1) and red with the same failure type on the head without the change (1/1): not caused by the change", "repair_ticket": "pro-exa3"}], "culprits": [], "clone": {"path": ".gov-runtime/close/clone", "reused": false, "replaced": null}, "nightly": {"read": true, "record": "docs/close/nightly/NR-20261001T030000Z-d1076d6e8750.json"}}, "session": ""}
+E   
+E   stderr:
+_ test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s _
+tests/acceptance/W2-115/test_w2_115_reds.py:387: in test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s
+    _assert_red_caused(project, before, run, BB_WIDGET, green_base=False)
+tests/acceptance/W2-115/test_w2_115_reds.py:279: in _assert_red_caused
+    said = support.assert_refused(run, RED_CAUSED)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-115/w2_115_support.py:411: in assert_refused
+    assert ok is not True and run.returncode != 0, f"the command was not refused\n{run.describe()}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: the command was not refused
+E   gov close PROJ-aaaa --json
+E   exit code: 0
+E   stdout:
+E   {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close": "scoped", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "commit": "54ecc60614c8ba3cf93bee57703d2f0a3e5de3dd", "selection": {"suites": ["tests/acceptance/W2-aa/", "tests/acceptance/W2-bb/", "tests/acceptance/W2-ff/"], "pytest_options": ["-p", "no:cacheprovider", "-o", "tmp_path_retention_policy=failed", "-o", "junit_family=xunit1", "--timeout=20"]}, "runs": [{"name": "parallel", "passed": 3, "failed": 1, "errors": 0, "skipped": 0}, {"name": "serial", "passed": 0, "failed": 0, "errors": 0, "skipped": 0}], "review": {"verdict": "READY", "record": null}, "reds": [{"test": "tests/acceptance/W2-bb/test_bb_widget.py::test_bb_reads_the_widget", "failure_type": "AssertionError", "caused": false, "reason": "red alone with AssertionError (1/1) and red with the same failure type on the head without the change (1/1): not caused by the change", "repair_ticket": "pro-y550"}], "culprits": [], "clone": {"path": ".gov-runtime/close/clone", "reused": false, "replaced": null}, "nightly": {"read": false, "record": null}}, "session": ""}
+E   
+E   stderr:
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_with_the_green_base_not_an_ancestor_a_red_the_parent_also_has_is_still_the_change_s
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_with_no_green_record_a_red_an_untrailered_first_commit_caused_is_the_change_s
+2 failed in 4.85s
+exit 1

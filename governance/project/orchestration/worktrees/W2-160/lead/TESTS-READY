@@ -1,0 +1,7 @@
+task: DAEO-fd0p
+merge: 9c507d513 W2-160 (DAEO-fd0p): merge td-1's acceptance tests (66: S1-S4, F1-F3), red before the build
+tests commit: 2289ba904182 (w2/W2-160-tests, td-1)
+red: gov accept W2-160 rc=3, outcome fail, error_kind null; totals passed 0 failed 66 skipped 0; success-1 21, success-2 9, success-3 25, success-4 11, failure-1..3 3 each (report /tmp/w2-160-lead/accept-red.txt)
+red reasons (td-1): `invalid choice: 'wait'` / `invalid choice: 'helper-watch'` / source-search folders not built
+note for the engineer: S4's filesystem spy allows only the inbox items, helper-watch-state.json and helper-watch.log to be written (no lock file beside them).
+TESTS-READY run 3: merge 14c9e7a36 (td-2's W2-159 F4 revision e1e170d35)

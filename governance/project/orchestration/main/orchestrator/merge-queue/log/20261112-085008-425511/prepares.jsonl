@@ -1,0 +1,6 @@
+{"tree": "merged", "at": "44bbfe86c1fc214c995806f669348cf3875ee168", "rc": 0, "seconds": 75.4, "args": [], "finished": "2026-11-12 08:51:24"}
+{"tree": "head-1f626332fde0-0", "at": "1f626332fde0c08f92de1805f49f6859734a0c58", "rc": 0, "seconds": 84.0, "args": ["--seed", "/home/usain/gov-os-worktrees/W2-00-store-a"], "finished": "2026-11-12 10:53:11"}
+{"tree": "merged", "at": "688d633bb2fa9aa78a78d311046e667f3ee0dd98", "rc": 0, "seconds": 61.2, "args": [], "finished": "2026-11-12 10:54:15"}
+{"tree": "head-9ed0d69ea14b-1", "at": "9ed0d69ea14b91d638aa0263fb444cc996baf153", "rc": 0, "seconds": 52.3, "args": ["--seed", "/home/usain/gov-os-worktrees/W2-00-store-a"], "finished": "2026-11-12 12:23:36"}
+{"tree": "merged", "at": "f13387929b27a064b2a7648d05ee264e653313ee", "rc": 0, "seconds": 36.7, "args": [], "finished": "2026-11-12 12:24:16"}
+{"tree": "W2-00-store-b", "at": "f13387929b27a064b2a7648d05ee264e653313ee", "rc": 0, "seconds": 118.1, "args": ["--seed", "/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged"], "finished": "2026-11-12 12:28:23"}

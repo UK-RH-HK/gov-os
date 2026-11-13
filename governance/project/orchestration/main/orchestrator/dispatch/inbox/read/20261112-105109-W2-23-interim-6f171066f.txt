@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-23
+status: interim result 6f171066f: W2-23 (DAEO-kmcr): probe record: rounds 1 and 2 (NOT READY on S3), and R2-1's fix at d2034dcf1478 verified by the lead in place of a third round (the owner's P-W2-23-8 (a), DEC-1142 (2)); rows R3-R9, 

@@ -1,0 +1,17 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-154 (DAEO-l4gf, STANDARD) at 7bcff333b595: pre-check passed
+W2-154: kernel gate at 7bcff333b595: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-13 01:24:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 01:24:05 merged W2-154 onto c9e857e335ab: 78fabb2e92a7
+2026-11-13 01:42:10 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 01:42:17 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 01:42:20 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 01:42:21 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 01:46:30 refs/heads/w2/integrate moved by records only (3 path(s)); merged again onto 5bac674cbcdf: f6c1920679e9; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-13 01:49:53 refs/heads/w2/integrate moved by records only (2 path(s)); merged again onto 1636c4c739a5: 17746d2c48b6; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-13 01:49:53 STOPPED: refs/heads/w2/integrate moved during each of 3 attempts; nothing advanced by this step, entries kept
+merge queue: stopped: refs/heads/w2/integrate moved during each of 3 attempts; entries kept
+queue run exit 4
+W2-154: not landed (still approved)

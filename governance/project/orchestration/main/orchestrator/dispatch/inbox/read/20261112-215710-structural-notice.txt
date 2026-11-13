@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-214202.out
+Structural: after the landing of W2-45 (base cf4e4fa9f732)
+status: structural pass at 5199a07df7e1 (the work tree differs from it at 1 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 15.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 18 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+15 more)
+authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since cf4e4fa9f732)
+links: NOTICE 8 new since cf4e4fa9f7321505b058f737fa345f35ea879a1b (1703 standing): UNLINKED_ID W2-H018 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:37 | orchestrator | add W2-H018 to DAEO-neam's sources: | UNLINKED_ID W2-M129 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:37 | orchestrator | add W2-M129 to DAEO-neam's sources: | UNLINKED_ID W2-M130 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:37 | orchestrator | add W2-M130 to DAEO-neam's sources: (+5 more)
+structural pass at 5199a07df7e1 (the work tree differs from it at 1 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 15.3 s; a notice, not a refusal

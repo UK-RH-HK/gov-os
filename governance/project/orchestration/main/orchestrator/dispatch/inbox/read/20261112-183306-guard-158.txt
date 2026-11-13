@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 159
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_011Mdop71AzGBjcCkEHKnQMH", "time": "2026-11-12T07:07:20.804Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-177-tests/a0cc944e-c34e-427b-b311-6532d82128bc.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-177-tests", "tool": "Read", "form": "/home/usain/gov-os-worktrees/W2-177-tests/tests/unit/accept/w2_96_reap.py", "rule": "the independent-test-designer does not read {ticket_impl} (tests/unit/accept/w2_96_reap.py): role_paths.independent-test-designer.reads_denied (governance/project/path-map.yaml, DEC-1052 G-14) (DEC-953 item 2)", "verdict": "", "c

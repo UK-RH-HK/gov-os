@@ -1,0 +1,2089 @@
+{
+ "load_before": [
+  8.1640625,
+  8.64306640625,
+  9.10205078125
+ ],
+ "tiers": {
+  "a-dev": {
+   "build_s": 0.0898121440113755,
+   "refresh_error": null,
+   "rows": [
+    {
+     "id": "DQ-A-01",
+     "total": 0.2281829010025831,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0037737300008302554,
+     "lexical._checked": 0.005794744996819645,
+     "lexical._ranked": 0.0012802660057786852,
+     "lexical.search": 0.004917115002172068,
+     "semantic._pin": 8.152599912136793e-05,
+     "semantic._status": 0.0031698550010332838,
+     "semantic._open": 0.00028779800049960613,
+     "ollama.ensure_query_available": 0.0015275059995474294,
+     "semantic._ready": 0.0016795709962025285,
+     "semantic._built_at": 8.81240121088922e-05,
+     "semantic._ask": 0.0013648430031025782,
+     "semantic.query_vector": 0.006831912993220612,
+     "semantic.search": 0.014787282998440787,
+     "fusion._records": 0.0008862690010573715,
+     "rerank.rerank (service round trip)": 0.20735766700818203
+    },
+    {
+     "id": "DQ-A-02",
+     "total": 0.22006812000472564,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0027236290043219924,
+     "lexical._checked": 0.004409650005982257,
+     "lexical._ranked": 0.0009372589993290603,
+     "lexical.search": 0.003536659001838416,
+     "semantic._pin": 6.648599810432643e-05,
+     "semantic._status": 0.002475182991474867,
+     "semantic._open": 0.0002520159905543551,
+     "ollama.ensure_query_available": 0.0010828619997482747,
+     "semantic._ready": 0.0012110289972042665,
+     "semantic._built_at": 5.483000131789595e-05,
+     "semantic._ask": 0.0008822219970170408,
+     "semantic.query_vector": 0.0038952030008658767,
+     "semantic.search": 0.009792215991183184,
+     "fusion._records": 0.0005794840108137578,
+     "rerank.rerank (service round trip)": 0.2059915449935943
+    },
+    {
+     "id": "DQ-A-03",
+     "total": 0.2196535699913511,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.00255863499478437,
+     "lexical._checked": 0.004464790996280499,
+     "lexical._ranked": 0.0009854660020209849,
+     "lexical.search": 0.0038015190075384453,
+     "semantic._pin": 5.271700501907617e-05,
+     "semantic._status": 0.0023143110011005774,
+     "semantic._open": 0.00025563999952282757,
+     "ollama.ensure_query_available": 0.0010007859964389354,
+     "semantic._ready": 0.0011245900095673278,
+     "semantic._built_at": 4.934800381306559e-05,
+     "semantic._ask": 0.0008372640004381537,
+     "semantic.query_vector": 0.005007505998946726,
+     "semantic.search": 0.010654697005520575,
+     "fusion._records": 0.0006442110025091097,
+     "rerank.rerank (service round trip)": 0.2043948180071311
+    },
+    {
+     "id": "DQ-A-04",
+     "total": 0.2776709449972259,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0023386009852401912,
+     "lexical._checked": 0.004096518998267129,
+     "lexical._ranked": 0.0008915710059227422,
+     "lexical.search": 0.0034606569970492274,
+     "semantic._pin": 6.912200478836894e-05,
+     "semantic._status": 0.0022460629988927394,
+     "semantic._open": 0.0002423999976599589,
+     "ollama.ensure_query_available": 0.0009951479878509417,
+     "semantic._ready": 0.0011133350053569302,
+     "semantic._built_at": 4.3167005060240626e-05,
+     "semantic._ask": 0.0009431549988221377,
+     "semantic.query_vector": 0.004792261999682523,
+     "semantic.search": 0.010520382988033816,
+     "fusion._records": 0.0006750739994458854,
+     "rerank.rerank (service round trip)": 0.26274289400316775
+    },
+    {
+     "id": "DQ-A-05",
+     "total": 0.1714950659952592,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0024992239923449233,
+     "lexical._checked": 0.0043473799887578934,
+     "lexical._ranked": 0.000679001008393243,
+     "lexical.search": 0.003447786992182955,
+     "semantic._pin": 5.094999505672604e-05,
+     "semantic._status": 0.0024024650047067553,
+     "semantic._open": 0.0002865309943445027,
+     "ollama.ensure_query_available": 0.0010107209964189678,
+     "semantic._ready": 0.001135409009293653,
+     "semantic._built_at": 4.9314010539092124e-05,
+     "semantic._ask": 0.0008862440008670092,
+     "semantic.query_vector": 0.0057468449958832934,
+     "semantic.search": 0.01185505700414069,
+     "fusion._records": 0.0006069030059734359,
+     "rerank.rerank (service round trip)": 0.15541190499789082
+    },
+    {
+     "id": "DQ-A-06",
+     "total": 0.25377477100118995,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003023450990440324,
+     "lexical._checked": 0.005079326001578011,
+     "lexical._ranked": 0.0012220930075272918,
+     "lexical.search": 0.0039850690081948414,
+     "semantic._pin": 5.269100074656308e-05,
+     "semantic._status": 0.0030551419913535938,
+     "semantic._open": 0.00026517699006944895,
+     "ollama.ensure_query_available": 0.0010118499922100455,
+     "semantic._ready": 0.0011295400036033243,
+     "semantic._built_at": 5.262500781100243e-05,
+     "semantic._ask": 0.0008829589933156967,
+     "semantic.query_vector": 0.005419385008281097,
+     "semantic.search": 0.011890526991919614,
+     "fusion._records": 0.0006072550022508949,
+     "rerank.rerank (service round trip)": 0.23712045200227294
+    },
+    {
+     "id": "DQ-A-07",
+     "total": 0.21200856499490328,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0027821010153274983,
+     "lexical._checked": 0.004579193991958164,
+     "lexical._ranked": 0.000908631001948379,
+     "lexical.search": 0.0036983619938837364,
+     "semantic._pin": 5.011500616092235e-05,
+     "semantic._status": 0.0025309299962827936,
+     "semantic._open": 0.00030878900724928826,
+     "ollama.ensure_query_available": 0.0010017089953180403,
+     "semantic._ready": 0.001134809004724957,
+     "semantic._built_at": 4.990700108464807e-05,
+     "semantic._ask": 0.00085303200467024,
+     "semantic.query_vector": 0.004858273998252116,
+     "semantic.search": 0.01082076400052756,
+     "fusion._records": 0.0005856060015503317,
+     "rerank.rerank (service round trip)": 0.19673612801125273
+    },
+    {
+     "id": "DQ-A-08",
+     "total": 0.22063756799616385,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003900811992934905,
+     "lexical._checked": 0.005651439991197549,
+     "lexical._ranked": 0.001094275008654222,
+     "lexical.search": 0.004609843992511742,
+     "semantic._pin": 5.553099617827684e-05,
+     "semantic._status": 0.00289478299964685,
+     "semantic._open": 0.0002918560057878494,
+     "ollama.ensure_query_available": 0.001159895007731393,
+     "semantic._ready": 0.0012908539938507602,
+     "semantic._built_at": 5.5880998843349516e-05,
+     "semantic._ask": 0.0008868720033206046,
+     "semantic.query_vector": 0.005009172993595712,
+     "semantic.search": 0.011471260993857868,
+     "fusion._records": 0.000686717001372017,
+     "rerank.rerank (service round trip)": 0.20369266699708533
+    },
+    {
+     "id": "DQ-A-09",
+     "total": 0.5032597499957774,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0031169889989541844,
+     "lexical._checked": 0.004875384998740628,
+     "lexical._ranked": 0.001403075992129743,
+     "lexical.search": 0.004155903996434063,
+     "semantic._pin": 9.393999062012881e-05,
+     "semantic._status": 0.0031302870047511533,
+     "semantic._open": 0.0005182260065339506,
+     "ollama.ensure_query_available": 0.00129024799389299,
+     "semantic._ready": 0.0014506389998132363,
+     "semantic._built_at": 4.923199594486505e-05,
+     "semantic._ask": 0.0007876089948695153,
+     "semantic.query_vector": 0.006245476004551165,
+     "semantic.search": 0.0133510300074704,
+     "fusion._records": 0.000574396995943971,
+     "rerank.rerank (service round trip)": 0.4849752180016367
+    },
+    {
+     "id": "DQ-A-10",
+     "total": 0.28999005499645136,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0026117430097656325,
+     "lexical._checked": 0.004480045012314804,
+     "lexical._ranked": 0.0007187090086517856,
+     "lexical.search": 0.0036301220097811893,
+     "semantic._pin": 4.750200605485588e-05,
+     "semantic._status": 0.002356553988647647,
+     "semantic._open": 0.00035152799682691693,
+     "ollama.ensure_query_available": 0.0009796910017030314,
+     "semantic._ready": 0.0011122800060547888,
+     "semantic._built_at": 5.32990088686347e-05,
+     "semantic._ask": 0.001111702003981918,
+     "semantic.query_vector": 0.0049807799950940534,
+     "semantic.search": 0.011561254999833182,
+     "fusion._records": 0.0006692390015814453,
+     "rerank.rerank (service round trip)": 0.273935540986713
+    },
+    {
+     "id": "DQ-A-11",
+     "total": 0.22298862900061067,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0035614409862319008,
+     "lexical._checked": 0.005690372010576539,
+     "lexical._ranked": 0.0009038179996423423,
+     "lexical.search": 0.003988166005001403,
+     "semantic._pin": 5.508499452844262e-05,
+     "semantic._status": 0.0033489600027678534,
+     "semantic._open": 0.0002912900090450421,
+     "ollama.ensure_query_available": 0.0010669839975889772,
+     "semantic._ready": 0.0011982730065938085,
+     "semantic._built_at": 6.396599928848445e-05,
+     "semantic._ask": 0.0009112959960475564,
+     "semantic.query_vector": 0.006778261988074519,
+     "semantic.search": 0.013644115999341011,
+     "fusion._records": 0.0006463990139309317,
+     "rerank.rerank (service round trip)": 0.20454364200122654
+    },
+    {
+     "id": "DQ-A-12",
+     "total": 0.2860861959925387,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0029153259965823963,
+     "lexical._checked": 0.004724212005385198,
+     "lexical._ranked": 0.0007105559925548732,
+     "lexical.search": 0.0036610319948522374,
+     "semantic._pin": 7.431299309246242e-05,
+     "semantic._status": 0.0024686609976924956,
+     "semantic._open": 0.00026649799838196486,
+     "ollama.ensure_query_available": 0.0012474300019675866,
+     "semantic._ready": 0.0013978269998915493,
+     "semantic._built_at": 8.095400698948652e-05,
+     "semantic._ask": 0.001110177006921731,
+     "semantic.query_vector": 0.006562105001648888,
+     "semantic.search": 0.012880387002951466,
+     "fusion._records": 0.0006580749904969707,
+     "rerank.rerank (service round trip)": 0.26871533899975475
+    },
+    {
+     "id": "DQ-A-13",
+     "total": 0.2897947929886868,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0032921829988481477,
+     "lexical._checked": 0.005622690005111508,
+     "lexical._ranked": 0.000697240000590682,
+     "lexical.search": 0.003947175995563157,
+     "semantic._pin": 7.930000720079988e-05,
+     "semantic._status": 0.003327623999211937,
+     "semantic._open": 0.0004954739997629076,
+     "ollama.ensure_query_available": 0.0013838209997629747,
+     "semantic._ready": 0.0016194260097108781,
+     "semantic._built_at": 6.084199412725866e-05,
+     "semantic._ask": 0.0009551569964969531,
+     "semantic.query_vector": 0.005640064991894178,
+     "semantic.search": 0.013576255005318671,
+     "fusion._records": 0.0006363559950841591,
+     "rerank.rerank (service round trip)": 0.27145071800623555
+    },
+    {
+     "id": "DQ-A-14",
+     "total": 0.23067016000277363,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003300814001704566,
+     "lexical._checked": 0.005165256006876007,
+     "lexical._ranked": 0.0012749909947160631,
+     "lexical.search": 0.004597332008415833,
+     "semantic._pin": 5.991299985907972e-05,
+     "semantic._status": 0.0026520190003793687,
+     "semantic._open": 0.00030893900839146227,
+     "ollama.ensure_query_available": 0.000995003996649757,
+     "semantic._ready": 0.0011240229941904545,
+     "semantic._built_at": 7.115199696272612e-05,
+     "semantic._ask": 0.0009616420138627291,
+     "semantic.query_vector": 0.006504481003503315,
+     "semantic.search": 0.01280597499862779,
+     "fusion._records": 0.0006111569964559749,
+     "rerank.rerank (service round trip)": 0.21249335999891628
+    },
+    {
+     "id": "DQ-A-15",
+     "total": 0.2032067569962237,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002826775991707109,
+     "lexical._checked": 0.004590673008351587,
+     "lexical._ranked": 0.0010224650031886995,
+     "lexical.search": 0.0037502859922824427,
+     "semantic._pin": 5.509301263373345e-05,
+     "semantic._status": 0.0025512310094200075,
+     "semantic._open": 0.0002917900128522888,
+     "ollama.ensure_query_available": 0.0011607719934545457,
+     "semantic._ready": 0.0013017460005357862,
+     "semantic._built_at": 6.0780002968385816e-05,
+     "semantic._ask": 0.0009126450022449717,
+     "semantic.query_vector": 0.0057210679951822385,
+     "semantic.search": 0.011885494997841306,
+     "fusion._records": 0.0006773960049031302,
+     "rerank.rerank (service round trip)": 0.18669914599740878
+    },
+    {
+     "id": "DQ-A-16",
+     "total": 0.22201067699643318,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0037432159879244864,
+     "lexical._checked": 0.005746026014094241,
+     "lexical._ranked": 0.0015136869915295392,
+     "lexical.search": 0.0055960799945751205,
+     "semantic._pin": 5.8555000578053296e-05,
+     "semantic._status": 0.0025559079949744046,
+     "semantic._open": 0.0003053539985558018,
+     "ollama.ensure_query_available": 0.0010176799987675622,
+     "semantic._ready": 0.0011542080028448254,
+     "semantic._built_at": 5.054600478615612e-05,
+     "semantic._ask": 0.000867591006681323,
+     "semantic.query_vector": 0.0040622679953230545,
+     "semantic.search": 0.010019620996899903,
+     "fusion._records": 0.0005830949958181009,
+     "rerank.rerank (service round trip)": 0.20563175200368278
+    },
+    {
+     "id": "DQ-A-17",
+     "total": 0.19090324200806208,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0025250530015910044,
+     "lexical._checked": 0.004981138015864417,
+     "lexical._ranked": 0.000808696000603959,
+     "lexical.search": 0.004230628997902386,
+     "semantic._pin": 5.2835006499662995e-05,
+     "semantic._status": 0.002369082998484373,
+     "semantic._open": 0.00027191500703338534,
+     "ollama.ensure_query_available": 0.0011178499989910051,
+     "semantic._ready": 0.0012509889929788187,
+     "semantic._built_at": 4.468100087251514e-05,
+     "semantic._ask": 0.0007692079961998388,
+     "semantic.query_vector": 0.00683286800631322,
+     "semantic.search": 0.013369616004638374,
+     "fusion._records": 0.0007152460020733997,
+     "rerank.rerank (service round trip)": 0.17241556200315244
+    },
+    {
+     "id": "DQ-A-18",
+     "total": 0.22564432700164616,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0037289689935278147,
+     "lexical._checked": 0.006405206004274078,
+     "lexical._ranked": 0.0010625470022205263,
+     "lexical.search": 0.005464928995934315,
+     "semantic._pin": 8.579499262850732e-05,
+     "semantic._status": 0.0032509250013390556,
+     "semantic._open": 0.00027639500331133604,
+     "ollama.ensure_query_available": 0.0011185390030732378,
+     "semantic._ready": 0.0012467599881347269,
+     "semantic._built_at": 7.31759937480092e-05,
+     "semantic._ask": 0.0009474260004935786,
+     "semantic.query_vector": 0.005359051996492781,
+     "semantic.search": 0.012361636006971821,
+     "fusion._records": 0.0006590349948965013,
+     "rerank.rerank (service round trip)": 0.2069915600004606
+    },
+    {
+     "id": "DQ-A-19",
+     "total": 0.2501199559919769,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0037865479971515015,
+     "lexical._checked": 0.005572512003709562,
+     "lexical._ranked": 0.000902990999747999,
+     "lexical.search": 0.004211485997075215,
+     "semantic._pin": 5.158099520485848e-05,
+     "semantic._status": 0.002948628010926768,
+     "semantic._open": 0.0002821500092977658,
+     "ollama.ensure_query_available": 0.0011831269948743284,
+     "semantic._ready": 0.0013369560037972406,
+     "semantic._built_at": 5.157799751032144e-05,
+     "semantic._ask": 0.0010198110103374347,
+     "semantic.query_vector": 0.003909987994120456,
+     "semantic.search": 0.010460315010277554,
+     "fusion._records": 0.0006060890009393916,
+     "rerank.rerank (service round trip)": 0.23465162499633152
+    },
+    {
+     "id": "DQ-A-20",
+     "total": 0.2742360709962668,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003085040007135831,
+     "lexical._checked": 0.005028344006859697,
+     "lexical._ranked": 0.0013032760034548119,
+     "lexical.search": 0.004376562006655149,
+     "semantic._pin": 7.633700442966074e-05,
+     "semantic._status": 0.002668401997652836,
+     "semantic._open": 0.0002673779963515699,
+     "ollama.ensure_query_available": 0.001257563999388367,
+     "semantic._ready": 0.0014071329933358356,
+     "semantic._built_at": 6.570499681401998e-05,
+     "semantic._ask": 0.001127313997130841,
+     "semantic.query_vector": 0.006580368004506454,
+     "semantic.search": 0.01299456600099802,
+     "fusion._records": 0.0006470549997175112,
+     "rerank.rerank (service round trip)": 0.2560300219920464
+    },
+    {
+     "id": "DQ-A-21",
+     "total": 0.18951609499345068,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0027149009983986616,
+     "lexical._checked": 0.004588707000948489,
+     "lexical._ranked": 0.0008683530031703413,
+     "lexical.search": 0.00369710499944631,
+     "semantic._pin": 5.468999734148383e-05,
+     "semantic._status": 0.002647695000632666,
+     "semantic._open": 0.0004700879944721237,
+     "ollama.ensure_query_available": 0.0014060410030651838,
+     "semantic._ready": 0.001621169998543337,
+     "semantic._built_at": 7.514200115110725e-05,
+     "semantic._ask": 0.0011153870000271127,
+     "semantic.query_vector": 0.006524090000311844,
+     "semantic.search": 0.013430983992293477,
+     "fusion._records": 0.0006329320021905005,
+     "rerank.rerank (service round trip)": 0.1715590989915654
+    },
+    {
+     "id": "DQ-A-22",
+     "total": 0.21964332499192096,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003343511009006761,
+     "lexical._checked": 0.005097511995700188,
+     "lexical._ranked": 0.0007083110103849322,
+     "lexical.search": 0.0033107460039900616,
+     "semantic._pin": 7.245900633279234e-05,
+     "semantic._status": 0.003195347002474591,
+     "semantic._open": 0.00029962300322949886,
+     "ollama.ensure_query_available": 0.0009820630075410008,
+     "semantic._ready": 0.0011295529984636232,
+     "semantic._built_at": 5.012800102122128e-05,
+     "semantic._ask": 0.001175320998299867,
+     "semantic.query_vector": 0.004014692996861413,
+     "semantic.search": 0.010721953003667295,
+     "fusion._records": 0.0006025430047884583,
+     "rerank.rerank (service round trip)": 0.2048086080030771
+    },
+    {
+     "id": "DQ-A-23",
+     "total": 0.21998346500913613,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0043258420046186075,
+     "lexical._checked": 0.006245789991226047,
+     "lexical._ranked": 0.0008584119932493195,
+     "lexical.search": 0.005020188007620163,
+     "semantic._pin": 4.940699727740139e-05,
+     "semantic._status": 0.003020377000211738,
+     "semantic._open": 0.0002535880048526451,
+     "ollama.ensure_query_available": 0.0014390019932761788,
+     "semantic._ready": 0.0015701820084359497,
+     "semantic._built_at": 4.564199480228126e-05,
+     "semantic._ask": 0.0007657980022486299,
+     "semantic.query_vector": 0.004882712004473433,
+     "semantic.search": 0.01160961099958513,
+     "fusion._records": 0.0006814270018367097,
+     "rerank.rerank (service round trip)": 0.2025045579939615
+    },
+    {
+     "id": "DQ-A-24",
+     "total": 0.2830088969931239,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0036519269924610853,
+     "lexical._checked": 0.005462440007249825,
+     "lexical._ranked": 0.0005022690020268783,
+     "lexical.search": 0.0039527330081909895,
+     "semantic._pin": 5.988100019749254e-05,
+     "semantic._status": 0.002808395991451107,
+     "semantic._open": 0.00042067799950018525,
+     "ollama.ensure_query_available": 0.0011460090026957914,
+     "semantic._ready": 0.0013568009890150279,
+     "semantic._built_at": 4.8362999223172665e-05,
+     "semantic._ask": 0.0010560240043560043,
+     "semantic.query_vector": 0.0059970459988107905,
+     "semantic.search": 0.012634677987080067,
+     "fusion._records": 0.0007415059953927994,
+     "rerank.rerank (service round trip)": 0.26551668300817255
+    }
+   ]
+  },
+  "b-dev": {
+   "build_s": 0.06675100700522307,
+   "refresh_error": null,
+   "rows": [
+    {
+     "id": "DQ-B-01",
+     "total": 0.2494122739881277,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.00295440798799973,
+     "lexical._checked": 0.0047937699855538085,
+     "lexical._ranked": 0.0009071890090126544,
+     "lexical.search": 0.0039815049967728555,
+     "semantic._pin": 5.7101991842500865e-05,
+     "semantic._status": 0.0024159599997801706,
+     "semantic._open": 0.0002697979944059625,
+     "ollama.ensure_query_available": 0.0010282220027875155,
+     "semantic._ready": 0.0011555000091902912,
+     "semantic._built_at": 4.8586996854282916e-05,
+     "semantic._ask": 0.0008128689951263368,
+     "semantic.query_vector": 0.005816412012791261,
+     "semantic.search": 0.011145502998260781,
+     "fusion._records": 0.0005878469964955002,
+     "rerank.rerank (service round trip)": 0.23349432500253897
+    },
+    {
+     "id": "DQ-B-02",
+     "total": 0.28603642398957163,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0026169070042669773,
+     "lexical._checked": 0.004596593018504791,
+     "lexical._ranked": 0.0006505609926534817,
+     "lexical.search": 0.003534475006745197,
+     "semantic._pin": 5.840000812895596e-05,
+     "semantic._status": 0.0024585909995948896,
+     "semantic._open": 0.00032807399111334234,
+     "ollama.ensure_query_available": 0.0014564500015694648,
+     "semantic._ready": 0.0015929389919620007,
+     "semantic._built_at": 3.89079941669479e-05,
+     "semantic._ask": 0.0009777139930520207,
+     "semantic.query_vector": 0.006486290003522299,
+     "semantic.search": 0.013093496003421023,
+     "fusion._records": 0.0006164410006022081,
+     "rerank.rerank (service round trip)": 0.2686260970076546
+    },
+    {
+     "id": "DQ-B-03",
+     "total": 0.20047978500952013,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003102730988757685,
+     "lexical._checked": 0.005035776004660875,
+     "lexical._ranked": 0.0009224520035786554,
+     "lexical.search": 0.00403459400695283,
+     "semantic._pin": 7.356199785135686e-05,
+     "semantic._status": 0.002631243012729101,
+     "semantic._open": 0.0002650579990586266,
+     "ollama.ensure_query_available": 0.0011769650009227917,
+     "semantic._ready": 0.0013146439887350425,
+     "semantic._built_at": 7.465599628631026e-05,
+     "semantic._ask": 0.00097704200015869,
+     "semantic.query_vector": 0.005260332996840589,
+     "semantic.search": 0.011075078000430949,
+     "fusion._records": 0.0005885540012968704,
+     "rerank.rerank (service round trip)": 0.1845938210026361
+    },
+    {
+     "id": "DQ-B-04",
+     "total": 0.21656763600185513,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0025306790048489347,
+     "lexical._checked": 0.004402111007948406,
+     "lexical._ranked": 0.0006473460089182481,
+     "lexical.search": 0.003474900993751362,
+     "semantic._pin": 5.021700053475797e-05,
+     "semantic._status": 0.00243266299366951,
+     "semantic._open": 0.0002460140094626695,
+     "ollama.ensure_query_available": 0.001199737991555594,
+     "semantic._ready": 0.0013763079914497212,
+     "semantic._built_at": 4.106698906980455e-05,
+     "semantic._ask": 0.0008121620048768818,
+     "semantic.query_vector": 0.004227899000397883,
+     "semantic.search": 0.009844755011727102,
+     "fusion._records": 0.0008527949976269156,
+     "rerank.rerank (service round trip)": 0.20211258200288285
+    },
+    {
+     "id": "DQ-B-05",
+     "total": 0.28501434199279174,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0037319300026865676,
+     "lexical._checked": 0.00552662399422843,
+     "lexical._ranked": 0.0006186480022734031,
+     "lexical.search": 0.0037730639887740836,
+     "semantic._pin": 5.063599382992834e-05,
+     "semantic._status": 0.003022365999640897,
+     "semantic._open": 0.00024386100994888693,
+     "ollama.ensure_query_available": 0.0011942660057684407,
+     "semantic._ready": 0.0013250839983811602,
+     "semantic._built_at": 4.262400034349412e-05,
+     "semantic._ask": 0.0010142339888261631,
+     "semantic.query_vector": 0.004497193003771827,
+     "semantic.search": 0.010608216005493887,
+     "fusion._records": 0.0006158549949759617,
+     "rerank.rerank (service round trip)": 0.26982795499498025
+    },
+    {
+     "id": "DQ-B-06",
+     "total": 0.1679683539987309,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003399728986551054,
+     "lexical._checked": 0.005850193003425375,
+     "lexical._ranked": 0.0009909999935189262,
+     "lexical.search": 0.004256317013641819,
+     "semantic._pin": 7.036699389573187e-05,
+     "semantic._status": 0.0034859279985539615,
+     "semantic._open": 0.00029690600058529526,
+     "ollama.ensure_query_available": 0.0013572110037785023,
+     "semantic._ready": 0.0014937189989723265,
+     "semantic._built_at": 8.058598905336112e-05,
+     "semantic._ask": 0.0010548449936322868,
+     "semantic.query_vector": 0.004704476988990791,
+     "semantic.search": 0.011596393000218086,
+     "fusion._records": 0.0006103829946368933,
+     "rerank.rerank (service round trip)": 0.15132662600080948
+    },
+    {
+     "id": "DQ-B-07",
+     "total": 0.35620696799014695,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0030065990140428767,
+     "lexical._checked": 0.005293829017318785,
+     "lexical._ranked": 0.0008213859982788563,
+     "lexical.search": 0.0037495940050575882,
+     "semantic._pin": 5.8083998737856746e-05,
+     "semantic._status": 0.003055810011574067,
+     "semantic._open": 0.0003581299970392138,
+     "ollama.ensure_query_available": 0.0009916120034176856,
+     "semantic._ready": 0.0011300470068817958,
+     "semantic._built_at": 4.638300742954016e-05,
+     "semantic._ask": 0.0007880719931563362,
+     "semantic.query_vector": 0.0043560720077948645,
+     "semantic.search": 0.010432989001856185,
+     "fusion._records": 0.0007254980009747669,
+     "rerank.rerank (service round trip)": 0.3411182769923471
+    },
+    {
+     "id": "DQ-B-08",
+     "total": 0.22713751799892634,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002699251999729313,
+     "lexical._checked": 0.004493221000302583,
+     "lexical._ranked": 0.000702153003658168,
+     "lexical.search": 0.0035209970083087683,
+     "semantic._pin": 5.637398862745613e-05,
+     "semantic._status": 0.002392386013525538,
+     "semantic._open": 0.0002718210016610101,
+     "ollama.ensure_query_available": 0.001086038988432847,
+     "semantic._ready": 0.0012223820085637271,
+     "semantic._built_at": 5.364899698179215e-05,
+     "semantic._ask": 0.0008590840006945655,
+     "semantic.query_vector": 0.005802243991638534,
+     "semantic.search": 0.011339656004565768,
+     "fusion._records": 0.0011548909969860688,
+     "rerank.rerank (service round trip)": 0.21090058999834582
+    },
+    {
+     "id": "DQ-B-09",
+     "total": 0.28996999700029846,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003363398995134048,
+     "lexical._checked": 0.00542912699165754,
+     "lexical._ranked": 0.0015520510060014203,
+     "lexical.search": 0.005239997000899166,
+     "semantic._pin": 5.785000394098461e-05,
+     "semantic._status": 0.0026942070107907057,
+     "semantic._open": 0.00035442599619273096,
+     "ollama.ensure_query_available": 0.0012163450010120869,
+     "semantic._ready": 0.001399949993356131,
+     "semantic._built_at": 5.924901051912457e-05,
+     "semantic._ask": 0.0011206350027350709,
+     "semantic.query_vector": 0.005537542005185969,
+     "semantic.search": 0.01198815599491354,
+     "fusion._records": 0.0006163510115584359,
+     "rerank.rerank (service round trip)": 0.2719209060014691
+    },
+    {
+     "id": "DQ-B-10",
+     "total": 0.23841876799997408,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0023541179980384186,
+     "lexical._checked": 0.0043467309878906235,
+     "lexical._ranked": 0.0009028469939948991,
+     "lexical.search": 0.00352146101067774,
+     "semantic._pin": 5.549400520976633e-05,
+     "semantic._status": 0.002440659998683259,
+     "semantic._open": 0.000420958996983245,
+     "ollama.ensure_query_available": 0.0010223790013696998,
+     "semantic._ready": 0.0011789380077971146,
+     "semantic._built_at": 4.759800503961742e-05,
+     "semantic._ask": 0.0009203240042552352,
+     "semantic.query_vector": 0.005657129004248418,
+     "semantic.search": 0.01142061200516764,
+     "fusion._records": 0.0006040769949322566,
+     "rerank.rerank (service round trip)": 0.22267730100429617
+    },
+    {
+     "id": "DQ-B-11",
+     "total": 0.35351217599236406,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0029636270191986114,
+     "lexical._checked": 0.004772833999595605,
+     "lexical._ranked": 0.0009196940081892535,
+     "lexical.search": 0.0038801809860160574,
+     "semantic._pin": 5.693799175787717e-05,
+     "semantic._status": 0.0025222140102414414,
+     "semantic._open": 0.0002994520036736503,
+     "ollama.ensure_query_available": 0.0011686119978548959,
+     "semantic._ready": 0.001321511997957714,
+     "semantic._built_at": 6.68660068186e-05,
+     "semantic._ask": 0.0009066740021808073,
+     "semantic.query_vector": 0.004634365002857521,
+     "semantic.search": 0.01034844400419388,
+     "fusion._records": 0.0006117849989095703,
+     "rerank.rerank (service round trip)": 0.33848110400140285
+    },
+    {
+     "id": "DQ-B-12",
+     "total": 0.15193301999534015,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003440674001467414,
+     "lexical._checked": 0.005236113996943459,
+     "lexical._ranked": 0.0014492909976979718,
+     "lexical.search": 0.004370075999759138,
+     "semantic._pin": 5.5670010624453425e-05,
+     "semantic._status": 0.003021315991645679,
+     "semantic._open": 0.0002954619994852692,
+     "ollama.ensure_query_available": 0.0009957160073099658,
+     "semantic._ready": 0.0011409690050641075,
+     "semantic._built_at": 5.522700666915625e-05,
+     "semantic._ask": 0.0011240659950999543,
+     "semantic.query_vector": 0.00538414299080614,
+     "semantic.search": 0.011395330002414994,
+     "fusion._records": 0.0006209770072018728,
+     "rerank.rerank (service round trip)": 0.13535037598921917
+    },
+    {
+     "id": "DQ-B-13",
+     "total": 0.22389779600780457,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003991940000560135,
+     "lexical._checked": 0.00589145599224139,
+     "lexical._ranked": 0.0005440060049295425,
+     "lexical.search": 0.003745686000911519,
+     "semantic._pin": 5.737700848840177e-05,
+     "semantic._status": 0.0036212790000718087,
+     "semantic._open": 0.0002985800092574209,
+     "ollama.ensure_query_available": 0.0011576530087040737,
+     "semantic._ready": 0.0013047629909124225,
+     "semantic._built_at": 5.970700294710696e-05,
+     "semantic._ask": 0.0010577060020295903,
+     "semantic.query_vector": 0.006608276002225466,
+     "semantic.search": 0.014385905989911407,
+     "fusion._records": 0.000676497002132237,
+     "rerank.rerank (service round trip)": 0.20488000600016676
+    },
+    {
+     "id": "DQ-B-14",
+     "total": 0.2275855890038656,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0038487100100610405,
+     "lexical._checked": 0.005873831993085332,
+     "lexical._ranked": 0.000781762006226927,
+     "lexical.search": 0.0044885680108563974,
+     "semantic._pin": 5.3898998885415494e-05,
+     "semantic._status": 0.0029800039919791743,
+     "semantic._open": 0.0002682739868760109,
+     "ollama.ensure_query_available": 0.0010767329949885607,
+     "semantic._ready": 0.0012154080031905323,
+     "semantic._built_at": 7.503399683628231e-05,
+     "semantic._ask": 0.0009169990080408752,
+     "semantic.query_vector": 0.008648186005302705,
+     "semantic.search": 0.01479960500728339,
+     "fusion._records": 0.0005987330077914521,
+     "rerank.rerank (service round trip)": 0.2074812430073507
+    },
+    {
+     "id": "DQ-B-15",
+     "total": 0.28877244000614155,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002602809981908649,
+     "lexical._checked": 0.0044619470136240125,
+     "lexical._ranked": 0.000916874996619299,
+     "lexical.search": 0.0037284590071067214,
+     "semantic._pin": 5.681600305251777e-05,
+     "semantic._status": 0.002400579003733583,
+     "semantic._open": 0.00036550800723489374,
+     "ollama.ensure_query_available": 0.0013218759995652363,
+     "semantic._ready": 0.0014890910097165033,
+     "semantic._built_at": 6.41270016785711e-05,
+     "semantic._ask": 0.0009375500085297972,
+     "semantic.query_vector": 0.005266089006909169,
+     "semantic.search": 0.011117446003481746,
+     "fusion._records": 0.0006535739958053455,
+     "rerank.rerank (service round trip)": 0.27304570699925534
+    },
+    {
+     "id": "DQ-B-16",
+     "total": 0.1850825809960952,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0025914189900504425,
+     "lexical._checked": 0.004998435004381463,
+     "lexical._ranked": 0.0008727509994059801,
+     "lexical.search": 0.003466920999926515,
+     "semantic._pin": 5.3158000810071826e-05,
+     "semantic._status": 0.0033464039879618213,
+     "semantic._open": 0.0004688319895649329,
+     "ollama.ensure_query_available": 0.001392479010974057,
+     "semantic._ready": 0.0016161160019692034,
+     "semantic._built_at": 6.826300523243845e-05,
+     "semantic._ask": 0.0014402759989025071,
+     "semantic.query_vector": 0.005629396997392178,
+     "semantic.search": 0.012658933992497623,
+     "fusion._records": 0.0006165410013636574,
+     "rerank.rerank (service round trip)": 0.1681524140003603
+    },
+    {
+     "id": "DQ-B-17",
+     "total": 0.35724429099354893,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0033672650024527684,
+     "lexical._checked": 0.005158852000022307,
+     "lexical._ranked": 0.0007064319943310693,
+     "lexical.search": 0.003493955999147147,
+     "semantic._pin": 6.965899956412613e-05,
+     "semantic._status": 0.003028958002687432,
+     "semantic._open": 0.0002617470017867163,
+     "ollama.ensure_query_available": 0.001327520003542304,
+     "semantic._ready": 0.0014582400035578758,
+     "semantic._built_at": 0.00011776600149460137,
+     "semantic._ask": 0.0009676070039859042,
+     "semantic.query_vector": 0.006869604985695332,
+     "semantic.search": 0.013229502001195215,
+     "fusion._records": 0.0006189410050865263,
+     "rerank.rerank (service round trip)": 0.33971814200049266
+    },
+    {
+     "id": "DQ-B-18",
+     "total": 0.21490039498894475,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002515736996429041,
+     "lexical._checked": 0.004344004002632573,
+     "lexical._ranked": 0.0005164169997442514,
+     "lexical.search": 0.0031300980044761673,
+     "semantic._pin": 6.773800123482943e-05,
+     "semantic._status": 0.0023765660007484257,
+     "semantic._open": 0.0002644890046212822,
+     "ollama.ensure_query_available": 0.00125701300567016,
+     "semantic._ready": 0.0013965149992145598,
+     "semantic._built_at": 5.689699901267886e-05,
+     "semantic._ask": 0.0010263900039717555,
+     "semantic.query_vector": 0.004317290004109964,
+     "semantic.search": 0.010108299000421539,
+     "fusion._records": 0.0006272410100791603,
+     "rerank.rerank (service round trip)": 0.2008054739999352
+    },
+    {
+     "id": "DQ-B-19",
+     "total": 0.21982721400854643,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.004134999995585531,
+     "lexical._checked": 0.006072331001632847,
+     "lexical._ranked": 0.0006823250005254522,
+     "lexical.search": 0.004642389001674019,
+     "semantic._pin": 7.208199531305581e-05,
+     "semantic._status": 0.0030847210000501946,
+     "semantic._open": 0.000309196999296546,
+     "ollama.ensure_query_available": 0.0010390629904577509,
+     "semantic._ready": 0.0012713390024146065,
+     "semantic._built_at": 5.978699482511729e-05,
+     "semantic._ask": 0.001101290006772615,
+     "semantic.query_vector": 0.006043852990842424,
+     "semantic.search": 0.012633674996322952,
+     "fusion._records": 0.000645128995529376,
+     "rerank.rerank (service round trip)": 0.20172275899676606
+    },
+    {
+     "id": "DQ-B-20",
+     "total": 0.16818282900203485,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.0039985390030778944,
+     "lexical._checked": 0.005929060003836639,
+     "lexical._ranked": 0.000690993998432532,
+     "lexical.search": 0.004161997989285737,
+     "semantic._pin": 7.867900421842933e-05,
+     "semantic._status": 0.0030996160057839006,
+     "semantic._open": 0.00028781800938304514,
+     "ollama.ensure_query_available": 0.0010561040107859299,
+     "semantic._ready": 0.0011901760008186102,
+     "semantic._built_at": 4.859500040765852e-05,
+     "semantic._ask": 0.0009193729929393157,
+     "semantic.query_vector": 0.004739001989946701,
+     "semantic.search": 0.010863746007089503,
+     "fusion._records": 0.0005527659959625453,
+     "rerank.rerank (service round trip)": 0.15242797900282312
+    },
+    {
+     "id": "DQ-B-21",
+     "total": 0.20253773900913075,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002687322994461283,
+     "lexical._checked": 0.004471960986847989,
+     "lexical._ranked": 0.0009108649974223226,
+     "lexical.search": 0.003739817999303341,
+     "semantic._pin": 6.161999772302806e-05,
+     "semantic._status": 0.002396740994299762,
+     "semantic._open": 0.0002799330104608089,
+     "ollama.ensure_query_available": 0.0012266139965504408,
+     "semantic._ready": 0.0013664160069311038,
+     "semantic._built_at": 4.865300434175879e-05,
+     "semantic._ask": 0.001031291001709178,
+     "semantic.query_vector": 0.006848385004559532,
+     "semantic.search": 0.012427993002347648,
+     "fusion._records": 0.0006604959926335141,
+     "rerank.rerank (service round trip)": 0.1854731250059558
+    },
+    {
+     "id": "DQ-B-22",
+     "total": 0.3610121439996874,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003590093008824624,
+     "lexical._checked": 0.006016466009896249,
+     "lexical._ranked": 0.0007940609939396381,
+     "lexical.search": 0.004842212001676671,
+     "semantic._pin": 5.615399277303368e-05,
+     "semantic._status": 0.0026979359972756356,
+     "semantic._open": 0.00026354398869443685,
+     "ollama.ensure_query_available": 0.001256974006537348,
+     "semantic._ready": 0.0013832900003762916,
+     "semantic._built_at": 6.463799218181521e-05,
+     "semantic._ask": 0.0009319989912910387,
+     "semantic.query_vector": 0.005312003006110899,
+     "semantic.search": 0.0112426370033063,
+     "fusion._records": 0.0006071980023989454,
+     "rerank.rerank (service round trip)": 0.3441454490093747
+    },
+    {
+     "id": "DQ-B-23",
+     "total": 0.22334053000668064,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003642843003035523,
+     "lexical._checked": 0.005737757004681043,
+     "lexical._ranked": 0.0006960809987504035,
+     "lexical.search": 0.00407181799528189,
+     "semantic._pin": 5.183200119063258e-05,
+     "semantic._status": 0.003056083995033987,
+     "semantic._open": 0.00026833701122086495,
+     "ollama.ensure_query_available": 0.0011623220052570105,
+     "semantic._ready": 0.001300650998018682,
+     "semantic._built_at": 0.00012425199383869767,
+     "semantic._ask": 0.0011985750024905428,
+     "semantic.query_vector": 0.005923188989982009,
+     "semantic.search": 0.01224182300211396,
+     "fusion._records": 0.0006556369917234406,
+     "rerank.rerank (service round trip)": 0.2061528560006991
+    },
+    {
+     "id": "DQ-B-24",
+     "total": 0.1606111609871732,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.004043469001771882,
+     "lexical._checked": 0.006849183002486825,
+     "lexical._ranked": 0.0016583820106461644,
+     "lexical.search": 0.006711373003781773,
+     "semantic._pin": 9.713099279906601e-05,
+     "semantic._status": 0.0027772869943873957,
+     "semantic._open": 0.00029117800295352936,
+     "ollama.ensure_query_available": 0.0012175199954072013,
+     "semantic._ready": 0.0013545309921028093,
+     "semantic._built_at": 5.607800267171115e-05,
+     "semantic._ask": 0.0010917549952864647,
+     "semantic.query_vector": 0.0042748159903567284,
+     "semantic.search": 0.010290072008501738,
+     "fusion._records": 0.0006275200139498338,
+     "rerank.rerank (service round trip)": 0.14276516099926084
+    },
+    {
+     "id": "DQ-B-25",
+     "total": 0.22040354000637308,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.002844931004801765,
+     "lexical._checked": 0.005048909006291069,
+     "lexical._ranked": 0.0005852600006619468,
+     "lexical.search": 0.003660215006675571,
+     "semantic._pin": 5.60589978704229e-05,
+     "semantic._status": 0.002810669000609778,
+     "semantic._open": 0.00029587899916805327,
+     "ollama.ensure_query_available": 0.0009670160070527345,
+     "semantic._ready": 0.0011079420073656365,
+     "semantic._built_at": 4.515299224294722e-05,
+     "semantic._ask": 0.000905084001715295,
+     "semantic.query_vector": 0.007971455008373596,
+     "semantic.search": 0.013878985002520494,
+     "fusion._records": 0.0006626840040553361,
+     "rerank.rerank (service round trip)": 0.20196436600235756
+    },
+    {
+     "id": "DQ-B-26",
+     "total": 0.2880619670031592,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003353723994223401,
+     "lexical._checked": 0.005231443981756456,
+     "lexical._ranked": 0.0006683750107185915,
+     "lexical.search": 0.004313466008170508,
+     "semantic._pin": 4.980000085197389e-05,
+     "semantic._status": 0.002379646000918001,
+     "semantic._open": 0.00027575499552767724,
+     "ollama.ensure_query_available": 0.0011641400051303208,
+     "semantic._ready": 0.001308161998167634,
+     "semantic._built_at": 7.229500624816865e-05,
+     "semantic._ask": 0.0008664670021971688,
+     "semantic.query_vector": 0.004278192995116115,
+     "semantic.search": 0.009787766000954434,
+     "fusion._records": 0.0006192729924805462,
+     "rerank.rerank (service round trip)": 0.2730858580034692
+    },
+    {
+     "id": "DQ-B-27",
+     "total": 0.37149907799903303,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.003948822995880619,
+     "lexical._checked": 0.005795998004032299,
+     "lexical._ranked": 0.0014343170041684061,
+     "lexical.search": 0.005213462995016016,
+     "semantic._pin": 5.3028998081572354e-05,
+     "semantic._status": 0.003021429991349578,
+     "semantic._open": 0.00029216900293249637,
+     "ollama.ensure_query_available": 0.0011808410054072738,
+     "semantic._ready": 0.0013221090048318729,
+     "semantic._built_at": 8.224300108850002e-05,
+     "semantic._ask": 0.0009210189891746268,
+     "semantic.query_vector": 0.007733880993328057,
+     "semantic.search": 0.014271862994064577,
+     "fusion._records": 0.0006935200071893632,
+     "rerank.rerank (service round trip)": 0.35107991099357605
+    },
+    {
+     "id": "DQ-B-28",
+     "total": 0.35685086699959356,
+     "reranked": true,
+     "n": 30,
+     "facets": {
+      "lexical": {
+       "available": true,
+       "reason": null
+      },
+      "semantic": {
+       "available": true,
+       "reason": null
+      }
+     },
+     "lexical._git": 0.004337042992119677,
+     "lexical._checked": 0.006610707001527771,
+     "lexical._ranked": 0.0005504889995791018,
+     "lexical.search": 0.004685767999035306,
+     "semantic._pin": 5.8568999520502985e-05,
+     "semantic._status": 0.0036031380004715174,
+     "semantic._open": 0.00046605500392615795,
+     "ollama.ensure_query_available": 0.001454057011869736,
+     "semantic._ready": 0.0016314499953296036,
+     "semantic._built_at": 0.0001404899958288297,
+     "semantic._ask": 0.0012393770011840388,
+     "semantic.query_vector": 0.005530815004021861,
+     "semantic.search": 0.01314809599716682,
+     "fusion._records": 0.0006869039934827015,
+     "rerank.rerank (service round trip)": 0.3381896000064444
+    }
+   ]
+  }
+ },
+ "load_after": [
+  8.37451171875,
+  8.66162109375,
+  9.10009765625
+ ],
+ "requests": [
+  {
+   "n": 30,
+   "longest_pair": 589,
+   "padded": 17670,
+   "chars": 7652,
+   "s": 0.20710923199658282
+  },
+  {
+   "n": 30,
+   "longest_pair": 596,
+   "padded": 17880,
+   "chars": 10059,
+   "s": 0.20581552700605243
+  },
+  {
+   "n": 30,
+   "longest_pair": 591,
+   "padded": 17730,
+   "chars": 7768,
+   "s": 0.2041898399911588
+  },
+  {
+   "n": 30,
+   "longest_pair": 616,
+   "padded": 18480,
+   "chars": 11343,
+   "s": 0.2625217530003283
+  },
+  {
+   "n": 30,
+   "longest_pair": 590,
+   "padded": 17700,
+   "chars": 8137,
+   "s": 0.1551816970022628
+  },
+  {
+   "n": 30,
+   "longest_pair": 605,
+   "padded": 18150,
+   "chars": 11027,
+   "s": 0.2369461620110087
+  },
+  {
+   "n": 30,
+   "longest_pair": 597,
+   "padded": 17910,
+   "chars": 9978,
+   "s": 0.19656207899970468
+  },
+  {
+   "n": 30,
+   "longest_pair": 596,
+   "padded": 17880,
+   "chars": 9578,
+   "s": 0.2035103639937006
+  },
+  {
+   "n": 30,
+   "longest_pair": 590,
+   "padded": 17700,
+   "chars": 8017,
+   "s": 0.4848040490032872
+  },
+  {
+   "n": 30,
+   "longest_pair": 625,
+   "padded": 18750,
+   "chars": 11586,
+   "s": 0.2737544300034642
+  },
+  {
+   "n": 30,
+   "longest_pair": 578,
+   "padded": 17340,
+   "chars": 7473,
+   "s": 0.20436015099403448
+  },
+  {
+   "n": 30,
+   "longest_pair": 582,
+   "padded": 17460,
+   "chars": 11171,
+   "s": 0.2685335389978718
+  },
+  {
+   "n": 30,
+   "longest_pair": 611,
+   "padded": 18330,
+   "chars": 12461,
+   "s": 0.2712555549951503
+  },
+  {
+   "n": 30,
+   "longest_pair": 647,
+   "padded": 19410,
+   "chars": 10751,
+   "s": 0.21231351999449544
+  },
+  {
+   "n": 30,
+   "longest_pair": 631,
+   "padded": 18930,
+   "chars": 12848,
+   "s": 0.18647112599865068
+  },
+  {
+   "n": 30,
+   "longest_pair": 622,
+   "padded": 18660,
+   "chars": 9389,
+   "s": 0.20545877898985054
+  },
+  {
+   "n": 30,
+   "longest_pair": 589,
+   "padded": 17670,
+   "chars": 11655,
+   "s": 0.17221850100031588
+  },
+  {
+   "n": 30,
+   "longest_pair": 578,
+   "padded": 17340,
+   "chars": 9207,
+   "s": 0.20681377001164947
+  },
+  {
+   "n": 30,
+   "longest_pair": 599,
+   "padded": 17970,
+   "chars": 11704,
+   "s": 0.23448051999730524
+  },
+  {
+   "n": 30,
+   "longest_pair": 620,
+   "padded": 18600,
+   "chars": 10955,
+   "s": 0.25582765899889637
+  },
+  {
+   "n": 30,
+   "longest_pair": 613,
+   "padded": 18390,
+   "chars": 8393,
+   "s": 0.17137417299090885
+  },
+  {
+   "n": 30,
+   "longest_pair": 589,
+   "padded": 17670,
+   "chars": 8730,
+   "s": 0.20460885801003315
+  },
+  {
+   "n": 30,
+   "longest_pair": 604,
+   "padded": 18120,
+   "chars": 10660,
+   "s": 0.20229343901155517
+  },
+  {
+   "n": 30,
+   "longest_pair": 590,
+   "padded": 17700,
+   "chars": 11260,
+   "s": 0.2653185550007038
+  },
+  {
+   "n": 30,
+   "longest_pair": 598,
+   "padded": 17940,
+   "chars": 5774,
+   "s": 0.23328798500006087
+  },
+  {
+   "n": 30,
+   "longest_pair": 588,
+   "padded": 17640,
+   "chars": 9056,
+   "s": 0.26845277698885184
+  },
+  {
+   "n": 30,
+   "longest_pair": 597,
+   "padded": 17910,
+   "chars": 8156,
+   "s": 0.18441867300134618
+  },
+  {
+   "n": 30,
+   "longest_pair": 615,
+   "padded": 18450,
+   "chars": 8917,
+   "s": 0.2018818829965312
+  },
+  {
+   "n": 30,
+   "longest_pair": 598,
+   "padded": 17940,
+   "chars": 8062,
+   "s": 0.26964714500354603
+  },
+  {
+   "n": 30,
+   "longest_pair": 594,
+   "padded": 17820,
+   "chars": 8119,
+   "s": 0.15115771799173672
+  },
+  {
+   "n": 30,
+   "longest_pair": 598,
+   "padded": 17940,
+   "chars": 10150,
+   "s": 0.34093940499587916
+  },
+  {
+   "n": 30,
+   "longest_pair": 589,
+   "padded": 17670,
+   "chars": 11303,
+   "s": 0.21062748700205702
+  },
+  {
+   "n": 30,
+   "longest_pair": 600,
+   "padded": 18000,
+   "chars": 8441,
+   "s": 0.2717430129996501
+  },
+  {
+   "n": 30,
+   "longest_pair": 604,
+   "padded": 18120,
+   "chars": 7568,
+   "s": 0.22250022599473596
+  },
+  {
+   "n": 30,
+   "longest_pair": 589,
+   "padded": 17670,
+   "chars": 7187,
+   "s": 0.33830010300152935
+  },
+  {
+   "n": 30,
+   "longest_pair": 432,
+   "padded": 12960,
+   "chars": 5868,
+   "s": 0.1351643649977632
+  },
+  {
+   "n": 30,
+   "longest_pair": 591,
+   "padded": 17730,
+   "chars": 7904,
+   "s": 0.2046869010082446
+  },
+  {
+   "n": 30,
+   "longest_pair": 611,
+   "padded": 18330,
+   "chars": 10004,
+   "s": 0.20728487700398546
+  },
+  {
+   "n": 30,
+   "longest_pair": 606,
+   "padded": 18180,
+   "chars": 8295,
+   "s": 0.27285898799891584
+  },
+  {
+   "n": 30,
+   "longest_pair": 615,
+   "padded": 18450,
+   "chars": 10201,
+   "s": 0.1679687110008672
+  },
+  {
+   "n": 30,
+   "longest_pair": 608,
+   "padded": 18240,
+   "chars": 9502,
+   "s": 0.33954745199298486
+  },
+  {
+   "n": 30,
+   "longest_pair": 591,
+   "padded": 17730,
+   "chars": 10278,
+   "s": 0.2006287069962127
+  },
+  {
+   "n": 30,
+   "longest_pair": 600,
+   "padded": 18000,
+   "chars": 9957,
+   "s": 0.201549673001864
+  },
+  {
+   "n": 30,
+   "longest_pair": 584,
+   "padded": 17520,
+   "chars": 5996,
+   "s": 0.15223090301151387
+  },
+  {
+   "n": 30,
+   "longest_pair": 612,
+   "padded": 18360,
+   "chars": 9806,
+   "s": 0.1852890649897745
+  },
+  {
+   "n": 30,
+   "longest_pair": 595,
+   "padded": 17850,
+   "chars": 9564,
+   "s": 0.34397129200806376
+  },
+  {
+   "n": 30,
+   "longest_pair": 579,
+   "padded": 17370,
+   "chars": 6167,
+   "s": 0.2059110059926752
+  },
+  {
+   "n": 30,
+   "longest_pair": 541,
+   "padded": 16230,
+   "chars": 7699,
+   "s": 0.14258387900190428
+  },
+  {
+   "n": 30,
+   "longest_pair": 604,
+   "padded": 18120,
+   "chars": 8381,
+   "s": 0.2017470189894084
+  },
+  {
+   "n": 30,
+   "longest_pair": 616,
+   "padded": 18480,
+   "chars": 9612,
+   "s": 0.2728795549919596
+  },
+  {
+   "n": 30,
+   "longest_pair": 615,
+   "padded": 18450,
+   "chars": 8262,
+   "s": 0.35086515099101234
+  },
+  {
+   "n": 30,
+   "longest_pair": 580,
+   "padded": 17400,
+   "chars": 8020,
+   "s": 0.338005430996418
+  }
+ ],
+ "rerank_chars": 500,
+ "summary": {
+  "n": 52,
+  "p95": 0.3610121439996874,
+  "mean": 0.2499427177675758,
+  "median": 0.22713751799892634,
+  "max": 0.5032597499957774
+ },
+ "stages": {
+  "lexical._git": {
+   "mean": 0.003226811229419232,
+   "p95": 0.004134999995585531,
+   "calls_per_query": 2.0
+  },
+  "lexical._checked": {
+   "mean": 0.005210934962983279,
+   "p95": 0.006405206004274078,
+   "calls_per_query": 2.0
+  },
+  "lexical._ranked": {
+   "mean": 0.0009106147898329744,
+   "p95": 0.0015136869915295392,
+   "calls_per_query": 1.0
+  },
+  "lexical.search": {
+   "mean": 0.004124631885553334,
+   "p95": 0.005464928995934315,
+   "calls_per_query": 1.0
+  },
+  "semantic._pin": {
+   "mean": 6.154076898103365e-05,
+   "p95": 8.579499262850732e-05,
+   "calls_per_query": 1.0
+  },
+  "semantic._status": {
+   "mean": 0.0028008313652557824,
+   "p95": 0.0034859279985539615,
+   "calls_per_query": 1.0
+  },
+  "semantic._open": {
+   "mean": 0.0003109303280115665,
+   "p95": 0.0004700879944721237,
+   "calls_per_query": 1.0
+  },
+  "ollama.ensure_query_available": {
+   "mean": 0.0011679573466468495,
+   "p95": 0.001454057011869736,
+   "calls_per_query": 1.0
+  },
+  "semantic._ready": {
+   "mean": 0.0013166402697187061,
+   "p95": 0.001621169998543337,
+   "calls_per_query": 1.0
+  },
+  "semantic._built_at": {
+   "mean": 6.207230818780282e-05,
+   "p95": 0.00011776600149460137,
+   "calls_per_query": 1.0
+  },
+  "semantic._ask": {
+   "mean": 0.000981753423380164,
+   "p95": 0.0012393770011840388,
+   "calls_per_query": 1.0
+  },
+  "semantic.query_vector": {
+   "mean": 0.0055868157105578575,
+   "p95": 0.007733880993328057,
+   "calls_per_query": 1.0
+  },
+  "semantic.search": {
+   "mean": 0.011932204942870438,
+   "p95": 0.014385905989911407,
+   "calls_per_query": 1.0
+  },
+  "fusion._records": {
+   "mean": 0.0006542610390170012,
+   "p95": 0.0008527949976269156,
+   "calls_per_query": 1.0
+  },
+  "rerank.rerank (service round trip)": {
+   "mean": 0.23303635613522672,
+   "p95": 0.3441454490093747,
+   "calls_per_query": 1.0
+  }
+ }
+}

@@ -1,0 +1,58 @@
+--- A. the bundle
+ok   A1 list.txt names the one file, root repo
+ok   A2 the before copy hashes as listed
+ok   A3 the after copy hashes as listed
+ok   A4 the main tree's dispatcher is the frozen before
+ok   A5 apply.sh parses
+ok   A6 one line removed (in_slot's docstring line, rewritten), the rest added
+     47 lines added
+--- B. a fresh clone of w2/integrate
+     state before (sha256 dd5e57e2d94b)
+ok   B1 check: state before (exit 0)
+ok   B2 the checks before the apply: 1 passes (it parses), 2 and 3 refuse (exits 0,1,1)
+     state applied (sha256 cda0af7196c8)
+ok   B3 apply (exit 0)
+ok   B4 the file is the after, byte for byte
+ok   B5 its mode kept (644)
+ok   B6 verify (exit 0)
+     state applied (sha256 cda0af7196c8); nothing to do
+ok   B7 apply again: nothing to do
+ok   B8 only the dispatcher changed in the clone
+dispatcher: the nightly's run counts as in a slot only with all three (its clone, a fresh marker, nightly.sh holding a slot); each missing one, and any other heavy step, stays outside
+ok   B9 the manifest's three checks after the apply (exits 0,0,0)
+--- C. a planted nightly, live (planted folders; the real slot files are never opened)
+     planted nightly.sh pid 197099, its suite stand-in pid 197110: python3 -c import time; time.sleep(40) -m pytest tests 
+ok   C1 the planted nightly holds its three planted slot locks by flock on its own fds (fdinfo lock lines)
+ok   C2 no planted process opens a real /tmp slot file
+ok   C3 before: the nightly's suite run is outside a slot (the incident, reproduced)
+ok   C4 after: the nightly's suite run is in a slot
+ok   C5 after, NIGHTLY-RUNNING absent: outside
+ok   C6 after, NIGHTLY-RUNNING 361 minutes old: outside
+ok   C7 after, the marker fresh again: in a slot
+ok   C8 after, a nightly that opens the slot files but holds no lock: outside
+ok   C9 after, the nightly's run working outside its run folder: outside
+ok   C10 after, a heavy step in a nightly clone folder with a fresh marker but no nightly.sh above it: outside
+--- D. the unit tests (through heavy_slot.sh, TMPDIR in the bed)
+ok   D1 the follow-up tests apply to the clone
+     before: 2 failed, 7 passed, 206 deselected in 2.60s
+ok   D2 before: the two in-slot cases red (the nightly's run, and beside a step elsewhere), the seven outside cases green
+     after: 9 passed, 206 deselected in 2.36s
+ok   D3 after: the nine new cases green
+     the whole dispatcher suite after: 196 passed, 3 skipped, 16 deselected in 112.89s (0:01:52)
+ok   D4 after: the whole of test_dispatcher.py green
+--- E. undo and refusals
+     state before (sha256 dd5e57e2d94b)
+ok   E1 undo (exit 0)
+ok   E2 undone byte for byte
+ok   E3 check: state before (exit 0)
+     refused: governance/project/orchestration/tools/dispatch/dispatcher.py is neither the frozen before nor the frozen after (sha256 3d7cd0c69a8d)
+ok   E4 apply refuses a dispatcher changed since the freeze (exit 3)
+     refused: governance/project/orchestration/tools/dispatch/dispatcher.py is not as this ACT left it (sha256 1db9fe5d0aef); a later change is not overwritten
+ok   E5 undo refuses it too (exit 3)
+ok   E6 verify refuses it (exit 3)
+ok   E7 a link in the file's place is refused
+--- F. the main tree
+ok   F1 the main tree's dispatcher is unchanged
+ok   F2 the main tree's tracked governance/tests/src status unchanged
+=== 38 ok, 0 failed
+failures: 0

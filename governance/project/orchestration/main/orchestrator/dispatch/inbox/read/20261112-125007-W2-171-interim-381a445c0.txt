@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result 381a445c0: Merge w2/integrate into w2/W2-171: run 5, for the probe record (docs/probes/DAEO-k1e2/** added to allowed_paths by d5b63037d) and W2-180's landing

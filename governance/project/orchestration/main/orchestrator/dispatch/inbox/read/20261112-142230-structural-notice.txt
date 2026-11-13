@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-134904.out
+Structural: after the landing of W2-179 (base 2fd7ad9259e4)
+status: structural pass at f0ef62f39314: NOTICE in mutation, portability, links (7 of 10 families ok), 14.2 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 6 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+3 more)
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: NOTICE 13 findings: differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md | differs from its composition of template/governance/kernel/templates/role-reviewer.md and template/governance/kernel/roles/independent-auditor.md | differs from its composition of template/governance/kernel/templates/role-test-designer.md and template/governance/kernel/roles/independent-test-designer.md (+10 more) [32 kernel role, skill, hook or .rulesync path(s) changed since 2fd7ad9259e4]
+links: NOTICE 62 new since 2fd7ad9259e49d165fbcb6c3eda5337c054c61e9 (1619 standing): UNKNOWN_ID tests/acceptance/W2-115 in DAEO-emq1's acceptance_tests.path | .tickets/DAEO-emq1.md:91 | orchestrator | write the tests at tests/acceptance/W2-11... | UNKNOWN_ID tests/acceptance/W2-124 in DAEO-mb2t's acceptance_tests.path | .tickets/DAEO-mb2t.md:47 | orchestrator | write the tests at tests/acceptance/W2-12... | UNLINKED_ID CAP-24 in 99dd5ca5235d's Implements: (product-spec), not in DAEO-k7hz's sources | .tickets/DAEO-k7hz.md:67 | orchestrator | add CAP-24 to DAEO-k7... (+59 more)
+structural pass at f0ef62f39314: NOTICE in mutation, portability, links (7 of 10 families ok), 14.2 s; a notice, not a refusal

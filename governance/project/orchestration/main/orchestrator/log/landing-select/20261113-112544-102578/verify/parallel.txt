@@ -1,0 +1,319 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 11:35:26)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+.................................................................F.F.... [  6%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+.........................................F................s............. [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+............F.............................................F............. [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+...............................................F...........F............ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+......................................................................s. [ 59%]
+........................................................................ [ 60%]
+.......................ss.s............................................. [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+..............................................ss.s...................... [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+..............F.........F.....F......................................... [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+................................................................         [100%]
+=================================== FAILURES ===================================
+____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-lead', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-lead.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+_____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-cto', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-cto.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-lrre/PR-...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-lrre/PR-DAEO-lrre.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-lrre/PR-DAEO-lrre.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]
+E       assert [{'at': '$', ...perty)', ...}] == []
+E         
+E         Left contains one more item: {'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-lrre/PR-DAEO-...sing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/orchestrator.md: the body is not that of templates/role-lead.md, one blank line, then that of roles/orchestrator.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th... mechanism.\n' == '# You are th... mechanism.\n'
+E         
+E         Skipping 1431 identical leading characters in diff, use -v to show
+E           -1052].
+E         + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E           - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E           - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E           ...
+E         
+E         ...Full output truncated (78 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+____ test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-ls-FOuTGX/pytest-of-usain/pytest-0/popen-gw3/test_s3_guard_the_check_finds_0')
+
+    def test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository(tmp_path):
+        """``python3 -m gov.adapters.portability`` from this repository's root (no rulesync: the kernel comparison runs
+        alone) names no ``subagents`` source. Green on integrate, where it compares the role files' bodies; it must stay
+        green once the sources hold the templates' bodies and the check compares the composition."""
+        done = subprocess.run([sys.executable, "-m", "gov.adapters.portability"], cwd=str(support.REPO),
+                              capture_output=True, text=True, timeout=support.COMMAND_TIMEOUT_S,
+                              env=support.portability_env(tmp_path, RULESYNC_BIN="/nonexistent/rulesync"),
+                              stdin=subprocess.DEVNULL)
+        findings = json.loads(done.stdout)["findings"]
+        drift = [f for f in findings if "/subagents/" in str(f.get("file", ""))]
+>       assert drift == [], f"role source findings: {drift}"
+E       AssertionError: role source findings: [{'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md', 'file': '.rulesync/subagents/orchestrator.md'}]
+E       assert [{'code': 'SO...estrator.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/orchestrator.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:108: AssertionError
+________________ test_the_twelve_sources_are_the_composition[] _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: orchestrator
+E           assert '---\nname: o... mechanism.\n' == '---\nname: o... mechanism.\n'
+E             
+E             Skipping 1693 identical leading characters in diff, use -v to show
+E               -1052].
+E             + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E               - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E               - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E               ...
+E             
+E             ...Full output truncated (78 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...estrator.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/orchestrator.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x7e17c8085d60>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7e17c8085d60>
+schema = PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261113-112544-102578/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-0mtg-PR-DAEO-0mtg': {'commissioned_by': 'orchestrator', 'implementer_session': "unknown (the engineer's log was...lementer_session': '8f696f48-3724-45bd-8ef2-dcc024b3ff5f', 'judged_by': 'orchestrator', 'judgement': 'pass', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-ls-FOuTGX/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-lrre-PR-DAEO-lrre.json::$: 'implementer_session' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x7e17c81180e0>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-lrre/PR-DAEO-lrre.md': [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-lrre/PR-DAEO-lrre.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-lrre/PR-DAEO-lrre.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]}
+E       assert not {'docs/probes/DAEO-lrre/PR-DAEO-lrre.md': [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session',...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 1 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-lrre/PR-DAEO-lrre.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-lrre/PR-DAEO-lrre.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}])
+E       assert not [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-lrre/PR-DAEO...ing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/landing-select/20261113-112544-102578/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=234702) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+10 failed, 5446 passed, 8 skipped, 6 warnings in 1144.94s (0:19:04)

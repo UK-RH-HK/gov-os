@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-115
+status: interim result 42dfec7d2: W2-115 (DAEO-emq1): probe record, FULL review round 2 (the last): FAIL at f39289d3a379 (R2-1 blocking, S4/F1: PK-3 (a)'s fallback with no green base)

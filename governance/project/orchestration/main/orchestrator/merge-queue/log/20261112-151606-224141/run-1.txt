@@ -1,0 +1,268 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+.....s.................................................................. [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+.................................sss.................................... [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+...............F.F...................................................... [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+..............................................sss....................... [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................F............................................... [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+.............F.......................................................... [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+.................................F...................................... [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+..................s..................................................... [ 96%]
+........................................................................ [ 98%]
+...................................................................s.... [ 99%]
+....x............................                                        [100%]
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/dispatch/test_peaks.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_peaks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_peaks.py:7: in <module>
+    from conftest import GIB
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_returns.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_returns.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_returns.py:7: in <module>
+    from conftest import git
+E   ImportError: cannot import name 'git' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+______________ ERROR collecting tests/unit/dispatch/test_start.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_start.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_start.py:9: in <module>
+    from conftest import GIB, REPO, git
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_status.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_status.py:12: in <module>
+    from conftest import REPO, GIB
+E   ImportError: cannot import name 'REPO' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-66/conftest.py)
+=================================== FAILURES ===================================
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7e8d028edb80>, position = 0
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['R', 'T'] == ['T', 'T']
+E         
+E         At index 0 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x7e8d028ee750>, position = 1
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['T', 'R'] == ['T', 'T']
+E         
+E         At index 1 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+______ test_core_schema_is_green_on_this_repository_with_w1_43_untouched _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/src/gov/__init__.py'
+
+    def test_core_schema_is_green_on_this_repository_with_w1_43_untouched(code_under_test):
+        """*Red.* Core-schema, run as declared in this worktree, finds nothing; the W1-43 report's sha256 is
+        ``b14e17d6...cdac1d`` before and after the run. Today: ``SCHEMA_INVALID_TYPE`` on the W1-43 report."""
+        assert S.sha256(S.REPO_ROOT / S.W1_43_REL) == S.W1_43_SHA256, "the W1-43 audit report is changed"
+        declaration = (S.REPO_ROOT / S.CHECKS_REL / "core-schema.yaml").read_text(encoding="utf-8")
+        command = yaml.safe_load(declaration)["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=S.CALL_TIMEOUT_S)
+>       assert done.returncode == 0, f"core-schema is not green on this repository\n{done.describe()}"
+E       AssertionError: core-schema is not green on this repository
+E         sh -c python3 -m gov.check.schema
+E         exit code: 1 (4.4 s)
+E         stdout:
+E         {
+E           "findings": [
+E             {
+E               "code": "SCHEMA_UNREADABLE_RECORD",
+E               "path": "docs/changes/W2-176-CIT-P.md",
+E               "message": "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"
+E             }
+E           ],
+E           "check": "core-schema",
+E           "records_validated": 1048,
+E           "left_out": [
+E             {
+E               "path": "docs/imported/",
+E               "files": 5,
+E               "why": "history (DEC-844): imported records are kept as they came and are not held to the schemas"
+E             }
+E           ],
+E           "validator": {
+E             "tool": "check-jsonschema",
+E             "pin": "0.38.2",
+E             "version": "0.38.2"
+E           }
+E         }
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x7e8d087d86b0>.returncode
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:231: AssertionError
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-176-CIT-P.md'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/changes/W2-176-CIT-P.md', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}]
+E       assert [{'code': 'SC...76-CIT-P.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-176-CIT-P.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+_________________ test_gov_check_gives_core_schema_green_here __________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+gov_check_here = (<w2_54_support.Run object at 0x7e8d0259c470>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '7b5a99ae988a144f16cefcf4f21f3e632b5adcab', 'inputs_hash': 'ba621a4b3c9be890'}, ...}, ...})
+
+    def test_gov_check_gives_core_schema_green_here(gov_check_here):
+        """*Red.* Core-schema, in ``gov check --json`` on this repository, is GREEN. In a close, that ``gov check`` is
+        gate (b)'s, whose output the close hands this run (README, "W2-75")."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CORE_SCHEMA_ID)
+        assert entry is not None, f"gov check lists no {S.CORE_SCHEMA_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CORE_SCHEMA_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: core-schema is RED here: [{"code": "SCHEMA_UNREADABLE_RECORD", "message": "docs/changes/W2-176-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", "path": "docs/changes/W2-176-CIT-P.md"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:53: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1168623) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+SKIPPED [1] tests/acceptance/W2-32/test_w2_32_s5_fusion_limit.py:91: this build refuses a limit above its cap; the order of a honoured limit does not arise
+5 failed, 5850 passed, 9 skipped, 1 xfailed, 6 warnings, 4 errors in 1028.33s (0:17:08)

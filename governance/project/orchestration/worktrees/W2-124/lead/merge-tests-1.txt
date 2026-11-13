@@ -1,0 +1,5 @@
+W2-124 (DAEO-mb2t): merge the acceptance tests (td-1, fc3474cb1)
+
+Task: DAEO-mb2t
+Role: orchestrator
+Implements: DEC-1027, DEC-1015, DEC-1014, DEC-1083, DEC-530, DEC-954, DAEO-2ds6, DAEO-2bdu

@@ -1,0 +1,23 @@
+$ bash apply.sh check
+state before (rc 0)
+$ bash apply.sh verify
+not applied: /tmp/claude-1000/p95-reh/home/.gov-os/machine/gate.json (rc 3)
+$ bash apply.sh apply
+applied (rc 0)
+$ bash apply.sh check
+state applied (rc 0)
+$ bash apply.sh verify
+verified: working_size_bytes 805306368 (rc 0)
+mode after apply: 640
+$ bash apply.sh apply
+already applied (rc 0)
+$ bash apply.sh undo
+undone (rc 0)
+undo: byte-identical to before
+$ bash apply.sh apply
+refused: state other: /tmp/claude-1000/p95-reh/home/.gov-os/machine/gate.json hashes cc39fca2738d9dfd5fa249e9cffd082fcc8760398078db9eaad88564ef6dcaa9 (rc 3)
+$ bash apply.sh check
+state other: /tmp/claude-1000/p95-reh/home/.gov-os/machine/gate.json hashes cc39fca2738d9dfd5fa249e9cffd082fcc8760398078db9eaad88564ef6dcaa9 (rc 3)
+temp files left: 0
+checks run: 12
+failures: 0

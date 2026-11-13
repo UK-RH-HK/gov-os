@@ -27,13 +27,13 @@ ok   B6 the registered command on a tree without the file exits 2 with "can't op
       create mode 100644 tests/unit/hooks/test_w2_176_context_watch.py
       create mode 100644 tests/unit/hooks/test_w2_176_precompact.py
 ok   C1 git merge --no-ff --no-edit of W2-176's head (exit 0)
-ok   C2 template/governance/kernel/hooks/context_watch.py is the bytes the owner approves (sha256 c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c)
+ok   C2 template/governance/kernel/hooks/context_watch.py is the bytes the owner approves (sha256 213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242)
 ok   C3 the clone is clean after the merge
 ok   C4.0 the merge left .claude/settings.json as the frozen before
 ok   C4.1 the merge left .rulesync/hooks.jsonc as the frozen before
-     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 b53505457407, approved c6dabb5eed39); nothing touched
+     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 2342b42a26c3, approved 213882efd7b8); nothing touched
 ok   C5 check refuses a hook file that is not the approved bytes (exit 6)
-     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 b53505457407, approved c6dabb5eed39); nothing touched
+     refused: template/governance/kernel/hooks/context_watch.py is not the approved bytes (sha256 2342b42a26c3, approved 213882efd7b8); nothing touched
 ok   C6 apply refuses it too (exit 6)
      state before; template/governance/kernel/hooks/context_watch.py in place as approved
 ok   C7 check: state before, the hook file in place (exit 0)
@@ -50,8 +50,8 @@ ok   check 4 as written (exit 0, count -)
 --- D. the baseline on the merged clone, before the apply
      findings: none | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
 ok   D1 adapter-portability on w2/integrate + W2-176: no findings
-     pytest: 166 passed, 1 skipped, 36 deselected
-ok   D2 tests/unit/hooks (W2-176's cases and the hook suites), before the apply: exit 0, 166 passed
+     pytest: 196 passed, 1 skipped, 36 deselected
+ok   D2 tests/unit/hooks (W2-176's cases and the hook suites), before the apply: exit 0, 196 passed
 --- E. the plain apply
 ok   E1 plain apply (no option, no env) (exit 0)
 ok   E2.0 .claude/settings.json is the frozen after, byte for byte
@@ -75,8 +75,8 @@ ok   check 0 as written (exit 0, count -)
      6
 ok   check 1 as written (exit 0, count 6)
 ok   check 2 as written (exit 0, count -)
-     7
-ok   check 3 as written (exit 0, count 7)
+     8
+ok   check 3 as written (exit 0, count 8)
      .claude/settings.json
      .rulesync/hooks.jsonc
 ok   check 4 as written (exit 0, count -)
@@ -85,7 +85,7 @@ ok   F1 adapter-portability after the apply: no findings (settings.json is what 
      findings: ['HOOKS_MATCHER_DIFFERS .rulesync/hooks.jsonc', 'GENERATED_DIFFERS .claude/settings.json'] | compared: {'rulesync_version': True, 'kernel_files': 29, 'generated_files': 44}
 ok   F2 the all-tools form (matcher "*") in the source is a finding: HOOKS_MATCHER_DIFFERS (and the generated settings differ)
 ok   F3 the source is the frozen after again
---- G. the registered command, run on planted PostToolUse events (a worker at 90 % of a 200,000 window)
+--- G. the registered command, run on planted PostToolUse events (a worker at 90 % of its model's 1,000,000 window; no cap)
 ok   G0 the command in the applied settings is the frozen one
      exit 0; stdout keys: ['hookSpecificOutput'] / PostToolUse ; additionalContext (cut): Context watch: this session has used 85 % or more of its context window. Write your checkpoint now and update every file that needs it: your record (g ...paction: carry on with your work once the handover is written.
 ok   G1 first call at 90 %: one additionalContext, exit 0, no stderr
@@ -96,10 +96,10 @@ ok   G4 a subagent's event (agent_id): no output
      files the hook wrote in the project: .gov-runtime/scratch/context_watch/g1
 ok   G5 the hook wrote one file, the session's marker under .gov-runtime/scratch/context_watch/
 --- H. the tests, applied state, one folder per run through the heavy-slot gate
-     pytest: 65 passed
-ok   H1 W2-176's two unit files: exit 0, 65 passed
-     pytest: 166 passed, 1 skipped, 36 deselected
-ok   H2 tests/unit/hooks (the hook suites): exit 0, 166 passed
+     pytest: 95 passed
+ok   H1 W2-176's two unit files: exit 0, 95 passed
+     pytest: 196 passed, 1 skipped, 36 deselected
+ok   H2 tests/unit/hooks (the hook suites): exit 0, 196 passed
      pytest: 42 passed, 3 deselected
 ok   H3 tests/acceptance/W1-29: exit 0, 42 passed
      pytest: 71 passed, 1 skipped, 33 deselected
@@ -137,8 +137,8 @@ ok   I7 verify (exit 0)
 ok   I8 adapter-portability after the re-apply: no findings
      6
 ok   check 1 as written (exit 0, count 6)
-     7
-ok   check 3 as written (exit 0, count 7)
+     8
+ok   check 3 as written (exit 0, count 8)
 ok   I9 undo, the hook file still in place (exit 0)
      moved: .claude/settings.json
 ok   I10 check refuses a file that changed (exit 3)

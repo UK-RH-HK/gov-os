@@ -1,8 +1,9 @@
 {
   "floor_kb": 3145728,
   "verification_peak_kb": 7404492,
-  "working_kb": 2140236,
+  "working_kb": 786432,
   "measured_on": "2026-10-29",
   "how": "verification_peak_kb: the largest lead process-tree RSS sampled (a lead's full test run, log/lead-mem.jsonl, 2026-10-29); working_kb: the owner's figure from the measurement of a lead outside verification (W2-71's peak, 2026-10-29). Re-measured weekly (DEC-947) with lead_mem.py --summary.",
-  "floor_note": "3 GiB (DEC-947), restored by the CTO 11-11 15:42 after oom_watch.sh tripped falsely at 15:23 on a cgroup kill (row 148); the owner said so (DEC-1133)"
+  "floor_note": "3 GiB (DEC-947), restored by the CTO 11-11 15:42 after oom_watch.sh tripped falsely at 15:23 on a cgroup kill (row 148); the owner said so (DEC-1133)",
+  "working_note": "DEC-1149 (1)-(2), ACT-P95-1: 0.75 GiB (805,306,368 B) per live session; this file was missed on 11-12 and corrected by the CTO 23:50 (DEC-1157); was 2,140,236 kB (DEC-947 item 2)"
 }

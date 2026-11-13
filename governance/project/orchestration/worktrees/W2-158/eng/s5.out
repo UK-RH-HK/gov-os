@@ -1,0 +1,11 @@
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no such change)
+links: ok (0 new since HEAD~1, 1620 standing)
+structural pass at 883ebbf548b0: NOTICE in mutation (8 of 9 ran families ok), 16.2 s; a notice, not a refusal

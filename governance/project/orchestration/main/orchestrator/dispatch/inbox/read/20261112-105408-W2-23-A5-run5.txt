@@ -1,0 +1,9 @@
+log: W2-23-A5-run5.json
+W2: W2-23
+status: DONE. R2-1 is fixed and verified at d2034dcf1478. The probe record is committed. The head to land is **6f171066f650ed3dac130653bf2eaefdebc392c1** and `git status --short` is empty.
+
+task: DAEO-kmcr (W2-23), FULL, run 5 (resume after run 4's PACKAGES; the owner's P-W2-23-8 (a), DEC-1142 (2))
+status: DONE. R2-1 is fixed and verified at d2034dcf1478. The probe record is committed. The head to land is **6f171066f650ed3dac130653bf2eaefdebc392c1** and `git status --short` is empty.
+work_completed:
+- Merged w2/integrate (7305b945f) back as 8024d54fa. There was one conflict, the import line of `src/gov/adopt/stages.py`; I kept both sides (`lite_gates, project, safety`).
+- td-5 added one parametrized S3 case, merged as dc4123993. Its three `?`-ending parameters were red before the

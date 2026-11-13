@@ -1,0 +1,7 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-88a (DAEO-pg6i, STANDARD) at c79a20f1fa69: pre-check passed
+W2-88a: kernel gate at c79a20f1fa69: exit 0
+ok template/governance/kernel/skills/adopt/SKILL.md 16fd341f267b DEC-1163
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-13 12:52:10 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 12:52:10 merged W2-88a onto 36fc597ca74f: 5d535ee621ba

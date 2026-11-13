@@ -1,0 +1,33 @@
+You are a fresh engineer. Ticket: DAEO-6n5k (W2-37, "gov impact"), profile FULL. You work only in the worktree `/home/usain/gov-os-worktrees/W2-37` on branch `w2/W2-37`, and write only inside the ticket's allowed paths: `src/gov/impact/**`, `src/gov/closure/**` (read API only: do not change its behaviour), `tests/unit/impact/**`. The implementation exists and passed two reviews' re-probes; the second review left findings the owner decided are fixed in this resume (DEC-812), plus the owner's closure-depth decision DEC-815. An independent test designer is writing acceptance cases for the same behaviours in parallel in another worktree; you never read or write `tests/acceptance/`.
+
+## Standing rules
+- First: `printenv GOV_ROLE GOV_TICKET` (expect `engineer`, `DAEO-6n5k`); `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-37`, `w2/W2-37`); `git rev-parse HEAD` (expect prefix `64ccbd0cc`). If anything differs, stop and say so.
+- DEC-732: every test run uses this worktree's own `src/`: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-37/src` per command. Quote `PYTHONPATH=/home/usain/gov-os-worktrees/W2-37/src python3 -c "import gov; print(gov.__file__)"` in your return.
+- **Every pytest runs through the heavy slot**, with a TMPDIR outside the repository and outside ~/gov-os-runs:
+  `env TMPDIR=/tmp/gov-os-w237-eng PYTHONUSERBASE=/home/usain/.local PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/bin:/usr/bin:/bin PYTHONPATH=/home/usain/gov-os-worktrees/W2-37/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest tests/acceptance/W2-37 tests/unit/impact -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rfs`
+  (make the TMPDIR first with `mkdir -p /tmp/gov-os-w237-eng`). A "all slots taken; waiting" line is a wait, not a refusal. Never `-x`.
+- Run everything in the foreground. Return only after your commit exists. No checkout of another commit, reset, clean, stash, amend, rebase, merge, push or tag. Stage by exact path, never `git add -A`/`.`. Untracked sandbox placeholder names (`.bashrc`, `.gitconfig`, `.mcp.json`, ...) are never touched.
+- Write files with the Write and Edit tools and literal absolute paths; anything longer than one line of shell goes in a script under `/home/usain/gov-os-worktrees/W2-37/.gov-runtime/scratch/`. No here-documents.
+- Never run `gov rebuild`, `gov close`, `gov adopt`, `gov pause`, `gov retrieve` or `gov context`. Search with Read and Grep; search again once in different words if the first does not answer. A code question uses the code graph's traversal, never a whole-graph query (DEC-859).
+- Never read `.claude/settings*.json`, anything under `~/.claude/`, the held-out file under `governance/project/`, the evaluation sets' root, or any hidden or memory-verdict folder. No glob/search/listing over `governance/project/`.
+- Refused twice for the same call by the guard, the sandbox or a hook: stop and say so. Never work around a refusal. Install nothing.
+
+## What to make true (each with a unit test in `tests/unit/impact/`)
+1. **A (compare against the proposal as committed).** `gov impact --compare` must never say `matches: true` (or list no differences) when the CIT-P file in the working tree differs from HEAD (edited, staged or uncommitted). Either compare against the proposal as HEAD / the store holds it, or refuse / report not matching while the file differs, naming the file. Example: CITP-001 listing DEC-002 committed and loaded; DEC-002 removed in the working tree, uncommitted; a CIT-E without DEC-002 must not give `matches: true`.
+2. **B (a register's first uncommitted entry).** The decision register named by the path map, differing from HEAD (added, staged or uncommitted content), makes `graphs.record` `stale` (naming the path), **even when HEAD holds no entry of it** (today only a register already holding an entry at HEAD is seen; a first entry DEC-090 added uncommitted reads `ok`, and with the register in a non-governance namespace the report reads `complete: true` while missing DEC-090). The record graph not current means `complete: false` and never a `deletable` item (reading R8, G-24).
+3. **C.** A compare result carries the proposal's own `complete` and its gaps (a CIT-P written with `complete: false` and a CIT-E with the same lists: the result says `complete: false` and lists the gaps, whatever `matches` says).
+4. **E.** Refusals name their real cause: a `--compare` CIT-P file that does not exist is refused as missing (not "lists nothing under affected"); `--out ""` is refused as an empty path and `--out <existing folder>` as a folder (not "a file is there already"). Exit 1, no traceback, nothing written.
+5. **F4.** `--out` whose file stem is an id already in the store (e.g. `CITP-001.md` written to a new path while CITP-001 is a stored record) is refused naming the clash; nothing written.
+6. **P-2 (DEC-815, the owner's decision).** The result's `depth_source` names `DEC-815` (the owner set R0/R1 one hop, R2 three, R3 eight for Wave 2; `gov.closure.depth_of_radius` already holds 1, 3, 8). Change `DEPTH_SOURCE` and its comment in `src/gov/impact/readings.py`; the acceptance case `test_w2_37_rows.py::test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement` turns green.
+
+Keep the change small; no behaviour that is green today changes. At the end, the acceptance suite run above: every case that passed before still passes, the depth case is green; the two `test_w2_37_skill_routing.py` cases stay red (they need the change skill's files, outside your paths: name them, do not touch them). Cases that build a code index may error at setup inside the sandbox (`/tmp/gov-cbm-<uid>` read-only): name them, the lead runs them outside.
+
+## Commit (one commit, your paths only)
+    git commit -m "W2-37: gov impact, the second review's findings A, B, C, E, F4 and the depth source (DEC-812, DEC-815)" --trailer "Task: DAEO-6n5k" --trailer "Role: engineer" --trailer "Implements: CAP-33.b, CAP-33.g, DEC-167" -- src/gov/impact tests/unit/impact
+Then show `git log -1 --format='%H%n%B'` and `git status --short`.
+
+## Return (your last message; the twelve fields as labelled lines, "none" where nothing)
+task: / status: / work_completed: / files_changed: / evidence: / tests: / discoveries: / risks: / lessons: / proposed_decisions: / unresolved: / recommended_next_action:
+In `tests:` give the suite's counts and each red with its reason. Then `guard_refusals:` (none, or each refusal's command form and reason).
+
+## The ticket's context (gov context, built by the lead outside the sandbox)

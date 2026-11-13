@@ -1,0 +1,12 @@
+Merge w2/W2-111-tests (DAEO-qvff): the 15 hook-latency cases time the hook's own work (CPU time of the hook and its children), at the same 100 ms p95
+
+The test designer's revision (84e0578f8701): W1-02's 5, W1-05's 9 and W2-57's 1 latency cases sample the CPU time
+(user and system) of the hook and its children per call, from RUSAGE_CHILDREN; bound, samples, warm-up, p95 and ids
+unchanged; nothing skipped, marked or removed. Green 15/15 at ambient loads 4 to 15; a planted 150 ms hook fails all
+15 on the latency assertion. The quiet-machine and load-50 runs are the CTO's benchmark (pending).
+
+Task: DAEO-qvff
+Role: orchestrator
+Implements: DEC-979, DEC-906, DEC-968
+Rewrite-Reason: DEC-979
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

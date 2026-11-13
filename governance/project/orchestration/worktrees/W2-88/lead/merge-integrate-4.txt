@@ -1,0 +1,5 @@
+W2-88 (DAEO-2bdu): merge w2/integrate (P-W2-88-B-1 decided, DEC-1157 (3), (12)) before run 4's fixes
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, DEC-957, CAP-44, CAP-20

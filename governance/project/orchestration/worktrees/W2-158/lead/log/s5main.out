@@ -1,0 +1,14 @@
+main head 010399309d69; status lines before: 0
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ (+6 more)
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no base given)
+links: skipped (no base given)
+structural pass at 010399309d69: NOTICE in mutation (7 of 8 ran families ok), 9.3 s; a notice, not a refusal
+exit 0 wall 9.37 s
+status lines after: 0

@@ -1,0 +1,3 @@
+log: night-hold.jsonl
+Hold: night
+status: from 03:00 until the nightly has ended. No new lead starts (DEC-1138 (3)); ready.txt lines held as #HELD-NIGHT: 0; running leads (not stopped): W2-115, W2-121, W2-173. They are released when the nightly has ended, or at 07:30.

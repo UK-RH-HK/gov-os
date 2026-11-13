@@ -1,0 +1,339 @@
+diff --git a/src/gov/launch/launcher.py b/src/gov/launch/launcher.py
+index b4cdce0e7..1256ab108 100644
+--- a/src/gov/launch/launcher.py
++++ b/src/gov/launch/launcher.py
+@@ -6,7 +6,10 @@ profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
+ ``GOV_TICKET``, ``GOV_STORE`` where the project configures its integration store
+ (W2-116, ``gov.launch.store``) and a per-session temp directory, removed when the session ends
+ (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
+-(DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
++(DEC-392). A worker session starts as its role: the role file's text and its named
++skills appended, its default model and effort, no compaction threshold, the user
++settings' ask and deny rules kept, and one launch record written before it starts
++(W2-60a). Nothing fails open: whatever cannot be read or is not of the stated
+ shape refuses the launch.
+ 
+ A lead (``gov launch orchestrator|lead <ticket>``, W2-136 S9) is started only when
+@@ -22,9 +25,12 @@ that override, and a lead's plan override, are written to
+ ``~/.gov-os/machine/launch.log`` and to stderr (P-1, P-8). A started session is
+ in the machine-wide registry while it runs.
+ 
+-Every session, lead or worker, gets its role's template as the appended system prompt
+-(``--append-system-prompt-file <root>/.claude/templates/<stem>.md``, after the caller's arguments); a launch whose
+-template is missing is refused (W2-153, DEC-1050).
++Every session, lead or worker, gets its role's template ``<root>/.claude/templates/<stem>.md`` in its appended
++system prompt, by the one ``--append-system-prompt-file`` after the caller's arguments; a launch whose template is
++missing is refused before anything is written (W2-153, DEC-1050). A lead's flag names the template itself. A worker's
++names one file in the session's temp folder, ``role-<role>.md``, composed of the role file's bytes as W2-60a appends
++them (the role file, then each named skill's ``SKILL.md``), then one blank line, then the template's bytes; the
++launch record's ``appended_sha256`` is that file's, and its ``template`` names the template's path and sha256.
+ 
+ No message of this module carries a held-out path.
+ """
+@@ -41,6 +47,7 @@ import subprocess
+ import sys
+ import tempfile
+ import time
++import uuid
+ from pathlib import Path
+ from subprocess import SubprocessError
+ 
+@@ -52,7 +59,7 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
+ from gov.guard.install import experiment_folder
+ from gov.guard.reads import PolicyError, check_sets
+ from gov.guard import runs
+-from gov.launch import environ, sandbox
++from gov.launch import environ, record, role as roles, sandbox
+ from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
+ from gov.launch.store import main_root as main_store_root
+ 
+@@ -110,6 +117,26 @@ END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+ INTERRUPT_EXIT = 130
+ END_WAIT_S = 5  # whole seconds a session that was asked to end may still run before it is killed
+ REAP_WAIT_S = 3.0  # seconds the launcher waits, after the kill, for the session's group to be gone (W2-56 S12)
++# W2-60a (DEC-826 Q5): what the launcher's own line keeps out: connectors, user-level agents and skills.
++OWN_SWITCHES = ("--setting-sources", "project,local", "--strict-mcp-config")
++KEPT_OUT = ["--strict-mcp-config", "--setting-sources project,local", "autoMemoryEnabled false"]
++# W2-60a: the arguments the launcher sets itself, refused after "--", and why.
++SET_ITSELF = {
++    "--agent": "the launcher starts the session as its role, with the role file's text appended (DEC-826 Q1)",
++    "--append-system-prompt": "the launcher appends the role's text itself (DEC-826 Q1)",
++    "--append-system-prompt-file": "the launcher appends the role's text itself (DEC-826 Q1)",
++    "--session-id": "the launcher gives the session its id and keys the launch record by it",
++    "--autocompact": "no launch sets a compaction threshold (DEC-838)",
++    "--fallback-model": "the session runs on the role's model alone, never on another (DEC-839 item 1)",
++    "--chrome": "a launched session loads no connector, and Chrome's runs outside the sandbox (DEC-826 Q5)",
++    "--ide": "a launched session loads no connector, and an IDE's runs outside the sandbox (DEC-826 Q5)",
++    "--system-prompt-snapshot": "the session's prompt is the CLI's default with the role's text appended (DEC-826 Q1)",
++}
++RESUME_RULE = "a launch resumes a session by its id (--resume <session id>), so that the record can name it"
++COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow"
++# W2-60a: the other names under env by which the CLI takes a compaction threshold.
++COMPACT_ENVS = (COMPACT_ENV, "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS")
++_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+ _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
+ 
+ 
+@@ -273,18 +300,28 @@ def _guard_wired(settings: dict) -> bool:
+     return GUARDED_TOOLS <= covered
+ 
+ 
+-def _check_repository_settings(root: Path) -> None:
++def _check_repository_settings(root: Path, worker: bool = True) -> None:
+     """The repository's settings carry no sandbox key (DEC-233) and wire the guard, with the hooks on.
+ 
+     The CLI may merge the repository's settings into the built ones, and a
+-    session whose settings register no guard has none.
++    session whose settings register no guard has none. For a worker (W2-60a), the
++    settings carry no agent key and no compaction threshold, and for a linked
++    worktree the CLI loads the local settings from the main checkout's file, which
++    is judged as the tree's own copy is (round 3, review 2's F1); a main checkout
++    that cannot be found refuses. A lead (``worker`` false, W2-136 S9) is judged as
++    before W2-60a.
+     """
+     wired = False
+-    for rel in REPO_SETTINGS:
+-        if not os.path.lexists(root / rel):
++    files = [(root / rel, rel) for rel in REPO_SETTINGS]
++    if worker:
++        main = record.main_checkout(root, "the local settings file the CLI loads for a worktree session")
++        if main != root:
++            files.append((main / REPO_SETTINGS[1], str(main / REPO_SETTINGS[1])))
++    for path, rel in files:
++        if not os.path.lexists(path):
+             continue
+         try:
+-            data = json.loads((root / rel).read_text(encoding="utf-8"))
++            data = json.loads(path.read_text(encoding="utf-8"))
+         except (OSError, ValueError):
+             raise _refuse(f"{rel} cannot be read, so it cannot be shown to carry no sandbox key") from None
+         if not isinstance(data, dict) or "sandbox" in data:
+@@ -300,12 +337,33 @@ def _check_repository_settings(root: Path) -> None:
+         if "additionalDirectories" in permissions:
+             raise _refuse(f"{rel} carries permissions.additionalDirectories: a worker session gets no added "
+                           f"directory (DEC-313)")
++        if worker:
++            _check_role_settings(data, rel)
+         wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
+     if not wired:
+         raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
+                       f"{', '.join(sorted(GUARDED_TOOLS))}: a worker session would have no guard")
+ 
+ 
++def _check_role_settings(data: dict, rel: str) -> None:
++    """W2-60a: a settings file that would change a worker session's prompt or its compaction threshold refuses."""
++    if "agent" in data:
++        raise _refuse(f"{rel} carries an agent key: the launcher starts the session as its role, with the role "
++                      f"file's text appended (DEC-826 Q1)")
++    env = data.get("env", {})
++    if not isinstance(env, dict) or COMPACT_ENV in env or COMPACT_KEY in data:
++        raise _refuse(f"{rel} sets {COMPACT_KEY} or env.{COMPACT_ENV}, or carries an env that is not a map: no "
++                      f"launch sets a compaction threshold (DEC-838)")
++    models = data.get("modelSettings", {})
++    if not isinstance(models, dict) or not all(isinstance(each, dict) for each in models.values()):
++        raise _refuse(f"{rel} carries a modelSettings that is not a map of maps, so it cannot be shown to set no "
++                      f"compaction threshold (DEC-838)")
++    thresholds = [f"env.{key}" for key in COMPACT_ENVS if key in env] + \
++        [f"modelSettings.{model}.{COMPACT_KEY}" for model, each in models.items() if COMPACT_KEY in each]
++    if thresholds:
++        raise _refuse(f"{rel} sets {thresholds[0]}: no launch sets a compaction threshold (DEC-838)")
++
++
+ def _check_cli_args(cli_args: list[str]) -> None:
+     """Refuse the arguments that take the launcher's settings or the guard away from the session."""
+     for arg, value in zip(cli_args, [*cli_args[1:], None]):
+@@ -339,6 +397,122 @@ def template_args(root: Path, role: str) -> list[str]:
+     return [TEMPLATE_FLAG, str(path)]
+ 
+ 
++def _given_value(name: str, arg: str, value: str | None, given: dict) -> str | None:
++    """The value of ``--model`` or ``--effort`` in ``arg`` (spaced or ``=``); ``None`` when ``arg`` is neither."""
++    if arg == name:
++        found = value if value is not None and not value.startswith("-") else ""
++    elif arg.startswith(name + "="):
++        found = arg[len(name) + 1:]
++    else:
++        return None
++    if not found:
++        raise _refuse(f"the CLI arguments carry {name} without a value")
++    if name in given:
++        raise _refuse(f"the CLI arguments carry {name} twice: the session has one")
++    return found
++
++
++def _check_own_args(cli_args: list[str]) -> dict:
++    """Refuse the arguments the launcher sets itself (W2-60a) and return the ``model``, ``effort`` and ``resume`` given.
++
++    Judged word by word, as ``_check_cli_args``: a prompt that only names one as a word passes."""
++    given: dict = {}
++    for arg, value in zip(cli_args, [*cli_args[1:], None]):
++        for name, why in SET_ITSELF.items():
++            if arg == name or arg.startswith(name + "="):
++                raise _refuse(f"the CLI arguments carry {name}: {why}")
++        if arg == "--fork-session":
++            raise _refuse("the CLI arguments carry --fork-session: the launcher forks a resumed session itself, so "
++                          "that it has an id of its own")
++        if arg in ("--continue", "-c") or (re.fullmatch(r"-[A-Za-z]{2,}", arg) and "c" in arg) \
++                or (arg.startswith("-c") and len(arg) > 2):
++            raise _refuse(f"the CLI arguments carry {arg} (--continue, -c): {RESUME_RULE}")
++        if arg in ("--resume", "-r") or arg.startswith("--resume="):
++            found = value if arg in ("--resume", "-r") else arg[len("--resume="):]
++            if found is None or not _UUID.fullmatch(found) or "resume" in given:
++                raise _refuse(f"the CLI arguments carry {arg} without one session id (a UUID): {RESUME_RULE}")
++            given["resume"] = found
++        elif (re.fullmatch(r"-[A-Za-z]{2,}", arg) and "r" in arg) or (arg.startswith("-r") and len(arg) > 2):
++            raise _refuse(f"the CLI arguments carry {arg}, a resume (--resume, -r) spelled otherwise: {RESUME_RULE}")
++        for name, key in (("--model", "model"), ("--effort", "effort")):
++            found = _given_value(name, arg, value, given)
++            if found is not None:
++                if key == "effort" and found not in roles.EFFORTS:
++                    raise _refuse(f"the CLI arguments carry --effort {found}: the effort is one of "
++                                  f"{', '.join(roles.EFFORTS)}")
++                given[name] = found
++    return {"model": given.get("--model"), "effort": given.get("--effort"), "resume": given.get("resume")}
++
++
++def _composed(appended: bytes, template: bytes) -> bytes:
++    """A worker's appended prompt: the role file's bytes as W2-60a appends them, one blank line, the template's bytes.
++    The blank line is one empty line after the role text's last line (a missing final newline is supplied first)."""
++    return (appended if appended.endswith(b"\n") else appended + b"\n") + b"\n" + template
++
++
++def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict) -> dict:
++    """W2-60a, before the gate: the role read once, its model and effort, the resumed session's record, and the
++    settings a worker session gets on top of ``build_settings`` (the record folder's deny rules, the user's ask and
++    deny rules, no model-side memory, the subagent model in its env). What ``_launch_line`` needs once the session's
++    temp folder exists is returned; any refusal comes here, before anything but the record folder is made."""
++    loaded = roles.read_role(root, role)
++    if given["model"] is not None and given["model"] != loaded["model"]:
++        raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the {role}'s model "
++                      f"{loaded['model']} (DEC-839 item 1)")
++    model, effort = loaded["model"], given["effort"] or loaded["effort"]
++    template_path = Path(template[1])
++    try:
++        template_bytes = template_path.read_bytes()
++    except OSError:
++        raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {template_path} cannot be read: no '{role}' "
++                                             f"session starts without it (DEC-1050)") from None
++    user_rules = roles.user_rules(Path.home())  # the ask and deny rules --setting-sources project,local would drop
++    ticket_class = (_load_ticket(str(root), ticket_id) or {}).get("class")
++    records = record.folder(root)
++    # Corrections to Behaviour 8: a resumed, forked session keeps its original's prompt, so its record holds that.
++    resumed = record.original(records, given["resume"], role, ticket_id) if given["resume"] else None
++    deny = settings["permissions"]["deny"]
++    # The user's ask and deny rules only: never an allow rule or a mode, which would take a protection away.
++    settings["permissions"]["deny"] = list(dict.fromkeys(deny + record.deny_rules(records) + user_rules["deny"]))
++    if user_rules["ask"]:
++        settings["permissions"]["ask"] = list(dict.fromkeys(user_rules["ask"]))
++    settings["autoMemoryEnabled"] = False  # DEC-826 Q5: no model-side memory
++    # DEC-839 item 3: in the env the launcher owns, so gov.launch.environ passes it to --settings and the CLI process
++    settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] = model
++    composed = _composed(loaded["appended"], template_bytes)
++    template_entry = {"path": str(template_path), "sha256": roles.sha256(template_bytes)}
++    origin = resumed or {"role_text": loaded["role_text"], "skills": loaded["skills"],
++                         "appended_sha256": roles.sha256(composed), "template": template_entry}
++    return {"role": role, "ticket": ticket_id, "root": root, "given": given, "model": model, "effort": effort,
++            "ticket_class": ticket_class, "records": records, "resumed": resumed is not None, "origin": origin,
++            "composed": composed}
++
++
++def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[str], Path]:
++    """W2-60a, once the temp folder exists: the appended file written, the launch record written before the session
++    starts and keyed by its id, and the launcher's own arguments: those before the caller's, and the one appended
++    file after them (W2-153's place). The record's path is returned, for its removal when the session cannot start."""
++    given, model, effort = plan["given"], plan["model"], plan["effort"]
++    appended = Path(tmpdir) / f"role-{plan['role']}.md"
++    appended.write_bytes(plan["composed"])
++    session_id = str(uuid.uuid4())
++    origin = plan["origin"]
++    written = record.write(plan["records"], {
++        "record": "gov-launch", "format": record.FORMAT, "session_id": session_id,
++        "resumes": given["resume"], "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
++        "root": str(plan["root"]), "role": plan["role"], "ticket": plan["ticket"], "ticket_class": plan["ticket_class"],
++        "model": model, "model_source": "after --" if given["model"] else "role default",
++        "effort": effort, "effort_source": "after --" if given["effort"] else "role default",
++        "subagent_model": model, "compaction_threshold": "none",
++        "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
++        "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
++        "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
++    head = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
++            *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
++            *(["--fork-session"] if plan["resumed"] else [])]
++    return head, [TEMPLATE_FLAG, str(appended)], written
++
++
+ def check_lead(root: Path, ticket_id: str):
+     """The plan's check of a lead (W2-136 S9): ``gov.launch.plan_check.check_lead``, looked up when called."""
+     from gov.launch import plan_check
+@@ -438,7 +612,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
+     if role in LEAD_ROLES:
+         plan_override = _admit_lead(root, ticket_id)
+         _check_cli_args(cli_args)
+-        _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
++        _check_repository_settings(root, False)  # a lead has no sandbox: the guard is its only fence
+         template = template_args(root, role)
+         cli = _cli()
+         settings = build_lead_settings(root, ticket_id)  # an unusable store setting refuses here, before the gate
+@@ -454,6 +628,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
+         raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
+                       f"or a lead role ({', '.join(LEAD_ROLES)})")
+     _check_cli_args(cli_args)
++    given = _check_own_args(cli_args)
+     _check_ticket(root, role, ticket_id)
+     _check_repository_settings(root)
+     template = template_args(root, role)
+@@ -462,6 +637,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
+     faults = sandbox_faults(settings)
+     if faults:
+         raise _refuse("the built settings are not strict: " + "; ".join(faults))
++    # W2-60a: the role read once; the session's model is the role's, and an effort after "--" is the launch's own.
++    plan = _worker_plan(root, role, ticket_id, given, template, settings)
+     # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
+     # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
+     try:
+@@ -480,19 +657,22 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
+         if name is not None and not os.path.lexists(name):
+             runs.make(name, str(root))
+         own = runs.own_folder(str(root), ticket_id, role)
+-        return _run(root, cli, settings, [*cli_args, *template], temp_prefix=TEMP_PREFIX, own=own,
+-                    entry=(ticket_id, role), lock=lock)
++        # W2-60a: the appended file (the role's text, then the template) and the record are made in _run
++        return _run(root, cli, settings, cli_args, temp_prefix=TEMP_PREFIX, own=own, entry=(ticket_id, role),
++                    lock=lock, worker=plan)
+     finally:
+         lock.release()
+ 
+ 
+ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_prefix: str | None = None,
+-         own: str | None = None, entry: tuple[str, str] | None = None, lock=None) -> int:
++         own: str | None = None, entry: tuple[str, str] | None = None, lock=None, worker: dict | None = None) -> int:
+     """Start the session and wait for it. With ``temp_prefix`` (a worker), the session gets a temp folder of its
+     own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386). With
+     ``entry`` (its ticket and role), the session is in the machine-wide registry while it runs (W2-20 S1): one that
+     cannot be entered is stopped, so the gate never runs blind to a session. ``lock`` (the machine-wide start lock,
+-    review F1) is given back once the session is registered, or when the launch ends without one."""
++    review F1) is given back once the session is registered, or when the launch ends without one. With ``worker``
++    (``_worker_plan``'s, W2-60a), the appended file and the launch record are written in the temp folder's time,
++    just before the session starts, and the record is removed when it cannot be started."""
+     from gov.resources import registry
+ 
+     state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None}
+@@ -530,11 +710,16 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
+         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
+         env = environ.session_env(os.environ, own_env)
+         if not state["ended"]:  # a signal that came first: no session is started
++            head, tail, written = [], [], None
++            if worker is not None:  # W2-60a: the record before the session starts; the appended file last (W2-153)
++                head, tail, written = _launch_line(worker, tmpdir, cli)
+             terminal = _terminal()
+             try:  # W2-56 S12: the session leads a process group of its own, which the ending signals reach
+-                state["session"] = _start([str(cli), "--settings", json.dumps(settings), *cli_args], root, env,
+-                                          terminal)
++                state["session"] = _start([str(cli), "--settings", json.dumps(settings), *head, *cli_args, *tail],
++                                          root, env, terminal)
+             except (OSError, SubprocessError):
++                if written is not None:
++                    record.remove(written)
+                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+             pid = getattr(state["session"], "pid", None)  # a started process always has one
+             if entry is not None and isinstance(pid, int) and pid > 0:

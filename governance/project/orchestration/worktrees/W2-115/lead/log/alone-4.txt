@@ -1,0 +1,22 @@
+##### /home/usain/gov-os-worktrees/W2-115 b5ae48b88654
+E             {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands
+E         {"ok": false, "command": "batch", "result": {}, "session": "", "error": {"code": "RUN_INCOMPLETE", "message": "the run on rest did not complete: the parallel run did not complete (pytest exit 4; slot: no heavy-job slots are configured (heavy_slots); the run took no slot); nothing lands", "
+        ran again alone and once on the head without the change, where it passed."""
+        the test ran and passed on G (not on the untrailered commit, where it is already red)."""
+        on the head without the change it ran and passed (the base it was judged against)."""
+        on the head without the change it ran and passed (the base it was judged against)."""
+FAILED tests/acceptance/W2-115/test_w2_115_batch.py::test_a_culprit_whose_red_is_its_own_new_test_goes_back_and_the_rest_land
+FAILED tests/acceptance/W2-115/test_w2_115_batch.py::test_nothing_landed_before_the_culprit_with_its_own_new_test_was_found
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_the_head_without_the_change_does_not_have_refuses_the_close
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_an_untrailered_commit_after_the_green_base_caused_is_never_excused
+FAILED tests/acceptance/W2-115/test_w2_115_reds.py::test_a_red_a_trailered_commit_after_a_green_untrailered_one_caused_is_refused
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+7 failed, 33 passed, 1 deselected in 40.13s
+exit 1
+##### /home/usain/gov-os-worktrees/W2-115-base f29fa36521e3
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2 failed, 13 passed, 1 deselected in 0.22s
+exit 1
+done

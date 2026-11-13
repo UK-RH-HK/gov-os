@@ -1,0 +1,572 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+..........F............................................................. [  6%]
+........................................................................ [  8%]
+.......................................................................F [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+...................F.................................................... [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+.....................................F.................................. [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+..........F............................................................. [ 30%]
+........................................................................ [ 32%]
+.............................................................F.......... [ 34%]
+............................F........................................... [ 35%]
+...................................................................F.... [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+.......................................................F................ [ 46%]
+.........F.............................................................. [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+...........................sss.......................................... [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+...............sss...................................................... [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+......................................F................................. [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+......................................................F............F.... [ 98%]
+.................FF........F................                             [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_UNKNOWN_TYPE', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'", 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_UNKNOWN_TYPE', 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'"}]
+E       assert [{'code': 'SC...type': 'bug'}] == []
+E         
+E         Left contains one more item: {'code': 'SCHEMA_UNKNOWN_TYPE', 'message': ".tickets/DAEO-1k7y.md: unknown record type 'bug'", 'path': '.tickets/DAEO-1k7y.md', 'type': 'bug'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+_ test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes[rerank-degraded] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x70a52c45d310>, fault = 'rerank'
+cause = 'degraded'
+
+    @pytest.mark.parametrize("fault,cause", [("rerank", "degraded"), ("semantic_missing", "degraded"),
+                                             ("pool", "degraded"), ("exit", "exit")])
+    def test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes(world, fault, cause):
+        SC.install(world, gov_edit=fault_at(1, fault=fault))
+        run = world.measure()
+        assert run.code == 0, run
+        assert causes(world) == {"attempt-1": cause}, causes(world)
+        assert not (world.attempt_dir(1) / "DONE").exists() and (world.attempt_dir(2) / "DONE").is_file()
+        assert (world.run_dir / "COUNTS").read_text().strip() == "attempt-2"
+        assert (world.run_dir / "control-1").is_dir() and (world.run_dir / "control-2").is_dir(), \
+            "the ready check, the probe and a new control, again before the restart"
+        expected = S.Expected(SC, world)
+        assert [x for x in run.lines if x.startswith("RETRIEVAL")] == [expected.retrieval_line(2)], \
+            "a faulted attempt's figures are never printed"
+        states = [(e["n"], e["state"], e["cause"]) for e in world.events("attempt")]
+        assert states == [(1, "start", None), (1, "fault", cause), (2, "start", None), (2, "done", None)], states
+        assert [e["ok"] for e in world.events("ready")] == [True, True]
+>       assert world.events("counts")[0]["attempt"] == "attempt-2"
+E       AssertionError: assert 2 == 'attempt-2'
+
+tests/acceptance/W2-171/test_w2_171_s4_fault.py:55: AssertionError
+_ test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes[semantic_missing-degraded] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x70a524f7f170>
+fault = 'semantic_missing', cause = 'degraded'
+
+    @pytest.mark.parametrize("fault,cause", [("rerank", "degraded"), ("semantic_missing", "degraded"),
+                                             ("pool", "degraded"), ("exit", "exit")])
+    def test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes(world, fault, cause):
+        SC.install(world, gov_edit=fault_at(1, fault=fault))
+        run = world.measure()
+        assert run.code == 0, run
+        assert causes(world) == {"attempt-1": cause}, causes(world)
+        assert not (world.attempt_dir(1) / "DONE").exists() and (world.attempt_dir(2) / "DONE").is_file()
+        assert (world.run_dir / "COUNTS").read_text().strip() == "attempt-2"
+        assert (world.run_dir / "control-1").is_dir() and (world.run_dir / "control-2").is_dir(), \
+            "the ready check, the probe and a new control, again before the restart"
+        expected = S.Expected(SC, world)
+        assert [x for x in run.lines if x.startswith("RETRIEVAL")] == [expected.retrieval_line(2)], \
+            "a faulted attempt's figures are never printed"
+        states = [(e["n"], e["state"], e["cause"]) for e in world.events("attempt")]
+        assert states == [(1, "start", None), (1, "fault", cause), (2, "start", None), (2, "done", None)], states
+        assert [e["ok"] for e in world.events("ready")] == [True, True]
+>       assert world.events("counts")[0]["attempt"] == "attempt-2"
+E       AssertionError: assert 2 == 'attempt-2'
+
+tests/acceptance/W2-171/test_w2_171_s4_fault.py:55: AssertionError
+_ test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes[pool-degraded] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x70a52cb9b530>, fault = 'pool'
+cause = 'degraded'
+
+    @pytest.mark.parametrize("fault,cause", [("rerank", "degraded"), ("semantic_missing", "degraded"),
+                                             ("pool", "degraded"), ("exit", "exit")])
+    def test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes(world, fault, cause):
+        SC.install(world, gov_edit=fault_at(1, fault=fault))
+        run = world.measure()
+        assert run.code == 0, run
+        assert causes(world) == {"attempt-1": cause}, causes(world)
+        assert not (world.attempt_dir(1) / "DONE").exists() and (world.attempt_dir(2) / "DONE").is_file()
+        assert (world.run_dir / "COUNTS").read_text().strip() == "attempt-2"
+        assert (world.run_dir / "control-1").is_dir() and (world.run_dir / "control-2").is_dir(), \
+            "the ready check, the probe and a new control, again before the restart"
+        expected = S.Expected(SC, world)
+        assert [x for x in run.lines if x.startswith("RETRIEVAL")] == [expected.retrieval_line(2)], \
+            "a faulted attempt's figures are never printed"
+        states = [(e["n"], e["state"], e["cause"]) for e in world.events("attempt")]
+        assert states == [(1, "start", None), (1, "fault", cause), (2, "start", None), (2, "done", None)], states
+        assert [e["ok"] for e in world.events("ready")] == [True, True]
+>       assert world.events("counts")[0]["attempt"] == "attempt-2"
+E       AssertionError: assert 2 == 'attempt-2'
+
+tests/acceptance/W2-171/test_w2_171_s4_fault.py:55: AssertionError
+__________________ test_the_ledger_events_have_item_3s_fields __________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_world = <function make_world.<locals>.make at 0x7b0c03206700>
+
+    def test_the_ledger_events_have_item_3s_fields(make_world):
+        world = make_world("judged:five")
+        ledger = world.ledger()
+        assert [e["seq"] for e in ledger] == list(range(1, len(ledger) + 1)), "seq consecutive"
+        assert all(ISO.match(e["at"]) for e in ledger), "at is ISO UTC to the microsecond"
+        by = {}
+        for e in ledger:
+            by.setdefault(e["event"], []).append(e)
+        assert set(by) >= {"preflight", "declaration", "used", "ready", "control", "search", "attempt", "store", "counts",
+                           "spend", "figures"}, sorted(by)
+        ready = by["ready"]
+        assert len(ready) == 1 and ready[0]["ok"] is True and ready[0]["why"] is None
+        control = by["control"][0]
+        assert {"k", "hit5", "of", "last", "last_audit", "ok"} <= set(control) and control["of"] == 40
+        searches = by["search"]
+        assert {"phase", "attempt", "call", "qid", "rc", "ms", "ok"} <= set(searches[0])
+        phases = {p: [e for e in searches if e["phase"] == p] for p in ("ready", "control", "attempt", "later")}
+        assert all(phases.values()) and {e["phase"] for e in searches} == set(phases)
+        assert len(phases["ready"]) == 1 and len(phases["control"]) == 40
+        kept = len(list((world.attempt_dir(1) / "kept").glob("*.json")))
+        assert len(phases["attempt"]) == kept
+        assert sorted(e["call"] for e in phases["attempt"]) == list(range(1, kept + 1)), "call is the kept number"
+        assert all(e["qid"] is None for e in phases["attempt"]) and all(e["qid"] for e in phases["later"])
+        assert all(isinstance(e["ms"], int) and e["ms"] >= 0 for e in searches)
+        assert [(e["n"], e["state"], e["cause"]) for e in by["attempt"]] == [(1, "start", None), (1, "done", None)]
+        store = by["store"][0]
+        assert (store["n"], store["same"], store["sha256"]) == (1, True, W.sha_file(world.store))
+>       assert by["counts"][0]["attempt"] == "attempt-1"
+E       AssertionError: assert 1 == 'attempt-1'
+
+tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py:118: AssertionError
+_ test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes[exit-exit] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x70a527ae5370>, fault = 'exit'
+cause = 'exit'
+
+    @pytest.mark.parametrize("fault,cause", [("rerank", "degraded"), ("semantic_missing", "degraded"),
+                                             ("pool", "degraded"), ("exit", "exit")])
+    def test_s4_a_fault_in_the_first_attempt_is_kept_never_counted_and_one_restart_passes(world, fault, cause):
+        SC.install(world, gov_edit=fault_at(1, fault=fault))
+        run = world.measure()
+        assert run.code == 0, run
+        assert causes(world) == {"attempt-1": cause}, causes(world)
+        assert not (world.attempt_dir(1) / "DONE").exists() and (world.attempt_dir(2) / "DONE").is_file()
+        assert (world.run_dir / "COUNTS").read_text().strip() == "attempt-2"
+        assert (world.run_dir / "control-1").is_dir() and (world.run_dir / "control-2").is_dir(), \
+            "the ready check, the probe and a new control, again before the restart"
+        expected = S.Expected(SC, world)
+        assert [x for x in run.lines if x.startswith("RETRIEVAL")] == [expected.retrieval_line(2)], \
+            "a faulted attempt's figures are never printed"
+        states = [(e["n"], e["state"], e["cause"]) for e in world.events("attempt")]
+        assert states == [(1, "start", None), (1, "fault", cause), (2, "start", None), (2, "done", None)], states
+        assert [e["ok"] for e in world.events("ready")] == [True, True]
+>       assert world.events("counts")[0]["attempt"] == "attempt-2"
+E       AssertionError: assert 2 == 'attempt-2'
+
+tests/acceptance/W2-171/test_w2_171_s4_fault.py:55: AssertionError
+____________ test_the_ledger_after_a_whole_measure_ends_with_counts ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x7b0c02d1be60>
+
+    def test_the_ledger_after_a_whole_measure_ends_with_counts(world):
+        S.SCENARIOS["five"].install(world)
+        assert world.measure().code == 0
+        ledger = world.ledger()
+>       assert ledger[-1]["event"] == "counts" and ledger[-1]["attempt"] == "attempt-1"
+E       AssertionError: assert ('counts' == 'counts'
+E         
+E           counts and 1 == 'attempt-1')
+
+tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py:130: AssertionError
+___________ test_f5_the_branch_changes_only_paths_the_ticket_allows ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_f5_the_branch_changes_only_paths_the_ticket_allows():
+        if _git("rev-parse", "--verify", "--quiet", "w2/integrate^{commit}").returncode != 0:
+            pytest.skip("F5 needs the w2/integrate reference, absent in this repository: not judged here")
+        if not TICKET.is_file():
+            pytest.skip("F5 needs the ticket file .tickets/DAEO-61vm.md, absent here: not judged here")
+        front = yaml.safe_load(TICKET.read_text(encoding="utf-8").split("\n---", 1)[0].removeprefix("---\n"))
+        allowed = list(front["allowed_paths"])
+        folder = str(front["acceptance_tests"]["path"]).rstrip("/")
+        allowed.append(folder + "/**")
+        base = _git("merge-base", "HEAD", "w2/integrate")
+        assert base.returncode == 0, base.stderr
+        diff = _git("-c", "core.quotePath=false", "diff", "--name-only", "--no-renames", f"{base.stdout.strip()}...HEAD")
+        assert diff.returncode == 0, diff.stderr
+        from gov.close.select import match
+        outside = [p for p in diff.stdout.splitlines() if p and not any(match(p, a) for a in allowed)]
+>       assert outside == [], outside
+E       AssertionError: ['docs/changes/W2-171-evidence.md', 'tests/acceptance/W2-171/README.md', 'tests/acceptance/W2-171/conftest.py', 'tests...ce/W2-171/fake_claude.py', 'tests/acceptance/W2-171/fake_gov.py', 'tests/acceptance/W2-171/ollama_rerank_stub.py', ...]
+E       assert ['docs/change...stub.py', ...] == []
+E         
+E         Left contains 21 more items, first extra item: 'docs/changes/W2-171-evidence.md'
+E         Use -v to get more diff
+
+tests/acceptance/W2-170/test_w2_170_f5_paths.py:39: AssertionError
+______________ test_s1_a_missing_control_set_ends_the_ready_check ______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x7b0c02d916d0>
+
+    def test_s1_a_missing_control_set_ends_the_ready_check(world):
+        """The CTO's ruling 9: no session opens the sets root to confirm the control's set; a missing set is
+        ``STOPPED notready`` and the first live run shows it."""
+        _scenario(34).install(world)
+        shutil.rmtree(world.sets / "fixtures" / "evaluation" / "memory-retrieval" / "visible")
+        run = world.measure()
+>       assert run.code == 2 and "STOPPED notready" in run.lines, run
+E       AssertionError: <exit 2; stdout 'DECLARED: audit commit a6cdbe0e00df, n 40, set digest acb780108dde
+E         USED written
+E         CONTROL control-1: hit@5 0 of 0; last 34; control out of range
+E         STOPPED control
+E         '; stderr ''>
+E       assert (2 == 2 and 'STOPPED notready' in ['DECLARED: audit commit a6cdbe0e00df, n 40, set digest acb780108dde', 'USED written', 'CONTROL control-1: hit@5 0 of 0; last 34; control out of range', 'STOPPED control'])
+E        +  where 2 = <exit 2; stdout 'DECLARED: audit commit a6cdbe0e00df, n 40, set digest acb780108dde\nUSED written\nCONTROL control-1: hit@5 0 of 0; last 34; control out of range\nSTOPPED control\n'; stderr ''>.code
+E        +  and   ['DECLARED: audit commit a6cdbe0e00df, n 40, set digest acb780108dde', 'USED written', 'CONTROL control-1: hit@5 0 of 0; last 34; control out of range', 'STOPPED control'] = <exit 2; stdout 'DECLARED: audit commit a6cdbe0e00df, n 40, set digest acb780108dde\nUSED written\nCONTROL control-1: hit@5 0 of 0; last 34; control out of range\nSTOPPED control\n'; stderr ''>.lines
+
+tests/acceptance/W2-171/test_w2_171_s1_control.py:123: AssertionError
+_ test_s2_the_counting_attempt_prints_the_planted_figures_and_keeps_every_output _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_171_world.World object at 0x7b0c02def710>
+
+    def test_s2_the_counting_attempt_prints_the_planted_figures_and_keeps_every_output(world):
+        SC.install(world)
+        run = world.measure()
+        assert run.code == 0, run
+        expected = S.Expected(SC, world)
+        retrieval = [x for x in run.lines if x.startswith("RETRIEVAL")]
+        assert retrieval == [expected.retrieval_line(1)], (retrieval, expected.retrieval_line(1))
+        attempt = world.attempt_dir(1)
+        # the measure's own question lines carry the planted ranks, in file-name order
+        lines = world.question_lines(attempt)
+        assert [q for q, *_ in lines] == [f"q{i:02d}" for i in range(1, 41)]
+        assert all(part == "hidden" for _, part, *_ in lines)
+        assert {q: rank for q, _, _, rank, _, _ in lines} == dict(SC.ranks)
+        assert {q: bundle for q, _, _, _, bundle, _ in lines} == {q: SC.in_bundle(q) for q in SC.ranks}
+        # every search's output kept, in call order
+        kept = sorted((attempt / "kept").glob("*.json"))
+        calls_per_question = {q: len(S.calls_for(r)) for q, r in SC.ranks.items()}
+        assert len(kept) == sum(calls_per_question.values())
+        assert [p.name for p in kept] == [f"{i:05d}.json" for i in range(1, len(kept) + 1)]
+        for path in kept:
+            doc = json.loads(path.read_text())
+            assert isinstance(doc["result"]["evidence"], list)
+        ms = (attempt / "ms").read_text().split()
+        assert len(ms) == len(kept) and all(x.replace(".", "", 1).isdigit() for x in ms)
+        for name in ("measure.txt", "measure.err", "ENDED", "DONE"):
+            assert (attempt / name).is_file(), name
+        assert not (attempt / "FAULT").exists()
+        assert (world.run_dir / "COUNTS").read_text().strip() == "attempt-1"
+>       assert world.events("counts")[0]["attempt"] == "attempt-1"
+E       AssertionError: assert 1 == 'attempt-1'
+
+tests/acceptance/W2-171/test_w2_171_s2_measure.py:51: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x70a5256fa3e0>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-171...>
+endtime = 54422.397135528, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x70a52565b740>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-171...>
+endtime = 54487.555675934, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x70a5256fa340>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-171/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x70a52571a020>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x70a52571bec0>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-171/py...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x70a5256f8680>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-lead-W2-171...>
+endtime = 54619.497368549, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-lead-W2-171/pytest-of-usain/pytest-0/popen-gw3/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-171/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1991860) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+16 failed, 4198 passed, 6 skipped, 6 warnings in 731.88s (0:12:11)

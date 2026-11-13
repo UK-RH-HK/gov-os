@@ -1,0 +1,7 @@
+Merge w2/W2-172-tests (DAEO-p8tv): path hygiene judges the world's paths, not the repository's own location (Rewrite-Reason: the merge queue's clone path (21:19 ejection))
+
+Task: DAEO-p8tv
+Role: orchestrator
+Implements: DEC-1101, DEC-1125, DEC-1097, DEC-1038, DEC-1050, DEC-1073
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

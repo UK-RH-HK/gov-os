@@ -1,0 +1,7 @@
+log: W2-157-A5-run1.json
+W2: W2-157
+status: DONE. The probed head is `365a4acda69b`; the branch head is `e1fea6fc2c24`, which adds only the probe record on top.
+
+task: DAEO-ozyt (W2-157), ticket lead, build run 1 (profile STANDARD, class C2)
+status: DONE. The probed head is `365a4acda69b`; the branch head is `e1fea6fc2c24`, which adds only the probe record on top.
+work_completed: The test designer wrote 109 acceptance cases, which were merged at `15db0ce13` and red before the code (108 failed, 1 passed). The engineer built `gov resources --backstop`. One acceptance case was red: a pgid too large for `os.killpg` crashed the command with OverflowError. A fresh engineer fixed it in `1c2ad5b9c6ef`, and gov accept went to 109/0. Review round 1 failed S1 and

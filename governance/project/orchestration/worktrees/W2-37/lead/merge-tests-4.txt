@@ -1,0 +1,4 @@
+Merge w2/W2-37-tests into w2/W2-37: acceptance tests for F1 (a), G-24 counts the store's stated links (DEC-1163 (7))
+
+Task: DAEO-6n5k
+Role: orchestrator

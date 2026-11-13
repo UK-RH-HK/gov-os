@@ -1,0 +1,7 @@
+log: W2-146-A5-run3.json
+W2: W2-146
+status: DONE. The branch head is `ebdbabd2e0d3`. It is verified, the review passed, and `gov accept` passed. The owner must approve the CIT-P record before the merge (CAP-33).
+
+task: DAEO-f6x3 (W2-146), run 3 (resumed from the checkpoint; td-1 and eng-1 not relaunched)
+status: DONE. The branch head is `ebdbabd2e0d3`. It is verified, the review passed, and `gov accept` passed. The owner must approve the CIT-P record before the merge (CAP-33).
+work_completed: rebuild ok. lead_verify was red only on 6 `test_w2_96` signal/timeout cases outside this ticket's paths: 2 passed alone (load-sensitive), and 4 also fail on w2/integrate's head `ee242e55`, so they are shared base reds. `gov accept` first refused with ACCEPT_NO_MAP because the acceptance README listed its tests wit

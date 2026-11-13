@@ -1,0 +1,4 @@
+{"at": "2026-11-12 03:00:17", "event": "hold", "why": "from 03:00 until the nightly has ended", "lines_held": [], "running_leads_untouched": ["W2-115", "W2-121", "W2-173"], "backup": null}
+{"at": "2026-11-12 03:19:29", "event": "extend", "lines_held": ["W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json"], "backup": "ready.txt.pre-hold-20261112-031929"}
+{"at": "2026-11-12 03:41:54", "event": "extend", "lines_held": ["W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json"], "backup": "ready.txt.pre-hold-20261112-034154"}
+{"at": "2026-11-12 05:00:57", "event": "release", "why": "the nightly has ended (20261112-0404/run.txt holds its end)", "lines_released": ["W2-121 DAEO-cb2b W2-121-A5-run2b.md W2-121-A5-run2b.json", "W2-173 DAEO-qz4p W2-173-A5-run2.md W2-173-A5-run2.json"], "handed_to_mem_hold": false}

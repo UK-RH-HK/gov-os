@@ -1,0 +1,4 @@
+fg run 1: SIGINT-ignored-at-start: 0 | 29 passed, 9 deselected in 23.52s
+fg run 2: SIGINT-ignored-at-start: 0 | 29 passed, 9 deselected in 23.51s
+fg run 3: SIGINT-ignored-at-start: 0 | 29 passed, 9 deselected in 23.24s
+FORM fg: 3 of 3 runs all passed, 0 with a red (or skip)

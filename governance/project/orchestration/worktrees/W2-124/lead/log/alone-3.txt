@@ -1,0 +1,31 @@
+            f"the settings' hook command lines do not reach the six kernel hooks: {sorted(scripts - reached)}"
+E       AssertionError: the settings' hook command lines do not reach the six kernel hooks: ['context_watch.py']
+E       assert ({'posttooluse...agentstop.py'} == {'context_wat...stop.py', ...}
+E         
+E         Extra items in the right set:
+E         'context_watch.py'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-23/test_w2_23_space.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+1 failed, 94 passed in 6.57s
+alone W2-124 exit 1
+.                                                                        [100%]
+1 passed in 72.62s (0:01:12)
+latency W2-124 exit 0
+Preparing worktree (detached HEAD 95c957ae9)
+HEAD is now at 95c957ae9 W2-172 (DAEO-p8tv): its Interface (PKG-W2-172-IFACE-1 (a), O1-O4 answered, O2 the product's gov resources --check) and the probe folder
+            f"the settings' hook command lines do not reach the six kernel hooks: {sorted(scripts - reached)}"
+E       AssertionError: the settings' hook command lines do not reach the six kernel hooks: ['context_watch.py']
+E       assert ({'posttooluse...agentstop.py'} == {'context_wat...stop.py', ...}
+E         
+E         Extra items in the right set:
+E         'context_watch.py'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-23/test_w2_23_space.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+1 failed in 0.19s
+base 95c957ae9 exit 1

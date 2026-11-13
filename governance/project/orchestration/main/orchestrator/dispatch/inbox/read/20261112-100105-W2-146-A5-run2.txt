@@ -1,0 +1,10 @@
+log: W2-146-A5-run2.json
+W2: W2-146
+status: CHECKPOINTED. I stopped at the CTO's usage hold (week 97%, DEC-1140 (5)-(6)). The test designer and the engineer both returned DONE and the tests are merged, but nothing is verified yet: no rebuild, lead_verify, gov accept or review has run.
+
+task: DAEO-f6x3
+status: CHECKPOINTED. I stopped at the CTO's usage hold (week 97%, DEC-1140 (5)-(6)). The test designer and the engineer both returned DONE and the tests are merged, but nothing is verified yet: no rebuild, lead_verify, gov accept or review has run.
+work_completed:
+- Merged w2/integrate (the Interface) into w2/W2-146 at 33c6ffe7f.
+- Ran the test designer (td-1) and the engineer (eng-1) in parallel, on Sonnet, high, C2. Neither changed the Interface and neither raised a package.
+- td-1 wrote tests/acceptance/W2-146: 192 cases. Before the build, 141 were red for the missing behav

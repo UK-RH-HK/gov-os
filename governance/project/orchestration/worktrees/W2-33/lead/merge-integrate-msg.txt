@@ -1,0 +1,4 @@
+Merge w2/integrate into w2/W2-33 (DAEO-lrre): W1-35 in the ticket's paths at 085b4391c (DEC-1156 (7))
+
+Task: DAEO-lrre
+Role: orchestrator

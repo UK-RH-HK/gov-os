@@ -1,0 +1,12 @@
+log: W2-45-A5-run4.json
+W2: W2-45
+status: DONE. Head to land: `5e53394ce9bc`. Review round 2 (the last) passed at `b13789476a9c`; the only commit since is the probe record.
+
+task: DAEO-neam (W2-45), run 4 (resume, then build, review and the probe record)
+status: DONE. Head to land: `5e53394ce9bc`. Review round 2 (the last) passed at `b13789476a9c`; the only commit since is the probe record.
+work_completed:
+- The test designer and the engineer ran in parallel.
+- **Test designer (td-4)** wrote 6 acceptance cases:
+  - 3 were red at base for the stated reasons: S1 on a 3,300-merge history (core-authority `CHECK_TIMED_OUT`), and the S5 group left running after SIGINT and after a huge limit.
+  - 3 are guards.
+  - It also made the W1-40 revision: line 49 now expects a no

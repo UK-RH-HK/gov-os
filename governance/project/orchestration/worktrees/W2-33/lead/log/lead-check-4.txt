@@ -1,0 +1,149 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 02:01:55)
+...............FFFFF......Fs............................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 86%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+______ test_the_definition_agrees_with_its_kernel_role_file[orchestrator] ______
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/orchestrator.md and template/governance/kernel/roles/orchestrator.md do not have the same fields: ['launch default', 'one writer per worktree', 'reads', 'skills', 'version', 'work order', 'writes']
+E       assert ['allowed pat...classes', ...] == ['allowed pat...network', ...]
+E         
+E         At index 3 diff: 'model tier' != 'launch default'
+E         Right contains 7 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+______ test_the_definition_agrees_with_its_kernel_role_file[product-spec] ______
+
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/product-spec.md and template/governance/kernel/roles/product-spec.md do not have the same fields: ['launch default', 'one writer per worktree', 'skills', 'version', 'work order']
+E       assert ['allowed pat...classes', ...] == ['allowed pat...network', ...]
+E         
+E         At index 3 diff: 'model tier' != 'launch default'
+E         Right contains 5 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+_ test_the_definition_agrees_with_its_kernel_role_file[independent-test-designer] _
+
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/independent-test-designer.md and template/governance/kernel/roles/independent-test-designer.md do not have the same fields: ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order']
+E       assert ['allowed pat...classes', ...] == ['allowed pat...el tier', ...]
+E         
+E         At index 3 diff: 'model tier' != 'launch by criticality'
+E         Right contains 6 more items, first extra item: 'permission classes'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+________ test_the_definition_agrees_with_its_kernel_role_file[engineer] ________
+
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/engineer.md and template/governance/kernel/roles/engineer.md do not have the same fields: ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order']
+E       assert ['allowed pat...classes', ...] == ['allowed pat...el tier', ...]
+E         
+E         At index 3 diff: 'model tier' != 'launch by criticality'
+E         Right contains 6 more items, first extra item: 'permission classes'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+__ test_the_definition_agrees_with_its_kernel_role_file[independent-auditor] ___
+
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/independent-auditor.md and template/governance/kernel/roles/independent-auditor.md do not have the same fields: ['launch default', 'one writer per worktree', 'skills', 'version', 'work order']
+E       assert ['allowed pat...classes', ...] == ['allowed pat...network', ...]
+E         
+E         At index 3 diff: 'model tier' != 'launch default'
+E         Right contains 5 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+__________ test_there_is_one_definition_per_role_and_the_research_one __________
+
+    def test_there_is_one_definition_per_role_and_the_research_one():
+        """Rewritten (DEC-1156 (3), (7)): one definition per kernel role, nine in all, none for ``independent-reviewer``,
+        each defined once. Red until the copies ACT generates the three new agents under ``.claude/agents/`` (a launched
+        session cannot write there, DEC-315)."""
+        found = support.live_support.agent_definitions()
+        wanted = set(support.ROLES + (support.RESEARCH,) + _ADDED_ROLES)
+        assert len(wanted) == 9, f"the wanted roster is not nine: {sorted(wanted)}"
+        assert _NOT_A_ROLE not in found, f"{_NOT_A_ROLE} is defined under .claude/agents/ though the kernel has no such role"
+>       assert set(found) == wanted, (
+            f"the definitions under .claude/agents/ are {sorted(found)}: missing {sorted(wanted - set(found))}, "
+            f"extra {sorted(set(found) - wanted)}"
+        )
+E       AssertionError: the definitions under .claude/agents/ are ['engineer', 'independent-auditor', 'independent-test-designer', 'orchestrator', 'product-spec', 'research']: missing ['qa-engineer', 'senior-engineer', 'ticket-lead'], extra []
+E       assert {'engineer', ...', 'research'} == {'engineer', ...ngineer', ...}
+E         
+E         Extra items in the right set:
+E         'senior-engineer'
+E         'qa-engineer'
+E         'ticket-lead'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:101: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[orchestrator]
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[product-spec]
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[independent-test-designer]
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[engineer]
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[independent-auditor]
+FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one
+6 failed, 325 passed, 1 skipped, 44 deselected in 312.72s (0:05:12)

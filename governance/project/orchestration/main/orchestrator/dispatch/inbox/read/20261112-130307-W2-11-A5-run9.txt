@@ -1,0 +1,7 @@
+log: W2-11-A5-run9.json
+W2: W2-11
+status: DONE. Head 6ba93fc8bf35. All four record checks pass, including W2-02's core-schema check. W2-11's folder shows only the seven copy reds, which stay red until the copies ACT (ACT-CLAUDE-COPIES-5).
+
+task: DAEO-k7hz (W2-11) run 9: replace the front matter of the two CIT-P review records with one plain line, as the CTO ruled; rerun the four record checks; name the copy cases; return DONE.
+status: DONE. Head 6ba93fc8bf35. All four record checks pass, including W2-02's core-schema check. W2-11's folder shows only the seven copy reds, which stay red until the copies ACT (ACT-CLAUDE-COPIES-5).
+work_completed: In `docs/changes/W2-11-CITP-REVIEW-r1.md` and `-r2.md` I replaced the `---` block with one line at the top: `Review record (not a probe record): ticket DAEO-k7hz, probed commit <full id>, 

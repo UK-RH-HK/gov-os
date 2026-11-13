@@ -1,0 +1,653 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  6%]
+......................................................................s. [  7%]
+........................................................................ [  8%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 14%]
+.................................................................s...... [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 27%]
+.......................sss.............................................. [ 28%]
+..s..................................................................... [ 29%]
+...............................................F........................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+.............................s.......................................... [ 35%]
+.................................................sss...............s.... [ 36%]
+........s............................................................... [ 37%]
+...................................................sssssssssssssssss.... [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+...........................................s............................ [ 41%]
+.......................................................x................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 45%]
+....sssssss......ssss................................................... [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+......................................................F................. [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 54%]
+.........................................F.............................. [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 56%]
+...............................................F........................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+.................................................................F...... [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+......................s................................................. [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+...................................................................sss.. [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+...............................sss...................................... [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+..........F............................................................. [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+............F........................................................... [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+.............................................................F.......... [ 96%]
+......F.............F.........sssssssss................................. [ 97%]
+................................................................F..F...F [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+world = <w2_170_world.World object at 0x7c26912016d0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw5/test_f3_a_run_s_file_access_lo0')
+
+    def test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders(world, tmp_path):
+        # the default runs folder is ~/gov-os-runs: a planted home holds one, so the run needs it and finds it there
+        home = tmp_path / "home-with-runs"
+        shutil.copytree(world.launch, home / "gov-os-runs")
+        world.write_set(W.clean_specs(), selection=False)
+        done, entries = _logged_run(world, home, tmp_path / "preflight.log", "preflight", world.pf_flags(runs_dir=False))
+        assert done.returncode == 0, (done.stdout, done.stderr)
+        world.write_notes(2, {"q27": ("reject", "R1-WRONG")})
+        done2, entries2 = _logged_run(world, home, tmp_path / "void.log", "void", world.void_flags())
+        assert done2.returncode == 0, (done2.stdout, done2.stderr)
+        done3, entries3 = _logged_run(world, home, tmp_path / "declare.log", "declare", world.dc_flags())
+        assert done3.returncode == 0, (done3.stdout, done3.stderr)
+        every = entries + entries2 + entries3
+        reached = [p for _, p in every if W.at_or_under(p, W.TRUE_SETS) or W.at_or_under(p, W.TRUE_RUNS)]
+>       assert reached == [], reached
+E       AssertionError: ['/home/usain/gov-os-runs/W2-00/nightly/20261112-0404/tests/acceptance/W2-170', '/home/usain/gov-os-runs/W2-00/nightly...261112-0404/src/gov/memaudit/__init__.py', '/home/usain/gov-os-runs/W2-00/nightly/20261112-0404/src/gov/memaudit', ...]
+E       assert ['/home/usain...emaudit', ...] == []
+E         
+E         Left contains 103 more items, first extra item: '/home/usain/gov-os-runs/W2-00/nightly/20261112-0404/tests/acceptance/W2-170'
+E         Use -v to get more diff
+
+tests/acceptance/W2-170/test_w2_170_s4_map.py:165: AssertionError
+_ test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGINT] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_an_ending_signal_to_t0'), home=PosixPath('/tmp/...t0/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_an_ending_signal_to_t0/pycache'))
+signum = <Signals.SIGINT: 2>
+
+    @pytest.mark.parametrize("signum", SIGNALS, ids=lambda n: signal.Signals(n).name)
+    def test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group(box, signum):
+        ready = _group_plan(box, ignore=False)
+        process = s.start_launch(box, s.ENGINEER, s.T.tk)
+        pid = None
+        try:
+            pid = _signal_launcher(box, process, ready, signum)
+>           code, _, err = s.finish(process, timeout=s.END_WAIT_S + 30)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_endings.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+process = <Popen: returncode: -9 args: ['/usr/bin/python3', '-c', "import sys\nimport ...>
+timeout = 35
+
+    def finish(process: subprocess.Popen, timeout: float = COMMAND_TIMEOUT_S) -> tuple[int, str, str]:
+        try:
+            out, err = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except OSError:
+                pass
+            out, err = process.communicate()
+>           raise AssertionError(f"gov launch did not end within {timeout:.0f} s\nstderr:\n{err[-1500:]}") from None
+E           AssertionError: gov launch did not end within 35 s
+E           stderr:
+E           gov launch: OVERRIDE gate_override: DEC-1112: engineer DAEO-zw56 started with the resource gate shut: config: gate.json: /tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_an_ending_signal_to_t0/home/.gov-os/machine/gate.json is missing (gov resources --init-config writes this machine's); cpu: reading null, limit 20 (the embedding servers' section cannot be read, so their CPU cannot be measured); memory: reading 14661705728, limit null; disk: reading 867282927616, limit null; inodes: reading 64091735, limit null (DEC-899)
+
+tests/acceptance/W2-56/w2_56_support.py:557: AssertionError
+__ test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGINT] __
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_the_temp_folder_is_re0'), home=PosixPath('/tmp/...e0/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_the_temp_folder_is_re0/pycache'))
+signum = <Signals.SIGINT: 2>
+
+    @pytest.mark.parametrize("signum", SIGNALS, ids=lambda n: signal.Signals(n).name)
+    def test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled(box, signum):
+        outside, fill = _fill(box)
+        ready = box.elsewhere / "ready"
+        s.set_plan(box, [fill, {"do": "touch", "path": str(ready)}, {"do": "sleep", "seconds": 90}])
+        process = s.start_launch(box, s.ENGINEER, s.T.tk)
+        try:
+            assert s.wait_for(ready.exists, 30), "the session did not fill its temp folder"
+            process.send_signal(signum)
+>           s.finish(process, timeout=s.END_WAIT_S + 30)
+
+tests/acceptance/W2-56/test_w2_56_endings.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+process = <Popen: returncode: -9 args: ['/usr/bin/python3', '-c', "import sys\nimport ...>
+timeout = 35
+
+    def finish(process: subprocess.Popen, timeout: float = COMMAND_TIMEOUT_S) -> tuple[int, str, str]:
+        try:
+            out, err = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except OSError:
+                pass
+            out, err = process.communicate()
+>           raise AssertionError(f"gov launch did not end within {timeout:.0f} s\nstderr:\n{err[-1500:]}") from None
+E           AssertionError: gov launch did not end within 35 s
+E           stderr:
+E           gov launch: OVERRIDE gate_override: DEC-1112: engineer DAEO-zw56 started with the resource gate shut: config: gate.json: /tmp/pytest-of-usain/pytest-188/popen-gw6/test_s12_the_temp_folder_is_re0/home/.gov-os/machine/gate.json is missing (gov resources --init-config writes this machine's); cpu: reading null, limit 20 (the embedding servers' section cannot be read, so their CPU cannot be measured); memory: reading 14548512768, limit null; disk: reading 867091378176, limit null; inodes: reading 64071480, limit null (DEC-899)
+
+tests/acceptance/W2-56/w2_56_support.py:557: AssertionError
+__________ test_an_interrupted_run_stops_its_child_and_leaves_nothing __________
+[gw11] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw11/test_an_interrupted_run_stops_0')
+
+    def test_an_interrupted_run_stops_its_child_and_leaves_nothing(tmp_path):
+        """SIGINT to gov alone, while a planted test sleeps: the child is stopped, nothing is left, nothing shown."""
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+>           run = started.interrupt()
+                  ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:1523: in interrupt
+    return self.send(signal.SIGINT, wait_s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-96/w2_96_support.py:1528: in send
+    return self.finish(wait_s, f"signal {int(signum)}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x722b611aeed0>, wait_s = 60.0
+after = 'signal 2'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signal 2
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x7ea20ef65bc0>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/pytest-of-usain/py...>
+endtime = 47607.603087881, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x7ea20ef67d80>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/pytest-of-usain/py...>
+endtime = 47674.008300664, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x7ea20ed35ee0>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/pytest-of-usain/pytes...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+_ test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends[a-second-press-once-the-removal-began] _
+[gw11] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw11/test_r9_a_ctrl_c_during_the_cl0')
+presses = 'a-second-press-once-the-removal-began'
+
+    @pytest.mark.parametrize("presses", list(CLEAN_UP_PRESSES))
+    def test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends(tmp_path, presses):
+        """A planted test leaves 20,000 files in its temporary folder, then sleeps. SIGINT to gov alone ends the run;
+        further presses (SIGINT, or SIGTERM, SIGHUP and SIGINT in turn) arrive during the clean-up, the revised form's
+        second once the planted files begin to disappear. When gov ends, the given TMPDIR is empty, no marker
+        anywhere, the child gone, and the exit code is 130."""
+        files = support.second_file("many_sleep", "test_qzv96leak_many", extra=support.MANY)
+        project = support.Project(tmp_path, files, support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+            schedule = CLEAN_UP_PRESSES[presses]
+            if any(delay == ON_REMOVAL for delay, _ in schedule):
+>               run = _press_on_removal(started, schedule, sleeping)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:193: in _press_on_removal
+    run = started.finish(60.0, f"signals {sent}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x722b611d9970>, wait_s = 60.0
+after = 'signals [2, 2]'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signals [2, 2]
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x7ea20f16b1a0>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x7ea20f16bce0>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/pytest-of-usain/pytes...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_ test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal[SIGINT] _
+[gw11] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw11/test_r12_a_signal_that_ends_th0')
+case = 'SIGINT'
+
+    @pytest.mark.parametrize("case", list(EXIT_AFTER))
+    def test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal(tmp_path, case):
+        """SIGTERM twice a few milliseconds apart, SIGHUP the same, or one SIGINT, while the child runs: the return
+        code is 143, 129 or 130, never a negative one; the given TMPDIR is empty and the child and grandchild gone."""
+        schedule, expected = EXIT_AFTER[case]
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+            sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+>           run = started.send_all(schedule)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:1541: in send_all
+    run = self.finish(wait_s, f"signals {sent}")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_96_support.Started object at 0x722b603e9790>, wait_s = 60.0
+after = 'signals [2]'
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
+        try:
+            stdout, stderr = self.process.communicate(timeout=wait_s)
+        except subprocess.TimeoutExpired:
+            self.stop()
+>           raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+E           AssertionError: gov accept did not end within 60 s of signals [2]
+
+tests/acceptance/W2-96/w2_96_support.py:1551: AssertionError
+__ test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored __
+[gw11] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw11/test_premise_r11_a_process_sta0')
+
+    def test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored(tmp_path):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README)
+        script = ("import signal, sys; sys.stdout.write(' '.join(str(int(signal.getsignal(s) == signal.SIG_IGN)) "
+                  "for s in (signal.SIGHUP, signal.SIGINT, signal.SIGTERM)))")
+        for signum, expected in ((HUP, "1 0 0"), (INT, "0 1 0"), (TERM, "0 0 1")):
+            tmpdir = tmp_path / f"premise-tmp-{int(signum)}"
+            tmpdir.mkdir()
+            process = project._popen([sys.executable, "-c", script], project.root, tmpdir, ignore=(signum,))
+            stdout, stderr = process.communicate(timeout=60)
+>           assert (process.returncode, stdout) == (0, expected), f"signal {int(signum)}: {stdout!r} {stderr[-2000:]}"
+E           AssertionError: signal 1: '1 1 0' 
+E           assert (0, '1 1 0') == (0, '1 0 0')
+E             
+E             At index 1 diff: '1 1 0' != '1 0 0'
+E             Use -v to get more diff
+
+tests/acceptance/W2-96/test_w2_96_at_run_2.py:384: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x7ea20f16b560>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/pytest-of-usain/py...>
+endtime = 47808.402849137, orig_timeout = 60, stdout_seq = [], stderr_seq = None
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/pytest-of-usain/pytest-188/popen-gw9/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/nightly/20261112-0404/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=158358) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-170/test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders
+FAILED tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGINT]
+FAILED tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGINT]
+FAILED tests/acceptance/W2-96/test_w2_96_at_no_leak.py::test_an_interrupted_run_stops_its_child_and_leaves_nothing
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+FAILED tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]
+FAILED tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends[a-second-press-once-the-removal-began]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]
+FAILED tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal[SIGINT]
+FAILED tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored
+FAILED tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it
+13 failed, 10588 passed, 57 skipped, 1 xfailed, 6 warnings in 1020.74s (0:17:00)

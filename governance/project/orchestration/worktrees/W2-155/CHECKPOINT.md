@@ -1,0 +1,5 @@
+task: DAEO-ar89
+decisions_applied: DEC-1125, DEC-105; DEC-1159 (2), (3) applied (discovery: not in sources)
+STATE: STOP-AND-REPORT 2026-11-13 01:52 GMT: option 1 applied (49f5ec46f), measured slower (p95 0.76-0.79 s vs 0.55-0.57 s at 24,000, A/B), reverted (8da607e3d); PACKAGES W2-155-2 returned | HEAD: 8da607e3d | NEXT: the owner picks an option in W2-155-profile-note.md "Options for the owner (run 2)" | WAITING ON: the owner (PKG W2-155-2)
+Time box: run 1 23:49-23:59 (10 min) + run 2 00:35-01:52 (77 min) = 87 lead-minutes of 120
+Workers: eng-1 (engineer, claude-sonnet-5-5 high, session 856da309-fa7a-4054-b069-d49da4568524) DONE exit 0 · Rounds: converged · Decisions taken: no test designer (existing cases only); the pair read kept 24,000; revert of 49f5ec46f (the change worsens the measured p95; DEC-1159 (2)'s premise disproved) · Open packages: W2-155-2 · Paths: W2-155-profile-note.md, gpu-reading-2x24000.json, latency-013043/, /tmp/w2-155-prof/ab-014722/, lead/briefs/eng-1.md, lead/log/eng-1.*

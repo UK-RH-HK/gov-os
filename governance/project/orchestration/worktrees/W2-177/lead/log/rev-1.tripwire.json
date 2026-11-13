@@ -1,0 +1,163 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "3c0cc4217f34",
+   "after": "c8e9c236c8b2"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "3c0cc4217f34",
+   "after": "c8e9c236c8b2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "3c0cc4217f34",
+   "after": "c8e9c236c8b2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "787b097ac95d",
+   "after": "e84e6c9cf7dc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-158",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-158-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "head",
+   "before": "3c0cc4217f34",
+   "after": "9a07fa73d191"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": "?? tests/unit/session_watch/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": "?? tests/unit/session_watch/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": "?? tests/unit/session_watch/test_route.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": "?? tests/unit/session_watch/test_waiter.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "head",
+   "before": "1ba9203a94fe",
+   "after": "8d1bb1636458"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "acceptance folder",
+   "folder": "W2-171"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-177-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178",
+   "change": "head",
+   "before": "d8dadc050a21",
+   "after": "6056c4f98d0a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180",
+   "change": "head",
+   "before": "ac906bda8faf",
+   "after": "21dc73cb5dc0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180",
+   "change": "acceptance folder",
+   "folder": "W2-173"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "head",
+   "before": "ac906bda8faf",
+   "after": "56f401a86c90"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-173/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-173/test_w2_173_unchanged.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "acceptance folder",
+   "folder": "W2-173"
+  }
+ ]
+}

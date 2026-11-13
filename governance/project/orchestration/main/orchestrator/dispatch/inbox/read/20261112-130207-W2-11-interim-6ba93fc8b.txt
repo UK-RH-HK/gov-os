@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-11
+status: interim result 6ba93fc8b: W2-11 (DAEO-k7hz): the two CIT-P review records' YAML front matter replaced by one plain line carrying the same facts (not probe records; the CTO's ruling, run 9); bodies unchanged

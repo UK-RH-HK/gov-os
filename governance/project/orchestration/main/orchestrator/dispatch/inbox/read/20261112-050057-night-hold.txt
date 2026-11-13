@@ -1,0 +1,3 @@
+log: night-hold.jsonl
+Hold: night released
+status: the nightly has ended (20261112-0404/run.txt holds its end). ready.txt lines uncommented: 2. Leads may start again.

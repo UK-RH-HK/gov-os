@@ -1,0 +1,15 @@
+Merge w2/W2-111-tests (DAEO-qvff): the 15 hook-latency cases judge the hook's CPU p95 less a stub reference hook timed beside each call, at the same 100 ms (form B, DEC-1163 (3))
+
+Round 2's revision (a5bf1c0131b8): W1-02's 5, W1-05's 9 and W2-57's 1 latency cases judge the round's CPU p95
+(user and system, RUSAGE_CHILDREN) of the hook and its children less the median CPU time of a stub reference hook
+called just before each timed call in the same round; bound 100 ms, 40 samples, 3 warm-up calls, nearest-rank p95,
+three-round repeat and the 15 ids unchanged; nothing skipped, marked or removed. The owner decided the measure,
+P-W2-111-MEASURE-1 (a), DEC-1163 (3): the start-up cost left out (about 16-21 ms) is accepted under DEC-906.
+Run 3's README edit (e3b1d59d70f6) names DEC-1163 (3) where each README names the measure. The lead's benchmark
+(bench-2): 15 pass quiet, at load ~20 and at 50+; a planted 150 ms hook fails all 15 at both loads.
+
+Task: DAEO-qvff
+Role: orchestrator
+Implements: DEC-979, DEC-906, DEC-968
+Rewrite-Reason: DEC-979
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

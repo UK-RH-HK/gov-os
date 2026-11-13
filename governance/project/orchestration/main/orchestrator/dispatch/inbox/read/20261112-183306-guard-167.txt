@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 168
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01NnARiqtaBo9RWbyv7ag41K", "time": "2026-11-12T16:19:04.116Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-124/50e4faf2-8c71-449d-bd86-f3e9ec80c72f.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-124", "tool": "Grep", "form": "/home/usain/gov-os-worktrees/W2-124/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py", "rule": "the engineer does not read {ticket_tests} (tests/acceptance/W2-124/**): role_paths.engineer.reads_denied (governance/project/path-map.yaml, DEC-1052 G-14) (DEC-953 item 2)", "verdict": "", "cost": "", "note": ""}

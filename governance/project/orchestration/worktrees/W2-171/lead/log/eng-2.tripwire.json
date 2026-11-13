@@ -1,0 +1,1390 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "head",
+   "before": "c6ca85d07219",
+   "after": "f1f950479641"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M src/gov/dispatch/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M src/gov/dispatch/config.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M src/gov/dispatch/returns.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M src/gov/dispatch/run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M src/gov/dispatch/state.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M tests/unit/dispatch/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M tests/unit/dispatch/test_returns.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": " M tests/unit/dispatch/test_status.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/.gov-owner"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/alembic"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/arq"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/check-jsonschema"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/copier"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/coverage"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/coverage-3.12"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/coverage3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/dotenv"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/f2py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/fastapi"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/gitleaks"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/gov"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/hf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/httpx"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/lefthook"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/mako-render"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/numpy-config"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/ollama"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/owner-ping"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/py.test"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyproj"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-decrypt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-encrypt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-keygen"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-priv2pub"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-sign"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pyrsa-verify"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/pytest"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/python"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/rulesync"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/tiny-agents"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/tk"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/uv"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/uvicorn"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-path-s84r8lo5/tmpwzyxjsj5/uvx"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? gov-rebuild-504-x4sf9g60.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exi0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_notifier_is_exicurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_va0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_a_missing_or_malformed_vacurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_r0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_item_never_rcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_it0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_never_ran_itcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_i0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_deleted_owner_item_icurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f1_a_return_deleted_from_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_is0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failed_escalation_iscurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_lea0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_failing_notifier_leacurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannot0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_that_cannotcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_end0/wt/W2-2/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_a_notifier_timeout_endcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_re0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f2_notify_retry_s_zero_recurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f4_a_path_only_untracked_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/bin/git"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_c0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-0/test_f6_a_hung_git_names_the_ccurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/.gov-cbm-base"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/.lock"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_finished_session_is_coucurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_finished_session_is_onecurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_fresh_peaks_file_is_kepcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_hung_notifier_is_limitecurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_job_past_its_peak_leavecurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_malformed_history_line_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_read_item_is_never_escacurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_recent_start_without_a_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_return_naming_only_exiscurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_start_is_refused_under_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_a_start_that_never_ran_iscurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_an_item_unread_past_the_tcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_commits_and_paths_are_rescurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_cpu_room_is_nproc_less_bucurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f1_a_deleted_item_never_rcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f1_a_deleted_never_ran_itcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f1_a_deleted_owner_item_icurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f1_a_return_deleted_from_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_failed_escalation_iscurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_failing_notifier_leacurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_that_cannotcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/notify.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_end0/wt/W2-2/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_notifier_timeout_endcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_a_read_item_is_not_retcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f2_notify_retry_s_zero_recurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f4_a_path_only_untracked_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/bin/git"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/hang_logged_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/hang_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/home/.gov-os/machine/gate.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/launch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/launch_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/loadavg"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/meminfo"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/notify_stub.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/project/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_c0/wt/W2-1/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_f6_a_hung_git_names_the_ccurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_no_history_counts_the_gatcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_other_kinds_running_are_fcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_peaks_are_the_maximum_of_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_peaks_older_than_a_day_arcurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_the_peaks_ahead_of_runnincurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-1/test_the_status_line_comes_frocurrent"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "status line gone",
+   "line": "?? pytest-of-usain/pytest-current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "head",
+   "before": "c6ca85d07219",
+   "after": "db682531d092"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-121/test_s2_start_rules.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-121/test_s6_nothing_project_specific.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-121/w2_121_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-121/test_s2_s6_gate_only.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-121/test_s4_escalation_retry.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-121/test_s4_items_once_ever.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-121/test_s4_s5_notifier_required.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-121/test_s9_untracked_paths.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121-tests",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "head",
+   "before": "1c2ad5b9c6ef",
+   "after": "97e44155c5e1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "status line added",
+   "line": " M docs/changes/W2-157-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "status line added",
+   "line": " M src/gov/resources/backstop.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "status line added",
+   "line": " M tests/unit/resources/test_w2_157_backstop.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157-tests",
+   "change": "head",
+   "before": "196c43ee6f66",
+   "after": "c4107a6d6cee"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-157-tests",
+   "change": "acceptance folder",
+   "folder": "W2-157"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-171",
+   "change": "head",
+   "before": "877243f48768",
+   "after": "c103e26bea80"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-177",
+   "change": "head",
+   "before": "2a35ec3073fe",
+   "after": "f5f050c87ddf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179",
+   "change": "head",
+   "before": "3eeb5cb2e98e",
+   "after": "4a9d5d074834"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-179-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

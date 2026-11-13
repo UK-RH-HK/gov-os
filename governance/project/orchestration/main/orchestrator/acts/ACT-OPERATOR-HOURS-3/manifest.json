@@ -1,0 +1,251 @@
+{
+ "act": "ACT-OPERATOR-HOURS-3",
+ "dec": "DEC-1157, DEC-1141 (6), DEC-1104",
+ "author": "cto",
+ "claimed_class": "O",
+ "parts": {
+  "A": {
+   "claimed_class": "b",
+   "what": "the crontab's operator line (line 7): every 10 minutes at every hour, no time window, no night-hold state file read",
+   "applied_by": "the CTO, after one review and the owner's yes",
+   "steps": "bash apply.sh A check|apply|verify|undo",
+   "touched": [
+    {
+     "root": "crontab",
+     "path": "crontab",
+     "before": "88cf08b165a184a23681b610ea07490c7c60559c6125fdba359db2a083d7c880",
+     "after": "72f1106f7a0c1d3e4a5bb25f00c82d24cae7149131bcd5a3906496a463a05fdc"
+    }
+   ],
+   "checks": [
+    {
+     "cmd": "crontab -l | grep -v '^#' | grep -c .",
+     "exit": 0,
+     "count": 4
+    },
+    {
+     "cmd": "crontab -l | grep -c '^\\*/10 \\* \\* \\* \\* /usr/bin/python3 -I .*/gov-os-operator/install/operator_launch\\.py >> .*/gov-os-operator/log/operator-launch\\.out 2>&1  # DEC-1157 (2), ACT-OPERATOR-HOURS-3 '",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "crontab -l | grep -c 'night-hold\\.state\\.json'",
+     "exit": 1,
+     "count": 0
+    },
+    {
+     "cmd": "crontab -l | grep -c 'operator_launch\\.py'",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "crontab -l | grep -c '^0 4 \\* \\* \\* /usr/bin/bash .*/nightly/nightly_restart\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "crontab -l | grep -c '^\\* \\* \\* \\* \\* /usr/bin/bash .*/dispatch/run_tick\\.sh$'",
+     "exit": 0,
+     "count": 1
+    }
+   ]
+  },
+  "B": {
+   "claimed_class": "O",
+   "what": "G9's time holds removed: the operator's install (opcommon.py, APPROVED) and the repository's source and tests; the path map's exemption entry for the commit (DEC-1136 (2)) by apply.sh B exempt",
+   "applied_by": "the owner's operator, by hand",
+   "steps": "bash apply.sh B check|apply|verify|undo, then exempt|exempt-verify|exempt-undo",
+   "touched": [
+    {
+     "root": "repo",
+     "path": "governance/project/operator/opcommon.py",
+     "before": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+     "after": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f"
+    },
+    {
+     "root": "repo",
+     "path": "tests/unit/operator/test_act_operator_hours_2.py",
+     "before": "b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760",
+     "after": "f5cab8e7dcdc018ab41c71bab8cf1eec7cb4627e671e7e98eb876bc255c352f9"
+    },
+    {
+     "root": "repo",
+     "path": "tests/acceptance/W2-148/test_w2_148_gates.py",
+     "before": "0f05dbcefa09ca498ea844b64874802a02e28174fbc6eded77cb869a10e5da6a",
+     "after": "691f3b6b138f96c5cf2c7b15ca3d77912e8ba47c352ddb6d83b0c981ac58426a"
+    },
+    {
+     "root": "repo",
+     "path": "tests/acceptance/W2-148/README.md",
+     "before": "625e078ba23d813ded0a30d3da31366841b0053e851569b253386c871061e6e7",
+     "after": "e990295b9e3699ccc9b690d02614253e8f37986901aa14a4ba63759b1ff75724"
+    },
+    {
+     "root": "home",
+     "path": "gov-os-operator/install/opcommon.py",
+     "before": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+     "after": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f"
+    },
+    {
+     "root": "home",
+     "path": "gov-os-operator/install/APPROVED",
+     "before": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+     "after": "ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114"
+    }
+   ],
+   "checks": [
+    {
+     "cmd": "sha256sum \"$HOME/gov-os-operator/install/opcommon.py\" | grep -c c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "sha256sum \"$HOME/gov-os-operator/install/APPROVED\" | grep -c ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "grep -c \"^HOLD_FROM = \\|night_hold_reasons\\|NIGHT_HOLD_MAX_AGE_S\" \"$HOME/gov-os-operator/install/opcommon.py\"",
+     "exit": 1,
+     "count": 0
+    },
+    {
+     "cmd": "grep -c \"the nightly runs (NIGHTLY-RUNNING)\" \"$HOME/gov-os-operator/install/opcommon.py\"",
+     "exit": 0,
+     "count": 1
+    },
+    {
+     "cmd": "grep -c \"opcommon.py\" \"$HOME/gov-os-operator/install/APPROVED\"",
+     "exit": 0,
+     "count": 1
+    }
+   ]
+  }
+ },
+ "touched": [
+  {
+   "root": "crontab",
+   "path": "crontab",
+   "before": "88cf08b165a184a23681b610ea07490c7c60559c6125fdba359db2a083d7c880",
+   "after": "72f1106f7a0c1d3e4a5bb25f00c82d24cae7149131bcd5a3906496a463a05fdc"
+  },
+  {
+   "root": "repo",
+   "path": "governance/project/operator/opcommon.py",
+   "before": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+   "after": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f"
+  },
+  {
+   "root": "repo",
+   "path": "tests/unit/operator/test_act_operator_hours_2.py",
+   "before": "b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760",
+   "after": "f5cab8e7dcdc018ab41c71bab8cf1eec7cb4627e671e7e98eb876bc255c352f9"
+  },
+  {
+   "root": "repo",
+   "path": "tests/acceptance/W2-148/test_w2_148_gates.py",
+   "before": "0f05dbcefa09ca498ea844b64874802a02e28174fbc6eded77cb869a10e5da6a",
+   "after": "691f3b6b138f96c5cf2c7b15ca3d77912e8ba47c352ddb6d83b0c981ac58426a"
+  },
+  {
+   "root": "repo",
+   "path": "tests/acceptance/W2-148/README.md",
+   "before": "625e078ba23d813ded0a30d3da31366841b0053e851569b253386c871061e6e7",
+   "after": "e990295b9e3699ccc9b690d02614253e8f37986901aa14a4ba63759b1ff75724"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/opcommon.py",
+   "before": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+   "after": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/APPROVED",
+   "before": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+   "after": "ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114"
+  }
+ ],
+ "files": {
+  "before/crontab/crontab": "88cf08b165a184a23681b610ea07490c7c60559c6125fdba359db2a083d7c880",
+  "before/home/gov-os-operator/install/APPROVED": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+  "before/home/gov-os-operator/install/opcommon.py": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+  "before/repo/governance/project/operator/opcommon.py": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+  "before/repo/tests/acceptance/W2-148/README.md": "625e078ba23d813ded0a30d3da31366841b0053e851569b253386c871061e6e7",
+  "before/repo/tests/acceptance/W2-148/test_w2_148_gates.py": "0f05dbcefa09ca498ea844b64874802a02e28174fbc6eded77cb869a10e5da6a",
+  "before/repo/tests/unit/operator/test_act_operator_hours_2.py": "b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760",
+  "after/crontab/crontab": "72f1106f7a0c1d3e4a5bb25f00c82d24cae7149131bcd5a3906496a463a05fdc",
+  "after/home/gov-os-operator/install/APPROVED": "ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114",
+  "after/home/gov-os-operator/install/opcommon.py": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f",
+  "after/repo/governance/project/operator/opcommon.py": "c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f",
+  "after/repo/tests/acceptance/W2-148/README.md": "e990295b9e3699ccc9b690d02614253e8f37986901aa14a4ba63759b1ff75724",
+  "after/repo/tests/acceptance/W2-148/test_w2_148_gates.py": "691f3b6b138f96c5cf2c7b15ca3d77912e8ba47c352ddb6d83b0c981ac58426a",
+  "after/repo/tests/unit/operator/test_act_operator_hours_2.py": "f5cab8e7dcdc018ab41c71bab8cf1eec7cb4627e671e7e98eb876bc255c352f9",
+  "apply.sh": "e91fc7e47d5eb491208716ed77007f0540ffd099a465ba36ec10b08993676198",
+  "list.txt": "e6f3250d3160d335bbda0566d410359182b249d88d84b7bf85799b86287b4a85",
+  "keep.txt": "851ee3394cde348686421bd4dd9c0edf1c2c71ef122905e2834eefa08189e0a1",
+  "rehearsal.log": "2114d8b62cdae1a15b546043e5de499897f632aca9c529f97bf5df8e6982287b"
+ },
+ "checks": [
+  {
+   "cmd": "crontab -l | grep -v '^#' | grep -c .",
+   "exit": 0,
+   "count": 4
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\*/10 \\* \\* \\* \\* /usr/bin/python3 -I .*/gov-os-operator/install/operator_launch\\.py >> .*/gov-os-operator/log/operator-launch\\.out 2>&1  # DEC-1157 (2), ACT-OPERATOR-HOURS-3 '",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c 'night-hold\\.state\\.json'",
+   "exit": 1,
+   "count": 0
+  },
+  {
+   "cmd": "crontab -l | grep -c 'operator_launch\\.py'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^0 4 \\* \\* \\* /usr/bin/bash .*/nightly/nightly_restart\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\* \\* \\* \\* \\* /usr/bin/bash .*/dispatch/run_tick\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/opcommon.py\" | grep -c c7ec467c569126d803046ad7ca0e883d19d69a8f03bca17ffdd615a815981f7f",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/APPROVED\" | grep -c ff3579ff5abd13f54c8c5b844db5baa23d97f8372dd7ea84f01b3a93c9809114",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"^HOLD_FROM = \\|night_hold_reasons\\|NIGHT_HOLD_MAX_AGE_S\" \"$HOME/gov-os-operator/install/opcommon.py\"",
+   "exit": 1,
+   "count": 0
+  },
+  {
+   "cmd": "grep -c \"the nightly runs (NIGHTLY-RUNNING)\" \"$HOME/gov-os-operator/install/opcommon.py\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"opcommon.py\" \"$HOME/gov-os-operator/install/APPROVED\"",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "2114d8b62cdae1a15b546043e5de499897f632aca9c529f97bf5df8e6982287b"
+ }
+}

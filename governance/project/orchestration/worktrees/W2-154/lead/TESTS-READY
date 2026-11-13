@@ -1,0 +1,3 @@
+task: DAEO-l4gf (W2-154)
+tests merge commits: f6dbab76b (run 2, td-1 22ccf2150); ae1d68394 (run 3, td-2 6fac7cbb3: harness keeps PYTHONUSERBASE)
+files: tests/unit/close/test_serial_w2_154_{plugin,nightly,support}.py

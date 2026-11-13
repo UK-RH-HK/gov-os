@@ -1,0 +1,7 @@
+log: W2-154-A5-run2.json
+W2: W2-154
+status: DONE. The tests are merged into w2/W2-154 at f6dbab76b. 11 of the 24 cases run fail on the base, each because the behaviour is missing. TESTS-READY is written.
+
+task: DAEO-l4gf (W2-154), run 2, run kind tests
+status: DONE. The tests are merged into w2/W2-154 at f6dbab76b. 11 of the 24 cases run fail on the base, each because the behaviour is missing. TESTS-READY is written.
+work_completed: I merged w2/integrate (8107e7b69, the ticket's Interface I1-I4) and re-read the ticket. I made the tests worktree, briefed the test designer (td-1, Sonnet 5.5, high, C2) against I1-I4 and S1-S3, F1 and F2, launched it and waited. I checked its return, trailers, tripwire and sandbox line, and read its support module for nightly safety. I merged the tests with a no-ff

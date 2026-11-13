@@ -1,46 +1,32 @@
 {
  "merged_not_closed": [
-  "W2-05",
-  "W2-55",
-  "W2-112",
-  "W2-91",
-  "W2-13",
   "W2-61h",
   "W2-32",
-  "W2-131",
-  "W2-133",
   "W2-134",
-  "W2-135",
-  "W2-129",
   "W2-138",
   "W2-137",
   "W2-136",
   "W2-147",
-  "W2-142",
-  "W2-141",
   "W2-145",
-  "W2-20",
-  "W2-148"
+  "W2-116"
  ],
  "built_held": [
-  "W2-52",
   "W2-37",
   "W2-60a",
-  "W2-78",
-  "W2-110"
+  "W2-98"
  ],
- "closes_next": "none running; CLOSED since 21:40: W2-90b, W2-05, W2-66c (merge queue), W2-149, W2-112 (DEC-953); W2-40 ejected (path map: ACT-PATHMAP-EXP-1 in review); next: W2-175 after its copies ACT; refused since the last report: none",
- "examin": "forecast FORECAST-W2-3 (11-11): EXAMIN's copy about 11-16 now that usage (A) ended at the lift (DEC-1126 (2)); W2-27 now also depends on W2-156 (batch 13) and W2-174; the memory audit's first run Mon 11-23 (W2-170 to W2-173)",
- "emergency": "ENDED: the lift done 11-11 (re-pin pin-797495bdfc70 at 13:31, the closes 15:3x); usage (A) ended; 80 % brake stays; WSL out-of-memory 14:19 (2,161 rg), recovered 15:04; mem_guard.py running (DEC-1133 (5))",
+ "closes_next": "close each as its check finds it ready (the owner, 01:55); open: W2-61h (hidden-form run, walled route), W2-32 (fresh probe; closes with W2-15a), W2-134 (after W2-61h), W2-137 (after W2-32), W2-138 (after W2-116), W2-145 (after W2-32/W2-137), W2-136 (S10: the nightly's group D, the owner), W2-147 (after W2-136), W2-148 (S15 ACT after HOURS-3 B), W2-116 (pass 2 after W2-60b/W2-33); CLOSED overnight: 17 (W2-124 to W2-56)",
+ "examin": "EXAMIN's copy about 11-20 (11-20 to 11-25): critical path W2-88 (run 4, the last review round), W2-174 (1 d), W2-27 (3 d); W2-172 closed",
+ "emergency": "none; the memory gate's paper reservation fixed by ACT-P95-1 (16:53)",
  "countdown": [
-  "Done 11-11 evening: closes W2-04, W2-81, W2-170, W2-105, W2-90b, W2-05, W2-66c, W2-149, W2-112; DEC-1139 (W2-175 approved); W2-11 designer DONE",
-  "Waiting on the owner: W2-175's template approval (DEC-1139 on the word); the two ACT r2 yes lines once packaged (EXAMIN-SETS-1, ACCEPTED-REDS-1); W2-148's options package",
-  "Now: leads W2-11 (r6) and W2-23 (run 1); reviews of ACT-PATHMAP-EXP-1 (W2-40's fix) and ACT-LOAD-BALANCER-A running; ACT-CLAUDE-COPIES-4 (W2-175) being built",
-  "Then: W2-175 copies ACT, S6 re-run, merge and close; ACT A's companion merge and review; W2-112 and W2-149 closes; W2-66c land and close; W2-23 lead (EXAMIN's path, free of conflicts)",
-  "After: EXAMIN's copy about 11-16 (FORECAST-W2-3); the nightly 11-12 04:00; the memory audit's first run 11-23; Wave 2's end about 11-24; usage 78 % at 21:49 (reset 11-15 09:00), the 80 % brake (DEC-1126): past it only EXAMIN's path runs"
+  "Done overnight (11-12 18:30 to 11-13 07:30): closed W2-124, W2-129, W2-172, W2-158, W2-45, W2-181, W2-121b, W2-120, W2-91, W2-131, W2-13, W2-135, W2-133, W2-141, W2-113, W2-142, W2-56; landed W2-172, W2-181, W2-160, W2-121b, W2-120, W2-154, W2-113; DEC-1156 to DEC-1162 recorded (no holds; emergency lifted; nightly beside the leads); the nightly ran beside the leads (red 99: 94 from its Node 18 PATH, fix ready)",
+  "Waiting on you: yes NIGHTLY-NODE22 bdfdc24b (before 04:00); go W2-33 (hand merge + COPIES-6 by your operator); yes ACT-OPERATOR-HOURS-3 716da9dc (B by your operator, then A); yes ACT-W2-148-S15-1 a3df8ff6 (after HOURS-3 B); yes ACT-LEADS-ADD-DIR-1 1781a708 (handover); W2-98's CIT-P; W2-88a's CIT-P; W2-37 F1 + P-1; the nightly's D and E and the route for its 5 drift reds; W2-120 P-W2-120-1; W2-113 PKG-2; W2-155 B/C; the sandboxed workers' unranked searches; yes ACT-EXAMIN-WRITERS-INSTALL-1 8d1efb01 and the walled-route wording (frees W2-93, W2-94)",
+  "Now: lead W2-88 run 4 (acceptance 198/1, a wrong test being fixed; then review round 2, the last; critical path); W2-111 returned PACKAGES (P-W2-111-MEASURE-1, yours)",
+  "Then: W2-88 lands, then W2-174 and W2-88b start; W2-33 hand merge on your go; the handover (ACT-LEADS-ADD-DIR-1, a fresh CTO with --add-dir x2 and --remote-control, then additionalDirectories removed); 10 merged-not-closed close as their waits clear",
+  "After: EXAMIN's copy about 11-20 (critical path W2-88, W2-174, W2-27; range 11-20 to 11-25); the memory audit's first run 11-23; usage report only (DEC-1149 (3))"
  ],
- "owner_action": "P2: W2-148-S15 (packages/W2-148-S15.md, option 2 recommended); `yes ACT-ACCEPTED-REDS-1 b8df21d8` (by hand, after EXAMIN-SETS-1 r2, class (a), READY e8020292, which the agent applies); coming: the yes lines for ACT-PATHMAP-EXP-1, ACT-LOAD-BALANCER-A, ACT-CLAUDE-COPIES-4 after their reviews",
- "last_report": "2026-11-11 20:59:52",
+ "owner_action": "yes NIGHTLY-NODE22 bdfdc24b; P-W2-111-MEASURE-1; go W2-33; yes ACT-OPERATOR-HOURS-3 716da9dc; yes ACT-W2-148-S15-1 a3df8ff6; yes ACT-LEADS-ADD-DIR-1 1781a708",
+ "last_report": "2026-11-13 09:33:46",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
  "parked": [],
@@ -96,5 +82,5 @@
   ],
   "keystone-7": "done: DEC-1089"
  },
- "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+ "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

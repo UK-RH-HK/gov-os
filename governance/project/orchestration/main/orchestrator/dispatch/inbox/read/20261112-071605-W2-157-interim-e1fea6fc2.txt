@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-157
+status: interim result e1fea6fc2: W2-157 (DAEO-ozyt): probe record of the STANDARD review, rounds 1 (fail, FR-1/FR-2) and 2 (pass at 365a4acda69b, READY by verdict.ready); residual rows FR-11 to FR-13, FR-3, FR-4, FR-6 to FR-10

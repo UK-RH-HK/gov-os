@@ -1,0 +1,174 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 19:50:25)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+..........................................................F............. [  2%]
+........................................................................ [  4%]
+..................................................s..................... [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+..................................................................sss... [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+...................F......................F............................. [ 70%]
+.....................................F.................................. [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.........................sss..........................                   [100%]
+=================================== FAILURES ===================================
+____ test_s3_the_record_gives_the_independent_review_with_its_pass_verdict _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_s3_the_record_gives_the_independent_review_with_its_pass_verdict():
+        """The independent review is recorded with its verdict (the last one stated begins with PASS)."""
+        text = _record()
+        low = text.lower()
+        assert "independent" in low and re.search(r"review|auditor", low), (
+            f"{support.CITP_REL} does not record an independent review")
+        stated = support.verdicts(text)
+        assert stated, f"{support.CITP_REL} records no verdict of the independent review (`verdict: PASS` or `FAIL`)"
+>       assert stated[-1].startswith("PASS"), (
+            f"the last verdict {support.CITP_REL} records is {stated[-1]!r}, not PASS (all stated: {stated})")
+E       AssertionError: the last verdict docs/changes/W2-88a-CIT-P.md records is 'PENDING', not PASS (all stated: ['PENDING'])
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x72d3373b5560>('PASS')
+E        +    where <built-in method startswith of str object at 0x72d3373b5560> = 'PENDING'.startswith
+
+tests/acceptance/W2-88a/test_w2_88a_citp_and_copies.py:112: AssertionError
+___ test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on ____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x78af02d90920>
+
+    def test_s4_only_the_named_group_is_stopped_and_a_same_name_process_runs_on(rig):
+        rig.smi("15900, 24000")
+        rig.config()
+        named = rig.job()
+        other = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)"], start_new_session=True)
+        rig.groups.append(other)
+        backstop.watch([named], rig.root, rig.env)
+>       assert rig.state(rig.groups[0].pid) == "T" and rig.state(other.pid) != "T"
+E       AssertionError: assert ('R' == 'T'
+E         
+E         - T
+E         + R)
+
+tests/unit/resources/test_w2_157_backstop.py:441: AssertionError
+_______ test_s1_below_then_above_the_limit_pauses_at_the_second_reading ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x72d334698440>
+
+    def test_s1_below_then_above_the_limit_pauses_at_the_second_reading(rig):
+        rig.smi("15800, 24000", "15900, 24000")
+        rig.config()
+        job = rig.job()
+        result = backstop.watch([job], rig.root, rig.env)
+        assert result["tripped"] is True and result["paused"] == [job]
+        assert rig.smi_calls() == 2  # the first reading did not trip, the second did
+        assert rig.state(rig.groups[0].pid) == "T"
+        assert result["reading"] == {"used_mib": 15900, "total_mib": 24000}
+        assert "15900" in result["reason"] and "15872" in result["reason"]
+>       assert rig.sleeps == [5]
+E       assert [5, 0.001, 0....8, 0.016, ...] == [5]
+E         
+E         Left contains 4118 more items, first extra item: 0.001
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:175: AssertionError
+_ test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+rig = <test_w2_157_backstop.Rig object at 0x78af02c02e10>, position = 2
+
+    @pytest.mark.parametrize("position", [0, 1, 2], ids=["first", "middle", "last"])
+    def test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item(rig, position):
+        groups, own, seen = _own_group_rig(rig, position)
+        result = backstop.watch(groups, rig.root, rig.env)
+        others = [g for g in groups if g != own]
+        assert seen["order"] == others + [own]
+>       assert seen["others_stopped"] == ["T", "T"]
+E       AssertionError: assert ['R', 'T'] == ['T', 'T']
+E         
+E         At index 0 diff: 'R' != 'T'
+E         Use -v to get more diff
+
+tests/unit/resources/test_w2_157_backstop.py:724: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-88a/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1604718) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+4 failed, 5083 passed, 7 skipped, 6 warnings in 1235.35s (0:20:35)

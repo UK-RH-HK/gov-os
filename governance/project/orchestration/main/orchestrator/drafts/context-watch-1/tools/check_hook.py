@@ -1,8 +1,9 @@
 """ACT-CONTEXT-WATCH-1's behaviour check of the hook the registration runs (run from the repository root with
 `python3 -I - < this file`, in the manifest as a here-document). Runs template/governance/kernel/hooks/context_watch.py as
 the registered command does (the interpreter with -E, no byte-code) on planted PostToolUse events: a planted project folder in
-a fresh temporary directory, a planted transcript, GOV_ROLE engineer on a planted ticket (a worker: its window is at most
-200,000). Nothing live is read or written. Prints 7 and exits 0 when: 50 % and 84 % give no output; 85 % gives one
+a fresh temporary directory, a planted transcript, GOV_ROLE engineer on a planted ticket (a worker on claude-opus-5-5: its own window, 1,000,000; no
+session has a token cap, DEC-1141). Nothing live is read or written. Prints 8 and exits 0 when: 180,000 tokens (the withdrawn
+cap's 90 %) gives no output; 50 % and 84 % give no output; 85 % gives one
 additionalContext (with READ FIRST and the not-a-stop sentence) and no decision key; the next call in the session gives
 none; a fall to 40 % re-arms and 99 % reminds once more; a subagent's event (agent_id) gives none; a missing transcript, a
 malformed (cut) assistant line and an empty event give no output and exit 0."""
@@ -47,20 +48,20 @@ def event(path, sid="s1", **extra):
                        "cwd": os.path.join(T, "proj"), "tool_name": "Bash", **extra})
 
 
-for pct, tokens in ((50, 100000), (84, 168000)):
+for pct, tokens in ((18, 180000), (50, 500000), (84, 840000)):
     r = run(event(transcript(tokens, f"p{pct}.jsonl"), sid=f"s{pct}"))
     ok(r.returncode == 0 and r.stdout == "", f"{pct} % gives no output")
-r = run(event(transcript(170000, "p85.jsonl")))
+r = run(event(transcript(850000, "p85.jsonl")))
 out = json.loads(r.stdout) if r.stdout else {}
 ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
 ok(r.returncode == 0 and out["hookSpecificOutput"]["hookEventName"] == "PostToolUse" and "READ FIRST:" in ctx
    and "not a stop" in ctx and "decision" not in out, "85 % gives one additionalContext")
-r = run(event(transcript(190000, "p95.jsonl")))
+r = run(event(transcript(950000, "p95.jsonl")))
 ok(r.returncode == 0 and r.stdout == "", "the next call in the session gives none")
-run(event(transcript(80000, "p40.jsonl")))
-r = run(event(transcript(198000, "p99.jsonl")))
+run(event(transcript(400000, "p40.jsonl")))
+r = run(event(transcript(990000, "p99.jsonl")))
 ok(r.returncode == 0 and r.stdout.count("additionalContext") == 1, "a fall to 40 % re-arms")
-r = run(event(transcript(190000, "px.jsonl"), sid="s77", agent_id="a1"))
+r = run(event(transcript(950000, "px.jsonl"), sid="s77", agent_id="a1"))
 ok(r.returncode == 0 and r.stdout == "", "a subagent's event gives none")
 mal = os.path.join(T, "pm.jsonl")
 open(mal, "w").write('{"type": "assistant", "message": {"usage": {"input_tokens": 190000, TRUNCATED\n')

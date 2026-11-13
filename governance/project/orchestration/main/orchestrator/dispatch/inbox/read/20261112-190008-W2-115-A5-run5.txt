@@ -1,0 +1,10 @@
+log: W2-115-A5-run5.json
+W2: W2-115
+status: DONE. The head to land is ea6dc2c14727. I have not landed it: the owner first needs the answer on how EXAMIN's copy gets its first green base.
+
+task: DAEO-emq1 (W2-115), run 5 (resume): carry out the owner's P1-K (a) (DEC-1150 (2)) as a fix on top of review round 2, with no round 3
+status: DONE. The head to land is ea6dc2c14727. I have not landed it: the owner first needs the answer on how EXAMIN's copy gets its first green base.
+work_completed:
+- (1) Merged w2/integrate 486bc0fb6992 into w2/W2-115 as 8e66a9bd7. No file changed on both sides.
+- (2) Test-design batch td-5 (Opus, high, C3):
+  - It revised the not-an-ancestor case to the new rule and added R2-1's planted case (no green record, an untrailered slip). Both failed on the old

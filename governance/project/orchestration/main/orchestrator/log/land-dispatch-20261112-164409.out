@@ -1,0 +1,20 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-171 (DAEO-k1e2, FULL) at 90424b3f6c6f: pre-check passed
+W2-171: kernel gate at 90424b3f6c6f: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 16:44:10 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 16:44:10 merged W2-171 onto ae806c3fee2c: cfc8f0578a19
+2026-11-12 17:04:22 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 17:04:29 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 17:04:33 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 17:04:34 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 17:04:35 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last]
+2026-11-12 17:05:37 the head without the batch: a throwaway worktree head-ae806c3fee2c-0 at ae806c3fee2c with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-12 17:05:39 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed
+2026-11-12 17:05:45 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record
+2026-11-12 17:05:51 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-12 17:05:52 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records
+2026-11-12 17:05:52 EJECTED W2-171: red; failing: tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed, tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record, tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository, tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records
+queue run exit 3
+W2-171: not landed (ejected: red)

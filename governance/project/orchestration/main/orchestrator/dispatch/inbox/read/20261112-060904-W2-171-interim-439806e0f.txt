@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-171
+status: interim result 439806e0f: W2-171 (DAEO-k1e2): acceptance tests for the memory audit's measure: S1-S8, F1-F5 on a planted world, fake gov and fake model, red on today's code

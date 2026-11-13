@@ -1,0 +1,84 @@
+...F...F                                                                 [100%]
+=================================== FAILURES ===================================
+______ test_several_batches_are_reranked_in_one_pass_over_the_merged_set _______
+
+api = <w1_21_support.Api object at 0x789961546c00>
+project = PosixPath('/tmp/gov-os-lead-W2-45/pytest-of-usain/pytest-57/w1-21-project0/repo')
+ollama = <w1_21_support.OllamaStandIn object at 0x7899613b2540>
+
+    def test_several_batches_are_reranked_in_one_pass_over_the_merged_set(api, project, ollama):
+        """Batches of three. The favoured file is the fifth by path, so it is not in the first batch of a route; the
+        one pass sees it and it comes first."""
+        outcome, bundle = reranked(api, project, ollama, batch_size=3, radius=support.RADIUS_FULL)
+        evidence = bundle[support.K_EVIDENCE]
+        assert len(bundle[support.K_BATCHES]) > 1 and bundle[support.K_CONTINUATION] is None
+        assert outcome.loads == 1, f"the reranker was loaded {outcome.loads} times"
+>       texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank in requests of at most 16
+                ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_merge.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = <w1_21_support.Outcome object at 0x7899615a57c0>
+
+    def one_rerank(outcome):
+        """The texts the one rerank scored across its requests; fails unless they are one rerank of the merged set."""
+        sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
+        texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
+        assert sizes, "the reranker was given nothing to score"
+>       assert max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts (DEC-1067 (f)): {sizes}"
+E       AssertionError: a rerank request carried more than 16 texts (DEC-1067 (f)): [18]
+E       assert 18 <= 16
+E        +  where 18 = max([18])
+
+tests/acceptance/W1-21/test_w1_21_merge.py:25: AssertionError
+________________ test_a_rerank_over_more_than_thirty_candidates ________________
+
+api = <w1_21_support.Api object at 0x789961546c00>
+ollama = <w1_21_support.OllamaStandIn object at 0x7899613b2540>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-45/pytest-of-usain/pytest-57/test_a_rerank_over_more_than_t0')
+
+    def test_a_rerank_over_more_than_thirty_candidates(api, ollama, tmp_path):
+        """DEC-419 DP-9: one rerank call over all candidates. At radius 2, three rounds of batch_size=10 gather up to
+        30 from one route, plus more from the other. The merged set exceeds the semantic route's TOP_K=30 and the
+        reranker sees them all in one pass."""
+        root = tmp_path / "wide"
+        root.mkdir()
+        support.git(root, "init", "-q", "-b", "main")
+        support.adopt(root, {"all": (["**"], support.NOT_EMBEDDED)})
+        for number in range(1, 45):
+            support.write(root, f"pages/p{number:03d}.md",
+                          f"# Page {number}\n\nThe {WIDE_PHRASE} is logged at station {number}.\n")
+        support.commit(root, "44 pages", support.BASE_DATE)
+        api.build(root, ollama.host)
+        outcome = api.outcome(root, WIDE_PHRASE, host=ollama.host, favour=["tungsten"],
+                              reranker=support.RERANKER, batch_size=10, radius=2, bundle_budget=0)
+        bundle = support.check_bundle(outcome.value(), root=root)
+        merge = bundle[support.K_MERGE]
+        assert merge.get(support.M_RERANKED) is True, f"the bundle was not reranked: {merge!r}"
+        assert type(merge.get(support.M_CANDIDATES)) is int and merge[support.M_CANDIDATES] > 30, \
+            f"the merged candidate set is at most 30: {merge.get(support.M_CANDIDATES)!r}"
+>       texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank, in requests of at most 16
+                ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_merge.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = <w1_21_support.Outcome object at 0x7899615a0860>
+
+    def one_rerank(outcome):
+        """The texts the one rerank scored across its requests; fails unless they are one rerank of the merged set."""
+        sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
+        texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
+        assert sizes, "the reranker was given nothing to score"
+>       assert max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts (DEC-1067 (f)): {sizes}"
+E       AssertionError: a rerank request carried more than 16 texts (DEC-1067 (f)): [40]
+E       assert 40 <= 16
+E        +  where 40 = max([40])
+
+tests/acceptance/W1-21/test_w1_21_merge.py:25: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-21/test_w1_21_merge.py::test_several_batches_are_reranked_in_one_pass_over_the_merged_set
+FAILED tests/acceptance/W1-21/test_w1_21_merge.py::test_a_rerank_over_more_than_thirty_candidates
+2 failed, 6 passed in 12.78s
+exit 1

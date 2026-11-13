@@ -1,0 +1,149 @@
+6ba93fc8bf35
+/home/usain/gov-os-worktrees/W2-11/src/gov/__init__.py
+=== four probe-record checks
+....                                                                     [100%]
+4 passed in 10.57s
+exit=0
+=== W2-11 acceptance folder
+...........s............................................................ [ 37%]
+........................................................................ [ 74%]
+....FF.....FF..FF..........F......................                       [100%]
+=================================== FAILURES ===================================
+_________ test_every_copy_carries_the_kernel_skills_body[test-design] __________
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the test-design copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+________ test_every_copy_carries_the_kernel_skills_body[orchestration] _________
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the orchestration copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[discovery] _______
+
+name = 'discovery'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: discovery: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
+
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+_____ test_the_skill_carries_one_version_in_all_four_places[orchestration] _____
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: orchestration: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.4.0', None, '1.4.0', '1.4.0']))
+E        +    where dict_values(['1.4.0', None, '1.4.0', '1.4.0']) = <built-in method values of dict object at 0x772383b00ac0>()
+E        +      where <built-in method values of dict object at 0x772383b00ac0> = {'.claude/skills': None, '.rulesync/skills': '1.4.0', 'template/.rulesync/skills': '1.4.0', 'template/governance/kernel/skills': '1.4.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[retrieval] _______
+
+name = 'retrieval'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: retrieval: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
+
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[test-design] ______
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: test-design: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.4.0', None, '1.4.0', '1.4.0']))
+E        +    where dict_values(['1.4.0', None, '1.4.0', '1.4.0']) = <built-in method values of dict object at 0x772383b10ac0>()
+E        +      where <built-in method values of dict object at 0x772383b10ac0> = {'.claude/skills': None, '.rulesync/skills': '1.4.0', 'template/.rulesync/skills': '1.4.0', 'template/governance/kernel/skills': '1.4.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md] _
+
+rel = '.claude/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling']
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:20: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[discovery]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[retrieval]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]
+7 failed, 186 passed, 1 skipped in 0.57s
+exit=1

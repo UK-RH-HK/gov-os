@@ -1,0 +1,88 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "6b8634d2c392",
+   "after": "ee242e55fc4e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "6b8634d2c392",
+   "after": "9ed0d69ea14b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "0aec6e10c3d7",
+   "after": "9ed0d69ea14b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-148"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-base",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-124",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "head",
+   "before": "680bdce1f526",
+   "after": "2a67c4a63da0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": " M tests/unit/session_watch/test_idle.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "status line added",
+   "line": " M tests/unit/session_watch/test_once_a_turn.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "acceptance folder",
+   "folder": "W2-159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "head",
+   "before": "680bdce1f526",
+   "after": "2a67c4a63da0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-159/test_s2_idle.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-159/test_s3_once_a_turn.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-159/test_f4_scope.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159-tests",
+   "change": "acceptance folder",
+   "folder": "W2-159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "d2034dcf1478",
+   "after": "6f171066f650"
+  }
+ ]
+}

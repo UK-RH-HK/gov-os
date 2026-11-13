@@ -1,0 +1,7 @@
+log: W2-98-A5-run4.json
+W2: W2-98
+status: DONE. The narrow independent check passed on f0259229e2b5. The head to land is **3a86f11c3981**: it adds only the probe record and the CIT-P on top of the verified head, and `git status --short` is empty.
+
+task: DAEO-wi46 (W2-98), run 4 (resume, then build), carrying out the owner's decision P-W2-98-R2 (a)
+status: DONE. The narrow independent check passed on f0259229e2b5. The head to land is **3a86f11c3981**: it adds only the probe record and the CIT-P on top of the verified head, and `git status --short` is empty.
+work_completed: Merged w2/integrate (c0f68478a). Wrote the round 2 findings as described behaviours C1-C3 (briefs/behaviours-r2.md) and ran two workers at the same time. td-3, the independent test designer, wrote 236 cases with a Rewrite-Reason; 186 were red at c0f68478a and 50 contro

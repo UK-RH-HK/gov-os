@@ -1,0 +1,6 @@
+5daa188c7 ACT-PATHMAP-EXP-1: the experiments root is in exactly one namespace of the path map (DEC-333, DEC-273)
+heavy_slot: all 3 slots taken; waiting (2026-11-12 15:58:40)
+........................................................................ [ 74%]
+.........................                                                [100%]
+97 passed in 6.58s
+base exit 0

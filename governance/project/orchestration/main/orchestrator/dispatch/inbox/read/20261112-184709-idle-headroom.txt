@@ -1,0 +1,4 @@
+log: dispatch.log
+Idle: headroom
+status: the gate is open and 4 of 5 leads run, but no ready line is startable (5 line(s) in ready.txt); skipped for a used or returned log: W2-121b DAEO-ifgf (already started for W2-121b-A5-run2.json). Write the line again with a new log name (<W2>-A5-<run>.json) to start it, or comment the line out of ready.txt if its ticket needs no new run (a lead that returned packages waits for the owner); waiting for other reasons: W2-115 DAEO-emq1 (running), W2-124 DAEO-mb2t (running), W2-172 DAEO-p8tv (running), W2-45 DAEO-neam (running)
+The standing rule: never idle while unblocked work remains (DEC-1110 (1), DEC-1109 (3)); ready.txt is the CTO's list.

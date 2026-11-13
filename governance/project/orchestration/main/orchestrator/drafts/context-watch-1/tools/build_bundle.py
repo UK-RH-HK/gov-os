@@ -15,7 +15,7 @@ FROZEN = "/home/usain/gov-os-runs/W2-00/context-watch-1/frozen"
 ACT = "ACT-CONTEXT-WATCH-1"
 FILES = [".claude/settings.json", ".rulesync/hooks.jsonc"]
 HOOK = "template/governance/kernel/hooks/context_watch.py"
-HOOK_SHA = "c6dabb5eed394c89c31aae40a9466185355cfb3d161c44284c863c636559607c"
+HOOK_SHA = "213882efd7b83e9988a50d3a348dc92479d4b402d2f54985db9e6ffd84d2a242"
 
 
 def sha(p):
@@ -130,10 +130,10 @@ def checks():
     cs = [{"cmd": "python3 -I -B -c 'import json,sys; json.load(open(sys.argv[1])); json.loads(__import__(\"re\").sub(r\"(?m)^\\s*//.*$\", \"\", open(sys.argv[2]).read()))' .claude/settings.json .rulesync/hooks.jsonc", "exit": 0, "count": None},
           {"cmd": here("check_register.py"), "exit": 0, "count": 6},
           {"cmd": f"test -f {HOOK} && test ! -L {HOOK} && test \"$(sha256sum {HOOK} | cut -c1-64)\" = {HOOK_SHA}", "exit": 0, "count": None},
-          {"cmd": here("check_hook.py"), "exit": 0, "count": 7},
+          {"cmd": here("check_hook.py"), "exit": 0, "count": 8},
           {"cmd": "git ls-files --error-unmatch " + " ".join(FILES), "exit": 0, "count": None}]
     with open(os.path.join(D, "tools", "checks.json"), "w") as f:
-        json.dump({"dec": "DEC-1140, DEC-1118, DEC-315, CAP-33", "checks": cs}, f, indent=1)
+        json.dump({"dec": "DEC-1140, DEC-1141, DEC-315, CAP-33", "checks": cs}, f, indent=1)
         f.write("\n")
     print(len(cs), "checks written")
 

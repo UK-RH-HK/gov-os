@@ -1,0 +1,7 @@
+Merge w2/W2-124-tests: P1-L (a), 20 earlier cases revised under DEC-1027 C (td-2, bb6a068bd)
+
+Task: DAEO-mb2t
+Role: orchestrator
+Implements: DEC-1027, DEC-1015, DEC-1014, DEC-1083, DEC-530, DEC-954, DAEO-2ds6, DAEO-2bdu
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

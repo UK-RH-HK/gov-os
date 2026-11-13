@@ -1,0 +1,11 @@
+bringing up nodes...
+bringing up nodes...
+
+.........................................................s.............. [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 67%]
+........................................................................ [ 89%]
+.................................                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+320 passed, 1 skipped in 117.61s (0:01:57)

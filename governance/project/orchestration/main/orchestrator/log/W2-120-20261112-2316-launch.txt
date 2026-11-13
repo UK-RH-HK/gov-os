@@ -1,0 +1,80 @@
+2026-11-12 23:16:03 admitted by the dispatcher; launching W2-120
+disk gate open: 768 GiB free, 60798432 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17591312384,
+  "sessions_live_memory_bytes": 1219751936,
+  "load_1m": 12.91,
+  "load_15m": 11.32,
+  "busy_cores_1m": 6.84,
+  "embedding_cpu_p95": {
+    "shared": 0.04,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 824025559040,
+    "free_inodes": 60798431
+  },
+  "sessions": [
+    {
+      "pid": 1043016,
+      "repository": "/home/usain/gov-os-worktrees/W2-113",
+      "ticket": "DAEO-g29a",
+      "role": "orchestrator",
+      "live_memory_bytes": 302579712
+    },
+    {
+      "pid": 1056267,
+      "repository": "/home/usain/gov-os-worktrees/W2-113-tests",
+      "ticket": "DAEO-g29a",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 308584448
+    },
+    {
+      "pid": 618937,
+      "repository": "/home/usain/gov-os-worktrees/W2-33",
+      "ticket": "DAEO-lrre",
+      "role": "orchestrator",
+      "live_memory_bytes": 309915648
+    },
+    {
+      "pid": 667036,
+      "repository": "/home/usain/gov-os-worktrees/W2-98",
+      "ticket": "DAEO-wi46",
+      "role": "orchestrator",
+      "live_memory_bytes": 298672128
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1062536,
+    "repository": "/home/usain/gov-os-worktrees/W2-120",
+    "ticket": "DAEO-i89t",
+    "role": "orchestrator",
+    "started": "2026-11-12T23:16:03+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 11082655
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 23:16:03 gate open; DAEO-i89t registered as pid 1062536; starting W2-120

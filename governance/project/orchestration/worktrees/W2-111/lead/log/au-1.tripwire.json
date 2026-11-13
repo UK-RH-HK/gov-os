@@ -1,0 +1,50 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-6y0x.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-g87r.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M .tickets/DAEO-lrre.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M docs/DECISION_REGISTER.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? .tickets/DAEO-5y8d.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/closes/W2-33-DAEO-lrre.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153-companion",
+   "change": "head",
+   "before": "b782bcff24a7",
+   "after": "073d5430f385"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153-companion",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/tools/dispatch/launch_now.sh"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153-companion",
+   "change": "acceptance folder",
+   "folder": "W2-153"
+  }
+ ]
+}

@@ -1,0 +1,2 @@
+d37834e08c86e24c0fdb1884c4f11164d734af4dcb4b3a5536bd20e3efc0085f  brief writer governance/project/indep-briefs/examin-sets/EXAMIN-writer.md
+57820503b56948bf9e6ebe41abb2182c9a81db234e685218f21f71c69076549c  brief writer governance/project/indep-briefs/examin-sets/PROVING-GROUND-writer.md

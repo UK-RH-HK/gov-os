@@ -1,0 +1,4 @@
+Merge w2/integrate into w2/W2-37: the widened ticket (df9d442e8, DEC-1163 (7)), before F1 (a) and the change skill's impact section
+
+Task: DAEO-6n5k
+Role: orchestrator

@@ -1,0 +1,8 @@
+Merge w2/W2-98-tests (DAEO-wi46): acceptance tests for the spec-writing skill, run 2 (I1-I4, DEC-1156 (5))
+
+94 cases, red on the base for the absent skill folder (one real-tree marker case green, named in the README).
+
+Task: DAEO-wi46
+Role: orchestrator
+Implements: DEC-959, DEC-957, DEC-616, DEC-645, DEC-1083, DEC-1084, DEC-315, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

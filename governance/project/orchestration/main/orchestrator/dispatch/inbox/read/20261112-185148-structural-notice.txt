@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-173908.out
+Structural: after the landing of W2-159 (base 1d0d8da0d550)
+status: structural pass at 8a0ee990393c: NOTICE in mutation, authority, links (6 of 9 families ok), 16.8 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 16 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+13 more)
+authority: NOTICE 1 finding: W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 1d0d8da0d550)
+links: NOTICE 1 new since 1d0d8da0d550109fe3346df88ef787f2c0ac5469 (1703 standing): UNKNOWN_ID tests/acceptance/W2-172 in DAEO-p8tv's acceptance_tests.path | .tickets/DAEO-p8tv.md:54 | orchestrator | write the tests at tests/acceptance/W2-17...
+structural pass at 8a0ee990393c: NOTICE in mutation, authority, links (6 of 9 families ok), 16.8 s; a notice, not a refusal

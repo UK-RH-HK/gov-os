@@ -1,0 +1,52 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 02:01:12)
+sssssss.............sss.................ss......................s....... [ 55%]
+ss.....sssss..........FF..................................               [100%]
+=================================== FAILURES ===================================
+__________ test_the_skill_runs_gov_impact_for_the_question[template] ___________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+_________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-37/test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[template]
+FAILED tests/acceptance/W2-37/test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[claude-copy]
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:24: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:31: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:38: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:52: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:59: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:72: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:78: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:48: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:54: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:64: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:51: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:58: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_question.py:40: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:109: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:211: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:277: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:290: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:309: codebase-memory-mcp is not on PATH on this machine
+2 failed, 108 passed, 20 skipped in 15.53s

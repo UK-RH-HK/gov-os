@@ -1,0 +1,200 @@
+ACT-CLAUDE-COPIES-8 build and rehearsal; integrate commits: W2-33's merge f6163461ea15, the COPIES-6 template patch d172bc71f81c, the sources' deletion b88a76172d42; w2/W2-33 82da49202ab1; rulesync 24.0.0
+--- generation A: W2-33's merge commit, w2/W2-33 merged, the COPIES-6 template patch by its apply.sh, the line deleted literally from the three sources, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the template patch's tree equals integrate's d172bc71f81c over template/.rulesync: True
+the three sources after the literal deletion: at their stated after sha256 and equal to b88a76172d42's: True
+composed 9 root role sources (the template's nine already equal compose()); rulesync's other output not written: ['.claude/settings.json']; --write-templates wrote 8 copies
+generation A changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']
+  .claude/agents/orchestrator.md: 20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f = the stated after
+  .claude/templates/role-cto.md: dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789 = the stated after
+  .claude/templates/role-lead.md: c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799 = the stated after
+  .rulesync/subagents/orchestrator.md: 5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba = the stated after
+--- generation B: integrate at the sources' deletion commit, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the COPIES-6 template patch's eight after hashes hold on b88a76172d42: True
+generation B changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']; byte-equal to generation A: True
+generation reproduces the four stated after hashes byte for byte: True
+portability in generation B after the copies: exit 0; findings []
+the checks (both forms): check 1 the four copies; check 2 the order, 36 files (9 kernel role files, 2 kernel templates, 9 template role sources, COPIES-6's 16 other copies); no live HOME path in either
+--- the rehearsal trees
+the revert of b88a76172d42 gives d172bc71f81c's tree exactly: True
+FINDING: COPIES-6's own check 2 on integrate at b88a76172d42 (the sources' deletion committed): exit 1 (it pins template/.rulesync/subagents/orchestrator.md at ef15ea7d; G8 would refuse COPIES-6 there)
+COPIES-6's own check 2 on the reverted tree after COPIES-6: exit 0
+ACT-CLAUDE-COPIES-8 build and rehearsal; integrate commits: W2-33's merge f6163461ea15, the COPIES-6 template patch d172bc71f81c, the sources' deletion b88a76172d42; w2/W2-33 82da49202ab1; rulesync 24.0.0
+--- generation A: W2-33's merge commit, w2/W2-33 merged, the COPIES-6 template patch by its apply.sh, the line deleted literally from the three sources, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the template patch's tree equals integrate's d172bc71f81c over template/.rulesync: True
+the three sources after the literal deletion: at their stated after sha256 and equal to b88a76172d42's: True
+composed 9 root role sources (the template's nine already equal compose()); rulesync's other output not written: ['.claude/settings.json']; --write-templates wrote 8 copies
+generation A changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']
+  .claude/agents/orchestrator.md: 20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f = the stated after
+  .claude/templates/role-cto.md: dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789 = the stated after
+  .claude/templates/role-lead.md: c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799 = the stated after
+  .rulesync/subagents/orchestrator.md: 5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba = the stated after
+--- generation B: integrate at the sources' deletion commit, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the COPIES-6 template patch's eight after hashes hold on b88a76172d42: True
+generation B changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']; byte-equal to generation A: True
+generation reproduces the four stated after hashes byte for byte: True
+portability in generation B after the copies: exit 0; findings []
+the checks (both forms): check 1 the four copies; check 2 the order, 36 files (9 kernel role files, 2 kernel templates, 9 template role sources, COPIES-6's 16 other copies); no live HOME path in either
+--- the rehearsal trees
+the revert of b88a76172d42 gives d172bc71f81c's tree exactly: True
+FINDING: COPIES-6's own check 2 on integrate at b88a76172d42 (the sources' deletion committed): exit 1 (it pins template/.rulesync/subagents/orchestrator.md at ef15ea7d; G8 would refuse COPIES-6 there)
+COPIES-6's own check 2 on the reverted tree after COPIES-6: exit 0
+--- ACT-CLAUDE-COPIES-8: 4 files; rehearsal on integrate at the sources' deletion commit, then COPIES-6 (the order: W2-33's merge, the template patch, the sources' commit, COPIES-6, this ACT); HOME planted
+     portability before the apply: exit 1; 3 findings: SOURCE_DIFFERS 1, TEMPLATE_COPY_DIFFERS 2
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended: the copies still carry the line): exit 1
+ok   check 2 before the apply (green: the template patch, the sources' commit and COPIES-6 are in): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 4 files): exit 0
+ok   check 2 (sha256sum -c, 36 files): exit 0
+ok   the changed set equals the touched list (4 files)
+ok   every target is at its stated after sha256
+ok   the applied bytes are the generation's
+ok   portability after the apply: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+     portability after the undo: exit 1; 3 findings: SOURCE_DIFFERS 1, TEMPLATE_COPY_DIFFERS 2 (the window's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set
+--- integrate at its head when built (4be656e70589; COPIES-6 landed by hand at 36d1a151b): as G7/G8 run it
+ok   apply.sh check: exit 0
+ok   check 2 before the apply (green): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1: exit 0
+ok   check 2: exit 0
+ok   the changed set equals the touched list (4 files)
+ok   portability after the apply: exit 0; findings []
+ok   apply.sh undo, the tree clean: exit 0
+--- out of order: each tree is a dry run as G7/G8 runs it (check, apply, checks); every one must be refused
+ok   W2-33's merge alone (no template patch, no sources' commit, no COPIES-6): apply.sh check exit 3 (G7 refuses)
+ok   W2-33's merge and COPIES-6 (no template patch, no sources' commit): apply.sh check exit 0; after the apply check 1 exit 0, check 2 exit 1 (G8 refuses)
+ok   the template patch and COPIES-6, before the sources' commit: apply.sh check exit 0; after the apply check 1 exit 0, check 2 exit 1 (G8 refuses)
+ok   integrate at the sources' commit, before COPIES-6: apply.sh check exit 3 (G7 refuses)
+--- the gated runs, one folder per pytest run through the heavy-job gate: the window (this form's tree before the ACT) and the landed tree (both forms land the same bytes); re-read from the first build's output files in the same scratch folder (the same commits' bytes)
+window tests/acceptance/W2-153: exit 1; 64 passed, 2 failed
+window tests/unit/adapters: exit 1; 100 passed, 2 failed
+window tests/unit/launch: exit 0; 220 passed, 0 failed
+window tests/unit/brief: exit 0; 25 passed, 0 failed
+window tests/acceptance/W2-152: exit 1; 66 passed, 1 failed
+window tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+window tests/acceptance/W2-128: exit 1; 119 passed, 2 failed
+window tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+ok   landed tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   landed tests/unit/adapters: exit 0; 102 passed, 0 failed
+ok   landed tests/unit/launch: exit 0; 220 passed, 0 failed
+ok   landed tests/unit/brief: exit 0; 25 passed, 0 failed
+ok   landed tests/acceptance/W2-152: exit 1; 66 passed, 1 failed
+ok   landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   landed tests/acceptance/W2-128: exit 1; 119 passed, 2 failed
+ok   landed tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+     red in the window: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]
+     red in the window: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead]
+     red in the window: tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes
+     red in the window: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync]
+     red in the window: tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository
+     red in the window: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+     red in the window: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+     red on the landed tree: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto] (expected: the same row 8 for role-cto.md)
+     red on the landed tree: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead] (expected: row 8 pins the "until W2-56" line in the kernel template role-lead.md (:72-75); the owner deleted it (DEC-1163 (1)); red from the sources' deletion (b88a76172, or the with-sources form's own), not from the copies; the case's revision is the CTO's)
+     red on the landed tree: tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes (expected: runs gov accept W2-128 (:61-75), so red while row 8 is)
+red in the window: 7; made green by the ACT: 4; red after: 3; new red brought by the ACT: []
+--- the by-hand steps literally
+ok   apply.sh check, apply: exit 0
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files not written by the rehearsal (unchanged, or moved only by a live commit), nothing written to the planted HOME
+failures: 0
+ACT-CLAUDE-COPIES-8-with-sources build and rehearsal; integrate commits: W2-33's merge f6163461ea15, the COPIES-6 template patch d172bc71f81c, the sources' deletion b88a76172d42; w2/W2-33 82da49202ab1; rulesync 24.0.0
+--- generation A: W2-33's merge commit, w2/W2-33 merged, the COPIES-6 template patch by its apply.sh, the line deleted literally from the three sources, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the template patch's tree equals integrate's d172bc71f81c over template/.rulesync: True
+the three sources after the literal deletion: at their stated after sha256 and equal to b88a76172d42's: True
+composed 9 root role sources (the template's nine already equal compose()); rulesync's other output not written: ['.claude/settings.json']; --write-templates wrote 8 copies
+generation A changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']
+  .claude/agents/orchestrator.md: 20fd6d04a3cbf08c788790a6202965ec9163c1de56290a376976d33c797e802f = the stated after
+  .claude/templates/role-cto.md: dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789 = the stated after
+  .claude/templates/role-lead.md: c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799 = the stated after
+  .rulesync/subagents/orchestrator.md: 5db8f0cbac35e30ebb81757bb8b92001c611a8080ba8dba9402bd6a4b6a222ba = the stated after
+--- generation B: integrate at the sources' deletion commit, COPIES-6 applied
+git merge w2/W2-33: Already up to date.
+the COPIES-6 template patch's eight after hashes hold on b88a76172d42: True
+generation B changed: ['.claude/agents/orchestrator.md', '.claude/templates/role-cto.md', '.claude/templates/role-lead.md', '.rulesync/subagents/orchestrator.md']; byte-equal to generation A: True
+generation reproduces the four stated after hashes byte for byte: True
+portability in generation B after the copies: exit 0; findings []
+the checks (both forms): check 1 the four copies; check 2 the order, 36 files (9 kernel role files, 2 kernel templates, 9 template role sources, COPIES-6's 16 other copies); no live HOME path in either
+--- the rehearsal trees
+the revert of b88a76172d42 gives d172bc71f81c's tree exactly: True
+FINDING: COPIES-6's own check 2 on integrate at b88a76172d42 (the sources' deletion committed): exit 1 (it pins template/.rulesync/subagents/orchestrator.md at ef15ea7d; G8 would refuse COPIES-6 there)
+COPIES-6's own check 2 on the reverted tree after COPIES-6: exit 0
+--- ACT-CLAUDE-COPIES-8-with-sources: 7 files; rehearsal on integrate with the sources' deletion commit reverted (the template patch's tree), then COPIES-6 (the order: W2-33's merge, the template patch, the revert, COPIES-6, this ACT); HOME planted
+     portability before the apply: exit 0; 0 findings: none
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended: the copies still carry the line): exit 1
+ok   check 2 before the apply (red, as intended: the three sources are this ACT's): exit 1
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 4 files): exit 0
+ok   check 2 (sha256sum -c, 36 files): exit 0
+ok   the changed set equals the touched list (7 files)
+ok   every target is at its stated after sha256
+ok   the applied bytes are the generation's
+ok   portability after the apply: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+     portability after the undo: exit 0; 0 findings: none (the window's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set
+--- integrate at its head when built (4be656e70589; COPIES-6 landed by hand at 36d1a151b): as G7/G8 run it
+ok   apply.sh check (refused at G7 while b88a76172 stands: the sources are at their after bytes): exit 3
+ok   the same head with b88a76172 reverted: apply.sh check, apply, both checks, undo: exit 0
+--- out of order: each tree is a dry run as G7/G8 runs it (check, apply, checks); every one must be refused
+ok   W2-33's merge alone: apply.sh check exit 3 (G7 refuses)
+ok   W2-33's merge and COPIES-6, before the template patch: apply.sh check exit 0; after the apply check 1 exit 0, check 2 exit 1 (G8 refuses)
+ok   the template patch, before COPIES-6: apply.sh check exit 3 (G7 refuses)
+ok   integrate at the sources' commit (not reverted), before COPIES-6: apply.sh check exit 3 (G7 refuses)
+ok   integrate at the sources' commit (not reverted), after COPIES-6: apply.sh check exit 3 (G7 refuses)
+--- the gated runs, one folder per pytest run through the heavy-job gate: the window (this form's tree before the ACT) and the landed tree (both forms land the same bytes); re-read from the first build's output files in the same scratch folder (the same commits' bytes)
+window tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+window tests/unit/adapters: exit 0; 102 passed, 0 failed
+window tests/unit/launch: exit 0; 220 passed, 0 failed
+window tests/unit/brief: exit 0; 25 passed, 0 failed
+window tests/acceptance/W2-152: exit 0; 67 passed, 0 failed
+window tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+window tests/acceptance/W2-128: exit 0; 121 passed, 0 failed
+window tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+ok   landed tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   landed tests/unit/adapters: exit 0; 102 passed, 0 failed
+ok   landed tests/unit/launch: exit 0; 220 passed, 0 failed
+ok   landed tests/unit/brief: exit 0; 25 passed, 0 failed
+ok   landed tests/acceptance/W2-152: exit 1; 66 passed, 1 failed
+ok   landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   landed tests/acceptance/W2-128: exit 1; 119 passed, 2 failed
+ok   landed tests/acceptance/W1-35: exit 0; 124 passed, 0 failed
+     red on the landed tree: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto] (expected: the same row 8 for role-cto.md)
+     red on the landed tree: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead] (expected: row 8 pins the "until W2-56" line in the kernel template role-lead.md (:72-75); the owner deleted it (DEC-1163 (1)); red from the sources' deletion (b88a76172, or the with-sources form's own), not from the copies; the case's revision is the CTO's)
+     red on the landed tree: tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes (expected: runs gov accept W2-128 (:61-75), so red while row 8 is)
+red in the window: 0; made green by the ACT: 0; red after: 3; new red brought by the ACT: ['tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]', 'tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead]', 'tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes']
+--- the by-hand steps literally
+ok   apply.sh check, apply: exit 0
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files not written by the rehearsal (unchanged, or moved only by a live commit), nothing written to the planted HOME
+failures: 0
+{"ACT-CLAUDE-COPIES-8": {"manifest_sha256": "e2fc98150aa1d19165d8b0da3e5ec57dc65c69d5de55924ff8f6aefa7f4e0dae", "touched": 4, "failures": 0}, "ACT-CLAUDE-COPIES-8-with-sources": {"manifest_sha256": "c8396adcdd9c3acb24ac6d236a60c351e294bf682430855b5a4545dc952f2344", "touched": 7, "failures": 0}}
+exit=0

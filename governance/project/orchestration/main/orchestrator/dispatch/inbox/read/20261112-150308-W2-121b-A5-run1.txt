@@ -1,0 +1,7 @@
+log: W2-121b-A5-run1.json
+W2: W2-121b
+status: PACKAGES
+
+task: DAEO-ifgf
+status: PACKAGES
+work_completed: Ran the interface check (DEC-1052) before starting any worker. Part a's Interface (DAEO-cb2b) leaves out four things that S1 to S4 need, so I wrote one proposal the CTO can accept in one line (P-W2-121b-1). The four gaps: how an approval is claimed and how the batch's argv is built (S1); how a running close, the tickets it closes and its record commit are seen, and whose commit retries (S2); the nightly's running marker (S3); which processes count as heavy steps and how "in a slot" is read (S4). I launched no test designer and no engineer, made 

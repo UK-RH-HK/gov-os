@@ -1,0 +1,10 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 17:47:34)
+........................................................................ [ 75%]
+.......................                                                  [100%]
+95 passed in 7.00s
+alone W2-124 exit 0
+Preparing worktree (detached HEAD ae806c3fe)
+HEAD is now at ae806c3fe W2-174, W2-27, W2-160, W2-45: the owner's item 4 (a1) and P1-J (a) widenings (DEC-1148 (2), (4))
+.                                                                        [100%]
+1 passed in 0.46s
+base ae806c3fe exit 0

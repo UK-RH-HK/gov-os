@@ -3,3 +3,21 @@ W2-52 (DAEO-siiz, FULL) at a77ef5f20089: pre-check passed
 reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
 2026-11-12 02:48:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
 2026-11-12 02:48:05 merged W2-52 onto 70e5840d9f47: 84011fe89aaf
+2026-11-12 03:10:42 refs/heads/w2/integrate moved by records only (5 path(s)); merged again onto 448e9faf493d: 695f59624d5d; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-12 03:10:42 ADVANCED refs/heads/w2/integrate 448e9faf493d -> 695f59624d5d; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/695f59624d5d.json
+2026-11-12 03:10:42 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 03:11:24 integration store promoted: the merged clone's stores at 695f59624d5d into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-52: 9bbef27f1 W2-52 (DAEO-siiz): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 2 findings: .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/ | .tickets/DAEO-qz4p.md: implementer allowed_paths pattern 'tests/acceptance/W2-149/w2_149_support.py' covers tests/acceptance/
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: ok [2 kernel role, skill, hook or .rulesync path(s) changed since 70e5840d9f47]
+structural pass: links: NOTICE 4 new since 70e5840d9f472235e7767e07c87a274fad60c367 (1611 standing): UNMARKED_CHANGE DEC-989 <- DEC-1141 (**Changes:**; part) | docs/DECISION_REGISTER.md:12409 | orchestrator | add "**Changed by:** DEC-1141 (two hand merges, (... | UNLINKED_ID DEC-1033 in 79d26af54679's Implements: (independent-test-designer), not in DAEO-siiz's sources | .tickets/DAEO-siiz.md:38 | orchestrator | add DE... | UNLINKED_ID DEC-1065 in 79d26af54679's Implements: (independent-test-designer), not in DAEO-siiz's sources | .tickets/DAEO-siiz.md:38 | orchestrator | add DE... (+1 more)
+structural pass: structural pass at 9bbef27f1d05: NOTICE in mutation, links (8 of 10 families ok), 15.8 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-031140-structural-notice.txt

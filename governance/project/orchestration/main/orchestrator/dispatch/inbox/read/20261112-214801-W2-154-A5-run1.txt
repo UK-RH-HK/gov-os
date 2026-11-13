@@ -1,0 +1,10 @@
+log: W2-154-A5-run1.json
+W2: W2-154
+status: PACKAGES
+
+I stopped at the interface check (DEC-1052) and am returning one package. I started no worker, wrote no brief and made no tests worktree or commit. The ticket gives nightly.sh's exact "serial:" lines, but it never says which record names an entry left out of the run, or in what words. It also gives no way to test nightly.sh against a stub serial phase.
+
+```
+task: DAEO-l4gf (W2-154)
+status: PACKAGES
+work_completed: Ran the identity and location checks (orchestrator, DAEO-l4gf; /home/usain/gov-os-worktrees/W2-154, w2/W2-154; no checkpoint, so a fresh run). Read the ticket, src/gov/close/serial.p

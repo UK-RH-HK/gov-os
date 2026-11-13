@@ -1,0 +1,8 @@
+9c20e5e3c737f422319ebf6286e8f5d2ddaf2cec4c6ab69de9cf9d58775e8b11  /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-ACCEPTED-REDS-1/manifest.json
+state before (sha256 1fe00f43d8ab)
+state applied (sha256 e4281125cf0e)
+0
+9	1	governance/project/path-map.yaml
+[w2/integrate 7ae4b16d3] ACT-ACCEPTED-REDS-1: accepted_reds lists the two warm real-model latency cases (W1-19, W2-13) until W2-155 closes (DEC-1134)
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+2 0

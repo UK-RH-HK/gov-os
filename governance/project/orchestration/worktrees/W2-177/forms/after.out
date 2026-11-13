@@ -1,0 +1,44 @@
+empty-home run 1: SIGINT-ignored-at-start: 0 | 14 passed in 13.98s
+empty-home run 2: SIGINT-ignored-at-start: 0 | 14 passed in 13.92s
+empty-home run 3: SIGINT-ignored-at-start: 0 | 14 passed in 13.97s
+empty-home run 4: SIGINT-ignored-at-start: 0 | 14 passed in 13.98s
+empty-home run 5: SIGINT-ignored-at-start: 0 | 14 passed in 13.97s
+empty-home run 6: SIGINT-ignored-at-start: 0 | 14 passed in 14.07s
+empty-home run 7: SIGINT-ignored-at-start: 0 | 14 passed in 14.09s
+empty-home run 8: SIGINT-ignored-at-start: 0 | 14 passed in 13.98s
+empty-home run 9: SIGINT-ignored-at-start: 0 | 14 passed in 13.93s
+empty-home run 10: SIGINT-ignored-at-start: 0 | 14 passed in 14.15s
+FORM empty-home: 10 of 10 runs all passed, 0 with a red (or skip)
+real-home run 1: SIGINT-ignored-at-start: 0 | 14 passed in 14.13s
+real-home run 2: SIGINT-ignored-at-start: 0 | 14 passed in 14.44s
+real-home run 3: SIGINT-ignored-at-start: 0 | 14 passed in 14.58s
+real-home run 4: SIGINT-ignored-at-start: 0 | 14 passed in 14.45s
+real-home run 5: SIGINT-ignored-at-start: 0 | 14 passed in 14.75s
+real-home run 6: SIGINT-ignored-at-start: 0 | 14 passed in 14.58s
+real-home run 7: SIGINT-ignored-at-start: 0 | 14 passed in 14.64s
+real-home run 8: SIGINT-ignored-at-start: 0 | 14 passed in 14.54s
+real-home run 9: SIGINT-ignored-at-start: 0 | 14 passed in 14.54s
+real-home run 10: SIGINT-ignored-at-start: 0 | 14 passed in 14.21s
+FORM real-home: 10 of 10 runs all passed, 0 with a red (or skip)
+setsid-bg run 1: SIGINT-ignored-at-start: 1 | 14 passed in 14.49s
+setsid-bg run 2: SIGINT-ignored-at-start: 1 | 14 passed in 14.24s
+setsid-bg run 3: SIGINT-ignored-at-start: 1 | 14 passed in 14.26s
+setsid-bg run 4: SIGINT-ignored-at-start: 1 | 14 passed in 14.32s
+setsid-bg run 5: SIGINT-ignored-at-start: 1 | 14 passed in 14.31s
+setsid-bg run 6: SIGINT-ignored-at-start: 1 | 14 passed in 14.41s
+setsid-bg run 7: SIGINT-ignored-at-start: 1 | 14 passed in 14.30s
+setsid-bg run 8: SIGINT-ignored-at-start: 1 | 14 passed in 14.44s
+setsid-bg run 9: SIGINT-ignored-at-start: 1 | 14 passed in 14.40s
+setsid-bg run 10: SIGINT-ignored-at-start: 1 | 14 passed in 14.48s
+FORM setsid-bg: 10 of 10 runs all passed, 0 with a red (or skip)
+bg-job run 1: SIGINT-ignored-at-start: 1 | 14 passed in 14.37s
+bg-job run 2: SIGINT-ignored-at-start: 1 | 14 passed in 14.47s
+bg-job run 3: SIGINT-ignored-at-start: 1 | 14 passed in 14.25s
+bg-job run 4: SIGINT-ignored-at-start: 1 | 14 passed in 14.13s
+bg-job run 5: SIGINT-ignored-at-start: 1 | 14 passed in 14.15s
+bg-job run 6: SIGINT-ignored-at-start: 1 | 14 passed in 14.03s
+bg-job run 7: SIGINT-ignored-at-start: 1 | 14 passed in 14.00s
+bg-job run 8: SIGINT-ignored-at-start: 1 | 14 passed in 13.98s
+bg-job run 9: SIGINT-ignored-at-start: 1 | 14 passed in 14.13s
+bg-job run 10: SIGINT-ignored-at-start: 1 | 14 passed in 14.40s
+FORM bg-job: 10 of 10 runs all passed, 0 with a red (or skip)

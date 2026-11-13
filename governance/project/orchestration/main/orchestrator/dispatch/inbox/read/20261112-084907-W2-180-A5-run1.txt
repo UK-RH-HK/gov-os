@@ -1,0 +1,8 @@
+log: W2-180-A5-run1.json
+W2: W2-180
+status: DONE. The head is `21dc73cb5dc0` on w2/W2-180 and the working tree is clean. The LITE review passed. The verify shows only the six W2-96 shared base reds.
+
+task: DAEO-weh2 (W2-180), build run 1, LITE, class C1. A test revision, widened at 07:35 to cover W2-173's branch-names cases as well.
+status: DONE. The head is `21dc73cb5dc0` on w2/W2-180 and the working tree is clean. The LITE review passed. The verify shows only the six W2-96 shared base reds.
+work_completed:
+- **td-1** (`e3ff31fc5f87`): W2-170's F5 case now runs through `judge_f5_paths(root)`. It judges only when HEAD is `refs/heads/w2/W2-170`. On any other checkout it is skipped and the skip names the branch it found, or "detached HEAD". The two earlier skips (no w2/integrate reference, n

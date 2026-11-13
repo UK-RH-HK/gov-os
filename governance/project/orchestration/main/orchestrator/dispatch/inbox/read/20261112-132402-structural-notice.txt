@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-125507.out
+Structural: after the landing of W2-23 (base f2e310aa2355)
+status: structural pass at 61710e333ca5: NOTICE in mutation, links (7 of 9 families ok), 14.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 9 findings: .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ (+6 more)
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since f2e310aa2355)
+links: NOTICE 23 new since f2e310aa2355a95a2d9c7d2cdd8bd76d44c68946 (1599 standing): UNKNOWN_ID tests/acceptance/W2-45 in DAEO-neam's acceptance_tests.path | .tickets/DAEO-neam.md:37 | orchestrator | write the tests at tests/acceptance/W2-45 ... | UNLINKED_ID W2-H035 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:43 | orchestrator | add W2-H035 to DAEO-kmcr's sources: | UNLINKED_ID W2-H036 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:43 | orchestrator | add W2-H036 to DAEO-kmcr's sources: (+20 more)
+structural pass at 61710e333ca5: NOTICE in mutation, links (7 of 9 families ok), 14.3 s; a notice, not a refusal

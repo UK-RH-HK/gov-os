@@ -1,0 +1,12 @@
+log: W2-171-A5-run4.json
+W2: W2-171
+status: DONE. The head to land is `8d1bb1636458`, after W2-180 lands. `git status --short` is empty.
+
+task: DAEO-k1e2 (W2-171), run 4: build, then review round 2 (the last, DEC-1010)
+status: DONE. The head to land is `8d1bb1636458`, after W2-180 lands. `git status --short` is empty.
+work_completed:
+- Merged w2/integrate into the branch (`5d517e241`).
+- **Test design (td-2):** a fresh independent test designer (Sonnet, high, C2) wrote the round-1 findings up as behaviours:
+  - B-1: the VERDICT line's interval is computed from the counts (32 of 40 prints `64.4 to 90.9 %`).
+  - B-2: `measure --kept` never prints the figures of an attempt that faulted; it refuses with `MS-KEPT`, exit 1.
+  - 9 new 

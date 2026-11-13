@@ -1,0 +1,53 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "82ddc705a41b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "dbb0891e8a4f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "03472cbf4506",
+   "after": "842a90615ea8"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "23c6bb45456f",
+   "after": "dbb0891e8a4f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37",
+   "change": "status line added",
+   "line": " M src/gov/impact/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37",
+   "change": "status line added",
+   "line": " M src/gov/impact/readings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37",
+   "change": "status line added",
+   "line": " M tests/unit/impact/test_impact.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-37/test_w2_37_resume_findings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "acceptance folder",
+   "folder": "W2-37"
+  }
+ ]
+}

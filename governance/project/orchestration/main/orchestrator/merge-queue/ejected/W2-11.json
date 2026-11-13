@@ -1,0 +1,26 @@
+{
+ "ticket": "W2-11",
+ "task": "DAEO-k7hz",
+ "branch": "w2/W2-11",
+ "commit": "dca382f3069fcf135b45a1135ae78a1b5e3a1173",
+ "requested_at": "2026-11-12 12:30:04",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T12:30:04.574159",
+ "reason": "red",
+ "failing": [
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[test-design]",
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[orchestration]",
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[discovery]",
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[orchestration]",
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[retrieval]",
+  "tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[test-design]",
+  "tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]",
+  "tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record",
+  "tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-123004-618829",
+ "tested_on": "1061e25b85da4135d052c8c416663933097f386f",
+ "ejected_at": "2026-11-12 12:51:24"
+}

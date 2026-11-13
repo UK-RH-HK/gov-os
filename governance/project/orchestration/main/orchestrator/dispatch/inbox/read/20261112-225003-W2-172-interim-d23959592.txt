@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-172
+status: interim result d23959592: W2-172 (DAEO-p8tv): the probe record of the narrow check of the two test revisions, pass, 0 blocking (head 25634cdde460); round 1's record kept as -round-1

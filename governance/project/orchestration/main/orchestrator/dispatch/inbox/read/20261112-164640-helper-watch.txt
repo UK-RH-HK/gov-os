@@ -1,0 +1,7 @@
+log: helper-watch.log
+Helper: worker gone
+status: launched worker td-3 (pid 2757099, /home/usain/gov-os-worktrees/W2-45/.gov-runtime/scratch/lead/log) is gone without its exit file
+last: no exit file; its log: /home/usain/gov-os-worktrees/W2-45/.gov-runtime/scratch/lead/log/td-3.json
+
+file: /home/usain/gov-os-worktrees/W2-45/.gov-runtime/scratch/lead/log/td-3.pid
+Check it and resume it (SendMessage to the agent id, or a fresh session from its brief).

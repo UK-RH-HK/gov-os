@@ -1,0 +1,5 @@
+W2-157 (DAEO-ozyt): merge the acceptance tests (td-1, 196c43ee6f66: 109 cases, S1-S5 and F1-F4, 108 red before the code)
+
+Task: DAEO-ozyt
+Role: orchestrator
+Implements: DEC-1067, DEC-1068, DEC-1030, DEC-1073

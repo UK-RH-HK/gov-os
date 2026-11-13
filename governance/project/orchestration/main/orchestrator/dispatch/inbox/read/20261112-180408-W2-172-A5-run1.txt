@@ -1,0 +1,7 @@
+log: W2-172-A5-run1.json
+W2: W2-172
+status: PACKAGES
+
+task: DAEO-p8tv (W2-172)
+status: PACKAGES
+work_completed: I stopped run 1 (tests) at the interface check (DEC-1052). The ticket has no `## Interface` section, while its siblings DAEO-61vm and DAEO-k1e2 each have one. No test designer was started. I wrote PKG-W2-172-IFACE-1, which holds a complete 12-section Interface block the CTO can paste into the ticket. It is built from the launch script's code (`indep_launch.py` at `1d0d8da0d`: its flags, exit codes 10–22, the counts line and the `AUDITS.log` form), W2-170's and W2-171's Interfaces, `rebuild/integration.py` (the store link, `<link>.lock` 

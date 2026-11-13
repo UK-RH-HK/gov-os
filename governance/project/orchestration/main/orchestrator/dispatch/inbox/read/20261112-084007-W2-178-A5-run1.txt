@@ -1,0 +1,7 @@
+log: W2-178-A5-run1.json
+W2: W2-178
+status: DONE
+
+task: DAEO-7oxm (W2-178)
+status: DONE
+work_completed: Build run 1 converged and FULL review round 1 passed. The change is two lines in `plan_inputs` (governance/project/orchestration/tools/indep_launch.py, about line 780): when an auditor's wall is built, files under `hidden/dropped/` are left out of the set copy. The module docstring gains one paragraph. The test designer (td-1) and the engineer (eng-1) ran in parallel, both on Sonnet high, class C2. I merged the tests at 2de763208 and wrote TESTS-READY. I ran the rebuild and lead_verify. The reviewer (rev-1, Opus high) returned PASS with 0 f

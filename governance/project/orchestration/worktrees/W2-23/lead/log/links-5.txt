@@ -1,0 +1,6 @@
+gov links: 5 new since 7305b945f, 1615 standing (UNMARKED_CHANGE orchestrator 10, UNKNOWN_ID independent-test-designer 4, UNKNOWN_ID orchestrator 54, UNKNOWN_ID owner 1, UNLINKED_ID orchestrator 1309, STATUS_CONFLICT orchestrator 1, NOT_IN_FORCE_AS_RULE orchestrator 19, ENFORCES_SUPERSEDED independent-test-designer 3, CLOSED_TICKET_EDITED orchestrator 118, TICKET_CHANGE_UNMARKED orchestrator 96; records 2120, register 1138 entries, commits 21)
+UNKNOWN_ID tests/acceptance/W2-178 in DAEO-7oxm's acceptance_tests.path | .tickets/DAEO-7oxm.md:37 | orchestrator | write the tests at tests/acceptance/W2-178 or correct DAEO-7oxm's acceptance_tests.path
+UNLINKED_ID W2-118 in DAEO-6w5n's KPI brackets, not in its sources | .tickets/DAEO-6w5n.md:36 | orchestrator | add W2-118 to DAEO-6w5n's sources:
+UNLINKED_ID W2-21 in DAEO-6w5n's KPI brackets, not in its sources | .tickets/DAEO-6w5n.md:36 | orchestrator | add W2-21 to DAEO-6w5n's sources:
+UNLINKED_ID W2-H046 in DAEO-6w5n's KPI brackets, not in its sources | .tickets/DAEO-6w5n.md:36 | orchestrator | add W2-H046 to DAEO-6w5n's sources:
+UNLINKED_ID W2-117 in DAEO-j9z6's KPI brackets, not in its sources | .tickets/DAEO-j9z6.md:38 | orchestrator | add W2-117 to DAEO-j9z6's sources:

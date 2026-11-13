@@ -1,0 +1,2 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-12 14:53:04)
+gov accept: ACCEPT_MAP_UNREADABLE: ticket DAEO-neam: the README of tests/acceptance/W2-45/ has a map row naming no KPI line it can read

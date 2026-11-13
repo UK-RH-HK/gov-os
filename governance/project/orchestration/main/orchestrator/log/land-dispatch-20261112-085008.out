@@ -1,0 +1,55 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-180 (DAEO-weh2, LITE) at 21dc73cb5dc0: pre-check passed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-12 08:50:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-12 08:50:08 merged W2-180 onto 1f626332fde0: 44bbfe86c1fc
+2026-11-12 10:50:35 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 10:50:43 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 10:50:46 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 10:50:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 10:50:50 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_a_partial_offload_line_written_since_the_start_trips_it
+2026-11-12 10:50:51 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log
+2026-11-12 10:50:51 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first]
+2026-11-12 10:50:52 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle]
+2026-11-12 10:51:47 the integration store /home/usain/gov-os-worktrees/W2-00-store-a is at 9ed0d69ea14b, not at the head 1f626332fde0, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 10:51:47 seed of head-1f626332fde0-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-a
+2026-11-12 10:53:11 the head without the batch: a throwaway worktree head-1f626332fde0-0 at 1f626332fde0, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 10:53:13 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-170/test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders
+2026-11-12 10:53:13 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
+2026-11-12 10:53:14 merged W2-180 onto 9ed0d69ea14b: 688d633bb2fa
+2026-11-12 12:22:21 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-12 12:22:30 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-12 12:22:34 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-12 12:22:34 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-12 12:22:39 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s1_the_limit_and_period_are_the_files
+2026-11-12 12:22:40 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[first]
+2026-11-12 12:22:40 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[middle]
+2026-11-12 12:22:41 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_the_own_group_is_stopped_after_every_other_group_the_trip_line_and_the_item[last]
+2026-11-12 12:22:41 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_l5b_a_job_sharing_the_backstops_own_group_and_a_second_group_are_both_paused_then_resumed
+2026-11-12 12:22:42 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_a_partial_offload_line_written_since_the_start_trips_it
+2026-11-12 12:22:43 flaky candidate (passes alone, decides nothing): tests/unit/resources/test_w2_157_backstop.py::test_s3_the_limit_comes_before_the_spill_before_the_embedder_before_the_log
+2026-11-12 12:22:43 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-12 12:22:44 the integration store /home/usain/gov-os-worktrees/W2-00-store-a is at 010399309d69, not at the head 9ed0d69ea14b, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-12 12:22:44 seed of head-9ed0d69ea14b-1 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-a
+2026-11-12 12:23:36 the head without the batch: a throwaway worktree head-9ed0d69ea14b-1 at 9ed0d69ea14b, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-12 12:23:37 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-12 12:23:38 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-12 12:23:39 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-170/test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders
+2026-11-12 12:26:25 refs/heads/w2/integrate moved by records only (2 path(s)); merged again onto 010399309d69: f13387929b27; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-12 12:26:25 ADVANCED refs/heads/w2/integrate 010399309d69 -> f13387929b27; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/f13387929b27.json
+2026-11-12 12:26:25 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-12 12:28:23 integration store promoted: the merged clone's stores at f13387929b27 into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-180: 1061e25b8 W2-180 (DAEO-weh2): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 9 findings: .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-96/w2_96_support.py' covers tests/acceptance/ | .tickets/DAEO-1k7y.md: implementer allowed_paths pattern 'tests/acceptance/W2-56/w2_56_support.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ (+6 more)
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: NOTICE 13 findings: differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md | differs from its composition of template/governance/kernel/templates/role-reviewer.md and template/governance/kernel/roles/independent-auditor.md | differs from its composition of template/governance/kernel/templates/role-test-designer.md and template/governance/kernel/roles/independent-test-designer.md (+10 more) [6 kernel role, skill, hook or .rulesync path(s) changed since 1f626332fde0]
+structural pass: links: NOTICE 25 new since 1f626332fde0c08f92de1805f49f6859734a0c58 (1597 standing): UNKNOWN_ID tests/acceptance/W2-178 in DAEO-7oxm's acceptance_tests.path | .tickets/DAEO-7oxm.md:37 | orchestrator | write the tests at tests/acceptance/W2-17... | UNKNOWN_ID tests/acceptance/W2-115 in DAEO-emq1's acceptance_tests.path | .tickets/DAEO-emq1.md:91 | orchestrator | write the tests at tests/acceptance/W2-11... | UNKNOWN_ID tests/acceptance/W2-146 in DAEO-f6x3's acceptance_tests.path | .tickets/DAEO-f6x3.md:44 | orchestrator | write the tests at tests/acceptance/W2-14... (+22 more)
+structural pass: structural pass at 1061e25b85da: NOTICE in mutation, portability, links (7 of 10 families ok), 14.1 s; a notice, not a refusal
+structural pass: notice -> inbox/20261112-122841-structural-notice.txt

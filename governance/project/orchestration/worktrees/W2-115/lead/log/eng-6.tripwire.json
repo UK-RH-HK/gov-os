@@ -1,0 +1,84 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f7085136de3c",
+   "after": "b5a0394e3183"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "f2e310aa2355",
+   "after": "f7085136de3c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "f2e310aa2355",
+   "after": "b5a0394e3183"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W1-41"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "216ddf2f8b83",
+   "after": "6ba93fc8bf35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-11-CIT-P.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "status line gone",
+   "line": "R  docs/probes/DAEO-k7hz/CITP-REVIEW-r1.md -> docs/changes/W2-11-CITP-REVIEW-r1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "status line gone",
+   "line": "R  docs/probes/DAEO-k7hz/CITP-REVIEW-r2.md -> docs/changes/W2-11-CITP-REVIEW-r2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "d8db5bb6f6e3",
+   "after": "f39289d3a379"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45",
+   "change": "head",
+   "before": "f29fa36521e3",
+   "after": "1b2c0f68735e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45",
+   "change": "acceptance folder",
+   "folder": "W2-45"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-45-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

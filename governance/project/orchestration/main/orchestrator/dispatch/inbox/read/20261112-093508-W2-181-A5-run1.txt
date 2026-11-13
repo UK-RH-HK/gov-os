@@ -1,0 +1,7 @@
+log: W2-181-A5-run1.json
+W2: W2-181
+status: CHECKPOINTED. I stopped on the CTO's order (week usage at 97%, DEC-1140 (5)-(6), brake file set for W2-181). The tests are merged, `gov accept` passes and the clone check passes. `lead_verify` is still RED: six cases in tests/unit/accept/test_w2_96_* fail again when run alone, and I have not checked
+
+task: DAEO-ywb5 (W2-181), build run 1: W2-157's F4 path case now judges only the branch w2/W2-157
+status: CHECKPOINTED. I stopped on the CTO's order (week usage at 97%, DEC-1140 (5)-(6), brake file set for W2-181). The tests are merged, `gov accept` passes and the clone check passes. `lead_verify` is still RED: six cases in tests/unit/accept/test_w2_96_* fail again when run alone, and I have not checked them on w2/integrate, so they are not yet named as a shared base red. The LITE review has not started, so there is no probe record yet.
+work_completed: Built the brief from `gov context`. Launc

@@ -1,0 +1,91 @@
+===== tests.acceptance.W2-124.test_w2_124_s5_stores_not_built::test_s5_no_gitleaks_toml_is_ok_incomplete_and_named
+runs = <conftest.Runs object at 0x79a718c93290>
+
+    def test_s5_no_gitleaks_toml_is_ok_incomplete_and_named(runs):
+        run, _, _ = runs.rebuild("s5-no-gitleaks", embedder="dead", project_options={"gitleaks": False},
+                                 args=("--json", "--no-embeddings"))
+>       assert run.prints_ok, f"the rebuild without .gitleaks.toml did not print ok (exit 0, ok: true; P2 (b))\n{run.describe()}"
+E       AssertionError: the rebuild without .gitleaks.toml did not print ok (exit 0, ok: true; P2 (b))
+E         gov rebuild --json --no-embeddings
+E         exit code: 1 after 0.6 s
+E         stdout:
+E         {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the lexical index: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-0/popen-gw2/s5-no-gitleaks0/box/project/.gitleaks.toml'", "details": {"store": "lexical", "error": ".gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-0/popen-gw2/s5-no-gitleaks0/box/project/.gitleaks.toml'"}}}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = Run(args=('rebuild', '--json', '--no-embeddings'), returncode=1, stdout='{"ok": false, "command": "rebuild", "result":...-of-usain/pytest-0/popen-gw2/s5-no-gitleaks0/box/project/.gitleaks.toml\'"}}}\n', stderr='', seconds=0.569628041004762).prints_ok
+
+tests/acceptance/W2-124/test_w2_124_s5_stores_not_built.py:48: AssertionError
+===== tests.acceptance.W2-124.test_w2_124_s5_stores_not_built::test_s5_a_store_the_path_map_does_not_call_for_is_not_in_not_built
+runs = <conftest.Runs object at 0x79a718c93290>
+
+    def test_s5_a_store_the_path_map_does_not_call_for_is_not_in_not_built(runs):
+        """The same project but the path map does not ask for the code index: it is not 'not built', and nothing else is."""
+        run, _, _ = runs.rebuild("s5-whole", embedder="healthy", project_options={"files": 5})
+        assert run.prints_ok, f"the whole rebuild is not ok\n{run.describe()}"
+        listed = _not_built(run, "a whole rebuild")
+>       assert listed == [] and run.result.get("complete") is True, \
+            f"a rebuild that built what it was asked to is not complete: complete {run.result.get('complete')}, not_built {listed}"
+E       AssertionError: a rebuild that built what it was asked to is not complete: complete False, not_built [{'store': 'codeintel', 'reason': "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}]
+E       assert ([{'reason': "... 'codeintel'}] == []
+E         
+E         Left contains one more item: {'reason': "[Errno 2] No such file or directory: 'codebase-memory-mcp'", 'store': 'codeintel'}
+E         Use -v to get more diff)
+
+tests/acceptance/W2-124/test_w2_124_s5_stores_not_built.py:70: AssertionError
+===== tests.acceptance.W2-124.test_w2_124_s5_stores_not_built::test_s5_no_embeddings_is_ok_and_says_it_skipped_the_vectors
+ "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 10, "remembered": 0}, "path": {"scanned": 5, "remembered": 0}}, "complete": false, "not_built": [{"store": "codeintel", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}], "timing": {"record_s": 0.2, "lexical_s": 1.0, "secrets_s": 2.8, "semantic_s": 0.0, "codeintel_s": 1.8, "compaction_s": 0.0, "total_s": 3.1}, "lock": {"path": "/tmp/gov-os-lead-W2-124/pytest-of-usain/pytest-0/popen-gw2/s5-no-embeddings0/box/locks/rebuild.lock", "source": "rebuild.yaml", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-12T15:47:06.094419+00:00", "released_at": "2026-11-12T15:47:09.238572+00:00"}, "slow": false, "slow_after_s": 600, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert False is True
+E        +  where False = <built-in method get of dict object at 0x79a718b878c0>('complete')
+E        +    where <built-in method get of dict object at 0x79a718b878c0> = {'compaction': {'.gov-runtime/store.db': 'compacted'}, 'complete': False, 'digest': '9e40bfab77af245bf366b34c46b3c9cd7...st-0/popen-gw2/s5-no-embeddings0/box/locks/rebuild.lock', 'released_at': '2026-11-12T15:47:09.238572+00:00', ...}, ...}.get
+E        +      where {'compaction': {'.gov-runtime/store.db': 'compacted'}, 'complete': False, 'digest': '9e40bfab77af245bf366b34c46b3c9cd7...st-0/popen-gw2/s5-no-embeddings0/box/locks/rebuild.lock', 'released_at': '2026-11-12T15:47:09.238572+00:00', ...}, ...} = Run(args=('rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": ...": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}\n', stderr='', seconds=3.395607022001059).result
+
+tests/acceptance/W2-124/test_w2_124_s5_stores_not_built.py:83: AssertionError
+===== tests.acceptance.W2-124.test_w2_124_s1_semantic_fails_named::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung]
+= support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: hung: the rebuild took 81 s: it waited out a real endpoint timeout
+E       assert 80.57102463400224 < 60
+
+/home/usain/gov-os-worktrees/W2-124/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+===== tests.acceptance.W2-124.test_w2_124_s1_semantic_fails_named::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500]
+t.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: part-way-500: the rebuild took 76 s: it waited out a real endpoint timeout
+E       assert 76.16374544800783 < 60
+
+/home/usain/gov-os-worktrees/W2-124/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError

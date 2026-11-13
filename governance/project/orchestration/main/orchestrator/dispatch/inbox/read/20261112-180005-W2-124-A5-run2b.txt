@@ -1,0 +1,10 @@
+log: W2-124-A5-run2b.json
+W2: W2-124
+status: DONE. The fix round's five reds from this ticket's code are green at 461d03775bcc. The only reds left are P4's 20 (with the owner), the w2_153 pair inherited from the base, and five load-sensitive reds from other tickets that pass alone.
+
+task: DAEO-mb2t (W2-124)
+status: DONE. The fix round's five reds from this ticket's code are green at 461d03775bcc. The only reds left are P4's 20 (with the owner), the w2_153 pair inherited from the base, and five load-sensitive reds from other tickets that pass alone.
+work_completed:
+- Read the checkpoint. The resource gate read open (`gov resources --check` open; `gate_check.py` OPEN, have 17.5 GB, need 11.7 GB), so I relaunched eng-2 unchanged under DEC-1146. The launcher named the session eng-2-3 (50e4faf2).
+- eng-2-3 returned DONE with commit 461d03775:
+  - A missing `.gitleaks.toml` now

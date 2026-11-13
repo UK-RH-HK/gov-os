@@ -1,0 +1,71 @@
+=== head /home/usain/gov-os-worktrees/W2-45
+1 failed, 271 passed, 1 skipped in 416.24s (0:06:56)
+FAILED tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py::test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner
+=== base /tmp/gov-os-lead-W2-45/triage3b/base
+        no own commit, is not what is read; a history that does not exist is an error, not a pass."""
+        triggered by setting any of text, encoding, errors or universal_newlines.
+13 failed, 218 passed, 1 skipped, 41 errors in 110.71s (0:01:50)
+>       assert done.returncode == 0, f"git show {commit}:{rel} failed:\n{done.stderr.decode(errors='replace')}"
+>       assert done.returncode == 0, f"git {' '.join(args)} failed in {repo}:\n{done.stderr}"
+E             Actual message: 'git log --no-merges --no-renames --full-history --format=\x01%H%x09%(trailers:key=Task,valueonly,separator=%x2C) -p w254-no-such-revision -- src/gov/check/schema.py failed in /tmp/gov-os-lead-W2-45/triage3b/base:\nfatal: not a git repository (or any of the parent directories): .git\n'
+E       AssertionError: git log --no-merges --no-renames --full-history --format=%H%x09%(trailers:key=Task,valueonly,separator=%x2C) -p w254-no-such-revision -- src/gov/check/schema.py failed in /tmp/gov-os-lead-W2-45/triage3b/base:
+E       AssertionError: git log --no-merges --no-renames --full-history --format=%H%x09%(trailers:key=Task,valueonly,separator=%x2C) HEAD -- failed in /tmp/gov-os-lead-W2-45/triage3b/base:
+E       AssertionError: git show 2a35fd7b:template/governance/kernel/schemas/audit-report.schema.json failed:
+E       AssertionError: git show b644d28a:docs/audit/wave-1/W1-43-wave-1-exit-audit.md failed:
+E       AssertionError: git show b644d28a:template/governance/kernel/checks/context-reproducibility.yaml failed:
+ERROR tests/acceptance/W1-26/test_w1_26_authority.py::test_lesson_cited_as_policy_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_authority.py::test_research_cited_as_decision_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_authority.py::test_research_cited_as_policy_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_authority.py::test_superseded_record_satisfying_current_requirement_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_authority.py::test_valid_authority_chain_no_finding
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_each_check_result_declares_severity
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_each_family_reported_with_a_colour
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_exit_0_when_all_checks_green
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_exit_nonzero_when_a_hard_block_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_gov_check_is_a_read_command
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_gov_check_list_still_works
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_hard_block_check_failing_makes_family_red
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_warning_check_failing_makes_family_yellow
+ERROR tests/acceptance/W1-26/test_w1_26_command.py::test_warning_yellow_does_not_change_exit_code
+ERROR tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_only_red_check_not_green
+ERROR tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_only_unmeasured_check_not_green
+ERROR tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_in_new_directory_discovered_by_schema_check
+ERROR tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_declaration_in_check_list
+ERROR tests/acceptance/W1-26/test_w1_26_dec438.py::test_family_green_requires_at_least_one_check
+ERROR tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_reason
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_clean_decisions_authority_green
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_decision_checker_finding_makes_authority_family_red
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_duplicate_id_flagged
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_gov_check_runs_decision_checker
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_no_decisions_authority_green
+ERROR tests/acceptance/W1-26/test_w1_26_decisions.py::test_supersession_cycle_flagged
+ERROR tests/acceptance/W1-26/test_w1_26_derived.py::test_adding_a_check_declaration_is_picked_up
+ERROR tests/acceptance/W1-26/test_w1_26_derived.py::test_adding_a_decision_is_picked_up_by_graph_check
+ERROR tests/acceptance/W1-26/test_w1_26_derived.py::test_adding_a_ticket_is_picked_up_by_schema_check
+ERROR tests/acceptance/W1-26/test_w1_26_derived.py::test_graph_check_discovers_all_decision_files
+ERROR tests/acceptance/W1-26/test_w1_26_derived.py::test_schema_check_discovers_all_ticket_files
+ERROR tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_required_missing_row_no_gap_ticket_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_required_missing_row_with_unlinked_gap_ticket_is_red
+ERROR tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_required_missing_row_with_valid_gap_ticket_passes
+ERROR tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found
+ERROR tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_commands_check_green_when_every_reserved_command_has_a_module
+ERROR tests/acceptance/W1-26/test_w1_26_provenance.py::test_each_check_result_has_provenance
+ERROR tests/acceptance/W1-26/test_w1_26_registry.py::test_all_17_families_named_in_result
+ERROR tests/acceptance/W1-26/test_w1_26_registry.py::test_exactly_17_families
+ERROR tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_dimensions_changed_with_cite_passes
+ERROR tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_dimensions_changed_without_cite_is_red
+FAILED tests/acceptance/W1-18/test_w1_18_no_always_on_unit.py::test_the_repository_ships_no_always_on_unit_for_ollama
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD]
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_the_schema_file_is_w2_02_s_byte_for_byte
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-4ce16df2]
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-HEAD]
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-4ce16df2]
+FAILED tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-HEAD]
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_only_the_timeout_line_is_added_to_the_declaration
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_declaration_s_other_keys_are_unchanged
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/gov-os-lead-W2-45/triage3c/pytest-of-usain/pytest-1/popen-gw1'), _trac...('/tmp/gov-os-lead-W2-45/triage3c/pytest-of-usain/pytest-1/popen-gw1'), _retention_count=3, _retention_policy='failed')
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/gov-os-lead-W2-45/triage3c/pytest-of-usain/pytest-1/popen-gw2'), _trac...('/tmp/gov-os-lead-W2-45/triage3c/pytest-of-usain/pytest-1/popen-gw2'), _retention_count=3, _retention_policy='failed')

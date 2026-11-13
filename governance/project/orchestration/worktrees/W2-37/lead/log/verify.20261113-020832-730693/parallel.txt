@@ -1,0 +1,154 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 01:51:15)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+................................................sssssss................. [ 39%]
+..................................................................s.ss.. [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+............................................................ss.......... [ 46%]
+.......................s.........................ss....................s [ 48%]
+ssss................F..FF............................................... [ 49%]
+........................................................................ [ 51%]
+................sss..................................................... [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+.........................sss............................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+................................                                         [100%]
+=================================== FAILURES ===================================
+___ test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement ___
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+asked = <function asked.<locals>.get at 0x72cca0e6f240>
+
+    def test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement(asked):
+        found = asked(support.CHANGED)
+        source = found.get("depth_source")
+        assert isinstance(source, str) and source.strip(), f"the result does not say where its depth comes from: {source!r}"
+        if support.DECISION_ID.match(source):
+>           assert source not in PLACEHOLDERS, f"the depth comes from {source}, whose numbers are placeholders"
+E           AssertionError: the depth comes from DEC-035, whose numbers are placeholders
+E           assert 'DEC-035' not in ('DEC-035', 'DEC-391')
+
+tests/acceptance/W2-37/test_w2_37_rows.py:124: AssertionError
+__________ test_the_skill_runs_gov_impact_for_the_question[template] ___________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+_________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-37/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3959500) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:24: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:31: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:38: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:52: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:59: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:72: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:78: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:48: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:54: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:64: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:51: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:58: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_question.py:40: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:109: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:211: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:277: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:290: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:309: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+3 failed, 4899 passed, 26 skipped, 6 warnings in 923.99s (0:15:23)

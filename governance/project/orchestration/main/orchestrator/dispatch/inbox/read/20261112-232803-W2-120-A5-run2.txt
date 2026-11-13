@@ -1,0 +1,7 @@
+log: W2-120-A5-run2.json
+W2: W2-120
+status: DONE. The acceptance suite `tests/acceptance/W2-120/` is merged into w2/W2-120 at fdce323721f2 and is red as required (success-1: 28 failed, 4 passed). TESTS-READY is written. The head is ready for a build run.
+
+task: DAEO-i89t (W2-120), run 2, run kind tests, profile STANDARD
+status: DONE. The acceptance suite `tests/acceptance/W2-120/` is merged into w2/W2-120 at fdce323721f2 and is red as required (success-1: 28 failed, 4 passed). TESTS-READY is written. The head is ready for a build run.
+work_completed: Merged w2/integrate into the branch. It was a fast-forward to 32d10098b0b7 and brings 7d8c2d524 (DEC-1156). I re-read the ticket: its `## Interface` I1-I4 is now stated, so the interface check passes. I made the tests worktree and wrote the test designer's brief (td-1.md), which cites I1-I4, tests 

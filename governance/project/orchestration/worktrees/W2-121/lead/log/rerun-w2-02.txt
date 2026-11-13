@@ -1,0 +1,4 @@
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+1 failed in 3.98s

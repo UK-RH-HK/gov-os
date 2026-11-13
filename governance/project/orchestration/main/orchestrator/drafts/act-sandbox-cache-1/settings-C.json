@@ -1,0 +1,30 @@
+{
+ "env": {
+  "PROBE_OUT": "/tmp/claude-1000/act-sandbox-cache-probe-111959/tC"
+ },
+ "permissions": {
+  "allow": [
+   "Bash(python3 -I /tmp/claude-1000/act-sandbox-cache-probe-111959/probe.py)"
+  ]
+ },
+ "sandbox": {
+  "enabled": true,
+  "failIfUnavailable": true,
+  "allowUnsandboxedCommands": false,
+  "network": {
+   "strictAllowlist": true,
+   "allowedDomains": [],
+   "allowUnixSockets": [
+    "/home/usain/.cache/gov-os/rerank.sock"
+   ],
+   "allowAllUnixSockets": true
+  },
+  "filesystem": {
+   "allowWrite": [
+    "//tmp/claude-1000/act-sandbox-cache-probe-111959/tC",
+    "//home/usain/.cache/gov-os/rerank.log",
+    "//home/usain/.cache/gov-os"
+   ]
+  }
+ }
+}

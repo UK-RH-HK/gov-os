@@ -1,0 +1,101 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "fa338ddb5f6e",
+   "after": "2e235e4e58bc"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "fa338ddb5f6e",
+   "after": "2e235e4e58bc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "03393ee51250",
+   "after": "3c0cc4217f34"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "fa338ddb5f6e",
+   "after": "2e235e4e58bc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-159",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-177",
+   "change": "head",
+   "before": "7cde9429ea0c",
+   "after": "170cae9b1836"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-177-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178",
+   "change": "head",
+   "before": "03393ee51250",
+   "after": "d8dadc050a21"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178-tests",
+   "change": "head",
+   "before": "03393ee51250",
+   "after": "8b67f1344d13"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-178-tests",
+   "change": "acceptance folder",
+   "folder": "W2-178"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180",
+   "change": "head",
+   "before": "e63381d7c869",
+   "after": "0d98914dc37f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180",
+   "change": "acceptance folder",
+   "folder": "W2-173"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "head",
+   "before": "e3ff31fc5f87",
+   "after": "56f401a86c90"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-180-tests",
+   "change": "acceptance folder",
+   "folder": "W2-173"
+  }
+ ]
+}

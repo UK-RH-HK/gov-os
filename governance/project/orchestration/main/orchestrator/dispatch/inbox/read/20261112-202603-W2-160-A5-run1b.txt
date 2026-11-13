@@ -1,0 +1,8 @@
+log: W2-160-A5-run1b.json
+W2: W2-160
+status: DONE
+
+task: DAEO-fd0p (W2-160), run 1b, the tests run
+status: DONE
+work_completed: The test designer (td-1: claude-sonnet-5-5, high, C2) wrote 66 acceptance tests in `tests/acceptance/W2-160/` from the KPI lines and the ticket's I1 and I2 only. I merged them into w2/W2-160 as 9c507d513, and `gov accept` shows every one red. TESTS-READY names the merge commit. The tests worktree and its branch are removed.
+files_changed: tests/acceptance/W2-160/{README.md, conftest.py, w2_160_support.py, test_s1_wait.py, test_s2_gone.py, test_s3_helper_watch.py, test_s4_reads_and_writes.py}. These are the ticket's ac

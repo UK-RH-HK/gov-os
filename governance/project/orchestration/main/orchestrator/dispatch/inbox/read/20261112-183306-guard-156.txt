@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 157
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01CKKAd8hAoPtafFBfaPgdDN", "time": "2026-11-12T06:27:34.625Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-157/4ad4ff19-4cc0-4b86-b9d9-eec361b11b9d.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-157", "tool": "Bash", "form": "cd $TMPDIR/rv && cat > p1.py <<'EOF' from common import * def run(variant): m = machine() try: m.plant_smi([(15800, 24576), (15900, 24576)]) m.write_gate() other = m.start_job() if variant == \"b\" else", "rule": "the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, config/secrets*, a file under a .secrets fo

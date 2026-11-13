@@ -1,0 +1,7 @@
+log: W2-171-A5-run5.json
+W2: W2-171
+status: DONE
+
+task: DAEO-k1e2 (W2-171)
+status: DONE
+work_completed: Run 5 did the three steps in the brief and nothing more. (1) I merged w2/integrate into w2/W2-171 as 381a445c0. The merge brings in d5b63037d, which adds `docs/probes/DAEO-k1e2/**` to the allowed paths, and W2-180's landing. There were no conflicts. (2) I committed the probe record from .gov-runtime/scratch/lead/PR-DAEO-k1e2.md as docs/probes/DAEO-k1e2/PR-DAEO-k1e2.md. It is byte-identical to the source (`cmp` clean). I did not change its `head:` line: it names the probed head 8d1bb1636458, which is the reviewer's, not the head to land. (3)

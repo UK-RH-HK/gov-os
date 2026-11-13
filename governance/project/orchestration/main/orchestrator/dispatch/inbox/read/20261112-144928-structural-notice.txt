@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-142907.out
+Structural: after the landing of W2-178 (base e538af6290ae)
+status: structural pass at e3d7f90c75ed: NOTICE in mutation, links (7 of 9 families ok), 14.4 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 6 findings: .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/test_w1_39_copy.py' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W1-39/README.md' covers tests/acceptance/ | .tickets/DAEO-emq1.md: implementer allowed_paths pattern 'tests/acceptance/W2-77/w2_77_support.py' covers tests/acceptance/ (+3 more)
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since e538af6290ae)
+links: NOTICE 1 new since e538af6290aeb832088105a88d67d68d19a1fd5c (1685 standing): UNLINKED_ID DEC-1052 in DAEO-o5x1's KPI brackets, not in its sources | .tickets/DAEO-o5x1.md:43 | orchestrator | add DEC-1052 to DAEO-o5x1's sources:
+structural pass at e3d7f90c75ed: NOTICE in mutation, links (7 of 9 families ok), 14.4 s; a notice, not a refusal

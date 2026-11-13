@@ -1,0 +1,11 @@
+2026-11-13 03:26:06 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 03:26:06 merged W2-113 onto 82ddc705a41b: 87decea0516c
+2026-11-13 03:46:36 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 03:46:43 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 03:46:46 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 03:46:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 03:47:22 the head without the batch: a throwaway worktree head-82ddc705a41b-0 at 82ddc705a41b with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 03:47:23 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+2026-11-13 03:47:23 ADVANCED refs/heads/w2/integrate 82ddc705a41b -> 87decea0516c; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/87decea0516c.json
+2026-11-13 03:47:23 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 03:48:05 integration store promoted: the merged clone's stores at 87decea0516c into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

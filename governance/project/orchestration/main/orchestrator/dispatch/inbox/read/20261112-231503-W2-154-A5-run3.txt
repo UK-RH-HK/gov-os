@@ -1,0 +1,9 @@
+log: W2-154-A5-run3.json
+W2: W2-154
+status: DONE. The head to land is ae1d68394752. The full verification run (lead_verify) is green, the tree is clean (`git status --short` is empty), and S1–S3, F1, F2 and F3 hold. S4 was not in this run: it is the CTO's package to the owner.
+
+task: DAEO-l4gf (W2-154), ticket lead, run 3 (build)
+status: DONE. The head to land is ae1d68394752. The full verification run (lead_verify) is green, the tree is clean (`git status --short` is empty), and S1–S3, F1, F2 and F3 hold. S4 was not in this run: it is the CTO's package to the owner.
+work_completed:
+- One engineer (eng-1) built I1–I4 in commit 0269b817e3cd:
+  - **I1 (the plugin):** in the serial-afterwards run, the plugin's `pytest_collection_modifyitems` is `trylast`, set through `pytest_impl` so the module still imports only the standard library. A new `pytest_deselected` hook reco

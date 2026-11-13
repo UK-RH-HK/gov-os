@@ -1,0 +1,6 @@
+W2-152 (DAEO-o5x1): merge w2/integrate (resume 11-12: the probe folder in allowed_paths, W2-124 interface)
+
+Task: DAEO-o5x1
+Role: orchestrator
+Implements: DEC-1052, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

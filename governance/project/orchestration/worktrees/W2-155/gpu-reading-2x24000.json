@@ -1,0 +1,67 @@
+{
+ "shape": "2x24000",
+ "texts": 2,
+ "padded_chars": 48000,
+ "round_trip_s": 0.969,
+ "ok": true,
+ "answer_keys": [
+  "device",
+  "scores"
+ ],
+ "error": null,
+ "before": [
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ]
+ ],
+ "after": [
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ],
+  [
+   0,
+   8255,
+   16303
+  ]
+ ],
+ "samples": 156,
+ "peak_used_mib": 9639,
+ "baseline_used_mib": 16303,
+ "request_delta_mib": -6664,
+ "total_mib": 16303,
+ "budget_mib": 14255,
+ "within_budget": true,
+ "max_util_during": 100,
+ "rerank_log_lines": [
+  "2026-11-13T00:37:32+0000\tMEMORY\tallocated 1168 MiB, reserved 1192 MiB"
+ ]
+}

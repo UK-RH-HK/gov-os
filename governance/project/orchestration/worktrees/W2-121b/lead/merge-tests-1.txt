@@ -1,0 +1,9 @@
+W2-121b (DAEO-ifgf): merge the acceptance tests (td-1, a60ee938c)
+
+48 cases for S1 to S4 (S1 10, S2 11, S3 13, S4 14), written to the ticket's Interface (P-W2-121b-1 (a)); all red on
+part a's code (the designer's run: 48 failed).
+
+Task: DAEO-ifgf
+Role: orchestrator
+Implements: DEC-1007, DEC-1014, DEC-1018, DEC-1008, DEC-979, DEC-989, DEC-1084
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -5,3 +5,5 @@
 2026-11-01 FAILED | 2026-11-01 04:54:43 nightly NOT STARTED: by the latest start, the main tree is not clean
 2026-11-02 running | serial exit 1 in 5858 s: 3 failed, 171 passed, 8 errors in 5349.37s (1:29:09)
 2026-11-02 ran | verdict: red 32 duration: estimate 11176 s, actual 19448 s (setup 2381 s, lock wait 898 s) head 9d605eba20a2 (corrected 2026-11-02 11:25 by the orchestrator from log/nightly/20261102-0400/run.txt, ended 09:24:14: the 09:00 check wrote FAILED while the re-runs alone were still going)
+2026-11-12 ran | verdict: red 15 duration: estimate 3554 s, actual 3352 s (setup 44 s, lock wait 0 s) head 9bbef27f1d05
+2026-11-13 ran | verdict: red 99 duration: estimate 2756 s, actual 4914 s (setup 64 s, lock wait 1702 s) head cb208f9434d7

@@ -1,0 +1,16 @@
+{
+ "ticket": "W2-121b",
+ "task": "DAEO-ifgf",
+ "branch": "w2/W2-121b",
+ "commit": "6e10493a5f8e8832b4c593bc2cc4663b9227b1a0",
+ "requested_at": "2026-11-12 21:22:01",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T21:22:01.858089",
+ "reason": "red",
+ "failing": [
+  "tests/acceptance/W2-157/test_w2_157_nothing_else.py::test_f4_the_branch_changes_only_the_tickets_allowed_paths"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261112-212201-904857",
+ "tested_on": "5fd8b2ac7437b73aa49d2b9c8436e7bdbbcbb807",
+ "ejected_at": "2026-11-12 21:37:22"
+}

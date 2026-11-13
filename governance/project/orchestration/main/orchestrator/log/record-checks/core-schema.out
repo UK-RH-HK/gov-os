@@ -2,7 +2,7 @@
   "ok": true,
   "result": {
     "check": "core-schema",
-    "records_validated": 993,
+    "records_validated": 1077,
     "left_out": [
       {
         "path": "docs/imported/",

@@ -1,0 +1,2 @@
+tests/acceptance/W1-10/test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds
+tests/acceptance/W2-13/test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget

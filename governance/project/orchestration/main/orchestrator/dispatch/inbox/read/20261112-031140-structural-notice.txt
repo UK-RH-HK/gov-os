@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261112-024805.out
+Structural: after the landing of W2-52 (base 70e5840d9f47)
+status: structural pass at 9bbef27f1d05: NOTICE in mutation, links (8 of 10 families ok), 15.8 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 2 findings: .tickets/DAEO-kmcr.md: implementer allowed_paths pattern 'tests/acceptance/W1-41/test_w1_41_migration.py' covers tests/acceptance/ | .tickets/DAEO-qz4p.md: implementer allowed_paths pattern 'tests/acceptance/W2-149/w2_149_support.py' covers tests/acceptance/
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: ok [2 kernel role, skill, hook or .rulesync path(s) changed since 70e5840d9f47]
+links: NOTICE 4 new since 70e5840d9f472235e7767e07c87a274fad60c367 (1611 standing): UNMARKED_CHANGE DEC-989 <- DEC-1141 (**Changes:**; part) | docs/DECISION_REGISTER.md:12409 | orchestrator | add "**Changed by:** DEC-1141 (two hand merges, (... | UNLINKED_ID DEC-1033 in 79d26af54679's Implements: (independent-test-designer), not in DAEO-siiz's sources | .tickets/DAEO-siiz.md:38 | orchestrator | add DE... | UNLINKED_ID DEC-1065 in 79d26af54679's Implements: (independent-test-designer), not in DAEO-siiz's sources | .tickets/DAEO-siiz.md:38 | orchestrator | add DE... (+1 more)
+structural pass at 9bbef27f1d05: NOTICE in mutation, links (8 of 10 families ok), 15.8 s; a notice, not a refusal

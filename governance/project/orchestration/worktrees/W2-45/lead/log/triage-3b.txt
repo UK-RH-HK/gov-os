@@ -1,0 +1,44 @@
+=== HEAD 0653dc01086e
+    def test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner(
+            project, pushed, machine, ci):
+        """``gov check`` itself reports the absent tool as YELLOW and ends with exit 0 (W1-26). The job does not
+        take that for green (DEC-494: never green; DEC-497 replaces "take the yellow")."""
+        done, statuses = _statuses(project, machine(openspec=False))
+>       assert done.returncode == 0 and statuses.get(OPENSPEC_CHECK) == "YELLOW", (
+            f"the fixture does not hold: gov check without openspec is not exit 0 with {OPENSPEC_CHECK} YELLOW: "
+            f"{statuses}\n{support.said(done)}")
+E       AssertionError: the fixture does not hold: gov check without openspec is not exit 0 with openspec-validate YELLOW: {'w1-40-g1': 'GREEN', 'w1-40-g2': 'GREEN', 'w1-40-g3': 'GREEN', 'openspec-validate': 'RED', 'skill-version': 'GREEN', 'readiness': 'GREEN'}
+E         exit 3
+E         --- stdout
+E         oducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "RED", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "w1-40-g1", "family": "schema/invariants", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "b9fadcf268e724a2"}}, {"id": "w1-40-g2", "family": "graph integrity", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "2be5ccdd0faa5299"}}, {"id": "w1-40-g3", "family": "retrieval regression", "severity": "hard-block", "status": "GREEN", "findings": [], "elapsed_s": 0.001, "time_limit_s": 60, "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "53d64fb39218ad37"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "c0b1aec056cfef12"}, "elapsed_s": 0.0, "time_limit_s": 60}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "829bedf41f5df85b"}, "elapsed_s": 0.0, "time_limit_s": 60}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "6591176ea9b30ccbb314f304f02b7bf6ddb2d87a", "check_version": "1.0.0", "inputs_hash": "5ce807bfdaf2e134"}, "elapsed_s": 0.004, "time_limit_s": 60}], "time_limit_s": 60}}}
+E         
+E         --- stderr
+E         families with no registered check: index freshness, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: GREEN
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: RED
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: GREEN
+E           schema/invariants: GREEN
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert (3 == 0)
+E        +  where 3 = CompletedProcess(args=['gov', 'check', '--json'], returncode=3, stdout='{"ok": false, "command": "check", "result": {}...ion: GREEN\n  schema/invariants: GREEN\n  secrets indexing: YELLOW (no registered check)\n  skill regression: GREEN\n').returncode
+
+tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py:49: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-40/test_w1_40_ci_unmeasured.py::test_the_job_names_the_openspec_check_unmeasured_and_fails_where_openspec_is_not_on_the_runner
+1 failed, 3 passed in 2.12s
+=== BASE w2/integrate 1d0d8da0d550
+....                                                                     [100%]
+4 passed in 2.89s

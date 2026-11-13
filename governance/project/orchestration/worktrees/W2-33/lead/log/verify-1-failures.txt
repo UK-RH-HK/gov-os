@@ -1,0 +1,24 @@
+lead_verify W2-33 DAEO-lrre head 3b3a90d74c3e: RED parallel exit 1 in 1096 s (5590 tests 50 failed 0 errors 7 skipped)
+(the run's parallel.xml was cleared by the second lead_verify run; this list was copied by the lead from it before then)
+
+23 tests/acceptance/W2-153/test_w2_153_sources.py
+   test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s... x11: .rulesync and template/.rulesync sources of engineer, independent-auditor, independent-test-designer, product-spec, research (10) and .rulesync/subagents/orchestrator.md (1)
+   test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_templ... x11: the same eleven sources
+   test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository x1
+10 tests/acceptance/W1-38/test_w1_38_heldout_step.py (each: SOURCE_DIFFERS from the role sources)
+   TestSettingsAfterTheHeldOutStep: test_generated_then_the_step_is_green, test_step_never_run_is_red_on_the_settings, test_one_rule_lost_is_red_on_the_settings, test_rule_the_held_out_file_does_not_give_is_red_on_the_settings
+   TestProjectWithoutAHeldOutFile: test_generated_settings_are_green, test_stray_read_deny_rule_is_red_on_the_settings
+   TestStepRepeated: test_project_is_still_green_after_the_second_run, test_whole_procedure_repeated_is_still_green
+   TestHeldOutStepThroughGovCheck: test_gov_check_is_green_after_the_apply_procedure, test_gov_check_is_red_when_a_rule_is_lost
+ 6 tests/acceptance/W1-38/test_w1_38_rulesync.py
+   TestRoleFieldAgreement::test_role_fields_match_kernel[engineer|independent-auditor|independent-test-designer|product-spec|research]
+   TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project
+ 6 tests/acceptance/W1-33
+   test_w1_33_agent_definitions.py::test_the_definition_agrees_with_its_kernel_role_file[orchestrator|product-spec|independent-test-designer|engineer|independent-auditor]
+   test_w1_33_kernel_role_files.py::test_the_research_role_file_is_unchanged
+ 3 tests/acceptance/W2-128
+   test_w2_128_round2a.py::test_review_f6_orchestrator_role_names_no_retired_brief_text_as_content[kernel|rulesync]
+   test_w2_128_templates.py::test_s4_engineer_role_line_5_says_to_fulfil_the_spec_and_its_kpis
+ 2 tests/unit/adapters
+   test_w2_153_compose.py::test_the_twelve_sources_are_the_composition
+   test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition

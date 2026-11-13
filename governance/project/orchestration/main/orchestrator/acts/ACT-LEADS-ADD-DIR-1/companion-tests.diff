@@ -1,0 +1,45 @@
+diff -ru a/tests/acceptance/W2-153/test_w2_153_dispatch.py b/tests/acceptance/W2-153/test_w2_153_dispatch.py
+--- a/tests/acceptance/W2-153/test_w2_153_dispatch.py	2026-11-13 01:48:40.299179771 +0000
++++ b/tests/acceptance/W2-153/test_w2_153_dispatch.py	2026-11-13 01:48:59.190947825 +0000
+@@ -47,11 +47,26 @@
+     assert run["calls"] == [], f"a lead session was started ({len(run['calls'])} call(s))"
+ 
+ 
++def _without_add_dirs(argv: list[str]) -> list[str]:
++    """``argv`` with each ``--add-dir <value>`` pair taken out: the lead's own tests worktree and the runs root, added
++    to the lead line after W2-153 by ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)); W2-153's comparison is of everything else."""
++    out, skip = [], False
++    for arg in argv:
++        if skip:
++            skip = False
++            continue
++        if arg == "--add-dir":
++            skip = True
++            continue
++        out.append(arg)
++    return out
++
++
+ def test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag(bed):
+     ours = _started(bed.run(support.current_dispatch_script()))
+     theirs = _started(bed.run(support.baseline_dispatch_script()))
+     assert ours["cwd"] == theirs["cwd"], f"the lead starts in {ours['cwd']}, integrate's in {theirs['cwd']}"
+-    mine = support.without_flag(ours["argv"])
++    mine = support.without_flag(_without_add_dirs(ours["argv"]))
+     assert mine == theirs["argv"], f"the lead line changed beyond the one flag\nthis tree: {mine}\nintegrate: {theirs['argv']}"
+ 
+ 
+diff -ru a/tests/unit/launch/test_w2_153_template.py b/tests/unit/launch/test_w2_153_template.py
+--- a/tests/unit/launch/test_w2_153_template.py	2026-11-13 01:48:40.297916748 +0000
++++ b/tests/unit/launch/test_w2_153_template.py	2026-11-13 01:50:28.637664601 +0000
+@@ -188,7 +188,9 @@
+     """F2: removing the added flag line leaves the exec command as integrate's (the call form kept, D-4)."""
+     lines = LAUNCH_NOW.read_text(encoding="utf-8").splitlines()
+     start = next(i for i, line in enumerate(lines) if line.startswith("exec /home/usain/.local/bin/claude "))
+-    command = [line for line in lines[start:start + 6] if "--append-system-prompt-file" not in line]
++    # ACT-LEADS-ADD-DIR-1 (DEC-1161 (2)) added the lead's --add-dir line after W2-153; it is judged apart from this.
++    command = [line for line in lines[start:start + 7]
++               if "--append-system-prompt-file" not in line and not line.startswith("  --add-dir ")]
+     assert command[:4] == [
+         "exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json "
+         "--permission-mode acceptEdits \\",

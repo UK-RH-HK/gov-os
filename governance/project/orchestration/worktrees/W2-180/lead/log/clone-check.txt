@@ -1,0 +1,18 @@
+clone of head 0d98914dc37f; w2/integrate d02e957ba35a; 2026-11-12T08:13:00Z
+--- checked out as the branch w2/W2-170
+E       AssertionError: ['tests/acceptance/W2-173/README.md', 'tests/acceptance/W2-173/test_w2_173_unchanged.py']
+E       assert ['tests/accep...unchanged.py'] == []
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:91: F3 judges only the branch w2/W2-173; this is the branch w2/W2-170: not judged here
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:91: F4 judges only the branch w2/W2-173; this is the branch w2/W2-170: not judged here
+1 failed, 2 skipped in 0.18s
+--- checked out as the branch w2/W2-173
+        """Failure line 4 on ``root``'s checkout: skipped unless HEAD is ``w2/W2-173``; there, only the ticket's paths."""
+E       AssertionError: the branch (against 6c9a5bb525ee) changes paths outside the ticket's: ['tests/acceptance/W2-170/README.md', 'tests/acceptance/W2-170/test_w2_170_f5_paths.py']
+E       assert ['tests/accep..._f5_paths.py'] == []
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:49: F5 judges only the branch w2/W2-170; this is the branch w2/W2-173: not judged here
+1 failed, 1 passed, 1 skipped in 0.14s
+--- detached HEAD at the head
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:46: F5 judges only the branch w2/W2-170; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:88: F3 judges only the branch w2/W2-173; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-173/test_w2_173_unchanged.py:88: F4 judges only the branch w2/W2-173; this is a detached HEAD: not judged here
+3 skipped in 0.12s

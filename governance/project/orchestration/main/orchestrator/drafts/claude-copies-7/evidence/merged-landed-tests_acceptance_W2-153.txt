@@ -1,0 +1,393 @@
+.........................................F.F.F.F.F.F.F.F.F.F.F.F.F       [100%]
+=================================== FAILURES ===================================
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[engineer-.rulesync] _
+
+role = 'engineer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/engineer.md: the body is not that of templates/role-engineer.md, one blank line, then that of roles/engineer.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 2319 identical leading characters in diff, use -v to show
+E           neer.
+E         - - **Version:** 1.1.0
+E         - - **Launch default:** model claude-sonnet-5-5, effort high
+E         - - **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low
+E         - - **Skills:** test-driven-development, systematic-debugging, verification-before-completion, retrieval...
+E         
+E         ...Full output truncated (25 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-auditor-.rulesync] _
+
+role = 'independent-auditor', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/independent-auditor.md: the body is not that of templates/role-reviewer.md, one blank line, then that of roles/independent-auditor.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 3525 identical leading characters in diff, use -v to show
+E           elf.
+E           
+E         - - **Version:** 1.1.0
+E         - - **Launch default:** model claude-opus-5-5, effort high
+E         - - **Skills:** audit, retrieval...
+E         
+E         ...Full output truncated (31 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-test-designer-.rulesync] _
+
+role = 'independent-test-designer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/independent-test-designer.md: the body is not that of templates/role-test-designer.md, one blank line, then that of roles/independent-test-designer.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th...other host.\n' == '# You are th...other host.\n'
+E         
+E         Skipping 2753 identical leading characters in diff, use -v to show
+E           elf.
+E           
+E         - - **Version:** 1.1.0
+E         - - **Launch default:** model claude-sonnet-5-5, effort high
+E         - - **Launch by criticality:** C3 model claude-opus-5-5, effort high; C2 model claude-sonnet-5-5, effort high; C1 model claude-sonnet-5-5, effort high; C0 model claude-haiku-5-5, effort low...
+E         
+E         ...Full output truncated (32 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync] _
+
+role = 'orchestrator', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/orchestrator.md: the body is not that of templates/role-lead.md, one blank line, then that of roles/orchestrator.md (S3 amended, DEC-1112 (3))
+E       assert '# You are th... (DEC-420).\n' == '# You are th... mechanism.\n'
+E         
+E         Skipping 1431 identical leading characters in diff, use -v to show
+E           -1052].
+E         + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E           - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E           - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E           ...
+E         
+E         ...Full output truncated (140 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[product-spec-.rulesync] _
+
+role = 'product-spec', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/product-spec.md: the body is not that of templates/role-product-spec.md, one blank line, then that of roles/product-spec.md (S3 amended, DEC-1112 (3))
+E       assert '# You are a ...other host.\n' == '# You are a ...other host.\n'
+E         
+E         Skipping 2282 identical leading characters in diff, use -v to show
+E           elf.
+E           
+E         - - **Version:** 1.1.0
+E         - - **Launch default:** model claude-sonnet-5-5, effort high
+E         - - **Skills:** planning, change, retrieval...
+E         
+E         ...Full output truncated (28 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[research-.rulesync] _
+
+role = 'research', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body(role, tree):
+        rel = f"{tree}/subagents/{role}.md"
+        front, body = support.split_front((support.REPO / rel).read_text(encoding="utf-8"))
+        _template_front, template_body = support.split_front(_template_text(role))
+        _role_front, role_body = support.split_front(_role_text(role))
+        expected_body = support.composed_body(template_body, role_body)
+>       assert body == expected_body, (
+            f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md, one blank line, then that of "
+            f"roles/{role}.md (S3 amended, DEC-1112 (3))")
+E       AssertionError: .rulesync/subagents/research.md: the body is not that of templates/role-research.md, one blank line, then that of roles/research.md (S3 amended, DEC-1112 (3))
+E       assert '# You are a ...the record.\n' == '# You are a ...the record.\n'
+E         
+E         Skipping 2059 identical leading characters in diff, use -v to show
+E           e 3.
+E           
+E         - - **Version:** 1.1.0
+E         - - **Launch default:** model claude-sonnet-5-5, effort high
+E         - - **Skills:** discovery, retrieval...
+E         
+E         ...Full output truncated (18 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-153/test_w2_153_sources.py:53: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[engineer-.rulesync] _
+
+role = 'engineer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/engineer.md: its labelled fields are not roles/engineer.md's: missing ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order'], extra [], changed ['allowed paths', 'model tier']
+E       assert (['launch by ...'model tier']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-auditor-.rulesync] _
+
+role = 'independent-auditor', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/independent-auditor.md: its labelled fields are not roles/independent-auditor.md's: missing ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'], extra [], changed ['model tier', 'purpose']
+E       assert (['launch def...', 'purpose']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-test-designer-.rulesync] _
+
+role = 'independent-test-designer', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/independent-test-designer.md: its labelled fields are not roles/independent-test-designer.md's: missing ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order'], extra [], changed ['allowed paths', 'model tier']
+E       assert (['launch by ...'model tier']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch by criticality', 'launch default', 'one writer per worktree', 'skills', 'version', 'work order'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[orchestrator-.rulesync] _
+
+role = 'orchestrator', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/orchestrator.md: its labelled fields are not roles/orchestrator.md's: missing ['launch default', 'one writer per worktree', 'reads', 'skills', 'version', 'work order', 'writes'], extra [], changed ['authority level', 'handoff format', 'model tier', 'permission classes', 'purpose']
+E       assert (['launch def...', 'purpose']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch default', 'one writer per worktree', 'reads', 'skills', 'version', 'work order', 'writes'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[product-spec-.rulesync] _
+
+role = 'product-spec', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/product-spec.md: its labelled fields are not roles/product-spec.md's: missing ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'], extra [], changed ['model tier']
+E       assert (['launch def...'model tier']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+_ test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[research-.rulesync] _
+
+role = 'research', tree = '.rulesync'
+
+    @pytest.mark.parametrize("tree", TREES)
+    @pytest.mark.parametrize("role", sorted(SKILLS))
+    def test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none(role, tree):
+        """W1-33's ``fields()`` rule (MR-5, DEC-066): every labelled list item of the source's text equals the role
+        file's, label for label and text for text, and the role template (the source's first part) has none, so no
+        field of the agent comes from it."""
+        rel = f"{tree}/subagents/{role}.md"
+        role_fields = support.fields(_role_text(role))
+        assert role_fields, f"roles/{role}.md has no labelled field: the case's premise"
+        template_fields = support.fields(_template_text(role))
+        assert template_fields == {}, (
+            f"templates/{KERNEL_ROLE_TEMPLATE[role]}.md carries labelled fields {sorted(template_fields)}: the template "
+            "must contribute none (S3 amended)")
+        source_fields = support.fields((support.REPO / rel).read_text(encoding="utf-8"))
+        missing = sorted(set(role_fields) - set(source_fields))
+        extra = sorted(set(source_fields) - set(role_fields))
+        changed = sorted(label for label in set(role_fields) & set(source_fields)
+                         if role_fields[label] != source_fields[label])
+>       assert (missing, extra, changed) == ([], [], []), (
+            f"{rel}: its labelled fields are not roles/{role}.md's: missing {missing}, extra {extra}, changed {changed}")
+E       AssertionError: .rulesync/subagents/research.md: its labelled fields are not roles/research.md's: missing ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'], extra [], changed ['model tier']
+E       assert (['launch def...'model tier']) == ([], [], [])
+E         
+E         At index 0 diff: ['launch default', 'one writer per worktree', 'skills', 'version', 'work order'] != []
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:94: AssertionError
+____ test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository _____
+
+tmp_path = PosixPath('/tmp/claude-1000/act-copies-7-360720/build/tmp/pytest-of-usain/pytest-7/test_s3_guard_the_check_finds_0')
+
+    def test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository(tmp_path):
+        """``python3 -m gov.adapters.portability`` from this repository's root (no rulesync: the kernel comparison runs
+        alone) names no ``subagents`` source. Green on integrate, where it compares the role files' bodies; it must stay
+        green once the sources hold the templates' bodies and the check compares the composition."""
+        done = subprocess.run([sys.executable, "-m", "gov.adapters.portability"], cwd=str(support.REPO),
+                              capture_output=True, text=True, timeout=support.COMMAND_TIMEOUT_S,
+                              env=support.portability_env(tmp_path, RULESYNC_BIN="/nonexistent/rulesync"),
+                              stdin=subprocess.DEVNULL)
+        findings = json.loads(done.stdout)["findings"]
+        drift = [f for f in findings if "/subagents/" in str(f.get("file", ""))]
+>       assert drift == [], f"role source findings: {drift}"
+E       AssertionError: role source findings: [{'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md', 'file': '.rulesync/subagents/engineer.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-reviewer.md and template/governance/kernel/roles/independent-auditor.md', 'file': '.rulesync/subagents/independent-auditor.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-test-designer.md and template/governance/kernel/roles/independent-test-designer.md', 'file': '.rulesync/subagents/independent-test-designer.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md', 'file': '.rulesync/subagents/orchestrator.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-product-spec.md and template/governance/kernel/roles/product-spec.md', 'file': '.rulesync/subagents/product-spec.md'}, {'code': 'SOURCE_MISSING', 'message': 'no rulesync source for template/governance/kernel/roles/qa-engineer.md', 'file': '.rulesync/subagents/qa-engineer.md'}, {'code': 'SOURCE_DIFFERS', 'message': 'differs from its composition of template/governance/kernel/templates/role-research.md and template/governance/kernel/roles/research.md', 'file': '.rulesync/subagents/research.md'}, {'code': 'SOURCE_MISSING', 'message': 'no rulesync source for template/governance/kernel/roles/senior-engineer.md', 'file': '.rulesync/subagents/senior-engineer.md'}, {'code': 'SOURCE_MISSING', 'message': 'no rulesync source for template/governance/kernel/roles/ticket-lead.md', 'file': '.rulesync/subagents/ticket-lead.md'}]
+E       assert [{'code': 'SO...eer.md'}, ...] == []
+E         
+E         Left contains 9 more items, first extra item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/engineer.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-engineer.md and template/governance/kernel/roles/engineer.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-153/test_w2_153_sources.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[engineer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-auditor-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[independent-test-designer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[product-spec-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[research-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[engineer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-auditor-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[independent-test-designer-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[orchestrator-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[product-spec-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none[research-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository
+13 failed, 53 passed in 6.26s

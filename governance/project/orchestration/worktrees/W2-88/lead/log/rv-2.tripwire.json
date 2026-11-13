@@ -1,0 +1,64 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-18/test_w1_18_on_demand_start.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-32/test_w1_32_command_set.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-121/test_s1_lock_off_status.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-123/test_w2_123_retry.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-136/test_w2_136_never_a_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-23/test_w2_23_space.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W1-18"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W1-32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-121"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-123"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-136"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-23"
+  }
+ ]
+}

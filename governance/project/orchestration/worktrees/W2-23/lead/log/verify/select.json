@@ -3,8 +3,8 @@
  "why_full": [],
  "core_changed": [],
  "unplaced": [],
- "base": "abef7e045133f5a3d2295c7a877cf5537a5219f2",
- "head": "3e7194a45a58245f8eede08f6956a7d1ca0b6633",
+ "base": "b7a9c996d97c330dcf06421a021e5c404bfbc8d5",
+ "head": "d2034dcf1478b1a6ba149f8dabcce305eaba00a2",
  "governance_left_out": [],
  "changed": [
   "src/gov/adapters/command.py",
@@ -580,6 +580,31 @@
   },
   {
    "target": "tests/unit/decisions",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/adapters/fixtures/programme/.rulesync/rules/overview.md",
+      "tests/unit/adapters/fixtures/programme/AGENTS.md",
+      "tests/unit/adapters/fixtures/programme/CLAUDE.md",
+      "tests/unit/adapters/fixtures/programme/README.md",
+      "tests/unit/adapters/fixtures/programme/claude-settings.json",
+      "tests/unit/adapters/test_generate.py",
+      "tests/unit/adopt/test_adopt.py",
+      "tests/unit/adopt/test_safety.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/dispatch",
    "why": [
     {
      "reason": "UNIT"
@@ -1454,6 +1479,31 @@
    ]
   },
   {
+   "target": "tests/unit/guard/test_w2_110_cto_install.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/adapters/fixtures/programme/.rulesync/rules/overview.md",
+      "tests/unit/adapters/fixtures/programme/AGENTS.md",
+      "tests/unit/adapters/fixtures/programme/CLAUDE.md",
+      "tests/unit/adapters/fixtures/programme/README.md",
+      "tests/unit/adapters/fixtures/programme/claude-settings.json",
+      "tests/unit/adapters/test_generate.py",
+      "tests/unit/adopt/test_adopt.py",
+      "tests/unit/adopt/test_safety.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
    "target": "tests/unit/guard/test_w2_141_search.py",
    "why": [
     {
@@ -2304,6 +2354,18 @@
      "reason": "TEST_CHANGED",
      "paths": [
       "tests/acceptance/W1-41/test_w1_41_migration.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-52/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-siiz",
+     "paths": [
+      "src/gov/adopt/stages.py"
      ]
     }
    ]
@@ -3263,8 +3325,10 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-106",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-107",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-108",
+  "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-110",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-112",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-116",
+  "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-121",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-122",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-123",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-126",
@@ -3287,8 +3351,10 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-150",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-152",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-153",
+  "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-157",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-16",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-170",
+  "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-173",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-20",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-32",
   "--ignore=/home/usain/gov-os-worktrees/W2-23/tests/acceptance/W2-49",
@@ -4438,8 +4504,10 @@
   "tests/acceptance/W2-106/",
   "tests/acceptance/W2-107/",
   "tests/acceptance/W2-108/",
+  "tests/acceptance/W2-110/",
   "tests/acceptance/W2-112/",
   "tests/acceptance/W2-116/",
+  "tests/acceptance/W2-121/",
   "tests/acceptance/W2-122/",
   "tests/acceptance/W2-123/",
   "tests/acceptance/W2-126/",
@@ -4462,8 +4530,10 @@
   "tests/acceptance/W2-150/",
   "tests/acceptance/W2-152/",
   "tests/acceptance/W2-153/",
+  "tests/acceptance/W2-157/",
   "tests/acceptance/W2-16/",
   "tests/acceptance/W2-170/",
+  "tests/acceptance/W2-173/",
   "tests/acceptance/W2-20/",
   "tests/acceptance/W2-32/",
   "tests/acceptance/W2-49/",

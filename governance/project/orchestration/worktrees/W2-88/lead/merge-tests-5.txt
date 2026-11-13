@@ -1,0 +1,5 @@
+W2-88 (DAEO-2bdu): merge td-5's L-1 cases (5f08d4343003): a binary over the file limit is no route and an over-limit proposal; the estimate counts chunks
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, DEC-078, CAP-44.b, CAP-44.g

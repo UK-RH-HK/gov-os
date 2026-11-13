@@ -1,0 +1,7 @@
+W2-146 (DAEO-f6x3): merge the acceptance README map fix (td-2, 86c9af064b84)
+
+gov accept refused ACCEPT_NO_MAP: the map's test names were bare; it reads only backticked items.
+
+Task: DAEO-f6x3
+Role: orchestrator
+Implements: DEC-1071, DEC-1099

@@ -1,0 +1,8 @@
+task: DAEO-ywb5
+decisions_applied: [DEC-866, DEC-253]
+STATE: CHECKPOINTED on the CTO's stop (week usage 97%, DEC-1140 (5)-(6); brake file for W2-181). Tests merged (499543a836d3); gov accept 121p/1s/0f; lead_verify RED 8, re-run alone: the two tests/unit/resources/test_w2_157_backstop.py cases pass (load-sensitive); tests/unit/accept/test_w2_96_{review3,review4,run2} fail again alone (13 failed incl. parameters), not this ticket's paths, base check on w2/integrate not yet run | HEAD: 499543a836d3 | NEXT: run log/../rerun_reds.sh's three test_w2_96 files on w2/integrate's head (a clean worktree of it) to name them a shared base red (clone check DONE, all 4 as expected: w2/W2-157 clean 7 passed; w2/W2-157 + outside path F4 failed naming it; w2/W2-121c skipped naming it; detached candidate merge skipped "detached HEAD"); then launch rv-1 (independent-auditor, Opus high, --class C1, --projection-usd 3) from briefs/rv-1.md, once the brake is cleared | WAITING ON: the owner's park decision and the CTO's brake clearance
+Workers: td-1 (independent-test-designer, claude-sonnet-5-5 high, session c8a814f3-99d1-495e-9350-567cee698027) DONE, commit 120474643433; no worker running
+Rounds: in progress (review not started)
+Decisions taken: designer copies W2-180's own-branch form (judge_f4_paths(root)); OUTSIDE src/gov/resources/slots.py, INSIDE src/gov/resources/backstop.py
+Open packages: none
+Paths: briefs .gov-runtime/scratch/lead/briefs/{td-1,rv-1}.md; logs .gov-runtime/scratch/lead/log/ (accept-1.txt, rebuild-1.txt, verify/, rerun-reds.txt, clone-check.txt (clone_check.sh was still running at the checkpoint), td-1/); tests worktree removed, branch w2/W2-181-tests deleted

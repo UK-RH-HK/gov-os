@@ -1,0 +1,9 @@
+log: W2-121b-A5-run3b.json
+W2: W2-121b
+status: DONE. Head to land: b24361b51 (`b24361b51` short form; the full hash starts b24361b51…). The tree is clean on w2/W2-121b. The code is verified at 889233218. The only commit after it, b24361b51, changes nothing but the probe record.
+
+task: DAEO-ifgf (W2-121b)
+status: DONE. Head to land: b24361b51 (`b24361b51` short form; the full hash starts b24361b51…). The tree is clean on w2/W2-121b. The code is verified at 889233218. The only commit after it, b24361b51, changes nothing but the probe record.
+work_completed: The new line S5 is built and checked, and it rides this resume as an accepted change with no new review round (DEC-802).
+- I merged w2/integrate into w2/W2-121b as fa608e568, with no conflicts. That brings in 48ef8cf66, which adds `src/gov/resources/config.py` to allowed_paths.
+- One engineer (eng-3, Sonnet 5.5, effo

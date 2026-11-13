@@ -1,0 +1,93 @@
+{
+ "act": "ACT-OPERATOR-HOURS-2",
+ "dec": "DEC-1141, DEC-1104, DEC-1138",
+ "author": "cto",
+ "claimed_class": "O",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/operator/opcommon.py",
+   "before": "e392d8a0e177e999f5361243a053e386f5fccc0619dec7d5e8c832cd756a1024",
+   "after": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87"
+  },
+  {
+   "root": "repo",
+   "path": "tests/unit/operator/test_act_operator_hours_2.py",
+   "before": null,
+   "after": "b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760"
+  },
+  {
+   "root": "repo",
+   "path": "tests/acceptance/W2-148/test_w2_148_gates.py",
+   "before": "1c9c44c33abcdb01c982be7de9a6a224bc7d80e9d45050a0d9216f0e32d10ebc",
+   "after": "0f05dbcefa09ca498ea844b64874802a02e28174fbc6eded77cb869a10e5da6a"
+  },
+  {
+   "root": "repo",
+   "path": "tests/acceptance/W2-148/README.md",
+   "before": "a9e4dc8833e4fddebd7cb360fd7e0944998069a693ea7f1a593f91aacc3e9f26",
+   "after": "625e078ba23d813ded0a30d3da31366841b0053e851569b253386c871061e6e7"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/opcommon.py",
+   "before": "e392d8a0e177e999f5361243a053e386f5fccc0619dec7d5e8c832cd756a1024",
+   "after": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/APPROVED",
+   "before": "97c9a3a5bd22e0bc3546cc12c6c5d9aca8f9f39d145825b6f129b59259895820",
+   "after": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc"
+  }
+ ],
+ "files": {
+  "before/home/gov-os-operator/install/APPROVED": "97c9a3a5bd22e0bc3546cc12c6c5d9aca8f9f39d145825b6f129b59259895820",
+  "before/home/gov-os-operator/install/opcommon.py": "e392d8a0e177e999f5361243a053e386f5fccc0619dec7d5e8c832cd756a1024",
+  "before/repo/governance/project/operator/opcommon.py": "e392d8a0e177e999f5361243a053e386f5fccc0619dec7d5e8c832cd756a1024",
+  "before/repo/tests/acceptance/W2-148/README.md": "a9e4dc8833e4fddebd7cb360fd7e0944998069a693ea7f1a593f91aacc3e9f26",
+  "before/repo/tests/acceptance/W2-148/test_w2_148_gates.py": "1c9c44c33abcdb01c982be7de9a6a224bc7d80e9d45050a0d9216f0e32d10ebc",
+  "after/home/gov-os-operator/install/APPROVED": "1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+  "after/home/gov-os-operator/install/opcommon.py": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+  "after/repo/governance/project/operator/opcommon.py": "123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+  "after/repo/tests/acceptance/W2-148/README.md": "625e078ba23d813ded0a30d3da31366841b0053e851569b253386c871061e6e7",
+  "after/repo/tests/acceptance/W2-148/test_w2_148_gates.py": "0f05dbcefa09ca498ea844b64874802a02e28174fbc6eded77cb869a10e5da6a",
+  "after/repo/tests/unit/operator/test_act_operator_hours_2.py": "b57723caaabb96efce377e6dc3003e6af185a5c580bf36b2d909b95cb528f760",
+  "apply.sh": "f4eaf481a22ca106944d33a73b4afd1bc62f6ce899c54fe3f57e5c6322714988",
+  "list.txt": "34010112c71059f6fe46459794e038d83f7c315aa8999e78766febe67884e578",
+  "keep.txt": "851ee3394cde348686421bd4dd9c0edf1c2c71ef122905e2834eefa08189e0a1",
+  "rehearsal.log": "a4a04d9dc85f1e914c5a127a416189eede88415ed63e927337a1ee2da8534b16"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/opcommon.py\" | grep -c 123e17e5581149725c75babaa9200a09c4854254053df14105b6ce17450bbc87",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/APPROVED\" | grep -c 1e557c49be5802256efa1906753964b53893a2eb507701fac02ebfe4f60914bc",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"^QUIET = \" \"$HOME/gov-os-operator/install/opcommon.py\"",
+   "exit": 1,
+   "count": 0
+  },
+  {
+   "cmd": "grep -c \"^HOLD_FROM = (2, 10)$\" \"$HOME/gov-os-operator/install/opcommon.py\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"opcommon.py\" \"$HOME/gov-os-operator/install/APPROVED\"",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "a4a04d9dc85f1e914c5a127a416189eede88415ed63e927337a1ee2da8534b16"
+ }
+}

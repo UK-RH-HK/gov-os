@@ -1,0 +1,12 @@
+{
+ "ticket": "W2-115",
+ "task": "DAEO-emq1",
+ "branch": "w2/W2-115",
+ "commit": "cb451051363787700c2fbe03d719e43f83665bd6",
+ "requested_at": "2026-11-12 19:57:09",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-12T19:57:09.996333",
+ "merge": "0ff85dcdddd8fd71fb4f7185c48f136134928856",
+ "record": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/0ff85dcdddd8.json",
+ "landed_at": "2026-11-12 20:20:26"
+}

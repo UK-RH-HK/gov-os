@@ -1,0 +1,10 @@
+clone head (detached candidate merge with w2/integrate, as the queue): 4c7a071b7fb1 in /tmp/gov-w2-172-lead3/gov-os-runs/x/clone
+..........s............................................................. [ 40%]
+........................................................................ [ 81%]
+...................s......s......                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-172/test_w2_172_f5_paths.py:30: F5 judges only the ticket's branch w2/W2-172 (this one is 'HEAD'): not judged here
+SKIPPED [1] tests/acceptance/W2-171/test_w2_171_f5_paths.py:50: F5 judges only the branch w2/W2-171; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:46: F5 judges only the branch w2/W2-170; this is a detached HEAD: not judged here
+174 passed, 3 skipped in 98.75s (0:01:38)
+clone rc=0

@@ -1,0 +1,47 @@
+{
+ "manifest_sha256": "c8396adcdd9c3acb24ac6d236a60c351e294bf682430855b5a4545dc952f2344",
+ "check_act": "pass",
+ "validate_manifest": "pass",
+ "path_rule": "pass",
+ "hash_mismatches": [],
+ "unnamed_on_disk": [],
+ "act_class": "O",
+ "rows": [
+  [
+   ".claude/agents/orchestrator.md",
+   "agents-skills-kernel",
+   "b"
+  ],
+  [
+   ".claude/templates/role-cto.md",
+   "claude-rest",
+   "b"
+  ],
+  [
+   ".claude/templates/role-lead.md",
+   "claude-rest",
+   "b"
+  ],
+  [
+   ".rulesync/subagents/orchestrator.md",
+   "rulesync-other",
+   "b"
+  ],
+  [
+   "template/.rulesync/subagents/orchestrator.md",
+   "unknown",
+   "O"
+  ],
+  [
+   "template/governance/kernel/templates/role-cto.md",
+   "agents-skills-kernel",
+   "b"
+  ],
+  [
+   "template/governance/kernel/templates/role-lead.md",
+   "agents-skills-kernel",
+   "b"
+  ]
+ ],
+ "hits": []
+}

@@ -1,9 +1,8 @@
 task: DAEO-qz4p
 decisions_applied: DEC-1101, DEC-1120, DEC-1112, DEC-1113, DEC-1050, DEC-1073
-STATE: build run 2 (P-1 (a)): td-2 running on W2-149's support file in /home/usain/gov-os-worktrees/W2-173-tests (w2/W2-173-tests from ca91895c0) | HEAD: ca91895c0 | NEXT: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-173/.gov-runtime/scratch/lead/log/td-2.exit; then check return, merge tests, rebuild, lead_verify, gov accept W2-149 and W2-173, FULL review | WAITING ON: td-2 (pid 3493111)
-Workers: td-1 done (run 1) · eng-1 done (run 1) · td-2 independent-test-designer, Opus high C3, pid 3493111, launched 02:48 UTC, running
-Rounds: in progress (build verified except S5; FULL review not started)
-Decisions taken: run 1's, plus: no engineer this run (S1-S4 code built in run 1; P-1 (a) is fixtures only); W2-149's two unit cases (tests/unit/orchestration/test_w2_149_indep_launch.py) are outside the paths: named in the return with td-2's needed change; gov context over ceiling (6590 > 6000 tokens): td-2 brief hand-built from run 1's
-Open packages: none (P-2 to its own ticket, the CTO)
-Night hold: no new worker after 03:00 UTC before the nightly
-Paths: briefs lead/briefs/td-2.md; logs lead/log/td-2.*, lead/log/verify/ (run 1), lead/log/accept-w2-149.txt (run 1)
+STATE: run 2c done: FULL review round 1 PASS (rev-1 session 03dbe517, 4 minor findings triaged in the probe record); probe record committed 5cbd79b4e45b | HEAD: 5cbd79b4e45b | NEXT: return DONE; the queue merges and closes | WAITING ON: the CTO (F1 ruling, land)
+Workers: td-1 done (run 1) · eng-1 done (run 1) · td-2 independent-test-designer, Opus high C3, session 13e4417d-3d72-4414-950f-02a1cea823dc, exit 0 DONE, 009642705 merged 05abbd36f (tests worktree and branch removed) · rev-1 independent-auditor: brief written, not launched · eng-2 engineer Opus high C3, session 3e07607e-d91e-41f4-88f8-521c69fec9bf, exit 0 DONE (d37564498) · rev-1 launched 03ccf53d74b8
+Rounds: build converged; FULL review round 1 PASS (converged)
+Decisions taken: run 1's, plus: no engineer in run 2 (P-1 (a) is fixtures only; the script is unchanged since b95bae7bf); W2-149's two unit cases (tests/unit/orchestration/test_w2_149_indep_launch.py) are outside the paths: their needed change is in the evidence's run-2 section and td-2's /home/usain/gov-os-worktrees/W2-173-tests/.gov-runtime/scratch/td2-unit-proposal.diff (gone with the removed worktree; the text is in the evidence and in lead/log/td-2.json); W2-96's six signal reds are not this ticket's (src/ and tests/unit/accept untouched against the merge-base 70e5840d9; red alone with the empty HOME, 13 failed and 7 passed; run 1 green alone with the real HOME); gov context over its ceiling (6590 > 6000 tokens): briefs hand-built
+Open packages: none (P-2, the hidden/dropped exclusion, goes to its own ticket, the CTO)
+Paths: briefs lead/briefs/{td-2,rev-1}.md; logs lead/log/td-2.*, lead/log/verify/ (run 2, head 05abbd36f), lead/log/accept-w2-173-r2.txt, lead/log/accept-w2-149-r2.txt, lead/log/rebuild-2.txt, scratch/rerun-w296.sh

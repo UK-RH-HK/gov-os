@@ -1,0 +1,80 @@
+2026-11-12 19:14:09 admitted by the dispatcher; launching W2-121b
+disk gate open: 779 GiB free, 61696751 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 16925011968,
+  "sessions_live_memory_bytes": 1160896512,
+  "load_1m": 3.42,
+  "load_15m": 14.88,
+  "busy_cores_1m": 2.04,
+  "embedding_cpu_p95": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 835540647936,
+    "free_inodes": 61696751
+  },
+  "sessions": [
+    {
+      "pid": 1022029,
+      "repository": "/home/usain/gov-os-worktrees/W2-172",
+      "ticket": "DAEO-p8tv",
+      "role": "orchestrator",
+      "live_memory_bytes": 294989824
+    },
+    {
+      "pid": 1024360,
+      "repository": "/home/usain/gov-os-worktrees/W2-88a-tests",
+      "ticket": "DAEO-pg6i",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 272928768
+    },
+    {
+      "pid": 4193626,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "orchestrator",
+      "live_memory_bytes": 296062976
+    },
+    {
+      "pid": 992487,
+      "repository": "/home/usain/gov-os-worktrees/W2-88a",
+      "ticket": "DAEO-pg6i",
+      "role": "orchestrator",
+      "live_memory_bytes": 296914944
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1029147,
+    "repository": "/home/usain/gov-os-worktrees/W2-121b",
+    "ticket": "DAEO-ifgf",
+    "role": "orchestrator",
+    "started": "2026-11-12T19:14:09+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 9675649
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 19:14:09 gate open; DAEO-ifgf registered as pid 1029147; starting W2-121b

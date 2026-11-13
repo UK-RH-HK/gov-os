@@ -1,0 +1,87 @@
+2026-11-12 17:17:05 admitted by the dispatcher; launching W2-115
+disk gate open: 784 GiB free, 62128794 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 15880245248,
+  "sessions_live_memory_bytes": 1466388480,
+  "load_1m": 3.37,
+  "load_15m": 11.3,
+  "busy_cores_1m": 4.4,
+  "embedding_cpu_p95": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 841225084928,
+    "free_inodes": 62128794
+  },
+  "sessions": [
+    {
+      "pid": 1062083,
+      "repository": "/home/usain/gov-os-worktrees/W2-157",
+      "ticket": "DAEO-ozyt",
+      "role": "orchestrator",
+      "live_memory_bytes": 261554176
+    },
+    {
+      "pid": 2130060,
+      "repository": "/home/usain/gov-os-worktrees/W2-121b",
+      "ticket": "DAEO-ifgf",
+      "role": "orchestrator",
+      "live_memory_bytes": 267595776
+    },
+    {
+      "pid": 2189192,
+      "repository": "/home/usain/gov-os-worktrees/W2-124",
+      "ticket": "DAEO-mb2t",
+      "role": "orchestrator",
+      "live_memory_bytes": 270163968
+    },
+    {
+      "pid": 2731556,
+      "repository": "/home/usain/gov-os-worktrees/W2-45",
+      "ticket": "DAEO-neam",
+      "role": "orchestrator",
+      "live_memory_bytes": 289828864
+    },
+    {
+      "pid": 3317872,
+      "repository": "/home/usain/gov-os-worktrees/W2-121b",
+      "ticket": "DAEO-ifgf",
+      "role": "engineer",
+      "live_memory_bytes": 377245696
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 3405802,
+    "repository": "/home/usain/gov-os-worktrees/W2-115",
+    "ticket": "DAEO-emq1",
+    "role": "orchestrator",
+    "started": "2026-11-12T17:17:05+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 9043417
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-12 17:17:05 gate open; DAEO-emq1 registered as pid 3405802; starting W2-115

@@ -1,0 +1,35 @@
+day          pts   rd_h  pts/h  usd            tiers                          closed    recs  merges  runs   seen  lead_h  usd/cl  pts/ldh  pts/cl
+2026-11-02   19.0  23.6  0.80   gap            gap                            0         0     5       gap    10    36.55   gap     0.52     -     
+2026-11-03   gap   gap   gap    gap            gap                            0         0     21      gap    0     0.00~   gap     -        -     
+2026-11-04   gap   gap   gap    gap            gap                            0         0     19      gap    0     0.00    gap     -        -     
+2026-11-05   gap   gap   gap    gap            gap                            0         0     1       gap    0     0.00    gap     -        -     
+2026-11-06   gap   gap   gap    gap            gap                            6 (+29b)  0     10      gap    0     0.00~   gap     -        -     
+2026-11-07   14.0  9.2   1.52   271.21 (+18u)  ? 170.3, opus 100.9            0         0     3       gap    0     0.00    -       -        -     
+2026-11-08   10.0  24.0  0.42   109.05 (+18u)  ? 96.6, opus 12.5              0         0     0       gap    0     0.00    -       -        -     
+2026-11-09   31.1  24.0  1.29   379.23 (+21u)  ? 352.0, opus 27.2, haiku 0.1  0         0     25      gap    0     0.00    -       -        -     
+2026-11-10   24.9  24.0  1.04   201.56 (+5u)   ? 191.7, opus 5.5, sonnet 4.4  0         0     41      gap    0     0.00    -       -        -     
+2026-11-11   20.0  24.0  0.83   131.12         opus 124.8, sonnet 6.3         21        21    12      gap    17    11.63~  6.24    1.72~    0.95  
+2026-11-12   34.0  24.0  1.42   268.78 (+11u)  opus 165.7, sonnet 103.1       26        26    27      31+1R  34    75.71   10.34   0.45     1.31  
+2026-11-13*  9.0   7.3   1.23   67.46 (+1u)    sonnet 44.2, opus 23.2         12        12    3       9      10    19.55   5.62    0.46     0.75  
+
+Pooled, 2026-11-08..2026-11-12 (5 full days with usage and spend): 120.0 pts, usd 1089.7, closed 47, merges 105; usd/pt 9.08; usd/merge 10.38; usd/close 23.19; pts/merge 1.14 (closes arrive in batches through the close queue, so per-close figures lag the work).
+Change, first 3 days (2026-11-02..2026-11-04) vs last 3 full days (2026-11-10..2026-11-12); n = days having the source:
+  pts/h       first 0.80 (n=1)  last 1.10 (n=3)  change +36%
+  usd/day     first gap (n=0)  last 200.48 (n=3)  change: gap in one window
+  closed/day  first 0.00 (n=3)  last 15.67 (n=3)  change n/a
+  merges/day  first 15.00 (n=3)  last 26.67 (n=3)  change +78%
+  lead_h/day  first 18.27 (n=2)  last 37.86 (n=2)  change +107%
+  usd/close   first gap (n=0)  last 8.51 (n=2)  change: gap in one window
+  pts/close   first gap (n=0)  last 1.15 (n=2)  change: gap in one window
+
+Sources and gaps:
+  usage: usage.txt + usage-lines.log, 674 readings (0 lines not readable as a week percent); pts = points gained (a drop = reset: gain = new value); rd_h = hours covered by readings; * = current partial day.
+  usage gap: 2026-11-02 23:38 .. 2026-11-07 14:47 UTC (111.1 h, 37% -> 82%): points not split by day; 0.41 pts/h on average over the gap
+  spend: spend.jsonl 2026-11-07..2026-11-13 (556 rows); days before the first row are a gap; (+Nu) = rows with no cost_usd (not summed, so usd is a floor); the CTO's own session and unpriced agents are not in it; tier ? = no tier, model or tier word in the row's text.
+  closed = tickets closed (status closed, not withdrawn; closing commit date; 0 undated, 2 withdrawn skipped); recs = close records (82 files; 'Closed:' line, 19 by git first-add); merges = first-parent merges into the branch.
+  leads: runs = lead-ledger runs started (+R = refused); seen = distinct lead trees in the samples; lead_h = lead-hours (lead-mem.jsonl before 2026-11-11 18:53:14+00:00, lead-mem-watch in_status after); samples are about a minute apart.
+  ~ = lead samples cover under 85% of the day's hours (lead_h under-counted, pts/lead_h over-stated): 2026-11-03 (13.36 h), 2026-11-06 (20.11 h), 2026-11-11 (8.92 h)
+  bulk close: 29 tickets closed by one commit 1504705509d9 on 2026-11-06 (D9 fates batch 3: whole-ticket fates (22 retired, 7 merged, 9 Wave 3, 12 formal-close note); shown as (+Nb) and left out of every ratio.
+spend by role over the range (usd 1428.4): (experiment, no role recorded) 332.8, (worker, no role recorded) 302.2, independent-auditor 277.0, independent-test-designer 183.7, engineer 131.2, (launched worker, no role recorded) 104.5
+spend by tier: ? 810.6, opus 459.7, sonnet 158.0, haiku 0.1
+spend by model: ? 951.2, claude-opus-5-5 285.1, claude-sonnet-5-5 152.6, opus 34.1, sonnet 5.4

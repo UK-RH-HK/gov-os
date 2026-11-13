@@ -1,0 +1,5 @@
+TESTS-READY DAEO-qvff (W2-111), run 3: merge commit 3da7242f4461 on w2/W2-111 (w2/W2-111-tests: a5bf1c0131b8 form B, e3b1d59d70f6 README names DEC-1163 (3)); branch w2/W2-111-tests deleted.
+The 15 hook-latency cases (W1-02 x5, W1-05 x9, W2-57 x1): 15 passed on 3da7242f4461 (lead run 2026-11-13 ~11:25, load 5.6, 47.6 s; log/lead-cases-3.xml). Collect-only: same 15 ids as collect-before.txt.
+The three files' default tier: 22 passed, 72 deselected by the conftest's opt-in lists (log/lead-files-3b.xml).
+gov accept W2-111: ACCEPT_NO_TESTS (declared tests/acceptance/W2-111/ is not in the ticket's allowed_paths; judged on its revised suites, DEC-892).
+Measure: DEC-1163 (3) (P-W2-111-MEASURE-1 (a)). Probe: probes/PR-DAEO-qvff.md (PASS). Pending: the CTO's load benchmark against 3da7242f4461 before the land.

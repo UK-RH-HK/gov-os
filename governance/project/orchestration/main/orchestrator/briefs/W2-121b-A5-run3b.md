@@ -1,0 +1,82 @@
+# Your assignment
+You are a fresh orchestrator session. Your role's rules are in your system prompt (template `role-lead`); this brief gives this assignment's facts.
+Ticket DAEO-ifgf (W2-121b), profile FULL. Objective: gov dispatch, part b: landing: the landing hand-off, no wait on a non-conflicting close, the nightly never kept from starting. Split from W2-121 (DAEO-cb2b) by the CTO's delegated decision on its run 1's P-W2-121-1 (a) and P-W2-121-3 (a), 2026-11-12: these KPI lines moved word for word; it builds on part a's Interface (in W2-121's ticket) and runs after it. The reference is the CTO's dispatcher (`governance/project/orchestration/tools/dispatch/`), never a target.
+
+## Where you work
+| what | path |
+|---|---|
+| your tree (write here only) | /home/usain/gov-os-worktrees/W2-121b |
+| branch | w2/W2-121b |
+| allowed paths | src/gov/dispatch/**, tests/unit/dispatch/test_w2_121b*, src/gov/resources/slots.py, docs/probes/DAEO-ifgf/**, src/gov/resources/config.py |
+| ticket file (read-only) | /home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-ifgf.md |
+| your scratch | /home/usain/gov-os-worktrees/W2-121b/.gov-runtime/scratch/ |
+
+## What must be true (KPI lines and how each is checked)
+| id | line | verify |
+|---|---|---|
+| S1 | Every ticket the orchestrator approved to land goes to the project's landing command (W2-115 (which took W2-117), where it exists; a configured command otherwise) as one batch whenever it is free, the tree clean and on the integration branch, and no close running; never one not approved, never twice (the approvals claimed before the launch); each outcome becomes an inbox item | planted approvals: an approved ticket goes to the landing command as one batch when the tree is clean, on the integration branch and no close runs; an unapproved ticket never goes; an approved one never goes twice (the approval is claimed before the launch); each outcome is an inbox item. [DEC-1007, DEC-989] [re-worded, DEC-1084] |
+| S2 | A landing never waits for a close it does not conflict with: a running close blocks a landing only when a ticket it closes is among the landing's, or while it is committing its records; otherwise the landing goes ahead, and two record commits never collide (retried) | planted closes: a running close with a ticket in the landing's set blocks the landing, as does one committing its records; a running close with no shared ticket does not block it; two record commits at the same time both land (one retried). [DEC-1014 item 5] |
+| S3 | The project's nightly is never kept from starting by a landing: from a configured time before its start until it has started (its running marker), or a configured latest time, the dispatcher claims no landing; one already running is finalised; the status names the hold | a planted configured hold time before the nightly: from then until its running marker (or the latest time) no landing is claimed, a landing already running is finalised, and the status names the hold. [DEC-1018 item 1] |
+| S4 | Every heavy step takes a heavy-job slot (W2-20: test runs, rebuilds, full checks, retrieval measures), so peaks stay capped whenever they come; a heavy step found running outside a slot is named in the status as a finding | a planted heavy step (test run, rebuild, full check, retrieval measure) is shown holding a slot; a planted one running with no slot is named in the status as a finding. [DEC-1008, DEC-979 D1] |
+| S5 | The template's default `working_size_bytes` (a new machine's `gate.json`, `src/gov/resources/config.py`) is 805,306,368 B (0.75 GiB per live session), dated 2026-11-12 with its source DEC-1149, as this machine's gate now holds (ACT-P95-1) | a unit case reads `config.template()` and finds working_size_bytes 805306368 with the date and the source naming DEC-1149 [DEC-1149 (2)] |
+Non-goals (do not build, do not test): the dispatcher core (W2-121, part a) and the other parts
+Done when: the DoD lines DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6 hold for your part.
+
+## Inputs
+- Sources: DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb. Read each by id in /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md, or ask memory (below).
+- What the lead knows of the ground: This is run 3b of W2-121b (DAEO-ifgf), a short resume (your run 3 returned P-W2-121b-2: decided (a), `src/gov/resources/config.py` is now in allowed_paths at 48ef8cf66; merge w2/integrate first so your ticket carries it; the unit case goes in `tests/unit/dispatch/test_w2_121b_config_default.py`): read your CHECKPOINT.md first. Your run 2 returned DONE at 18:46 (head 4a8634017, review round 2 pass). The owner widened this ticket by one KPI line (DEC-1149 (2); the ticket's last success line and its last section): the template's default `working_size_bytes` in `src/gov/resources/config.py` becomes 805,306,368 B (0.75 GiB per live session), dated 2026-11-12 with its source naming DEC-1149, as ACT-P95-1 set on this machine. Do: merge w2/integrate into w2/W2-121b (keep both sides); one engineer (Sonnet, high, C2) makes the one-line change and adds one unit case under the ticket's unit-test paths (reads `config.template()` and finds 805306368 with the date and source); rebuild, lead_verify, gov accept. It rides as an accepted change in a resume (DEC-802): no new review round; record it in the probe record's notes. Return DONE with the head to land.
+Class C2 (RUBRIC-2): the engineer on Sonnet, high (claude-sonnet-5-5, --class C2). Every pytest through bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh, with a TMPDIR outside the repository and outside ~/gov-os-runs, PYTHONUSERBASE=/home/usain/.local, -p no:cacheprovider -o tmp_path_retention_policy=failed. The base-red rule holds. A resource gate's refusal is a wait (DEC-1146). No new ticket and no further widening. A session refused twice for an action by the guard, the sandbox or a hook stops and says so (DEC-1142 (9)).
+Keep contexts short; before compaction the hook writes your checkpoint. Return DONE with the head, or PACKAGES.
+none
+
+## Commands (copy them as they are)
+| name | command |
+|---|---|
+| identity | `printenv GOV_ROLE GOV_TICKET` |
+| where | `git -C /home/usain/gov-os-worktrees/W2-121b rev-parse --show-toplevel --abbrev-ref HEAD` |
+| retrieve | `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}"` |
+| context | `gov context DAEO-ifgf --role {WORKER_ROLE}` |
+| launch_worker | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/launch_worker.sh {WORKER_ROLE} {EFFORT} {BRIEF_FILE}` |
+| wait_for | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}` |
+| tests_worktree | `git -C /home/usain/gov-os-worktrees/W2-121b worktree add /home/usain/gov-os-worktrees/W2-121b-tests -b w2/W2-121b-tests HEAD` |
+| merge_tests | `git -C /home/usain/gov-os-worktrees/W2-121b merge --no-ff w2/W2-121b-tests -F {MESSAGE_FILE}` |
+| accept | `gov accept W2-121b --root /home/usain/gov-os-worktrees/W2-121b` |
+| rebuild | `env PYTHONPATH=/home/usain/gov-os-worktrees/W2-121b/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh /home/usain/gov-os-worktrees/W2-121b` |
+| lead_verify | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh /home/usain/gov-os-worktrees/W2-121b W2-121b DAEO-ifgf` |
+| tests_worktree_remove | `git -C /home/usain/gov-os-worktrees/W2-121b worktree remove /home/usain/gov-os-worktrees/W2-121b-tests` |
+| links | `gov links --since {BASE}` |
+Ask memory first: outside the sandbox gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}" "<which decision governs X | where is Y implemented>"; inside it, the Read and Grep tools [DEC-1065]; grep the register only by id.
+Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read.
+No `gov retrieve` in the sandbox, and no `gov context`: a launched worker searches with the Read and Grep tools, and searches again once the same way [DEC-1065].
+Every whole-folder pytest run adds `-m "not local_only" -k "not real and not green_here and not time_limit"` and an empty `HOME`: run it as env HOME=/home/usain/gov-os-worktrees/W2-121b/.gov-runtime/scratch/empty-home PYTHONPATH=/home/usain/gov-os-worktrees/W2-121b/src python3 -m pytest {FOLDER} -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit" [DEC-1065].
+Wait for anything long with bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}, one call per 9.5 min; never a hand-written sleep loop.
+No merge inside the sandbox: the CTO or your lead merges into your branch outside it; a restore or conflict resolution in `tests/acceptance/` is a test designer's [DEC-1052].
+
+## Forms that work (the guard and the harness accept these)
+- Write and edit files with the Write and Edit tools and absolute paths.
+- Anything longer than one line goes in a script file under /home/usain/gov-os-worktrees/W2-121b/.gov-runtime/scratch/, run with `bash <file>` or `python3 <file>`.
+- Use literal paths, never a shell variable or `$(…)` as a write target; name the folder a listing or search starts at.
+- The harness allows these headless without asking: Bash, Read, Edit, Write, Grep, Glob. For anything else use a script file as above, or report it; never retry another form.
+
+## Commit (your paths only)
+```
+git commit -m "{SUBJECT}" --trailer "Task: DAEO-ifgf" --trailer "Role: orchestrator" --trailer "Implements: DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb" -- {COMMIT_PATHS}
+```
+- `Task:` is the ticket's id (DAEO-ifgf, a `DAEO-…` id), never a W2 id [DEC-182].
+- `Implements:` lists only ids from the ticket's `sources:`, each ACCEPTED [DEC-927].
+- Put an id you need that is not in `sources:` in `discoveries`, never into `Implements:` alone [DEC-1073].
+- Cite only ACCEPTED decisions as rules; name a PROPOSED one "proposed", never as the rule [DEC-1073].
+
+## Return (your last message; nothing else is read)
+The twelve fields first, each a labelled line ("none" where nothing), then each section below, always present:
+```
+task: / status: / work_completed: / files_changed: / evidence: / tests: / discoveries: / risks: / lessons: / proposed_decisions: / unresolved: / recommended_next_action:
+template: role-lead@1.0.1
+commits: <hash12> <subject> | Task/Role/Implements as committed
+brief_gaps: none | - <what was missing> | <where it belonged: template, facts, ticket, tool> | <minutes, est.>
+guard_refusals: none | - <time> | <the command's form, one line> | <the rule's reason as the hook gave it> | true or false-positive [DEC-958]
+```
+Refused twice for the same call: stop and say so. Never work around a refusal: report it.
+
+## Your run: resume (only this section is in your brief)
+**resume**: read /home/usain/gov-os-worktrees/W2-121b/.gov-runtime/scratch/lead/CHECKPOINT.md; do its NEXT line; then continue in the run kind it names.

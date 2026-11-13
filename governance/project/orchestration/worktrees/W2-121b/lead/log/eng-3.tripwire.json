@@ -1,0 +1,81 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "head",
+   "before": "fa608e5683f8",
+   "after": "88923321806f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-121b",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/digest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/driver.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/schedule.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172-tests",
+   "change": "head",
+   "before": "80da3fbcca0d",
+   "after": "5193add3965d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-172/test_w2_172_s2_s4_refusals.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-172-tests",
+   "change": "acceptance folder",
+   "folder": "W2-172"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/test_w2_88a_citp_and_copies.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/test_w2_88a_matchers.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/test_w2_88a_skill_order.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/test_w2_88a_verify_section.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-88a/w2_88a_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88a-tests",
+   "change": "acceptance folder",
+   "folder": "W2-88a"
+  }
+ ]
+}

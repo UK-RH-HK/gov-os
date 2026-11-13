@@ -1,0 +1,35 @@
+== 2026-11-12 04:04:23 nightly_cron: start
+code: governance/project/orchestration/nightly at b2e6256fa, tree 303156c9759a
+rotate: done
+2026-11-12 04:04:23 nightly night: estimate {"estimate_s": 3554, "parallel_s": 1763, "serial_s": 1427, "setup_s": 41, "effective_workers": 7.58, "margin": 1.1, "runs": ["history", "history", "history"]}
+latest start 07:00
+head 9bbef27f1d05
+seed: seeded (copy): vectors only, 26515 vectors from /home/usain/gov-os-worktrees/W2-00-store-b at 9bbef27f1d05 in 1.0 s
+secrets full scan: off by configuration (DEC-1045)
+clone rebuilt
+gate: OPEN full-run leads=0 load=0.9/1.2 nproc=20 have=19751956kB need=10550220kB
+heavy-job slots held: 3 of 3 (waited 0 s)
+the suites' thread budget and CPU sets: the gate's, for the slots held (1,2,3)
+heavy-job slots released after the suites
+parallel exit 1 in 1097 s: 13 failed, 10588 passed, 57 skipped, 1 xfailed, 6 warnings in 1020.74s (0:17:00)
+serial exit 1 in 1365 s: 2 failed, 134 passed, 39 deselected, 1 warning in 1289.18s (0:21:29)
+red-alone tests/acceptance/W2-170/test_w2_170_s4_map.py::test_f3_a_run_s_file_access_log_shows_no_open_of_the_true_sets_root_or_runs_folders: 1 failed in 0.57s
+red-alone tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGINT]: 1 failed in 86.98s (0:01:26)
+red-alone tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGINT]: 1 failed in 84.83s (0:01:24)
+red-alone tests/acceptance/W2-96/test_w2_96_at_no_leak.py::test_an_interrupted_run_stops_its_child_and_leaves_nothing: 1 failed in 60.61s (0:01:00)
+red-alone tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]: 1 failed in 60.78s (0:01:00)
+red-alone tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]: 1 failed in 60.46s (0:01:00)
+red-alone tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends[a-second-press-once-the-removal-began]: 1 failed in 120.95s (0:02:00)
+red-alone tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]: 1 failed in 2.41s
+red-alone tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]: 1 failed in 62.47s (0:01:02)
+red-alone tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal[SIGINT]: 1 failed in 60.57s (0:01:00)
+red-alone tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]: 1 failed in 2.41s
+red-alone tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it: 1 failed in 60.48s (0:01:00)
+red-alone tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored: 1 failed in 0.15s
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95: 1 failed in 70.42s (0:01:10)
+red-alone tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget: 1 failed in 52.44s
+verdict: red 15
+duration: estimate 3554 s, actual 3352 s (setup 44 s, lock wait 0 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261112-0404
+2026-11-12 05:00:15 done
+== 2026-11-12 05:00:16 nightly_cron: end, exit 0

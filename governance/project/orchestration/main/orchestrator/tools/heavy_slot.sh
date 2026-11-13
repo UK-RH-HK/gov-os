@@ -153,19 +153,47 @@ prio_waiting() {
 }
 [ -n "$PRIO" ] && { : > "$MINE"; trap 'rm -f "$MINE"' EXIT; }
 said=""
+# DEC-1157 (13): every wait for a slot is logged (one JSON line when the run starts after waiting); (10): a priority
+# caller (the merge queue, a close) holds at most PRIO_CAP of the slots; while capped it does not register as a waiter,
+# so a lead may take the free slot (DEC-1011's priority applies below the cap only).
+WAITLOG=${GOV_HEAVY_WAITLOG:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl}
+PRIO_CAP=${GOV_HEAVY_PRIO_CAP:-2}
+T0=$(date +%s)
+prio_held() {  # live priority runs holding a slot
+  local n=0 f p
+  for f in "$DIR"/gov-os-heavy-prioheld-*; do
+    [ -e "$f" ] || continue
+    p=$(cat "$f" 2>/dev/null)
+    if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then n=$((n + 1)); else rm -f "$f"; fi
+  done
+  echo "$n"
+}
 while :; do
   if [ -z "$PRIO" ] && prio_waiting; then
     [ -z "$said" ] && { echo "heavy_slot: a landing or close waits first; waiting ($(date '+%F %T'))" >&2; said=1; }
     sleep 10; continue
   fi
+  if [ -n "$PRIO" ] && [ "$(prio_held)" -ge "$PRIO_CAP" ]; then
+    rm -f "$MINE"  # capped: not a waiter, so leads may take the free slot
+    [ -z "$said" ] && { echo "heavy_slot: priority runs hold $PRIO_CAP slots (the cap, DEC-1157 (10)); waiting ($(date '+%F %T'))" >&2; said=1; }
+    sleep 2; continue
+  fi
+  [ -n "$PRIO" ] && [ ! -e "$MINE" ] && : > "$MINE"
+  WAITED=$(( $(date +%s) - T0 ))
   for ((i = 1; i <= SLOTS; i++)); do
     s=$(share "$i")
     budget "$s" "$(ncpus "$s")" "$PYTEST_XDIST_AUTO_NUM_WORKERS"
     export GOV_HEAVY_SLOT=$i
     if [ -n "$PRIO" ]; then  # the registration ends the moment the slot is taken, not when the run ends
-      flock -n -o -E "$BUSY" "$DIR/gov-os-heavy-slot-$i.lock" bash -c 'rm -f "$0"; exec "$@"' "$MINE" "${PREFIX[@]}" "$@"
+      flock -n -o -E "$BUSY" "$DIR/gov-os-heavy-slot-$i.lock" bash -c '
+        rm -f "$0"; m="$1"; w="$2"; l="$3"; shift 3; echo $$ > "$m"; trap "rm -f \"$m\"" EXIT
+        [ "$w" -gt 0 ] && printf "{\"t\": \"%s\", \"waited_s\": %s, \"slot\": %s, \"priority\": true, \"cwd\": \"%s\", \"cmd\": \"%s\"}\n" "$(date "+%F %T")" "$w" "${GOV_HEAVY_SLOT}" "$PWD" "$(echo "$*" | cut -c1-120 | tr -d "\"\\\\")" >> "$l" 2>/dev/null
+        "$@"' "$MINE" "$DIR/gov-os-heavy-prioheld-$i" "$WAITED" "$WAITLOG" "${PREFIX[@]}" "$@"
     else
-      flock -n -o -E "$BUSY" "$DIR/gov-os-heavy-slot-$i.lock" "${PREFIX[@]}" "$@"
+      flock -n -o -E "$BUSY" "$DIR/gov-os-heavy-slot-$i.lock" bash -c '
+        w="$0"; l="$1"; shift 1
+        [ "$w" -gt 0 ] && printf "{\"t\": \"%s\", \"waited_s\": %s, \"slot\": %s, \"priority\": false, \"cwd\": \"%s\", \"cmd\": \"%s\"}\n" "$(date "+%F %T")" "$w" "${GOV_HEAVY_SLOT}" "$PWD" "$(echo "$*" | cut -c1-120 | tr -d "\"\\\\")" >> "$l" 2>/dev/null
+        exec "$@"' "$WAITED" "$WAITLOG" "${PREFIX[@]}" "$@"
     fi
     rc=$?
     [ "$rc" -ne "$BUSY" ] && { [ -n "$PRIO" ] && rm -f "$MINE"; exit "$rc"; }

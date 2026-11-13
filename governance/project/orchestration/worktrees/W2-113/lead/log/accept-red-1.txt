@@ -1,0 +1,45 @@
+{
+  "ticket": "DAEO-g29a",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "fail",
+      "passed": 15,
+      "failed": 15,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "fail",
+      "passed": 24,
+      "failed": 20,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-1",
+      "outcome": "fail",
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-2",
+      "outcome": "fail",
+      "passed": 10,
+      "failed": 4,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 39,
+    "failed": 35,
+    "skipped": 0
+  }
+}

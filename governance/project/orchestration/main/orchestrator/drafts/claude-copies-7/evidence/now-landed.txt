@@ -1,0 +1,16 @@
+=== tests/acceptance/W2-98
+502 passed in 38.00s
+=== tests/acceptance/W2-11
+199 passed, 1 skipped in 6.57s
+=== tests/unit/adapters
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2 failed, 100 passed, 40 deselected in 5.68s
+=== tests/acceptance/W2-153
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body[orchestrator-.rulesync]
+FAILED tests/acceptance/W2-153/test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository
+2 failed, 64 passed in 8.72s
+=== tests/acceptance/W1-33
+112 passed, 2 deselected in 16.80s
+=== tests/acceptance/W1-38
+42 passed, 159 deselected in 57.35s

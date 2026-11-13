@@ -1,0 +1,34 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "head",
+   "before": "6831c6e3ab3a",
+   "after": "569c2933d33c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "acceptance folder",
+   "folder": "W1-39"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115",
+   "change": "acceptance folder",
+   "folder": "W2-77"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-115-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23",
+   "change": "head",
+   "before": "dc4123993a37",
+   "after": "d2034dcf1478"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-23-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

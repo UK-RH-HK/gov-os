@@ -1,0 +1,6 @@
+Merge w2/W2-179-tests (DAEO-c9n8): W2-170's F3 case excludes the repository's own root from the true runs-folder and sets-root opens, with its guard (td-1, 3c1981b03)
+
+Task: DAEO-c9n8
+Role: orchestrator
+Implements: DEC-820, DEC-866, DEC-966, DEC-1101
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

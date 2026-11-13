@@ -1,9 +1,8 @@
-STATE: build run 2, iteration 2 returned: eng-2 PACKAGES (fixes committed; gov accept crashes in its sandbox); verify 2 and accept-2 running on 20b33403f; the spend brake tripped for W2-115 (22.91 USD, brake 20; inbox 20261112-023252-spend-brake.txt): no further launch until the CTO clears it; night hold from 03:00 | HEAD: 20b33403f | NEXT: wait_for.sh .gov-runtime/scratch/lead/log/verify/verify.exit and accept-2.exit; read alone-2.txt; return (no review this run: the brake and the night hold) | WAITING ON: lead_verify (pid 3316410), gov accept (background), alone-2 (background)
-Workers: td-1 DONE ($6.41) · eng-1 f12efad7-fc16-481c-a9f1-c8b7f093f989 PACKAGES ($11.43) · td-2 DONE ($1.06, 0bae231ad merged a1104449d) · eng-2 4a29722c-bd73-421e-b2b8-60a994fb5030 PACKAGES ($4.01; commits 0fb32b21f 7e04abcb8 1e4275491 d7360e45a 20b33403f)
-Rounds: in progress (build iteration 2 of at most 3)
-Verify 1 (646f14e0a5e8): RED 26 failed of 4172; accept 64/13
-Decisions taken: briefs/shared-interface.md · P1 (a) batch via `gov.close.batch run` · P-TD-1 (a) load-sensitive = serial-only kind latency · td-2 for the warm-clone test defect
-Open packages (for the return): PK-1 W1-39 overlay vs the template close.yaml; PK-2 W2-77 exact nightly keys vs secrets_full_scan; PK-3 the spend brake (a review round needs a launch)
-Paths: briefs .gov-runtime/scratch/lead/briefs/; logs .gov-runtime/scratch/lead/log/
+STATE: run 5 ended: DONE (not landed: the owner first gets how EXAMIN's copy gets its first green base). P1-K (a) built: td-5 (374cc59e9, 4f8897e00), eng-7 (1b400c263, 34601a7ba), lead doc b08fae150, probe note ea6dc2c14; verify at b08fae150258: 1 red, W2-157 backstop, load-sensitive (green alone, alone-5.txt), not this ticket's; serial green; gov accept 88/0 (S12 no tests, P4) | HEAD: ea6dc2c14727 | NEXT: none (the queue lands on the CTO's word after the owner's EXAMIN first-green-base answer) | WAITING ON: the CTO/owner (EXAMIN's first green base)
+Workers: run 5: td-5 52989e19-3afc-4b72-81e8-e57cb5c9ac8c DONE ($3.45, R2-5 refused by reads_denied); eng-7 49da35c0-2dce-4290-9c26-dcd87d1649f5 DONE ($1.34)
+Rounds: review round 2 the last (FAIL); the fix accepted riding a resume (DEC-802), no round 3 (DEC-1010); build converged
+Decisions taken: P1-K (a) applied (the owner's, DEC-1150 (2)); R2-5 moved to the engineer after the guard denied the test designer's read; the lead brought two stale research-doc passages to the rule
+Open packages: none; PK-7 deferred with PK-5 (the CTO); R2-3, R2-6 rows
+Paths: briefs lead/briefs/td-5.md, eng-7.md; logs lead/log/eng-7.*, verify/, alone-5.txt, accept-8.*, links-5.txt, rebuild-5.out; TESTS-READY; tests worktree and branch removed
 task: DAEO-emq1
-decisions_applied: DEC-1052, DEC-1112, DEC-983, DEC-963, DEC-1065, DEC-968, DEC-096, DEC-105, CAP-33
+decisions_applied: DEC-1150, DEC-1010, DEC-802, DEC-988, DEC-989, DEC-979, DEC-1002, DEC-136, DEC-963, DEC-1142, DEC-1146

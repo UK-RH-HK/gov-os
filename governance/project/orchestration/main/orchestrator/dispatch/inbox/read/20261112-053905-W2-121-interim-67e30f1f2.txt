@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-121
+status: interim result 67e30f1f2: W2-121 (DAEO-cb2b): probe record, review round 1: FAIL (S4: F-1 a deleted inbox item is rewritten as unread, F-2 a failed notification is never retried; F-3 to F-6 recorded)
