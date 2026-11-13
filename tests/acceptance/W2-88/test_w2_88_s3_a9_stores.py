@@ -105,6 +105,7 @@ def test_s3_a_second_rebuild_waits_for_the_first_under_w2_76s_lock(worlds):
     adoption = W.fork(nine, "fork-lock")
     lock, release = adoption.box.lock, adoption.box.base / "release"
     holder = subprocess.Popen([sys.executable, str(HOLDER), str(lock), str(release), "120"], stdout=subprocess.PIPE, text=True)
+    process = None
     try:
         assert holder.stdout.readline().startswith("held"), "the stand-in holder did not take the lock"
         process = subprocess.Popen([sys.executable, "-m", "gov.cli.main", "adopt", "--lite", "--stage", "A9", "--out",
@@ -121,10 +122,8 @@ def test_s3_a_second_rebuild_waits_for_the_first_under_w2_76s_lock(worlds):
     finally:
         release.write_text("go", encoding="utf-8")
         holder.wait(timeout=30)
-        try:
+        if process is not None and process.poll() is None:
             process.kill()
-        except Exception:  # noqa: BLE001
-            pass
 
 
 # ---- S4 / F3: four digests ------------------------------------------------------------------------------------
