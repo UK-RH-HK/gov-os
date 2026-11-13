@@ -435,12 +435,30 @@ def test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no
     second times out at all three tries, no later batch is sent; the semantic stage is ``not_recreated`` with R3's
     reason, so the tries and waits are stated in the rebuild's result. The vectors of the first batch may stay, but
     the store is not reported as built: a search without refresh reports ``FACET_UNAVAILABLE``, ``stale``, no hit.
-    The base code tries once and states the bare ``NO_EMBEDDING``."""
+    The base code tries once and states the bare ``NO_EMBEDDING``.
+
+    Revised for DEC-1163 (6) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491, as DEC-1150
+    (3) did for 13 older cases; routed by DEC-1156 (7)). Reason: W2-124 (merge a2f28ccf3, DEC-1027 C) made a rebuild
+    whose asked-for semantic store is not recreated fail, so ``gov rebuild --json`` answers ``ok: false``,
+    ``REBUILD_FAILED``, ``store: semantic`` and the stores of the run in ``error.details.stores``, where it answered
+    ok with the semantic stage ``not_recreated`` (the nightly of 2026-11-13 found ``envelope ok False``).
+    W2-124's revision of the older cases missed this one. Decided behaviour: the case expects ``REBUILD_FAILED``
+    naming the semantic store; the last failed try's record is read from ``error.details.stores.semantic``
+    (``not_recreated``, R3's reason with the tries, the timeout and the waits), and the error's own message states
+    the tries and waits. What the case still catches: a retry that is not tried three times, a later batch sent
+    after the last failed try, a reason without the tries and waits, a store reported built after the failure
+    (the search without refresh must say ``FACET_UNAVAILABLE``, ``stale``, no hit), and a rebuild that answers ok."""
     project = make_project(tmp_path / "project")
     runner = place.serve(holds={1: 3})
     envelope, described = rebuild(place, project)
-    assert envelope.get("ok") is True, described
-    semantic_stage = envelope["result"]["stores"]["semantic"]
+    error = envelope.get("error") or {}
+    assert envelope.get("ok") is False and error.get("code") == "REBUILD_FAILED", \
+        f"a rebuild whose semantic store was not recreated did not fail with REBUILD_FAILED: {described}"
+    details = error.get("details") or {}
+    assert details.get("store") == "semantic", f"the failure does not name the semantic store: {details}"
+    semantic_stage = (details.get("stores") or {}).get("semantic") or {}
+    assert expected_reason() in str(error.get("message")), \
+        f"the failure's message does not state the tries and waits: {error.get('message')}"
     assert [entry["outcome"] for entry in runner.tries_of(1)] == ["held"] * TRIES, \
         f"the batch that kept timing out was not tried {TRIES} times: {runner.tries_of(1)}; {semantic_stage}"
     assert len(runner.batches) == 2, f"a later batch was sent after the last failed try: {len(runner.batches)} batches"

@@ -47,7 +47,12 @@ def test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve():
     # Revised (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20 records ``resources`` beside them: six.
     # Revised for D-10's red fix (W2-20; DEC-753, DEC-1088, DEC-1074 (7), a recorded rewrite): ``brief``, ``links``
     # and ``plan`` are recorded beside them: nine.
-    assert sorted(recorded) == ["accept", "brief", "ci", "launch", "links", "lock", "plan", "resources",
+    # Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite, DEC-491): ``impact`` is recorded
+    # beside them: ten. DEC-812 item 6 renames this case; it keeps its name for now, as it did for DEC-970, because
+    # ``tests/optin-lifted-breadth.txt`` (line 42) names this function and ``test_optin_lifted.py``'s
+    # ``test_every_entry_of_the_real_lists_names_a_test_path_or_function_that_exists`` fails on an entry naming a
+    # function that no longer exists; that list is outside W2-37's paths, so the rename waits on its line.
+    assert sorted(recorded) == ["accept", "brief", "ci", "impact", "launch", "links", "lock", "plan", "resources",
                                 "telemetry"], recorded
     assert not set(recorded) & set(support.RESERVED_COMMANDS), "a recorded command is one of the twelve"
 
@@ -59,6 +64,9 @@ def test_a_recorded_gov_command_is_offered_and_answers_its_help(gov, name):
     Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite): the recorded ``gov`` commands
     are eight with ``accept`` (DEC-970), ``resources`` (W2-20), ``brief`` (W2-152, DEC-1088 (3)), ``links``
     (W2-129, DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088); one case each, read from the support's lines.
+
+    Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite, DEC-491): ``impact`` joins them, so
+    the recorded ``gov`` commands are nine; the case gains ``[impact]``, read from the support's lines.
     """
     listed = gov("--help")
     assert listed.returncode == 0, listed.describe()

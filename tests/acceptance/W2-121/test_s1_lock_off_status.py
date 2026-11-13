@@ -160,10 +160,24 @@ def test_s1_a_fresh_status_is_not_called_old(project):
 
 
 def test_s1_status_runs_no_pass_and_writes_nothing(project):
+    """Revised for DEC-1163 (6) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; routed by
+    DEC-1156 (7)). Reason: the nightly of 2026-11-13, run beside the leads, failed this case with only the ``logs``
+    folder's mtime and a new ``logs/<log>.exit`` in the diff: the fake launched job is detached and writes its
+    ``.exit`` file when it ends, which under load came between the case's two snapshots. ``gov dispatch status`` had
+    written nothing; the race was the case's own. Decided behaviour: the case waits, bounded (60 s, a clear failure
+    message), for the launched job's ``.exit`` file before its first snapshot, so the job has made its last write and
+    ``gov dispatch status`` is judged on what it writes itself. Nothing is left out of the snapshot: a file status
+    wrote, whatever its name, still shows. The point is kept: a status that runs a pass, or writes into the state
+    folder, still fails the case."""
     p = project
-    p.ready(p.add_ticket(901))
+    entry = p.add_ticket(901)
+    p.ready(entry)
     assert p.tick().code == 0
     p.wait_launches(1)
+    exit_file = p.state / "logs" / f"{entry.log}.exit"
+    support.wait_for(exit_file.is_file, 60.0,
+                     what=f"the launched job's exit file {exit_file}: the job has not ended, so the snapshots "
+                          f"cannot tell what `gov dispatch status` writes from the job's late write")
     before = snapshot(p.state)
     r = p.status_cmd()
     assert r.code == 0, r

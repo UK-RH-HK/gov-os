@@ -168,3 +168,15 @@ How the sorting works:
   - The runs, closes and exit are spent.
   - In force: DEC-137, DEC-156, DEC-182, DEC-220, DEC-221, DEC-236, DEC-371, DEC-413, DEC-420, DEC-462, DEC-463 and DEC-498.
   - The guard and close KDs among them stay built and tested. Only their use as gates here is lifted (LIFTED §A and §E).
+
+## D. Spent or superseded after DEC-951 (DEC-1164, 2026-11-13)
+- DEC-946 items 1-6, 8, 9: superseded by DEC-1164 (6) (gov plan's order, the critical path first). Item 7 in force; item 10 done.
+- DEC-1052's "The plan, updated" and "Tonight"; DEC-1055's order and (8)-(10): spent, D-4 to D-10 and the lift done (DEC-1164 (2)).
+- DEC-1064 (2)'s hold until W2-127: met (DEC-1164 (3)).
+- DEC-1086: A and B product record (W2-32 S11, W2-135); C changed by DEC-1091; D spent at window 4 (DEC-1089; DEC-1164 (7)).
+- DEC-1087 (1)-(11): spent, window 4 and the experiments done (DEC-1164 (7)); (13) in force.
+- DEC-1093 (1)'s one-batch close form for W2-139 and W2-140: spent, both closed on 2026-11-13 by DEC-953's practice (DEC-1164 (1), (7)).
+- DEC-1097 (1)(g), (9): the holds for the 80's run, spent (DEC-1164 (7)).
+- DEC-1098 (6): the work in order to the lift, spent (DEC-1164 (7)).
+- DEC-1115 (4), DEC-1122 (2), (3): usage (A) ended at the lift (DEC-1126 (2)); D-10's go spent (DEC-1164 (7)).
+- DEC-1141 (6), DEC-1142 (5): the operator's night sleep, superseded by DEC-1164 (4) (ACT-OPERATOR-HOURS-3).
