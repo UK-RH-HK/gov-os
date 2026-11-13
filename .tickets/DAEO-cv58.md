@@ -28,6 +28,17 @@ allowed_paths:
 - tests/unit/launch/test_w1_32.py
 - docs/changes/W2-60a-CIT-E.md
 - docs/research/W2-60-rules-probe.md
+- tests/acceptance/W2-50/w2_50_support.py  # the merge of integrate: conflict resolution by a test designer (DEC-1157 (12))
+- tests/acceptance/W2-58/README.md  # the same
+- tests/acceptance/W2-58/test_w2_58_launched_sessions.py  # the same
+- tests/acceptance/W2-58/w2_58_support.py  # the same
+- tests/unit/launch/test_w2_136_plan_check.py  # older fixtures planting no role file (DEC-1156 (7), P-3)
+- tests/unit/launch/test_w2_153_template.py  # the same
+- tests/unit/launch/test_w2_56.py  # the same
+- tests/acceptance/W2-153/test_w2_153_launch.py  # the same; the appended-file value and line asserts (P-3, P-4 (A))
+- tests/acceptance/W2-56/test_w2_56_environment.py  # the same
+- tests/acceptance/W2-56/test_w2_56_endings.py  # the same
+- tests/acceptance/W2-56/test_w2_56_refused_arguments.py  # the same
 kpis:
   success:
   - 'gov launch <role> <ticket> starts the session as its role: the role''s text (its generated agent, or the role file''s text appended) is in the session''s context at its start, shown by a launched session''s log; the launch record holds the role file''s path, version and content hash. Verify: a planted role file and a launch of that role: the session''s first context names the role''s text, and the launch record holds the file''s path, version and sha256 [DEC-826 Q1, lens E F2] [Verify clause added, DEC-1157 (12)]'
@@ -80,3 +91,11 @@ Card: the draft card `W2-60` (W2-60a part), from the accepted plan (`docs/plan/W
 - **Merges after the role files carry their default line** (model and effort, no threshold), which W2-33's widening writes through CIT-P (DEC-839 item 5). It is built and tested against fixture role files until then.
 - **Paths:** `launcher.py` for the CLI line, the settings' env lines it sets, its argument checks and the calls only. The probe record is the lead's. The role files, generated agents and skills are not in the paths (W2-11, W2-33).
 - **The test designer's files** (MR-3): `tests/acceptance/W2-60a/**`.
+
+## Interface for run 4's additions (the CTO, at claim, DEC-1157 (3), (12); 2026-11-13 01:25)
+
+- **S12, the launcher's plan (P-2 (A)):** `gov launch --plan <role> <ticket>` prints one line `model <id>, effort <e>` read from the role file's `- **Launch default:**` line (W2-33's line form; with `- **Launch by criticality:**` applied for the ticket's class where the file has it) and exits 0, starting nothing; a role file without the line refuses with `LAUNCH_REFUSED` naming the file (exit 2). About 40 lines and one case.
+- **The role text and the template in one appended file (P-4 (A), kept):** the role file's text, one blank line, then the template's bytes; W2-153's value and whole-line asserts are revised to that form (P-3).
+- **Older cases (P-3, DEC-1156 (7)):** a test designer plants a role file (and, for W2-60a's own suite, the template and an open gate file) in the fixtures of W2-136, W2-153 and W2-56 listed in the paths, and revises W2-153's appended-file asserts to "the one appended file starts with the role text and ends with the template's bytes"; each with its Rewrite-Reason; no case loses its point.
+- **The merge's four acceptance conflicts** (W2-50's and W2-58's files in the paths): resolved by a test designer keeping both sides' cases.
+
