@@ -1,6 +1,6 @@
 # W2-88 acceptance tests: memory for any repository (the assessment, the plan, A9 lite, the store layout)
 
-Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2. **Run 5 (review round 2's RV2-1 and RV2-2, P1-W2-88-RV2-1 (a))** on the base `a15de913e8c4`: the cases are in
+Ticket `DAEO-2bdu` (W2-88), profile FULL, class C2. **Run 6 (the narrow check's NC-1 and NC-2, P1-W2-88-NC-1 (a))** on the base `01ec6d2a7`: three cases in "Run 6 revisions" below (`test_w2_88_nc1_commit.py`, `standin_nc1/`, `standin_nc2/`); every other case stands. **Run 5 (review round 2's RV2-1 and RV2-2, P1-W2-88-RV2-1 (a))** on the base `a15de913e8c4`: the cases are in
 "Run 5 revisions" below (`test_w2_88_rv2_undo.py`, `standin_rv2/`, two cases in `test_w2_88_s2_plan.py`); every other case stands as run 4 wrote it. **Run 4 (td-3, one narrow revision, 2026-11-13)** on the base `b1fe858ac` (the ticket
 branch's head with P-W2-88-B-1 decided, DEC-1157 (3), (12), after review round 1 failed): B-1.1 + B-1.3 (A9's copy step, S16), B-1.2 (the reranker
 and the bundle are the pin's constants, S11/F7), B-1.4 (the pool is the whole shipped block), B-1.5 (the secrets scan not run, S2), RV1-2 (a vector scan
@@ -275,6 +275,54 @@ the cases do not name how the undo is built.
 **Red run on the base** (`heavy_slot.sh`, the sandbox's TMPDIR, an empty HOME in it; 2026-11-13): `test_w2_88_rv2_undo.py` **8 cases, 7 failed (each for the reason in the table), 1 passed (Case D, GUARD)**;
 the two `rv2_2` cases: **2 cases, 1 failed (the list), 1 passed (the one-line form, GUARD)**. None is red by an import, collection or plant error: every case asserts first that the stand-in ran and that A9's four
 copies were written and staged when it did.
+
+## Run 6 revisions (P1-W2-88-NC-1 (a); base `01ec6d2a7`)
+
+The narrow independent check after review round 2 (`docs/probes/DAEO-2bdu/PR-DAEO-2bdu.md` at `01ec6d2a7`) failed on NC-1 (a blocker: when A9's own record commit is
+refused, W2-23's `project.commit` runs `git reset --hard` and the work done in the repository during the run is lost) and NC-2 (minor: an interrupt between A9's `git add`
+and its listing leaves A9's copies staged); the owner decided P1-W2-88-NC-1 (a): complete run 5's undo on those two paths. The cases are written from the behaviours the
+lead stated (DEC-1052, DEC-136), before the fix, never from the engineer's code (DEC-820). Run 5's interface (RV2-1 items 1 to 6, `HEAD_MOVED`) stands unchanged. The
+interface ("the start commit" is the commit HEAD named when A9 began, before its copy step):
+
+- **NC-1, A9's own record commit (success-16; reached through success-3's refusals).** A9's last act is one commit holding its copies and its record
+  (`governance/adoption/A9-<title>.md`); W2-23's `project.commit` and `project.restore` are not on A9's path and stay unchanged (A1 to A8 keep them). (1) When that commit
+  is refused (git commit exits non-zero: a `pre-commit` or `commit-msg` hook, commit signing), or the record's write or `git add` fails, or an interrupt comes during it:
+  **no `git reset --hard`**, no checkout; A9's undo runs as run 5's items 1 to 5 state it, with A9's record counted among what A9 wrote and staged (unstaged only while its
+  index entry is still the blob A9 staged, deleted only while its bytes are still A9's; A9's copies likewise). (2) A tracked file edited during the run keeps its edit; a file
+  staged during the run stays staged; an untracked file made during the run stays; HEAD and the branch do not move; the reflog gains no `reset`. (3) Where HEAD did not move
+  A9 is refused `ADOPT_GIT_FAILED`: the message names the refused `git commit` and carries git's own error text (a hook's message is in it), `details.exit_code` is the
+  commit's exit code (1 for a refusing hook), `ok: false`; where HEAD moved, `HEAD_MOVED` holds with `cause: "ADOPT_GIT_FAILED"`; an interrupt stays an interrupt. (4) When the
+  commit succeeds nothing changes (one commit, `gov adopt --lite A9: <title>`); an untracked file at the record's path is still refused `ADOPT_WOULD_OVERWRITE` before
+  anything is written there, and that refusal runs A9's undo too.
+- **NC-2, an interrupt inside the copy step (success-16).** An interrupt (or any exception) at any point after A9's `git add` of its copies has begun leaves none of A9's copies
+  in the index (and, as run 5, none in the tree where the bytes are still A9's; a replaced tracked file gets its start-commit content back). An index entry whose blob is the
+  blob of A9's own bytes for that path counts as staged by A9.
+
+**The plants.** A9 runs in a child process on a fork of the planted adoption at A8 (the suite's A9 cases), with a stand-in folder first on the child's `PYTHONPATH`.
+**Case C** (`standin_nc1/sitecustomize.py`): the case installs a `pre-commit` hook in the fork's `.git/hooks/` after A8's commit (so only A9's record commit meets it; the suite's
+own git calls run with `core.hooksPath=/dev/null`): it appends to a marker file outside the repository, prints a unique word to stderr and exits 1. The stand-in replaces
+`gov.rebuild.command.run` by a function that rewrites the tracked `docs/notes.txt` (not staged), stages a new `staged-during-run.md`, then **calls the real rebuild** (the
+suite's stand-in embedder), so A9 reaches its record commit. The case first checks the plant took: the stand-in saw all four copies written and staged, the real rebuild
+returned, and the hook's marker file exists. **Case D** (`standin_nc2/sitecustomize.py`): wraps `subprocess.Popen` (so `run`, `check_output` and `check_call` too) and lets the first
+`git` call whose arguments hold `add` and a path of A9's copy plan run to its end, then raises `KeyboardInterrupt` the moment `communicate`/`wait` returns to the caller; it
+writes `nc2-plant: fired ...` to stderr, and a case without that line fails as "the plant did not take" (with the git calls it saw). Two parameters: the repository tracks its
+own `governance/project/retrieval.yaml` (A9's plan is the four kernel files), and tracks none (A9 installs Gov OS's, so the plan is five files).
+
+| KPI id / item | tests | red on the base `01ec6d2a7` |
+|---|---|---|
+| success-16, success-3 / NC-1 items 1, 2, 3 (Case C also holds success-3's refusals: the record commit is refused after the whole build) | `test_w2_88_nc1_commit.py::test_s16_nc1_c_a_refused_record_commit_resets_nothing_and_a9_takes_back_only_its_copies_and_its_record` (Case C: a refusing `pre-commit` hook, an unstaged edit of `docs/notes.txt` and a staged new file made during the run; the refusal is `ADOPT_GIT_FAILED` with `ok: false` and the exit code of every `gov adopt` refusal, `details.exit_code == 1`, the message names the `git commit` and holds the hook's word; HEAD is the start commit on `main`; the edit stays; the new file stays staged and the index holds it alone; no `reset` in the reflog since the start; none of A9's copies and not A9's record in the tree or the index; no folder A9 made; `git status --porcelain --untracked-files=all` is exactly the edit and the staged file) | the undo is W2-23's `project.commit` reset: `docs/notes.txt` holds its start-commit text (the edit is thrown away), the staged new file is deleted from tree and index, the reflog gains `reset: moving to ...`. The refusal's code, `details.exit_code` (1) and the hook's word in the message already hold on the base (those assertions pass) |
+| success-16 / NC-2 | `test_w2_88_nc1_commit.py::test_s16_nc2_d_an_interrupt_the_moment_the_git_add_of_the_copies_returns_leaves_no_copy_in_the_index_or_the_tree[retrieval-tracked]`, `test_w2_88_nc1_commit.py::test_s16_nc2_d_an_interrupt_the_moment_the_git_add_of_the_copies_returns_leaves_no_copy_in_the_index_or_the_tree[retrieval-not-tracked]` (Case D: `KeyboardInterrupt` the moment A9's `git add` of its copies returns; the interrupt stays an interrupt (non-zero exit, `KeyboardInterrupt` in stderr, no `HEAD_MOVED`), HEAD is the start commit, none of A9's copies is in the index or the tree, no folder A9 made is left, `git status --porcelain --untracked-files=all` is empty; the second parameter adds `governance/project/retrieval.yaml` to the plan) | A9's copies are left in the index (all four, and `governance/project/retrieval.yaml` in the second parameter): the interrupt stays an interrupt and HEAD does not move, but the copies A9 staged are not taken out of the index. The plant fires (the `nc2-plant: fired` line is there) and the interrupt stays an interrupt on the base |
+
+Readings this run makes, named: (a) the lead wrote that `gov adopt` "exits as for any refusal (2)"; on the base every refusal of this suite exits **1** (`W.assert_refused` reads exit 2 as argparse's
+usage error), so Case C reads "as for any refusal" as exit 1 (`ADOPT_GIT_FAILED` exits 1 on the base, as run); (b) "the message names the refused `git commit`" is read as the word `commit` in the message (the
+base's reads `git commit -q -m gov adopt --lite A9: ...: <hook's word>`); (c) Case C's record is the file `governance/adoption/A9*` (A1 to A8 have their own records in that folder); (d) the
+interrupt in Case D is judged on what the child ends with (non-zero exit, `KeyboardInterrupt` in stderr, no `HEAD_MOVED`), as run 5's Case A; (e) the cases do not cover the other two ways item 1 names (the
+record's write failing; an interrupt during the commit itself), nor `HEAD_MOVED` with `cause: "ADOPT_GIT_FAILED"` (a hook that commits during a refused commit is no ordinary plant), nor the
+`ADOPT_WOULD_OVERWRITE` undo of item 4: the interface's two plants, C and D, are what this run writes (named as residual coverage for the narrow check); (f) no case reads the engineer's code and
+the cases do not name how the undo is built.
+
+**Red run on the base** (`heavy_slot.sh`, the sandbox's TMPDIR, an empty HOME in it; 2026-11-13): `test_w2_88_nc1_commit.py` **3 cases, 3 failed (each for the reason in the table), 0 passed**; none is red by an import,
+collection or plant error (Case C asserts first that the stand-in ran with A9's four copies written and staged, that the real rebuild returned and that the hook ran; Case D that the plant fired).
 
 ## Run 4 on the base (`b1fe858ac`)
 
