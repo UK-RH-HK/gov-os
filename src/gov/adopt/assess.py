@@ -238,8 +238,19 @@ def _per_session_limit() -> tuple[int | None, str]:
     return None, "; ".join(reasons) or "working_size_bytes is not given"
 
 
-def _peak() -> int:
+def peak_rss() -> int:
+    """This process's peak resident set in bytes: ``VmHWM`` where ``/proc`` gives it (it is the process's own, reset
+    by ``exec``), else ``ru_maxrss`` (which a process started by a large parent carries from the parent's copy)."""
+    try:
+        for row in Path("/proc/self/status").read_text(encoding="ascii").splitlines():
+            if row.startswith("VmHWM:"):
+                return int(row.split()[1]) * 1024
+    except (OSError, ValueError):
+        pass
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024  # Linux: kilobytes
+
+
+_peak = peak_rss
 
 
 def assess(root: Path, out: Path) -> dict:

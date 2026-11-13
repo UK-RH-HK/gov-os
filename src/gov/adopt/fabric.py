@@ -170,7 +170,8 @@ def check_coverage(record: dict, tracked) -> None:
 # ---- the stores' lists, read from the stores the rebuild built
 
 def _peak() -> int:
-    return max(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
+    """The stage's process's own peak (``VmHWM``), or a child's (the scanner, the code graph) where that is more."""
+    return max(assess.peak_rss(), resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss * 1024)
 
 
 def _namespaces(run) -> dict[str, str | None]:
