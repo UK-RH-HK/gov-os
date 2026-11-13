@@ -43,6 +43,7 @@ HELD = {
 
 REFUSALS = s.refusals()
 PLANTED = s.planted()
+replayable = s.replayable  # the fixture: a vanished worktree's row is replayed in a stand-in tree (README, fixtures)
 
 
 def _id(r):
@@ -50,7 +51,9 @@ def _id(r):
 
 
 @pytest.mark.parametrize("row", REFUSALS, ids=[_id(r) for r in REFUSALS])
-def test_kpi11_each_logged_refusal_replayed(row):
+def test_kpi11_each_logged_refusal_replayed(row, replayable):
+    row = replayable(row)
+    assert os.path.isdir(row["root"]), f"line {row['line']}: no tree to judge in: {row['root']}"
     got, why, code = s.run_hook(row["tool"], row["input"], row["cwd"], row["root"], row["role"],
                                 agent_type=row["agent_type"], tmpdir=row["tmpdir"])
     if row["verdict"] == "true" or row["line"] in HELD:

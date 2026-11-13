@@ -47,6 +47,26 @@ hook lists every worktree for rules 2 and 5), so run with `-n auto`.
     session, ACT-GUARD-FIX-3 §2: lines 55, 56, 59, 60, which are replayed).
   - **Secrets:** gitleaks (`gitleaks dir <file> --no-banner --redact`) found none in either fixture; nothing was
     replaced. (`planted.json` was scanned before its `base_caught` booleans were added.)
+- **Stand-ins for vanished worktrees** (`w2_42a_support.replayable`, td-1, 2026-11-13): 33 of the 76 rows name a
+  project folder that has since gone (W2-16, -64, -67, -76, -84, -90, -95, -96, -107, -112: landed, worktrees
+  removed). The hook reads its project folder for the held-out list, the hidden globs, `tree_roots` (the tree's
+  worktrees and its `origin`), the ticket and the acceptance folder, so a missing folder, or an unrelated one, is not
+  its judgement of the logged call. For each such folder the fixture makes one stand-in: a `git clone --shared` of
+  the tree under test, checked out detached at its HEAD, named as the vanished folder, with the tree under test as
+  `origin` (so `tree_roots` reaches the same worktree list as from the logged tree). A clone, not `git worktree add`,
+  because the clone writes only under the run's own tmp folder (a worktree would add an entry to the main
+  repository's `.git/worktrees`, which the sandbox keeps read-only). The vanished path is replaced by the stand-in's
+  in the row's `cwd`, `root`, `tmpdir` and every string of `input`, only where it stands whole (`W2-95` never matches
+  inside `W2-95-tests`); the worktrees folder that held it, named as itself (`find /home/usain/gov-os-worktrees …`,
+  line 74), becomes the stand-ins' folder; and the logged `cwd` is made inside the stand-in, since the session ran
+  there. Each stand-in also holds a placeholder file of its own (`stand-in.txt`, never the hidden half's contents) in
+  each evaluation set's hidden folder named in its path map. A tree of the logged time held those parts on disk, and
+  line 74's logged rule is a read of one. Today no tree does (moved to `~/gov-os-eval`, DEC-1070). Rule 2 judges a
+  listing by what it reaches, so without the placeholder line 74 is allowed even with a root that still exists. Role,
+  agent type, verdict, rule and the hook are the row's and unchanged; rows whose folder exists run as before. One
+  stand-in per folder serves all of a run's workers (made once, by an atomic rename, under a shared lock) and the
+  last worker removes them. No row is skipped. A planted parser change that refuses line 40 (`rm -f chain-*.json`,
+  root W2-16, a stand-in row) fails the case, so the substitution does not make it vacuous.
 - **`fixtures/planted.json`** (built by `tools/build_planted.py` from the reviewed `test_guard_fix_3.py`,
   `b6f8216c97bc`): 155 cases the hook must refuse: ACT-GUARD-FIX-3's 137 planted writes and unknown forms (rule 1,
   acceptance folder; rule 5, outside a reviewer's record; its one key-read case, rule 3, left out), its logged pattern
@@ -140,8 +160,8 @@ without failing open or changing a rule; the tests expect each still refused by 
 ## Notes
 
 - The replay runs against this machine's trees: each refusal's cwd and project folder (worktrees under
-  `~/gov-os-worktrees/`, the main tree). A tree removed later changes what rules 2 and 5 see; the fixture states
-  each path.
+  `~/gov-os-worktrees/`, the main tree). A tree removed later is replayed in a stand-in (The fixtures, "Stand-ins
+  for vanished worktrees"); the fixture states each logged path.
 - No case reads a secret, the held-out material or a hidden half: the read-judge cases name `.env`, a key path and a
   hidden file of their own stand-in project as words; the replay passes the logged commands to the hook, which runs
   none of them.
