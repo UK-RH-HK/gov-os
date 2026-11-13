@@ -40,12 +40,16 @@ the kernel guard, fixture role files at ``template/governance/kernel/roles/``
 fixture generated agents at ``.claude/agents/`` (whose text is not the role
 file's), fixture skills at ``.claude/skills/`` (the copies the session loads)
 and kernel copies at ``template/governance/kernel/skills/`` with other versions
-(which the record must not take). Nothing is copied from this repository but
-the guard script and the research allowlist, as single named files.
+(which the record must not take), and the eight template copies at
+``.claude/templates/<stem>.md`` (W2-153; any bytes). Nothing is copied from
+this repository but the guard script and the research allowlist, as single
+named files. Every ``gov`` child's environment names an open resource gate
+planted in the test home (``plant_open_gate``, W2-20 S19).
 """
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -442,6 +446,15 @@ BASE_FILES = {
     ".mcp.json": json.dumps({"mcpServers": {PROJECT_CONNECTOR: {"type": "stdio", "command": "true"}}}, indent=2)
     + "\n",
 }
+# W2-153 (DEC-1050): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role
+# (LAUNCH_NO_TEMPLATE); the fixture project holds the eight copies (any bytes, W2-58's form), so the template check is
+# never what refuses a launch here. Each carries the marker TEMPLATE_WORD, never in a role file.
+TEMPLATE_WORD = "zq60a-template-copy"
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-60a fixture template copy {stem} "
+                  f"{TEMPLATE_WORD}\n" for stem in TEMPLATE_STEMS}
+BASE_FILES.update(TEMPLATE_FILES)
 
 
 def make_project(sandbox, roles=WORKER_ROLES, skills=SKILLS, kernel_skills=True, agents=True, extra=None,
@@ -599,7 +612,63 @@ def python_path():
     return os.environ.get("PYTHONPATH") or str(REPO_ROOT / "src")
 
 
+GIB = 1024 ** 3
+
+
+def plant_open_gate(sandbox):
+    """An open resource gate in the sandbox's HOME; the variables that name its readings, for ``gov launch``'s
+    environment.
+
+    W2-20 S19 (DEC-1088 (5)(b)) runs the gate on every launch, and S8 shuts it when the configuration is missing. The
+    form is W2-58's ``plant_open_gate``, from W2-136's ``_plant_open_gate`` and W2-20's README, "The configuration
+    file": every value dated and sourced, in ``$HOME/.gov-os/machine/gate.json``; the readings are files under
+    ``<elsewhere>/open-gate`` with room to spare, named through ``GOV_RESOURCES_*``. The gate is W2-20's, not under
+    test here. Planted once per sandbox."""
+    today = datetime.date.today().isoformat()
+
+    def dated(value, source="planted for the W2-60a launcher cases (W2-20 README)"):
+        return {"value": value, "date": today, "source": source}
+
+    base = sandbox.elsewhere / "open-gate"
+    readings = {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+    env = {"GOV_RESOURCES_NPROC": "64", **{variable: str(base / name) for variable, (name, _) in readings.items()}}
+    if base.is_dir():
+        return env
+    base.mkdir(parents=True)
+    cpu = str(max(os.sched_getaffinity(0)))
+    values = {
+        "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+        "verification_peak_bytes": dated(4 * GIB),
+        "working_size_bytes": dated(1 * GIB),
+        "rebuild_peak_bytes": dated(2 * GIB),
+        "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+        "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+        "verification_lock": dated(str(base / "verification.lock")),
+        "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+        "oom_floor_bytes": dated(1 * GIB),
+        "heavy_slots": dated(2),
+        "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+        "embedding_servers": {
+            "shared": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+            "query": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+        },
+    }
+    machine = sandbox.home / ".gov-os" / "machine"
+    machine.mkdir(parents=True, exist_ok=True)
+    (machine / "gate.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
+    for name, text in readings.values():
+        (base / name).write_text(text, encoding="utf-8")
+    return env
+
+
 def base_environment(sandbox, extra=None):
+    """A minimal environment, built from scratch, with the open resource gate planted (``plant_open_gate``)."""
     env = {
         "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
         "HOME": str(sandbox.home),
@@ -612,6 +681,7 @@ def base_environment(sandbox, extra=None):
         "PYTHONDONTWRITEBYTECODE": "1",
         "GIT_CONFIG_GLOBAL": os.devnull,
         "GIT_CONFIG_SYSTEM": os.devnull,
+        **plant_open_gate(sandbox),
     }
     env.update(extra or {})
     return env

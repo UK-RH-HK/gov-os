@@ -87,6 +87,101 @@ def test_named_skills_follow_the_role_text_in_the_order_named(tmp_path):
     assert described["c"]["version"] == role.NO_VERSION
 
 
+@pytest.mark.parametrize("front, expected", (
+    ("version: 1.0.0\n", "1.0.0"),
+    ("metadata:\n  version: 1.4.0\n", "1.4.0"),
+    ("version: 2.0.0\nmetadata:\n  version: 1.4.0\n", "2.0.0"),
+    ("metadata: 1.4.0\n", role.NO_VERSION),
+    ("metadata:\n  - version: 1.4.0\n", role.NO_VERSION),
+    ("metadata:\n  author: x\n", role.NO_VERSION),
+    ("description: x\n", role.NO_VERSION),
+))
+def test_a_skill_s_version_is_its_own_else_its_metadata_s(tmp_path, front, expected):
+    text = f"---\nname: a\n{front}---\nA\n"
+    command = f"---\n{front}---\nC\n"
+    tree = _tree(tmp_path, VERSION, DEFAULT, skills={"a": text})
+    (tree / role.COMMANDS_REL).mkdir(parents=True)
+    (tree / role.COMMANDS_REL / "c.md").write_text(command, encoding="utf-8")
+    described = {skill["name"]: skill for skill in role.read_role(tree, "engineer")["skills"]}
+    assert (described["a"]["version"], described["c"]["version"]) == (expected, expected)
+    assert described["a"]["sha256"] == role.sha256(text.encode())
+
+
+def test_a_named_skill_versioned_under_metadata_loads(tmp_path):
+    text = "---\nname: a\nmetadata:\n  version: 1.4.0\n---\nA\n"
+    loaded = role.read_role(_tree(tmp_path, VERSION, DEFAULT, "- **Skills:** a", skills={"a": text}), "engineer")
+    assert [(s["name"], s["version"], s["named"]) for s in loaded["skills"]] == [("a", "1.4.0", True)]
+    assert loaded["appended"].endswith(text.encode())
+
+
+@pytest.mark.parametrize("front", ("", "metadata: 1.4.0\n", "metadata:\n  author: x\n"))
+def test_a_named_skill_with_no_version_in_either_place_refuses(tmp_path, front):
+    tree = _tree(tmp_path, VERSION, DEFAULT, "- **Skills:** a", skills={"a": f"---\nname: a\n{front}---\n"})
+    with pytest.raises(GovError, match="carries no version"):
+        role.read_role(tree, "engineer")
+
+
+def _planted(tree, role_name="engineer", status="in_progress"):
+    (tree / ".tickets").mkdir(exist_ok=True)
+    (tree / ".tickets" / "DAEO-p1an.md").write_text(f"---\nid: DAEO-p1an\nstatus: {status}\nrole: {role_name}\n---\n",
+                                                    encoding="utf-8")
+    return tree
+
+
+def test_the_plan_prints_the_launch_default_line_and_starts_nothing(tmp_path, monkeypatch, capsys):
+    tree = _planted(_tree(tmp_path, DEFAULT, "- **Skills:** missing"))  # only the default line is read
+    started = []
+    for name in ("_admit_start", "_run", "_cli", "build_settings", "template_args"):
+        monkeypatch.setattr(launcher, name, lambda *a, _n=name, **k: started.append(_n))
+    monkeypatch.setattr(launcher.tempfile, "mkdtemp", lambda **kw: started.append("mkdtemp") or str(tmp_path))
+    before = sorted(p.relative_to(tree) for p in tree.rglob("*"))
+    assert launcher.plan(tree, "engineer", "DAEO-p1an") == 0
+    assert capsys.readouterr().out == "model claude-opus-5-5, effort high\n"
+    assert started == [] and sorted(p.relative_to(tree) for p in tree.rglob("*")) == before
+
+
+def test_the_plan_reads_an_adopted_tree_s_role_file(tmp_path, capsys):
+    tree = _planted(_tree(tmp_path, VERSION, "- **Launch default:** model claude-sonnet-5-5, effort max",
+                          roles_rel=role.ADOPTED_ROLES_REL))
+    assert launcher.plan(tree, "engineer", "DAEO-p1an") == 0
+    assert capsys.readouterr().out == "model claude-sonnet-5-5, effort max\n"
+
+
+@pytest.mark.parametrize("lines", (
+    (VERSION,),
+    (VERSION, DEFAULT, DEFAULT),
+    (VERSION, "- **Launch default:** model claude-opus-5-5, effort high, threshold none"),
+    (VERSION, "- **Launch default:** model claude-opus-5-5, effort huge"),
+    (VERSION, "- **Launch by criticality:** C3 model claude-opus-5-5, effort high"),
+))
+def test_a_plan_without_a_whole_default_line_refuses_naming_the_role_file(tmp_path, capsys, lines):
+    tree = _planted(_tree(tmp_path, *lines))
+    with pytest.raises(GovError) as refused:
+        launcher.plan(tree, "engineer", "DAEO-p1an")
+    assert refused.value.code == "LAUNCH_REFUSED" and f"{role.ROLES_REL}/engineer.md" in refused.value.message
+    assert capsys.readouterr().out == ""
+
+
+@pytest.mark.parametrize("who, ticket, status, owner", (
+    ("orchestrator", "DAEO-p1an", "in_progress", "engineer"),
+    ("../engineer", "DAEO-p1an", "in_progress", "engineer"),
+    ("engineer", "DAEO-none", "in_progress", "engineer"),
+    ("engineer", "DAEO-p1an", "done", "engineer"),
+    ("engineer", "DAEO-p1an", "in_progress", "research"),
+))
+def test_a_plan_refuses_what_a_launch_refuses_before_the_role_file(tmp_path, capsys, who, ticket, status, owner):
+    tree = _planted(_tree(tmp_path, VERSION, DEFAULT), owner, status)
+    with pytest.raises(GovError, match="LAUNCH_REFUSED|role|ticket") as refused:
+        launcher.plan(tree, who, ticket)
+    assert refused.value.code == "LAUNCH_REFUSED" and capsys.readouterr().out == ""
+
+
+def test_a_plan_with_no_role_file_refuses_naming_it(tmp_path):
+    tree = _planted(tmp_path)
+    with pytest.raises(GovError, match=f"{role.ADOPTED_ROLES_REL}/engineer.md"):
+        launcher.plan(tree, "engineer", "DAEO-p1an")
+
+
 def test_the_folder_hash_follows_a_file_beside_skill_md(tmp_path):
     tree = _tree(tmp_path, VERSION, DEFAULT, skills={"a": "---\nname: a\n---\n"})
     before = role.read_role(tree, "engineer")["skills"][0]["folder_sha256"]

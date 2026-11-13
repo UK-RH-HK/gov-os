@@ -80,6 +80,8 @@ The last round, under DEC-413's exception (DEC-951 item 4), strictly two items:
 | 9 | `src/gov/launch/record.py` | `main_checkout(root, what)` factored out of `folder`; `folder` calls it. | `tests/unit/launch/test_launch_record.py` |
 | 10 | `src/gov/launch/launcher.py` | `_check_repository_settings` adds the main checkout's local file for a linked worktree; the loop judges each file as before. | the same |
 | 11 | `src/gov/launch/role.py` | `ADOPTED_ROLES_REL`; the role file's folder chosen by whether `template` exists. | `tests/unit/launch/test_role.py` |
+| 12 | `src/gov/launch/role.py` (after the `w2/integrate` merge) | A skill's or command's version is its top-level `version`, else `metadata.version` when `metadata` is a map (the kernel's generated copies carry it there); neither is `no version`, and a named skill with neither still refuses (S2). | `tests/unit/launch/test_role.py`; acceptance `test_w2_60a_skills.py` |
+| 13 | `src/gov/launch/role.py`, `launcher.py` | `gov launch --plan` (routed from W2-33 S2, DEC-1156 (3); DEC-1167 (2)): `launch_default` reads the default line alone, from `read_role`'s file with its refusals; `launcher.plan` checks the role and the ticket as a launch does, prints the line and starts nothing. The flag itself is added in `src/gov/launch/command.py` (outside this ticket's paths). | `tests/unit/launch/test_role.py` |
 
 ## A. Behaviour
 
@@ -104,6 +106,15 @@ root:
   `Edit(/<folder>)` and `Edit(/<folder>/**)` (Behaviour 9); the user settings file's deny rules after the
   launcher's, and its ask rules as `permissions.ask` (Behaviour 4). It holds no `CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
 - The launcher writes nothing new to stdout or stderr.
+
+### Behaviour: the plan, `gov launch --plan <role> <ticket>`
+
+- It prints one line, `model <id>, effort <e>`, from the role file's `- **Launch default:**` line (Behaviour 1's
+  file; no `Launch by criticality` line is read), and exits 0. It starts nothing: no session, no CLI run, no launch
+  record, no temp folder, no gate.
+- A role that is not a worker role, a ticket a launch refuses, a role file that cannot be read, or one without that
+  line once, whole and of its form, refuses with `LAUNCH_REFUSED`, naming the role file's path when the refusal is
+  the role file's, and the same exit code as a launch's refusal; nothing is printed on stdout.
 
 ### Behaviour 1: the role's text
 

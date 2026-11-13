@@ -593,6 +593,26 @@ def _cli() -> Path:
     return cli
 
 
+def _check_worker_role(role: str) -> None:
+    if role not in WORKER_ROLES:
+        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
+                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+
+
+def plan(root: Path, role: str, ticket_id: str) -> int:
+    """``gov launch --plan <role> <ticket>`` (W2-60a, routed from W2-33 S2; DEC-1167 (2)): print the one line
+    ``model <id>, effort <e>`` of the role file's default line and return 0. A worker's role and ticket are checked as a
+    launch checks them; nothing is started, made or gated. A lead reads no role file, so it has no plan here."""
+    root = Path(os.path.realpath(root))
+    if role in LEAD_ROLES:
+        raise _refuse(f"a '{role}' session is started without a role file's default line, so it has no plan")
+    _check_worker_role(role)
+    _check_ticket(root, role, ticket_id)
+    model, effort = roles.launch_default(root, role)
+    print(f"model {model}, effort {effort}")
+    return 0
+
+
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
            gpu_need_mib: int | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
@@ -624,9 +644,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
             return _run(root, cli, settings, [*cli_args, *template], entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
-    if role not in WORKER_ROLES:
-        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
-                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+    _check_worker_role(role)
     _check_cli_args(cli_args)
     given = _check_own_args(cli_args)
     _check_ticket(root, role, ticket_id)

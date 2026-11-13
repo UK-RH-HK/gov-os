@@ -235,16 +235,11 @@ Readings these cases take:
 ### The live cases
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
-<<<<<<< HEAD
 credentials, at most 6 turns, Bash only) in a fixture project built from scratch
 (`w2_58_support.make_project`, with `w2/integrate` as T's base). Since W2-60a the builder writes one fixture role
 file per worker role (DEC-826 Q1), and a live case's copy names Haiku 4.5 at effort low in its default line in place
-of `--model haiku` (DEC-839 items 2 and 5). The session runs one probe script,
-`.gov-runtime/scratch/w2-58/probe.sh`, which writes the commands' output there. The test reads those files from
-outside. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
-=======
-credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script by one call,
+of `--model haiku` (DEC-839 items 2 and 5); no `--model` is passed. The live case also plants an open resource gate
+(`plant_open_gate`, W2-20 S19). The session runs one probe script by one call,
 `bash .gov-runtime/scratch/w2-58/probe.sh`, the form W1-46's, W1-50's and W2-54's live sessions run and one the
 session's permissions allow (`--allowedTools Bash`; the fixture's settings carry no permission rules). A long
 compound line in its place (`;`, redirections, several programs) was refused by the CLI's permission layer before
@@ -254,7 +249,6 @@ any of it ran (D-10, round 1). Each step writes its output to `.gov-runtime/scra
 this repository's hook names the pinned interpreter. A bare `python3` hook cannot import `gov` there and refuses
 every call with exit 2 and no reason; that was D-10's red. As the repository's hook does, the fixture's hook refuses
 a call with a reason (exit 2) when it cannot start or crashes, never leaves it unguarded. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
->>>>>>> w2/integrate
 fails with "did not run the probe to its end" when the session could not run (no network to the model's API).
 Each session runs once per module, and its sandbox, HOME and project are temporary.
 
