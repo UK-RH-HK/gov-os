@@ -25,7 +25,8 @@ from gov.status import command  # noqa: E402
 
 ARGS = argparse.Namespace(json=True)
 PARTS = ("tickets", "decision_packages", "readiness", "governance_share", "pause", "doctor",
-         "reranker")  # W2-112: the shared reranker's fallbacks and refusals
+         "reranker",  # W2-112: the shared reranker's fallbacks and refusals
+         "integration_store")  # W2-116 S2: the integration store's head and age, after reranker
 TICKET = "---\nid: {id}\ntype: task\nstatus: {status}\ndeps: []\nwbs_id: W9-01\n---\n# A ticket\n"
 
 
@@ -169,10 +170,12 @@ def test_a_status_with_a_part_not_read_names_every_such_place(project, monkeypat
 
     monkeypatch.setattr(doctor, "run", lambda *args: {"healthy": True, "tools": {"status": "unmeasured"}})
     answer = command.run(project, ARGS, {})
-    assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == []
+    assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == [
+        # W2-116 S2: a project whose rebuild.yaml names no integration_store has no integration store
+        "integration_store: governance/project/rebuild.yaml names no integration_store: there is no integration store"]
     assert answer["doctor"]["parts"] == {"tools": "unmeasured"}
     (project / store.STORE_REL).unlink()
     answer = command.run(project, ARGS, {})
     assert [place.split(":")[0] for place in answer["not_read"]] == ["tickets.ready", "tickets.blocked",
-                                                                    "decision_packages"]
+                                                                    "decision_packages", "integration_store"]
     assert answer["pause"]["paused"] is False and not (project / ".gov-runtime" / "store.db").exists()

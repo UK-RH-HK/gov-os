@@ -1,6 +1,6 @@
 ---
 id: DAEO-6y0x
-status: in_progress
+status: closed
 deps: [DAEO-l78m, DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:08Z
