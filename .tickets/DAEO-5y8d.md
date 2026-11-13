@@ -27,6 +27,15 @@ allowed_paths:
 - tests/acceptance/W2-23/README.md
 - docs/probes/DAEO-5y8d/**  # the probe record
 - template/.rulesync/hooks.jsonc  # E (a): the template's hooks source gains context_watch.py (a product-spec worker's line, not a test designer's)
+reads:
+- .gov-runtime/scratch/orchestrator/drafts/nightly-20261113-analysis.md
+- src/gov/check/commands.py
+- src/gov/rebuild/**
+- src/gov/session_watch/items.py
+- .rulesync/hooks.jsonc
+- template/governance/kernel/hooks/**
+needs: []
+waits_on: []
 kpis:
   success:
   - 'B: W1-32''s recorded command list holds the four approved commands gov --help shows (dispatch W2-121, adapters W2-23, session-watch W2-159, wait W2-160), and nothing else changes in it [DEC-1163 (6), DEC-1156 (7)] Verify: tests/acceptance/W1-32/test_w1_32_command_set.py passes on w2/integrate; a planted unrecorded command name added to gov --help in a stand-in makes it fail'
