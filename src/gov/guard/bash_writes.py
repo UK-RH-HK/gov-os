@@ -1615,9 +1615,10 @@ class Judgement:
         self.writes += [SENT if t.startswith(UNKNOWN) else t for t in sub.targets()]
 
     def body(self, body, kind, part, ecwd, whole, depth, argv=None, reader=None):
-        if not body["quoted"] and kind != "shell":
+        if not body["quoted"]:
             # The shell runs an unquoted body's substitutions before its reader sees the text, whoever reads it
-            # (W2-42a: the Python reader and an unknown one too, not only a data reader).
+            # (W2-42a: the Python reader and an unknown one too, not only a data reader). A shell reader too: the
+            # body's comments are text to the shell that expands it, so a substitution in one runs (DEC-1174 (1)).
             text = re.sub(r"\\[\\$`]", "  ", body["text"])
             for _, _, s, e in spans(text):
                 self.sub(text[s:e], ecwd, whole, depth)

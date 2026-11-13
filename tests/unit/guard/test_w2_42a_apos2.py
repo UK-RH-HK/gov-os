@@ -164,6 +164,15 @@ def test_fail_closed_the_second_readings_keep_the_unreadable_answer_too(root):
     assert "R/src/ok.py" in out and SENT in out
 
 
+@pytest.mark.parametrize("comment", ["# note $(touch {T})", "# it's $(touch {T})", "# it's `touch {T}`",
+                                     "ls # it's; grep x <<< \"$(touch {T})\""])
+def test_fail_closed_a_substitution_in_an_unquoted_shell_body_comment_runs(root, comment):
+    # the shell that feeds the body expands it first, comments and all
+    body = comment.replace("{T}", T)
+    assert f"R/{T}" in got(f"bash <<EOF\n{body}\nEOF", root)
+    assert got(f"bash <<'EOF'\n{body}\nEOF", root) == []  # a quoted body is not expanded
+
+
 def test_f4_a_here_string_to_bash_holding_a_hash_is_refused_as_before():
     assert "cannot be read" in lift_refusal('bash <<< "ls # b"')
     assert lift_refusal('bash <<< "gov pause --off"')
