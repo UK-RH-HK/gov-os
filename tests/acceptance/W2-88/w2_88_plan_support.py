@@ -79,6 +79,21 @@ def plant_clean(base: Path, name: str = "clean") -> Path:
     return root
 
 
+BINARY_REL = "assets/big.bin"
+
+
+def plant_with_binary(base: Path, name: str, size: int, rel: str = BINARY_REL) -> Path:
+    """L-1: ``plant_clean`` (nothing else to refactor) plus one tracked binary of exactly ``size`` bytes at ``rel``: a NUL byte
+    first (inside its first 8,000 bytes) and a fixed, secret-free pattern after it. Two repositories planted with it alike but
+    for ``size`` differ in that file only."""
+    root = plant_clean(base, name)
+    data = (b"\x00binary-bytes\x01\x02\x03" * (size // 16 + 1))[:size]
+    assert len(data) == size and b"\x00" in data[:8000]
+    W.write(root, rel, data)
+    W.commit_all(root, f"a tracked binary of {size} bytes")
+    return root
+
+
 def covers(patterns, rel: str) -> bool:
     for pattern in patterns or []:
         if not isinstance(pattern, str):

@@ -14,6 +14,7 @@ import re
 
 import pytest
 
+import w2_88_plan_support as P
 import w2_88_support as W
 
 SECRET_RULE = "aws-access-token"   # the rule id of gitleaks' default set that detects W2-81's cloud-access-key form
@@ -313,3 +314,74 @@ def test_f4_the_memory_grows_with_the_largest_file_not_with_the_tree_size(box, h
     assert rss["many"] - rss["few"] <= 40 * MIB, \
         f"peak RSS grows with the tree: 10 files {rss['few']} B, 6,000 files {rss['many']} B (limit +40 MiB)"
     assert rss["many"] < W.per_session_figure()
+
+
+# ---- L-1 (DEC-1052, the lead's stated interface): what the stores will take is what the assessment says -------------------
+#
+# The keyword index chunks a tracked binary's bytes as text, so a binary over ``assess.FILE_LIMIT_BYTES`` is over the chunker's limit
+# like a text file is: ``no_route: {path, reason: "over-limit"}`` (and still in ``binary``); a binary at or under the limit stays only in
+# ``binary``. The estimate counts the chunks the keyword index will make, binaries included: ``estimate.chunks``.
+
+CHUNK_CHARS = 1200      # gov.retrieval.chunking.MAX_CHARS - OVERLAP_CHARS is 1,080; the interface's lower bound uses 1,200
+
+
+def ma_record(box, host, root, name):
+    """MA on ``root`` (gitleaks on PATH, so the scan runs): ``(run, out, record)``."""
+    out = box.base / name
+    run = W.run_adopt(root, W.env(box, host), "MA", "--out", str(out))
+    W.assert_offered(run, "MA")
+    W.assert_ok(run, f"MA on {name}")
+    record = out / W.ASSESSMENT
+    assert record.is_file(), f"MA wrote no {W.ASSESSMENT} under --out\n{run.describe()}"
+    return run, out, W.read_json(record)
+
+
+def test_s1_l1a_a_tracked_binary_over_the_limit_is_in_binary_and_in_no_route_as_over_limit(box, host):
+    """L-1a: MA on a repository with one tracked binary of 2 MiB (``assets/big.bin``, a NUL byte in its first 8,000 bytes) and nothing
+    else to refactor: the file is listed under ``binary`` and under ``no_route`` as ``{path, reason: "over-limit"}`` (once)."""
+    limit, _ = W.limits()
+    root = P.plant_with_binary(box.base, "bin-over", 2 * MIB)
+    assert 2 * MIB > limit
+    run, out, record = ma_record(box, host, root, "bin-over-out")
+    rel = P.BINARY_REL
+    assert W.holds(record["binary"], rel), f"the 2 MiB binary is not under `binary`: {record['binary']}"
+    entries = [i for i in record["no_route"] if isinstance(i, dict) and i.get("path") == rel]
+    assert len(entries) == 1 and entries[0].get("reason") == "over-limit", \
+        f"the 2 MiB binary (over {limit} B) is not in no_route once as {{path, reason: over-limit}}: {record['no_route']}"
+
+
+def test_s1_l1a_a_binary_at_or_under_the_limit_stays_only_in_binary_and_one_byte_over_is_over_limit(box, host):
+    """L-1a, the edge: a binary of 4 KiB and one of exactly ``assess.FILE_LIMIT_BYTES`` are listed under ``binary`` only (no
+    ``no_route`` entry for them); one of ``FILE_LIMIT_BYTES + 1`` is under ``binary`` and in ``no_route`` as ``over-limit``.
+    Each size is planted in its own repository, alike but for that file's size."""
+    limit, _ = W.limits()
+    rel = P.BINARY_REL
+    for size, over in ((4096, False), (limit, False), (limit + 1, True)):
+        root = P.plant_with_binary(box.base, f"bin-{size}", size)
+        run, out, record = ma_record(box, host, root, f"bin-{size}-out")
+        assert W.holds(record["binary"], rel), f"the binary of {size} B is not under `binary`: {record['binary']}"
+        routed = [i for i in record["no_route"] if isinstance(i, dict) and i.get("path") == rel]
+        if over:
+            assert routed and all(i.get("reason") == "over-limit" for i in routed), \
+                f"the binary of {size} B (one byte over the limit {limit}) is not no_route: over-limit: {record['no_route']}"
+        else:
+            assert not W.holds(record["no_route"], rel), f"the binary of {size} B (at or under {limit}) is in no_route: {record['no_route']}"
+
+
+def test_s1_l1b_the_estimate_counts_the_keyword_indexs_chunks_binaries_included(box, host):
+    """L-1b: two repositories alike but for the tracked binary's size (2 MiB, 4 KiB): ``estimate.chunks`` exists (an integer), the
+    2 MiB repository's is at least ``2 * 1048576 / 1200`` larger than the 4 KiB one's, and its ``estimate.index_seconds`` is larger."""
+    figures = {}
+    for name, size in (("wide", 2 * MIB), ("narrow", 4096)):
+        root = P.plant_with_binary(box.base, f"est-{name}", size)
+        run, out, record = ma_record(box, host, root, f"est-{name}-out")
+        estimate = record.get("estimate")
+        assert isinstance(estimate, dict), f"no estimate block: {estimate!r}"
+        chunks = estimate.get("chunks")
+        assert isinstance(chunks, int) and not isinstance(chunks, bool) and chunks > 0, \
+            f"estimate.chunks is no positive integer ({name}, {size} B binary): {estimate!r}"
+        figures[name] = (chunks, estimate["index_seconds"])
+    assert figures["wide"][0] - figures["narrow"][0] >= 2 * MIB / CHUNK_CHARS, \
+        f"estimate.chunks grows by {figures['wide'][0] - figures['narrow'][0]} for 2 MiB of binary bytes, less than {2 * MIB / CHUNK_CHARS:.0f}"
+    assert figures["wide"][1] > figures["narrow"][1], \
+        f"estimate.index_seconds is not larger for the 2 MiB binary: {figures['wide'][1]} vs {figures['narrow'][1]}"

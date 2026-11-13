@@ -204,6 +204,28 @@ time is a figure whatever the route answered): **2 fail** (`route-unavailable`, 
 cases): **12 fail**, the untouched-constants guard passes. The measured-scan case needs a real build (`gov.rebuild.command.run`), which the stand-in A9 does not
 run: it is not shown to bite on its own.
 
+## Run 4b addition (L-1, DEC-1052, the lead's stated interface; base `89576e801a02`; five cases, one narrow addition)
+
+What the stores will take is what the assessment and the plan say: the keyword index chunks a tracked binary's bytes as text, so (L-1a) a tracked
+file over `assess.FILE_LIMIT_BYTES` is in `no_route` as `over-limit` whether text or binary (a binary over the limit is in `binary` and in `no_route`;
+the plan proposes its `over-limit` ticket; a binary at or under the limit stays only in `binary`), and (L-1b) `estimate.chunks` is the chunks the
+keyword index will make, binaries included. Planted by `w2_88_plan_support.plant_with_binary` (the clean repository plus `assets/big.bin`, a NUL byte
+first); MA runs as every MA case runs it (gitleaks on `PATH`). No existing case plants a binary over the limit and asserts `no_route`, the plan or
+`NOTHING-TO-REFACTOR.md` (the proving-ground builders run at 300,000 B and the case asserts the peak RSS only): no existing case is revised.
+
+| KPI id / item | tests | red reason on the base `89576e801a02` |
+|---|---|---|
+| success-1 (S1) / L-1a | `test_w2_88_s1_assessment.py::test_s1_l1a_a_tracked_binary_over_the_limit_is_in_binary_and_in_no_route_as_over_limit` | a 2 MiB binary is under `binary` but `no_route` is empty: the base leaves a binary out of `no_route` |
+| success-1 (S1) / L-1a (the edge) | `test_w2_88_s1_assessment.py::test_s1_l1a_a_binary_at_or_under_the_limit_stays_only_in_binary_and_one_byte_over_is_over_limit` | the binaries of 4 KiB and of exactly the limit pass (only in `binary`: kept, as today); the one of limit + 1 byte is in no `no_route` entry |
+| success-1 (S1) / L-1b | `test_w2_88_s1_assessment.py::test_s1_l1b_the_estimate_counts_the_keyword_indexs_chunks_binaries_included` | no `estimate.chunks` on the base (`estimate` holds `index_seconds`, `estimated_nodes`, `estimated_edges`, ... only) |
+| success-2 (S2) / L-1a | `test_w2_88_s2_plan.py::test_s2_l1a_a_tracked_binary_over_the_limit_gets_the_over_limit_proposal_and_no_nothing_to_refactor` | a repository whose only finding is a 2 MiB binary gets `NOTHING-TO-REFACTOR.md` and no `over-limit` proposal |
+| success-2 (S2) / L-1a (the edge) | `test_w2_88_s2_plan.py::test_s2_l1a_a_binary_at_or_under_the_limit_gets_no_proposal_and_one_byte_over_gets_one` | the binaries of 4 KiB and of exactly the limit get no proposal and `NOTHING-TO-REFACTOR.md` (kept, as today); the one of limit + 1 byte gets no proposal |
+
+The two edge cases hold their at-or-under-the-limit halves as part of the same case (green on the base by design) beside the over-the-limit half that is red;
+no other new case is green on the base. Each binary size is planted in its own repository (alike but for that file's size), so the repositories of
+`estimate.chunks` differ in that file only (2 MiB against 4 KiB: the interface's lower bound on the difference is `2 * 1048576 / 1200`). The suite's S1 and S2
+modules with the bite checks (`test_w2_88_bites.py`): **58 cases, 5 failed (the five above), 53 passed**.
+
 ## Run 4 on the base (`b1fe858ac`)
 
 Full run (`heavy_slot.sh`, `-rfE --tb=no`, 2026-11-13, HOME an empty folder, the sandbox's own TMPDIR): **199 cases, 34 failed, 163 passed, 2 skipped**
