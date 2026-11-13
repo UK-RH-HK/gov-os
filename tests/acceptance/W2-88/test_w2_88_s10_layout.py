@@ -147,11 +147,11 @@ def test_s10_gov_rebuild_replaces_a_stale_store_and_reports_the_layout(box, host
     else:
         project, planted = plant(box, host, case, f"rebuild-{case}")
         found = planted["version"]
-    run = W.S124.rebuild(project, box, host, "--json", "--no-embeddings")
+    run = W.rebuild(project, box, host, "--json", "--no-embeddings")
     assert run.prints_ok, f"gov rebuild on a stale store ({case}) did not print ok\n{run.describe()}"
     layout = run.result.get("layout")
     expected = outcome(box, host, project).get("layout_version")
-    assert layout == {"found": found, "expected": expected, "rebuilt": True}, f"the rebuild reports layout {layout}"
+    assert layout == {"found": found, "expected": expected, "rebuilt": True}, f"the rebuild reports layout {layout}\n{run.describe()}"
     seen = outcome(box, host, project)
     assert seen["outcome"] == "opened", f"the store is still refused after the rebuild: {seen}"
 
@@ -159,10 +159,10 @@ def test_s10_gov_rebuild_replaces_a_stale_store_and_reports_the_layout(box, host
 def test_f3_a_rebuild_digest_set_has_four_digests(box, host):
     """I6: the rebuild's result carries ``digests: {record, lexical, vectors, codegraph_bytes}``; ``digest`` is unchanged."""
     project = W.S124.plant(box, "digests", files=3)
-    run = W.S124.rebuild(project, box, host, "--json")
+    run = W.rebuild(project, box, host, "--json")
     assert run.prints_ok, run.describe()
     digests = run.result.get("digests")
-    assert isinstance(digests, dict) and set(W.DIGESTS) <= set(digests), f"digests {digests}"
+    assert isinstance(digests, dict) and set(W.DIGESTS) <= set(digests), f"digests {digests}\n{run.describe()}"
     assert run.result.get("digest") == digests["record"], "``digest`` (the record graph's) stays as it is and equals digests.record"
     for key in ("record", "lexical", "vectors"):
         assert re.fullmatch(r"[0-9a-f]{64}", str(digests[key])), f"digests.{key} is no sha256: {digests[key]!r}"

@@ -178,6 +178,10 @@ def env(box, host: str, *, tools=(), code_graph: bool = False, **extra) -> dict:
     ``tk`` or ``crontab``); the real code-graph tool is on PATH only for ``code_graph=True`` (a ``local_only`` case)."""
     folders = [*(str(t) for t in tools), str(box.tools), str(Path(sys.executable).parent), "/usr/bin", "/bin"]
     values = {"PYTHONPATH": str(SRC)}
+    standin = os.environ.get("W2_88_STANDIN")          # a bite check only (README, "Bite checks"): a stand-in folder first
+    if standin:
+        values["PYTHONPATH"] = standin + os.pathsep + str(SRC)
+        values["W2_88_STANDIN_MODE"] = os.environ.get("W2_88_STANDIN_MODE", "good")
     if code_graph:
         tool = shutil.which("codebase-memory-mcp") or str(Path.home() / ".local/bin/codebase-memory-mcp")
         folders.append(str(Path(tool).parent))
@@ -185,6 +189,11 @@ def env(box, host: str, *, tools=(), code_graph: bool = False, **extra) -> dict:
     values["PATH"] = os.pathsep.join(folders)
     values.update(extra)
     return S124.environment(box, host, **values)
+
+
+def rebuild(project, box, host: str, *extra):
+    """``gov rebuild <extra>`` in ``project`` with this suite's environment (a stand-in folder first on a bite check)."""
+    return S124.gov(project, env(box, host), "rebuild", *extra)
 
 
 def run_adopt(project, environment, stage: str, *extra, session: str = SESSION):
