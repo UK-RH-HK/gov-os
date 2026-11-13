@@ -190,20 +190,33 @@ def user_rules(home: Path) -> dict[str, list[str]]:
     return rules
 
 
+def _role_file(root: Path, role: str) -> tuple[str, bytes, list[str]]:
+    """The role file's path (relative to ``root``), bytes and lines; refused when it cannot be read."""
+    roles_rel = ROLES_REL if os.path.lexists(root / ROLES_REL.split("/")[0]) else ADOPTED_ROLES_REL
+    rel = f"{roles_rel}/{role}.md"
+    try:
+        data = (root / rel).read_bytes()
+        return rel, data, data.decode("utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        raise _refuse(f"the role file {rel} cannot be read: the session would start without its role (DEC-826 Q1)") \
+            from None
+
+
+def launch_default(root: Path, role: str) -> tuple[str, str]:
+    """The model and effort of the role file's default line alone, for ``gov launch --plan`` (DEC-1167 (2)): the same
+    file and the same refusals as ``read_role``; no other line of it is read."""
+    rel, _, lines = _role_file(root, role)
+    default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
+    return default.group(1), default.group(2)
+
+
 def read_role(root: Path, role: str) -> dict:
     """The role file read once: its path, bytes, version, sha256, default model and effort, and the skills.
 
     ``skills`` holds every loadable skill, named or not, in the record's form; ``appended`` the bytes of the text
     appended to the session's prompt: the role file, then each named skill's ``SKILL.md`` in the order named.
     """
-    roles_rel = ROLES_REL if os.path.lexists(root / ROLES_REL.split("/")[0]) else ADOPTED_ROLES_REL
-    rel = f"{roles_rel}/{role}.md"
-    try:
-        data = (root / rel).read_bytes()
-        lines = data.decode("utf-8").splitlines()
-    except (OSError, UnicodeDecodeError):
-        raise _refuse(f"the role file {rel} cannot be read: the session would start without its role (DEC-826 Q1)") \
-            from None
+    rel, data, lines = _role_file(root, role)
     version = _one_line(lines, VERSION_HEAD, VERSION_LINE, rel, "- **Version:** <major>.<minor>.<patch>", True)
     default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
     named_line = _one_line(lines, SKILLS_HEAD, SKILLS_LINE, rel, "- **Skills:** <name>, <name>", False)
