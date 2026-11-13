@@ -414,6 +414,10 @@ acceptance_exemptions:
     decision: DEC-1141  # ACT-OPERATOR-HOURS-2's commit (DEC-1136 (2))
   - commit: "44a290a490d9b428263f1dfe15618bb039f020ad"
     decision: DEC-1157  # ACT-OPERATOR-HOURS-3's commit (DEC-1136 (2))
+  - commit: "5b7941b66aa2351e0ddf8cf4fa8f3ac9377fb722"
+    decision: DEC-1173  # W2-60a's WIP merge kept 4 acceptance files' markers for the test designer (b12), as DEC-1031 item 3
+  - commit: "349341ab8f03562ddb0bff8812770de9e745c397"
+    decision: DEC-1173  # W2-104 run 3's WIP merge kept the W1-07 and W1-32 files' markers for the test designer, as DEC-1031 item 3
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
