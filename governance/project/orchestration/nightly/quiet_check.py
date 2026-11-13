@@ -3,8 +3,16 @@
 else running".) Reads only; prints one reason a line and exits 1 when anything runs, prints "quiet" and exits 0 when
 nothing does. Standard library only.
 
-    quiet_check.py [--no-load] [--own-off]   --no-load leaves out the load test, --own-off accepts dispatch/OFF as the
+    quiet_check.py [--no-load] [--own-off] [--beside-leads]   --no-load leaves out the load test, --own-off accepts
+                                     dispatch/OFF as the
                                      wrapper's own (its second look, just after it wrote the switch; the status is then not read)
+
+--beside-leads (DEC-1159 (1), the owner 2026-11-13: the nightly runs beside the leads, in its own capped unit): leads and
+their work are not "something else running": a running or launching lead, a lead's, slot's or rebuild job, a heavy slot held, a
+heavy step outside a slot, a process in a worktree or the runs folder, pytest, heavy_slot.sh, launch_worker.sh,
+launch_now.sh, rebuild_slot.sh, a rebuild lock, and the load are left out. Still counted: a landing, a close, the merge queue, an ACT,
+the operator's freeze, a memory measure, another nightly, the main tree (a merge, a change, a young head), the rg storm,
+and the dispatcher's status being unreadable or stale. The nightly takes its heavy slots and the rebuild lock itself.
 
 What counts as something else running (each from a source that already exists on this machine):
   - a lead, a landing, a close, a rebuild or any other job: the dispatcher's own status.json (its truth since DEC-1008:
@@ -87,32 +95,39 @@ def processes():
     return out
 
 
-def process_reasons():
+LEAD_SCRIPTS = ("heavy_slot.sh", "rebuild_slot.sh", "launch_worker.sh", "launch_now.sh")   # leads' own: left out --beside-leads (the nightly takes the rebuild lock itself)
+
+
+def process_reasons(beside=False):
     out = []
     for pid, argv, cwd in processes():
         head = argv[:4]
         base = [os.path.basename(a) for a in head]
         why = None
-        if any(cwd.startswith(r) for r in BUSY_ROOTS) and not cwd.startswith(OWN_RUNS):
+        in_busy = any(cwd.startswith(r) for r in BUSY_ROOTS) and not cwd.startswith(OWN_RUNS)
+        if beside and in_busy:
+            continue   # a lead's or worker's process (a landing's clone is named by the status and the job scripts)
+        if in_busy:
             first = cwd[len(next(r for r in BUSY_ROOTS if cwd.startswith(r))):].split("/")[0]
             if not first.startswith(NOT_A_JOB):
                 why = f"a process works in {cwd}"
-        if why is None and any(b in JOB_SCRIPTS for b in base):
+        if why is None and any(b in JOB_SCRIPTS and not (beside and b in LEAD_SCRIPTS) for b in base):
             why = "a job script runs: " + " ".join(base[:3])
         prog = os.path.basename(argv[0])
         is_py = prog.startswith("python")
         module = argv[argv.index("-m") + 1] if is_py and "-m" in argv[1:5] and argv.index("-m") + 1 < len(argv) else ""
         script = os.path.basename(argv[1]) if is_py and len(argv) > 1 else ""
-        if why is None and (prog in ("pytest", "py.test") or module == "pytest" or script in ("pytest", "py.test")):
+        if why is None and not beside and (prog in ("pytest", "py.test") or module == "pytest"
+                                           or script in ("pytest", "py.test")):
             why = "a test run: " + " ".join(argv[:4])[:100]
-        if why is None and ((module == "gov.cli.main" and "rebuild" in argv[1:8]) or (prog == "gov" and "rebuild" in argv[1:3])):
+        if why is None and not beside and ((module == "gov.cli.main" and "rebuild" in argv[1:8]) or (prog == "gov" and "rebuild" in argv[1:3])):   # --beside-leads: a test helper's rebuild in a temporary project is a lead's work (F2 of the F5 check); a landing's is named by the landing
             why = "a rebuild: " + " ".join(argv[:5])[:100]
         if why:
             out.append(f"{why} (pid {pid})" if pid else why)
     return out[:8]
 
 
-def status_reasons(own_off=False):
+def status_reasons(own_off=False, beside=False):
     off = os.path.exists(os.path.join(os.path.dirname(STATUS), "OFF"))
     if off and not own_off:
         return ["the dispatcher is switched OFF (the CTO's hold: dispatch/OFF)"]
@@ -126,16 +141,20 @@ def status_reasons(own_off=False):
     if age > STATUS_MAX_AGE_S:
         return [f"the dispatcher's status is {int(age)} s old (over {STATUS_MAX_AGE_S}): leads cannot be counted"]
     out = []
-    if s.get("lead_count"):
+    if s.get("lead_count") and not beside:
         out.append(f"{s['lead_count']} lead(s) running: {', '.join(map(str, s.get('leads', [])))[:80]}")
     for j in s.get("jobs") or []:
+        if beside and j.get("kind") in ("lead", "slot", "rebuild"):   # a rebuild job is a lead's or worker's store (F5); a landing's is named by land_running
+            continue
         out.append(f"job {j.get('kind')} {j.get('name')} ({j.get('phase')})")
     for key, text in (("land_running", "a landing runs"), ("close_running", "a close runs"),
                       ("queue_busy", "the merge queue is busy"), ("outside_slot", "a heavy step runs outside a slot"),
                       ("pending_launches", "a lead is launching")):
+        if beside and key in ("outside_slot", "pending_launches"):
+            continue
         if s.get(key):
             out.append(text)
-    if s.get("slots_held"):
+    if s.get("slots_held") and not beside:
         out.append("heavy slot(s) held: " + ", ".join(s["slots_held"]))
     return out
 
@@ -155,9 +174,11 @@ def lock_busy(path):
         os.close(fd)
 
 
-def lock_reasons():
-    out = [f"heavy slot {n} is held" for n in (1, 2, 3) if lock_busy(f"{SLOT_DIR}/gov-os-heavy-slot-{n}.lock")]
-    out += [f"a rebuild lock is held: {os.path.basename(p)}" for p in sorted(glob.glob(REBUILD_GLOB)) if lock_busy(p)]
+def lock_reasons(beside=False):
+    out = []
+    if not beside:   # --beside-leads: the nightly waits for the slots and the rebuild lock itself (nightly.sh)
+        out += [f"heavy slot {n} is held" for n in (1, 2, 3) if lock_busy(f"{SLOT_DIR}/gov-os-heavy-slot-{n}.lock")]
+        out += [f"a rebuild lock is held: {os.path.basename(p)}" for p in sorted(glob.glob(REBUILD_GLOB)) if lock_busy(p)]
     rl = ORCH + "/merge-queue/run.lock"
     if os.path.exists(rl) and lock_busy(rl):
         out.append("the merge queue's run lock is held")
@@ -212,8 +233,10 @@ def rg_count():
 
 
 def main(argv):
-    reasons = status_reasons("--own-off" in argv) + process_reasons() + lock_reasons() + file_reasons() + tree_reasons()
-    if "--no-load" not in argv:
+    beside = "--beside-leads" in argv
+    reasons = (status_reasons("--own-off" in argv, beside) + process_reasons(beside) + lock_reasons(beside)
+               + file_reasons() + tree_reasons())
+    if "--no-load" not in argv and not beside:
         try:
             load = float(E("NR_LOAD") or open("/proc/loadavg").read().split()[0])
         except (OSError, ValueError):
