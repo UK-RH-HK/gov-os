@@ -1,0 +1,5 @@
+# Record of what the spec-writing skill imports from another source (DEC-959 item 5, DEC-1084).
+# A part is adopted only with its licence checked and recorded here; each entry holds
+# part, source, version and licence (an allowed licence: see spec-form.md).
+# This skill imports nothing, so the list is empty.
+imports: []

@@ -19,6 +19,7 @@ allowed_paths:
 - tests/unit/context/test_w2_183_*.py
 - tests/unit/close/test_w2_183_*.py
 - tests/unit/close/test_context.py  # its :31 case pins build_context(ROOT, "T-1"); revised to the decided call with budget= (DEC-1165; CTO, DEC-1156 (7), DEC-1157 (12))
+- tests/acceptance/W2-54/test_w2_54_dropped_order.py  # its :172 case assumes a --budget holds all evidence; revised by a test designer to the capped room (DEC-1165 (2); CTO, DEC-1156 (7), the W2-33/W1-35 form)
 - docs/probes/DAEO-href/**  # the probe record
 reads:
 - src/gov/context/context_check.py
@@ -59,3 +60,5 @@ round it with `--budget`. Two changes:
 
 The mandatory part is never shortened (CAP-15.d). The key sits in `budgets:` because the kernel's facts schema (kernel bytes) admits no new top-level key and `budgets:`
 already admits any key with a whole number; it counts tokens, not the prose characters of the template keys. A test designer writes the cases from these lines; an engineer builds; a STANDARD review; the land.
+
+- **Delegated (CTO, 2026-11-13 14:40, P3):** P-W2-183-1 (a): W2-54's :172 case revised to the capped room (`min(room_for_all, mandatory + SUPPLEMENTARY_CAP)` or evidence under 6,000 tokens), by a test designer in W2-183's run 3, then a narrow check.

@@ -18,7 +18,6 @@ Refused twice for the same call: stop and say so. Never work around a refusal: r
 - Launch with {CMD:launch_worker}; wait with {CMD:wait_for}; never a hand-written sleep loop.
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - State the ticket's interface (where config lives, error names, function signatures) in the ticket before the pair starts [DEC-1052].
-- Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
 - Merge `w2/integrate` and the designer's tests into a worker's branch yourself, outside the sandbox [DEC-1052].
 
 Part form (at most 2,000 characters): Why now | Decisions staged for this run (ids, one line each) | Order of this run | Probe focus (FULL) | Known traps (paths, reds).
