@@ -10,6 +10,7 @@ import pytest
 from gov.cli.errors import GovError
 from gov.close import command
 from gov.close.command import _build_context, _Finding
+from gov.context import close_budget
 
 ROOT = Path("/no-such-project")
 PACKET = {"hash": "ab" * 32, "mandatory": [{"id": "DEC-1", "authority": "decision", "sha256": "cd" * 32}]}
@@ -28,7 +29,7 @@ def test_the_packet_is_the_one_gov_context_built():
     with patch("gov.context.context", return_value=PACKET) as built, \
             patch("gov.decisions.check", return_value=[]):
         assert _build_context(ROOT, "T-1") is PACKET
-    built.assert_called_once_with(ROOT, "T-1")
+    built.assert_called_once_with(ROOT, "T-1", budget=close_budget(ROOT))  # DEC-1165: the project's setting
 
 
 @pytest.mark.parametrize("code, message, details", [
