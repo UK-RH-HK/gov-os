@@ -1,6 +1,6 @@
 ---
 id: DAEO-0pyc
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-rd0g]
 links: []
 created: 2026-10-16T16:35:11Z
