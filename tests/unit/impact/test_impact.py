@@ -317,3 +317,90 @@ def test_the_depth_of_a_radius_is_the_owners_decision(root):
     from gov.closure import depth_of_radius
 
     assert [depth_of_radius(number) for number in range(4)] == [1, 1, 3, 8]
+
+
+# F1 (a), DEC-1163 (7): G-24's "no record names the item" counts the store's stated links too.
+STATED_REGISTER = """\
+# The register
+
+### DEC-062 — Stands under another
+- **Status:** ACCEPTED · **Under:** DEC-063
+
+### DEC-063 — Stood under
+- **Status:** ACCEPTED
+
+### DEC-064 — Changes another
+- **Status:** ACCEPTED
+- **Changes:** DEC-065 (its cap)
+
+### DEC-065 — Changed
+- **Status:** ACCEPTED
+
+### DEC-067 — Named by nothing
+- **Status:** ACCEPTED
+"""
+STATED_FILES = {
+    "governance/project/path-map.yaml": "decision_register: docs/REGISTER.md\n",
+    "docs/REGISTER.md": STATED_REGISTER,
+    ".tickets/DAEO-t1.md": "---\nid: DAEO-t1\ntype: task\nstatus: open\nsources: [DEC-060]\n---\n# one\n",
+    ".tickets/DAEO-t2.md": "---\nid: DAEO-t2\ntype: task\nstatus: open\ncloses: [DEC-061]\n---\n# two\n",
+    "DEC-060.md": "---\nid: DEC-060\nstatus: ACTIVE\ntype: decision\n---\n",
+    "DEC-061.md": "---\nid: DEC-061\nstatus: ACTIVE\ntype: decision\n---\n",
+}
+
+
+@pytest.fixture()
+def stated(root):
+    """``root`` with decisions named only by a ticket's sources or closes and by the register's Under and Changes lines,
+    committed and loaded; DEC-067 is named by nothing."""
+    for rel, text in STATED_FILES.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(text, encoding="utf-8")
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "stated links")
+    store.load(root)
+    return root
+
+
+def deletable(root, item):
+    return impact.assess(root, [item], {})["change"][0]["deletable"]
+
+
+def test_the_planted_links_are_stated_links_and_no_edge(stated):
+    """The fixture holds what F1 (a) is about: each target is named by a stated link, and by no edge."""
+    from gov import records
+    from gov.retrieval import graph_route
+
+    links = {(link["type"], link["source"], link["target"]) for link in graph_route.stated_links(stated)}
+    assert {("CITES", "DAEO-t1", "DEC-060"), ("CITES", "DAEO-t2", "DEC-061"), ("UNDER", "DEC-062", "DEC-063"),
+            ("AMENDS", "DEC-064", "DEC-065")} <= links
+    assert not {edge["target"] for edge in records.edges(stated)} & {"DEC-060", "DEC-061", "DEC-063", "DEC-065"}
+
+
+@pytest.mark.parametrize("item,named_by", [("DEC-060", "a ticket's sources"), ("DEC-061", "a ticket's closes"),
+                                           ("DEC-063", "the register's Under line"),
+                                           ("DEC-065", "the register's Changes line")])
+def test_a_decision_named_only_by_a_stated_link_is_not_deletable(stated, item, named_by):
+    found = impact.assess(stated, [item], {})
+    assert found["graphs"]["record"] == "ok", named_by  # a current graph: only the link keeps the decision
+    assert found["change"][0]["deletable"] is False, named_by
+    assert found["radius"] != "R0"
+
+
+def test_a_decision_no_edge_and_no_stated_link_names_stays_deletable(stated):
+    found = impact.assess(stated, ["DEC-067"], {})
+    assert found["graphs"]["record"] == "ok" and found["change"][0]["deletable"] is True and found["radius"] == "R0"
+    assert deletable(stated, "DEC-050") is True
+
+
+def test_what_the_item_itself_names_does_not_count(stated):
+    """The ticket and the changing decisions name others; nothing names them."""
+    assert [deletable(stated, item) for item in ("DAEO-t1", "DAEO-t2", "DEC-062", "DEC-064")] == [True] * 4
+
+
+def test_a_store_with_no_stated_links_never_makes_a_decision_deletable(stated, monkeypatch):
+    """An older store has no ``stated_links`` table: the record graph is not read in full, so the stricter side holds."""
+    monkeypatch.setattr(impact.graph_route, "stated_links", lambda _root: None)
+    found = impact.assess(stated, ["DEC-067"], {})
+    assert found["graphs"]["record"].startswith("stale") and "stated links" in found["graphs"]["record"]
+    assert found["change"][0]["deletable"] is False and found["complete"] is False

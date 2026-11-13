@@ -23,6 +23,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.impact import readings
 from gov.impact.readings import CODE, KINDS, OK, RECORD
+from gov.retrieval import graph_route
 
 CITP_TYPE, CITE_TYPE = "change-impact-proposal", "change-execution-record"
 DEPTH_LIMIT, UNRESOLVED, NO_KIND = "DEPTH_LIMIT_REACHED", "UNRESOLVED", "NO_KIND"  # the first two as gov closure's
@@ -75,6 +76,12 @@ class _Records:
             if edge["source"] != edge["target"]:
                 self.named_by.setdefault(edge["target"], set()).add(edge["source"])
         self.testers = {edge["source"] for edge in edges if edge["type"] == "TESTS"}
+        # F1 (a), DEC-1163 (7): the links the records state that no edge holds (a ticket's sources and closes, the
+        # register's Under and Changes lines) name their target too. None: the store holds no such table.
+        links = graph_route.stated_links(root)
+        for link in links or []:
+            if link["source"] != link["target"]:
+                self.named_by.setdefault(link["target"], set()).add(link["source"])
         head = _git(root, "rev-parse", "HEAD").strip()
         stored_paths = {record["path"] for record in self.by_id.values()} | _register_paths(root)
         dirty = _uncommitted(root, stored_paths)
@@ -84,6 +91,9 @@ class _Records:
         elif dirty:
             self.state = f"stale: {', '.join(dirty)} differ from HEAD, which the store was loaded from; gov impact " \
                          "never loads it again"
+        elif links is None:  # a graph not read in full never makes an item deletable (R8)
+            self.state = "stale: the store holds no stated links (it was built before them); gov impact never loads " \
+                         "it again"
         else:
             self.state = OK
 

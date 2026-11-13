@@ -37,8 +37,10 @@ def symbol_kind(paths: list[str]) -> str:
 
 
 # P-3, reading R8 (G-24, the deletable-class join): deletable only when neither graph has anything that depends on
-# the item: no record edge names it and, for a symbol, the code index answers it as dead code (W1-16). What the item
-# depends on itself does not count. A graph that is not read in full and current never makes an item deletable.
+# the item: no record names it, by an edge or by a link the store keeps as stated (a ticket's ``sources`` and
+# ``closes``, the register's Under and Changes lines; F1 (a), DEC-1163), and, for a symbol, the code index answers it
+# as dead code (W1-16). What the item depends on itself does not count. A graph that is not read in full and current
+# (a store with no stated links included) never makes an item deletable.
 def deletable(named_by_records: bool, dead_in_code: bool, graphs_current: bool) -> bool:
     return graphs_current and not named_by_records and dead_in_code
 
