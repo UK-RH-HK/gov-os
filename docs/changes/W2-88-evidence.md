@@ -3,11 +3,12 @@
 The implementer's evidence (DEC-996 (3) A; DEC-1150 (1)). Counts, ids, digests and figures only: nothing of a
 repository's content, no secret value. Proofs (b) and (c) are W2-88b's; the Contract CIT-P is W2-88a's.
 
-## Seams (P-1, P-4, P-6, P-10; the three values)
+## Seams (P-1, P-4, P-6, P-10; the three values; run 4's decided items are item 8)
 
 Batch 1 of run 3, committed alone for the test designer's narrow revision. After this commit a seam's name or form
-changes only with a later commit's subject saying so, and the return naming it. Every path:line is of this branch at
-`b482fc5bf` (the base of run 3).
+changes only with a later commit's subject saying so, and the return naming it. Items 1 to 7 are as run 3 left them,
+**except where item 8 says otherwise** (run 4: review round 1's findings and P-W2-88-B-1; items 4, 5 and the no-route
+sentence of item 6 are superseded there).
 
 ### 1. P-1 (a): the retrieve budget's source
 
@@ -21,7 +22,7 @@ changes only with a later commit's subject saying so, and the return naming it. 
   and the same as `fabric.a9`'s `run.args.budget_ms`. It is not a key of `retrieval.yaml`: `gov.config.loader`
   refuses any key of that file other than `routing` and `pool` (see item 4). The module constant may also be set by
   a test (`monkeypatch.setattr(fabric, "RETRIEVE_BUDGET_MS", n)`).
-- **Over the budget** is `vector_scan_ms > budget_ms`; **over the envelope** is nodes above 80,000, edges above
+- **Over the budget** is `vector_scan_ms > budget_ms` (only a vector scan that ran: item 8, RV1-2); **over the envelope** is nodes above 80,000, edges above
   270,000 or the stage's peak RSS above 2.2 GB (`assess.ENVELOPE`, DEC-078). Either writes `<out>/SCALE-PROPOSAL.md`.
 
 ### 2. P-1 (b): A9's question-set input
@@ -67,7 +68,7 @@ changes only with a later commit's subject saying so, and the return naming it. 
   `216`) takes `fcntl.flock(LOCK_EX | LOCK_NB)` and, when another holds it, waits with a blocking `LOCK_EX`
   (`watch.py:210`): a second rebuild waits, serialised. No change to the lock.
 
-### 4. P-10: the `retrieval.yaml` key of each `fabric.STANDARD` setting
+### 4. P-10: the `retrieval.yaml` key of each `fabric.STANDARD` setting (superseded by item 8: only the pool has a key)
 
 - **What the file is today.** `governance/project/retrieval.yaml` as Gov OS ships it holds two blocks only:
   `routing:` (`code_first`, `named_first`, `phrasings`) and `pool:` (`meaning_uncut`, `route_depth`, `rerank_depth`,
@@ -98,9 +99,9 @@ changes only with a later commit's subject saying so, and the return naming it. 
   four standard values are also written in the record's `standard` block from the pin's code (`rerank.MODEL`,
   `retrieve.BUNDLE_BUDGET`), so a pin whose constants differ from the standard is a departure too.
 
-### 5. P-6: the stage that copies the kernel's retrieval skill and T-0
+### 5. P-6: the stage that copies the kernel's retrieval skill and T-0 (run 3's finding; built in run 4, item 8)
 
-**None.** No stage of `gov adopt --lite` copies a kernel skill or T-0 into the adopted repository:
+**None, at run 3.** No stage of `gov adopt --lite` copies a kernel skill or T-0 into the adopted repository:
 
 - `stages.py:497` `STAGE` holds `A0` to `A8` and `A10`. `A0` writes `.gitleaks.toml` and the `.gov-runtime/` ignore
   line only (`safety.py:41` `setup`); `A1` to `A6` read and move; `A8` imports legacy rule files and leaves the
@@ -109,15 +110,15 @@ changes only with a later commit's subject saying so, and the return naming it. 
 - T-0 is filled by `gov brief` (`src/gov/brief/command.py:3`) from `template/governance/kernel/templates/brief.md`;
   it is not copied at adoption.
 
-So S15's copy has no existing stage. I add **no copy code**. The lead returns the case as a package (it is not moved to
-W2-88a, P-6 (a)).
+So S15's copy had no existing stage. The lead returned the case as package P-W2-88-B-1, which decided it (B-1.1 (a),
+B-1.3 (a)): the copy step is `fabric.install` at A9 (item 8). A0 (`safety.py`) is not touched.
 
 ### 6. The three values
 
 | value | figure | where it comes from |
 |---|---|---|
 | `assess.FILE_LIMIT_BYTES` | **1,048,576 B (1 MiB), the proposal stands: no byte limit is stated in the code.** | The chunker bounds a line, not a file: `chunking.py:29` `READ_CHARS = 32768`; the embedder cuts a chunk at `semantic.py:88` `EMBED_LIMIT_CHARS = 10_000`; `secrets/__init__.py:60` `_LARGE = 64 << 20` only throttles the scan's memory. The rebuild code (`rebuild/command.py`) holds no size limit. "Over the chunker's limit" is therefore: a file over `FILE_LIMIT_BYTES` **or** with a line over `READ_CHARS` (32,768). |
-| the code graph's languages | **`assess.CODE_GRAPH_SUFFIXES`, the engineer's list, unconfirmed.** | `gov.codeintel` states none: `codeintel/__init__.py:37` names the tool (`codebase-memory-mcp`, 0.11.0 here) and `index` (`codeintel/__init__.py:293`) copies what `gov.secrets.indexable` returns; the tool decides which language it reads, and `codebase-memory-mcp --help` lists none. The list: `.py .pyi .js .jsx .mjs .cjs .ts .tsx .rs .go .java .kt .c .h .cc .cpp .hpp .cs .rb .php .swift .scala .sh .lua`. A file whose suffix is in no list and is no document is `no_route` with reason `unsupported-language`. The lead or the CTO confirms it against the tool on the machine that has it. |
+| the code graph's languages | **`assess.CODE_GRAPH_SUFFIXES`, the engineer's list, unconfirmed.** | `gov.codeintel` states none: `codeintel/__init__.py:37` names the tool (`codebase-memory-mcp`, 0.11.0 here) and `index` (`codeintel/__init__.py:293`) copies what `gov.secrets.indexable` returns; the tool decides which language it reads, and `codebase-memory-mcp --help` lists none. The list: `.py .pyi .js .jsx .mjs .cjs .ts .tsx .rs .go .java .kt .c .h .cc .cpp .hpp .cs .rb .php .swift .scala .sh .lua`. The no-route rule is stated once, in `assess.py`'s module text, and in item 8 (RV1-8). The lead or the CTO confirms the list against the tool on the machine that has it. |
 | the retrieve budget | `fabric.RETRIEVE_BUDGET_MS = 2000` (proposed) | item 1: no budget in the code; the flag `--budget-ms` plants a lower one. |
 
 The per-session figure is read from `gov.resources.config` (`working_size_bytes`) and never restated here.
@@ -140,83 +141,164 @@ The per-session figure is read from `gov.resources.config` (`working_size_bytes`
 - `check_coverage` also raises `FABRIC_INCOMPLETE` (details `not_built`) for a store the path map calls for that is
   absent from the record's `stores`, or marked `built: false` or `status: not_recreated`.
 
+### 8. Run 4: review round 1's findings and package P-W2-88-B-1 (the seams as built)
+
+Every path:line is of this branch after run 4's first commit.
+
+- **B-1.1 and B-1.3, the copy step** (`fabric.install`, `fabric._sources`, `fabric.undo`; called by `fabric.a9`).
+  A9 first judges the standard (a refusal there writes nothing), then writes, byte for byte, into the adopted
+  repository, stages them (`git add`) and lets the stage's one record commit take them:
+  - every file of Gov OS's `template/governance/kernel/skills/retrieval/` and `.../discovery/` to
+    `.claude/skills/retrieval/` and `.claude/skills/discovery/` (same relative names);
+  - T-0 `template/governance/kernel/templates/brief.md` and T-8 `.../role-cto.md` to
+    `governance/kernel/templates/brief.md` and `governance/kernel/templates/role-cto.md`;
+  - Gov OS's `governance/project/retrieval.yaml` to `governance/project/retrieval.yaml` **only where the repository
+    tracks none**; a tracked one is kept as it is and judged (B-1.4).
+  - The files are in place before the build and the scale and measure queries, and join the stage's judged files (the
+    stores' lists name them). On any refusal after the copies, `fabric.undo` takes them out (a hard reset to the commit
+    the stage found, the copies and the folders made for them removed): a refusal writes nothing in the tree. An
+    untracked file at a destination is never overwritten (`ADOPT_WOULD_OVERWRITE`).
+  - The record, and the stage's result, hold `installed: [{path, sha256, from}]` (`path` relative to the adopted
+    repository, `from` relative to Gov OS) and `kept: [{path, sha256}]` (the repository's own `retrieval.yaml`; `[]`
+    when none).
+  - The standard is judged on the `retrieval.yaml` in force: the tracked one, else the installed copy
+    (`read_standard`). A fresh adoption with none and no `--decision` is ok.
+- **B-1.2, the reranker and the bundle are the pin's constants** (`fabric.settings_of`, `_code_settings`,
+  `check_keys`). `reranker` is the last `/` part of `gov.retrieval.rerank.MODEL`; `bundle_tokens` is
+  `gov.retrieval.retrieve.BUNDLE_BUDGET`; `reranker_service` is `shared` when `(rerank.CACHE_REL, rerank.SOCKET)` is
+  `(".cache/gov-os", "rerank.sock")`, else `"<CACHE_REL>/<SOCKET>"` (a second reranker); `widen` is `sections`. A
+  `retrieval.yaml` in force with a top-level `rerank` or `bundle` key is refused `CONFIG_INVALID` naming the key
+  (`details["keys"]`) before any store is built; a `--decision` does not make it ok. On the CLI path
+  `gov.config.loader` refuses it first with its own `CONFIG_INVALID` (either is the decided behaviour). Item 4's table
+  is superseded: only the pool has a key.
+- **B-1.4, the pool** (RV1-1; `fabric.departures`). The standard's pool is the whole `pool:` block as Gov OS ships it
+  (`fabric.STANDARD["pool"]`). A block that differs in any key (a value, a missing or an added key), or none, is a
+  departure `{setting: "pool", value: <the file's block, or false when there is none or meaning_uncut is not true>}`:
+  A9 is `STANDARD_DEPARTURE` without a `--decision` naming it.
+- **B-1.5, the secrets scan not run** (RV1-3; `assess._rules`, `refactor_plan.unscanned`, `stages.ma`). With no
+  `gitleaks` on `PATH`, rules that cannot be read, or blobs over `assess.SCAN_LIMIT_BYTES` (16 MiB), MA still writes
+  `memory-assessment.json` (now with `secrets_unscanned_reason`) and the proposals found; it writes no
+  `NOTHING-TO-REFACTOR.md`; `refactor-plan/PLAN.md` holds `secrets: not scanned (<reason>)` and `Unscanned paths:` (the
+  paths, or `all <n> tracked files` where the scanner did not run); the result is not ok: `SECRETS_UNSCANNED`, `details`
+  `{reason, unscanned, unscanned_count, proposals, kinds, assessment}` (at most 1,000 paths in `unscanned`; the whole
+  list of tracked paths is the assessment's `paths`). The repository is byte-identical before and after.
+- **RV1-2, a vector scan that did not run** (`fabric.vector_scan`, `fabric._scan`, `fabric.scale`). The scan is taken
+  through `fabric.vector_scan(root, question) -> dict` (the semantic route's reply; the seam a test replaces, as
+  `fabric.search`). `scale.vector_scan_ms` is a figure only where the reply has `available: true`; an unavailable reply or
+  an error gives `vector_scan_ms: null` and `scale.vector_scan_reason` (the reply's `reason`, or the error's name; `null`
+  when measured). A null scan is never compared with the budget and writes no proposal. `scale.routes.semantic` stays the
+  time of the route's reply (a route time, recorded and never compared); only the vector scan is compared with the
+  budget, and DEC-078's envelope figures still write the proposal when over.
+- **RV1-4, binaries the store holds** (`fabric._stores`). A tracked binary the lexical index chunked is in
+  `stores.lexical.indexed` (and `stores.vectors.indexed` when it has vectors) and named in that store's
+  `binary_held: [paths]`; `refused` never holds a file the store holds. The reason `binary` stays for a binary the store
+  did not take.
+- **RV1-5, the code graph** (`fabric._stores`, `fabric.check_coverage`). With the code graph called for, a file whose
+  suffix is not in `assess.CODE_GRAPH_SUFFIXES` is refused `unsupported-language` and never counted as indexed by it,
+  whatever the tool staged. A graph that cannot be read makes `stores.codegraph` `{built: false, error: "<reason>"}` and
+  A9 `FABRIC_INCOMPLETE` with `codegraph` in `details["not_built"]` and the error in the message (never nodes 0 and
+  edges 0 with ok). The graph's own suffix list stays the engineer's, unconfirmed (item 6).
+- **RV1-6, a load never makes a stale store current** (`store/loader.py` `_current_or_new`, `_load`). `loader.load`
+  stamps a store only when `layout.found_of` finds it current, or the store is new; `loader.connect` after a load into a
+  stale store still raises `STORE_LAYOUT_STALE` with the same `details["found"]`. (`gov rebuild` replaces a stale store
+  before it loads, so a rebuilt store is new and is stamped.)
+- **RV1-8, the no-route rule** (`assess.py`'s module text, `OTHER_CODE_SUFFIXES`). Stated once: a file is no route
+  when it is over the chunker's limit (`over-limit`) or when its suffix is in `assess.OTHER_CODE_SUFFIXES`, a code
+  language the graph does not read (`unsupported-language`; the list holds at least `.vue .ps1 .proto .svelte .cob`, and
+  `.psm1 .graphql .gql .tf .hcl .sol .bat .cmd .coffee .fs .fsx` besides the older ones). A file of any other suffix is
+  no code and is not `no_route` for that reason. This replaces item 6's former sentence, which described a rule the
+  code did not apply.
+- **Accepted seams, unchanged:** `fabric.RETRIEVE_BUDGET_MS = 2000` (provisional, for the owner's reading) with
+  `--budget-ms <N>`; A9's question set only by `--questions <file>`. **The sixth refused reason `not-indexed` is not in
+  the code:** run 3's batch 2c added it and batch 3b withdrew it (`77299906`), so the refused reasons are the
+  Interface's five and `not-embedded` names a file a namespace keeps out of the keyword index. Run 4 does not re-add it
+  (the brief calls it unchanged); the lead says if it is wanted.
+
 ## Proof (a): W2-81's five synthetic repositories, adopted to A9 lite with a stand-in embedder
 
 Built by W2-81's builders (`tests/acceptance/W2-81/w2_81_build.py`, read and run, never edited) under
 `~/gov-os-runs/W2-88/proving-ground/` (the exact path: `/home/usain/gov-os-runs/W2-88/proving-ground/`, outside this
 repository; `git status` of this repository shows none of it). Seed: W2-81's default; the large files of the legacy
 documents at the real run's size (48 MiB each). Each repository: a path map (one namespace, `embedding_policy:
-embedded`, `memory_class: governance`) and Gov OS's shipped `retrieval.yaml` committed, then A0, A1, A2, MA, A3
+embedded`, `memory_class: governance`) committed (**no hand copy of `retrieval.yaml` any more**: A9's copy step installs
+Gov OS's as shipped, B-1.3, and the standard is judged on that copy), then A0, A1, A2, MA, A3
 (`--assessment`; the proposal holds no action: every artefact kept), A4, A5 (the verdict commit is the proof's stand-in
 for the independent auditor: `Role: independent-auditor`), A6, A8 and A9 (`--questions` from W2-81's visible set,
 resolved by `w2_81_questions.resolve`). One process per repository: its peak is its own.
 
 **What stands in, said once.** (1) The embedder: no model runs in the sandbox (DEC-1064, DEC-1065), so the vectors are
 a hash of each chunk, written as the real stage writes them; there is no embedder manifest, so the semantic route
-answers unavailable and retrieval is the keyword and code routes. The measure below is therefore not a measure of the
-standard. (2) The code graph: `codebase-memory-mcp index_repository` exits 1 in this sandbox, so the path map's
+answers unavailable (`available: false`) and **no vector scan was measured on any of the five repositories**: each
+section's `vector_scan_ms` is null with the route's reason, and the budget was compared with no scan (RV1-7; the figure
+the first run of this proof gave as a scan time was an unavailable route's reply and was never a scan). Retrieval is
+the keyword and code routes; the measure below is therefore not a measure of the standard. (2) The code graph: `codebase-memory-mcp index_repository` exits 1 in this sandbox, so the path map's
 `code_intelligence` is off here: the code graph is "not asked for" (`requested: false`), nodes and edges 0. (3) The
 rebuild lock: `/tmp` is read-only here, so `GOV_REBUILD_LOCK` names a file in the sandbox's own temp folder; it is the
 same lock, one rebuild at a time. (4) The reader: no reader model runs in A9; `right_e2e` is the evidence side (every
 gold path stacked, no forbidden path in the first five). The lead re-runs the proof outside the sandbox with the real
 embedder, the code graph and the reranker. The figures are data and set no bar (DEC-954 Q9e).
 
-**The largest proof repository** is the legacy documents (19 files, 100,671,458 bytes).
-Its assessment's **peak RSS** is 41,230,336 bytes, against the resource gate's
+**The largest proof repository** is the legacy documents (18 files, 100,670,630 bytes).
+Its assessment's **peak RSS** is 41,295,872 bytes, against the resource gate's
 **per-session figure** of 805,306,368 bytes (`working_size_bytes`, read from
 `gov.resources.config` by the assessment itself): under it. The A9 stage's own high-water mark on that repository is
-1,083,609,088 bytes: it is the rebuild's, which the gate bounds by `rebuild_peak_bytes`
+1,084,026,880 bytes: it is the rebuild's, which the gate bounds by `rebuild_peak_bytes`
 (7,582,199,808 B on this machine), not by the session figure.
 
 ### Python with drifted specs (python-app)
 
-- **commit:** built at `feadf6088cca`; assessed at `2db3994aae90` (after A2); A9's record committed at `2c3959f12b87`.
-- **size:** 23 files, 9,271 bytes, 12 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 25 s to index, 76,682,730 B estimated peak RSS, 1,943,912 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,556,096 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **commit:** built at `5a5bb025863d`; assessed at `1d546d146fb7` (after A2); A9's record committed at `c06cfe85374e`.
+- **size:** 22 files, 8,443 bytes, 12 commits.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 24 s to index, 76,682,730 B estimated peak RSS, 1,942,256 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,511,040 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 21, 21, 0 (reasons: none), 54 chunks, 0.0 s; vectors 20, 20, 0, 54 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 42.2 s of the rebuild's stage. The A9 stage's high-water mark 66,129,920 B. Digests: record `6970274f0134`, lexical `79e7d8df7061`, vectors `ae9c25625530`, code graph 26,742 bytes (reported, not compared).
-- **scale:** lexical 6.2 ms, semantic 1.7 ms (the stand-in's route), retrieve 12.7 ms; the vector scan 1.7 ms against the budget 2,000 ms; no `SCALE-PROPOSAL.md`.
-- **measure** (11 questions): right end to end 54.5 %, wrong claims 4, hit@5 45.5 %; 7 residuals named with their cause (4 forbidden path in the first five, 2 no gold path among the first five items, 1 the standing reader residual).
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 25, 25, 0 (reasons: none), 83 chunks, 2.4 s; vectors 24, 24, 0, 83 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 38.2 s of the rebuild's stage. The A9 stage's high-water mark 65,679,360 B. Digests: record `fb0981c17725`, lexical `3428ce97ce69`, vectors `5a5432686117`, code graph 41,433 bytes (reported, not compared).
+- **scale:** lexical 1.4 ms, semantic route's reply 4.7 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 14.4 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
+- **measure** (11 questions): right end to end 54.5 %, wrong claims 4, hit@5 54.5 %; 6 residuals named with their cause (4 forbidden path in the first five, 1 no gold path among the first five items, 1 the standing reader residual).
 
 ### Rust workspace (rust-workspace)
 
-- **commit:** built at `9f10774ca647`; assessed at `18a4f268e57e` (after A2); A9's record committed at `750b8b9ba66f`.
-- **size:** 22 files, 8,929 bytes, 11 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 24 s to index, 67,934,850 B estimated peak RSS, 1,087,508 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,576,576 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **commit:** built at `805f243ea6c9`; assessed at `011eb0343400` (after A2); A9's record committed at `ede72a84ef7a`.
+- **size:** 21 files, 8,101 bytes, 11 commits.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 23 s to index, 67,934,850 B estimated peak RSS, 1,085,852 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,547,904 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 20, 20, 0 (reasons: none), 46 chunks, 0.0 s; vectors 20, 20, 0, 46 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 43.8 s of the rebuild's stage. The A9 stage's high-water mark 65,572,864 B. Digests: record `2eccf4640945`, lexical `0b2b27661884`, vectors `8e9408cd000d`, code graph 26,353 bytes (reported, not compared).
-- **scale:** lexical 5.5 ms, semantic 1.4 ms (the stand-in's route), retrieve 14.9 ms; the vector scan 1.4 ms against the budget 2,000 ms; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 24, 24, 0 (reasons: none), 76 chunks, 2.5 s; vectors 24, 24, 0, 76 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 54.0 s of the rebuild's stage. The A9 stage's high-water mark 66,195,456 B. Digests: record `38da94b63c7f`, lexical `2e16907c6d70`, vectors `6c52b53feed1`, code graph 41,044 bytes (reported, not compared).
+- **scale:** lexical 2.9 ms, semantic route's reply 12.9 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 22.6 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 80.0 %, wrong claims 2, hit@5 80.0 %; 3 residuals named with their cause (2 forbidden path in the first five, 1 the standing reader residual).
 
 ### TypeScript monorepo (typescript-monorepo)
 
-- **commit:** built at `36b5401b6ae5`; assessed at `37f9e4036cba` (after A2); A9's record committed at `13868f450ae3`.
-- **size:** 25 files, 9,652 bytes, 13 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 27 s to index, 74,495,760 B estimated peak RSS, 1,730,744 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,609,344 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **commit:** built at `7a7ca21e3e32`; assessed at `6ab58da572af` (after A2); A9's record committed at `97f9fb235b24`.
+- **size:** 24 files, 8,824 bytes, 13 commits.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 26 s to index, 74,495,760 B estimated peak RSS, 1,729,088 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,568,384 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 23, 23, 0 (reasons: none), 48 chunks, 0.0 s; vectors 23, 23, 0, 48 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 52.0 s of the rebuild's stage. The A9 stage's high-water mark 65,966,080 B. Digests: record `0c7e5cebe5ec`, lexical `efbdcf7a4596`, vectors `487da05a8265`, code graph 27,269 bytes (reported, not compared).
-- **scale:** lexical 10.0 ms, semantic 3.2 ms (the stand-in's route), retrieve 26.3 ms; the vector scan 3.2 ms against the budget 2,000 ms; no `SCALE-PROPOSAL.md`.
-- **measure** (10 questions): right end to end 60.0 %, wrong claims 3, hit@5 60.0 %; 5 residuals named with their cause (3 forbidden path in the first five, 1 no gold path among the first five items, 1 the standing reader residual).
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 27, 27, 0 (reasons: none), 78 chunks, 4.3 s; vectors 27, 27, 0, 78 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 65.4 s of the rebuild's stage. The A9 stage's high-water mark 66,326,528 B. Digests: record `e0844c5ac3a2`, lexical `00bb54824fba`, vectors `555f5f3e6b60`, code graph 41,960 bytes (reported, not compared).
+- **scale:** lexical 3.7 ms, semantic route's reply 17.7 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 31.4 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
+- **measure** (10 questions): right end to end 60.0 %, wrong claims 3, hit@5 50.0 %; 6 residuals named with their cause (3 forbidden path in the first five, 2 no gold path among the first five items, 1 the standing reader residual).
 
 ### Legacy documents with large files (legacy-docs)
 
-- **commit:** built at `55ceb419d9aa`; assessed at `0527ab774fe0` (after A2); A9's record committed at `ea6dae6ebc40`.
-- **size:** 19 files, 100,671,458 bytes, 10 commits.
-- **assessment:** 2 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 18 s to index, 61,373,940 B estimated peak RSS, 201,770,776 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 41,230,336 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **commit:** built at `c3d4b7ae8671`; assessed at `64927f84cc21` (after A2); A9's record committed at `22dd7464ae6a`.
+- **size:** 18 files, 100,670,630 bytes, 10 commits.
+- **assessment:** 2 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 17 s to index, 61,373,940 B estimated peak RSS, 201,769,120 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 41,295,872 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 17, 15, 2 (reasons: binary), 94,192 chunks, 2.0 s; vectors 15, 15, 0, 94,192 vectors (stand-in), 0.3 s; code graph not asked for (the sandbox cannot run the tool), 61.8 s of the rebuild's stage. The A9 stage's high-water mark 1,083,609,088 B. Digests: record `ed42d9e0d5d6`, lexical `bd70b805563b`, vectors `5e90a77fb297`, code graph 100,688,792 bytes (reported, not compared).
-- **scale:** lexical 269.2 ms, semantic 1.7 ms (the stand-in's route), retrieve 6356.3 ms; the vector scan 1.7 ms against the budget 2,000 ms; no `SCALE-PROPOSAL.md`.
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 21, 21, 0 (reasons: none), 94,222 chunks, 6.3 s; vectors 21, 21, 0, 94,222 vectors (stand-in), 0.5 s; code graph not asked for (the sandbox cannot run the tool), 90.7 s of the rebuild's stage. The A9 stage's high-water mark 1,084,026,880 B. Digests: record `458c35b8e0dc`, lexical `7a7f33de29ee`, vectors `0f36cfa1613b`, code graph 100,703,483 bytes (reported, not compared).
+- **scale:** lexical 140.7 ms, semantic route's reply 362.1 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 7853.1 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
 - **measure** (10 questions): right end to end 80.0 %, wrong claims 2, hit@5 60.0 %; 5 residuals named with their cause (2 forbidden path in the first five, 2 no gold path among the first five items, 1 the standing reader residual).
 
 ### A secret in history (secret-history)
 
-- **commit:** built at `00c9d7c90d27`; assessed at `b743f424ac43` (after A2); A9's record committed at `37f161bc9c6b`.
-- **size:** 17 files, 7,680 bytes, 10 commits.
-- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 18 s to index, 67,934,850 B estimated peak RSS, 1,085,010 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,523,328 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
+- **commit:** built at `8413ddd1901e`; assessed at `baada0ccd4c9` (after A2); A9's record committed at `3251839263a6`.
+- **size:** 16 files, 6,852 bytes, 10 commits.
+- **assessment:** 0 binary, 0 generated, 0 minified, 0 vendored, 0 secrets by rule id (none), 0 files no route can take; the estimate: 17 s to index, 67,934,850 B estimated peak RSS, 1,083,354 B disk, inside DEC-078's envelope: True; **the assessment's own peak RSS 23,572,480 B** (alone in its own process), per-session figure 805,306,368 B, under it: True.
 - **plan's proposals (count and kinds):** 0; none (`NOTHING-TO-REFACTOR.md`).
-- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.0 s; lexical 15, 15, 0 (reasons: none), 36 chunks, 0.0 s; vectors 15, 15, 0, 36 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 30.2 s of the rebuild's stage. The A9 stage's high-water mark 63,721,472 B. Digests: record `8fc292138743`, lexical `6acdb02d062f`, vectors `d9517b31cc17`, code graph 24,827 bytes (reported, not compared).
-- **scale:** lexical 4.8 ms, semantic 1.2 ms (the stand-in's route), retrieve 10.9 ms; the vector scan 1.2 ms against the budget 2,000 ms; no `SCALE-PROPOSAL.md`.
-- **measure** (10 questions): right end to end 100.0 %, wrong claims 0, hit@5 100.0 %; 1 residuals named with their cause (1 the standing reader residual).
+- **per-store figures** (judged, indexed, refused with reason, chunks, vectors, nodes, edges, seconds; each store's memory field in the record holds the A9 stage's own high-water mark, one rebuild, not one per store): record 1, 1, 0, nodes 9, edges 0, 0.1 s; lexical 19, 19, 0 (reasons: none), 66 chunks, 4.0 s; vectors 19, 19, 0, 66 vectors (stand-in), 0.0 s; code graph not asked for (the sandbox cannot run the tool), 49.1 s of the rebuild's stage. The A9 stage's high-water mark 66,334,720 B. Digests: record `7462d88d22e1`, lexical `f3f855a348c2`, vectors `ecc16f58fb08`, code graph 39,518 bytes (reported, not compared).
+- **scale:** lexical 2.9 ms, semantic route's reply 9.2 ms (recorded as a route time only: an unavailable answer, no scan ran), retrieve 36.2 ms; **no vector scan was measured** (`vector_scan_ms` null; reason: missing): the budget of 2,000 ms was compared with no scan, so this run says nothing of whether a scan is under it; no `SCALE-PROPOSAL.md`.
+- **installed by A9's copy step:** 5 files (the retrieval and discovery skills, T-0, T-8, and Gov OS's `retrieval.yaml`), kept: 0 (the repository's own `retrieval.yaml`); the standard's departures: 0.
+- **measure** (10 questions): right end to end 100.0 %, wrong claims 0, hit@5 90.0 %; 2 residuals named with their cause (1 no gold path among the first five items, 1 the standing reader residual).
 
 **Set checks of these questions** (W2-81's visible sets, resolved by W2-81's builders against each built `HEAD`; counts
 by `set-checks`): path missing 0, heading on no line 0, heading on more than one line 0, unresolved 0, quota PASS (a source's `holds` line stands for the heading; the quota is W2-81's own, at least 10 questions with gold sources in each repository: python-app 11, rust-workspace 10, typescript-monorepo 10, legacy-docs 10, secret-history 10; it is not the R5 quota of S12's set).
@@ -236,12 +318,13 @@ A3's `--assessment`, A9 lite) on its clone at adoption, on W2-16's release; that
 | success 2 (the plan) | `adopt/refactor_plan.py` `plan` | built; its own unit tests |
 | success 3 (A9: stores, lists, coverage, never two at once) | `adopt/fabric.py` `a9`, `_stores`, `check_coverage`; `stages.a9` | built; stand-ins for the embedder and the code graph |
 | success 4 (the layout, four digests) | `store/layout.py`; `store/loader.py`; `rebuild/command.py` `digests_of` | built; its own unit tests |
-| success 5 (scale) | `fabric.scale`, `over`, `proposal` | built; the vector scan is the stand-in's here |
+| success 5 (scale) | `fabric.scale`, `vector_scan`, `over`, `proposal` | built; no vector scan was measured here (no query embedder): null with its reason |
 | success 6 (memory works, measured) | `fabric.load_questions`, `measure`; `--questions` | built; evidence side only, no reader model |
 | success 7, 8, 9 (the proofs) | this file | (a) and (d) written; the real-embedder re-run is the lead's |
 | success 10 (stale layout refused) | `store/layout.py` `check`; `loader.connect`; `rebuild/command.py` `_replace_stale` | built |
-| success S10 (the standard) | `fabric.read_standard`, `departures`, `settings_of` | built; only the pool has a key `gov.config.loader` accepts (package) |
+| success S10 (the standard) | `fabric.read_standard`, `departures`, `settings_of`, `check_keys` | built; the pool is the whole shipped block; the reranker, its service and the bundle are the pin's constants, and a `retrieval.yaml` with `rerank:` or `bundle:` is `CONFIG_INVALID` |
 | success S11 (the refresh) | the refresh command is written in the record and the ACT (`memory_sets.walls_act`); never installed by the tool | built |
-| success S12 to S14, S16, S17 | not this ticket's code (the sets are the writer's and checker's; S17 is W2-88a's); S15's copy has no stage today (package P-6) | not built here |
+| success S12 to S14, S17 | not this ticket's code (the sets are the writer's and checker's; S17 is W2-88a's) | not built here |
+| success S15, S16 (the kernel copy) | `fabric.install`, `undo`; called by `fabric.a9` | built (B-1.1, B-1.3); its own unit tests |
 | success S18 to S23 | `adopt/memory_sets.py` | built; its own unit tests |
 | failure 1 to 9 | the same modules; nothing is written in the repository by MA and the plan; no `tk` call | built; see the tests |
