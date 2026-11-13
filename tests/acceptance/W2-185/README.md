@@ -35,7 +35,7 @@ the file does not hold.
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_an_event_only_the_template_has_is_a_finding` | green on the base; stays a finding |
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_a_template_post_tool_use_entry_other_than_posttooluse_with_no_root_event_is_a_finding` | red: `no hooks finding names postToolUse` (today the whole event is exempt while the root lacks it; the only finding is the root's `stop`) |
 | F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_f1_a_template_post_tool_use_failure_entry_other_than_posttooluse_with_no_root_event_is_a_finding` | red: `no hooks finding names postToolUseFailure` (the whole event is exempt) |
-| Map | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_the_readme_maps_every_case_of_this_folder` | green; fails when a case of this folder is not in the tables |
+| F1 | `tests/acceptance/W2-185/test_w2_185_hooks.py::test_the_readme_maps_every_case_of_this_folder` | green; fails when a case of this folder is not in the tables (the self-check sits under F1 because a case that drops out of the map unseen would let a drift stay a finding no one runs, and `gov accept` reads a KPI cell only as a ticket line) |
 
 ## What each case judges
 
