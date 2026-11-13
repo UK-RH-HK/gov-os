@@ -274,7 +274,6 @@ BRANCH_FILES = {
     ),
     f"{T.acceptance}/README.md": f"# The tests of W2-95 {TEST_WORD} {WORD}\n",
 }
-<<<<<<< HEAD
 # W2-60a (DEC-826 Q1): gov launch reads the role file of the tree it starts in, with its version line and its
 # default line (DEC-839 items 1 and 5), and refuses a tree without one. One fixture role file per worker role.
 ROLES_REL = "template/governance/kernel/roles"
@@ -287,14 +286,12 @@ def role_file_text(role, model="claude-opus-5-5", effort=None):
 
 
 ROLE_FILES = {f"{ROLES_REL}/{role}.md": role_file_text(role) for role in ROLE_EFFORT}
-=======
 # W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
 # base commit holds the eight copies (any bytes), so the template check is never what refuses a launch here.
 TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
                   "role-reviewer", "role-lead", "role-cto")
 TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-58 fixture template copy {stem}\n"
                   for stem in TEMPLATE_STEMS}
->>>>>>> w2/integrate
 # The files T's branch changes against its base, other than tests and tickets.
 CHANGED = ("src/app/main.py", "src/app/added.py")
 UNCHANGED = ("src/other/main.py", "docs/notes.md")

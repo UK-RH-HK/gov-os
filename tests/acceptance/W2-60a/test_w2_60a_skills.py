@@ -188,6 +188,53 @@ def test_a_skills_folder_the_record_could_not_describe_refuses_the_launch(sandbo
     s.assert_refused(launch(s.ENGINEER), "skill")
 
 
+# --------------------------------------------------------------------------
+# The kernel's generated copies: the version under ``metadata:`` (KPI S2, F3)
+# --------------------------------------------------------------------------
+
+def _metadata_skill_text(folder, metadata_version, top_version=None):
+    """A ``SKILL.md`` in the form the kernel's generated copies take today (``.claude/skills/test-design/SKILL.md``):
+    the version only as ``metadata: version: <x.y.z>``, unquoted; with ``top_version``, a top-level ``version`` too."""
+    head = ["---", f"name: {folder}", "description: >-", f"  The W2-60a fixture skill {folder}."]
+    if top_version is not None:
+        head.append(f"version: {top_version}")
+    head += ["metadata:", f"  version: {metadata_version}", "---", ""]
+    body = [f"# {folder}", "", f"This skill's method text carries the marker zq60a-skill-{folder}.", ""]
+    return "\n".join(head + body)
+
+
+def test_a_named_skill_versioned_only_under_metadata_launches_and_is_recorded_with_that_version(project, launch):
+    """KPI S2: the version is taken from the copy the session loads; F3: today's generated copies, which carry their
+    version only as ``metadata: version:``, are not refused as carrying no version. Red today: "carries no version"."""
+    folder = "w260a-metadata-only"
+    path = s.write(project / s.SKILLS_REL / folder / "SKILL.md", _metadata_skill_text(folder, "1.4.0"))
+    s.write_role(project, s.ENGINEER, skills=(folder,))
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    assert f"zq60a-skill-{folder}" in result.appended()["text"], (
+        f"the named skill {folder}'s text is not in the session's start")
+    entry = _by_name(result.record()).get(folder)
+    assert entry is not None, f"the named skill {folder} is not in the launch record: {result.record().get('skills')}"
+    assert entry.get("version") == "1.4.0", (
+        f"{folder}: version {entry.get('version')!r}, not the loaded copy's metadata.version '1.4.0'")
+    assert entry.get("sha256") == s.sha256_file(path), f"{folder}: sha256 is not the loaded SKILL.md's"
+    assert entry.get("named") is True, f"{folder} is named by the role but recorded as named={entry.get('named')!r}"
+
+
+def test_a_skill_with_a_top_level_version_and_a_metadata_version_is_recorded_with_the_top_level_one(project, launch):
+    """KPI S2: a top-level ``version`` stays the recorded one when ``metadata.version`` is there as well."""
+    folder = "w260a-both-versions"
+    path = s.write(project / s.SKILLS_REL / folder / "SKILL.md", _metadata_skill_text(folder, "9.0.0", "2.2.0"))
+    s.write_role(project, s.ENGINEER, skills=(folder,))
+    result = launch(s.ENGINEER)
+    s.assert_launched(result)
+    entry = _by_name(result.record()).get(folder)
+    assert entry is not None, f"the named skill {folder} is not in the launch record: {result.record().get('skills')}"
+    assert entry.get("version") == "2.2.0", (
+        f"{folder}: version {entry.get('version')!r}, not the top-level '2.2.0' (metadata.version is '9.0.0')")
+    assert entry.get("sha256") == s.sha256_file(path), f"{folder}: sha256 is not the loaded SKILL.md's"
+
+
 def test_no_skills_folder_is_an_empty_list(project, launch):
     shutil.rmtree(project / s.SKILLS_REL)
     result = launch(s.ENGINEER)
