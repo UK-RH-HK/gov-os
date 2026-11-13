@@ -29,8 +29,10 @@ VISIBLE = REPO_ROOT / "fixtures/evaluation" / SET / "visible"
 HIDDEN_REL = f"fixtures/evaluation/{SET}/hidden"
 NEW_VISIBLE = ("q21.yaml", "q22.yaml", "q23.yaml", "q24.yaml")
 LENS_B = tuple(f"q{n:02d}.yaml" for n in range(1, 21))
-# The hidden half as DEC-1069 (4) sets it: W2-61h's 24 (h01-h24) and the operator's 16 (h25-h40).
-HIDDEN_COUNT = 40
+# The hidden half as DEC-1069 (4) sets it, W2-61h's 24 (h01-h24) and the operator's 16 (h25-h40), less h10: DEC-1171 (2)
+# retired h10 (moved to retired-hidden/ by the owner's operator), so the half holds 39 until the walled writer's
+# replacement question lands and brings it back to 40 (revise this count then).
+HIDDEN_COUNT = 39
 SETS_ROOT_VAR = "GOV_EVAL_SETS_ROOT"
 TICKET = "DAEO-h2k3"
 TIMEOUT_S = 60.0
