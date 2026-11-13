@@ -302,6 +302,58 @@ reads the proposal from HEAD or the store passes with DEC-002 still a difference
 matching while the CIT-P file differs from HEAD passes by naming `CITP-001.md`; (2) a CIT-P file removed from the
 working tree is expected to be refused as missing (finding E), also by a fix that reads the proposal from HEAD for A.
 
+## Fourth batch: F1 (a), G-24 counts the store's stated links (DEC-1163 (7))
+
+A fresh independent test designer added these after the implementation was committed, from KPI line S2's new Verify
+clause: "G-24's 'no record names the item' counts the store's stated links too (a ticket's sources and closes, the
+register's Under and Changes lines): a planted decision named only by a ticket's sources is not deletable". The
+implementation was not read (`src/gov/impact/` untouched by this designer); the store's `stated_links` is read from
+`src/gov/store/loader.py`'s module docstring and the loader's own code. Every case is in
+`test_w2_37_stated_links.py`, built on the suite's fixtures (`built`, `base`, `box`) and its support module, which is
+unchanged. No earlier case's assertions were changed.
+
+Reading taken here (extends R8): the item that a stated link **names** (the link's target) is not deletable; an
+item that only **names** others (the link's source) is. That is R8's direction for edges ("what it depends on itself
+does not count"), kept for stated links. If the owner meant both directions, the success guard's last loop
+(`test_a_decision_no_edge_and_no_stated_link_names_is_still_deletable`, the two register entries that name others)
+is the line to revisit, not the four failure cases.
+
+One temporary repository, built once per module: the suite's fixture, then one commit planting five decisions, two
+tickets and two register entries, and the store loaded at that commit (nothing uncommitted: `graphs.record` is `ok`).
+Each case first asserts the premise through the store's documented tables, `edges` and `stated_links`: the four
+stated links are in `stated_links` (CITES, CITES, UNDER, AMENDS) and **no edge** names or leaves any planted record,
+so a red can only be the missing join. No case builds a code index; none is `local_only`.
+
+| Planted decision | Named only by | Stated link in the store |
+|---|---|---|
+| DEC-401 | ticket PROJ-st01's frontmatter `sources: [DEC-401]` | CITES PROJ-st01 -> DEC-401 |
+| DEC-402 | ticket PROJ-st02's frontmatter `closes: [DEC-402]` | CITES PROJ-st02 -> DEC-402 |
+| DEC-403 | register entry DEC-406's `**Under:** DEC-403` | UNDER DEC-406 -> DEC-403 |
+| DEC-404 | register entry DEC-407's `**Changes:** DEC-404` | AMENDS DEC-407 -> DEC-404 |
+| DEC-405 | nothing | none |
+
+`**Supersedes:** <ids alone>` is not used for the Changes case: the loader also makes a SUPERSEDES **edge** from it
+(`loader.py`, the register's first-line read), which the closure already holds, so it would not be named "only by a
+stated link". An amendment (`**Changes:**`) makes AMENDS in `stated_links` and no edge, which is what the case needs.
+Both 3 and 4 could be planted so the store records the link and no edge.
+
+| # | Verify clause part | Test (`test_w2_37_stated_links.py::`) | `local_only` | Red reason (today) |
+|---|---|---|---|---|
+| 1 | a ticket's `sources` | `test_a_decision_named_only_by_a_tickets_sources_is_not_deletable`: `gov impact DEC-401` gives `change[0].deletable` false and a radius other than R0 | no | **failed**: "DEC-401 is called deletable although PROJ-st01 names it": `deletable: true`, radius R0 |
+| 2 | a ticket's `closes` | `test_a_decision_named_only_by_a_tickets_closes_is_not_deletable` (DEC-402) | no | **failed**: as above, `deletable: true`, R0 |
+| 3 | the register's Under line | `test_a_decision_named_only_by_a_register_under_line_is_not_deletable` (DEC-403) | no | **failed**: as above, `deletable: true`, R0 |
+| 4 | the register's Changes line | `test_a_decision_named_only_by_a_register_changes_line_is_not_deletable` (DEC-404) | no | **failed**: as above, `deletable: true`, R0 |
+| 5 | Success guard | `test_a_decision_no_edge_and_no_stated_link_names_is_still_deletable`: DEC-405 `deletable: true`, radius R0, nothing affected; DEC-406 and DEC-407 (the register entries that only name others) `deletable: true` | no | green today (a guard that the fix does not over-count) |
+
+The radius half of cases 1 to 4 ("the radius is not R0") is the owner's brief for this batch, read as: a change that
+something names does not read as the radius of a change nothing names. It is the assertion after the `deletable`
+one, so a fix that sets `deletable` but keeps R0 fails there, on its own message.
+
+Run at the commit that added the batch, in the sandbox through the heavy slot, `codebase-memory-mcp` not on its PATH
+(so the 21 cases that need the code index skip): **6 failed, 93 passed, 21 skipped** (120 cases). The 6 failures
+are the 4 new cases and the 2 known reds, `test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[template]`
+and `[claude-copy]`. The new file adds **5 cases**: 4 red, 1 green.
+
 ## Packages, and the tests that depend on each
 
 - **P-1, the change skill (outside `allowed_paths`).** The routing of the question to `gov impact` is in
