@@ -118,6 +118,15 @@ def _plant(project):
 
 
 def test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_starts_nothing(stage):
+    """Revised for DEC-1163 (6) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491, as DEC-1150
+    (3) did for 13 older cases; routed by DEC-1156 (7)). Reason: W2-124 (merge a2f28ccf3, DEC-1027 C) made a rebuild
+    whose asked-for semantic store is not recreated fail, so with the server not answering ``gov rebuild --json``
+    answers ``ok: false``, ``REBUILD_FAILED``, ``store: semantic``, the stores of the run in ``error.details.stores``;
+    it answered ok with the semantic store refused. W2-124's revision of the older cases missed this one (the nightly
+    of 2026-11-13: ``assert None == 'recreated'``). Decided behaviour: the case expects ``REBUILD_FAILED`` naming the
+    semantic store, with ``EMBEDDER_UNAVAILABLE`` in its stores. What the case still catches: a keyword index not
+    built beside the refused semantic store, a retrieval that does not answer by keywords (the note in the first five
+    paths) or does not report the semantic part unavailable, and any start of the stand-in ``ollama`` (DEC-1065 (1))."""
     stage.install_executable("healthy")
     project = stage.root / "project"
     project.mkdir()
@@ -139,9 +148,15 @@ def test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_start
     rebuilt = subprocess.run([sys.executable, "-m", "gov.cli.main", "rebuild", "--json"], cwd=project, env=env,
                              capture_output=True, text=True, timeout=support.HANG_LIMIT_S * 4)
     envelope = json.loads(rebuilt.stdout.strip().splitlines()[-1])
-    stores = (envelope.get("result") or {}).get("stores") or {}
+    error = envelope.get("error") or {}
+    assert envelope.get("ok") is False and error.get("code") == "REBUILD_FAILED", \
+        f"the rebuild that could not recreate its semantic store did not fail with REBUILD_FAILED: {envelope}"
+    details = error.get("details") or {}
+    assert details.get("store") == "semantic", f"the failure does not name the semantic store: {details}"
+    stores = details.get("stores") or {}
     assert stores.get("lexical", {}).get("status") == "recreated", f"the keyword index is built: {envelope}"
-    assert stores.get("semantic", {}).get("status") != "recreated" and UNAVAILABLE in json.dumps(stores["semantic"]), \
+    assert stores.get("semantic", {}).get("status") != "recreated" \
+        and UNAVAILABLE in json.dumps(stores.get("semantic")), \
         f"the semantic store is refused, named {UNAVAILABLE}: {stores.get('semantic')}"
 
     asked = subprocess.run([sys.executable, "-c", RETRIEVE, str(project), QUESTION], cwd=project, env=env,

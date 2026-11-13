@@ -136,8 +136,10 @@ def _connect(interpreter: str) -> socket.socket:
     A listener that does not take the connection (its queue full: EAGAIN, asked again until ``CONNECT_S`` has passed;
     or no accept within ``CONNECT_S``) is named as such: no connection within ``CONNECT_S`` (W2-145 S1, S4)."""
     folder = _cache()
-    folder.mkdir(parents=True, exist_ok=True)
-    folder.chmod(0o700)
+    if not folder.is_dir():  # a sandbox binds an existing folder read-only: mkdir and chmod would fail there with
+        folder.mkdir(parents=True, exist_ok=True)  # EROFS and hide the true cause, the socket's EPERM (SANDBOX-1 B2,
+    if folder.stat().st_mode & 0o777 != 0o700:  # DEC-1167 (7)); each runs only when its work is needed
+        folder.chmod(0o700)
     path, deadline, started, waited = str(folder / SOCKET), time.monotonic() + START_S, None, False
     busy = None  # when the listener first left the connection waiting (EAGAIN)
     while True:
