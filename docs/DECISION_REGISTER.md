@@ -14924,7 +14924,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 ### DEC-1163 — The morning of 2026-11-13: the "until W2-56" line deleted; the nightly on Node 22; W2-111's measure (a); go W2-33; the three ACTs; the nightly's D, E and route; W2-37 F1 (a); W2-98's CIT-P; two ACTs; two corrections
 - **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~10:30-11:15; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1157, DEC-1156 (7), DEC-1159, DEC-1160, DEC-1161, DEC-1162, DEC-906, DEC-979, DEC-105, DEC-1052
 - **Decision:**
-  - (1) **The "until W2-56" line deleted** (W2-56 closed 1c02c490f; `gov brief` refused every lead brief UNTIL_CLOSED W2-56): the owner approved the bytes `role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb` (template/governance/kernel/templates/role-lead.md, role-cto.md, template/.rulesync/subagents/orchestrator.md), committed b88a76172; the four generated copies (.claude/templates/role-lead.md, role-cto.md, .rulesync/subagents/orchestrator.md, .claude/agents/orchestrator.md) by ACT-CLAUDE-COPIES-8 after its review. The owner: "This should have been P1 number one."
+  - (1) **The "until W2-56" line deleted** (W2-56 closed 1c02c490f; `gov brief` refused every lead brief UNTIL_CLOSED W2-56): the owner approved the bytes `role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb` (template/governance/kernel/templates/role-lead.md, role-cto.md, template/.rulesync/subagents/orchestrator.md), committed b88a76172 (the owner's exception (a) to the control-path rule, COPIES-8's review covers it); the four generated copies (.claude/templates/role-lead.md, role-cto.md, .rulesync/subagents/orchestrator.md, .claude/agents/orchestrator.md) by ACT-CLAUDE-COPIES-8 after its review. The owner: "This should have been P1 number one."
   - (2) **`yes NIGHTLY-NODE22 bdfdc24b`:** the nightly wrappers' PATH on Node 22.23.3 and nightly_alone.py's class-id fix, an amendment of ACT-NIGHTLY-RESTART-1 (class (b)); applied 8f68e0c7c.
   - (3) **P-W2-111-MEASURE-1 (a):** W2-111's cases judge the round's CPU p95 of the hook and its children minus the median CPU of a stub hook timed beside each call, at the same 100 ms (form B, a5bf1c0131b8); the start-up cost left out (~16-21 ms) is accepted under DEC-906.
   - (4) **`go W2-33`:** merged by hand (f6163461e) with the template commit (d172bc71f); ACT-CLAUDE-COPIES-6 by the owner's operator.
@@ -14936,6 +14936,14 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (10) **Corrections:** W2-113's PKG-2 was decided (b) on 11-12 (S2 and F2 into W2-33, no child ticket); ACT-EXAMIN-WRITERS-INSTALL-1 was applied on 11-12 (ba27e4c0d), so W2-15a, W2-93 and W2-94 wait only on the walled-route wording, which the CTO brings now.
   - (11) For each by-hand step (HOURS-3 Part B, S15-1, COPIES-6, the handover's), the CTO gives the owner's operator's exact message, in order.
 - **Basis:** the owner's message of 2026-11-13 (~10:30) and "W2-56 UNTIL deletion approved: role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb" (~11:05).
+
+### DEC-1165 — gov context's ceiling: the close's packet at a project setting, and the supplementary cap; W2-183 filed
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 is held: drafted, PROPOSED, waiting for the owner's reading
+- **Decision:** of the two scopes brought for gov context's ceiling (DEC-1027 H refuses most tickets: W2-88 at 56,284 tokens against 6,000; every lead works round it with `--budget`), the owner chose **"add the supplementary cap"**, and a ticket filed for it (W2-183, `DAEO-href`):
+  - (1) `gov close` builds its context packet at a project setting, `context.close_tokens` in `governance/project/facts.yaml` (65536 here), so closes stop refusing on the ceiling; with no setting, the default of 6,000 applies.
+  - (2) Every packet carries at most 6,000 tokens of supplementary context above its mandatory part, whatever `--budget` a lead passes.
+  - (3) The mandatory part is never shortened (CAP-15.d); a ticket whose mandatory part alone passes its ceiling (W2-88's, about 61,500) still needs its text trimmed, which this does not do.
+- **Basis:** the owner's message of 2026-11-13 (~12:40): "The context ceiling: add the supplementary cap; file it."; the two scopes as brought at ~12:02.
 
 | Version | Date | Change |
 |---|---|---|
@@ -15035,3 +15043,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.542 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1161 (P-W2-98-R2 (a); W2-60a P-1 (A) at the morning handover). Next free id: DEC-1162. |
 | 0.543 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1162 (W2-141 closed as built, switch-on parked; yes ACT-CLAUDE-COPIES-6). Next free id: DEC-1163. |
 | 0.544 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1163 (the morning of 11-13: the "until W2-56" line deleted; Node 22 nightly; W2-111 (a); go W2-33; three ACT yeses; the nightly's D, E, route; W2-37 F1 (a), P-1; W2-98 CIT-P; two ACTs; two corrections). Next free id: DEC-1164. |
+| 0.545 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1165 (gov context's ceiling: the close's packet at a project setting and the supplementary cap; W2-183 filed). DEC-1164 held (PROPOSED, the owner reading). Next free id: DEC-1166. |
