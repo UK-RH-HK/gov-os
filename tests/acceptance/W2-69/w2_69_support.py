@@ -133,6 +133,7 @@ def base_environment(sandbox, path=None):
         "GIT_CONFIG_SYSTEM": os.devnull,
         "GIT_AUTHOR_NAME": "W2-69 acceptance", "GIT_AUTHOR_EMAIL": "w2-69@example.invalid",
         "GIT_COMMITTER_NAME": "W2-69 acceptance", "GIT_COMMITTER_EMAIL": "w2-69@example.invalid",
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
 
@@ -1172,7 +1173,8 @@ class EmbedderStandIn:
                     stand_in.embedded += len(texts)
                     reply = {"model": EMBED_MODEL, "embeddings": [stand_in.vector(text) for text in texts]}
                 elif path == "/api/ps":
-                    reply = {"models": [{"name": EMBED_MODEL, "model": EMBED_MODEL, "size": 1, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{"name": EMBED_MODEL, "model": EMBED_MODEL, "size": 1, "size_vram": 1}]}
                 else:
                     reply = {}
                 payload = json.dumps(reply).encode()

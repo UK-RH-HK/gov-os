@@ -1,7 +1,7 @@
 ---
 id: DAEO-dy7j
-status: open
-deps: []
+status: closed
+deps: [DAEO-0uhh]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task
@@ -32,7 +32,7 @@ kpis:
   - 'gov check validates every playbook: core-schema maps the type playbook to its schema, in the record folders it already reads; a planted playbook that lacks any of the five parts, a practice with no id, or a role with no skills is refused, naming the record and the field [DEC-944 item 3, DEC-872 item 2]'
   - 'Adoption creates the form in a product: the adopt skill gains the step that writes one playbook per stream from the kernel form, its four copies kept in step through the adapter, its version raised; a product built from this template at a temporary path passes gov check with one playbook and is refused with a planted faulty one [DEC-944 item 3, CAP-44.a, CAP-24.a]'
   - 'CIT-P first: docs/changes/W2-83a-CIT-P.md before any kernel file changes, reviewed independently and approved by the owner before the merge; the CIT-E after [CAP-33.a, CAP-24.c, DEC-944]'
-  - 'Nothing project-specific in the kernel: the form and the adopt step name no keystone, no EXAMIN, no workbench and no path of this repository; gov check is green; the full regression in the close''s form is green apart from reds the ticket does not own [DEC-880, DEC-866]'
+  - 'Nothing project-specific in the kernel: the form and the adopt step name no keystone, no EXAMIN, no workbench and no path of this repository; gov check is green; the scoped set in the close''s form is green; every red the ticket did not cause is named for the CTO [DEC-968, DEC-983, DEC-982] [DEC-880, DEC-866]'
   failure:
   - 'A playbook that lacks purpose, practices, ticket classes, roles or skills passes gov check.'
   - 'A practice without a decision or Contract id passes.'
@@ -50,6 +50,7 @@ sources:
 - CAP-24.a
 - DEC-954
 - DEC-957
+- DEC-983
 est_loc: 350
 acceptance_tests:
   path: tests/acceptance/W2-83a/
@@ -76,3 +77,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-83a), from the owner's decision of 2026-
 - **Paths shared:** `src/gov/check/schema.py` for the schema map's entry only (after W2-64). `template/governance/kernel/schemas/**` is held as a glob by W2-64 and W2-78; this ticket adds only `playbook.schema.json` (split by file, DEC-942). No open ticket holds the adopt skill. If the product-spec role cannot write `schema.py`, the lead returns a package naming the one line.
 - **Place:** priority 5 of the owner's standing priorities (DEC-946).
 - **The test designer's files:** `tests/acceptance/W2-83a/`: planted playbooks, one per missing part; a product made from `template/` with Copier at a temporary path, with one playbook and one faulty playbook.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C; it leaves K9.

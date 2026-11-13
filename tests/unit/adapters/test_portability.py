@@ -12,7 +12,13 @@ import sys
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
+# Only when gov is not importable already (a bare run): an insert at the front of sys.path would shadow, for every
+# later test in the same xdist worker, the gov a suite such as W1-50 puts on the path for its own tree (DEC-968
+# item 3, found in the batch close of 2026-10-31: 47 W1-50 cases red when they shared a worker with this file).
+try:
+    import gov  # noqa: F401
+except ImportError:
+    sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "src")))
 
 from gov.adapters import portability
 from gov.guard import heldout

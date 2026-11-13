@@ -271,15 +271,36 @@ def test_deleting_the_lock_does_not_silence_an_edited_kernel_file(project, sandb
         f"one byte was appended to {rel} and {support.LOCK_REL} was deleted")
 
 
-def test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured(project, sandbox):
+def _a_project_never_installed(installed, destination):
+    """A project never installed from the template (W1-27's shape): its overlay alone (its path map among it), no
+    installed kernel, no lock, no answers file. The overlay's files are copied one by one from the temporary
+    installed project (never from this repository), and the folder is a git repository of its own."""
+    destination.mkdir(parents=True)
+    for rel in support.files_under(installed, support.OVERLAY_REL):
+        target = destination / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(installed / rel, target)
+    support.git(destination, "init", "-q", "-b", "main")
+    support.commit_all(destination, "a project never installed from the template")
+    for absent in (support.KERNEL_REL, support.LOCK_REL, support.ANSWERS_REL):
+        assert not (destination / absent).exists(), f"this case needs a project without {absent}"
+    return destination
+
+
+def test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured(installed, sandbox, tmp_path):
     """Neither file: a project never installed from the template. The lock part is unmeasured and no failure.
 
     DEC-499: as W1-27's cases hold, and as this repository is before its adoption. Not a match either: nothing
-    was hashed (DEC-488). That an installed project can delete both files is a residual of DEC-499 (the lock is
-    not signed before Wave 3).
+    was hashed (DEC-488).
+
+    Rewritten in W2-16's last round (DEC-761, a recorded rewrite, DEC-491). Reason: the case deleted both files
+    from a project made by ``copier copy``, which keeps its installed kernel; W2-16's KPI success 4 (W2-H029, "a
+    project cannot silence the lock comparison") makes an installed kernel with neither file a failure, as
+    W2-16's ``test_deleting_both_the_lock_and_the_answers_file_does_not_silence_the_comparison`` holds. The
+    purpose is kept: a project never installed from the template (no installed kernel, no lock, no answers file)
+    has its lock part unmeasured and is no failure, and nothing is a match without hashing.
     """
-    _delete_the_lock(project)
-    (project / support.ANSWERS_REL).unlink()
+    project = _a_project_never_installed(installed, tmp_path / "product")
     result = support.doctor(project, sandbox)
     support.assert_not_a_match(result, f"the project holds neither {support.LOCK_REL} nor {support.ANSWERS_REL}")
     assert result.section.get("status") == "unmeasured" and not result.reports_drift, (

@@ -245,7 +245,7 @@ def test_a_ticket_whose_mandatory_input_is_missing_turns_the_context_check_red(s
     of the round is built the check is red before the violation too (it finds no ticket), and this case is red
     for that reason. Not caught by this check: a packet over its ceiling, a superseded input, a contradiction."""
     project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {}\n")
+    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
     project.base_source()
     project.write(f".tickets/{TICKET}.md", r15.ticket_text(TICKET, "W9-01"))
     project.declare_as_the_kernel_does("context-reproducibility")
@@ -269,7 +269,7 @@ def test_a_checkpoint_without_its_next_action_turns_the_fresh_agent_check_red(sc
     and this case is red for that reason. Not caught by this check: a transition that wrote no checkpoint at
     all, a stale checkpoint (the watchdog), the worker return contract."""
     project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {}\n")
+    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
     project.base_source()
     project.write(f".tickets/{TICKET}.md", r15.ticket_text(TICKET, "W9-01"))
     project.declare_as_the_kernel_does("fresh-agent-reconstruction")

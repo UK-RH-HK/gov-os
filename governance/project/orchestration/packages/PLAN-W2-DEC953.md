@@ -1,5 +1,8 @@
 # PLAN-W2-DEC953
 
+> **Superseded figure (2026-11-12, DEC-1149):** the gate's working size is now 805,306,368 B (0.75 GiB) per live
+> session (ACT-P95-1, applied 16:53). The 2.04 GiB (2,191,601,664 B, DEC-947 item 2) figure below is kept as history.
+
 The rest of Wave 2 and the plan for closing its tickets, under DEC-953.
 
 From the W2 orchestrator's planning helper, 2026-10-30, for the owner to review.

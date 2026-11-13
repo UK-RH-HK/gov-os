@@ -418,7 +418,7 @@ def environment(sandbox, without=()):
     dead = dead_endpoint()
     return {
         "OLLAMA_HOST": dead,
-        "GOV_QUERY_OLLAMA_HOST": dead,  # W2-54, DEC-798: the CPU-only embedder's address is dead too
+        "GOV_QUERY_OLLAMA_HOST": dead,  # W2-54, DEC-1033: the query embedder's address is dead too
         "GOV_OLLAMA_BIN": str(Path(sandbox.elsewhere) / "no-embedding-program" / "ollama"),
         "PATH": path,
         "HOME": str(sandbox.home),
@@ -429,6 +429,7 @@ def environment(sandbox, without=()):
         "GIT_CONFIG_NOSYSTEM": "1",
         "GIT_AUTHOR_NAME": "W1-41 tests", "GIT_AUTHOR_EMAIL": "w1-41@example.invalid",
         "GIT_COMMITTER_NAME": "W1-41 tests", "GIT_COMMITTER_EMAIL": "w1-41@example.invalid",
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
 

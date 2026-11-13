@@ -354,8 +354,9 @@ class TestSpecificationWorkOrder:
                 f"planning skill does not mention spec work step '{step}'"
 
     def test_work_order_correct_sequence_discovery(self, skill_texts):
-        _, _, full_text = skill_texts["discovery"]
-        text_lower = full_text.lower()
+        # The body only: a frontmatter key such as `metadata:` is not a work step (DEC-981, DEC-832 item 2).
+        _, body, _ = skill_texts["discovery"]
+        text_lower = body.lower()
         positions = []
         for step in self.SPEC_ORDER:
             pos = text_lower.find(step)

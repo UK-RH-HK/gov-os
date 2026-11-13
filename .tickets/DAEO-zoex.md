@@ -1,6 +1,6 @@
 ---
 id: DAEO-zoex
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-0rfi]
 created: 2026-10-31T02:37:52Z

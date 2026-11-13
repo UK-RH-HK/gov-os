@@ -22,9 +22,9 @@ allowed_paths:
 kpis:
   success:
   - 'A fresh auditor gives the copy''s verdict against the lite conditions of Contract v4.2''s CAP-44.h: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY. Anything short of ADOPTED_HEALTHY
-    goes to the owner before W2-29.'
-  - The verdict checks that nothing of the owner's was lost from EXAMIN's own CLAUDE.md, AGENTS.md and .claude/commands/, each migrated into EXAMIN's rulesync sources or kept in place, never silently overwritten
-    [DEC-736].
+    goes to the owner before W2-29. Verify: the auditor''s result record names one of the three verdicts, against the CAP-44.h lite conditions it lists; a planted record with ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY puts one item in the owner''s inbox naming the verdict, and W2-29 does not start until the owner answers.'
+  - 'The verdict checks that nothing of the owner''s was lost from EXAMIN''s own CLAUDE.md, AGENTS.md and .claude/commands/, each migrated into EXAMIN''s rulesync sources or kept in place, never silently overwritten.
+    Verify: a planted copy in which one rule line of CLAUDE.md, one of AGENTS.md and one command file are missing from both the rulesync sources and the original places is refused by the verdict, naming each; a copy where each is migrated or kept passes; a planted overwritten file (the content differs, no migration record) is named [DEC-736]'
   failure: []
 profile: FULL
 sources:

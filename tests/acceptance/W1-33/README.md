@@ -23,6 +23,27 @@ the definitions describe. No session is started, no network is used, nothing is 
 write there (DEC-312, DEC-315), so the definitions may be placed later than the role files and the roster. Report
 this file's result apart from the other three.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 111 in the full run, 0 in `breadth`, 3 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tool... | `test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests` (5 of 5), `test_w1_33_kernel_role_files.py::test_no_other_pattern_includes_the_acceptance_tests` (4 of 4), `test_w1_33_kernel_role_files.py::test_the_auditor_is_read_only_except_its_ticket_s_report_path` | the ticket's words |
+| S2: Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner ... | `test_w1_33_kernel_role_files.py::test_the_research_exception_is_stated_by_the_research_role_file_alone`, `test_w1_33_kernel_role_files.py::test_the_orchestrator_may_install_only_after_owner_approval`, `test_w1_33_kernel_role_files.py::test_the_test_designer_pattern_includes_the_acceptance_tests` | the ticket's words |
+| S3: Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_RE... | `test_w1_33_kernel_role_files.py::test_the_role_maps_the_classes_as_the_contract_says` (5 of 5) | the ticket's words |
+| S4: The generated definitions replace the minimal definitions W1-05 placed under .claude/agents/ (DEC-119, DEC-154); the orchestrator definition st... | `test_w1_33_agent_definitions.py::test_the_orchestrator_definition_states_its_write_scope`, `test_w1_33_kernel_role_files.py::test_the_orchestrator_role_file_states_its_write_scope` | the ticket's words |
+| S5: The generated definitions leave the minimal research role of W1-46 in place where it exists; W1-33 does not redefine it (DEC-163) | `test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one`, `test_w1_33_agent_definitions.py::test_the_research_definition_is_the_generated_one`, `test_w1_33_agent_definitions.py::test_the_definition_is_no_longer_the_minimal_one` (5 of 5) | the ticket's words |
+| F1: A role lacks any required field | `test_w1_33_agent_definitions.py::test_a_definition_without_one_required_field_is_found` (5 of 5) | the ticket's words |
+| F2: An implementer role pattern covers tests/acceptance/** | `test_w1_33_kernel_role_files.py::test_an_implementer_pattern_that_covers_the_acceptance_tests_is_found` (4 of 4) | the ticket's words |
+
 ## KPI lines and their tests
 
 | KPI line | Tests |
@@ -88,6 +109,8 @@ adapter-portability check's (W1-38); this case holds the one file KPI success 5 
 
 `RESEARCH_AGENT_SHA256` left `w1_33_support.py` with the case that read it. The two other "unchanged" cases (the
 research role file, the roster entry) were not touched.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5), DEC-1109):** the `launch` fixture plants an open resource gate (`plant_open_gate`, W2-136's form; W2-20 S19 runs the gate on every launch), and `test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker[orchestrator-no ready list|orchestrator-a ready list without the ticket]` now asserts W2-136 S9's lead refusal (it names the ticket and the ready list, and no session starts) in place of "worker role"; the full run goes from 110 to 111 cases.
 
 ## The form the tests read
 

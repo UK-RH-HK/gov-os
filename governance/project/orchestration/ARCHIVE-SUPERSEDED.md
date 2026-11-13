@@ -4,14 +4,14 @@ Draft of 2026-10-30, for DEC-953 item 7. History is not rewritten: the full regi
 
 How the sorting works:
 - `DECISIONS-IN-FORCE.md` lists the decisions that still guide work.
-- `LIFTED-BY-DEC953.md` lists what DEC-953 lifts.
+- `DECISIONS-IN-FORCE.md`, its "Lifted" section, lists what DEC-953 lifts (it replaced `LIFTED-BY-DEC953.md`, DEC-1052 R-9).
 - This file lists the rest. Each line gives what superseded it, or why it is spent.
 - **Product record** means a decision about how the product behaves, or about the plan. It is still the authority for that behaviour, but it is not a working rule for sessions.
 
 ## A. Superseded or changed before DEC-953 (from the register's status lines)
 - DEC-004: settled by DEC-086.
-- DEC-038: SUPERSEDED by DEC-048, itself superseded by DEC-051.
-- DEC-045: amended by DEC-049, itself superseded by DEC-053 Q5.
+- DEC-038: SUPERSEDED by DEC-048; DEC-048's own successor is on its line.
+- DEC-045: amended by DEC-049 (location of the originals); DEC-049's own fate is on its line.
 - DEC-048: SUPERSEDED by DEC-051.
 - DEC-049: SUPERSEDED by DEC-053 Q5.
 - DEC-053: Q7 reversed by DEC-165, for framework lessons.
@@ -31,11 +31,16 @@ How the sorting works:
 - DEC-365, DEC-407: their ancestry rule replaced by DEC-409.
 - DEC-410: changed by DEC-918.
 - DEC-448: its one-off limit superseded by DEC-477.
-- DEC-454, DEC-455, DEC-480, DEC-490, DEC-492: changed by DEC-868, DEC-899, DEC-904 and DEC-908. Their close parts are now lifted (LIFTED §A).
+- DEC-454: changed by DEC-868, DEC-899 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-455: changed by DEC-868, DEC-899 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-480: changed by DEC-868 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-490: changed by DEC-904. Its close parts are now lifted (LIFTED §A).
+- DEC-492: changed by DEC-868 and DEC-899. Its close parts are now lifted (LIFTED §A).
 - DEC-460: its cause corrected by DEC-840, and its model replaced by DEC-839.
 - DEC-466: every close through `gov close` and `gov check` as a blocking gate. SUPERSEDED by DEC-953 item 1 (LIFTED §A).
 - DEC-493: changed by DEC-896 item 2 and DEC-903 (the overlay holds the test map).
-- DEC-501: corrected by DEC-502. DEC-502: corrected by DEC-512.
+- DEC-501: corrected by DEC-502.
+- DEC-502: corrected by DEC-512.
 - DEC-518: corrected by DEC-533.
 - DEC-526: its last point superseded by DEC-541.
 - DEC-584: the Wave 1 finish line. Spent: Wave 1 passed (DEC-718).
@@ -69,14 +74,14 @@ How the sorting works:
 - DEC-947: SUPERSEDED by DEC-953 item 1 (LIFTED §D).
 
 ## B. Wave 2 entries (DEC-720 to DEC-951) that are spent or product record
-"Feature lifted" means that the feature the entry served is lifted by DEC-953 (see `LIFTED-BY-DEC953.md`).
+"Feature lifted" means that the feature the entry served is lifted by DEC-953 (see the "Lifted" section of `DECISIONS-IN-FORCE.md`).
 
 - DEC-721: the adoption-readiness block, W2-01 first. Spent.
 - DEC-722: Contract v4.2 brings two Wave 3 items in. Product record.
 - DEC-725: a ranked lexical route; EXP-003 in two passes. Product record.
 - DEC-727: EXAMIN's adoption on the copy, safety-critical subset first. Product record.
 - DEC-728: `~/gov-os-runs` as a durable scratch root. Product record. Its write scope is lifted.
-- DEC-729: the Wave 2 plan approved; W2-00. Spent.
+- DEC-729: the Wave 2 plan approved; W2-00. In force until W2-00 closes (its item 3; DEC-1098 (3)).
 - DEC-730: the `wbs_id` letter suffix. Product record.
 - DEC-733: probe records under `docs/probes/<ticket>/`. Kept as the review record's place (practice 9).
 - DEC-734: the form of an accepted-history entry. Feature lifted.
@@ -105,7 +110,7 @@ How the sorting works:
 - DEC-781, DEC-805: `gov check` rows (openspec-validate, drift). Spent.
 - DEC-782, DEC-797: the query-vector cache. Product record.
 - DEC-783, DEC-784: W2-05's settings re-sort; the W1-46 fixture. Spent.
-- DEC-786: stacked starts by rule. Spent, within DEC-942.
+- DEC-786: stacked starts by rule. In force (item 1); its cap is DEC-942's (DEC-1098 (3)).
 - DEC-789, DEC-799: the worker tripwire; `gov launch` for every worker (W2-56). Product record.
 - DEC-790: W2-50's close through the resume probe. Spent; feature lifted.
 - DEC-791, DEC-825: decision tagging; decisions land by tag. Product record (W2-55).
@@ -132,12 +137,14 @@ How the sorting works:
 - DEC-863, DEC-864, DEC-865: W2-62, W2-59 and W2-63 packages. Spent.
 - DEC-867, DEC-870, DEC-872, DEC-874, DEC-877, DEC-882, DEC-885, DEC-886, DEC-892, DEC-894, DEC-897, DEC-937: refused closes and their repairs. Spent; feature lifted.
 - DEC-868: the pre-close gate and full record checks. Lifted (LIFTED §A).
-- DEC-871, DEC-912, DEC-918, DEC-921: accepted history, merge rules, containment. Spent; feature lifted. DEC-912 and DEC-918 stay product record.
+- DEC-871, DEC-921: accepted history, containment. Spent; feature lifted.
+- DEC-912, DEC-918: the merge rules. Product record (DEC-1098 (3)).
 - DEC-873: (c) and (d) enforced by the guard. Product record; (c) is lifted.
 - DEC-879, DEC-888, DEC-890, DEC-899, DEC-903, DEC-907, DEC-913, DEC-914, DEC-917, DEC-919, DEC-920: merge orders, splits and review points. Spent.
 - DEC-880, DEC-881, DEC-883, DEC-889: W2-48 withdrawn; lens H; batched and scoped closes (W2-66, W2-68). Product record. Scoped selection is kept (DEC-953 item 4).
 - DEC-884, DEC-922, DEC-931, DEC-932, DEC-935: re-pins and their ACTs. Spent; feature lifted.
-- DEC-891, DEC-895, DEC-896, DEC-900, DEC-923, DEC-924, DEC-926, DEC-927, DEC-928: history entries, readers, work without a task, `Implements:`. Lifted or spent.
+- DEC-891, DEC-895, DEC-896, DEC-900, DEC-923, DEC-926: history entries, readers, work without a task, `Implements:`. Lifted or spent.
+- DEC-924, DEC-927, DEC-928: their standing items stay in force: DEC-924 item 2, DEC-927 item 2 (LINK-INTEGRITY §5, DEC-1074 (7)), DEC-928 items 1 and 3 (DEC-1098 (3)). Their other items are finished.
 - DEC-901: DEC-281's 0.30 threshold kept with a reason. Product record.
 - DEC-904: the retention trial and its bridge. Spent (DEC-905).
 - DEC-908, DEC-909, DEC-910: W2-07's batch; W2-69's last rounds. Spent.

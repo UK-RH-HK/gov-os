@@ -6,7 +6,7 @@ Profile: STANDARD.
 
 ## KPI-to-test mapping
 
-### Success KPI 1 — doctor reports installation health [CAP-02.a, CAP-06.a, CAP-25.a]
+### Success 1 — doctor reports installation health [CAP-02.a, CAP-06.a, CAP-25.a]
 
 > doctor reports pinned vs found tool versions, hooks wired, path map with zero
 > unclassified paths, index freshness, canaries, framework.lock MATCH/DRIFT,
@@ -25,7 +25,7 @@ Profile: STANDARD.
 | `test_doctor_report_mentions_isolation` | test_w1_27_doctor.py | `gov doctor` not implemented |
 | `test_doctor_exit_nonzero_on_any_failure` | test_w1_27_doctor.py | `gov doctor` not implemented |
 
-### Success KPI 2 — rebuild guarantees [CAP-07.a, CAP-20.a, CAP-46.a]
+### Success 2 — rebuild guarantees [CAP-07.a, CAP-20.a, CAP-46.a]
 
 > rebuild recreates every derived store; two rebuilds give the same digest; a
 > fresh clone plus doctor plus rebuild works
@@ -39,7 +39,7 @@ Profile: STANDARD.
 | `test_rebuild_needs_only_git` | test_w1_27_rebuild.py | `gov rebuild` not implemented |
 | `test_rebuild_digest_matches_store_loader` | test_w1_27_rebuild.py | `gov rebuild` not implemented |
 
-### Success KPI 3 — path-map compliance [CAP-06.d]
+### Success 3 — path-map compliance [CAP-06.d]
 
 > Path-map compliance is checked by doctor: every tracked path matches a
 > path-map entry, and a recorded reference to a moved path is reported
@@ -50,7 +50,7 @@ Profile: STANDARD.
 | `test_unclassified_path_is_reported` | test_w1_27_path_compliance.py | `gov doctor` not implemented |
 | `test_moved_path_reference_is_reported` | test_w1_27_path_compliance.py | `gov doctor` not implemented |
 
-### Success KPI 4 — recovery/rebuild family check [CAP-38.b]
+### Success 4 — recovery/rebuild family check [CAP-38.b]
 
 > Registers the recovery/rebuild family check: derived state deleted and rebuilt
 > gives the same digest
@@ -63,7 +63,7 @@ Profile: STANDARD.
 | `test_recovery_rebuild_check_is_listed` | test_w1_27_recovery_check.py | `gov check --list` does not yet include it |
 | `test_derived_state_deleted_and_rebuilt_gives_same_digest` | test_w1_27_recovery_check.py | `gov rebuild` not implemented |
 
-### Success KPI 5 — adoption level [CAP-54.a]
+### Success 5 — adoption level [CAP-54.a]
 
 > doctor reports an adoption level: a repository with only the kernel installed
 > passes at the minimal level, and each completed adoption stage raises it
@@ -75,7 +75,7 @@ Profile: STANDARD.
 | `test_minimal_kernel_passes_at_minimal_level` | test_w1_27_adoption.py | `gov doctor` not implemented |
 | `test_completed_stages_raise_adoption_level` | test_w1_27_adoption.py | `gov doctor` not implemented |
 
-### Success KPI 6 — Claude Code drift [DEC-210, DEC-214]
+### Success 6 — Claude Code drift [DEC-210, DEC-214]
 
 > doctor reports Claude Code drift; the CLI and extension differing, either
 > being newer than the registry, or the extension's bundled binary at the
@@ -91,7 +91,7 @@ Profile: STANDARD.
 | `test_extension_below_minimum_is_failure` | test_w1_27_drift.py | `gov doctor` not implemented |
 | `test_cli_at_recorded_version_different_sha256_is_failure` | test_w1_27_drift.py | `gov doctor` not implemented |
 
-### Success KPI 7 — held-out.yaml missing [DEC-223]
+### Success 7 — held-out.yaml missing [DEC-223]
 
 > doctor reports a missing governance/project/held-out.yaml in this repository,
 > because the guard treats a missing file as no held-out rule
@@ -101,7 +101,7 @@ Profile: STANDARD.
 | `test_missing_held_out_yaml_is_reported` | test_w1_27_held_out.py | `gov doctor` not implemented |
 | `test_present_held_out_yaml_is_not_reported` | test_w1_27_held_out.py | `gov doctor` not implemented |
 
-### Success KPI 8 — path-map schema replacement [DEC-185, DEC-189, DEC-228]
+### Success 8 — path-map schema replacement [DEC-185, DEC-189, DEC-228]
 
 > gov validates governance/project/path-map.yaml against the kernel's path-map
 > schema of W1-08, which replaces the minimal schema of W1-07 in
@@ -127,13 +127,13 @@ Profile: STANDARD.
 | `test_absent_system_without_reason_is_invalid` | test_w1_27_schema.py | Schema not yet replaced |
 | `test_repairing_the_key_clears_the_error` | test_w1_27_schema.py | Schema not yet replaced |
 
-### Failure KPI 1 — doctor passes with a wrong tool version
+### Failure 1 — doctor passes with a wrong tool version
 
 | Test | File | Red reason |
 |------|------|------------|
 | `test_doctor_does_not_pass_with_wrong_tool_version` | test_w1_27_doctor.py | `gov doctor` not implemented |
 
-### Failure KPI 2 — rebuild needs anything not in git
+### Failure 2 — rebuild needs anything not in git
 
 | Test | File | Red reason |
 |------|------|------------|
@@ -589,7 +589,7 @@ and a stand-in for the endpoint's program that records a start.
 | `test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for` | the semantic entry as above | red |
 | `test_the_mode_builds_everything_else_a_rebuild_builds` | the same digest, the same store names, lexical `recreated`, the same code-index status as a rebuild of the same project without the argument; no vector in the store | red |
 | `test_two_rebuilds_in_the_mode_give_the_same_digest` | determinism (CAP-46.a) | red |
-| `test_the_mode_writes_only_under_gov_runtime` | the working tree and the sandbox's home outside the project's `.gov-runtime/` are as before | red |
+| `test_the_mode_writes_only_under_gov_runtime` | the working tree and the sandbox's home outside the project's `.gov-runtime/` are as before; left out, and nothing else (rewritten, reason DEC-967; DEC-978): W2-107's secrets scan cache, exactly `.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and `.cache`, `.cache/gov-os` only where they hold nothing else, under that home | red |
 | `test_a_retrieval_on_a_store_whose_vectors_could_not_be_built_says_so` | the control of retrieval honesty: after a rebuild whose endpoint has no model, `gov retrieve` says the semantic facet is not available and gives lexical evidence | green |
 | `test_a_retrieval_on_a_store_rebuilt_without_embeddings_says_so` | the same after the mode: the facet is not available, the stopping reason says so, no route of the evidence names it, and the endpoint was asked nothing | red |
 
@@ -671,3 +671,34 @@ addresses, as they did for `OLLAMA_HOST`. No expectation, assertion, pass line o
 sandbox, after the change: `test_w1_27_rebuild_r8_no_embeddings.py` 9 passed. Commit trailer: `Rewrite-Reason:
 DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own port; the
 fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 66 in the full run, 113 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: doctor reports pinned vs found tool versions, hooks wired, path map with zero unclassified paths, index freshness, canaries, framework.lock MAT... | `test_w1_27_doctor.py::test_doctor_report_mentions_path_map_coverage`, `test_w1_27_adoption.py::test_doctor_report_mentions_adoption_level`, `test_w1_27_doctor.py::test_doctor_report_mentions_tool_versions` | the ticket's words |
+| S2: rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works [CAP-07.a, CAP-20.a, CAP... | `test_w1_27_rebuild.py::test_fresh_clone_doctor_rebuild`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores`, `test_w1_27_rebuild.py::test_two_rebuilds_give_the_same_digest` | the ticket's words |
+| S3: Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is reported [CA... | `test_w1_27_doctor_r5.py::test_stale_path_in_historical_record_is_not_reported` (1 of 4), `test_w1_27_path_compliance.py::test_moved_path_reference_is_reported`, `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` | the ticket's words |
+| S4: Registers the recovery/rebuild family check: derived state deleted and rebuilt gives the same digest [CAP-38.b] | `test_w1_27_recovery_check.py::test_derived_state_deleted_and_rebuilt_gives_same_digest` | the ticket's words |
+| S5: doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoption stage ra... | `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level`, `test_w1_27_adoption.py::test_completed_stages_raise_adoption_level` | the ticket's words |
+| S6: doctor reports Claude Code drift (DEC-210, DEC-214); the CLI at ~/.local/bin/claude and the active VS Code extension differing from each other,... | `test_w1_27_drift.py::test_cli_and_extension_different_versions_is_drift`, `test_w1_27_drift.py::test_extension_bundled_binary_different_sha256_is_drift` | the ticket's words |
+| S7: doctor reports a missing governance/project/held-out.yaml in this repository, because the guard treats a missing file as no held-out rule (DEC-... | `test_w1_27_held_out.py::test_missing_held_out_yaml_is_reported`, `test_w1_27_held_out.py::test_present_held_out_yaml_is_not_reported` | the ticket's words |
+| S8: gov validates governance/project/path-map.yaml against the kernel's path-map schema of W1-08, which replaces the minimal schema of W1-07 in src... | `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level`, `test_w1_27_schema.py::test_valid_w1_08_path_map_loads`, `test_w1_27_schema_compat_r2.py::test_status_accepts_minimal_path_map_with_only_namespaces` | the ticket's words |
+| F1: doctor passes with a tool at the wrong version | `test_w1_27_doctor_r7.py::test_home_tool_wrong_sha256_not_ok` (1 of 4) | the ticket's words |
+| F2: rebuild needs anything not in git | `test_w1_27_rebuild.py::test_rebuild_needs_only_git` | the ticket's words |
+
+Inventory row M5 (DEC-1040 (1), applied at the cut): `test_w1_27_path_compliance_r2.py`'s
+`test_stale_path_in_live_document_not_sources_is_reported` and `test_stale_path_in_src_gov_cli_is_reported`
+are folded into `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` (one doctor run, the
+three planted paths); the older tables above that name them read as that case.
+
+**Citations (DEC-1109 (2), 2026-11-09):** `test_w1_27_rebuild_r8_no_embeddings.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

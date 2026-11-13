@@ -29,6 +29,12 @@ BETA = {
     "README.md": "# Beta\n\nAnother small repository.\n",
 }
 
+# The machine-wide cache of clean gitleaks verdicts (W2-107): one SQLite file under the HOME, outside every repository,
+# holding hashes and verdicts only, by the owner's approved design (DEC-967). The sweep for index files leaves out
+# exactly that file and its two SQLite side files, under the child's HOME only (DEC-970, P-W2-107-2 (a)).
+SCAN_CACHE_REL = ".cache/gov-os/secrets-scan.sqlite"
+SCAN_CACHE_SUFFIXES = ("", "-wal", "-shm")
+
 
 def _repository(base, files):
     repo = support.Repo(base)
@@ -61,6 +67,16 @@ def two(module, cbm, sandbox, tmp_path_factory):
 
 def _home(repo, sandbox):
     return Path(support.one(repo.root, "home", [], sandbox))
+
+
+def _scan_cache_in(place, home):
+    """The scan cache's file and side files as paths relative to ``place`` when ``place`` is the child's HOME or
+    holds it; none elsewhere."""
+    try:
+        at = Path(home).relative_to(place)
+    except ValueError:
+        return frozenset()
+    return frozenset((at / SCAN_CACHE_REL).as_posix() + suffix for suffix in SCAN_CACHE_SUFFIXES)
 
 
 @pytest.fixture(scope="module")
@@ -143,7 +159,10 @@ def test_indexing_again_keeps_one_project(two, sandbox):
 
 @pytest.mark.local_only
 def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, answers, sandbox):
-    """Failure 2. Index files are SQLite files, their side files and graph dumps, wherever a child could write."""
+    """Failure 2. Index files are SQLite files, their side files and graph dumps, wherever a child could write.
+
+    Left out, and nothing else: the secrets scan cache and its ``-wal`` and ``-shm``, at their one place under the
+    child's HOME (DEC-967, DEC-970)."""
     alpha, beta, _ = two
     for repo in (alpha, beta):
         # The run that asked ``callers`` and ``dead_code`` of this repository came before (``answers``).
@@ -156,7 +175,8 @@ def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, answers, sand
         assert repo.status() == [], \
             f"{repo.root.name}: the run changed the repository outside .gov-runtime/: {repo.status()}"
     for place in sandbox.places:
-        left = support.index_files(place)
+        cache = _scan_cache_in(place, sandbox.home)
+        left = [rel for rel in support.index_files(place) if rel not in cache]
         assert not left, f"index files left in {place}: {left}"
 
 

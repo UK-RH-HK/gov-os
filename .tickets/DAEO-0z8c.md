@@ -1,6 +1,6 @@
 ---
 id: DAEO-0z8c
-status: in_progress
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 allowed_paths:
+- tests/conftest.py  # the suites' own git calls never reach a repository the caller's environment names (D-10's red-fix list item 1, the core.bare tests' half) [DEC-1074 (8), DEC-1083, DEC-1109 (2)]
 - src/gov/**/*.py
 - src/gov/util/gitenv.py
 - lefthook.yml
@@ -35,6 +36,20 @@ kpis:
 profile: FULL
 sources:
 - DEC-710
+- DEC-971
+- DEC-580
+- DEC-712
+- DEC-777
+- DEC-783
+- DEC-802
+- DEC-804
+- DEC-805
+- DEC-807
+- DEC-906
+- DEC-951
+- DEC-953
+- DEC-970
+- DEC-980
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-05/
@@ -54,6 +69,8 @@ list_rows:
 ---
 # W2-05 The git environment of every check, hook and helper; the settings re-sort
 
+**DEC-971 item 3 (owner, 2026-10-31), package H (a), refined:** DEC-805's comparison of the template's hooks source with this repository's (`src/gov/adapters/portability.py`, the adapter-portability check, inside this ticket's `src/gov/**/*.py`) gets an exception covering **exactly the two hook events ACT 1 lifted** (`postToolUse` and `postToolUseFailure`), **named in the comparison**, and **ending when those events return** (with W2-08). A test designer revises the two cases (`test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources`, `test_this_repository_s_two_hooks_sources_agree`) to the exception, lowering nothing else. R3-1 is W2-08's entry criterion (DEC-971 item 3).
+
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-05), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
 - **Allowed paths:**
@@ -64,3 +81,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-05), as approved (DEC-729). The list row
   - A hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (the DEC-710 case) [AR-2].
   - `lefthook install` and `uninstall` leave `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green [AR-2].
 - **KPIs, failure:** a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 4 (landed `b4a747f1`). The CTO closes it at the lift (P1-13).

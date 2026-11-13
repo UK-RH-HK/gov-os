@@ -259,6 +259,8 @@ def test_a_flag_put_over_the_placeholder_during_a_command_stays(kernel_freeze_la
         env = inherited(os.environ)
         env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
                     "TMPDIR": str(launch_tmp)})
+        # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
+        env.update(launch_support.plant_open_gate(sandbox))
         owner.start()
         try:
             # The stream of messages, so that a failure can say what the session's Bash call returned.

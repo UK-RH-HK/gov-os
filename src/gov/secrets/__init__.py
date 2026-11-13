@@ -15,6 +15,11 @@ reads at 1 MB/s or faster (DEC-853). A store whose bytes were scanned clean befo
 and the same gitleaks, is not scanned again: the check's record of clean results says so, and the reuse
 is labelled on standard error with the store's path and digest. A finding is never recorded.
 
+The filter remembers too (W2-107, DEC-966 item 4): a file's content or a path's names judged clean, with no finding at
+all by any rule set, is kept by its digest in the machine-wide record of ``cache``, so the same bytes judged again by
+the same gitleaks and rules are answered without a scan. A finding, an exempt commit hash included, is scanned every
+time. ``scan_counts()`` says how many texts of each kind were scanned and how many answered from the record.
+
 What gitleaks reads (DEC-897, docs/research/W2-69-secrets-scan.md): a SQLite store is judged by each value it
 holds and by each region of its freed space, each on its own; any other file, or a store that cannot be read, by
 its bytes. Each is given in overlapping pieces that begin and end at a true boundary, a blank line after each, so
@@ -39,9 +44,13 @@ import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from gov.config.loader import load_config
-from gov.guard.runs import root as runs_root
+from gov.config.loader import load_config, secrets_scan_on
+from gov.util.runs_root import root as runs_root
+from gov.secrets import cache
 
+# The switch (DEC-1045): ``scan: off`` in ``governance/project/secrets.yaml`` gives no content to gitleaks; every place
+# it acts says so with this line. Absent, it is on, and every behaviour below is as before.
+SCAN_OFF = "secrets scan: off by configuration (DEC-1045)"
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
 RECORD_REL = f"{RUNTIME_REL}/secrets-clean.json"  # the clean results, by digest (DEC-853)
@@ -49,7 +58,7 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 4  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 4  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
@@ -71,7 +80,28 @@ _SQLITE = b"SQLite format 3\0"
 _BUSY_S = 10.0  # how long a store's lock held by another process is waited out before the store is judged by its bytes
 _FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
-__all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
+__all__ = ["SCAN_OFF", "indexable", "path_holds_secret", "scan_counts", "scan_on", "stores_with_secrets"]
+
+
+def scan_on(root: Path) -> bool:
+    """Whether the secrets scan is on at ``root`` (DEC-1045); CONFIG_INVALID when its switch cannot be read."""
+    return secrets_scan_on(Path(root))
+
+_KINDS = ("content", "path")  # what the filter judges: a file's content, a path's names
+_counts = {kind: {"scanned": 0, "remembered": 0} for kind in _KINDS}
+_counting = threading.Lock()
+
+
+def scan_counts() -> dict[str, dict[str, int]]:
+    """The texts of each kind this process gave to gitleaks (``scanned``) and answered from the record
+    (``remembered``), as a fresh dict: a caller takes the difference around its own work."""
+    with _counting:
+        return {kind: dict(each) for kind, each in _counts.items()}
+
+
+def _count(kind: str, what: str) -> None:
+    with _counting:
+        _counts[kind][what] += 1
 
 
 def _toml(value) -> str:
@@ -148,9 +178,25 @@ def _forms(content: bytes) -> list[bytes]:
     return [content, content.replace(b"\0", b"")] if b"\0" in content else [content]
 
 
-def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None) -> bool:
-    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``."""
-    return _scan(rules, _forms(content), root)
+def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None, kind: str | None = None) -> bool:
+    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``.
+
+    With ``kind``, bytes judged clean before by the same engine (the rules, the gitleaks and the form of what a scan
+    reads, taken once before the scan) are answered from the record, and a scan that finds nothing at all is kept
+    there; a scan with any finding, exempt or not, is never kept.
+    """
+    if kind is None:
+        return _scan(rules, _forms(content), root)
+    digest, engine = hashlib.sha256(content).hexdigest(), cache.engine(rules, _FORM)
+    if cache.remembered(kind, digest, engine):
+        _count(kind, "remembered")
+        return False
+    _count(kind, "scanned")
+    found = []
+    secret = _scan(rules, _forms(content), root, found)
+    if not (secret or found):
+        cache.remember(kind, digest, engine)
+    return secret
 
 
 # Row W2-L423's rule (DEC-911 item 4): its id is written only in parts, so no file holds it whole.
@@ -217,12 +263,13 @@ def _exempt(finding, root: Path | None) -> str | None:
     return secret if isinstance(secret, str) and _HASH.fullmatch(secret) else None
 
 
-def _scan(rules: tuple[str, ...], chunks, root: Path | None = None) -> bool:
+def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list | None = None) -> bool:
     """Whether gitleaks finds a secret in any of ``chunks`` by any of ``rules``. Raises when gitleaks cannot run or does not decide.
 
     Each chunk is a text of its own: its pieces are never joined to another chunk's but by a blank line. With ``root``,
     a match of row W2-L423's rule that is exactly a commit of the repository at ``root`` is no finding (DEC-911 item 4);
-    the matches are read from gitleaks' report on its standard output and held in memory only.
+    the matches are read from gitleaks' report on its standard output and held in memory only. A rule set that reports
+    anything at all, exempt or not, is added to ``found``.
     """
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
     parts = [b"\n"]
@@ -243,6 +290,8 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None) -> bool:
         if done.returncode not in (0, _LEAKS):
             raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
         if done.returncode == _LEAKS:
+            if found is not None:
+                found.append(each)
             try:
                 findings = json.loads(done.stdout)
             except ValueError:
@@ -252,6 +301,31 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None) -> bool:
                 return True
             hashes.update(found)
     return bool(hashes) and _commits(root, hashes) != hashes
+
+
+def _workers() -> int:
+    """How many texts the scan judges at once, each a gitleaks (W2-20, DEC-1038, DEC-1039).
+
+    The CPUs this process may use (its CPU set, ``os.sched_getaffinity``), never the machine's count, so a scan inside
+    a heavy-job slot confined to its share of the CPUs runs at most that share at once; ``os.cpu_count()`` where the
+    CPU set cannot be read. No more than the slot's thread budget when one is exported (``GOV_HEAVY_THREAD_BUDGET``,
+    digits only): each of the slot's workers then runs its own share (incident 2026-11-02 16:20: about 120 gitleaks at
+    once from one slot's 6 workers, each pool as wide as the machine).
+    """
+    try:
+        cpus = len(os.sched_getaffinity(0))
+    except (AttributeError, OSError):  # no affinity call on this platform, or it cannot be read
+        cpus = os.cpu_count() or 1
+    budget = os.environ.get("GOV_HEAVY_THREAD_BUDGET", "")
+    if budget.isascii() and budget.isdigit() and int(budget) >= 1:
+        cpus = min(cpus, int(budget))
+    return max(1, cpus)
+
+
+def pool_size() -> int:
+    """The width of any of the product's own pools (W2-20 S18): the CPUs this process may use, within the slot's
+    thread budget; the rule ``_workers`` applies to the scan, for the code index and any other pool to share."""
+    return _workers()
 
 
 def _matches(rel: str, pattern: str) -> bool:
@@ -270,7 +344,8 @@ def _governance(namespaces: dict, rel: str) -> bool:
 def indexable(root: Path, paths: list[str]) -> list[str]:
     """The sub-list of ``paths`` an indexer may read, in the order asked (DEC-285)."""
     root = Path(root).resolve()
-    rules = _rules(root)
+    scanning = scan_on(root)  # off (DEC-1045): the namespace filter alone, no content given to gitleaks
+    rules = _rules(root) if scanning else ()
     namespaces = load_config(root)["path-map.yaml"]["namespaces"]
 
     def allowed(rel: str) -> bool:
@@ -282,16 +357,19 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
             return False
         if not (_governance(namespaces, rel) and _governance(namespaces, target)):
             return False
-        return not _holds_secret(rules, content, root)
+        return not (scanning and _holds_secret(rules, content, root, "content"))
 
-    with ThreadPoolExecutor() as pool:
+    with ThreadPoolExecutor(max_workers=_workers()) as pool:  # results in the order asked, whatever the width
         verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
     return [rel for rel, verdict in zip(dict.fromkeys(paths), verdicts) if verdict]
 
 
 def path_holds_secret(root: Path, path: str) -> bool:
-    """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is."""
-    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root)
+    """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is.
+    False, with no scan, where the scan is off by configuration (DEC-1045)."""
+    if not scan_on(root):
+        return False
+    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root, "path")
 
 
 def _number(content: bytes, at: int, size: int) -> int:
@@ -509,8 +587,12 @@ def _record(root: Path, scanner: str, clean: set[str]) -> None:
 
 
 def stores_with_secrets(root: Path) -> list[str]:
-    """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290)."""
+    """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290).
+    Empty, with no scan and no record written, where the scan is off by configuration (DEC-1045): the check that
+    calls it (``python3 -m gov.secrets``) names that state itself."""
     root = Path(root)
+    if not scan_on(root):
+        return []
     rules = _rules(root)
     if not os.path.lexists(root / RUNTIME_REL):
         return []
@@ -551,11 +633,11 @@ def stores_with_secrets(root: Path) -> list[str]:
                 clean.add(digest)
             return False
 
-    # Every file is read and judged, the largest first, as many at a time as there are processors, so a large
-    # store is neither started last nor slowed by more runs than the machine runs at once. The first file that
-    # cannot be decided raises, and then nothing is recorded.
+    # Every file is read and judged, the largest first, as many at a time as the process has CPUs (its CPU set and
+    # thread budget, _workers), so a large store is neither started last nor slowed by more runs than the CPUs run at
+    # once. The first file that cannot be decided raises, and then nothing is recorded.
     by_size = sorted(files, key=lambda path: -path.stat().st_size)
-    with ThreadPoolExecutor(max_workers=os.cpu_count() or 1) as pool:
+    with ThreadPoolExecutor(max_workers=_workers()) as pool:
         verdicts = dict(zip(by_size, pool.map(judge, by_size)))
     for path, digest in sorted(reused.items()):  # the label names the store and the digest, never content
         print(f"secrets-indexing: clean result reused, not scanned again: {path.relative_to(root).as_posix()} "

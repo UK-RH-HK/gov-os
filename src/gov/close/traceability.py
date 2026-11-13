@@ -10,26 +10,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-import yaml
-
 from gov.close.history import BASE_KEY  # DEC-482: with a base, only the commits after it are judged
-
-
-def _frontmatter(path: Path) -> dict | None:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    if not text.startswith("---"):
-        return None
-    end = text.find("---", 3)
-    if end < 0:
-        return None
-    try:
-        front = yaml.safe_load(text[3:end])
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
+from gov.util.frontmatter import of_file as _frontmatter
+from gov.util.gitenv import git_env
 
 
 def _closed_tickets(root: Path) -> list[dict]:
@@ -47,7 +30,7 @@ def _closed_tickets(root: Path) -> list[dict]:
 def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
     result = subprocess.run(
         ["git", "-C", str(root), "log", "-1", "--format=%(trailers)", sha],
-        capture_output=True, text=True,
+        capture_output=True, text=True, env=git_env(root, pinned=True),
     )
     if result.returncode != 0:
         raise RuntimeError(f"git log (trailers) failed for {sha[:12]}: {result.stderr.strip()[:200]}")
@@ -73,7 +56,7 @@ def _commits_for_ticket(root: Path, ticket_id: str) -> list[dict]:
     result = subprocess.run(
         ["git", "-C", str(root), "log", "HEAD", "--format=%H",
          f"--grep=Task: {ticket_id}"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, env=git_env(root, pinned=True),
     )
     if result.returncode != 0:
         raise RuntimeError(f"git log failed for ticket {ticket_id}: {result.stderr.strip()[:200]}")

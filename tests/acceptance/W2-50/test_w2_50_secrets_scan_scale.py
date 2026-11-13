@@ -161,38 +161,53 @@ def first_runs(sandbox, project, stand_in, rels):
 # Success: the scan finishes on large stores [DEC-853 item 1]
 # --------------------------------------------------------------------------
 
+def short_limit(sandbox):
+    """The declared short limit of the large-store and hang cases (README-W2-67.md), with the large stores' premise:
+    read at SLOW_RATE, the scaled store takes at least twice the declared base, so a limit that does not grow with
+    the content's size cannot decide it."""
+    assert scan.SCALED_LARGE_SIZE / scan.SLOW_RATE >= 2 * scan.DECLARED_BASE_S
+    assert scan.SCALED_LARGE_SIZE >= scan.DECLARED_LARGE_FILE > max(SMALL_STORE, 16 * 1024)
+    return scan.declare_short_limit(sandbox)
+
+
 def test_a_large_clean_store_is_decided_green(env, sandbox):
-    """160 MiB, read by gitleaks at 2 MB/s (twice the working figure): 84 s a run, past today's fixed 60 s."""
+    """16 MiB, read by gitleaks at 2 MB/s (twice the working figure): 8.4 s a run, past the declared base of 4 s
+    (W2-67: 160 MiB against the check's 60 s before)."""
     project, stand_in = env
+    declaration = short_limit(sandbox)
+    size = scan.SCALED_LARGE_SIZE
     start, middle, end = words(LARGE)
-    scan.text_store(project / LARGE, scan.LARGE_SIZE,
-                    {16: start, scan.LARGE_SIZE // 2 + 4096: middle, scan.LARGE_SIZE - 64: end})
+    scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
     run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
-    assert_green(run, f"a clean store of {scan.LARGE_SIZE} bytes read at {scan.SLOW_RATE} bytes a second")
+    assert_green(run, f"a clean store of {size} bytes read at {scan.SLOW_RATE} bytes a second")
     assert_full_scan(run, LARGE, "the large store")
+    scan.assert_declared(run, declaration)
 
 
 def test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it(env, sandbox):
     """The canary stands across the store's exact middle byte, where a split into halves or powers of two falls."""
     project, stand_in = env
+    declaration = short_limit(sandbox)
+    size = scan.SCALED_LARGE_SIZE
     start, middle, end = words(LARGE)
-    across = scan.LARGE_SIZE // 2 - (len(scan.SECRET) + 2) // 2
-    scan.text_store(project / LARGE, scan.LARGE_SIZE,
-                    {16: start, across: scan.SECRET, across + 4096: middle, scan.LARGE_SIZE - 64: end})
+    across = size // 2 - (len(scan.SECRET) + 2) // 2
+    scan.text_store(project / LARGE, size, {16: start, across: scan.SECRET, across + 4096: middle, size - 64: end})
     run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
     assert_red_naming(run, LARGE, "a large store with a canary")
     assert any(call.get("code") not in (None, 0) for call in run.calls), (
         f"the check is red, but no gitleaks run over the store finished and reported a finding: red by failure, "
         f"not by a verdict\n{run.describe()}")
     assert_given_again(run, LARGE, "the large store with a canary")
+    scan.assert_declared(run, declaration)
 
 
 def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
     """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
     project, stand_in = env
+    declaration = short_limit(sandbox)
+    size = scan.SCALED_LARGE_SIZE
     start, middle, end = words(LARGE)
-    scan.text_store(project / LARGE, scan.LARGE_SIZE,
-                    {16: start, scan.LARGE_SIZE // 2 + 4096: middle, scan.LARGE_SIZE - 64: end})
+    scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
     small = scan.marker("smallfile")
     block = scan.filler_block(16 * 1024, seed="small").decode()
     for index in range(300):
@@ -212,6 +227,7 @@ def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandb
     assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
     assert_full_scan(run, LARGE, "the large store in a full pool")
     assert run.given(small), f"the small stores were not given to gitleaks\n{run.describe()}"
+    scan.assert_declared(run, declaration)
 
 
 # --------------------------------------------------------------------------
@@ -349,8 +365,10 @@ def test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count(env,
 @pytest.mark.parametrize("fault", ("hang", "signal", "exit-code"))
 def test_a_scan_that_cannot_finish_fails_closed_and_records_nothing(env, sandbox, fault):
     """gitleaks never finishes, is killed by a signal, or exits with a code it does not give, on one store's
-    content. The store was clean, then changed by one byte (still clean), so the failed run had to scan it."""
+    content. The store was clean, then changed by one byte (still clean), so the failed run had to scan it. A hang
+    waits out the declared short limit (W2-67: the check's 60 s before)."""
     project, stand_in = env
+    declaration = short_limit(sandbox) if fault == "hang" else None
     db_store(project, rows=[f"the word {FAULT} stands here"])
     run1 = scan.run_scan(sandbox, project, stand_in, markers=words(STORE_DB))
     assert_green(run1, "run 1, a clean store")
@@ -372,6 +390,9 @@ def test_a_scan_that_cannot_finish_fails_closed_and_records_nothing(env, sandbox
             f"after a failed run (gitleaks {fault}), the store was not scanned in full: a clean result was "
             f"recorded from the failed run\n{after.describe()}")
     assert_not_labelled(after, STORE_DB, old, changed)
+    if declaration is not None:
+        for each in (run1, failed, after):
+            scan.assert_declared(each, declaration)
 
 
 def _record_candidates(before, after):

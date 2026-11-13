@@ -110,13 +110,15 @@ def _known() -> dict[str, Command]:
     """The reserved commands, then every other name with a command module, none of them loaded."""
     known = {command.name: command for command in COMMANDS}
     for path in sorted(PACKAGE.glob("*/command.py")):
-        known.setdefault(path.parent.name, Command(path.parent.name, "act", ""))
+        name = path.parent.name.replace("_", "-")  # a hyphenated command lives in its underscore folder (P-W2-159-1)
+        known.setdefault(name, Command(name, "act", ""))
     return known
 
 
 def _module_name(name: str) -> str | None:
-    if (PACKAGE / name / "command.py").is_file():
-        return f"gov.{name}.command"
+    folder = name.replace("-", "_")
+    if (PACKAGE / folder / "command.py").is_file():
+        return f"gov.{folder}.command"
     if (PACKAGE / "cli" / "commands" / f"{name}.py").is_file():
         return f"gov.cli.commands.{name}"
     return None
@@ -184,6 +186,9 @@ def _emit(args, ok: bool, result: dict, error: GovError | None) -> None:
     elif error is not None:
         print(f"gov {args.command}: {error.code}: {error.message}", file=sys.stderr)
     else:
+        store = result.get("store") if args.command == "retrieve" else None
+        if isinstance(store, dict):  # W2-138 S1 (DEC-1090 (3)): the store a search answered from, first
+            print(f"store: {str(store.get('commit') or 'unknown')[:12]} ({store.get('root')})")
         print(json.dumps(result, indent=2))
 
 
@@ -193,12 +198,14 @@ def _version() -> str:
     Run from a source tree, the version is its ``pyproject.toml``'s and the commit the ``HEAD`` of the repository
     whose top is that tree. An installed package names the version it was built with, and its commit as unknown."""
     import subprocess
+
+    from gov.util.gitenv import git_env
     tree = PACKAGE.parents[1]
     if PACKAGE.parent.name == "src" and (tree / "pyproject.toml").is_file():
         import tomllib
         version = tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         git = ["git", "-C", str(tree), "rev-parse", "--show-toplevel", "HEAD"]
-        done = subprocess.run(git, capture_output=True, text=True)
+        done = subprocess.run(git, capture_output=True, text=True, env=git_env(tree, pinned=True))
         lines = done.stdout.splitlines() if done.returncode == 0 else []
         commit = lines[1] if len(lines) == 2 and Path(lines[0]).resolve() == tree else "unknown"
     else:

@@ -4,7 +4,9 @@
 DEC-186) and refuses when a hard-block check among them is RED. ``gov ci staged-secrets`` runs gitleaks over what
 is staged, twice: with the project's ``.gitleaks.toml`` as it stands, then with the project's rules alone
 (DEC-347, DEC-369). A result is measured or it is refused: a named tier with no declared check, a name that is no
-tier, a gitleaks that cannot run or does not decide, and rules that cannot be read all refuse.
+tier, a gitleaks that cannot run or does not decide, rules that cannot be read and an inherited ``GIT_INDEX_FILE``
+that is not git's own index of the project (``gov.util.gitenv.foreign_index``) all refuse. With ``scan: off`` in
+``governance/project/secrets.yaml`` (DEC-1045) nothing is scanned: it exits 0 and says so.
 
 ``gov ci job`` is the gate of the CI job (DEC-087, DEC-489): every check ``gov check`` runs but the declared
 checks of a tier above G2, so the checks of ``gov check`` that carry no tier (openspec, skill version, readiness,
@@ -23,11 +25,12 @@ record: for one that says "no G3 check declared" those words are its report, and
 from __future__ import annotations
 
 import json
-import os
 import subprocess
+import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.util.gitenv import foreign_index, git_env
 
 CLASS = "read"
 HELP = "the gates of the lefthook hooks and the CI job: checks by tier, staged secrets, the evidence record"
@@ -94,12 +97,21 @@ def _checks(root: Path, tiers: list[str], job: bool = False) -> dict:
 
 
 def _staged_secrets(root: Path) -> dict:
-    from gov.secrets import CONFIG_REL, _rules
+    from gov.secrets import CONFIG_REL, SCAN_OFF, _rules, scan_on
 
-    scan = ["gitleaks", "git", "--pre-commit", "--staged", "--no-banner", "--redact", "--verbose",
+    if not scan_on(root):  # DEC-1045: nothing is given to gitleaks; the line says so, the envelope too
+        print(SCAN_OFF, file=sys.stderr)
+        return {"scans": 0, "scan": "off", "reason": SCAN_OFF}
+    scan =["gitleaks", "git", "--pre-commit", "--staged", "--no-banner", "--redact", "--verbose",
             "--log-level", "error", "--exit-code", str(_LEAKS)]
+    # gitleaks reads the index git gave this commit (``index.lock`` of ``commit -a``). An inherited index that is not
+    # git's own is the commit's all the same: the default index is never scanned in its place (review F1).
+    foreign = foreign_index(root)
+    if foreign is not None:
+        raise GovError(NOT_MEASURED, f"the inherited GIT_INDEX_FILE {foreign} is not git's own index of {root}: "
+                       "the index being committed is not scanned", {"index": foreign})
     # A configuration path in the environment would win over the rules given there.
-    env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
+    env ={key: value for key, value in git_env(root).items() if key != "GITLEAKS_CONFIG"}
     try:
         alone = _rules(root)[-1]  # the project's rules without `extend`: gitleaks' built-in allowlist is not in it
         for extra, scan_env in ((["--config", CONFIG_REL], env), ([], env | {"GITLEAKS_CONFIG_TOML": alone})):
@@ -115,7 +127,7 @@ def _staged_secrets(root: Path) -> dict:
 
 def _git(root: Path, *args: str) -> str:
     try:
-        done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+        done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=git_env(root))
     except OSError as error:
         raise GovError(NOT_MEASURED, f"git {args[0]} could not run: {error}") from None
     if done.returncode != 0:

@@ -93,8 +93,14 @@ def kernel_folder(kernel_project):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
-def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
-    """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+def test_a_research_install_inside_the_experiment_folder_is_let_through(kernel_guard, kernel_folder, name):
+    """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule.
+
+    W2-90b (Rewrite-Reason: DEC-953 item 2, DEC-999 item 1): asked of the kernel's wiring, no longer of this
+    repository's settings (whose hook program W1-46's fixture project does not hold since ACT 1), with its verdict
+    unchanged. Until W2-105 removes the template's ``Bash(npm install*)`` deny rule it is red at its own assertion;
+    W2-90c holds it (tests/acceptance/W2-90b/README.md)."""
+    guard, folder = kernel_guard, kernel_folder
     result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
     w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
 
@@ -149,8 +155,11 @@ def test_the_committed_settings_carry_no_ask_rule_on_installs():
     assert left == [], f".claude/settings.json still carries install or download ask rules: {left}"
 
 
-def test_the_built_settings_carry_no_ask_rule_on_installs(launch):
-    """The launcher does not bring back what DEC-172 withdrew: a later settings file cannot lift an ask rule."""
+def test_the_built_settings_carry_no_ask_rule_on_installs(kernel_launch):
+    """The launcher does not bring back what DEC-172 withdrew: a later settings file cannot lift an ask rule.
+
+    W2-90b (Rewrite-Reason: DEC-953 item 2): launched in the project on a generated project (the kernel's wiring)."""
+    launch = kernel_launch
     built = launch(RESEARCH).settings()
     asks = [rule for rule in w47.permission_rules(built, "ask") if w47.bash_rule_prefix(rule) is not None]
     assert asks == [], f"the settings built for a research session carry Bash ask rules: {asks}"
@@ -179,8 +188,11 @@ def test_a_research_install_on_another_roles_ticket_is_denied(kernel_guard, kern
     w47.assert_denied_by_rule(result, "`uv add requests` by research on the engineer's ticket")
 
 
-def test_sudo_stays_denied_to_the_research_role(guard, folder):
-    """DEC-083: "sudo is denied to all agent roles". "No worker role installs system-wide" (DEC-157)."""
+def test_sudo_stays_denied_to_the_research_role(kernel_guard, kernel_folder):
+    """DEC-083: "sudo is denied to all agent roles". "No worker role installs system-wide" (DEC-157).
+
+    W2-90b (Rewrite-Reason: DEC-953 item 2): asked of the kernel's wiring, no longer of this repository's settings."""
+    guard, folder = kernel_guard, kernel_folder
     for command in ("sudo apt-get install -y jq", "sudo pip install requests"):
         result = guard("Bash", w47.bash_input(command), RESEARCH, cwd=folder)
         w47.assert_denied_by_rule(result, f"`{command}` by research")

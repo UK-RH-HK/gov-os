@@ -50,18 +50,48 @@ def test_status_is_one_of_the_wave_1_operations(empty_project, sandbox):
     assert support.COMMAND in _commands(run), f"gov --help does not name status\n{run.describe()}"
 
 
+# DEC-753: ``release`` (W2-16) is recorded in the command lists only after W2-20 closes. Until then it alone is
+# excused; once the lists record it, the excuse changes nothing.
+EXCUSED_UNTIL_RECORDED = ("release",)
+
+
 def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
     """Rewritten (DEC-542) from ``test_this_ticket_adds_no_command``, which pinned the three as found. Every
     command ``gov`` offers is in the command list, every ``gov`` command of the list is offered, and the
-    recorded module command is not among them."""
-    assert tuple(RECORDED) == ("ci", "launch", "telemetry") and tuple(NO_GOV_COMMAND) == ("lock",)
+    recorded module command is not among them.
+
+    Rewritten again in W2-16's last round (DEC-761, a recorded rewrite, DEC-491). Reason: ``gov --help`` offers
+    ``release`` (W2-16), which DEC-753 records in the command lists only after W2-20 closes, so the case failed
+    on a command the owner has approved and whose recording is scheduled. ``release``, and only ``release``, is
+    excused while the lists lack it (DEC-753); the case passes unchanged once they record it. The purpose is
+    kept: any other command ``gov`` offers that the lists do not record still fails it, a recorded command gone
+    from ``gov --help`` still fails it, and the module command is still none of ``gov``'s.
+
+    Revised for DEC-970 (W2-96, P-W2-96-CMDLIST (a); a recorded rewrite, DEC-959 item 6): ``accept`` is recorded,
+    so the recorded ``gov`` commands are four, not the three of the case's name, which W1-32's README map names
+    and so stays as it is.
+
+    Revised for W2-20 (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20's KPI adds ``resources`` to the
+    recorded ``gov`` commands; the set is still exact, and ``release`` is still excused until recorded (DEC-753).
+
+    Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite by a fresh test designer, DEC-491):
+    ``gov --help`` offers ``brief`` (W2-152, DEC-1088 (3)), ``links`` (W2-129, DEC-1074 (7)) and ``plan``
+    (W2-136, DEC-1088), approved commands the lists did not record, so the case failed on them. W1-07's lines
+    record them; the pinned set is still exact, any other unrecorded command still fails, a recorded command
+    gone from ``gov --help`` still fails, the module command is still none of ``gov``'s, and ``release`` alone
+    is still excused until recorded (DEC-753).
+    """
+    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "brief", "ci", "launch", "links", "plan",
+                                                            "resources", "telemetry"}, RECORDED
+    assert tuple(NO_GOV_COMMAND) == ("lock",)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)
     assert set(cli_support.RESERVED_COMMANDS) <= set(commands), f"a Wave 1 operation is gone\n{run.describe()}"
     gone = sorted(set(RECORDED) - set(commands))
     assert not gone, f"a recorded command is gone from gov --help: {gone}\n{run.describe()}"
-    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(RECORDED))
+    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(RECORDED) - set(EXCUSED_UNTIL_RECORDED))
     assert not extra, f"gov has commands the command list does not record: {extra}"
+    assert not set(NO_GOV_COMMAND) & set(commands), f"the module command is offered by gov\n{run.describe()}"
 
 
 def test_status_has_no_sub_command_and_no_argument_that_acts(empty_project, sandbox):

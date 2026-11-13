@@ -224,6 +224,7 @@ faulty = fault and (not fault_marker or "\0fault" in seen)
 record = {"pid": os.getpid(), "sub": sub, "rules": rules(), "size": size,
           "seen": sorted(s for s in seen if s != "\0fault"), "fault": fault if faulty else None,
           "began": time.time() - (time.monotonic() - began)}
+record["ppid"] = os.getppid()   # the process that ran this gitleaks: where a declared limit must be in force (W2-67)
 
 
 def log(entry):
@@ -284,6 +285,139 @@ def install_stand_in(sandbox):
     path.chmod(0o755)
     stand_in.set()
     return stand_in
+
+
+# --------------------------------------------------------------------------
+# A declared short limit (W2-67, DEC-914; README-W2-67.md)
+# --------------------------------------------------------------------------
+#
+# The check states its limit on one gitleaks run in figures of its own: a base of seconds, plus a second for every
+# 1,000,000 bytes it gives (DEC-853's working figure); a file of a stated size or more is a large file of the pool.
+# No declaration or setting of the check names them, so the large-store and hang cases declare them from the test
+# side: a ``sitecustomize`` module first on the check's import path that, once ``gov.secrets`` has been imported,
+# sets two figures and nothing else (the base, and the large-file size scaled with the stores), and writes a proof
+# line naming its process and the figures it found and left. The rate per megabyte, the scan and every code path
+# stay the check's own. ``assert_declared`` shows the figures were in force in the process that ran the run's
+# gitleaks runs.
+
+DECLARED_BASE_S = 4                                   # the declared base, against the check's 60 s
+SCALED_LARGE_SIZE = 16 * 1024 * 1024                  # 16,777,216 bytes: 8.4 s at SLOW_RATE (> 2 x 4 s)
+DECLARED_LARGE_FILE = SCALED_LARGE_SIZE * (64 << 20) // LARGE_SIZE   # 64 MiB is to 160 MiB as this is to 16 MiB
+
+_DECLARATION = r'''"""W2-50's declared short limit (W2-67, DEC-914): two figures of gov.secrets, set once it is imported."""
+import importlib.abc, importlib.util, json, os, sys
+
+FIGURES, PROOF, HERE = @FIGURES@, @PROOF@, @HERE@
+
+
+def declare(module):
+    entry = {"pid": os.getpid(), "figures": {}}
+    for name, value in FIGURES.items():
+        was = getattr(module, name, None)
+        if isinstance(was, (int, float)) and not isinstance(was, bool):
+            setattr(module, name, value)
+        entry["figures"][name] = {"was": was if isinstance(was, (int, float)) else repr(was),
+                                  "now": getattr(module, name, None)}
+    floor = getattr(module, "_FLOOR", None)
+    entry["left"] = {"_FLOOR": floor if isinstance(floor, (int, float)) else repr(floor)}
+    fd = os.open(PROOF, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+    try:
+        os.write(fd, (json.dumps(entry) + "\n").encode())
+    finally:
+        os.close(fd)
+
+
+class _Loader(importlib.abc.Loader):
+    def __init__(self, inner):
+        self.inner = inner
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def create_module(self, spec):
+        return self.inner.create_module(spec)
+
+    def exec_module(self, module):
+        self.inner.exec_module(module)
+        declare(module)
+
+
+class _Finder(importlib.abc.MetaPathFinder):
+    busy = False
+
+    def find_spec(self, name, path, target=None):
+        if name != "gov.secrets" or self.busy:   # asked again while it asks the others: not its turn
+            return None
+        self.busy = True
+        try:
+            for finder in [each for each in sys.meta_path if each is not self]:
+                spec = getattr(finder, "find_spec", lambda *a: None)(name, path, target)
+                if spec is not None:
+                    spec.loader = _Loader(spec.loader)
+                    return spec
+        finally:
+            self.busy = False
+        return None
+
+
+sys.meta_path.insert(0, _Finder())
+# The interpreter's own sitecustomize, if any, still runs: this module stands first only to be found first.
+for folder in sys.path:
+    candidate = os.path.join(folder or ".", "sitecustomize.py")
+    if os.path.realpath(folder or ".") != os.path.realpath(HERE) and os.path.isfile(candidate):
+        spec = importlib.util.spec_from_file_location("_next_sitecustomize", candidate)
+        try:
+            spec.loader.exec_module(importlib.util.module_from_spec(spec))
+        except Exception:
+            pass
+        break
+'''
+
+
+@dataclass
+class Declaration:
+    folder: Path
+    proof: Path
+    figures: dict
+
+    def entries(self):
+        if not self.proof.is_file():
+            return []
+        return [json.loads(line) for line in self.proof.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def declare_short_limit(sandbox, base_s=DECLARED_BASE_S, large_file=DECLARED_LARGE_FILE):
+    """Declare the short limit for every run of the check in this sandbox (``environment`` puts it on the path)."""
+    folder = sandbox.elsewhere / "short-limit"
+    folder.mkdir(parents=True, exist_ok=True)
+    declaration = Declaration(folder, folder / "proof.jsonl", {"_TIMEOUT_S": base_s, "_LARGE": large_file})
+    (folder / "sitecustomize.py").write_text(
+        _DECLARATION.replace("@FIGURES@", repr(declaration.figures)).replace("@PROOF@", repr(str(declaration.proof)))
+        .replace("@HERE@", repr(str(folder))), encoding="utf-8")
+    return declaration
+
+
+def assert_declared(run, declaration):
+    """The declared figures were in force in the process that ran each of this run's gitleaks runs, and they
+    replaced figures of the check's own that were larger (so the check, not the declaration, still names them)."""
+    assert run.calls, f"no gitleaks run was logged: the declaration cannot be shown in force\n{run.describe()}"
+    declared = {}
+    for entry in declaration.entries():
+        figures = entry.get("figures", {})
+        for name, value in declaration.figures.items():
+            found = figures.get(name, {})
+            assert isinstance(found.get("was"), (int, float)), (
+                f"the check's process holds no figure {name} (found {found.get('was')}): the declared short limit "
+                f"cannot reach the check; README-W2-67.md says how the declaration must follow it")
+            assert found["was"] > value, (
+                f"the check's own {name} is {found['was']}, not larger than the declared {value}: nothing is "
+                f"shortened, so the case no longer shows its property against a short limit")
+        if all(figures.get(name, {}).get("now") == value for name, value in declaration.figures.items()):
+            declared[entry["pid"]] = entry
+    started_by = {call.get("ppid") for call in run.calls}
+    assert started_by and started_by <= set(declared), (
+        f"gitleaks was run by process(es) {sorted(map(str, started_by - set(declared)))} in which the declared "
+        f"figures {declaration.figures} were not in force (proof: {declaration.entries()})\n{run.describe()}")
 
 
 # --------------------------------------------------------------------------
@@ -440,6 +574,9 @@ def environment(sandbox, stand_in):
     if stand_in is not None:
         env["PATH"] = f"{stand_in.bin}{os.pathsep}{env['PATH']}"
     env["XDG_CACHE_HOME"] = str(sandbox.home / ".cache")
+    declared = sandbox.elsewhere / "short-limit"
+    if (declared / "sitecustomize.py").is_file():   # declare_short_limit: first on the path, the code under test after
+        env["PYTHONPATH"] = f"{declared}{os.pathsep}{env['PYTHONPATH']}"
     return env
 
 

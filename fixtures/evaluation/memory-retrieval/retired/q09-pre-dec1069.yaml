@@ -1,0 +1,42 @@
+# Q09, re-labelled blind by the owner's decision of 2026-11-03 (DEC-1066 (4)), by a session independent of the
+# retrieval work: the gold sources decided from the question, the gold answer and the repository at the commit, never
+# from a retrieval run. Lens B's label named only W2-04's ticket KPI lines; it is kept unchanged in ../retired/
+# (q09-lens-b.yaml, README.md), which the measure never reads. The question and the gold answer are kept: both hold at
+# the commit (src/gov/context: DEFAULT_BUDGET = 6000; CONTEXT_OVER_CEILING raised when the mandatory part alone, or the
+# packet, passes the ceiling).
+# The size the question asks for is stated by the Contract, which governs it, and restated by the ticket, so the
+# sources are alternatives of one entry, any one of which answers it: the Contract's envelope (its token budget,
+# "Context packet ≤ ~6k tokens") in contract.yaml, the authority, and in CONTRACT_v4.md, its same content; CAP-15's
+# acceptance ("stays under the configured ceiling (default ~6k tokens)") in contract.yaml, in CONTRACT_v4.md and in
+# CAP-15's own record; and W2-04's ticket KPI lines, which state the whole gold answer, the refusal over the ceiling
+# included. Left out: DEC-004's entry (it states "≤ ~6k tokens (tunable)" but is PROPOSED, settled by DEC-086, which
+# does not state the size; the Contract carries the rule) and the code (it carries the rule out; no line of it states
+# the rule).
+id: Q09
+category: ticket
+commit: 68ce354a74c7
+ticket: DAEO-u4oz
+question: How large may the context packet be?
+gold_answer: >-
+  Within the packet ceiling of about 6k tokens (the Contract envelope), never dropping the ticket's own text; when the
+  mandatory inputs alone exceed it, gov context refuses with a named error and a non-zero exit, never ok: true over
+  its budget.
+sources:
+  - - path: docs/contract/contract.yaml
+      heading: "  token_budget:"
+      lines: [52, 60]
+    - path: docs/contract/CONTRACT_v4.md
+      heading: "- **Token budget** (DEC-004, DEC-086). Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md ≤ ~1.5k tokens. A breach is a health finding, never a silent cost."
+      lines: [44, 44]
+    - path: docs/contract/contract.yaml
+      heading: "- id: CAP-15"
+      lines: [962, 969]
+    - path: docs/contract/CONTRACT_v4.md
+      heading: "### CAP-15 — Context packet compilation"
+      lines: [256, 273]
+    - path: docs/contract/capabilities/CAP-15.md
+      heading: "# CAP-15: Context packet compilation"
+      lines: [11, 19]
+    - path: .tickets/DAEO-u4oz.md
+      heading: "kpis:"
+      lines: [24, 36]

@@ -40,7 +40,7 @@ def _project(scratch, template=True, sound=SOUND):
     """A project that holds the base source, the kernel's declaration of the check, the kernel's template
     ticket and the sound tickets given."""
     project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {}\n")
+    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
     project.base_source()
     if template:
         r16.place_template_ticket(project)

@@ -9,7 +9,10 @@ cannot decide, there is no index. The answers are read from the graph the tool b
 The root must be the top level of a git repository whose ``.gov-runtime/`` is no link:
 any other root is refused before anything is written or deleted. The tool's daemon keeps
 its lock and socket files in ``daemon_dir(root)``, never in the tool's shared default
-(DEC-338), and does not serve the tool's loopback UI: every start of the tool sets ``ui_enabled``
+(DEC-338): in a test session under that session's own folder (also in a process the session starts
+with an environment built anew, found from the mark above the repository), in a session ``gov launch``
+started under its own temp folder (W2-56 S1, ``daemon_base``); a folder made for a tool that cannot
+be started is not left. It does not serve the tool's loopback UI: every start of the tool sets ``ui_enabled``
 to ``false`` in the home first (DEC-362). The graph is read in one session of the tool, so that
 its daemon starts once for it (DEC-561).
 """
@@ -21,18 +24,32 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import threading
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from gov.secrets import indexable, path_holds_secret
+from gov.secrets import indexable, path_holds_secret, pool_size
+from gov.util.gitenv import git_env
 
 TOOL = "codebase-memory-mcp"
 BASE_REL = ".gov-runtime/codeintel"
-# Where the daemon directories stand: short, because a socket path holds at most 107 bytes (DEC-338).
+# Where the daemon directories stand: short, because a socket path holds at most 107 bytes (DEC-338). This is the
+# place outside a test session and outside a launched session (``daemon_base``).
 DAEMON_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
+# W2-56 S1 (DEC-799 item 1): a test session's own folder for its daemon directories (``tests/conftest.py`` makes it,
+# sets this variable and removes the folder when the session ends) ...
+BASE_ENV = "CODEINTEL_DAEMON_BASE"
+# ... named also in a mark the conftest writes in each of its processes' pytest temp base, for a process the session
+# starts with an environment built anew (no ``CODEINTEL_DAEMON_BASE``) on a repository under that base: the nearest
+# mark above the repository, the user's own regular file, names the folder, unless this process wrote it (a case that
+# removes the variable in the session's own process asks for the place outside a test session) ...
+MARK = ".gov-cbm-base"
+# ... and, in a session ``gov launch`` started, its own temp folder (``gov-launch-`` and a few letters, DEC-159),
+# found from ``CLAUDE_CODE_TMPDIR``: the launcher's folder itself, or the CLI's ``claude-<uid>`` folder in it.
+LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
 # Seconds a session of the tool has for one answer, and for its end once its input is closed; then it is killed.
@@ -42,8 +59,8 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callees", "callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects",
-           "references"]
+__all__ = ["callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home", "impact", "index",
+           "launch_folder", "make_session_base", "marked_base", "projects", "references", "write_mark"]
 
 
 def home(root: Path) -> Path:
@@ -51,9 +68,97 @@ def home(root: Path) -> Path:
     return Path(root).resolve() / BASE_REL / "home"
 
 
+def launch_folder(env=None) -> Path | None:
+    """The temp folder of the ``gov launch`` session this process runs in (W2-56, D-12), or None outside one."""
+    given = (os.environ if env is None else env).get(LAUNCH_TMP_ENV) or ""
+    if not os.path.isabs(given):
+        return None
+    place = Path(os.path.normpath(given))
+    for folder in (place, place.parent):
+        if folder.name.startswith(LAUNCH_PREFIX) and folder.parent != folder:
+            return folder
+    return None
+
+
+def write_mark(folder: Path, base: Path) -> Path:
+    """Write the mark (``MARK``) naming ``base`` in ``folder``, a test process's pytest temp base; return its path."""
+    mark = Path(folder) / MARK
+    staged = mark.with_name(f"{MARK}.{os.getpid()}")
+    staged.write_text(json.dumps({"base": str(base), "pid": os.getpid()}), encoding="utf-8")
+    os.replace(staged, mark)
+    return mark
+
+
+def marked_base(root) -> Path | None:
+    """The test session's folder the nearest mark above ``root`` names (W2-56 S1); None where there is none, where it is
+    no regular file of this user's, names no absolute folder, or was written by this process."""
+    for folder in Path(os.path.abspath(root)).parents:
+        mark = folder / MARK
+        try:
+            seen = os.lstat(mark)
+        except OSError:
+            continue
+        if not stat.S_ISREG(seen.st_mode) or seen.st_uid != os.getuid():
+            return None
+        try:
+            named = json.loads(mark.read_text(encoding="utf-8"))
+            base, pid = named["base"], named["pid"]
+        except (OSError, ValueError, LookupError, TypeError):
+            return None
+        if not isinstance(base, str) or not os.path.isabs(base) or pid == os.getpid():
+            return None
+        return Path(os.path.normpath(base))
+    return None
+
+
+def daemon_base(env=None, root=None) -> Path:
+    """Where the daemon directories of this process stand: the test session's own folder (``CODEINTEL_DAEMON_BASE``),
+    else the launched session's temp folder (``launch_folder``), else, for a repository ``root`` under a test process's
+    temp base, the folder its mark names (``marked_base``: the shared place is never used during a test session), else
+    ``DAEMON_BASE``."""
+    env = os.environ if env is None else env
+    given = env.get(BASE_ENV) or ""
+    if os.path.isabs(given):
+        return Path(os.path.normpath(given))
+    launched = launch_folder(env)
+    if launched is not None:
+        return launched / LAUNCH_SUB
+    marked = marked_base(root) if root is not None else None
+    return marked if marked is not None else DAEMON_BASE
+
+
+def make_session_base(env=None) -> Path:
+    """A new folder for one test session's daemon directories (W2-56 S1), short enough for the tool's socket: in the
+    launched session's temp folder, else under ``/tmp``, else under the temp folder. The caller removes it, and holds
+    its owner's record in it, by which the next session removes it after a kill (``tests/conftest.py``, W2-56 R3): a
+    change to these names is a change to the conftest's too."""
+    import secrets
+    import tempfile
+
+    launched = launch_folder(env)
+    if launched is not None:  # four letters: a launcher's folder of the older, longer name still fits (D-12)
+        for _ in range(100):
+            made = launched / ("c" + "".join(secrets.choice("abcdefghijklmnopqrstuvwxyz0123456789") for _ in "xyz"))
+            try:
+                made.mkdir(mode=0o700)
+                return made
+            except FileExistsError:
+                continue
+            except OSError:
+                break
+    for place in (Path("/tmp"), Path(tempfile.gettempdir())):
+        try:
+            return Path(tempfile.mkdtemp(prefix=f"gov-cbm-{os.getuid()}-", dir=place))
+        except OSError:
+            continue
+    raise OSError("no folder for the test session's daemon directories can be made")
+
+
 def daemon_dir(root: Path) -> Path:
-    """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository."""
-    return DAEMON_BASE / hashlib.sha256(os.fsencode(Path(root).resolve())).hexdigest()[:16]
+    """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository,
+    as this process sees it (``daemon_base``)."""
+    root = Path(root).resolve()
+    return daemon_base(root=root) / hashlib.sha256(os.fsencode(root)).hexdigest()[:16]
 
 
 def _daemon_dir(root: Path) -> Path:
@@ -69,7 +174,8 @@ def _daemon_dir(root: Path) -> Path:
 def _checked(root: Path) -> Path:
     """``root`` resolved. Raises unless it is the top level of a git repository and its home is under it."""
     root = Path(root).resolve()
-    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True,
+                         env=git_env(root))
     if top.returncode != 0 or Path(top.stdout.removesuffix("\n")).resolve() != root:
         raise RuntimeError(f"{root} is not the top level of a git repository: no code index there")
     if home(root).resolve() != root / BASE_REL / "home":  # a link on the way would put the index somewhere else
@@ -80,14 +186,25 @@ def _checked(root: Path) -> Path:
 def _env(root: Path, tool: str) -> dict:
     """The environment of a start of the binary: the repository's home and the repository's daemon directory.
 
-    Both are set here whatever the caller's environment holds; the rest of that environment is passed on.
+    Both are set here whatever the caller's environment holds; the rest of that environment is passed on, less the
+    inherited ``GIT_*`` variables (``git_env``: the tool starts git in the project, AR-2).
     The tool's loopback UI is turned off in that home first (DEC-362).
     """
     root = _checked(root)
-    env = {**os.environ, "CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
+    new = not os.path.lexists(daemon_dir(root))
+    env = {**git_env(root),"CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
     # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every start.
-    if subprocess.run([TOOL, "config", "set", "ui_enabled", "false"], capture_output=True, text=True,
-                      stdin=subprocess.DEVNULL, env=env).returncode != 0:
+    try:
+        done = subprocess.run([TOOL, "config", "set", "ui_enabled", "false"], capture_output=True, text=True,
+                              stdin=subprocess.DEVNULL, env=env)
+    except OSError:  # the tool cannot be started (not on PATH): the folder made for it is not left (W2-56 S1)
+        if new:
+            try:
+                os.rmdir(env["CBM_RUNTIME_DIR"])
+            except OSError:
+                pass
+        raise
+    if done.returncode != 0:
         raise RuntimeError(f"{TOOL} config set ui_enabled false failed: {tool} is not run")
     return env
 
@@ -181,9 +298,11 @@ def index(root: Path) -> None:
         shutil.rmtree(base)
     _graph.cache_clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-                            capture_output=True, text=True, check=True).stdout
+                            capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
-    with ThreadPoolExecutor() as pool:  # the index stores paths: a path that holds a secret stays out (DEC-339)
+    # The index stores paths: a path that holds a secret stays out (DEC-339). The pool is as wide as the CPUs this
+    # process may use (its CPU set), never the machine's count (W2-20 S18): inside a slot, at most the slot's share.
+    with ThreadPoolExecutor(max_workers=pool_size()) as pool:
         named = list(pool.map(lambda rel: path_holds_secret(root, rel), allowed))
     for rel in (rel for rel, secret in zip(allowed, named) if not secret):
         (staged / rel).parent.mkdir(parents=True, exist_ok=True)

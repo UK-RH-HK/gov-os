@@ -1,7 +1,7 @@
 ---
 id: DAEO-hgv3
-status: open
-deps: []
+status: closed
+deps: [DAEO-k7hz, DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
 type: task
@@ -14,7 +14,7 @@ title: 'The technical-writing skill for product-spec: Diátaxis''s four kinds (t
 class: specification
 state_class: AUTHORITATIVE
 role: product-spec
-depends_on: []
+depends_on: [DAEO-k7hz, DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/technical-writing/**
 - .claude/skills/technical-writing/**
@@ -46,4 +46,8 @@ list_rows: []
 ---
 # W2-103 The technical-writing skill for product-spec
 
+**Dependencies (PLAN-GROWTH-1 §2 gaps 2 and 3):** after W2-11's round 1 (the skill template) and W2-104 (the skill harness, which runs its three scenarios before adoption, DEC-959 item 5).
+
 Card: ROLES-RESEARCH-1 §5.3 item 12, approved (DEC-959 item 8): the Wave 2 tail. Starts after W2-11 r1 merges.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C.

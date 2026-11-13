@@ -1,6 +1,6 @@
 ---
 id: DAEO-ouet
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-30T23:20:53Z
@@ -18,6 +18,7 @@ depends_on: []
 allowed_paths:
 - src/gov/accept/**
 - tests/unit/accept/test_w2_96*
+- src/gov/check/commands.py
 kpis:
   success:
   - 'gov accept <ticket> runs that ticket''s acceptance tests (its declared acceptance_tests.path) with the tree''s own src/ and reports, per KPI line of the designer''s README map, pass or fail, with the counts of tests passed and failed under each line; --json gives the same in the API-0002 envelope [DEC-959 item 6, DEC-957]'
@@ -26,6 +27,8 @@ kpis:
   - 'A collection error, a timeout or a crash is reported as error for the run with its kind only (collection, timeout, crash), never its message [DEC-959 item 6]'
   - 'The exit code is 0 when every mapped line passes, a declared code when any fails, another when the run errors; the command is a read command and writes nothing in the repository [DEC-317]'
   - 'The common lead brief and the engineer''s brief template name gov accept as the engineer''s only way to run the acceptance tests (the brief change is the orchestrator''s, recorded with this ticket''s merge) [DEC-959 items 6 and 7]'
+  - 'S-D10a gov accept runs the opt-in groups (tests/optin-lifted*.txt suites) that its own map''s cases need, and only for that ticket''s cases, so a KPI line whose mapped cases an opt-in list leaves out of a default run is measured, not failed with no failed case; a line whose mapped cases still run zero stays a fail; the report names which opt-in groups it enabled; it enables only `breadth`: a line resting only on `lifted` cases is reported report-only, never run (DEC-1061 (2)), and a run whose every line is report-only fails; a cell naming a further line other than after a join, or a repeat, is refused [DEC-1112 (3), DEC-1061, DEC-959 item 6] [added, DEC-1112 (3)] [changed, DEC-1112 (3): PKG-D10a-scope (b)]'
+  - 'S-D10b The map reader reads every KPI line a map cell lists (a cell such as Success 4, failures 4, 5 names success-4, failure-4 and failure-5), or refuses the map naming the cell; it never keeps the first line and drops the rest silently [DEC-1112 (3), DEC-959 item 6] [added, DEC-1112 (3)]'
   failure:
   - 'Any test source, assertion text, value, traceback or captured output in the output, the JSON or a file left behind.'
   - 'An unmapped test named, or a README without a map answered with raw output.'
@@ -33,11 +36,18 @@ kpis:
   - 'A write in the repository.'
 profile: FULL
 sources:
+- DEC-1112
+- DEC-1061
+- DEC-866
+- DEC-1109
 - DEC-959
 - DEC-957
 - DEC-820
 - DEC-317
 - MR-3
+- DEC-911
+- DEC-970
+- DEC-987
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-96/
@@ -47,9 +57,13 @@ list_rows: []
 ---
 # W2-96 The opaque acceptance runner
 
+**DEC-970 (2026-10-31):** `src/gov/check/commands.py` is in the paths for one line only, `accept` in `RECORDED_GOV_COMMANDS` (P-W2-96-CMDLIST (a)); W2-16, W2-20 and W2-37 hold the rest of that file, split by line, and whichever merges second merges back. For the independent test designer, not in allowed_paths: W1-07's support list of recorded commands and W1-07's and W1-32's pinned command tuples gain `accept` (`tests/acceptance/W1-07/`, `tests/acceptance/W1-32/`; `Rewrite-Reason: DEC-959 item 6`). PKG-1 (a): any failed or errored case, mapped or not, fails the run (exit 3); PKG-2 (c).
+
 Card: ROLES-RESEARCH-1 §5.3 item 6, approved by the owner as a priority now (DEC-959 item 6): the five-rule guard lets engineers read the acceptance tests, so "pass or fail only" (DEC-957's work order) needs a runner that enforces it.
 
 - **Profile FULL:** it is the one mechanism that keeps the engineer from seeing the tests' content; a leak is silent (it fails open on the work order's separation), so it gets the independent review.
 - **Where:** a new command module, `src/gov/accept/command.py` (`gov accept`), by the command-module convention (`src/gov/cli/main.py`'s docstring): no change to the CLI file.
 - **Not in this ticket:** a guard rule refusing engineers' direct pytest runs on the acceptance folder would be a sixth guard rule, the owner's decision (DEC-953 item 2); the brief carries the rule until then.
 - **Overlaps:** none running.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 9 of 10 (landed `107514f5`); met in half: S6 (`brief-engineer.md` does not name `gov accept`). The CTO closes it at the lift (P1-13).

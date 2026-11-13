@@ -38,7 +38,7 @@ import test_w1_26_skill_validator as skills  # noqa: E402
 
 cli_support = support.cli_support
 
-GOV_COMMANDS = cli_support.RECORDED_GOV_COMMANDS          # ci, launch, telemetry
+GOV_COMMANDS = cli_support.RECORDED_GOV_COMMANDS          # ci, launch, telemetry, accept, resources, brief, links, plan
 MODULE_COMMANDS = cli_support.RECORDED_MODULE_COMMANDS    # lock
 RECORDED = GOV_COMMANDS + MODULE_COMMANDS
 
@@ -70,6 +70,10 @@ def _findings(project, sandbox, interface):
 
 @pytest.mark.parametrize("name", RECORDED)
 def test_a_recorded_command_without_its_module_is_a_finding_that_names_it(name, project, sandbox, interface):
+    """Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite by a fresh test designer): the
+    recorded commands read from W1-07's lines are nine with ``brief`` (W2-152, DEC-1088 (3)), ``links`` (W2-129,
+    DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088); each has its module file as the others do, and a removed one is
+    a finding that names it. The case's purpose is unchanged."""
     files = _module_files(project, name)
     assert files, f"the defect cannot be planted: the project holds no module of {name!r}"
     for path in files:
@@ -112,6 +116,9 @@ def _unknown_commands(tmp_path, body):
 
 @pytest.mark.parametrize("name", GOV_COMMANDS)
 def test_a_skill_may_name_a_recorded_gov_command(name, tmp_path):
+    """Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite): a skill may name ``gov brief``,
+    ``gov links`` and ``gov plan`` too, recorded ``gov`` commands read from W1-07's lines; ``gov lock`` stays
+    flagged (the case below)."""
     unknown, done = _unknown_commands(tmp_path, f"Run `gov {name}` where the procedure asks for it.\n")
     assert not unknown, f"a skill that names `gov {name}` is flagged: {unknown}"
     assert done.returncode == 0, f"the skill validator does not pass the skill: {done.stdout}"

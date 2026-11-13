@@ -31,6 +31,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.close import command as _close, evidence as _evidence, select as _select
 from gov.close.repo import git as _git
+from gov.util.gitenv import git_env, runner_env
 
 COMMAND = "nightly"
 EXIT_RED = 3
@@ -89,9 +90,19 @@ def _alone(tree: Path, test: str, limit: list[str], run_limit: float, env: dict)
     return PASSED if done.returncode == 0 else FAILED
 
 
-_BISECT_STEP = """
-import subprocess, sys
-code = subprocess.run([sys.executable, "-m", "pytest", *sys.argv[1:]]).returncode
+# ``git bisect run`` exports ``GIT_DIR``, ``GIT_EXEC_PATH`` and ``GIT_PREFIX`` to the step and puts its own folder
+# first on ``PATH``: the step's tests get the run's environment as handed to it, never the step's own (R4-1). A
+# step that cannot read it judges nothing: 125, the commit untestable, never good (DEC-580).
+_STEP_ENV = "GOV_NIGHTLY_STEP_ENV"
+_BISECT_STEP = f"""
+import json, os, subprocess, sys
+try:
+    env = json.loads(os.environ["{_STEP_ENV}"])
+except (KeyError, ValueError):
+    sys.exit(125)
+if not isinstance(env, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in env.items()):
+    sys.exit(125)
+code = subprocess.run([sys.executable, "-m", "pytest", *sys.argv[1:]], env=env).returncode
 sys.exit(0 if code == 0 else 125 if code == 5 else 1)
 """
 
@@ -101,22 +112,25 @@ def _bisect(tree: Path, good: str, bad: str, test: str, limit: list[str], env: d
     path, sep, rest = test.partition("::")
     step = [sys.executable, "-c", _BISECT_STEP, path + sep + rest, "-q", "-p", "no:cacheprovider", "--no-header",
             "--rootdir", str(tree)] + limit
-    git_env = {key: value for key, value in env.items() if not key.startswith("GIT_")}
-    try:
-        subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
-                       env=git_env, check=True)
-        done = subprocess.run(["git", "-C", str(tree), "bisect", "run", *step], capture_output=True, text=True,
-                              env=git_env, cwd=str(tree))
-        for line in done.stdout.splitlines():
-            word = line.split(" ", 1)[0]
-            if line.endswith("is the first bad commit") and len(word) == 40:
-                return word
-        found = _git(tree, "rev-parse", "--verify", "--quiet", "refs/bisect/bad", ok=(0, 1)).strip()
-        return found or None
-    except (OSError, subprocess.CalledProcessError, GovError):
-        return None
-    finally:
-        subprocess.run(["git", "-C", str(tree), "bisect", "reset"], capture_output=True, env=git_env)
+    # The clone is another folder and the step starts the tests, which start git in folders of their own (P-1).
+    # Each commit is judged in the environment of the run that found the red (``_started``'s, DEC-970), handed to
+    # the step whole: what git adds for the step reaches no test (R4-1).
+    with runner_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")}) as bisect_env:
+        try:
+            subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
+                           env=bisect_env, check=True)
+            done = subprocess.run(["git", "-C", str(tree), "bisect", "run", *step], capture_output=True, text=True,
+                                  env={**bisect_env, _STEP_ENV: json.dumps(bisect_env)}, cwd=str(tree))
+            for line in done.stdout.splitlines():
+                word = line.split(" ", 1)[0]
+                if line.endswith("is the first bad commit") and len(word) == 40:
+                    return word
+            found = _git(tree, "rev-parse", "--verify", "--quiet", "refs/bisect/bad", ok=(0, 1)).strip()
+            return found or None
+        except (OSError, subprocess.CalledProcessError, GovError):
+            return None
+        finally:
+            subprocess.run(["git", "-C", str(tree), "bisect", "reset"], capture_output=True, env=bisect_env)
 
 
 def _scoped_closes(root: Path, tree: Path, since: str | None, head: str) -> list[dict]:
@@ -287,7 +301,7 @@ def _own_entry(root: Path, tree: Path, entry: Path) -> bool:
 def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:
     """Remove the clone by its exact path; when that fails, its own confirmed entry alone. The failure, or None."""
     done = subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", str(tree)],
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, env=git_env(root))
     if done.returncode == 0 and not (entry and entry.exists()):
         return None
     error = " ".join(done.stderr.split()) or f"the entry {entry} is still there after git worktree remove"
@@ -305,12 +319,45 @@ def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:
 # The night
 # ---------------------------------------------------------------------------
 
-def night(root: Path, branch: str, coverage: bool = False) -> dict:
-    """Run the night on ``branch``'s head; its record, written to the working tree."""
+SECRETS_FULL_SCAN = "GOV_SECRETS_FULL_SCAN"  # W2-115 S8 (DEC-966 item 4): the night's rebuild scans every text
+
+
+def rebuild_stores(tree: Path) -> dict:
+    """The project worktree's stores rebuilt before the night's run with the full secrets scan (W2-115 S8):
+    ``GOV_SECRETS_FULL_SCAN=1`` in the rebuild's environment, whatever the caller's, and the caller's value put back
+    after it. ``gov rebuild`` by its own code, in this process, as the batch rebuilds (never ``--no-embeddings``:
+    the stores stay the project's). ``{"ok", "error", "GOV_SECRETS_FULL_SCAN"}``."""
+    from gov.config.loader import load_config
+    from gov.rebuild.command import run as rebuild
+
+    before = os.environ.get(SECRETS_FULL_SCAN)
+    os.environ[SECRETS_FULL_SCAN] = "1"
+    try:
+        rebuild(Path(tree), argparse.Namespace(no_embeddings=False, seed=None, integration=None, json=True),
+                load_config(Path(tree)))
+        outcome = {"ok": True, "error": None}
+    except (GovError, OSError, ValueError) as e:
+        outcome = {"ok": False, "error": f"{getattr(e, 'code', type(e).__name__)}: {getattr(e, 'message', e)}"[:400]}
+    finally:
+        if before is None:
+            os.environ.pop(SECRETS_FULL_SCAN, None)
+        else:
+            os.environ[SECRETS_FULL_SCAN] = before
+    return {**outcome, SECRETS_FULL_SCAN: "1"}
+
+
+def night(root: Path, branch: str, coverage: bool = False, rebuild: bool = True) -> dict:
+    """Run the night on ``branch``'s head; its record, written to the working tree. ``rebuild``: the project
+    worktree's stores rebuilt first with the full secrets scan (S8); the strict close's batch, which rebuilds before
+    it, passes False (today's, F4)."""
     root = Path(root)
     head = _git(root, "rev-parse", "--verify", "--quiet", f"{branch}^{{commit}}", ok=(0, 1)).strip()
     if not head:
         raise GovError("BRANCH_UNKNOWN", f"{branch} names no commit of {root}", {"branch": branch})
+    rebuilt = rebuild_stores(root) if rebuild else {"ok": False, "error": None}  # S8: before the run
+    if rebuilt["error"]:
+        print(f"nightly: the stores' rebuild with the full secrets scan failed: {rebuilt['error']}",
+              file=sys.stderr, flush=True)
     tree_id = _git(root, "rev-parse", f"{head}^{{tree}}").strip()
     since = _last_green(root, head)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -320,7 +367,7 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
 
     work = Path(tempfile.mkdtemp(prefix="gov-nightly-"))
     tree = work / "tree"
-    _git(root, "worktree", "add", "--detach", "--force", str(tree), head)
+    _git(root, "worktree", "add", "--detach", "--force", str(tree), head, pinned=False)
     entry = _entry_of(tree)
     try:
         test_map, _ = _select.load_map(tree)
@@ -373,8 +420,11 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
         if not full.exists():
             full.write_text("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<testsuites/>\n", encoding="utf-8")
         junit.append(full.relative_to(root).as_posix())
+    # S8: the record says whether the full secrets scan ran (one key, true or false, nothing time-varying; a failed
+    # rebuild's error goes to stderr); the tests' verdict stays the tests' own, as the strict close's batch reads it
     verdict = GREEN if not findings and not listed else RED
     record = {"branch": branch, "head": head, "tree": tree_id, "base": since, "scope": "full", "verdict": verdict,
+              "secrets_full_scan": bool(rebuilt["ok"]),
               "junit_xml": junit, "failures": listed, "packages": packages, "tests_run": counts,
               "findings": findings, "per_test_timeout": per_test, "distribution": distribution,
               "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}

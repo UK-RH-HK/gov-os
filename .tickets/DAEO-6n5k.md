@@ -23,16 +23,18 @@ allowed_paths:
 - tests/unit/impact/**
 kpis:
   success:
-  - A decision change raises a CIT-P that lists the affected specifications, decisions, tickets, tests and code from both graphs, with a radius [CAP-33.b, W2-M285].
-  - After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319].
-  - '"What''s the impact of X?" in plain language runs gov impact [CAP-33.g, DEC-167].'
-  - It also takes the S0b2 glue G-16 (id mapping) and G-24 (deletable-class join).
+  - '"What''s the impact of X?" in plain language runs gov impact [CAP-33.g, DEC-167]. Verify: a planted question "what is the impact of DEC-NNN?" given to the plain-language entry runs gov impact on DEC-NNN and prints its result [Verify clause added, DEC-1157 (12)]'
+  - 'It also takes the S0b2 glue G-16 (id mapping) and G-24 (deletable-class join). Verify: planted records with mapped ids and a deletable-class row: gov impact resolves the mapped ids (G-16) and joins the deletable class (G-24) in its result [Verify clause added, DEC-1157 (12)]'
   failure: []
+  lifted:
+  - 'A decision change raises a CIT-P that lists the affected specifications, decisions, tickets, tests and code from both graphs, with a radius [CAP-33.b, W2-M285]. [lifted (was S1), DEC-1083: the query only, no CIT-P (INVESTIGATION-1 §5, W-3)]'
+  - 'After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319]. [lifted (was S2), DEC-1083: the query only, no CIT-P (INVESTIGATION-1 §5, W-3)]'
 profile: FULL
 sources:
 - CAP-33.b
 - CAP-33.g
 - DEC-167
+- DEC-1083
 est_loc: 280
 acceptance_tests:
   path: tests/acceptance/W2-37/

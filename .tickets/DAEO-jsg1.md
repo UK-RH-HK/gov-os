@@ -1,6 +1,6 @@
 ---
 id: DAEO-jsg1
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-10-30T22:14:02Z

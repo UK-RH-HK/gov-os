@@ -43,13 +43,23 @@ def _offered(run):
 
 def test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve():
     recorded = support.RECORDED_GOV_COMMANDS + support.RECORDED_MODULE_COMMANDS
-    assert sorted(recorded) == ["ci", "launch", "lock", "telemetry"], recorded
+    # DEC-970: ``accept`` (W2-96) is recorded too, so the lines name five; the case keeps its name.
+    # Revised (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20 records ``resources`` beside them: six.
+    # Revised for D-10's red fix (W2-20; DEC-753, DEC-1088, DEC-1074 (7), a recorded rewrite): ``brief``, ``links``
+    # and ``plan`` are recorded beside them: nine.
+    assert sorted(recorded) == ["accept", "brief", "ci", "launch", "links", "lock", "plan", "resources",
+                                "telemetry"], recorded
     assert not set(recorded) & set(support.RESERVED_COMMANDS), "a recorded command is one of the twelve"
 
 
 @pytest.mark.parametrize("name", support.RECORDED_GOV_COMMANDS)
 def test_a_recorded_gov_command_is_offered_and_answers_its_help(gov, name):
-    """One case for each of ``ci``, ``launch`` and ``telemetry``."""
+    """One case for each of ``ci``, ``launch`` and ``telemetry``.
+
+    Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a recorded rewrite): the recorded ``gov`` commands
+    are eight with ``accept`` (DEC-970), ``resources`` (W2-20), ``brief`` (W2-152, DEC-1088 (3)), ``links``
+    (W2-129, DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088); one case each, read from the support's lines.
+    """
     listed = gov("--help")
     assert listed.returncode == 0, listed.describe()
     assert name in _offered(listed), f"gov --help does not offer the recorded command {name}\n{listed.describe()}"

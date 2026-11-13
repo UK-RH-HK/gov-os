@@ -253,6 +253,14 @@ def make_session_sandbox(base):
     Nothing is installed by a test. The package of this worktree is made importable the way an editable
     install does it: a path file in the user site folder of the stand-in home. A registered command that
     sets ``PYTHONPATH`` itself still finds it, as it would find an installed package.
+
+    Revised (Rewrite-Reason: DEC-966 item 2): the editable install's ``gov`` script is written too, at
+    ``<home>/.local/bin/gov``, its first line naming this interpreter, as ``pip install --user -e`` leaves it
+    (DEC-605). The template's guard lines take the pinned form (DEC-822, W2-59): they find the installed gov
+    there, else on ``PATH``, and start their program with the interpreter its first line names, with ``-E``
+    (which keeps the user site folder, so the path file above still gives this worktree's package). Without the
+    script the lines find only the ``gov`` on the runner's ``PATH`` (on this machine the owner's pin, whose
+    interpreter imports its own package, not this worktree's: DEC-732), or none, and then refuse every call.
     """
     box = live_support.make_sandbox(base)
     env = live_support.command_environment(box.home, box)
@@ -261,6 +269,11 @@ def make_session_sandbox(base):
     assert site.startswith(str(box.home) + os.sep), f"the user site folder {site} is not under the stand-in home"
     Path(site).mkdir(parents=True, exist_ok=True)
     (Path(site) / "gov-of-this-worktree.pth").write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    script = box.home / ".local" / "bin" / "gov"
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(f"#!{os.path.realpath(sys.executable)}\nimport sys\nfrom gov.cli.main import main\n"
+                      f"sys.exit(main())\n", encoding="utf-8")
+    script.chmod(0o755)
     return box
 
 
