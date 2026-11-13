@@ -40,6 +40,18 @@ allowed_paths:
 - tests/acceptance/W2-56/test_w2_56_environment.py  # the same
 - tests/acceptance/W2-56/test_w2_56_endings.py  # the same
 - tests/acceptance/W2-56/test_w2_56_refused_arguments.py  # the same
+- tests/acceptance/W1-28/w1_28_launch_support.py  # P-8 (a), CTO, DEC-1156 (7): older launch fixtures plant the role file and its named skills' copies; a test designer, one Rewrite-Reason a file, no assertion changed
+- tests/acceptance/W1-32/w1_32_launch_support.py  # the same
+- tests/acceptance/W1-46/w1_46_support.py  # the same
+- tests/acceptance/W1-50/w1_50_freeze_support.py  # the same
+- tests/acceptance/W2-116/w2_116_support.py  # the same
+- tests/acceptance/W2-136/w2_136_support.py  # the same
+- tests/acceptance/W2-20/w2_20_support.py  # the same
+- tests/acceptance/W2-56/w2_56_support.py  # the same
+- tests/acceptance/W2-56/w2_56_sandbox_support.py  # the same
+- tests/unit/resources/test_w2_20_unit_launch.py  # the same
+- tests/unit/resources/test_w2_20_round3.py  # the same
+- tests/unit/resources/conftest.py  # the same
 kpis:
   success:
   - 'gov launch <role> <ticket> starts the session as its role: the role''s text (its generated agent, or the role file''s text appended) is in the session''s context at its start, shown by a launched session''s log; the launch record holds the role file''s path, version and content hash. Verify: a planted role file and a launch of that role: the session''s first context names the role''s text, and the launch record holds the file''s path, version and sha256 [DEC-826 Q1, lens E F2] [Verify clause added, DEC-1157 (12)]'
