@@ -14914,6 +14914,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (2) **W2-60a P-1 (A), at the morning handover (DEC-1140 (4)), in this order:** an ACT giving ticket leads `--add-dir` for their own `-tests` worktree and the runs from `launch_now.sh` (class (b)); then a fresh CTO session started by the owner's operator with `--add-dir /home/usain/gov-os-worktrees --add-dir /home/usain/gov-os-runs` and `--remote-control`; then the owner's operator removes `permissions.additionalDirectories` from the main checkout's `.claude/settings.local.json`. Workers stay walled (DEC-313); W2-60a's half-done merge waits in its worktree (backup `merge-r4/`) until then. The ACT and the steps come in the 09:00 digest.
 - **Basis:** the owner's message of 2026-11-13 ~01:45.
 
+### DEC-1162 — W2-141 closed as built, its switch-on parked (DEC-1128 (2)); `yes ACT-CLAUDE-COPIES-6 85c9b1c7`
+- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~02:20; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1128 (2), DEC-953, DEC-1132 (1), DEC-1156 (3), DEC-1160 (2)
+- **Decision:**
+  - (1) **W2-141 (a):** closed as built (merged; acceptance 184/0 on integrate a8b0a9a41; reviews READY); its guard rule stays off under DEC-1128 (2) until set-up A's evidence shows 100 %; the switch-on is DECIDED-NOT-DONE row 108.
+  - (2) **`yes ACT-CLAUDE-COPIES-6 85c9b1c7`** (W2-33's generated copies; review PASS, `acts/ACT-CLAUDE-COPIES-6/review.md`): applied by hand by the owner's operator (`Role: owner`, the package's §4), as COPIES-4 and -5, after the CTO's hand merge of W2-33 and its template commit, so W2-33 lands tonight.
+- **Basis:** the owner's message of 2026-11-13 ~02:20.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15010,3 +15017,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.540 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1159 (the nightly beside the leads; W2-155 option 1, option 5 the fallback; the live reranker's limit). Next free id: DEC-1160. |
 | 0.541 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1160 (the nightly's minimum cap 7.5 GiB; W2-33's kernel role files approved, C0 Haiku low). Next free id: DEC-1161. |
 | 0.542 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1161 (P-W2-98-R2 (a); W2-60a P-1 (A) at the morning handover). Next free id: DEC-1162. |
+| 0.543 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1162 (W2-141 closed as built, switch-on parked; yes ACT-CLAUDE-COPIES-6). Next free id: DEC-1163. |
