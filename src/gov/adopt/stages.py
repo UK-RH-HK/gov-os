@@ -9,6 +9,7 @@ references and consumers are flagged in the plan.
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 from dataclasses import dataclass
@@ -32,6 +33,7 @@ MANIFESTS = ("pyproject.toml", "setup.py", "setup.cfg", "package.json", "Cargo.t
 REFS = "refs/gov/adoption"
 SEMANTIC_NOT_RECREATED = "SEMANTIC_NOT_RECREATED"  # the finding of a semantic store asked for and not recreated (W2-124)
 POLICIES = (EMBEDDED, "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
+SCAN_LIST_LIMIT = 1000  # paths named in SECRETS_UNSCANNED's details (the full list is the assessment's ``paths``)
 
 
 @dataclass
@@ -55,6 +57,9 @@ class Run:
 
 
 def run(root: Path, args, config: dict) -> dict:
+    if args.stage == "MA":  # in no chain, and it writes nothing in the repository: a clean tree is not its condition
+        project.require_commit(root)
+        return ma(Run(root, args, config, "MA", {}, {}, {}))
     project.require_repository(root)
     tracked = project.tree(root)
     if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
@@ -62,6 +67,38 @@ def run(root: Path, args, config: dict) -> dict:
     records, hashes = project.chain(root, tracked, args.stage)
     stage = STAGE[args.stage]
     return stage(Run(root, args, config, args.stage, tracked, records, hashes))
+
+
+def ma(run: Run) -> dict:
+    """The memory assessment and the refactoring plan (W2-88 S1, S2): files under ``--out``, none in the repository."""
+    from gov.adopt import assess, refactor_plan
+
+    out = getattr(run.args, "out", None)
+    if not out:
+        raise refuse("NO_OUT", "stage MA needs --out <folder>: where the assessment and the plan are written (a folder "
+                               "outside the project)")
+    out = Path(out).resolve()
+    assessment = assess.assess(run.root, out)
+    path_map = run.config.get("path-map.yaml")
+    made = refactor_plan.plan(assessment, path_map if isinstance(path_map, dict) else None, out)
+    blind = made["secrets_unscanned"]
+    if blind:  # the files are written (the assessment, the proposals found, PLAN.md); the result is not ok (B-1.5)
+        listed = blind["unscanned"] or sorted(assessment.get("paths") or [])
+        raise GovError("SECRETS_UNSCANNED", f"the secrets scan did not cover the repository ({blind['reason']}): "
+                       "the plan cannot say there is no secret in a tracked file; the assessment and the proposals found "
+                       f"are written under {out}", {"reason": blind["reason"], "unscanned": listed[:SCAN_LIST_LIMIT],
+                                                    "unscanned_count": blind["all"] or len(blind["unscanned"]),
+                                                    "proposals": made["count"],
+                                                    "kinds": [item["kind"] for item in made["proposals"]],
+                                                    "assessment": str(out / assess.FILE)})
+    return {"stage": "MA", "assessment": str(out / assess.FILE), "assessment_sha256": assess.sha256_of(out),
+            "plan": str(out / refactor_plan.FOLDER), "proposals": made["count"],
+            "kinds": [item["kind"] for item in made["proposals"]], "peak_rss_bytes": assessment["peak_rss_bytes"]}
+
+
+def a9(run: Run) -> dict:
+    from gov.adopt import fabric
+    return fabric.a9(run)
 
 
 def _coordination(root: Path) -> tuple[dict, dict]:
@@ -308,7 +345,28 @@ def _embedding_policies(config: dict) -> None:
                      none_embedded=bool(none))
 
 
+def _assessment(run: Run) -> dict:
+    """What A3's record says of the memory assessment (W2-88 R1 (b)): ``none`` without ``--assessment``; with it, the
+    sha256 of its ``memory-assessment.json`` for HEAD's commit (no proposal of it is copied), else ASSESSMENT_MISSING."""
+    from gov.adopt import assess
+
+    folder = getattr(run.args, "assessment", None)
+    if not folder:
+        return {"assessment": "none"}
+    head, file = resolve(run.root, "HEAD"), Path(folder) / assess.FILE
+    try:
+        data = file.read_bytes()
+        held = json.loads(data)
+    except (OSError, ValueError):
+        held = data = None
+    if not isinstance(held, dict) or held.get("commit") != head:
+        raise GovError("ASSESSMENT_MISSING", f"{folder} holds no {assess.FILE} for HEAD's commit {head}: run `gov adopt "
+                       "--lite --stage MA --out <folder>` first", {"assessment": str(folder), "commit": head})
+    return {"assessment": "sha256:" + project.sha256(data), "assessment_commit": head}
+
+
 def a3(run: Run) -> dict:
+    cited = _assessment(run)  # before anything is recorded
     _embedding_policies(run.config)
     proposal = _proposal(run.args.map)
     inventory = {item["path"]: item for item in run.records["A1"]["artefacts"]}
@@ -336,7 +394,7 @@ def a3(run: Run) -> dict:
         if "batch" in entry and entry["batch"] is None:
             entry["batch"] = last  # what A6 executes and the proposal put in no batch: one batch after the others
     artefacts = [entries.get(rel, {"path": rel, "action": "KEEP"}) for rel in inventory]
-    return run.finish({"proposal_sha256": project.sha256(Path(run.args.map).read_bytes()),
+    return run.finish({"proposal_sha256": project.sha256(Path(run.args.map).read_bytes()), **cited,
                        "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts})
 
 
@@ -548,4 +606,4 @@ def a8(run: Run) -> dict:
 
 
 STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
-         "A10": lite_gates.gate}
+         "A9": a9, "A10": lite_gates.gate, "MA": ma}

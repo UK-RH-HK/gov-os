@@ -15,7 +15,6 @@ class: integration
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
-- DAEO-zmo4  # W2-174: an adopted repository's tickets get their Verify clauses [added, DEC-1132 (2)]
 - DAEO-wahn  # W2-175: the role templates carry Policy 2's four refusals, DEC-861's record rule and the two-refusal stop, before EXAMIN's copy [added, DEC-1137 (3)]
 - DAEO-g0ip
 - DAEO-ym8a
@@ -31,17 +30,14 @@ depends_on:
 - DAEO-wnnz
 - DAEO-0pyc
 - DAEO-cv58
-- DAEO-ecac
 - DAEO-k7hz
 - DAEO-lrre
 - DAEO-l78m
 - DAEO-2bdu
-- DAEO-g87r
 - DAEO-h2k3
 - DAEO-jsg1
 - DAEO-a3u2
 - DAEO-n0wb
-- DAEO-6y0x
 - DAEO-57hm
 - DAEO-ouet
 - DAEO-wq2b
@@ -68,7 +64,6 @@ depends_on:
 - DAEO-f58b
 - DAEO-2tfd
 - DAEO-8s85
-- DAEO-ylsh
 - DAEO-ozyt
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**

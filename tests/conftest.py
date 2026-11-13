@@ -321,7 +321,7 @@ _CBM_TOOL = "codebase-memory-mcp"
 _CBM_MARK = ".gov-cbm-base"  # gov.codeintel.MARK
 # The suites (and the one file) that run the real code-graph tool (T-8); every other case runs without it, so none starts
 # a daemon outside the run's own folder. W1-41's adopt stage A3, W2-52's adopt stages, W2-69's rebuild, W2-92's code-graph route and W1-06's digest check need it (D-10).
-_CBM_SUITES = frozenset({"W1-16", "W1-20", "W1-41", "W2-52", "W2-69", "W2-92", "test_w1_06_digests.py"})
+_CBM_SUITES = frozenset({"W1-16", "W1-20", "W1-41", "W2-52", "W2-69", "W2-92", "W2-37", "test_w1_06_digests.py"})
 _cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
 _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
 
