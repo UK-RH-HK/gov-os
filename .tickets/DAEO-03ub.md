@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- docs/probes/DAEO-03ub/**  # the probe record (the resume after the emergency, DEC-1158; CTO)
 - src/gov/guard/decide.py
 - src/gov/guard/reads.py
 - src/gov/guard/bash_writes.py
