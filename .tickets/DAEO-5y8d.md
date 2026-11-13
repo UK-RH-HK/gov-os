@@ -70,3 +70,5 @@ every ticket that broke them is closed. Analysis: `.gov-runtime/scratch/orchestr
 - **E** (W2-23 S6): W2-176's 7th kernel hook (context_watch.py, hand merge 3430341c4) never reached `template/.rulesync/hooks.jsonc`; the owner's (a).
 
 A test designer revises the cases (`Rewrite-Reason: DEC-1163 (6)`); a product-spec worker adds the template's hook line; a narrow independent check; the land.
+
+- **Delegated (CTO, 2026-11-13 13:40, P3):** run 2 was LAUNCH_BLOCKED (the launcher refuses a product-spec worker on a test-designer ticket, `launcher.py:63`), so the CTO wrote E (a)'s one line on `w2/W2-182` (f0cb5284d) instead of changing the ticket's role (which would make core-mutation flag its acceptance paths); the narrow audit judges it.
