@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added), and to DEC-1126 on 2026-11-11 (re-pin window 5 done at 13:31: the live pin is `pin-797495bdfc70`, `pin-bcea09060ebc` kept for rollback; register v0.511, DEC-1128), to DEC-1150 on 2026-11-12, and to DEC-1159 on 2026-11-13 (DEC-1158 (4): the emergency of 2026-11-02 lifted, its section moved to "Lifted"; DEC-1157's and DEC-1159's changes marked; register v0.540; items the CTO's sweep `drafts/dif-sweep-20261113.md` only recommends are marked, not removed). Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added), and to DEC-1126 on 2026-11-11 (re-pin window 5 done at 13:31: the live pin is `pin-797495bdfc70`, `pin-bcea09060ebc` kept for rollback; register v0.511, DEC-1128), to DEC-1150 on 2026-11-12, to DEC-1159 on 2026-11-13 (DEC-1158 (4): the emergency of 2026-11-02 lifted, its section moved to "Lifted"; DEC-1157's and DEC-1159's changes marked; register v0.540), and to DEC-1164 on 2026-11-13 (the sweep `drafts/dif-sweep-20261113.md` decided: its markers replaced by the decided words; register v0.551). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -26,50 +26,58 @@ the machine and the governance):
 - **The idle check's record** (DEC-1110 (2)): a named, legitimate wait only.
 - Beside these, ordering rather than holding: the ready list and committed claims (DEC-1007); the queue, lands of two or
   three disjoint tickets, at most two of the three heavy slots (DEC-989, DEC-1157 (4), (10)); the disk gate (DEC-898);
-  the GPU budget and no spill (DEC-1039 (1b), DEC-1158 (3)); the nightly in its capped unit beside the leads (DEC-1159 (1)).
+  the GPU budget and no spill (DEC-1039 (1b), DEC-1158 (3)); the nightly in its capped unit beside the leads (DEC-1159 (1)),
+  the CTO making no commit on `w2/integrate` and leaving the main tree clean from 03:55 until it starts (DEC-1018 (1) as
+  changed by DEC-1164 (5)).
 
 ## The owner
 - R-11, R-8 (DEC-1050 (9), DEC-1057): a ping only when work waits on the owner (a blocking P1, an ACT a step waits on,
   LAUNCH_BLOCKED, ESCALATION, AUTH_REQUIRED) or an emergency; the rest in two digests a day (09:00, 18:00), one page
   each. Six parts only for a blocking P1, else question, options, recommendation; P1 only by DEC-957's rubric (§7). A
   delegated choice is a line in its ticket's file or close record, not a register entry. **Every decision that stops or
-  delays a lead comes to the owner at once, at any hour, as a full package (DEC-1157 (1)).**
+  delays a lead comes to the owner at once, at any hour, as a full package (DEC-1157 (1)), unless the owner has said they are
+  asleep (DEC-1156 (8)); then it waits for the morning package (DEC-1164 (23)).**
 - DEC-972, DEC-1021 (changed by DEC-1157 (1)), DEC-973: a ping is `tools/ping_log.sh`, `PushNotification`, `--result`; a blocking P1 "not sent"
-  by day falls back to `owner-ping`. Quiet hours 02:00 to 07:30, except a decision that stops or delays a lead (DEC-1157 (1)); an emergency pings at once at any hour (owner, D-3 answer 3); the morning package at 09:00.
+  by day falls back to `owner-ping`. Quiet hours 02:00 to 07:30, except a decision that stops or delays a lead (DEC-1157 (1)), unless the owner has said they are asleep (DEC-1156 (8)); then it waits for
+  the morning package (DEC-1164 (23)); an emergency pings at once at any hour (owner, D-3 answer 3); the morning package at 09:00.
 - DEC-991, corrected by DEC-1050 (8): `owner-ping` and `.claude/` paths ask; `rm` is free but the catastrophic (the
   hook refuses it); `sudo`, `git push` denied. A call that may ask is never chained; by day ping first; 02:00 to
   07:30 never run it: queue it (`log/approval-queue.jsonl`) for 09:00 (a reviewer's read-only probes allowed in the
-  quiet hours, DEC-1144 (7)). The quiet-hours ban on a call a lead waits on: (the 09:00 sweep: recommended to amend)
+  quiet hours, DEC-1144 (7)). A call a lead waits on is not queued: the CTO pushes the owner and runs it at any hour,
+  unless the owner has said they are asleep (DEC-1156 (8)); then it waits for the morning package (DEC-1164 (17), (23)).
 - DEC-957: the work order (the test designer from the spec, never the code; the engineer to the spec, never the tests;
   QA reads both, changes neither); installs only through the CTO's session.
 - DEC-974, DEC-1142 (8) (standing; changed by DEC-1157 (12)): a new WBS ticket is a P1 before it is filed; no new
   ticket and no split is filed without the owner's decision; leads name one, never file it. Widenings and KPI edits
   within a ticket's own purpose are the CTO's, listed for the owner's reading (DEC-1157 (12)). A defect inside a
-  closed ticket's scope reopened by the CTO (DEC-1088 (6)): (the 09:00 sweep: recommended to amend)
+  closed ticket's own scope and paths is reopened and fixed by the CTO, a P2 listed, landed on a narrow check
+  (DEC-1088 (6) as changed by DEC-1164 (18)); new scope is a new ticket, the owner's.
 - DEC-954 Q1: EXAMIN's copy on K9's entry criteria, never a date. DEC-952 (6): a fresh CTO session each morning; no handover by context size (O-3 refused).
 
 ## Machine and ACTs
 - O-6 (DEC-1057), scoping DEC-1038 (1) and DEC-1028 (6): an ACT only for a machine change, where it helps: installs, services, crontab,
   `.wslconfig`, `~/.local/bin` (the pinned gov), `~/.config`, `~/.ollama`, `~/.local/share`, environment files,
-  `.claude/` settings and hooks; exact commands, check and undo (DEC-925 (2)). No ACT for records. Until D-10, a
-  settings change runs its own scoped tests on a clone, not the full suite (owner, D-3 answer 5). **Every ACT is
+  `.claude/` settings and hooks; exact commands, check and undo (DEC-925 (2)). No ACT for records. A settings change
+  runs its own scoped tests and the DEC-866 sweep on a clone, never the full suite, which runs only in the nightly
+  (DEC-1057 (5), DEC-925 (2), as changed by DEC-1164 (10)). **Every ACT is
   rehearsed end to end, exactly as the operator will run it, in a scratch copy (its own clone) before it is handed
-  over; its stated counts are the rehearsal's (owner, standing, 2026-11-03).** After D-10, a full run per settings ACT
-  (DEC-1057 (5), DEC-925 (2)): (the 09:00 sweep: recommended to amend)
+  over; its stated counts are the rehearsal's (owner, standing, 2026-11-03).**
 - P-ACT-SPLIT (DEC-1058, owner, 2026-11-03; the shared servers' settings now (a), DEC-1104 (2)): (a) the operator's ACTs: the guard, its hooks, `.claude/` settings and generated
   files, the pinned gov, the sentinel, what the CTO's session runs on; (b) the CTO's ACTs on the owner's ping reply
   (crontab, the servers' settings, the CTO's watchers, `~/.config/gov-os*`, `~/.cache/gov-os`), only with a rehearsed
   rollback, the approval recorded verbatim in the ACT and `log/act-approvals.jsonl`, the report in the next digest.
-  Never the CTO's: `sudo`, `git push`, installs, irreversible deletion, secrets, its own permissions, quiet hours.
-  (b) in the quiet hours once a lead waits and the owner's yes is recorded: (the 09:00 sweep: recommended to amend)
-- DEC-1028 (6), scoped by O-6: while an ACT is applied, no commit touches its paths (`log/act-in-progress.txt`). G9
-  holding every queued ACT on that file: (the 09:00 sweep: recommended to amend)
+  Never the CTO's: `sudo`, `git push`, installs, irreversible deletion, secrets, its own permissions; in the quiet
+  hours only an emergency's rollback or a (b) ACT a lead waits on, once the owner's yes is recorded (DEC-1164 (11)).
+- DEC-1028 (6), scoped by O-6: while an ACT is applied, no commit touches its paths (`log/act-in-progress.txt`); the
+  operator's G9 holds only a queued ACT whose paths overlap that file's (DEC-1164 (14); G9's change by its own ACT,
+  class (O); until then a by-hand ACT holds the queue with an empty `land.txt`).
 - DEC-1038 (2)-(4) ((4)'s T1 band removed by DEC-1157 (5); a land holds at most two of the three heavy slots, DEC-1157
   (10), DEC-979 changed): the CTO's checkpoint to scratch (`tools/cto_checkpoint.sh`); `.wslconfig` unchanged until the RAM
   upgrade; the standing targets (a breach over 15 min an incident); every heavy job through `tools/heavy_slot.sh`
-  (each wait logged, DEC-1157 (13)). The fixed three slots and "only the owner may override": (the 09:00 sweep: recommended to amend)
+  (each wait logged, DEC-1157 (13)); the slot count from the machine, re-sized by the CTO within the week from the wait
+  log and the load; a slot held with no heavy work while jobs wait released by the CTO, a P2 (DEC-1164 (9)).
 - DEC-1039 (1b), (6), DEC-1037 (4), (5), O-A1, O-10 (DEC-1039 (1b)'s CPU term removed by DEC-1157 (5); its GPU budget
-  and no-spill kept and its "two or three leads" obsolete, DEC-1158 (3)): admission by the Load Balancer's forecast (`gate_check.py`
+  and no-spill kept; its "two or three leads" deleted, DEC-1158 (3), DEC-1164 (8)): admission by the Load Balancer's forecast (`gate_check.py`
   lifted); limits from the machine; `tools/tree_busy.sh`, never `pgrep -f`; a stop parks the queue's approvals.
 - DEC-1030, DEC-1015: the dispatcher watches the GPU and server logs (a crash or 0-layer load: inbox and push); a
   rebuild without its semantic store has failed.
@@ -81,7 +89,7 @@ the machine and the governance):
 - DEC-1065 (standing): no CPU fallback for embeddings anywhere (the shared GPU embedders unreachable: the semantic part
   unavailable, named, keywords answer; never a private embedder on the CPU, as the reranker's ACT-RERANK-WAIT-1);
   search respects role separation (`gov retrieve` filtered by the caller's `role_paths`, before W2-127 and the restart).
-  DEC-1064: sandboxed workers run no `gov retrieve` and no real-model test until then (W2-127 closed; DEC-1114 holds): (the 09:00 sweep: recommended to supersede)
+  Sandboxed workers search unranked, named and counted (DEC-1114 (3)); DEC-1064 (2)'s hold until W2-127 met (DEC-1164 (3)).
 - **Standing practice, the owner (2026-11-04):** whenever the CTO waits on the owner or the operator, it writes
   `log/cto-standby.txt` (what it waits for) and ends it when the wait ends, so the sentinel raises no false alarm;
   `tools/sentinel_check.sh` runs while `dispatch/sentinel-expected` exists (the sentinel's login, Remote Control,
@@ -90,6 +98,11 @@ the machine and the governance):
   `GIT_DIR`, and a test's `git init` re-initialised the main repository as bare on 2026-11-04 00:31); a process is
   stopped only by the pids a check named, never by a text match.
 - DEC-1045: no gitleaks scan here (`secrets.yaml` `scan: off`); a weekly full scan only on the owner's approval.
+- DEC-902 (1) (standing; changed by DEC-1164 (15)): the sweep (`.gov-runtime/scratch/orchestrator/tools/sweep.py`)
+  weekly (Monday) and whenever the disk gate nears its floor, at any time; never anything modified in the last 24 hours,
+  held open (`lsof`) or cited as evidence, a live session's or daemon's folder, `~/.cache`, a ticket in progress's
+  `~/gov-os-runs/` folder, the record worktree, EXAMIN's copy or the workbench. The 09:30 runs sweep back in the crontab
+  by its ACT (DEC-1164 (20)).
 - DEC-1040 (3), DEC-849: a false refusal is worked round at once by an equivalent form and named; a true one is taken.
 
 ## Tickets, tests, reviews
@@ -100,8 +113,8 @@ the machine and the governance):
 - DEC-968: scoped runs only (`tools/select_tests.py`); a close refused only by its own failure; no accepted reds.
 - DEC-959, DEC-988, DEC-989: every merge through the queue (`tools/land.py`), one per ticket; merge and close one step;
   except the refactoring's merges as built (D-1, D-4b: one review, READY by code, the CTO merges; DEC-1052, DEC-1055).
-  Lands in batches of two or three tickets with disjoint paths; no commit freeze during lands (DEC-1157 (4), (7)). A
-  critical-path ticket landing first: (the 09:00 sweep: recommended to amend)
+  Lands in batches of two or three tickets with disjoint paths; no commit freeze during lands (DEC-1157 (4), (7)); a
+  ticket on EXAMIN's critical path lands first (DEC-989 (2) as changed by DEC-1164 (19)).
 - DEC-995, DEC-996: a role is its reads and writes; a skill never widens it; mixed tickets split first.
 - DEC-1007, DEC-1012 (1), DEC-999: leads start only from `dispatch/ready.txt`, returns land in its inbox, one batch
   from `land.txt`, `status.txt` the truth; claims committed before a lead starts; two lines ready at all times (claim,
@@ -120,10 +133,11 @@ the machine and the governance):
 - DEC-1050 (its (5) superseded by DEC-1158; T-1, Q-1, G-1, G-2, O-7 kept): this repository kept; no full `gov check` in leads' runs (T-1); attribution once each way (Q-1); the
   landing refuses an acceptance-test change but the designer's or owner's (G-1); guard rules 1 and 5 judge only
   targets that resolve (G-2); review effort as it is (G-12).
-- DEC-1053: D-0 done; `w2/W2-78` and the in-flight branches with unmerged work wait for D-9. (the 09:00 sweep: recommended to amend)
-- DEC-1052, DEC-1055: the plan (`packages/LIFT-1/P1-PLAN.md`): G-14, D-3, D-4 beside D-4b (memory, as refactoring
-  work, no leads; D-4 two heavy slots, D-4b one and the rebuild lock), the final memory measure, re-pin window 3 and
-  the integration store, D-5 to D-9, D-10, the lift. No run the old way. D-4 to D-10 done; D-11 (the weekly basis review) not started: (the 09:00 sweep: recommended to supersede)
+- DEC-1053 (changed by DEC-1164 (12)): D-0 done; the CTO disposes of `w2/W2-78` and each in-flight branch with unmerged
+  work now (a P2, listed); one whose disposal could lose work goes to the owner first.
+- D-11 (DEC-1052's basis, trigger 3; DEC-1164 (2)): weekly, a basis review of everything in force with each item's
+  measured cost; the lift-or-remove list to the owner first; the sweep of 2026-11-13 was its first run. (The plan's
+  D-4 to D-10 and the lift are done: DEC-1052's plan bullet and DEC-1055's order spent.)
 
 ## Rules about rules
 - O-11, DEC-1012: a rule broken twice becomes a mechanism only if it passes DEC-1010's test; a slipped ceremony is
@@ -158,7 +172,7 @@ the machine and the governance):
   (green, then the owner lifts the emergency: DEC-1158 is that lift).
 - DEC-1157 (2026-11-12): **DEC-1138** whole (was: the lead cap of five through 11-12's working day; no new lead run after
   03:00 before the nightly; its (2) safety nets kept by DEC-1149 (1) and DEC-1157 (14), its (4) by DEC-1149);
-  **DEC-1156 (8)** (night pushes "until the owner says they are asleep": now at any hour, DEC-1157 (1)); DEC-1140 (2)'s
+  **DEC-1156 (8)** (night pushes "until the owner says they are asleep": at any hour, DEC-1157 (1); the asleep clause restored, DEC-1164 (23)); DEC-1140 (2)'s
   dispatcher lead cap and (5)'s "the night hold for the nightly stays"; DEC-1018 (1)'s landing hold; DEC-1021's quiet
   hours for a decision that stops or delays a lead; DEC-1032's CPU band, DEC-1038 (4)'s T1 band and DEC-1039 (1b)'s CPU
   term; ACT-DISPATCH-1's `max_leads`; the CTO's one land per batch; commit freezes during lands; the interface check as
@@ -166,6 +180,14 @@ the machine and the governance):
   all three heavy slots (DEC-979 changed). DEC-1149 (3): the usage stop (DEC-1140 (6)'s 97 % line; DEC-1115 (4)'s
   priority rule).
 - DEC-1159 (2026-11-13): DEC-1132 (4)'s "with nothing else running" for leads (the nightly runs beside them).
+- DEC-1164 (2026-11-13), the sweep decided: **DEC-946**'s priorities (items 1-6, 8, 9: "finish before you start", the
+  order of 10-29, "nothing else starts", staggered launches, the nightly frozen; its item 7 kept); **DEC-1141 (6)** and
+  ACT-OPERATOR-HOURS-1/2's night sleep (DEC-1142 (5); G9's two time holds); **DEC-1064 (2)**'s hold until W2-127 (met);
+  DEC-1039 (1b)'s "even if that limits leads to two or three"; the prompt's DEC-942 load wait, verify and rebuild locks,
+  close windows and pre-close gate, red-nightly hold, night wait for lead-stopping P1s, usage limits and spent "until
+  a closed W2 ticket" holds (the owner's prompt edit, DEC-1164 (21)). **Spent:** DEC-1052's plan bullet and DEC-1055's order (D-4 to
+  D-10 and the lift done); DEC-1086 D; DEC-1087 (1)-(11); DEC-1093 (1)'s close form for W2-139 and W2-140 (closed 2026-11-13); DEC-1097 (1)(g) and (9)'s holds for the 80; DEC-1098 (6);
+  DEC-1115 (4); DEC-1122 (3).
 
 ## Approved restarts by class (owner, O-6)
 Approved (owner, DEC-1057 (4), D-3 answer 4, 2026-11-03): the five classes in `governance/project/orchestration/RESTART-CLASSES.md`
@@ -176,8 +198,9 @@ other restart is an ACT.
 - DEC-1067 (standing for D-4b; its (b) changed by DEC-1071: a structural fix judged on all 80; its (f) by DEC-1090,
   DEC-1095 (the reranker's request cap measured, 64) and DEC-1159 (2) (`MAX_REQUEST_CHARS` about 48,000 after one GPU-window reading, option 5 the fallback)): the memory measure's hidden half never chooses a method (adopted only if it wins on
   the visible half alone; the hidden half reported separately; hidden ranks never in the index or on integrate);
-  labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; no measure or
-  rebuild beside one; the GPU back in budget between); no install until the owner decides the bigger models. GPU safety's "no measure or rebuild beside one" (with prompt rule 8's commit freeze): (the 09:00 sweep: recommended to amend)
+  labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; a measure and a
+  rebuild never use the GPU at the same time; the GPU back in budget between; no commit freeze during a measure,
+  DEC-1164 (13)); no install until the owner decides the bigger models.
 - DEC-1068 (2026-11-04): re-pin window 3 done (`pin-8284fb408bd4` live, registry `b05f62b8`; the integration store at
   `8284fb40` with `embed_headers` on); class 3 gains the force-stop (SIGKILL 30 s after SIGTERM); the reranker's memory
   release (W2-112) goes into window 4; h02, h24 and any hidden label are corrected by the owner's operator, outside the
@@ -285,25 +308,9 @@ other restart is an ACT.
   (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
   (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
   first; the fresh 80 unused until the owner decides what it measures. Basis: 1.
-- DEC-1086 (2026-11-06; its C's cap changed by DEC-1091 (1): no cap): S11 re-worded ("within 2 of the harness on the 138"; speed against the pin in window 4);
-  W2-135, a 4,000-character cap per item (a guard against one-line files; the total size tested in E5); the
-  search-again reader sees the 138 (no tools, no transcript, counts only; the pilot, then the owner's cap). Recorded,
-  acted on only at the owner's go: no re-pin and no experiment before the owner reads the seven answers. Basis: 1.
-  The spent "no re-pin and no experiment before …": (the 09:00 sweep: recommended to supersede)
-- DEC-1087 (2026-11-06): before re-pin window 4, all done and tested:
-  - W2-135 and S11 (DEC-1086);
-  - the integration store refreshed now (if safe);
-  - W2-116's refresh after every merge, the daily backstop and the worktree store path;
-  - W2-129 (`gov links`);
-  - the dependency-mapping tool's decision, spec and KPI package (its home and timing assessed);
-  - the status block fixed (countdown, (a) to (d), the sixth line);
-  - a clean tree and the worktree list;
-  - window 4 as a rehearsed ACT;
-  - dates re-estimated.
-
-  After the re-pin: the parallel-agents and memory test first, then E0 to E5 and the fresh 80; M3's adoption after
-  all the experiments. The three layers stay in Wave 2 (reversing W3-P23): after the lift, streams and a trial plan
-  as a package. Basis: 1. The spent "before re-pin window 4" list: (the 09:00 sweep: recommended to supersede)
+- DEC-1087 (13) (2026-11-06): the three layers (the CTO as master, a Senior Engineer per stream, its leads and agents)
+  stay in Wave 2 (DEC-1156 (3)); its (1)-(11), the items before re-pin window 4 and the experiments' order, are spent
+  (DEC-1164 (7)). Basis: 1.
 - DEC-1088 (2026-11-06; its (5)(a) changed by DEC-1157 (9): a dependency merged into `w2/integrate` counts as met for
   starting, by `plan_override: DEC-1157` on the ticket, closing still waits for it to be closed; the product's plan check
   reading "merged" parked to Wave 3): `gov plan`, W2-136:
@@ -316,8 +323,8 @@ other restart is an ACT.
     for.
 
   **Standing:** a closed ticket is never edited (a fix or upgrade is a new ticket); an open ticket may change, marked
-  with the decision that made it, and `gov links` flags a change without one. Basis: 2. The standing "a closed ticket
-  is never edited" for a defect inside its own scope: (the 09:00 sweep: recommended to amend)
+  with the decision that made it, and `gov links` flags a change without one; a defect inside a closed ticket's own
+  scope and paths is reopened and fixed by the CTO (DEC-1164 (18)). Basis: 2.
 - DEC-1089 (2026-11-07): re-pin window 4 done (`pin-bcea09060ebc` live; `pin-8284fb408bd4` kept for rollback); the
   go for START-NEXT-SESSION §4, the parallel-agents test's result to the owner **before E0**. **K7 done for Wave 2**:
   the pin ladder by hand until Wave 3 (W2-17, W2-18 Wave 3); the first numbered, frozen release (cut by the owner,
@@ -340,11 +347,11 @@ other restart is an ACT.
   80 runs; on the 80 every condition may be measured, only the one chosen beforehand is judged. Basis: 1.
 - DEC-1093 (2026-11-07): the CAP-45.a note approved (4.3; CAP-45 and CAP-45.a to Wave 3; the "in Wave 2" clause
   withdrawn, hashes kept beside the signed tag); **W2-139** (`DAEO-ongl`, the apply) and **W2-140** (`DAEO-5ce2`, W2-49's
-  tests) merge and close in one batch, one green run, outside an experiment window; DEC-841's nine to P1-11, else
+  tests), closed on 2026-11-13 by DEC-953's practice (the one-batch close form spent, DEC-1164 (1)); DEC-841's nine to P1-11, else
   exceptions in W2-46's record. **W2-141** (`DAEO-xwro`): the guard refuses an engineer's Grep, Glob or recursive Bash
   search that can reach its own acceptance folder unless excluded (saying how), at the lift's re-pin ACT; **until then
   every engineer brief carries the exclusion line.** ADR-0002 refreshed, reviewed, to the owner, after the experiments.
-  Basis: 2. The spent W2-139/W2-140 sequencing: (the 09:00 sweep: recommended to supersede)
+  Basis: 2. (W2-139 and W2-140 closed on 2026-11-13 by DEC-953's practice: their close form is spent, DEC-1164 (1).)
 - DEC-1094 (2026-11-07): **G1:** profile the shared reranker (GPU utilization in a 20-search burst, each request's time
   split); if the GPU idles between requests, (b) batching as a new ticket, tests first, live at the lift; if saturated,
   fewer scored pairs per search after E3 to E5; (a) only beside (b). **Search again once** is the standing practice
@@ -376,8 +383,8 @@ other restart is an ACT.
   Q07/Q14 after the 80; the label audit at each release cut and before a new verdict set (rubric v3 after the 80); the
   embedder trial a Wave 3 row; the keystone count from the plan's list; the old window scripts fixed or retired.
   **Standing:** every decided item with a stage trigger enters `packages/DECIDED-NOT-DONE.md` when decided, ticked off
-  with its commit when done. Basis: 1 and 2. The spent "W2-139 and W2-140 held": (the 09:00 sweep: recommended to
-  supersede); "no commit … during the run" as carried by prompt rule 8: (the 09:00 sweep: recommended to amend)
+  with its commit when done. Basis: 1 and 2. (Its holds for the 80's run, on commits, rebuilds, GPU windows and W2-139
+  and W2-140, spent with the 80: DEC-1164 (7); prompt rule 8's general freeze removed: DEC-1164 (13).)
 - DEC-1098 (2026-11-09): **the fresh 80 accepted; K9's memory line met.** **Standing: Gov OS's memory standard** is
   the measured configuration (the 0.6B reranker, the pool on, today's 6,000-token bundle widened to sections, agents
   searching again once), and every adopted repository builds it at Wave 0 by W2-88's practice and proves it with its
@@ -386,9 +393,8 @@ other restart is an ACT.
   sitting accepted (A-G; H1 (b): open and in-progress tickets only, KPI 4 changed; H2 as recommended). **A
   sandbox-and-guard experiment before W2-56 builds** (bar: every action judged right, 100 %; path-map guard alone
   against guard plus generated sandbox; the guard alone kept if the pair cannot reach it; the design to the owner
-  first). ADR-0002 accepted, re-read at the lift's re-pin. The work in order: item 8, Q07/Q14, W2-139/W2-140, the
-  sitting, D-5 and D-6 part 2, D-10 on the owner's word, the lift. Basis: 1, 2 and 4. The spent "the work in order":
-  (the 09:00 sweep: recommended to supersede)
+  first). ADR-0002 accepted, re-read at the lift's re-pin. Basis: 1, 2 and 4. (Its (6), the work in order to the lift,
+  spent: DEC-1164 (7).)
 - DEC-1099 (2026-11-09): **the sandbox-and-guard experiment approved** (write scope in the bar; names-only listings of
   held-out material allowed; the CTO's session unsandboxed; an outside labeller, a second on 10 %; the held-out halves
   sealed by a path-map ACT; three rounds; a held-out failure reported, not fixed; if both miss, tuned A as an ACT only
@@ -482,9 +488,8 @@ other restart is an ACT.
   (the CLI's config.lock placeholders, P-S7) is W3-P29.
 - DEC-1115 (2026-11-09; its (4) changed by DEC-1122 (2): brought forward to 11-10, until the reset 11-15 09:00): yes to ACT-SETS-GLOBS-1 (the owner's operator by hand) and ACT-CLAUDE-COPIES-1 (the operator
   agent, its first live run; on a refusal the CTO says why and the operator applies by hand; the agent's yes form is
-  `yes ACT-<id> <manifest sha8>` on its own line); TPL-6's Appendix A applied now. **Standing until the lift: past 80 %
-  of the week's usage, only the lift's critical path runs; the rest waits for the reset.** Basis: 2 and 4. (Its (4)
-  changed by DEC-1149 (3): usage never stops a lead or a worker.) The spent (4): (the 09:00 sweep: recommended to supersede)
+  `yes ACT-<id> <manifest sha8>` on its own line); TPL-6's Appendix A applied now. Basis: 2 and 4. (Its (4) spent at
+  the lift, DEC-1164 (7); usage never stops a lead or a worker, DEC-1149 (3).)
 - Delegated (CTO, 2026-11-10, DEC-1112 (3)): set-up A's seeds by the launch script's own draw, written to SEEDS.log
   before any content (the declaration's amendment A5; option (2) of the wiring lead's DEC-105 choice: commit-derived
   seeds are knowable in advance); the wiring's proposals taken: W2-149's allowed paths gain the walls' kinds.yaml and
@@ -534,10 +539,8 @@ other restart is an ACT.
   reason; every spawn names model and effort; the spend log records tier, class and promotion. Basis: 4.
 - DEC-1121 (2026-11-10): the ticket template gains `class` as version 1.0.1 (W1-08's DEC-105 case, (a)); its hash to
   the owner before it lands. Basis: 2.
-- DEC-1122 (2026-11-10): the ticket template 1.0.1 approved (`bbfc068e58e2`); **usage (A) from now until the reset
-  11-15 09:00: only the lift's critical path runs** (DEC-1115 (4) brought forward; **(A) ended at the lift, DEC-1126 (2)**); D-10 goes once ACT-PATHMAP-NS-2 is
-  committed and gov check is green, the triage of the first run's reds to the owner; a fresh CTO session at the next
-  quiet point. Basis: 1 and 2. The spent usage (A) and D-10 go: (the 09:00 sweep: recommended to supersede)
+- DEC-1122 (2026-11-10): the ticket template 1.0.1 approved (`bbfc068e58e2`); its usage (A) ended at the lift (DEC-1126
+  (2)) and its D-10 go spent (DEC-1164 (7)). Basis: 1 and 2.
 - DEC-1123 (2026-11-10): D-10 run 2 by option 1 (the lifted step alone, the fixes by role, run 2 from a normal shell);
   context-reproducibility's 34 errors fixed in the records now (product-spec, Sonnet); **standing until W2-115:
   `product-traceability-trailers` counts as a warning, not a hard block (Q-8), for D-10, the re-pin and the lift**;
@@ -614,10 +617,9 @@ other restart is an ACT.
   at any hour, a report only** (an exception to DEC-1089 (3); the 97 % stop changed by DEC-1149 (3)). Basis: questions 2 and 4.
 - DEC-1141 (2026-11-12; (3) and (6) standing): W2-11's K3 CIT-P approved at `dca382f3069f`; W2-176's approval withdrawn (its cap);
   **no token cap for any session** (CTO, leads, workers, helpers): full window and compaction, the hook writing the checkpoint and the
-  read-first line (DEC-1118 (A) replaced entirely; DEC-1140 (4) corrected); hand merges of W2-175 and W2-176 tonight; **the operator
-  agent asleep only during the nightly** (by ACT at 08:00; with the night hold gone, DEC-1157 (2): until its crontab ACT
-  the operator does not launch from 02:10 to 08:00). Basis: questions 2 and 4. (6), with DEC-1104 (2)'s G9 and
-  ACT-OPERATOR-HOURS-1/2: (the 09:00 sweep: recommended to supersede)
+  read-first line (DEC-1118 (A) replaced entirely; DEC-1140 (4) corrected); hand merges of W2-175 and W2-176 tonight.
+  Basis: questions 2 and 4. (Its (6), the operator asleep during the nightly, superseded by DEC-1164 (4): the operator
+  runs every hour, ACT-OPERATOR-HOURS-3, DEC-1163 (5).)
 - DEC-1142 (2026-11-12, (8) (9) standing): W2-176's no-cap bytes approved at `3b6c5cb79d39` (ACT-CONTEXT-WATCH-1 (a), the
   matcher `Bash`); P-W2-23-8 (a); W2-115 PK-1 (a)+(c) (DEC-903's overlay list names the template's `close.yaml`); W2-148
   S15 option 2 (the home settings a fixed class (b)); ACT-OPERATOR-HOURS-1 (a), keep `0210`, and -2 (a); ACT-DISPATCH-1's
@@ -676,7 +678,7 @@ other restart is an ACT.
 - DEC-1155 (2026-11-12): P1-N (a) W2-172 widened by W2-171's F5 case for one revision, under a narrow check; a sweep of
   every acceptance test for the two ejection defects (a path case judging any branch; a hygiene check tripped by the
   queue's folder), `drafts/ejection-sweep-20261112.md`. Basis: the owner's answer (no question named).
-- DEC-1156 (2026-11-12, (7) standing; (8) superseded by DEC-1157 (1)): ROUTE-1 (a); P-W2-120-1 (b) (the "no output
+- DEC-1156 (2026-11-12, (7) standing; (8) superseded by DEC-1157 (1), restored by DEC-1164 (23)): ROUTE-1 (a); P-W2-120-1 (b) (the "no output
   class" half deferred); W2-33 option A (its Interface; `senior-engineer.md`, the three layers in Wave 2 by DEC-1087
   (13)); W2-113 PKG-1 (a), PKG-2 (b); P-W2-98-IF-1 (a); W2-157's and W2-159's F4 fixed now (W2-181 back from W3-P31);
   **standing: a test revision that only records a behaviour the owner already decided, and a path case that judges any
@@ -685,8 +687,8 @@ other restart is an ACT.
   by DEC-1157). Basis: the owner's answers (no question named).
 - DEC-1157 (2026-11-12, standing): **every rule that holds or delays a lead is removed, except what protects the
   machine and the governance** (the list at the top, (14)): (1) every decision that stops or delays a lead to the owner
-  at once, at any hour, as a full package; (2) no night hold: no lead start or landing held for the nightly
-  (`night_hold.py` stopped; the operator's cron line still sleeps 02:10-08:00 until its crontab ACT, class (b)); (3) the
+  at once, at any hour, as a full package (unless the owner has said they are asleep, DEC-1164 (23)); (2) no night hold: no lead start or landing held for the nightly
+  (`night_hold.py` stopped; the operator runs every hour by ACT-OPERATOR-HOURS-3, DEC-1164 (4)); (3) the
   CTO states each ticket's interface at claim, before its lead takes a slot (a lead returns an interface package only
   for a gap the statement leaves); (4) lands in batches of two or three tickets with disjoint paths; (5) no CPU band
   (`cpu_band` [0, 1000]); (6) two lines ready at all times (claim, worktree, brief); (7) no commit freeze during lands
@@ -714,6 +716,17 @@ other restart is an ACT.
   option 1 (`MAX_REQUEST_CHARS` from 24,000 to about 48,000 after one GPU-window reading of the per-request peak; option
   5, the warm p95 a named red, the fallback; DEC-1067 (f) changed); **standing: no worker sends the live shared reranker
   requests above its limit outside a GPU window.** Basis: the owner's answers (no question named).
+- DEC-1164 (2026-11-13, (4), (5), (9)-(19), (23) standing): **the DIF sweep decided** (`drafts/dif-sweep-20261113.md`): DEC-946
+  (1-6, 8, 9), DEC-1141 (6), DEC-1142 (5) and DEC-1064 (2)'s hold superseded; the operator runs every hour (HOURS-3);
+  no CTO commit from 03:55 until the nightly starts; heavy slots from the machine, re-sized from the wait log, a starved
+  slot released by the CTO; settings ACTs on scoped tests only; a (b) ACT a lead waits on at night once the yes is
+  recorded; the D-9 branches disposed by the CTO; a measure and a rebuild never share the GPU, no commit freeze during a
+  measure; G9 holds only overlapping ACTs; the sweep at any time; packages a lead waits on bypass the cap; a call a lead
+  waits on runs at night after a push; a defect in a closed ticket's own scope reopened by the CTO; critical-path
+  tickets land first; the runs sweep back by ACT; spent sequencing archived (DEC-1093 (1)'s close form for W2-139 and W2-140 among it);
+  the prompt's lifted holds removed; **a decision that stops or delays a lead goes to the owner at once, at any hour, unless the
+  owner has said they are asleep (DEC-1156 (8)); then it waits for the morning package** ((23)). Basis: the owner's acceptance of
+  the sweep, 2026-11-13.
 - DEC-1168 (2026-11-13, (1) standing): **a launched worker's sandbox allows exactly one network entry, `127.0.0.1:<port>` for the shared reranker's token-guarded TCP route (W2-186, built after EXAMIN's copy starts); never a bare host; `sandbox.faults` refuses any other** (changes DEC-158 and DEC-1114 S9). Basis: SANDBOX-1-B4 (a), B3's probe.
 - DEC-1169 (2026-11-13, (2) standing): **in each status block, beside the ticket total, every ticket added since the last report is named with the owner's decision that approved it.** Basis: the owner's words.
 - DEC-1170 (2026-11-13, standing): **the gitleaks scan stays off on this repository: a private, local development repository, nothing public**; not raised again; it stays built and tested in the product (changes DEC-1045 from a measure to a standing decision). Basis: the owner's words.
