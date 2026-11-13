@@ -450,6 +450,15 @@ def _composed(appended: bytes, template: bytes) -> bytes:
     return (appended if appended.endswith(b"\n") else appended + b"\n") + b"\n" + template
 
 
+def _worker_deny(deny: list[str], records: Path, user_deny: list[str]) -> list[str]:
+    """A worker's deny list: ``build_settings``' rules, the record folder's two rules, the user's; each once, in that
+    order. The record folder's rules always stand in their own place, whether or not the folder existed when
+    ``.gov-runtime`` was listed (W2-56 S3: one list on every launch; W2-60a S8: the folder denied by two literal rules
+    once each)."""
+    own = record.deny_rules(records)
+    return list(dict.fromkeys([rule for rule in deny if rule not in own] + own + user_deny))
+
+
 def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict) -> dict:
     """W2-60a, before the gate: the role read once, its model and effort, the resumed session's record, and the
     settings a worker session gets on top of ``build_settings`` (the record folder's deny rules, the user's ask and
@@ -473,7 +482,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
     resumed = record.original(records, given["resume"], role, ticket_id) if given["resume"] else None
     deny = settings["permissions"]["deny"]
     # The user's ask and deny rules only: never an allow rule or a mode, which would take a protection away.
-    settings["permissions"]["deny"] = list(dict.fromkeys(deny + record.deny_rules(records) + user_rules["deny"]))
+    settings["permissions"]["deny"] = _worker_deny(deny, records, user_rules["deny"])
     if user_rules["ask"]:
         settings["permissions"]["ask"] = list(dict.fromkeys(user_rules["ask"]))
     settings["autoMemoryEnabled"] = False  # DEC-826 Q5: no model-side memory

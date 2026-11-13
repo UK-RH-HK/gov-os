@@ -163,6 +163,20 @@ def test_the_main_checkout_s_own_launch_is_unchanged(tmp_path):
         launcher._check_repository_settings(main)
 
 
+def test_the_deny_list_is_the_same_before_and_after_the_record_folder_exists(tmp_path):
+    """W2-56 S3 with W2-60a S8: the first launch makes ``.gov-runtime/launches``; the next launch's deny list holds the
+    same rules in the same order, each once, the folder named by its two literal rules."""
+    root = tmp_path.resolve()
+    records = root / ".gov-runtime" / "launches"
+    before = launcher.build_settings(root, "engineer", "T-1")["permissions"]["deny"]
+    assert record.folder(root) == records
+    after = launcher.build_settings(root, "engineer", "T-1")["permissions"]["deny"]
+    merged = [launcher._worker_deny(deny, records, ["Edit(/elsewhere)"]) for deny in (before, after)]
+    assert merged[0] == merged[1]
+    assert len(merged[0]) == len(set(merged[0]))
+    assert all(merged[0].count(rule) == 1 for rule in record.deny_rules(records))
+
+
 def test_the_record_s_folder_keeps_its_messages(tmp_path):
     (tmp_path / "tree").mkdir()
     (tmp_path / "tree" / ".git").write_text(f"gitdir: {tmp_path}/nowhere\n", encoding="utf-8")
