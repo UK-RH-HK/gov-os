@@ -20,6 +20,10 @@ from gov.cli.errors import GovError
 PRECEDENCE = ("charter", "contract", "decision", "specification", "ticket")
 PRECEDENCE_RANK = {kind: i for i, kind in enumerate(PRECEDENCE)}
 DEFAULT_BUDGET = 6000
+SUPPLEMENTARY_CAP = 6000  # the most supplementary context a packet carries, whatever its budget (DEC-1165 (2))
+CLOSE_BUDGET_KEY = "budgets.close_context_tokens"
+FACTS_REL = "governance/project/facts.yaml"
+SETTING_INVALID = "CONTEXT_SETTING_INVALID"
 TOKEN_CHARS = 4
 BRIEF_LIMIT = 2500
 EXTERNAL_REFERENCES_REL = "governance/project/external-references.yaml"
@@ -34,6 +38,42 @@ _HELD_FORM = re.compile(r"DEC-\d+|ADR-\d+|CAP-\d+(\.[a-z]+)?|MR-\d+|L-\d{4,}|W\d
 
 def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
+
+
+def close_budget(root: Path) -> int:
+    """The ceiling ``gov close`` builds a ticket's packet at: the project's ``budgets.close_context_tokens`` (DEC-1165).
+
+    ``DEFAULT_BUDGET`` where the project has no ``governance/project/facts.yaml``, no ``budgets:`` mapping or no such
+    key. A setting that is not a whole number of at least 1 (a bool, a float and a quoted number included), and a
+    facts file that cannot be read, is not valid YAML or is not a mapping, refuse as ``CONTEXT_SETTING_INVALID``:
+    never a silent default, never a crash (DEC-449).
+    """
+    import yaml
+
+    path = Path(root) / FACTS_REL
+    if not path.is_file():
+        return DEFAULT_BUDGET
+
+    def invalid(why: str, **details) -> GovError:
+        return GovError(SETTING_INVALID, f"{FACTS_REL}: {why}", {"key": CLOSE_BUDGET_KEY, "file": FACTS_REL, **details})
+
+    try:
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError) as exc:
+        raise invalid(f"the file cannot be read, so {CLOSE_BUDGET_KEY} is unknown: {exc}", value=None) from exc
+    except yaml.YAMLError as exc:
+        raise invalid(f"the file is not valid YAML, so {CLOSE_BUDGET_KEY} is unknown: {exc}", value=None) from exc
+    if document is None:
+        return DEFAULT_BUDGET  # an empty file has no setting
+    if not isinstance(document, dict):
+        raise invalid(f"the file is not a mapping, so {CLOSE_BUDGET_KEY} is unknown", value=None)
+    budgets = document.get("budgets")
+    if not isinstance(budgets, dict) or "close_context_tokens" not in budgets:
+        return DEFAULT_BUDGET
+    value = budgets["close_context_tokens"]
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:  # bool is an int: checked first
+        raise invalid(f"{CLOSE_BUDGET_KEY} is {value!r}, not a whole number of tokens of at least 1", value=value)
+    return value
 
 
 def _read_record(root: Path, record: dict, ticket: str) -> tuple[str, str]:
@@ -345,7 +385,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     # Supplementary context: in batches, ranked and stacked into the room the mandatory part leaves (DEC-860)
     skip_paths = {ticket_rel} | {rec["path"] for rec in resolved if not rec.get("in_register")}
     skip_entries = {rec["id"] for rec in resolved if rec.get("in_register")}
-    block = _try_supplementary(root, str(front.get("title", "")), _kpi_lines(front), limit - mandatory_tokens,
+    block = _try_supplementary(root, str(front.get("title", "")), _kpi_lines(front),
+                               min(limit - mandatory_tokens, SUPPLEMENTARY_CAP),  # DEC-1165 (2): at most 6,000
                                skip_paths, skip_entries, role, ticket)  # S5-F1: the packet's ticket too
     supplementary, left_out = block["supplementary"], block["left_out"]
     # one order whatever order the retrieval returned its items in (DEC-768): an entry is its id and its reason,

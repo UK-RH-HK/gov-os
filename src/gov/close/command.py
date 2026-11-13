@@ -505,11 +505,11 @@ def _build_context(root: Path, ticket: str) -> dict:
     cannot run, or when it finds the register itself contradictory.
     """
     import sqlite3
-    from gov.context import context as build_context
+    from gov.context import close_budget, context as build_context
     from gov.decisions import check as check_decisions
 
     try:
-        packet = build_context(root, ticket)
+        packet = build_context(root, ticket, budget=close_budget(root))  # the project's setting (DEC-1165 (1))
     except GovError as e:
         raise _Finding("CONTEXT_FAILED",
                        f"the context of {ticket} cannot be built: {e.code}: {e.message}",
