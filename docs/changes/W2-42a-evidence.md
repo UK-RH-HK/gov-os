@@ -214,3 +214,21 @@ with tests/unit/guard: **1416 passed, 2 xfailed**; with tests/unit/hooks, pause,
 lines), no lift form the base found is lost, and each of the 39,319 commands whose answer changed toward free, run in
 real bash with a stand-in `gov`, neither writes the acceptance folder nor runs the lift form where the new guard leaves
 it free.
+
+**F1 and F4 of the apostrophe fix (DEC-1174 (1), APOS-3/APOS-4).** `heredocs` (`src/gov/guard/bash_writes.py`) now
+follows `${…}`, quoted or not and at any depth: a `#` in it starts no comment, the first plain `}` closes it, a nested
+`${` nests, quotes pair as outside it, `<<` in it is text, and an unclosed `${` (bash runs nothing of such a line) is
+`UnclosedQuote`; `${#v}`, `${v#a}` and `$#` read as before. `<<<` is a here-string, no longer taken for a heredoc whose
+delimiter is its word (which also stops the lines after `cat <<< EOF` being swallowed as a data body). A here-string
+only data readers take is read; one a command may run (`bash <<< …`, `cat <<< … | sh`, an unknown program) stays
+unreadable as before. Fail closed: where the new reading cannot read a command, `judge` reads it again with
+here-strings as data and with the earlier comment rule, and returns those targets with what an unreadable command
+gets (the line parser, the unresolvable target for a quote open or in a comment); an unquoted shell heredoc's
+substitutions are judged on its whole text, comments too, since the shell feeding it runs them (the base let
+`bash <<EOF` / `# note $(touch tests/acceptance/…)` through). Departure 1 (`python3 -c` writes) is unchanged.
+**Counts:** test_w2_42a_apostrophe_2.py went from 28 failed, 52 passed to **80 passed**; test_w2_42a_apostrophe.py
+**312 passed**; the acceptance folder with tests/unit/guard **1535 passed, 2 xfailed**; with tests/unit/hooks, pause,
+containment and tests/acceptance/W1-28 **1847 passed, 2 xfailed, 2 failed** (test_live_hook's `rm -f ~/.bashrc` cases,
+failing alike on c461d79de with the sandbox's scratch HOME). **Fail closed:** across 136,925 generated commands (`${…}`,
+comment, here-string and write fragments under five wrappers), each of the 11,117 whose answer changed toward allow,
+run in real bash with a stand-in `gov`, neither writes the acceptance folder nor runs the lift form.
