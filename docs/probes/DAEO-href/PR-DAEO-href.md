@@ -2,12 +2,16 @@
 type: probe
 task: DAEO-href
 reviewer_session: 26fdc72a-0754-4aeb-ac3b-e32f68fe2d15
+narrow_check_session: ffb9f8d2-3ade-462a-af18-6cf9c4c73cc7
 implementer_session: b1f27b65-a5cf-47c1-aa82-f46022cc2690
+revision_test_designer_session: 4c28878e-4aa4-4e68-addb-9e4e7d7c6776
 reviewer_wrote_nothing: true
 commissioned_by: orchestrator (W2-183 ticket lead)
 judged_by: orchestrator (W2-183 ticket lead)
 judgement: pass
 probed_commit: e0c076514c9dbbf84d8fca72a93c37b7fa60847b
+narrow_check_judgement: pass
+narrow_check_commit: 8b0056d783705c6eba1874a752a0b35d807e8358
 ---
 
 # Probe record: W2-183 (DAEO-href) gov close's context packet at a project setting; the supplementary cap, STANDARD review
@@ -85,4 +89,46 @@ Judgement: **pass**
 ```
 
 decisions: DEC-1165, DEC-1027, DEC-860, CAP-15.d, DEC-801, DEC-808, DEC-1010
+guard_refusals: none. The only refusal was the mandated sandbox-check write in step 0 (a), which is expected to fail.
+
+## Narrow independent check (head 8b0056d78370): PASS
+
+### The lead's judgement
+
+- **The decision:** P-W2-183-1 (a) (CTO, 2026-11-13, delegated; DEC-1156 (7); recorded in the ticket's body, aa4d460ff). W2-54's case `test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing` (old `:172`) is revised to the capped room by a test designer, then gets a narrow independent check of that revision only. There is no new review round (DEC-1010). Round 1's verdict above stands as written.
+- **The revision:** `b2b0c4ed94b9` (independent test designer, claude-sonnet-5-5, high, C2; session `4c28878e-4aa4-4e68-addb-9e4e7d7c6776`), merged in `8b0056d78370`. It touches one file, `tests/acceptance/W2-54/test_w2_54_dropped_order.py` (+28/−5), and carries `Rewrite-Reason: DEC-1165 (2)` in the docstring and in the trailer.
+  - The designer chose the second form of the decision: the stand-in's evidence stays under 6,000 tokens. The case's project is the shared corpus without `docs/charter/big.md`: one line of about 25,000 to 36,000 tokens, which no room under the cap can hold, so `min(room_for_all, mandatory + 6000)` would still drop it.
+  - The four old assertions are kept character for character. A premise assertion is added: the project's files come to at most 6,000 tokens.
+  - Figures on the head: fixed part 177; evidence 4,449 tokens in 37 items; room `min(26121 − 177, 6000)` = 6000.
+  - The designer's planted breaks: a skipped last fitting item fails, and so does a room one token short (both at `:201`). With the cap removed the case stays green; it does not test the cap, which W2-183's S2 cases do.
+- **The check:** a fresh read-only independent auditor (claude-opus-5-5, high, C2; session `ffb9f8d2-3ade-462a-af18-6cf9c4c73cc7`; log `.gov-runtime/scratch/lead/log/rv-3.json` in the W2-183 tree). Its brief carried JUDGEMENT.md word for word. It wrote nothing.
+  - Its own planted breaks, run in a `$TMPDIR` mirror: an item silently left unstacked fails at `:203`; an item moved to `dropped` fails at `:201`; a room one token short stays green, as expected, because the evidence is about 1,550 tokens under the room.
+  - S1, S3 and F1 carry from round 1: `git diff --stat e0c076514c9d 8b0056d78 -- src tests/acceptance/W2-183 tests/unit/close tests/unit/context governance/project/facts.yaml` is empty.
+- **Rows, not a round (DEC-801, DEC-808).** N1, the premise counts whole fixture files, which approximately bounds the evidence the batches read (margin about 1,200 to 1,550 tokens):
+  - Ordinary work: yes, because a later designer could grow the shared corpus.
+  - Consequence: other. If the corpus grew past the cap while the premise held, the case would go red at `:201`, never green.
+  - A recorded row.
+- **Evidence at `8b0056d78370`:**
+  - `gov accept W2-183`: pass, 49/49 (S1 14, S2 11, S3 11, F1 13).
+  - `tests/acceptance/W2-54`: 66 passed, 1 failed, 38 deselected. The revised case is green. The failure is `test_w2_54_audit_report.py:231`, core-schema's `SCHEMA_UNREADABLE_RECORD` on `docs/changes/W2-98-CIT-P.md`. That file came in with w2/integrate (the same blob, `6786d18ba`, from W2-98's `ab2d4fdc9`) and is outside this ticket's paths.
+  - lead_verify: 6,140 tests, 6 failed, 7 skipped; serial phase 2 of 2 green.
+    - Three of the failures are known: W2-128 row 8 ×2 and W2-152 S10.
+    - Three are the same core-schema finding on `docs/changes/W2-98-CIT-P.md`: `tests/acceptance/W2-54/test_w2_54_audit_report.py:231`, `tests/acceptance/W2-02/test_w2_02_green_here.py:62` and `tests/acceptance/W2-54/test_w2_54_green_here.py:47`.
+    - The W2-153 composition pair is green (cleared by COPIES-8).
+- **The lead's judgement: pass.** No finding is in scope, ordinary work yes, and fails open or loses work.
+
+### The reviewer's record (as returned, abridged to its findings and verdict)
+
+**N1** — `tests/acceptance/W2-54/test_w2_54_dropped_order.py:197-198`. The premise adds up whole fixture files. It leaves out the files `adopt()` writes into the project, and the rounding up on each of the 37 chunks (at most 37 tokens). So it bounds the evidence the batches read approximately, not exactly; the margin is about 1,200 to 1,550 tokens. If the corpus grew past the cap while the premise still held, the case would turn red at :201 (an item dropped), never green.
+Ordinary work: yes, because a later designer could grow the shared corpus. Consequence: other (a red premise mismatch, not fail-open and no lost work). Scope: in (S2's revision), non-blocking.
+
+Unresolved (as returned): plant B was not reproduced by the reviewer (a heavy-slot wait; run stopped); the designer reports it red at :201. Plants A and D already show the case catches an item dropped while it fits.
+
+Judgement: pass. Classification: one finding, in scope, ordinary work yes, consequence other; none blocks.
+
+```verdict
+{"kpis": [{"kpi": "S1", "verdict": "pass", "findings": []}, {"kpi": "S2", "verdict": "pass", "findings": [{"id": "N1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "S3", "verdict": "pass", "findings": []}, {"kpi": "F1", "verdict": "pass", "findings": []}]}
+```
+
+decisions: DEC-1165, DEC-1156, DEC-860, DEC-801, DEC-808, DEC-1010
 guard_refusals: none. The only refusal was the mandated sandbox-check write in step 0 (a), which is expected to fail.
