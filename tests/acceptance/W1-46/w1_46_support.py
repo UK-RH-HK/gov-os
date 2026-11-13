@@ -503,17 +503,37 @@ def assert_refused(result, *words):
     )
 
 
-def caller_args_then_template_pair(argv, args):
-    """True when ``args`` are one contiguous, ordered run at the end of ``argv``, followed by nothing or by exactly
-    ``--append-system-prompt-file <...>/.claude/templates/<stem>.md`` (W2-153's S1, DEC-1050; DEC-866). The rule is
-    W2-56's revised S6. An extra argument, a dropped one or a reordering still fails."""
+ROLE_PROMPT_FLAG = "--append-system-prompt-file"
+
+
+def caller_args_then_template_pair(argv, args, role=None):
+    """True when ``args`` are one contiguous, ordered run at the end of ``argv``, followed by nothing or by exactly one
+    ``--append-system-prompt-file <path>`` pair whose file name is ``role-<role>.md`` (any one role when ``role`` is
+    None): since P-4 (A) (DEC-1167) a worker launch hands its role text, a blank line and the template's bytes as one
+    file in its TMPDIR, placed last (W2-153's S1, DEC-1050; DEC-866; DEC-1156 (7)). The rule is W2-56's revised S6.
+    An extra, dropped or reordered caller argument, a second pair, a pair before or inside the caller's run, and
+    anything after the pair still fail."""
     argv, args = list(argv), list(args)
-    if argv[-len(args):] == args:
-        return True
-    if len(argv) < len(args) + 2 or argv[-len(args) - 2:-2] != args or argv[-2] != "--append-system-prompt-file":
+    n = len(args)
+
+    def pairs(items):
+        return sum(1 for item in items if item == ROLE_PROMPT_FLAG or item.startswith(ROLE_PROMPT_FLAG + "="))
+
+    if not args:
         return False
-    head, sep, stem = argv[-1].replace("\\", "/").rpartition("/.claude/templates/")
-    return bool(sep and head and stem.endswith(".md") and len(stem) > 3 and "/" not in stem)
+    if argv[-n:] == args:
+        return pairs(argv) == 0
+    if len(argv) < n + 2 or argv[-n - 2:-2] != args or argv[-2] != ROLE_PROMPT_FLAG:
+        return False
+    if pairs(argv[:-2]):
+        return False
+    head, sep, name = argv[-1].replace("\\", "/").rpartition("/")
+    if not (sep and head) or (head + "/").endswith("/.claude/templates/"):
+        return False  # the bare template is the old pair: a worker now gets the composed file in its TMPDIR
+    if role is not None:
+        return name == f"role-{role}.md"
+    stem = name[len("role-"):-len(".md")] if name.startswith("role-") and name.endswith(".md") else ""
+    return bool(stem) and not stem.startswith("-")
 
 
 # --------------------------------------------------------------------------
