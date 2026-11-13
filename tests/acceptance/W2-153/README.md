@@ -156,7 +156,7 @@ the dispatcher without its file check failed its F1.
 
 ## Routed line (from W2-33, its S7 copies and F1 drift; DEC-1156 (3); revision 5)
 
-The ticket's sixth success line: *the generated role copies carry each kernel role file's `Launch default`,
+The ticket's sixth success line (success line 6, `S6` in the table below): *the generated role copies carry each kernel role file's `Launch default`,
 `Launch by criticality` and `Skills` lines unchanged, and a hand edit to a generated role copy is named as drifted by
 the generation check.* The copies ACTs are applied (COPIES-6 `36d1a151b`, COPIES-8 `bb9dfca7a`), so the cases are
 **expected green on this tree**: they are the line's verify, not a build's driver. All in
@@ -164,12 +164,12 @@ the generation check.* The copies ACTs are applied (COPIES-6 `36d1a151b`, COPIES
 this repository write nothing; the drift cases build a stand-in project in `tmp_path` (`PortabilityBed` with the
 engineer's role file carrying the three lines) and never touch this repository's files.
 
-| Clause | Test (node id) | Expected on this tree | What it checks |
-|---|---|---|---|
-| unchanged | `test_w2_153_routed.py::test_routed_each_generated_role_copy_carries_the_kernel_role_file_s_line_byte_for_byte` | green; 9 roles x 3 folders x 3 labels = 81 cases, of which 63 run and 18 skip | each line the kernel role file carries (`- **<label>:** ...`) is a whole line, byte for byte (split on `\n` alone), of `.claude/agents/<role>.md`, `.rulesync/subagents/<role>.md` and `template/.rulesync/subagents/<role>.md`; the id names role, folder and label |
-| unchanged | `test_w2_153_routed.py::test_routed_guard_the_cases_below_are_not_a_silent_narrowing` | green (guard) | each label is carried by at least one role file and every role file has `Launch default` and `Skills`, so only the role files' own gaps skip |
-| drift named | `test_w2_153_routed.py::test_routed_the_unedited_stand_in_names_neither_the_generated_agent_nor_the_source` | green (control) | the unedited stand-in has no finding and exits 0 |
-| drift named | `test_w2_153_routed.py::test_routed_a_hand_edit_to_one_of_the_three_lines_is_named_as_drifted` | green; 6 cases (2 files x 3 labels) | one line of `.claude/agents/engineer.md` (rulesync's output) or of `.rulesync/subagents/engineer.md` (the composed source) edited by hand: the check exits non-zero, a finding names that file, and none names the other |
+| KPI line | Clause | Test (node id) | Expected on this tree | What it checks |
+|---|---|---|---|---|
+| S6 | unchanged | `test_w2_153_routed.py::test_routed_each_generated_role_copy_carries_the_kernel_role_file_s_line_byte_for_byte` | green; 9 roles x 3 folders x 3 labels = 81 cases, of which 63 run and 18 skip | each line the kernel role file carries (`- **<label>:** ...`) is a whole line, byte for byte (split on `\n` alone), of `.claude/agents/<role>.md`, `.rulesync/subagents/<role>.md` and `template/.rulesync/subagents/<role>.md`; the id names role, folder and label |
+| S6 | unchanged | `test_w2_153_routed.py::test_routed_guard_the_cases_below_are_not_a_silent_narrowing` | green (guard) | each label is carried by at least one role file and every role file has `Launch default` and `Skills`, so only the role files' own gaps skip |
+| S6 | drift named | `test_w2_153_routed.py::test_routed_the_unedited_stand_in_names_neither_the_generated_agent_nor_the_source` | green (control) | the unedited stand-in has no finding and exits 0 |
+| S6 | drift named | `test_w2_153_routed.py::test_routed_a_hand_edit_to_one_of_the_three_lines_is_named_as_drifted` | green; 6 cases (2 files x 3 labels) | one line of `.claude/agents/engineer.md` (rulesync's output) or of `.rulesync/subagents/engineer.md` (the composed source) edited by hand: the check exits non-zero, a finding names that file, and none names the other |
 
 **Skips, stated, never silent:** a role file with no line for a label has no case for it. `Launch by criticality` is
 carried by three role files (engineer, independent-test-designer, qa-engineer); the other six skip it in each of the
