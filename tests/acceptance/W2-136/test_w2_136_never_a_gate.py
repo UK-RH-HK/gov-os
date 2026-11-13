@@ -61,7 +61,16 @@ def test_s10_no_module_of_the_category_imports_or_calls_gov_plan(category):
 
 
 def test_s10_no_module_of_gov_outside_plan_and_launch_imports_or_calls_gov_plan():
-    allowed = (support.SRC / "gov" / "plan", support.SRC / "gov" / "launch")
+    """Revised for DEC-1163 (6) D (a) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; a
+    contradiction between two tickets' lines settled as DEC-105 asks, DEC-1156 (7) routing the edit). Reason: W2-159's
+    S5 has ``gov session-watch`` read the dispatcher's ready list by ``gov plan --ready``
+    (``src/gov/session_watch/items.py``, landed 4f4592021), which this scan refused, so the nightly of 2026-11-13
+    found the case red. Decided behaviour: the scan allows the folder ``src/gov/session_watch`` beside ``plan/`` and
+    ``launch/`` (compared with ``Path.is_relative_to``, DEC-1155, never a prefix of the path as a string); S10's own
+    categories (close, landing, claim, readiness, hooks) are unchanged. What the case still catches: any other module
+    of ``src/gov`` outside ``plan/``, ``launch/`` and ``session_watch/`` that imports or calls ``gov plan`` (a sibling
+    folder such as ``session_watch_extra`` is not allowed by the name)."""
+    allowed = (support.SRC / "gov" / "plan", support.SRC / "gov" / "launch", support.SRC / "gov" / "session_watch")
     files = [p for p in _files(["src/gov/**/*.py"]) if not any(p.is_relative_to(a) for a in allowed)]
     assert len(files) > 100, len(files)
     used = {str(p.relative_to(support.TREE)): hits for p in files if (hits := support.uses_plan(p))}
