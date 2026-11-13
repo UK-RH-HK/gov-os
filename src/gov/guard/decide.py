@@ -404,12 +404,16 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
         return _line_write_targets(text, where, literal)
     try:
         judged = bash_writes.judge(command, cwd, parse, _expand_token)
-    except bash_writes.Unreadable:
+    except bash_writes.Unreadable as unread:
         found = parse(command, cwd)
         if "\\\n" in command:
             more = parse(command.replace("\\\n", ""), cwd)
             if found is not None or more is not None:
                 found = list(found or []) + list(more or [])
+        if isinstance(unread, bash_writes.UnclosedQuote) or bash_writes.COMMENT_QUOTE.search(command):
+            # The line parser is blind to comments: a comment's apostrophe may close the open quote, or two may pair
+            # and hide a write between them; its reading is not a free one (DEC-1174 (1)).
+            found = [_UNRESOLVABLE] + list(found or [])
         return found
     except RecursionError:
         return [_UNRESOLVABLE]
@@ -982,6 +986,39 @@ def _pipeline_lifts(pipeline: list[list[str]]) -> bool:
 
 
 def _lift_in(command: str) -> bool:
+    """Whether ``command`` holds the lift form (DEC-409), read twice (DEC-1174 (1)): as before, and with the quotes
+    of its comments blanked where a shell reads them as comments (its top-level text and the bodies of heredocs a
+    shell runs, ``bash <<EOF``; a Python or data body is read as before). The form found by either reading refuses;
+    the comment's words stay, so a comment holding the form is refused as before. The command cannot be read when
+    neither reading can, or when the scan finds a quote open outside every comment."""
+    from gov.guard import bash_writes
+    try:
+        found, error = _lift_read(command), None
+    except ValueError as exc:
+        found, error = False, exc
+    if found:
+        return True
+    try:
+        spans = bash_writes.comment_spans(command)
+    except bash_writes.UnclosedQuote:
+        raise ValueError("a quote open outside every comment") from None
+    except bash_writes.Unreadable:
+        if bash_writes.COMMENT_QUOTE.search(command):
+            raise ValueError("a comment's quote the scan cannot place") from None
+        spans = []
+    if not spans:
+        if error is not None:
+            raise error
+        return False
+    chars = list(command)
+    for start, end in spans:
+        for i in range(start, end):
+            if chars[i] in "'\"`\\":
+                chars[i] = " "
+    return _lift_read("".join(chars))
+
+
+def _lift_read(command: str) -> bool:
     lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n`")
     lex.whitespace_split = True
     lex.whitespace = " \t\r"
