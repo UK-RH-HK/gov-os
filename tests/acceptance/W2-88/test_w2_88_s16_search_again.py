@@ -13,8 +13,9 @@ a refused A9 leaves no copy in the tree.
 A string test for "search again once", "own, different words", "not found" and "two searches" on the sources adoption copies and on the
 copies a planted adoption holds. The sources: the kernel's retrieval skill, and the brief template that carries T-0's line and the CTO role
 template (T-8's carrier): this head holds the lines in the retrieval skill, ``brief.md`` and ``role-cto.md`` (the source cases are green
-here and stay green; they go red for W2-142 and W2-128 (``waits_on``) if the lines leave). The discovery skill's line is W2-142's S2 and is
-not on this head: the case on the copied discovery skill is red for W2-142 as well as for the copy step.
+here and stay green; they go red for W2-142 and W2-128 (``waits_on``) if the lines leave). The discovery skill's line is W2-142's S2
+("searches once more in its own words before treating the question as unanswered"), merged and decided; it is not one of the four
+phrases, and the case on the copied discovery skill asks that the copy hold it, unchanged (green on this head).
 """
 
 from __future__ import annotations
@@ -34,6 +35,7 @@ COPIES = {"the retrieval skill": ".claude/skills/retrieval/SKILL.md", "T-0's bri
           "T-8's role template (CTO)": "governance/kernel/templates/role-cto.md"}
 PLAN = W.copy_plan()                       # (path in the adopted repository, path in Gov OS), read from Gov OS's own files
 DISCOVERY_COPY = ".claude/skills/discovery/SKILL.md"
+DISCOVERY_LINE = "searches once more in its own words before treating the question as unanswered"   # W2-142 S2, as Gov OS ships it
 
 
 def holds(text: str) -> list[str]:
@@ -117,16 +119,18 @@ def test_s16_a_planted_adoption_holds_the_four_phrases_in_the_copy(worlds, name)
 
 
 def test_s16_a_planted_adoption_holds_the_discovery_skills_search_again_line(worlds):
-    """W2-142's S2 (``waits_on`` DAEO-qskx): the discovery skill's line "search again once before routing a question to the owner
-    as unanswered" is in the copy. Known red reason on this head: Gov OS's own discovery skill does not hold the line yet
-    (W2-142), as well as the copy step (B-1.1); the case is not weakened."""
+    """W2-142's S2 (DAEO-qskx, closed and merged), copied unchanged: the discovery skill's line as Gov OS ships it ("the practitioner
+    searches once more in its own words before treating the question as unanswered", the retrieval skill's step 7; DEC-1092 (1)) is in
+    the planted adoption's copy, which is Gov OS's discovery skill byte for byte. The four phrases are the retrieval skill's and T-0's,
+    not this skill's; the KPI asks only that this line be copied unchanged. Green on the head (the copy step is built and the line
+    is in Gov OS's skill); red if the copy is absent, differs from Gov OS's skill, or the skill's line is gone."""
     nine = worlds.a9("default")
     nine.need_a9()
     copy = nine.project / DISCOVERY_COPY
     assert copy.is_file(), f"the planted adoption holds no {DISCOVERY_COPY}: no stage copies the discovery skill (B-1.1)"
     assert copy.read_bytes() == (KERNEL / "skills/discovery/SKILL.md").read_bytes(), f"{DISCOVERY_COPY} is not Gov OS's discovery skill"
     flat = re.sub(r"\s+", " ", copy.read_text(encoding="utf-8").lower())
-    assert "search again once" in flat, "the discovery skill's line (search again once) is not in Gov OS's skill yet: W2-142 (DAEO-qskx) waits"
+    assert DISCOVERY_LINE in flat, f"the copied discovery skill lacks W2-142's S2 line ({DISCOVERY_LINE!r})"
 
 
 # ---- B-1.3: retrieval.yaml, installed only where the repository tracks none -----------------------------------------
