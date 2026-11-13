@@ -1496,8 +1496,14 @@ class Judgement:
             if not a.startswith("--") and a.endswith("c"):
                 if i + 1 >= len(args):
                     return
+                at = len(self.findings)
                 self.code(args[i + 1], part, ecwd, whole, depth, shell_text=True,
                           argv=["-c"] + [self.expand(w) for w in args[i + 2:]])
+                # The product: a -c string's writes are the command's, as a Python file it writes and runs (KPI 8);
+                # the apostrophe that made the call unreadable no longer refuses it (DEC-1174 (1)).
+                for targets, _scope, _code in self.findings[at:]:
+                    self.writes += [SENT if raw == SENT or full is None else os.path.realpath(full)
+                                    for raw, full in targets]
                 return
             if not a.startswith("--") and "c" in a[1:]:
                 self.findings.append(([(SENT, None)], part, True))  # -cXYZ: the code glued to the option

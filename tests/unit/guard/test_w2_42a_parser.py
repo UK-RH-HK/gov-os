@@ -384,3 +384,11 @@ def test_comment_spans_reach_into_shell_bodies_only():
 ])
 def test_where_the_scan_cannot_read_a_comment_quote_is_unresolvable(root, command):
     assert SENT in got(command.replace("{T}", A + "/W1/t.py"), root)
+
+
+def test_a_python_c_string_writes_are_the_commands(root):
+    """The apostrophe no longer refuses the call whole (DEC-1174 (1)): the -c string's writes refuse it."""
+    py = f"python3 -c \"open('{A}/W1/zz.py','w').write('x')\""
+    assert got(py, root) == [f"R/{A}/W1/zz.py"]
+    assert f"R/{A}/W1/zz.py" in got(f"bash <<'EOF'\n# don't overwrite\necho hi\nEOF\n{py}", root)
+    assert got("python3 -c \"print(open('src/m.py').read())\"", root) == []
