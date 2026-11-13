@@ -39,6 +39,7 @@ import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.store import layout
 from gov.util.gitenv import git_env
 # The fingerprints' git runner is the close's own (``gov.close.repo.git``, DEC-500): one source (W2-150 S6).
 from gov.util.gitrun import git as _commit_git
@@ -570,7 +571,13 @@ def connect(root: Path) -> sqlite3.Connection:
     path = Path(root) / STORE_REL
     if not path.is_file():
         raise GovError("STORE_MISSING", f"{STORE_REL}: no store at {root}; load it first", {"root": str(root)})
-    return sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+    connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        layout.check(connection, STORE_REL)  # W2-88 F3: a store of another layout is never read as current
+    except BaseException:
+        connection.close()
+        raise
+    return connection
 
 
 # ---------------------------------------------------------------------------
@@ -693,6 +700,7 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
         connection.execute(f"INSERT INTO {FINGERPRINTS_TABLE} VALUES (?, ?, ?, ?)",
                            (head, prints["code"] if prints else None,
                             prints["records"] if prints and records_fingerprint else None, kind))
+        layout.stamp(connection, commit=False)  # W2-88: the layout this load wrote, with the load's own transaction
         connection.execute("COMMIT")
         return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}, prints
     finally:
