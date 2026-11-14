@@ -999,6 +999,46 @@
         "trace",
         null
       ]
+    },
+    "fix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "code",
+        "action"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^q[0-9]{2}$"
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "SOURCE_IS_SCAFFOLD",
+            "SOURCE_PATH_ABSENT",
+            "SOURCE_NOT_TEXT",
+            "SPAN_OUT_OF_FILE",
+            "HEADING_NOT_FOUND",
+            "ANSWER_NOT_IN_SPANS",
+            "NONEXISTENT_NAME_FOUND",
+            "NONEXISTENT_NO_NAME"
+          ]
+        },
+        "action": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "corrected",
+            "replaced",
+            null
+          ]
+        }
+      },
+      "description": "The one-question fix flow only (W2-94 S13, DEC-1180 (4)): its question id, its reason code and the action the delivered result names; action null until a delivered result names it (dry, refused, stopped)."
     }
   }
 }

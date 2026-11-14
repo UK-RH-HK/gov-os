@@ -36,9 +36,10 @@ def projection_of(n: int, given) -> float:
 
 
 class _Judge:
-    def __init__(self, p, repo, gov, caller, brake, emit):
+    def __init__(self, p, repo, gov, caller, brake, emit, store_commit=None):
         self.p, self.run, self.reader = p, p["run"], p["run"] / "reader"
         self.repo, self.gov, self.caller, self.brake, self.emit = repo, gov, caller, brake, emit
+        self.store_commit = store_commit  # a standing run: a later search must answer from the declared store
         self.lock, self.stopped = threading.Lock(), False
 
     # ---- a later search: a failure or a degraded answer is counted and gives an empty bundle
@@ -51,8 +52,10 @@ class _Judge:
         ms = int((time.monotonic() - started) * 1000)
         text = done.stdout.decode("utf-8", "replace")
         ok, why = fault.answered(done.returncode, text)
-        events.search(self.run, "later", None, None, qid, done.returncode, ms, ok)
         result = (fault.result_of(text) or {}) if ok else {}
+        if ok and self.store_commit is not None and fault.store_commit_of(result) != self.store_commit:
+            ok, why, result = False, "store", {}  # another store's answer is a counted search failure, an empty bundle
+        events.search(self.run, "later", None, None, qid, done.returncode, ms, ok)
         rerank = result.get("rerank")
         return result, ok, why, rerank.get("by") if isinstance(rerank, dict) else None
 
@@ -159,10 +162,24 @@ def _control_of(run, attempt_n: int) -> dict:
     return {}
 
 
-def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, resume=False, emit) -> str:
+def asked(p: dict, audit: str, repo) -> list[dict]:
+    """The questions the reader is asked: the whole kept set, or for a standing week the live ones (each loaded alone, so
+    a dropped question whose anchors are gone is never opened)."""
+    if not p.get("week"):
+        return matcher.questions(p["root"], audit, "hidden", repo)
+    gone = set((read_json(p["preflight"]) or {}).get("dropped_ids") or [])
+    out = []
+    for f in layout.entries(p["hidden"])[0]:
+        if f.stem not in gone:
+            out += matcher.questions(p["root"], audit, "hidden", repo, only=f.stem)
+    return out
+
+
+def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, resume=False, emit, week=None) -> str:
     """The exit word: ``ok``, ``refused`` (``MS-`` codes), ``stopped`` (the brake) or ``used``. A usage fault raises
-    ``UsageError``."""
-    p = layout.paths(sets_root, audit)
+    ``UsageError``. With ``week`` (a standing run) the live questions are asked by this same path, no ``misses.jsonl`` is
+    written and no line holds an id."""
+    p = layout.paths(sets_root, audit, week)
     repo = Path(repo) if repo is not None else toplevel()
     gov = os.path.abspath(os.path.expanduser(str(gov) if gov is not None else "~/.local/bin/gov"))
     claude = os.path.abspath(os.path.expanduser(str(claude) if claude is not None else "~/.local/bin/claude"))
@@ -206,7 +223,7 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     if declare.gov_pin(gov) != decl.get("gov_pin"):
         emit("MS-PIN")
         return "refused"
-    qs = matcher.questions(p["root"], audit, "hidden", repo)
+    qs = asked(p, audit, repo)
     parsed = fault.read_parsed(counting)
     where = figures.starts(parsed)
     if any(q["id"] not in where for q in qs):
@@ -233,7 +250,7 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     write_whole(reader, "plan.json", {"ids": [q["id"] for q in qs], "apart": [q["id"] for q in qs if q["apart"]],
                                       "projection": proj, "brake": brake})
     caller = Caller(claude, run_dir, reader)
-    job = _Judge(p, repo, gov, caller, brake, emit)
+    job = _Judge(p, repo, gov, caller, brake, emit, decl.get("store_commit") if week else None)
     with ThreadPoolExecutor(WORKERS) as pool:
         list(pool.map(lambda q: job.work(q, first[q["id"]]), qs))
     if job.stopped:
@@ -243,7 +260,8 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
     attempt_n = int(counting.name.rsplit("-", 1)[1])
     spend = {"usd": round(caller.total, 6), "projection": proj, "brake": brake}
     fig, misses = figures.build(audit, decl, qs, rows, counting, parsed, _control_of(run_dir, attempt_n), spend)
-    figures.write_misses(run_dir, misses)
+    if not week:  # a standing run's questions leave nothing behind but its rows in this run folder (S4)
+        figures.write_misses(run_dir, misses)
     figures.write_figures(run_dir, fig)
     v = fig["verdict"]
     events.append(run_dir, "figures", right=v["right"], wrong=v["wrong"], n=fig["n"], passes=v["passes"])
@@ -252,5 +270,6 @@ def run(sets_root, audit, *, repo=None, gov=None, claude=None, projection=None, 
         emit(line)
     failed = sorted(r["id"] for r in rows.values() if r.get("search_failures"))
     if failed:
-        emit(f"SEARCH FAILED {sum(r.get('search_failures', 0) for r in rows.values())}: {', '.join(failed)}")
+        total = sum(r.get("search_failures", 0) for r in rows.values())
+        emit(f"SEARCH FAILED {total}" if week else f"SEARCH FAILED {total}: {', '.join(failed)}")
     return "ok"

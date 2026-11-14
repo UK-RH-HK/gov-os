@@ -79,7 +79,7 @@ def test_s5_a_verdict_below_the_bar_stands_as_recorded_and_is_a_result(make_worl
     world = make_world("judged:below")
     assert world.staged["judge"]["code"] == 0, "a miss is a result: exit 0, FIGURES.json written"
     out = world.staged["judge"]["out"].splitlines()
-    assert any(x.startswith("BAR at least 34 right (NOT met)") and ": MISSES;" in x for x in out), out
+    assert any(x.startswith("BAR at least 38 right (NOT met)") and ": MISSES;" in x for x in out), out
     figures = world.json_of("FIGURES.json")
     assert figures["verdict"]["right"] == 33 and figures["verdict"]["passes"] is False
     assert figures["verdict"]["right_ok"] is False and figures["verdict"]["wrong_ok"] is True

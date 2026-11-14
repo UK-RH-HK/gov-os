@@ -125,3 +125,28 @@ CLI argument for W2-60a's passthrough checks. Section 3's package (`.gov-runtime
 Builder cases: `tests/unit/launch/test_w2_184_command.py` (the keywords alone and together, empty values passed on, no new
 keyword when absent, `--plan` not reading them, the usage line, and through `gov` the options before `--` taken and after it
 passed through).
+
+## 9. R1-R3 (batch eng-7, DEC-1180 (4); the narrow check's F1-F3, interface section 10)
+
+The ticket was reopened for the narrow check's three findings (`docs/probes/DAEO-6f0s/PR-DAEO-6f0s-f1.md`). **R1** (10.1):
+`command.py` refuses a lead launch (`orchestrator`, `lead`, `launcher.LEAD_ROLES`) given any of `--reason`, `--trial` or
+`--owner-named` before `--` (an empty value counts as given) with exit 2, before the launcher is called, so nothing starts,
+no record is written, the gate is not asked and no plan override is logged; the message on stderr says that a lead launch
+takes none of the three and names each option given. `--plan`, a lead launch without them, a worker launch with them and
+the same words after `--` are unchanged. `launcher.launch` called directly with a lead role and any of the three keywords not
+`None` refuses with LAUNCH_REFUSED before `_admit_lead` (the second fence). **R2** (10.2): `record.write` writes the bytes,
+flushed and fsynced, to `.<session id>.<16 hex>.tmp` in the record folder (made with `O_EXCL|O_NOFOLLOW`), hard-links it
+to `<session id>.json` (a link fails where the name exists, so nothing is overwritten) and removes the temporary file; a
+name already there refuses as before ("already there") and any other `OSError` refuses as before ("cannot be written"),
+each removing the temporary file and leaving no final-name file. So a launch killed inside the write leaves no record of
+its name or a whole one, and a leftover `.tmp` at most, which no reader of `*.json` takes, so it no longer refuses the next
+launch. **R3** (10.3, revising P-td5-2): `_probe_files` now keeps every root's copy of a root-relative path (the launch
+root's first), and `_promotion` reads each copy (identical bytes once), so each copy that is not of the form refuses naming
+the file; the path is one review: it holds a fail-open finding, or counts as one failed record, when any of its copies
+does. Builder cases: `tests/unit/launch/test_w2_184_r_engineer.py` (the CLI's exit 2 and message for each option and both
+lead roles without calling the launcher, a lead launch without them and a worker's options passed on, the launcher's
+fence; the record whole under its name with no temporary file left, a write killed at the write or the fsync leaving only
+a hidden `.tmp`, an `OSError` at the write, fsync or link leaving neither file, an existing name refused with the
+temporary file removed, a leftover `.tmp` not read; another root's copy promoting over a stale launch-root copy and the
+reverse, a path failed in any copy counted once, two differing failed copies not two reviews, another root's unreadable
+copy refused naming its file, identical copies read once).

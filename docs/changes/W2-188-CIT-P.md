@@ -1,7 +1,7 @@
 ---
 id: W2-188-CIT-P
 type: change-impact-proposal
-status: 'PROPOSED: the bytes are written; the independent review and the owner''s approval of the skill''s bytes come before the merge (CAP-33)'
+status: 'APPROVED: the owner approved the skill''s bytes 6a884cf1 (DEC-1181 (1)); merged by hand on w2/integrate at 5f9a9dedf after W2-187''s land; the copies follow by ACT-CLAUDE-COPIES-12 (DEC-1183 (3))'
 date: 2026-11-14
 branch: w2/W2-188
 base: '5336a6fca (the adopt skill at sha256 16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0)'

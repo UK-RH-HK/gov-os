@@ -518,29 +518,38 @@ def _probe_roots(root: Path, names: list[str], launches: list[tuple[str, dict]])
     return [root, *sorted(others, key=str)]
 
 
-def _probe_files(roots: list[Path], names: list[str]) -> list[tuple[str, Path, Path]]:
+def _probe_files(roots: list[Path], names: list[str]) -> list[tuple[str, list[tuple[Path, Path]]]]:
     """The ticket's probe records (W2-184 5.1, 5.1a): the ``.md`` files under ``docs/probes/<ticket id>/`` of each root,
-    at any depth, as ``(root-relative path, file, root)`` in sorted path order. A path under two roots counts once: the
-    first root's copy (the launch root, then the others in sorted order; P-td5-2)."""
-    chosen: dict[str, tuple[Path, Path]] = {}
+    at any depth, as ``(root-relative path, [(file, root), ...])`` in sorted path order. Every root's copy of a path is
+    kept (R3, interface 10.3, revising P-td5-2), the launch root's first, then the others in sorted order."""
+    copies: dict[str, list[tuple[Path, Path]]] = {}
     for base in roots:
         for name in names:
             folder = base / PROBES_REL / name
             if not _PROBE_NAME.fullmatch(name) or not folder.is_dir():
                 continue
-            for path in folder.rglob("*.md"):
+            for path in sorted(folder.rglob("*.md")):
                 if path.is_file():
-                    chosen.setdefault(path.relative_to(base).as_posix(), (path, base))
-    return [(rel, path, base) for rel, (path, base) in sorted(chosen.items())]
+                    found = copies.setdefault(path.relative_to(base).as_posix(), [])
+                    if all(path != seen for seen, _ in found):
+                        found.append((path, base))
+    return sorted(copies.items())
 
 
-def _probe_record(rel: str, path: Path) -> tuple[dict, str] | None:
-    """One probe record's front matter and the text after it; ``None`` when it has none, or it is not a map with
-    ``type: probe`` (skipped). A front matter that is not YAML, or a file that cannot be read, refuses, naming the
-    file as ``rel`` (its root-relative path, with the file's own path when it lies under another root)."""
+def _read_probe(rel: str, path: Path) -> bytes:
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except (OSError, UnicodeDecodeError):
+        return path.read_bytes()
+    except OSError:
+        raise _refuse(f"the probe record {rel} cannot be read, so the ticket's promotion cannot be judged") from None
+
+
+def _probe_record(rel: str, data: bytes) -> tuple[dict, str] | None:
+    """One probe record's front matter and the text after it, from the file's bytes; ``None`` when it has none, or it
+    is not a map with ``type: probe`` (skipped). A front matter that is not YAML, or bytes that are not UTF-8, refuse,
+    naming the file as ``rel`` (its root-relative path, with the file's own path when it lies under another root)."""
+    try:
+        lines = data.decode("utf-8").splitlines()
+    except UnicodeDecodeError:
         raise _refuse(f"the probe record {rel} cannot be read, so the ticket's promotion cannot be judged") from None
     if not lines or lines[0].strip() != "---":
         return None
@@ -579,17 +588,30 @@ def _fails_open(rel: str, body: str) -> bool:
 def _promotion(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> dict | None:
     """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records, under the launch root and every root the
     ticket's launch records name (5.1a), hold a fail-open finding (checked first), or two or more of them have
-    ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path."""
+    ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path.
+
+    R3 (interface 10.3): every root's copy of a path is read (identical bytes are one copy), and each copy that
+    refuses refuses the launch; the path is one review: it holds a fail-open finding, or has failed, when any of its
+    copies does, and counts as one failed record at most."""
     failed, fail_open = [], None
-    for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
-        shown = rel if base == root else f"{rel} ({path})"
-        loaded = _probe_record(shown, path)
-        if loaded is None:
-            continue
-        front, body = loaded
-        if _fails_open(shown, body) and fail_open is None:
+    for rel, copies in _probe_files(_probe_roots(root, names, launches), names):
+        read: list[bytes] = []
+        path_fails_open = path_failed = False
+        for path, base in copies:
+            shown = rel if base == root else f"{rel} ({path})"
+            data = _read_probe(shown, path)
+            if data in read:
+                continue
+            read.append(data)
+            loaded = _probe_record(shown, data)
+            if loaded is None:
+                continue
+            front, body = loaded
+            path_fails_open = _fails_open(shown, body) or path_fails_open
+            path_failed = path_failed or front.get("judgement") in ("fail", "failed")
+        if path_fails_open and fail_open is None:
             fail_open = rel
-        if front.get("judgement") in ("fail", "failed"):
+        if path_failed:
             failed.append(rel)
     if fail_open is not None:
         return {"reason": "a fail-open finding", "record": fail_open}
@@ -927,6 +949,12 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
 
     root = Path(os.path.realpath(root))
     if role in LEAD_ROLES:
+        # W2-184 R1 (interface 10.1): the second fence behind the CLI's exit 2, before anything is read or started
+        given = [flag for flag, value in (("--reason", reason), ("--trial", trial), ("--owner-named", owner_named))
+                 if value is not None]
+        if given:
+            raise _refuse(f"a lead launch ({role}) takes none of --reason, --trial and --owner-named; given: "
+                          f"{', '.join(given)}")
         plan_override = _admit_lead(root, ticket_id)
         _check_cli_args(cli_args)
         _check_repository_settings(root, False)  # a lead has no sandbox: the guard is its only fence

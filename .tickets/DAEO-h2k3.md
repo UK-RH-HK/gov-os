@@ -1,6 +1,6 @@
 ---
 id: DAEO-h2k3
-status: in_progress
+status: closed
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-29T15:55:50Z
@@ -135,3 +135,5 @@ on the list. The hidden half is never read by any launched session; its cases ar
 **N2 (b), 2026-11-14 (the owner, DEC-1180 (1)):** the changed-lines list also holds a heading-cited source whose section text (from its heading line to the next heading of the same or a higher level, or the end of the file) differs between the source's own commit and the head is listed too, though its heading is still found; an entry is listed once even when two of its alternatives changed (row N1, fixed in the same flow, DEC-1180 (4)). One more test revision by an independent test designer (`w2_61h_support.py`, the README, the case files only where needed; `Rewrite-Reason: DEC-1180 (1)`), proved on planted data, then a narrow independent check (`docs/probes/DAEO-h2k3/PR-DAEO-h2k3-n2.md`). W2-61h closes on this revision and the owner's operator's walled re-run. (The merge queue closed it at c1cb5285c with the F3 land; it stays open for this, status in_progress.)
 
 **Kept open 2026-11-14 15:55 by the CTO (DEC-1180 (1)):** the N2 (b) revision landed at d3f3326c4 (the queue closed the ticket in the same step); W2-61h closes on the owner's operator's walled run of the hidden-form file at that tree (expected 7 passed, a GoldBlockChanged warning listing h03's entry), with a close record (DEC-953). DEC-1180 added to sources.
+
+**Closed 2026-11-14 by the CTO (DEC-1184 (5)):** the owner's operator's walled run at `5f9a9dedf` gave 7 passed and one `GoldBlockChanged` warning listing h03 entries 1 and 2, h20 entry 2, h24 entry 1, h35 entry 1 and h36 entry 1; the list goes to the walled writer's weekly cycle (`governance/project/orchestration/packages/REANCHOR-LIST-20261116.md`). Close record: `governance/project/orchestration/closes/W2-61h-DAEO-h2k3.md`.

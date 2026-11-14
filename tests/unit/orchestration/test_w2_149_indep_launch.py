@@ -1093,7 +1093,8 @@ def test_counts_schema_closes_every_object_and_string():
     as_given.append(whole["properties"]["delivered"]["properties"]["files_sha256"])
     # set-up A's numbers are optional keys of `out` (and files_sha256 of `delivered`): present only when given
     optional = {id(whole["properties"]["out"]): set(indep_launch.SGX_OUT) - {"labelled", "allow", "refuse"},
-                id(whole["properties"]["delivered"]): {"files_sha256"}}
+                id(whole["properties"]["delivered"]): {"files_sha256"},
+                id(whole): {"fix"}}
 
     def walk(node):
         if isinstance(node, dict):

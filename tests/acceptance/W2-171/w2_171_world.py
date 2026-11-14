@@ -60,7 +60,7 @@ KEYWORD_QID = "q19"
 
 
 def bar(n: int) -> dict:
-    return {"need_right": -(-85 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
+    return {"need_right": -(-95 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
 
 
 # -- the repository's files (W2-170's) ---------------------------------------------------------------------------

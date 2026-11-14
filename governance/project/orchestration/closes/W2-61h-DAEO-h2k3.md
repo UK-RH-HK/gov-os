@@ -14,3 +14,11 @@
 - gitleaks: off by configuration (DEC-1045): the change was not scanned
 - Queue run: 2026-11-14 15:29:09 to 2026-11-14 15:46:18
 - Closed: 2026-11-14 15:54:30 GMT, by the orchestrator under DEC-953 items 1 and 5, DEC-989
+
+## Final close (DEC-1184 (5)): kept open after the land, closed on the owner's operator's result
+
+- Merged into w2/integrate by the merge queue at dc67c4f6b (d3f3326c4): N2 (b)'s revision, `dbe123673`, after DEC-1178 (1)'s F3 revision (121a44c9a, c1cb5285c)
+- Narrow independent check of the N2 (b) and N1 revision: pass at dbe123673 (`docs/probes/DAEO-h2k3/PR-DAEO-h2k3-n2.md`, 1a2bf4a16); earlier F3 check `PR-DAEO-h2k3-f3.md`
+- The owner's operator's walled run of the hidden-form file at `5f9a9dedf` (2026-11-14, tree-checked): 7 passed, one `GoldBlockChanged` warning listing h03 entries 1 and 2, h20 entry 2, h24 entry 1, h35 entry 1 and h36 entry 1. That list goes to the walled writer's weekly cycle (`packages/REANCHOR-LIST-20261116.md`, the Monday slot of 2026-11-16; DECIDED-NOT-DONE row 202); it never blocks a close (DEC-1178 (1))
+- The hidden half was read by no launched session; only the owner's operator ran the walled file (DEC-820 (d))
+- Closed: 2026-11-14, by the orchestrator under DEC-953 items 1 and 5, DEC-1132 (1), DEC-1180 (1), DEC-1184 (5)

@@ -42,6 +42,12 @@ allowed_paths:
 - src/gov/adopt/safety.py  # [added, DEC-1178 (P-1): its parents[3] read]
 - src/gov/secrets/__init__.py  # [added, DEC-1178: the secret scan's speed]
 - tests/unit/secrets/test_w2_88*  # [added, DEC-1178]
+- pyproject.toml  # [added, DEC-1183 (1): package 1 (a), the shipped copies as package data]
+- src/gov/_shipped/**  # [added, DEC-1183 (1): package 1 (a)]
+- src/gov/codeintel/__init__.py  # [added, DEC-1183 (1): package 2 (a), the graph read in pages]
+- src/gov/retrieval/code_route.py  # [added, DEC-1183 (1): package 2 (a), only if the reader lives there]
+- tests/unit/adopt/test_safety.py  # [added, DEC-1183: package 3, S26 refuses first]
+- tests/unit/codeintel/test_w2_88*  # [added, DEC-1183 (1)]
 kpis:
   success:
   - 'The assessment: before the target path map (A3), adoption writes a memory-assessment record for the repository. It holds tracked files and bytes, languages, commits, the largest files, binaries, generated, minified and vendored candidates (by name, header and folder), the files the secrets filter refuses (by rule id, never the value), the files no route can take (a language the code graph does not read, a file over the chunker''s limit), and the estimated index time, peak RSS and disk against DEC-078''s envelope and the machine''s free memory and disk. It streams the tree and never loads it whole: on the largest proof repository its peak RSS is recorded and stays under the resource gate''s per-session figure. The repository''s tree, index and history are byte-identical before and after. Verify: on a planted repository (a vendored folder, a generated file, a minified file, a binary, a file over the chunker''s limit, a secret in a tracked file, a language the code graph does not read) the memory-assessment record is written before A3 and holds every field named above, each planted item under its category and the secret by rule id only (a grep of every output for the planted secret''s value finds 0 hits); a hash of the planted repository''s tree, index and history before and after is identical; on the largest proof repository the recorded peak RSS is under the resource gate''s per-session figure [DEC-954 Q9f, DEC-078, CAP-44.b]'
@@ -85,6 +91,9 @@ kpis:
   - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved to W2-124, DEC-1083] (was S5)'
 profile: FULL
 sources:
+- DEC-1183
+- DEC-1154
+- DEC-385
 - DEC-954
 - DEC-953
 - DEC-078
@@ -136,8 +145,6 @@ sources:
 - DEC-1112
 - DEC-1132
 - DEC-1178
-- W2-124
-- W2-26
 est_loc: 750  # [changed, DEC-1099 (2)] was 500 (W2-88-STANDARD-1 §4)
 acceptance_tests:
   path: tests/acceptance/W2-88/

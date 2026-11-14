@@ -64,8 +64,12 @@ def test_a_change_older_than_28_days_does_not_count_and_a_retrieval_path_does(re
     assert schedule.retrieval_changed(repo, None, x) == []
 
 
-def _history(runs, rows):
-    folder = schedule.folder(runs)
+def _sd(runs, repo):
+    return schedule.state_dir(runs, repo)
+
+
+def _history(state, rows):
+    folder = state
     folder.mkdir(parents=True)
     (folder / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
 
@@ -76,26 +80,26 @@ def _line(commit, **kw):
 
 
 def test_the_mode_is_weekly_until_three_measured_audits_and_monthly_when_they_were_calm(repo, tmp_path):
-    runs = tmp_path / "runs"
+    runs = _sd(tmp_path / "runs", repo)
     head = _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(head), _line(head)])
     assert schedule.decide(repo, runs, head, T0)["reason"] == "start"
     _history_more = [_line(head)] * 3
-    (schedule.folder(runs) / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in _history_more))
+    (runs / "HISTORY.jsonl").write_text("".join(json.dumps(r) + "\n" for r in _history_more))
     got = schedule.decide(repo, runs, head, T0)
     assert (got["mode"], got["reason"]) == ("monthly", "stable")
 
 
 @pytest.mark.parametrize("change,reason", [({"passes": False}, "verdict"), ({"pool_regression": True}, "pool")])
 def test_a_last_verdict_below_the_bar_or_a_pool_regression_sends_it_back_to_weekly(repo, tmp_path, change, reason):
-    runs, head = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
+    runs, head = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(head), _line(head), _line(head, **change)])
     got = schedule.decide(repo, runs, head, T0)
     assert (got["mode"], got["reason"]) == ("weekly", reason)
 
 
 def test_a_retrieval_change_since_the_last_audit_sends_it_back_to_weekly(repo, tmp_path):
-    runs, audited = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
+    runs, audited = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
     _history(runs, [_line(audited)] * 3)
     head = _commit(repo, {"src/gov/codeintel/z.py": "y"}, "2026-11-10T00:00:00+00:00")
     got = schedule.decide(repo, runs, head, T0)
@@ -103,8 +107,8 @@ def test_a_retrieval_change_since_the_last_audit_sends_it_back_to_weekly(repo, t
 
 
 def test_due_is_six_days_when_weekly_and_twenty_eight_when_monthly(repo, tmp_path):
-    runs, head = tmp_path / "runs", _git(repo, "rev-parse", "HEAD")
-    folder = schedule.folder(runs)
+    runs, head = _sd(tmp_path / "runs", repo), _git(repo, "rev-parse", "HEAD")
+    folder = runs
     folder.mkdir(parents=True)
 
     def due_after(days):
@@ -182,3 +186,93 @@ def test_figures_gives_null_for_a_missing_file_and_exits_ok(tmp_path):
     assert digest.figures(str(tmp_path), "memory-audit-20261112", said.append) == "ok"
     line = json.loads(said[0])
     assert line["verdict"] is None and line["kept"] is None and line["pool"] is None
+
+
+# ---- W2-187: a fresh run beside a live standing set (I7, I12), and the state per repository (I2)
+
+def test_a_fresh_digest_beside_a_live_set_has_the_twelve_lines_then_drift_and_the_latest_maintain_line():
+    plain = digest.lines(_state())
+    assert len(plain) == 12  # with no live set the block is as it was
+    maintain = "MAINTAIN 1 store current aaaaaaaaaaaa 2 layout current 3 links 0 4 unindexed 0 5 not_found 0 second 0 6 reanchor 0"
+    block = digest.lines(_state(drift={"set": "s", "word": "STANDING_FITTED", "S": 96.0, "F": 90.0, "k": 4},
+                                maintain=maintain))
+    assert block[:12] == plain and len(block) == 14
+    assert block[12] == "DRIFT S 96.0 F 90.0: STANDING_FITTED" and block[13] == maintain
+    assert digest.lines(_state(drift={"word": "none", "S": 95.0, "F": 94.0, "k": 4}))[12] == "DRIFT S 95.0 F 94.0: none"
+    assert digest.lines(_state(drift={"word": None, "k": 2}))[12:] == ["DRIFT not yet (2 of 4)", "MAINTAIN none"]
+
+
+def test_the_history_line_says_fresh_only_beside_a_live_set(tmp_path):
+    st = {"audit": "memory-audit-20261116", "commit": "a" * 40, "mode": "weekly"}
+    at = T0
+    for kind in (None, "fresh"):
+        driver._history(tmp_path, st, at, 0.01, False, measured=True, fig={"verdict": {"passes": True}}, kind=kind)
+    rows = [json.loads(x) for x in (tmp_path / "HISTORY.jsonl").read_text().splitlines()]
+    assert "kind" not in rows[0] and rows[1]["kind"] == "fresh"
+    assert {k: v for k, v in rows[1].items() if k != "kind"} == rows[0]
+
+
+def test_a_refusal_for_a_fresh_run_ignores_the_standing_starts_and_a_standing_run_needs_no_baseline(repo, tmp_path):
+    head = _git(repo, "rev-parse", "HEAD")
+    at = T0.replace(year=2026, month=10, day=1, hour=1)  # an hour after the head's commit
+    state = tmp_path / "state"
+    (state / "indep").mkdir(parents=True)
+    (state / "STARTS.log").write_text(json.dumps({"audit": "s", "at": schedule.stamp(at - timedelta(days=1)),
+                                                  "kind": "standing"}) + "\n")
+    st = {"audit": "memory-audit-20261001"}
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) == "RN-NOBASE"
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo, standing=True) is None
+    (state / "indep" / "AUDITS.log").write_text(json.dumps({"commit": head}) + "\n")
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) is None  # the standing start is not recent
+    (state / "STARTS.log").write_text(json.dumps({"audit": "f", "at": schedule.stamp(at - timedelta(days=1)),
+                                                  "kind": "fresh"}) + "\n")
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, False, at, head, repo) == "RN-RECENT"
+    assert driver._refusal(st, state, str(tmp_path / "lock"), True, False, at, head, repo, standing=True) == "RN-LOCK"
+    late = at + timedelta(days=2)
+    assert driver._refusal(st, state, str(tmp_path / "lock"), False, True, late, head, repo, standing=True) == "RN-STALE"
+
+
+# ---- F-A (review round 1; S3, S6/I6, S7): the children that read the store and the anchors work in the store link
+
+READS = ("preflight", "measure", "judge")  # the children whose searches and anchors must be the declared store's
+
+
+def _recorded(tmp_path, monkeypatch, path: str):
+    """``_Cycle.<path>`` with every child stood in for: ``{step: argv}`` of the steps it started (nothing is run)."""
+    seen = {}
+
+    def spawn(argv, repo, env, out, err):
+        seen[argv[3] if argv[1:3] == ["-m", "gov.memaudit"] else out.stem] = list(argv)
+        out.write_text("PRE-FLIGHT standing: n 40 of 40; dropped 0\n" if out.stem == "preflight" else "")
+        err.write_text("")
+        return 0
+
+    monkeypatch.setattr(driver, "_spawn", spawn)
+    monkeypatch.setattr(driver._Cycle, "brief", lambda self, kind: (f"briefs/{kind}.md", "a" * 64))
+    a_dir = tmp_path / "a"
+    a_dir.mkdir()
+    st = {"audit": "memory-audit-20261111", "commit": "c" * 40, "steps": [], "cost": {}}
+    cycle = driver._Cycle(st, a_dir, tmp_path / "repository", {}, lambda line: None, str(tmp_path / "sets"), [],
+                          ["launch"], str(tmp_path / "link"), week="2026-W46" if path == "standing" else None)
+    cycle.counts = {}
+    assert getattr(cycle, path)(str(tmp_path / "repository"), "/g/gov", "/c/claude") is True
+    return seen
+
+
+def _repo_flag(argv):
+    return argv[argv.index("--repo") + 1]
+
+
+@pytest.mark.parametrize("path", ["standing", "run"])
+def test_preflight_measure_and_judge_are_handed_the_store_link_not_the_repository(tmp_path, monkeypatch, path):
+    seen = _recorded(tmp_path, monkeypatch, path)
+    assert {s: _repo_flag(seen[s]) for s in READS} == {s: str(tmp_path / "link") for s in READS}
+    m = seen["measure"]
+    assert m[m.index("--store") + 1] == f"{tmp_path / 'link'}/.gov-runtime/store.db"  # the store declared is the one searched
+    assert m[m.index("--commit") + 1] == "c" * 40 and seen["preflight"][seen["preflight"].index("--commit") + 1] == "c" * 40
+
+
+def test_the_fresh_path_still_starts_its_launch_steps_and_figures_as_before(tmp_path, monkeypatch):
+    seen = _recorded(tmp_path, monkeypatch, "run")
+    assert set(seen) >= {"writer-1", "checker-1", "void", "auditor", "classes", "pool", "figures", *READS}
+    assert "--repo" not in seen["figures"] and "--repo" not in seen["void"]
