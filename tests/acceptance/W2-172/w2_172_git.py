@@ -32,6 +32,16 @@ EXCLUDE_TEXT = "# planted exclusions\nfixtures/evaluation/**\ngovernance/project
 N = len(PLAIN) + len(RETR)
 
 
+class _MakesParent(type(Path())):
+    """The log's path as the helper hands it out: opening it to write makes its parent folder first, because the key
+    folder's ``indep/`` no longer exists until a run makes it (W2-187 I2, G1: the S6 file stays byte-unchanged)."""
+
+    def open(self, mode="r", *args, **kwargs):
+        if any(c in mode for c in "wax+"):
+            self.parent.mkdir(parents=True, exist_ok=True)
+        return super().open(mode, *args, **kwargs)
+
+
 class Light(Driver):
     """A base folder with the pieces ``Driver`` needs; ``repo`` is filled by a builder."""
 
@@ -42,7 +52,7 @@ class Light(Driver):
         self.runs_env = self.base / "launch-log"  # $GOV_INDEP_RUNS_DIR
         self.mem = self.runs_env / "indep" / "memaudit" / state_key(self.repo)  # W2-187 I2 (Rewrite-Reason: DEC-1179 (5))
         self.runs = self.mem  # the folder whose ``indep/`` holds AUDITS.log (as ``<runs>/indep`` was)
-        self.audits_log = self.runs / "indep" / "AUDITS.log"
+        self.audits_log = _MakesParent(self.runs / "indep" / "AUDITS.log")
         self.spy_dir = self.base / "nospy"
         self.now = now
         self.audit_commit = None

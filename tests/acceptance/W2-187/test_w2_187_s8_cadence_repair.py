@@ -246,7 +246,8 @@ def test_s8_the_owners_decision_id_closes_it_and_is_recorded(make_world):
     last = world.history()[-1]
     assert last["kind"] == "repair" and last["word"] == "MEMORY_REPAIR residual" and last["decision"] == "DEC-1", last
     after = world.status_repair()
-    assert after.code == 0 and after.lines == ["REPAIR residual DEC-1"], after
+    # I8: a plain `status --repair` has two outputs only; the residual closes the repair, so it is `REPAIR none`, exit 0
+    assert after.code == 0 and after.lines == ["REPAIR none"], after
 
 
 @pytest.mark.parametrize("bad", ["DEC-x", "DEC-", "1", "dec-1", "DEC-1 DEC-2"])
