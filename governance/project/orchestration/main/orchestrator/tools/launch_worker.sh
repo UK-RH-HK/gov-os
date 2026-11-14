@@ -177,6 +177,9 @@ if "sandbox-trial" not in text and "EMG-d4b-launched.md" not in text:
 copy.write_text(text, encoding="utf-8")
 PY
 [ -e "$TRIAL_DIR/.sandbox-trial-$ID" ] && refuse 4 "a sandbox trial file is already there ($TRIAL_DIR/.sandbox-trial-$ID): the after-check would prove nothing; the CTO looks at it first"
+if [ -n "$owner_named$reason$trial" ] && ! grep -rqs -e '--owner-named' "${LAUNCH_CODE_ROOT:-$tree}/src/gov/launch" "${LAUNCH_CODE_ROOT:-$tree}/src/gov/cli"; then
+  refuse 2 "this tree's gov launch has no --owner-named/--reason/--trial (W2-184 not merged here: ${LAUNCH_CODE_ROOT:-$tree}/src); launch without them"
+fi
 cli "$role" "$effort"
 dry=$(cd "$tree" && PYTHONPATH="${LAUNCH_CODE_ROOT:-$tree}/src" python3 - "$tree" "$role" "$ID" "${CLI[@]}" 2>&1 <<'PY'
 import sys

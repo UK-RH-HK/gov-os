@@ -2,7 +2,7 @@
 task: DAEO-6f0s
 decisions_applied: [DEC-1167, DEC-1120, DEC-1119, DEC-1052, DEC-1010, DEC-1146, DEC-802, DEC-136, DEC-1154, DEC-1177]
 ---
-STATE: CTO answered P-W2-184-4 (a); rv-f1 (narrow check, DEC-1154) launched pid 1343130 at fb2ea8460857 with --owner-named DEC-1177 --reason | HEAD: fb2ea8460857 | NEXT: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-184/.gov-runtime/scratch/lead/log/rv-f1.exit; then commit its record as docs/probes/DAEO-6f0s/PR-DAEO-6f0s-f1.md (implementer_session, probed_commit in full, quoted values with ': '); then merge w2/integrate --no-ff (moved: 62 commits, no shared file); PASS: DONE; FAIL: PACKAGES | WAITING ON: rv-f1
+STATE: rv-f1 (e0e76090) PASS at fb2ea8460; record committed 076aec76e; w2/integrate merged 0a2dde35c (clean, no ticket file) | HEAD: 0a2dde35c0cc | NEXT: read lead/log/accept-merge.txt; return DONE with head 0a2dde35c0cc | WAITING ON: gov accept on the merged head
 Workers: td-5 83e513a0, eng-5 06690070, td-6 ec344c7f, eng-6 b8148380 done; rv-1 0be7734a (fail), rv-2 d4de9d3f (fail); narrow check not launched
 Rounds: two review rounds done (DEC-1010); narrow check (DEC-1154, DEC-1177 (1)) pending: launcher counts it as review_round 3
 Verify: verify-f1 at 42d0867d3 GREEN 7992/0; verify-cli at fb2ea8460 GREEN 8037/0 (lead/log/verify-cli/parallel.xml); gov accept 507/507 at fb2ea8460

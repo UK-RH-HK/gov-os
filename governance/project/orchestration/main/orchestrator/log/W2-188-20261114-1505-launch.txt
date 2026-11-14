@@ -1,0 +1,122 @@
+2026-11-14 15:05:09 admitted by the dispatcher; launching W2-188
+disk gate open: 661 GiB free, 53579125 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 15306891264,
+  "sessions_live_memory_bytes": 3961389056,
+  "load_1m": 17.35,
+  "load_15m": 11.33,
+  "busy_cores_1m": 14.81,
+  "embedding_cpu_p95": {
+    "shared": 0.12,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 708748972032,
+    "free_inodes": 53579120
+  },
+  "sessions": [
+    {
+      "pid": 107366,
+      "repository": "/home/usain/gov-os-worktrees/W2-88",
+      "ticket": "DAEO-2bdu",
+      "role": "engineer",
+      "live_memory_bytes": 665841664
+    },
+    {
+      "pid": 1329242,
+      "repository": "/home/usain/gov-os-worktrees/W2-184",
+      "ticket": "DAEO-6f0s",
+      "role": "orchestrator",
+      "live_memory_bytes": 282820608
+    },
+    {
+      "pid": 1343333,
+      "repository": "/home/usain/gov-os-worktrees/W2-184",
+      "ticket": "DAEO-6f0s",
+      "role": "independent-auditor",
+      "live_memory_bytes": 278745088
+    },
+    {
+      "pid": 1570180,
+      "repository": "/home/usain/gov-os-worktrees/W2-94-fix",
+      "ticket": "DAEO-g87r",
+      "role": "engineer",
+      "live_memory_bytes": 307503104
+    },
+    {
+      "pid": 3395055,
+      "repository": "/home/usain/gov-os-worktrees/W2-88",
+      "ticket": "DAEO-2bdu",
+      "role": "orchestrator",
+      "live_memory_bytes": 287444992
+    },
+    {
+      "pid": 3815645,
+      "repository": "/home/usain/gov-os-worktrees/W2-187",
+      "ticket": "DAEO-0cd2",
+      "role": "orchestrator",
+      "live_memory_bytes": 261300224
+    },
+    {
+      "pid": 3863156,
+      "repository": "/home/usain/gov-os-worktrees/W2-187",
+      "ticket": "DAEO-0cd2",
+      "role": "engineer",
+      "live_memory_bytes": 956923904
+    },
+    {
+      "pid": 507931,
+      "repository": "/home/usain/gov-os-worktrees/W2-94-fix",
+      "ticket": "DAEO-g87r",
+      "role": "orchestrator",
+      "live_memory_bytes": 295526400
+    },
+    {
+      "pid": 525883,
+      "repository": "/home/usain/gov-os-worktrees/W2-61h-c39",
+      "ticket": "DAEO-h2k3",
+      "role": "orchestrator",
+      "live_memory_bytes": 270880768
+    },
+    {
+      "pid": 747720,
+      "repository": "/home/usain/gov-os-worktrees/W2-61h-c39",
+      "ticket": "DAEO-h2k3",
+      "role": "independent-auditor",
+      "live_memory_bytes": 354402304
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1606606,
+    "repository": "/home/usain/gov-os-worktrees/W2-188",
+    "ticket": "DAEO-zlog",
+    "role": "orchestrator",
+    "started": "2026-11-14T15:05:10+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 24387109
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-14 15:05:10 gate open; DAEO-zlog registered as pid 1606606; starting W2-188

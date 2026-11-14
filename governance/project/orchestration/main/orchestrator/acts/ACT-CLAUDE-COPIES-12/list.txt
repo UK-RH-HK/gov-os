@@ -1,0 +1,1 @@
+repo|.claude/skills/adopt/SKILL.md|77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6|65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc

@@ -9328,3 +9328,8 @@
 {"at": "2026-11-14 14:57:55", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 14:48:41", "pending_tool": null, "age_min": 9, "verdict": "alive"}
 {"at": "2026-11-14 15:00:06", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 14:48:41", "pending_tool": null, "age_min": 11, "verdict": "alive"}
 {"at": "2026-11-14 15:02:20", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:02:16", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-14 15:04:35", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:04:32", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-14 15:06:46", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:06:45", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-14 15:09:00", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:08:47", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-14 15:11:14", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:08:47", "pending_tool": null, "age_min": 2, "verdict": "alive"}
+{"at": "2026-11-14 15:13:28", "transcript": "6ff2ee7c-f234-443c-8484-b5e93fc3d159.jsonl", "last_assistant": "2026-11-14 15:13:19", "pending_tool": null, "age_min": 0, "verdict": "alive"}

@@ -1,4 +1,4 @@
-======== rehearsal of the re-pin from release 0.1.0 (neg-sha), 2026-11-14 14:19:29
+======== rehearsal of the re-pin from release 0.1.0 (neg-sha), 2026-11-14 15:11:15
 ======== the live paths before
 gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
 gov script sha256: bdb6107b19f8
@@ -11,40 +11,40 @@ registry file sha256: e5d41b8de325
 shared reranker pid: 32310
 main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
 main tree docs/releases: README.md 
-store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 494d5c9335fa
-store halves: a at c1cb5285c03c, b at 494d5c9335fa
-w2/integrate: 494d5c9335fa
-the stand-in C: 494d5c9335fa (the main tree's w2/integrate head now)
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at 18a279055d99
+store halves: a at 18a279055d99, b at 494d5c9335fa
+w2/integrate: 18a279055d99
+the stand-in C: 18a279055d99 (the main tree's w2/integrate head now)
 ======== the scratch release 0.1.0 at the stand-in C (a scratch clone only)
 record: /tmp/gov-os-rel-repin/neg-sha/release/docs/releases/0.1.0
 manifest.json: OK
 scratch status: ?? docs/releases/0.1.0/ 
-scratch tag: v0.1.0 -> fe9fbc48e0ec (parent 494d5c9335fa), tag
-scratch record: version 0.1.0 commit 494d5c9335fa cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl 4376c78ba335 files 278
+scratch tag: v0.1.0 -> 33908f8fc711 (parent 18a279055d99), tag
+scratch record: version 0.1.0 commit 18a279055d99 cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl ee0f4566e91c files 278
 ======== fill_release.sh from the scratch release
-C=494d5c9335fa (tag v0.1.0 on fe9fbc48e0ec)
-EPOCH=1794665234
-SHA=4376c78ba33586384f72d24130d5093d4058bbe6e7ab44739ee168633de3837f (the record's wheel sha256)
-RECORD=7bc9ffa65197a1fbe2dcc055aa2651f477dfb59d6119e9e20cead64f070e7dfa (manifest.json's sha256)
-filled: /tmp/gov-os-rel-repin/neg-sha/REPIN-COMMANDS-REL-0.1.0.sh sha256 16093e69b7e021a7709608d4f19170a8d4826c3cb4dd214ae64d45ad00cf886c
-hash list: /tmp/gov-os-rel-repin/neg-sha/REPIN-REL-0.1.0.sha256 (13 files) sha256 d48f5892ca5c4520c615f6beaed0ef83dfa6d8391c7b3de09ba149d97a53f0d6
+C=18a279055d99 (tag v0.1.0 on 33908f8fc711)
+EPOCH=1794668634
+SHA=ee0f4566e91c993615160fb1c541966f877375220e3db7484b26b8e1a6da5853 (the record's wheel sha256)
+RECORD=c5d44b1164410d0ac4b7597f8fa62609c76f58f7b2e246ec45824552b7aa9c06 (manifest.json's sha256)
+filled: /tmp/gov-os-rel-repin/neg-sha/REPIN-COMMANDS-REL-0.1.0.sh sha256 2b7e96c4ab8f778e140170e37775ec3fe46749fdb795e2b6d0070e918cf02410
+hash list: /tmp/gov-os-rel-repin/neg-sha/REPIN-REL-0.1.0.sha256 (13 files) sha256 49040dac1d4e3ebe7a2ef8fd05816732c869afb52e9fba2f99ac6e367cc46003
 the filled script differs from the template in the four value lines only
-half a: c1cb5285c03c, store 580M
+half a: 18a279055d99, store 581M
 half b: 494d5c9335fa, store 581M
-registry clone at 494d5c9335fa on w2/integrate
+registry clone at 18a279055d99 on w2/integrate
 scratch hook: 099de326c45b (a copy of the live one)
-mirror ready: gov -> /tmp/gov-os-rel-repin/neg-sha/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/neg-sha/home/gov-os-worktrees/W2-00-store-b
+mirror ready: gov -> /tmp/gov-os-rel-repin/neg-sha/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/neg-sha/home/gov-os-worktrees/W2-00-store-a
 neg-sha: the filled SHA line now: SHA=00000000000000000000000000...
 ======== the operator's script (filled from the scratch release), against the mirror
 /tmp/gov-os-rel-repin/neg-sha/REPIN-COMMANDS-REL-0.1.0.sh: FAILED
 sha256sum: WARNING: 1 computed checksum did NOT match
 the hash list fails on the edited script, as it would for the operator (neg-sha runs the script anyway, to show part R's stop)
 == 0. preconditions
-ok (gov -> pin-797495bdfc70; store -> W2-00-store-b at 494d5c9335fa; w2/integrate at 494d5c9335fa, 494d5c9335fa and it the same wheel inputs; the hook is only read)
+ok (gov -> pin-797495bdfc70; store -> W2-00-store-a at 18a279055d99; w2/integrate at 18a279055d99, 18a279055d99 and it the same wheel inputs; the hook is only read)
 == R. release 0.1.0: the tag v0.1.0 and its record, checked against the values filled in (RL-1)
 manifest.json: OK
 
-STOP: the record does not name what was filled in: the manifest's wheel sha256 '4376c78ba33586384f72d24130d5093d4058bbe6e7ab44739ee168633de3837f' is not the one filled in
+STOP: the record does not name what was filled in: the manifest's wheel sha256 'ee0f4566e91c993615160fb1c541966f877375220e3db7484b26b8e1a6da5853' is not the one filled in
 Nothing was switched: /tmp/gov-os-rel-repin/neg-sha/home/.local/bin/gov is still pin-797495bdfc70. Tell the CTO.
 ======== the script ended: exit 1, 0 s
 ======== the live paths after
@@ -59,9 +59,9 @@ registry file sha256: e5d41b8de325
 shared reranker pid: 32310
 main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
 main tree docs/releases: README.md 
-store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at 494d5c9335fa
-store halves: a at c1cb5285c03c, b at 494d5c9335fa
-w2/integrate: 494d5c9335fa
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at 18a279055d99
+store halves: a at 18a279055d99, b at 494d5c9335fa
+w2/integrate: 18a279055d99
 the live gov link, script, pins, wheels, hook, registry file, reranker pid, main-tree tags and docs/releases: UNCHANGED (every line equal before and after)
 the live store link, its halves and w2/integrate: UNCHANGED
 the scratch hook after: 099de326c45b (the script only reads it)

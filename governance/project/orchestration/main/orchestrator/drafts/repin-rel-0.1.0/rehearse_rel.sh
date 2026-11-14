@@ -204,8 +204,9 @@ else echo "the live store link or halves DIFFER while w2/integrate did not move:
 echo "the scratch hook after: $(sha256sum < "$S/hooks/reference-transaction" | cut -c1-12) (the script only reads it)"
 [ "$(sha256sum < "$S/hooks/reference-transaction" | cut -c1-12)" = "$(sha256sum < "$R/.git/hooks/reference-transaction" | cut -c1-12)" ] || { echo "the scratch hook differs from the live one"; bad=1; }
 C12=${STANDIN:0:12}
-nothing_switched() {
-  [ ! -e "$S/home/.local/share/gov-os/pin-$C12" ] && [ "$(readlink -f "$S/home/gov-os-worktrees/W2-00-store")" = "$START_STORE" ] \
+nothing_built() { [ ! -e "$S/home/.local/share/gov-os/pin-$C12" ] && [ ! -e "$S/home/.local/share/gov-os/wheels" ]; }
+nothing_switched() {  # the gov link and the store link as at the start; the live paths unchanged; the script said so
+  [ "$(readlink -f "$S/home/gov-os-worktrees/W2-00-store")" = "$START_STORE" ] \
     && [ "$(readlink -f "$S/home/.local/bin/gov")" = "$(readlink -f "$LIVEPINS/pin-$OLD/bin/gov")" ] && [ "$bad" = 0 ] \
     && grep -q "Nothing was switched" "$S/script.out" && [ "$rc" = 1 ]
 }
@@ -221,7 +222,7 @@ case "$MODE" in
     exit 0;;
   neg-src|neg-uncommitted)
     want='differs between'; [ "$MODE" = neg-uncommitted ] && want='uncommitted changes in src'
-    if nothing_switched && grep -q "^STOP: .*$want" "$S/script.out" && ! grep -q '^== R\.' "$S/script.out"; then
+    if nothing_switched && nothing_built && grep -q "^STOP: .*$want" "$S/script.out" && ! grep -q '^== R\.' "$S/script.out"; then
       echo "NEGATIVE RUN OK ($MODE): STOP at part 0 before anything was read, built or switched"; exit 0
     fi;;
   neg-check)
@@ -235,8 +236,8 @@ case "$MODE" in
       neg-manifest) want="does not match its manifest.sha256";;
       neg-sha) want="the manifest's wheel sha256 .* is not the one filled in";;
     esac
-    if nothing_switched && grep -q "^STOP: .*$want" "$S/script.out" && ! grep -q '^== A\.' "$S/script.out" \
-       && [ ! -e "$S/home/.local/share/gov-os/wheels" ] && { [ "$MODE" = neg-sha ] || [ "$FILLREF" = ok ]; }; then
+    if nothing_switched && nothing_built && grep -q "^STOP: .*$want" "$S/script.out" && ! grep -q '^== A\.' "$S/script.out" \
+       && { [ "$MODE" = neg-sha ] || [ "$FILLREF" = ok ]; }; then
       echo "NEGATIVE RUN OK ($MODE): STOP at part R before anything was built or switched$([ "$MODE" = neg-sha ] || echo '; fill_release.sh refused it too')"; exit 0
     fi;;
 esac

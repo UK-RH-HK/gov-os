@@ -1,15 +1,15 @@
 {
   "ticket": "DAEO-zlog",
-  "ticket_text": "---\nid: DAEO-zlog\nwbs_id: W2-188\nexternal-ref: W2-188\ntitle: \"The adopt skill's step 6 and the practice record say the verdict set becomes the standing set, judged every week at 95 %, counts only, checked monthly against a fresh set; A9's weekly cron line named (MEMORY-AUDIT G6 and G4's text; CIT-P)\"\ntype: task\nclass: spec\nrole: product-spec\nprofile: STANDARD\nstatus: open\nstate_class: AUTHORITATIVE\npriority: 1\ncreated: 2026-11-14\ndeps: [DAEO-pg6i]\nallowed_paths:\n- template/governance/kernel/skills/adopt/SKILL.md\n- .rulesync/skills/adopt/SKILL.md\n- template/.rulesync/skills/adopt/SKILL.md\n- docs/research/W2-88-memory-practice.md\n- docs/changes/W2-188-CIT-P.md\n- docs/probes/DAEO-zlog/**\nreads:\n- .gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md\n- .gov-runtime/scratch/orchestrator/governance/project/orchestration/packages/MEMORY-AUDIT-P1.md\n- .gov-runtime/scratch/orchestrator/drafts/memory-scope-20261113/MEMORY-AUDIT.md\n- docs/changes/W2-88a-CIT-P.md\n- docs/changes/W2-98-CIT-P.md\n- tests/acceptance/W2-88a/**\n- tests/acceptance/W2-11/**\n- governance/project/orchestration/packages/LIFT-1/FRESH-80-1.md\n- governance/project/orchestration/packages/LIFT-1/E3-RESULT.md\nneeds:\n- template/governance/kernel/skills/adopt/SKILL.md\nwaits_on:\n- ref: DAEO-0cd2\n  reason: 'the promotion and the copies ACT follow W2-187''s merge, so the generated copy never states a mode the product lacks; the text itself names no subcommand and is written in parallel'\nest_loc: 60\nkpis:\n  success:\n  - 'S1 A9''s step 6 in the adopt skill says, in its own words: the verdict set is declared and measured once at Wave 0 as the first verdict; from then on it is the repository''s standing set, judged end to end every week on the same questions (monthly once the repository is stable, under the package''s O3 (b)) as Gov OS''s memory is judged (the standard''s bundle read whole by the reader, search again once), against 95 %, behind the walls, with only counts leaving its run; it never chooses or judges a fix (fixes chosen on the tuning set and the fresh sets'' misses); a fresh set each month checks it for fitting and a fitted set is replaced; a miss is never re-run in the same week and never re-scored; it cites DEC-1179 [DEC-1179 (1)-(4), DEC-1176 (1), DEC-1098 (1)] Verify: a string test on step 6''s stretch of the three copies finds each of these statements (standing set, every week, same questions, 95 %, counts only, never chooses a fix, fresh set monthly, fitted replaced, DEC-1179); W2-88a''s step matcher (`check_steps`) returns no problem on A9''s section'\n  - 'S2 After A9''s seven steps, one paragraph says the weekly audit runs from one cron line that A9''s ACT package gives the repository''s owner''s operator beside the walls, never installed by adoption, and that a fall below 95 % is handled as the practice record''s section 9 states [DEC-1179 (4), (5), DEC-1101 (2)] Verify: a string test finds the paragraph between step 7 and the `## Verify clauses for adopted tickets` heading in all three copies, with \"cron\", \"ACT\", \"operator\", \"never installs\" (or \"never installed\") and \"95 %\"'\n  - 'S3 The practice record states the standing set: \u00a73''s confirmation line, \u00a75 item 6''s practice lines and \u00a76 step 6 re-worded as the CIT-P quotes, and a new \u00a79 \"The standing set (DEC-1179)\" with what it is, the method (the reader ranking the whole bundle and searching again once, A2, with the E2 and E3 figures), the bar, the walls (counts only, no id read by anyone), fixes never chosen on it, staleness by count, the monthly check against fitting with its two 5-point rules, and DEC-1179 (4)''s rule below 95 % word for word [DEC-1179, DEC-1074 (1), DEC-1074 (4), DEC-1072 (2)] Verify: a string test on each named place of `docs/research/W2-88-memory-practice.md`; \u00a76 still passes W2-88a''s step matcher; \u00a79''s below-95 text equals DEC-1179 (4)''s as recorded'\n  - 'S4 The three copies of the skill are byte-equal; the version goes from \"1.0.0\" to \"1.1.0\" in all three (the next minor if W2-88a''s promotion has taken 1.1.0 by then); nothing else in the skill changes but step 6, the new paragraph, the governing sources line (adding DEC-1101, DEC-1125 and DEC-1179) and the version [CAP-33, DEC-832 item 2, DEC-981] Verify: sha256 of the three copies equal; `git diff` of the kernel copy against the base touches only those four places; `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0'\n  - 'S5 The CIT-P record `docs/changes/W2-188-CIT-P.md` gives the skill''s sha256 before and after, the lines added and removed, the old and new text of each changed place, the impact table (W2-11''s body case red until the copies ACT; W2-88a''s cases unchanged), the independent review''s verdict and the owner''s approval line of the bytes before the merge [CAP-33, DEC-105] Verify: the record holds both hashes (the after equal to the kernel copy at the ticket''s last commit), the counts, a `verdict: PASS` as the last verdict and an `owner_approval:` line naming the sha256'\n  failure:\n  - 'F1 Any other step, section or rule of the adopt skill changes, or the skill grants a permission, names a `gov.memaudit` subcommand or states a mode the product lacks. Verify: the S4 diff; a grep of the three copies for `gov.memaudit` and `standing declare` finds nothing'\n  - 'F2 The ticket writes `.claude/skills/adopt/SKILL.md` or any test under `tests/acceptance/`. Verify: the close''s diff names neither; the copies ACT regenerates the `.claude` copy after the owner''s approval'\n  - 'F3 The text says the standing set may be used to choose, judge, adopt or reject a fix, prints or reads a question id, or calls the reader a second reranking model. Verify: a string test on step 6 and \u00a79 for \"never chooses or judges a fix\" and \"counts only\"; \u00a79 says W2-88 S10''s second reranker stays forbidden'\nnon_goals:\n- 'no code: the standing mode, the bar, the per-repository state, the maintenance pass and the cron line in the ACT package''s text are W2-187'\n- 'no `.claude/` copy (the copies ACT) and no acceptance test (the test designer)'\n- 'no change to A9''s other six steps, to the Verify section or to W2-88''s closed ticket (its lines are re-baselined by the CTO''s record edit under DEC-1179 (7))'\n- 'no change to W2-88 S10''s standard or the forbidden second reranking model'\ndone_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]\nsources: [DEC-1179, DEC-1176, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1071, DEC-1072, DEC-105, DEC-974, CAP-33, DAEO-pg6i, DAEO-2bdu]\nacceptance_tests: {path: tests/acceptance/W2-188/}\n---\n\n# W2-188 The adopt skill's step 6 and the practice record: the standing set\n\n**Problem.** The adopt skill's A9 step 6 (`template/governance/kernel/skills/adopt/SKILL.md:58`, and the two `.rulesync`\ncopies) says: \"Declare and measure the verdict set once. A miss stands as it is: the set is never run again.\" The\npractice record says \"measured once\" in three places (`docs/research/W2-88-memory-practice.md:91-92, 190-191, 221`).\nDEC-1176 (1) kept them standing until the weekly re-measure was decided. The owner decided it on 2026-11-14 (DEC-1179,\nprovisional): the verdict set stays as each repository's standing set, judged every week at 95 %, counts only, checked\nmonthly against a fresh set.\n\n**Approach.** Re-word step 6 and add one paragraph after the seven steps, as `drafts/memory-audit-p1/W2-188-CIT-P.md`\n\u00a72.1 quotes. The proposed step 6 keeps \"declare\", \"measure\", \"the verdict set\" and \"once\", so W2-88a's matcher passes\nunrevised; this was checked on the draft's text. Re-word the practice record's three places and add its \u00a79 (\u00a72.2). Bump\nthe version and write the CIT-P. The skill names no subcommand, so the text does not wait for W2-187. Its promotion and\nthe `.claude` copies ACT come after W2-187 merges (W2-88a's finding F4).\n\n**Rabbit holes.**\n- Do not restate the method's figures in the skill: they belong in the practice record.\n- Do not touch step 5's 5 points or \u00a73's 3 points (a known older wording, left as is).\n- Do not write the below-95 rule before DEC-1179 (4) is recorded. Copy it word for word.\n\n**Filed 2026-11-14 on the owner's decision (DEC-1179, MEMORY-AUDIT-P1), by the CIT-P route (W2-188's CIT-P draft: `.gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md`).** The kernel bytes need the owner's approval of the CIT-P before the merge (DEC-1166 (4)); the `.claude` copy follows by a copies ACT.\n",
+  "ticket_text": "---\nid: DAEO-zlog\nwbs_id: W2-188\nexternal-ref: W2-188\ntitle: \"The adopt skill's step 6 and the practice record say the verdict set becomes the standing set, judged every week at 95 %, counts only, checked monthly against a fresh set; A9's weekly cron line named (MEMORY-AUDIT G6 and G4's text; CIT-P)\"\ntype: task\nclass: spec\nrole: product-spec\nprofile: STANDARD\nstatus: in_progress\nstate_class: AUTHORITATIVE\npriority: 1\ncreated: 2026-11-14\ndeps: [DAEO-pg6i]\nallowed_paths:\n- template/governance/kernel/skills/adopt/SKILL.md\n- .rulesync/skills/adopt/SKILL.md\n- template/.rulesync/skills/adopt/SKILL.md\n- docs/research/W2-88-memory-practice.md\n- docs/changes/W2-188-CIT-P.md\n- docs/probes/DAEO-zlog/**\nreads:\n- .gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md\n- governance/project/orchestration/packages/MEMORY-AUDIT-P1.md\n- .gov-runtime/scratch/orchestrator/drafts/memory-scope-20261113/MEMORY-AUDIT.md\n- docs/changes/W2-88a-CIT-P.md\n- docs/changes/W2-98-CIT-P.md\n- tests/acceptance/W2-88a/**\n- tests/acceptance/W2-11/**\n- governance/project/orchestration/packages/LIFT-1/FRESH-80-1.md\n- governance/project/orchestration/packages/LIFT-1/E3-RESULT.md\nneeds:\n- template/governance/kernel/skills/adopt/SKILL.md\nwaits_on:\n- ref: DAEO-0cd2\n  reason: 'the promotion and the copies ACT follow W2-187''s merge, so the generated copy never states a mode the product lacks; the text itself names no subcommand and is written in parallel'\nest_loc: 60\nkpis:\n  success:\n  - 'S1 A9''s step 6 in the adopt skill says, in its own words: the verdict set is declared and measured once at Wave 0 as the first verdict; from then on it is the repository''s standing set, judged end to end every week on the same questions (monthly once the repository is stable, under the package''s O3 (b)) as Gov OS''s memory is judged (the standard''s bundle read whole by the reader, search again once), against 95 %, behind the walls, with only counts leaving its run; it never chooses or judges a fix (fixes chosen on the tuning set and the fresh sets'' misses); a fresh set each month checks it for fitting and a fitted set is replaced; a miss is never re-run in the same week and never re-scored; it cites DEC-1179 [DEC-1179 (1)-(4), DEC-1176 (1), DEC-1098 (1)] Verify: a string test on step 6''s stretch of the three copies finds each of these statements (standing set, every week, same questions, 95 %, counts only, never chooses a fix, fresh set monthly, fitted replaced, DEC-1179); W2-88a''s step matcher (`check_steps`) returns no problem on A9''s section'\n  - 'S2 After A9''s seven steps, one paragraph says the weekly audit runs from one cron line that A9''s ACT package gives the repository''s owner''s operator beside the walls, never installed by adoption, and that a fall below 95 % is handled as the practice record''s section 9 states [DEC-1179 (4), (5), DEC-1101 (2)] Verify: a string test finds the paragraph between step 7 and the `## Verify clauses for adopted tickets` heading in all three copies, with \"cron\", \"ACT\", \"operator\", \"never installs\" (or \"never installed\") and \"95 %\"'\n  - 'S3 The practice record states the standing set: \u00a73''s confirmation line, \u00a75 item 6''s practice lines and \u00a76 step 6 re-worded as the CIT-P quotes, and a new \u00a79 \"The standing set (DEC-1179)\" with what it is, the method (the reader ranking the whole bundle and searching again once, A2, with the E2 and E3 figures), the bar, the walls (counts only, no id read by anyone), fixes never chosen on it, staleness by count, the monthly check against fitting with its two 5-point rules, and DEC-1179 (4)''s rule below 95 % word for word [DEC-1179, DEC-1074 (1), DEC-1074 (4), DEC-1072 (2)] Verify: a string test on each named place of `docs/research/W2-88-memory-practice.md`; \u00a76 still passes W2-88a''s step matcher; \u00a79''s below-95 text equals DEC-1179 (4)''s as recorded'\n  - 'S4 The three copies of the skill are byte-equal; the version goes from \"1.0.0\" to \"1.1.0\" in all three (the next minor if W2-88a''s promotion has taken 1.1.0 by then); nothing else in the skill changes but step 6, the new paragraph, the governing sources line (adding DEC-1101, DEC-1125 and DEC-1179) and the version [CAP-33, DEC-832 item 2, DEC-981] Verify: sha256 of the three copies equal; `git diff` of the kernel copy against the base touches only those four places; `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0'\n  - 'S5 The CIT-P record `docs/changes/W2-188-CIT-P.md` gives the skill''s sha256 before and after, the lines added and removed, the old and new text of each changed place, the impact table (W2-11''s body case red until the copies ACT; W2-88a''s cases unchanged), the independent review''s verdict and the owner''s approval line of the bytes before the merge [CAP-33, DEC-105] Verify: the record holds both hashes (the after equal to the kernel copy at the ticket''s last commit), the counts, a `verdict: PASS` as the last verdict and an `owner_approval:` line naming the sha256'\n  failure:\n  - 'F1 Any other step, section or rule of the adopt skill changes, or the skill grants a permission, names a `gov.memaudit` subcommand or states a mode the product lacks. Verify: the S4 diff; a grep of the three copies for `gov.memaudit` and `standing declare` finds nothing'\n  - 'F2 The ticket writes `.claude/skills/adopt/SKILL.md` or any test under `tests/acceptance/`. Verify: the close''s diff names neither; the copies ACT regenerates the `.claude` copy after the owner''s approval'\n  - 'F3 The text says the standing set may be used to choose, judge, adopt or reject a fix, prints or reads a question id, or calls the reader a second reranking model. Verify: a string test on step 6 and \u00a79 for \"never chooses or judges a fix\" and \"counts only\"; \u00a79 says W2-88 S10''s second reranker stays forbidden'\nnon_goals:\n- 'no code: the standing mode, the bar, the per-repository state, the maintenance pass and the cron line in the ACT package''s text are W2-187'\n- 'no `.claude/` copy (the copies ACT) and no acceptance test (the test designer)'\n- 'no change to A9''s other six steps, to the Verify section or to W2-88''s closed ticket (its lines are re-baselined by the CTO''s record edit under DEC-1179 (7))'\n- 'no change to W2-88 S10''s standard or the forbidden second reranking model'\ndone_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]\nsources: [DEC-1179, DEC-1176, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1071, DEC-1072, DEC-105, DEC-974, CAP-33, DAEO-pg6i, DAEO-2bdu]\nacceptance_tests: {path: tests/acceptance/W2-188/}\n---\n\n# W2-188 The adopt skill's step 6 and the practice record: the standing set\n\n**Problem.** The adopt skill's A9 step 6 (`template/governance/kernel/skills/adopt/SKILL.md:58`, and the two `.rulesync`\ncopies) says: \"Declare and measure the verdict set once. A miss stands as it is: the set is never run again.\" The\npractice record says \"measured once\" in three places (`docs/research/W2-88-memory-practice.md:91-92, 190-191, 221`).\nDEC-1176 (1) kept them standing until the weekly re-measure was decided. The owner decided it on 2026-11-14 (DEC-1179,\nprovisional): the verdict set stays as each repository's standing set, judged every week at 95 %, counts only, checked\nmonthly against a fresh set.\n\n**Approach.** Re-word step 6 and add one paragraph after the seven steps, as `drafts/memory-audit-p1/W2-188-CIT-P.md`\n\u00a72.1 quotes. The proposed step 6 keeps \"declare\", \"measure\", \"the verdict set\" and \"once\", so W2-88a's matcher passes\nunrevised; this was checked on the draft's text. Re-word the practice record's three places and add its \u00a79 (\u00a72.2). Bump\nthe version and write the CIT-P. The skill names no subcommand, so the text does not wait for W2-187. Its promotion and\nthe `.claude` copies ACT come after W2-187 merges (W2-88a's finding F4).\n\n**Rabbit holes.**\n- Do not restate the method's figures in the skill: they belong in the practice record.\n- Do not touch step 5's 5 points or \u00a73's 3 points (a known older wording, left as is).\n- Do not write the below-95 rule before DEC-1179 (4) is recorded. Copy it word for word.\n\n**Filed 2026-11-14 on the owner's decision (DEC-1179, MEMORY-AUDIT-P1), by the CIT-P route (W2-188's CIT-P draft: `.gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md`).** The kernel bytes need the owner's approval of the CIT-P before the merge (DEC-1166 (4)); the `.claude` copy follows by a copies ACT.\n\n## Interface (the CTO at claim, DEC-1179 (8), DEC-1157 (3) and (12); listed for the owner's reading)\n\n- **I1, the skill's three copies and the four places (S1, S2, S4, F1).** `template/governance/kernel/skills/adopt/SKILL.md`\n  is edited. `.rulesync/skills/adopt/SKILL.md` and `template/.rulesync/skills/adopt/SKILL.md` are then byte copies of it,\n  all three at base sha256 `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0`, 74 lines. Exactly four\n  places change:\n  - **Line 4:** `version: \"1.0.0\"` becomes `version: \"1.1.0\"` (W2-88a is closed and the kernel copy still reads 1.0.0\n    at `10c0ca52b`). If the version line reads anything other than 1.0.0 at claim, use the next minor after it (S4).\n  - **Line 58, step 6:** replaced in place by one numbered line, `6. Declare ...`.\n  - **A new paragraph** after line 59 (step 7), with one blank line before it, before line 61's\n    `## Verify clauses for adopted tickets`.\n  - **Line 74, the sources line:** adds DEC-1101, DEC-1125 and DEC-1179 in numeric order.\n\n  `git diff <base> -- template/governance/kernel/skills/adopt/SKILL.md` shows those four hunks and no other.\n  `.claude/skills/adopt/SKILL.md` is not touched (the copies ACT).\n\n- **I2, step 6's text constraints (S1, F1, F3; W2-88a's `check_steps` at `tests/acceptance/W2-88a/w2_88a_support.py:207`).**\n  - **The step-6 anchor:** step 6 opens with `Declare`, and no word starting `declar` stands earlier in steps 1 to 5.\n  - **The step-6 checks:** it says `measure`, `the verdict set` and `once`.\n  - **The step-7 anchor** (`record\\w*` then, within one sentence, `every|each|all` then `method`) must not occur in step 6.\n  - **No subcommand:** it names no `gov.memaudit` and no `standing declare`.\n  - **No second reranking model:** it never calls the reader one.\n  - **The literal phrases step 6 holds:** `standing set`, `every week`, `same questions`, `95 %`, `counts only`,\n    `never chooses or judges a fix`, `fresh set` with `month`, `fitted` with `replaced`, and `DEC-1179`. S1's\n    statement that a miss is never re-run in the same week and never re-scored is kept in words as well, though the\n    S1 Verify list does not test it.\n\n- **I3, the paragraph after step 7 (S2).** One paragraph that holds the literal words `cron`, `ACT`, `operator`,\n  `never installs` (or `never installed`) and `95 %`, and points to the practice record's section 9. It names no\n  subcommand, and the step-7 anchor rule does not apply after step 7.\n\n- **I4, the practice record `docs/research/W2-88-memory-practice.md` (280 lines at the base; S3, F3).**\n  - **The places re-worded as the CIT-P quotes:** \u00a73's bullet at lines 91-92; \u00a75 item 6's two sub-bullets at lines\n    190-191; \u00a76 step 6 at line 221.\n  - **\u00a76 still passes `check_steps`:** the same anchor rules as I2, and step 6 keeps `Declare`, `measure`,\n    `the verdict set` and `once`.\n  - **A new `## 9. The standing set (DEC-1179)`,** appended after \u00a78 at the end of the file. It holds:\n    - what the set is;\n    - the method: the reader ranking the whole bundle and searching again once, A2, with E2's 115 and 128 of 138 and\n      E3's 114 against 84;\n    - the bar, ceil(0.95 n);\n    - the walls, with the literal `counts only`;\n    - the literal `never chooses or judges a fix`;\n    - the sentence that W2-88 S10's second reranking model stays forbidden;\n    - staleness by count;\n    - the monthly check with its two 5-point rules;\n    - DEC-1179 (4)'s text as recorded, word for word: the bytes of the register's DEC-1179 line `  - (4) ...` after\n      `(4) `, from `**Below 95 %:**` to its closing `.`.\n\n- **I5, the checks the session runs and records under `docs/probes/DAEO-zlog/` (S1, S3, S4).**\n  - `check_steps` on A9's region of each copy (`a9_regions`) and on the practice record's \u00a76: no problems;\n  - `check_pointer` on A9's region: no problems;\n  - `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt`: exit 0;\n  - `sha256sum` of the three copies: equal;\n  - `grep -c 'gov.memaudit\\|standing declare'` of the three copies: 0;\n  - the I1 `git diff --stat` and hunk count.\n\n  It runs no test suite.\n\n- **I6, the CIT-P record `docs/changes/W2-188-CIT-P.md` (S5).** Built from the draft\n  `.gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md`. It holds:\n  - the skill's sha256 before (`16fd341f...`) and after; the after equals the kernel copy at the ticket's last commit, so\n    the record is the last file changed;\n  - the lines added and removed;\n  - the old and new text of each changed place;\n  - the impact table: W2-11's body case `test_every_copy_carries_the_kernel_skills_body[adopt]` red until the copies ACT;\n    W2-88a's cases unchanged;\n  - the reviewer's `verdict: PASS` as the last verdict line;\n  - in the front matter, `owner_approval: '<sha256 after> approved by the owner, <date>, <reference>'`, written before\n    the merge.\n\n- **How the code-bound clauses read:**\n  - **S1:** \"never chooses a fix\" reads as F3's literal `never chooses or judges a fix`. \"Fresh set monthly\" reads as\n    `fresh set` and `month` within step 6. \"Fitted replaced\" reads as `fitted` and `replaced` within step 6. \"Counts only\"\n    is the literal phrase.\n  - **S4:** \"the next minor\" is 1.1.0. \"Those four places\" are I1's four hunks.\n  - **S3:** \"equals DEC-1179 (4)'s as recorded\" is I4's verbatim substring.\n  - **F2:** the close's diff names no `.claude/` path and no `tests/` path.\n\n- **Gaps:** none inside `allowed_paths`. The draft's text needs four changes to meet these clauses (see discoveries):\n  - its step 6 says \"with only counts leaving its run\" and lacks the literal `counts only`;\n  - its \u00a79 lacks the literal `counts only` and `never chooses or judges a fix`;\n  - its \u00a79 last bullet must be replaced by DEC-1179 (4)'s recorded text, recorded at `976e53791`.\n",
   "authority": [
     {
       "id": "DEC-1179",
-      "sha256": "1e8a43d29a1e95f8035f6687d2da5a27c2991b8c9f3a61d6e5b61354061f0c54",
+      "sha256": "d86bc27f560c2e8f7214bdf6d276afc4672611a6e6b048c8b43489b4bc3dc130",
       "authority": "decision",
       "lifecycle": "ACCEPTED",
-      "constraint": "1e8a43d29a1e95f8035f6687d2da5a27c2991b8c9f3a61d6e5b61354061f0c54",
+      "constraint": "d86bc27f560c2e8f7214bdf6d276afc4672611a6e6b048c8b43489b4bc3dc130",
       "reason": "declared in sources",
-      "tokens": 6606
+      "tokens": 1335
     },
     {
       "id": "DEC-1176",
@@ -141,12 +141,12 @@
   "mandatory": [
     {
       "id": "DEC-1179",
-      "sha256": "1e8a43d29a1e95f8035f6687d2da5a27c2991b8c9f3a61d6e5b61354061f0c54",
+      "sha256": "d86bc27f560c2e8f7214bdf6d276afc4672611a6e6b048c8b43489b4bc3dc130",
       "authority": "decision",
       "lifecycle": "ACCEPTED",
-      "constraint": "1e8a43d29a1e95f8035f6687d2da5a27c2991b8c9f3a61d6e5b61354061f0c54",
+      "constraint": "d86bc27f560c2e8f7214bdf6d276afc4672611a6e6b048c8b43489b4bc3dc130",
       "reason": "declared in sources",
-      "tokens": 6606
+      "tokens": 1335
     },
     {
       "id": "DEC-1176",
@@ -283,48 +283,6 @@
       "tokens": 274
     },
     {
-      "id": "aa9e808019587c5a0103570b",
-      "path": "governance/project/orchestration/packages/MEMORY-AUDIT-P1.md",
-      "text": "  fitting and DEC-1179 (4)'s rule word for word.\n- **Why it goes by CIT-P:** a kernel skill path, so the CIT-P, one independent review, the owner's approval of the\n  bytes, a version bump to 1.1.0, and the `.claude` copy by the copies ACT after W2-187 merges.\n- **W2-88a's cases stay unrevised:** the new step keeps \"declare\", \"measure\", \"the verdict set\" and \"once\", so its\n  matcher passes. This was checked on the draft text with `check_steps`, with no problems.\n- **One departure from the brief:** G4's cron line in A9's ACT package is code (`src/gov/adopt/memory_sets.py`,\n  `walls_act`), which the product-spec role cannot write. That code moves to W2-187 (S11), and W2-188 carries only its\n  text.\n\n",
-      "tokens": 177
-    },
-    {
-      "id": "239aeefa22c2862dfe4efa61",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_matchers.py",
-      "text": "def _problems(text):\n    regions = support.a9_regions(text)\n    assert regions, \"no A9 region found\"\n    joined = \"\\n\\n\".join(regions)\n    return support.check_steps(joined) + support.check_pointer(joined)\n",
-      "tokens": 52
-    },
-    {
-      "id": "28cd0ae53c1e57d2df81b9a9",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
-      "text": "def test_s1_step_5_until_the_halves_agree_within_5_points():\n    \"\"\"Step 5: until the tuning set's halves agree within 5 points.\"\"\"\n    problems = [p for p in support.check_steps(_a9_text())\n                if p.startswith(\"step 5\") and (\"halves\" in p or \"5 points\" in p or \"is missing\" in p\n                                               or \"out of order\" in p)]\n    assert not problems, \"A9's step 5 is wrong: \" + \"; \".join(problems)\n",
-      "tokens": 109
-    },
-    {
-      "id": "54db7a7b252967561bab5d59",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
-      "text": "def test_s1_step_5_fixes_only_the_structure_never_a_named_question():\n    \"\"\"Step 5: fix only the structure, never a named question (the KPI's words or the same meaning).\"\"\"\n    problems = [p for p in support.check_steps(_a9_text())\n                if p.startswith(\"step 5\") and (\"named question\" in p or \"structure\" in p or \"is missing\" in p\n                                               or \"out of order\" in p)]\n    assert not problems, \"A9's step 5 is wrong: \" + \"; \".join(problems)\n",
-      "tokens": 122
-    },
-    {
-      "id": "840aba4a9eff928470855bb5",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
-      "text": "def test_s1_a9s_step_states_the_seven_steps_in_the_kpi_order():\n    \"\"\"Assess and plan; census the links and build the graph; build the store with the standard and its refresh;\n    the verdict set and the tuning set written; measure the tuning set; declare and measure the verdict set once;\n    record every method and figure: all seven, in that order.\"\"\"\n    problems = support.check_steps(_a9_text())\n    assert not problems, \"A9's step does not state the seven steps in order: \" + \"; \".join(problems)\n",
-      "tokens": 126
-    },
-    {
-      "id": "dc6337202417aebe943505eb",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
-      "text": "def test_s1_step_6_declares_and_measures_the_verdict_set_once():\n    \"\"\"Step 6: declare and measure the verdict set, once.\"\"\"\n    problems = [p for p in support.check_steps(_a9_text()) if p.startswith(\"step 6\")]\n    assert not problems, \"A9's step 6 is wrong: \" + \"; \".join(problems)\n",
-      "tokens": 71
-    },
-    {
-      "id": "e2eee04e9e4c32b6fbd7d478",
-      "path": "tests/acceptance/W2-88a/w2_88a_support.py",
-      "text": "def check_steps(region_text):\n    \"\"\"Problems of the seven steps in ``region_text`` (``[]`` when each stands, in order, with its content).\n\n    Anchors are found left to right: step k is the first match after step k-1's anchor. A step whose anchor exists\n    only earlier is out of order; one that exists nowhere is missing.\"\"\"\n    text = flat(region_text)\n    problems, anchors, cursor = [], [], 0\n    for number, label, anchor, checks, lead in STEPS:\n        found = re.compile(anchor, re.S).search(text, cursor)\n        if found:\n            anchors.append((number, found.start(), found.end()))\n            cursor = found.end()\n            continue\n        anywhere = re.compile(anchor, re.S).search(text)\n        if anywhere:\n            problems.append(f\"step {number} ({label}) is out of order: it stands before step \"\n                            f\"{anchors[-1][0] if anchors else '1'}'s\")\n        else:\n            problems.append(f\"step {number} ({label}) is missing\")\n        anchors.append((number, None, None))\n    for index, (number, label, _anchor, checks, lead) in enumerate(STEPS):\n        start = anchors[index][1]\n        if start is None:\n            continue\n",
-      "tokens": 295
-    },
-    {
       "id": "DEC-1178",
       "path": "docs/DECISION_REGISTER.md",
       "text": "  - (2) **W2-100 and W2-101:** `yes W2-100-CIT-P 7bb4f1ac`, `yes ACT-CLAUDE-COPIES-10 f535215e`, `yes W2-101-CIT-P 42c1cc38`, `yes ACT-CLAUDE-COPIES-11 3b4e462f`. The CIT-Ps' kernel bytes are approved (DEC-1166 (4)'s form: `owner_approval` in each CIT-P, a row per kernel file in the kernel gate's list); the CTO hand-merges each and queues each copies ACT for the operator agent.\n  - (3) **P-RELEASE-1, the first numbered, frozen release:**\n    - (a) **`yes P-RELEASE-1`:** commit point (B), the integrate head after W2-100's, W2-101's and P-1's lands; version 0.1.0; the owner's steps and trailers as its \u00a74 (a plain terminal; `gov release 0.1.0`; the record committed with `Role: owner`, `Task: DAEO-sdxk`, `Implements: DEC-772, DEC-1089, DEC-1178`; the annotated, unsigned tag `v0.1.0` on the record commit); the re-pin from the release as its \u00a76. The CTO's hold: nothing lands on `w2/integrate` from \"release ready at <C>\" until the re-pin is done.\n    - (b) **P-1 (a):** A9's `parents[3]` reads (fabric.py, memory_sets.py, safety.py) are fixed before the release, in W2-88's closed scope (DEC-1164 (18)), with a narrow independent check.\n",
@@ -367,10 +325,52 @@
       "tokens": 197
     },
     {
-      "id": "4f809868f35e07a278a840f2",
+      "id": "6ac69d8c18165eb1271754a1",
       "path": "governance/project/orchestration/packages/DECIDED-NOT-DONE.md",
       "text": "| 192 | DEC-1178 (1): W2-61h reopened for F3's test revision (each source at its own commit; moved-unchanged no fault; changed lines listed by question id and entry, not failed; KPI reworded); the list to the walled writer in G5's sixth item (W2-187), the operator's Monday slot until then | NOT STARTED: next: the CTO reopens DAEO-h2k3 and briefs a TD revision, narrow check, the operator's walled re-run |\n| 193 | DEC-1178 (1) Q2 (i): W2-134 closes on its fresh accept (28/0 at c451c2180) and the walled run's six passes | NOT STARTED: next: the close record and tk close, today |\n| 194 | DEC-1178 (2): W2-100/W2-101 CIT-Ps approved (7bb4f1ac, 42c1cc38); COPIES-10/-11 (f535215e, 3b4e462f) | NOT STARTED: next: owner_approval lines, kernel-approved rows, hand merges, the two .req files, closes on fresh accepts |\n| 195 | DEC-1178 (3): P-RELEASE-1, 0.1.0 at commit point (B); P-1 (a) in W2-88's reopen; setup (a); W2-81 (b) on the release; the EXAMIN CTO brief 995d0dcf with date and DEC | WAITS: P-1 (W2-88's reopen) and W2-100's/W2-101's lands; then \"release ready at <C>\", the re-pin bundle, the owner's evening sitting |\n",
       "tokens": 282
+    },
+    {
+      "id": "aa9e808019587c5a0103570b",
+      "path": "governance/project/orchestration/packages/MEMORY-AUDIT-P1.md",
+      "text": "  fitting and DEC-1179 (4)'s rule word for word.\n- **Why it goes by CIT-P:** a kernel skill path, so the CIT-P, one independent review, the owner's approval of the\n  bytes, a version bump to 1.1.0, and the `.claude` copy by the copies ACT after W2-187 merges.\n- **W2-88a's cases stay unrevised:** the new step keeps \"declare\", \"measure\", \"the verdict set\" and \"once\", so its\n  matcher passes. This was checked on the draft text with `check_steps`, with no problems.\n- **One departure from the brief:** G4's cron line in A9's ACT package is code (`src/gov/adopt/memory_sets.py`,\n  `walls_act`), which the product-spec role cannot write. That code moves to W2-187 (S11), and W2-188 carries only its\n  text.\n\n",
+      "tokens": 177
+    },
+    {
+      "id": "239aeefa22c2862dfe4efa61",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_matchers.py",
+      "text": "def _problems(text):\n    regions = support.a9_regions(text)\n    assert regions, \"no A9 region found\"\n    joined = \"\\n\\n\".join(regions)\n    return support.check_steps(joined) + support.check_pointer(joined)\n",
+      "tokens": 52
+    },
+    {
+      "id": "28cd0ae53c1e57d2df81b9a9",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
+      "text": "def test_s1_step_5_until_the_halves_agree_within_5_points():\n    \"\"\"Step 5: until the tuning set's halves agree within 5 points.\"\"\"\n    problems = [p for p in support.check_steps(_a9_text())\n                if p.startswith(\"step 5\") and (\"halves\" in p or \"5 points\" in p or \"is missing\" in p\n                                               or \"out of order\" in p)]\n    assert not problems, \"A9's step 5 is wrong: \" + \"; \".join(problems)\n",
+      "tokens": 109
+    },
+    {
+      "id": "54db7a7b252967561bab5d59",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
+      "text": "def test_s1_step_5_fixes_only_the_structure_never_a_named_question():\n    \"\"\"Step 5: fix only the structure, never a named question (the KPI's words or the same meaning).\"\"\"\n    problems = [p for p in support.check_steps(_a9_text())\n                if p.startswith(\"step 5\") and (\"named question\" in p or \"structure\" in p or \"is missing\" in p\n                                               or \"out of order\" in p)]\n    assert not problems, \"A9's step 5 is wrong: \" + \"; \".join(problems)\n",
+      "tokens": 122
+    },
+    {
+      "id": "840aba4a9eff928470855bb5",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
+      "text": "def test_s1_a9s_step_states_the_seven_steps_in_the_kpi_order():\n    \"\"\"Assess and plan; census the links and build the graph; build the store with the standard and its refresh;\n    the verdict set and the tuning set written; measure the tuning set; declare and measure the verdict set once;\n    record every method and figure: all seven, in that order.\"\"\"\n    problems = support.check_steps(_a9_text())\n    assert not problems, \"A9's step does not state the seven steps in order: \" + \"; \".join(problems)\n",
+      "tokens": 126
+    },
+    {
+      "id": "dc6337202417aebe943505eb",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
+      "text": "def test_s1_step_6_declares_and_measures_the_verdict_set_once():\n    \"\"\"Step 6: declare and measure the verdict set, once.\"\"\"\n    problems = [p for p in support.check_steps(_a9_text()) if p.startswith(\"step 6\")]\n    assert not problems, \"A9's step 6 is wrong: \" + \"; \".join(problems)\n",
+      "tokens": 71
+    },
+    {
+      "id": "e2eee04e9e4c32b6fbd7d478",
+      "path": "tests/acceptance/W2-88a/w2_88a_support.py",
+      "text": "def check_steps(region_text):\n    \"\"\"Problems of the seven steps in ``region_text`` (``[]`` when each stands, in order, with its content).\n\n    Anchors are found left to right: step k is the first match after step k-1's anchor. A step whose anchor exists\n    only earlier is out of order; one that exists nowhere is missing.\"\"\"\n    text = flat(region_text)\n    problems, anchors, cursor = [], [], 0\n    for number, label, anchor, checks, lead in STEPS:\n        found = re.compile(anchor, re.S).search(text, cursor)\n        if found:\n            anchors.append((number, found.start(), found.end()))\n            cursor = found.end()\n            continue\n        anywhere = re.compile(anchor, re.S).search(text)\n        if anywhere:\n            problems.append(f\"step {number} ({label}) is out of order: it stands before step \"\n                            f\"{anchors[-1][0] if anchors else '1'}'s\")\n        else:\n            problems.append(f\"step {number} ({label}) is missing\")\n        anchors.append((number, None, None))\n    for index, (number, label, _anchor, checks, lead) in enumerate(STEPS):\n        start = anchors[index][1]\n        if start is None:\n            continue\n",
+      "tokens": 295
     },
     {
       "id": "W2-11-CIT-P",
@@ -479,33 +479,145 @@
       "path": "tests/acceptance/W2-142/test_w2_142_skills_check.py",
       "text": "def test_guard_the_skills_check_finds_nothing(skill):\n    env = dict(os.environ)\n    env[\"PYTHONPATH\"] = env.get(\"PYTHONPATH\") or str(support.REPO / \"src\")\n    folder = f\"template/governance/kernel/skills/{skill}\"\n    done = subprocess.run(\n        [sys.executable, \"-m\", \"gov.check.skill_validator\", \"--both-layouts\", folder],\n        cwd=support.REPO, env=env, capture_output=True, text=True, timeout=60, check=False)\n    assert done.returncode == 0, f\"the skills check on {folder}: exit {done.returncode}: {done.stdout}{done.stderr}\"\n    assert json.loads(done.stdout.strip().splitlines()[-1]) == {\"findings\": []}, done.stdout\n",
       "tokens": 158
+    },
+    {
+      "id": "4934c63ab137446ea6b41677",
+      "path": "tests/acceptance/W2-142/test_w2_142_skills_check.py",
+      "text": "\"\"\"S1 and S2: the skills check (``python3 -m gov.check.skill_validator --both-layouts <skill folder>``, its\nrequired fields, its 2,500-token body budget and its known ``gov`` commands) finds nothing in either skill (README).\n\nRun as a process from the repository's root, on the tree ``PYTHONPATH`` names (else the repository's own ``src``).\n\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nimport os\nimport subprocess\nimport sys\n\nimport pytest\n\nimport w2_142_support as support\n\n\n@pytest.mark.parametrize(\"skill\", [\"retrieval\", \"discovery\"])\n",
+      "tokens": 137
+    },
+    {
+      "id": "ceb7505fccf8e2ee1d5a9d7d",
+      "path": "tests/acceptance/W2-88a/README.md",
+      "text": "## How the tests reach the files\n\nOnly by reading files and by child processes: `git` (a fixed base commit, a log of one path, a diff) and the skills\ncheck `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` (judged by exit code\nand its JSON). The repository is located from `Path(__file__)` (`parents[3]`); every child gets this tree's `src/` first on\n`PYTHONPATH`. No network, no model, never a store. The folder runs in under a second.\n\n",
+      "tokens": 121
+    },
+    {
+      "id": "be0e487772d0a34d5d56e6be",
+      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py",
+      "text": "def test_s1_the_skills_check_passes_on_the_kernel_adopt_skill():\n    \"\"\"`python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0 with no\n    findings: front matter, a description of at most 60 tokens, a body of at most 2,500 tokens, only known gov\n    commands. (Holds on the base; it guards the added step and section against the body limit.)\"\"\"\n    code, output = support.run_skill_validator()\n    assert code == 0, f\"the skills check exited {code}: {output.strip()[:400]}\"\n    assert '\"findings\": []' in output, f\"the skills check reported findings: {output.strip()[:400]}\"\n",
+      "tokens": 156
+    },
+    {
+      "id": "8dba4fabfb485b570da405ae",
+      "path": "tests/acceptance/W2-88a/w2_88a_support.py",
+      "text": "def run_skill_validator():\n    \"\"\"The skills check of S1's Verify, judged by exit code in a child process. Returns ``(exit_code, stdout)``.\"\"\"\n    done = subprocess.run(\n        [sys.executable, \"-m\", \"gov.check.skill_validator\", \"--both-layouts\",\n         \"template/governance/kernel/skills/adopt\"],\n        cwd=REPO_ROOT, capture_output=True, text=True, env=child_env(), timeout=120)\n    return done.returncode, done.stdout + done.stderr\n",
+      "tokens": 110
+    },
+    {
+      "id": "W2-27-CIT-P",
+      "path": "docs/changes/W2-27-CIT-P.md",
+      "text": "## 11. The route from here (CAP-33)\n\n1. **One independent review** by a fresh, read-only auditor (CAP-33.d; K7-W2-REMAINDER \u00a73). Done at `4bebfe6bb`:\n   READY, with F1 to F12. This revision is the one answer round (\u00a712).\n2. **The owner's approval** under DEC-105 (apply now). It answers V, A, C, R, T and N, and approves the two new tickets\n   before they are filed (DEC-974 item 2). It is recorded as an owner entry.\n3. **The CTO files the two tickets.** The test-revision ticket's designer writes against the approved text, before the\n   apply.\n4. **The apply ticket** (product-spec) applies \u00a75, regenerates the records and writes `docs/changes/W2-27-CIT-E.md`.\n5. **Both tickets merge and close in one merge-queue batch,** on one green run over the combined candidate (DEC-988\n   item 3, DEC-989 item 2), outside an experiment window (\u00a74 row 27). The run includes a scoped run of\n   `tests/acceptance/W2-49/`.\n6. **The orchestrator's edits** follow (\u00a74 rows 9, 10, 12, 14, 16, 24). W2-27's KPI line for exit criterion 7 is met.\n\n",
+      "tokens": 258
+    },
+    {
+      "id": "W2-49-CIT-P",
+      "path": "docs/changes/W2-49-CIT-P.md",
+      "text": "## 11. The route from here (CAP-33)\n\n1. **Independent review** of this CIT-P by a fresh, read-only independent auditor (CAP-33.d, CAP-47.b). Done at\n   `9dd15777`, recommendation ACCEPT_WITH_FINDINGS; this revision answers each finding (\u00a712).\n2. **The owner's approval** (Q-14), with answers to Questions A\u2013J. The owner commits the approval entry with\n   `Role: owner` (DEC-724).\n3. **Versioned promotion:** a fresh W2-49 lead applies the approved text to `contract.yaml` and `CONTRACT_v4.md` as\n   version 4.2 (DEC-737, staged). The orchestrator regenerates the capability records (\u00a78).\n4. **The CIT-E** (`docs/changes/W2-49-CIT-E.md`) records what was done, and either that it matches this CIT-P or each\n   difference.\n\nOrder: W2-49 runs in layer 2, **beside W2-01, and closes after W2-01's close.** DEC-721's \"W2-01 goes first, alone\"\nbinds the closes, not the work, and W2-49's paths do not overlap W2-01's; W2-49's `tk` dependency on W2-01 reads\n\"closes after W2-01\", not \"starts after\" (DEC-737, the owner's of 2026-10-16, staged for the owner's commit and not yet\nin this worktree's register). After the owner approves this CIT-P, a fresh lead applies it; the ticket is then held for\n",
+      "tokens": 298
+    },
+    {
+      "id": "74b4e6d462eda90aa48663bc",
+      "path": "docs/assessment/2026-10/I-SYNTHESIS.md",
+      "text": "### P-IS-5. The first re-pin: three ticket-file corrections before it\n*Merges I3 F4; I1 P-I1-7 and I2 F8 (for W2-69); DEC-896 item 2 (W2-66's file); P-I1-2 (the settings regeneration).*\n\n1. **Context.** The first re-pin carries W2-58, W2-59, W2-65, W2-66 and W2-07 (DEC-896 item 3), and W2-69 (DEC-897). The owner regenerates the settings after it (DEC-884).\n2. **What happened.**\n   - **W2-65 cannot make its own change without refusing its own close.** W1-29's hook cases run the copies in `src/gov/hooks/`, and `TestHookCopiesIdentical` requires each to equal the template's copy. W2-65's paths hold the template's `subagentstop.py` only, so its fix turns that test red. W1-29's SubagentStop case also accepts the undocumented form the fix removes (I3 F4; checked in `DAEO-e82f.md`).\n   - **W2-69 names no earlier test it may change.** It changes what the secrets check scans. I1 expects W2-50's scale cases to be revised with it (P-I1-7), but its paths do not hold `tests/acceptance/W2-50/**`. It does hold `tests/unit/secrets/**`, the folder that shadows the standard library (I2 F8; row W2-L373).\n",
+      "tokens": 276
+    },
+    {
+      "id": "5680a770700a0efdade0a405",
+      "path": "docs/changes/W2-153-evidence.md",
+      "text": "- `_kernel_findings` compares each role source's body with `compose()`'s (the blank lines after the front matter stay\n  the one tolerated difference). A `SOURCE_DIFFERS` names both origins: \"differs from its composition of\n  `<template>` and `<role file>`\". The skills, tools and `TEMPLATE_COPY_*` checks are unchanged.\n- The twelve sources were written from `compose()` by a one-off scratch script: each only gained the role file's body.\n- Verified: `tests/unit/adapters/test_w2_153_compose.py` (15) and `test_w2_153_portability.py` (18), 33 passed;\n  `tests/unit/adapters` and `tests/unit/launch` 314 passed (126 left out by the repository's opt-in lists, none by\n  the real-model exclusion); acceptance `tests/acceptance/W2-153` 66 passed; portability with rulesync 24.0.0: only\n  the six `GENERATED_DIFFERS` for `.claude/agents/*.md`, which ACT-CLAUDE-COPIES-3 regenerates; W1-33 21 failed,\n  90 passed, 1 skipped, all 21 in `test_w1_33_agent_definitions.py`, which reads `.claude/agents/` (red until the ACT).\n- `rulesync generate --targets claudecode --features subagents` from a temporary copy into an empty folder writes the\n",
+      "tokens": 284
+    },
+    {
+      "id": "3260b37943590a298838fb5f",
+      "path": "governance/project/orchestration/packages/LIFT-1/D4-LIST-B.md",
+      "text": "## Appendix A \u2014 the opt-in list `tests/optin-lifted.txt` (T-10), its content\n\n145 lines when written out one entry a line (`py/final.py`'s rule regenerates them); in short:\n- **Whole folders:** `tests/acceptance/W2-01/`, `W2-07/`, `W2-53/`, `W2-68/`, `W2-69/`, `W2-71/`, `W2-107/`.\n- **W1-15:** `test_w1_15_{family_check,filter,gitleaks_rules,parallel_scan,review_batch,shelter_batch}.py` (today's\n  `nightly_only.txt` W1-15 lines). **W1-16:** `test_w1_16_token_rule.py`,\n  `test_w1_16_builtin_allowlist_and_daemon_secrets.py` (today's `nightly_only.txt` W1-16 lines).\n- **W1-26:** `test_w1_26_{policy,skill,decision_citations,decision_register_and_base,probe_records}.py`.\n- **W1-30:** every file but `test_w1_30_close.py` and `test_w1_30_receipt.py`; in those two, every function but the\n  seven core cases (44 node ids): kept are `test_close_returns_api_0002_envelope`,\n  `test_close_succeeds_on_green_standard_ticket`, `test_close_runs_acceptance_tests`,\n  `test_close_refuses_when_acceptance_tests_fail`, `test_regression_failure_blocks_close` (close) and\n  `test_close_record_has_packet_hash`, `test_close_record_has_tests_and_deviations` (receipt).\n",
+      "tokens": 289
+    },
+    {
+      "id": "4fe4a7b8836452d8de383582",
+      "path": "governance/project/orchestration/packages/REVIEW-BUNDLE-2026-10-22.md",
+      "text": "### P-IS-5. The first re-pin: three ticket-file corrections before it\n*Merges I3 F4; I1 P-I1-7 and I2 F8 (for W2-69); DEC-896 item 2 (W2-66's file); P-I1-2 (the settings regeneration).*\n\n1. **Context.** The first re-pin carries W2-58, W2-59, W2-65, W2-66 and W2-07 (DEC-896 item 3), and W2-69 (DEC-897). The owner regenerates the settings after it (DEC-884).\n2. **What happened.**\n   - **W2-65 cannot make its own change without refusing its own close.** W1-29's hook cases run the copies in `src/gov/hooks/`, and `TestHookCopiesIdentical` requires each to equal the template's copy. W2-65's paths hold the template's `subagentstop.py` only, so its fix turns that test red. W1-29's SubagentStop case also accepts the undocumented form the fix removes (I3 F4; checked in `DAEO-e82f.md`).\n   - **W2-69 names no earlier test it may change.** It changes what the secrets check scans. I1 expects W2-50's scale cases to be revised with it (P-I1-7), but its paths do not hold `tests/acceptance/W2-50/**`. It does hold `tests/unit/secrets/**`, the folder that shadows the standard library (I2 F8; row W2-L373).\n",
+      "tokens": 276
+    },
+    {
+      "id": "1b9055495cc572a893999f7d",
+      "path": "tests/acceptance/W2-59/README.md",
+      "text": "  never this repository's `.rulesync/hooks.jsonc` (the one mention in `test_w1_38_rulesync.py` is a generated\n  project's). If the template's lines later take the same form, run 1's list applies, and a `-I` or `-s` form would\n  also break its live cases, whose stand-in session finds `gov` through a path file in the user site folder\n  (`w1_38_hooks_support.make_session_sandbox`).\n- **`tests/acceptance/W1-05/`:** none turns red, and none needs a revision. Its live cases run the lines of the\n  generated `.claude/settings.json` (which the owner regenerates, DEC-835 item 3) in an environment built from\n  scratch with no `PYTHONPATH` (`w1_05_support.command_environment`), so dropping an inherited one changes nothing\n  there. A `-E` form also ignores the `PYTHONDONTWRITEBYTECODE=1` that environment sets; the programs run as scripts\n  and no W1-05 case fails on an extra untracked file (`bash_call` asserts only that the changed paths are listed).\n  This is a reading: W1-05 was not run against a regenerated settings file.\n\n",
+      "tokens": 258
+    },
+    {
+      "id": "DAEO-6icv",
+      "path": ".tickets/DAEO-6icv.md",
+      "text": "  - 'An imported skill or part (Anthropic''s collection or another source) is adopted only with its licence checked and recorded and its three scenarios passing; nothing is copied without a licence that allows it. Verify: a planted imported part with a licence record and three passing scenarios is adopted; one with no licence record, and one with a failing scenario, are each refused naming the part [DEC-959 item 5]'\n  - 'The generated copies (.claude/skills/, .rulesync/skills/, template/.rulesync/skills/) match the template''s source, regenerated by the adapter, not edited by hand. Verify: after the adapter regenerates, `diff -r` of each generated copy against the template''s source shows no difference; a planted hand edit in one copy makes the adapter check print DRIFT naming the file [DEC-616, DEC-645]'\n  failure:\n  - 'A domain skill that grants or implies a permission. Verify: a planted skill copy with an allowed-tools or permission line: the skill validator refuses it naming the line; the three real skills pass with no such line.'\n",
+      "tokens": 263
+    },
+    {
+      "id": "DAEO-sdhj",
+      "path": ".tickets/DAEO-sdhj.md",
+      "text": "---\nid: DAEO-sdhj\nstatus: open\ndeps: [DAEO-g0ip, DAEO-49o5]\nlinks: []\ncreated: 2026-10-16T16:35:11Z\ntype: task\npriority: 4\nassignee: engineer\nexternal-ref: W2-17\ntags: [wave-2, implementation, full, wave-3, deferred]\nwbs_id: W2-17\ntitle: gov update\nclass: implementation\nstate_class: AUTHORITATIVE\nrole: engineer\ndepends_on:\n- DAEO-g0ip\n- DAEO-49o5\nallowed_paths:\n- src/gov/update/**\n- src/gov/adapters/**\n- tests/unit/update/**\nkpis:\n  success:\n  - 'gov update --check reports the installed and target versions, the migrations and their impact. Verify: in a planted project installed at release A with a target release B holding two migrations, `gov update --check` exits 0 and prints \"A\", \"B\", the two migrations by id and an impact line for each, and changes no file (`git status` clean).'\n  - 'The update [CAP-45.a, W2-M176]: verifies the target release''s manifest and file hashes; applies the migrations with copier update, keeping the overlay files unchanged; regenerates the adapters and\n",
+      "tokens": 249
+    },
+    {
+      "id": "DAEO-sdhj",
+      "path": ".tickets/DAEO-sdhj.md",
+      "text": "# W2-17 gov update\n\n**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** The rest of K7 (DEC-941 item 3); CAP-45.a moves to Wave 3 by a CIT-P note or is a named exception.\n\nCard: `docs/plan/WAVE_2_WBS.md` \u00a72 (W2-17), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).\n\n- **Allowed paths:** `src/gov/update/**` (new), `src/gov/adapters/**` (regeneration only), `tests/unit/update/**`.\n- **KPIs, success:**\n  - `gov update --check` reports the installed and target versions, the migrations and their impact.\n  - The update [CAP-45.a, W2-M176]:\n    - verifies the target release's manifest and file hashes;\n    - applies the migrations with `copier update`, keeping the overlay files unchanged;\n    - regenerates the adapters and rebuilds the affected indexes;\n    - runs `gov doctor` and writes a ledger entry.\n  - A failed update rolls back to the recorded point.\n- **KPIs, failure:**\n  - An update to a release that fails hash verification refuses.\n  - An overlay file changed by the update is a failure and triggers the rollback.\n\n",
+      "tokens": 299
+    },
+    {
+      "id": "DAEO-uw5h",
+      "path": ".tickets/DAEO-uw5h.md",
+      "text": "  - 'An imported skill or part (Anthropic''s collection or another source) is adopted only with its licence checked and recorded and its three scenarios passing; nothing is copied without a licence that allows it. Verify: a planted imported part with a licence record and three passing scenarios is adopted; one with no licence record, and one with a failing scenario, are each refused naming the part [DEC-959 item 5]'\n  - 'The generated copies (.claude/skills/, .rulesync/skills/, template/.rulesync/skills/) match the template''s source, regenerated by the adapter, not edited by hand. Verify: after the adapter regenerates, `diff -r` of each generated copy against the template''s source shows no difference; a planted hand edit in one copy makes the adapter check print DRIFT naming the file [DEC-616, DEC-645]'\n  failure:\n  - 'A domain skill that grants or implies a permission. Verify: a planted skill copy with an allowed-tools or permission line: the skill validator refuses it naming the line; the four real skills pass with no such line.'\n",
+      "tokens": 263
+    },
+    {
+      "id": "DAEO-wi46",
+      "path": ".tickets/DAEO-wi46.md",
+      "text": "  - 'An imported skill or part (Anthropic''s collection or another source) is adopted only with its licence checked and recorded; nothing is copied without a licence that allows it. Verify: a planted imported part with a licence record naming a permissive licence is accepted; a planted imported part with no licence record, and one whose recorded licence forbids the use, are each refused naming the part; a grep of the skill folder for copied text finds no part without a record [DEC-959 item 5] [re-worded, DEC-1084]'\n  - 'The generated copies (.claude/skills/, .rulesync/skills/, template/.rulesync/skills/) match the template''s source, regenerated by the adapter, not edited by hand. Verify: after the adapter regenerates, `diff -r` of each generated copy against the template''s source shows no difference; a planted hand edit in one copy makes the doctor or the adapter check print DRIFT naming the file [DEC-616, DEC-645]'\n  failure:\n",
+      "tokens": 236
     }
   ],
   "supplementary_query": "The adopt skill's step 6 and the practice record say the verdict set becomes the standing set, judged every week at 95 %, counts only, checked monthly against a fresh set; A9's weekly cron line named (MEMORY-AUDIT G6 and G4's text; CIT-P)\nS1 A9's step 6 in the adopt skill says, in its own words: the verdict set is declared and measured once at Wave 0 as the first verdict; from then on it is the repository's standing set, judged end to end every week on the same questions (monthly once the repository is stable, under the package's O3 (b)) as Gov OS's memory is judged (the standard's bundle read whole by the reader, search again once), against 95 %, behind the walls, with only counts leaving its run; it never chooses or judges a fix (fixes chosen on the tuning set and the fresh sets' misses); a fresh set each month checks it for fitting and a fitted set is replaced; a miss is never re-run in the same week and never re-scored; it cites DEC-1179 [DEC-1179 (1)-(4), DEC-1176 (1), DEC-1098 (1)] Verify: a string test on step 6's stretch of the three copies finds each of these statements (standing set, every week, same questions, 95 %, counts only, never chooses a fix, fresh set monthly, fitted replaced, DEC-1179); W2-88a's step matcher (`check_steps`) returns no problem on A9's section\nS2 After A9's seven steps, one paragraph says the weekly audit runs from one cron line that A9's ACT package gives the repository's owner's operator beside the walls, never installed by adoption, and that a fall below 95 % is handled as the practice record's section 9 states [DEC-1179 (4), (5), DEC-1101 (2)] Verify: a string test finds the paragraph between step 7 and the `## Verify clauses for adopted tickets` heading in all three copies, with \"cron\", \"ACT\", \"operator\", \"never installs\" (or \"never installed\") and \"95 %\"\nS3 The practice record states the standing set: \u00a73's confirmation line, \u00a75 item 6's practice lines and \u00a76 step 6 re-worded as the CIT-P quotes, and a new \u00a79 \"The standing set (DEC-1179)\" with what it is, the method (the reader ranking the whole bundle and searching again once, A2, with the E2 and E3 figures), the bar, the walls (counts only, no id read by anyone), fixes never chosen on it, staleness by count, the monthly check against fitting with its two 5-point rules, and DEC-1179 (4)'s rule below 95 % word for word [DEC-1179, DEC-1074 (1), DEC-1074 (4), DEC-1072 (2)] Verify: a string test on each named place of `docs/research/W2-88-memory-practice.md`; \u00a76 still passes W2-88a's step matcher; \u00a79's below-95 text equals DEC-1179 (4)'s as recorded\nS4 The three copies of the skill are byte-equal; the version goes from \"1.0.0\" to \"1.1.0\" in all three (the next minor if W2-88a's promotion has taken 1.1.0 by then); nothing else in the skill changes but step 6, the new paragraph, the governing sources line (adding DEC-1101, DEC-1125 and DEC-1179) and the version [CAP-33, DEC-832 item 2, DEC-981] Verify: sha256 of the three copies equal; `git diff` of the kernel copy against the base touches only those four places; `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0\nS5 The CIT-P record `docs/changes/W2-188-CIT-P.md` gives the skill's sha256 before and after, the lines added and removed, the old and new text of each changed place, the impact table (W2-11's body case red until the copies ACT; W2-88a's cases unchanged), the independent review's verdict and the owner's approval line of the bytes before the merge [CAP-33, DEC-105] Verify: the record holds both hashes (the after equal to the kernel copy at the ticket's last commit), the counts, a `verdict: PASS` as the last verdict and an `owner_approval:` line naming the sha256\nF1 Any other step, section or rule of the adopt skill changes, or the skill grants a permission, names a `gov.memaudit` subcommand or states a mode the product lacks. Verify: the S4 diff; a grep of the three copies for `gov.memaudit` and `standing declare` finds nothing\nF2 The ticket writes `.claude/skills/adopt/SKILL.md` or any test under `tests/acceptance/`. Verify: the close's diff names neither; the copies ACT regenerates the `.claude` copy after the owner's approval\nF3 The text says the standing set may be used to choose, judge, adopt or reject a fix, prints or reads a question id, or calls the reader a second reranking model. Verify: a string test on step 6 and \u00a79 for \"never chooses or judges a fix\" and \"counts only\"; \u00a79 says W2-88 S10's second reranker stays forbidden",
   "further_batch": [
     {
-      "id": "4934c63ab137446ea6b41677",
-      "path": "tests/acceptance/W2-142/test_w2_142_skills_check.py"
+      "id": "DEC-1141",
+      "path": "docs/DECISION_REGISTER.md"
     },
     {
-      "id": "ceb7505fccf8e2ee1d5a9d7d",
-      "path": "tests/acceptance/W2-88a/README.md"
+      "id": "DEC-702",
+      "path": "docs/DECISION_REGISTER.md"
     },
     {
-      "id": "be0e487772d0a34d5d56e6be",
-      "path": "tests/acceptance/W2-88a/test_w2_88a_skill_order.py"
+      "id": "DEC-814",
+      "path": "docs/DECISION_REGISTER.md"
     },
     {
-      "id": "8dba4fabfb485b570da405ae",
-      "path": "tests/acceptance/W2-88a/w2_88a_support.py"
+      "id": "DEC-817",
+      "path": "docs/DECISION_REGISTER.md"
     },
     {
-      "id": "W2-27-CIT-P",
-      "path": "docs/changes/W2-27-CIT-P.md"
+      "id": "DEC-863",
+      "path": "docs/DECISION_REGISTER.md"
     },
     {
-      "id": "W2-49-CIT-P",
-      "path": "docs/changes/W2-49-CIT-P.md"
+      "id": "DEC-879",
+      "path": "docs/DECISION_REGISTER.md"
+    },
+    {
+      "id": "998f5c05e978ae43d3a7e1c8",
+      "path": "docs/assessment/2026-10/C-decisions-to-spec.md"
+    },
+    {
+      "id": "e342d37f409280abeee31b37",
+      "path": "docs/changes/W2-153-evidence.md"
+    },
+    {
+      "id": "W2-59-CIT-P",
+      "path": "docs/changes/W2-59-CIT-P.md"
+    },
+    {
+      "id": "W2-59-CIT-P",
+      "path": "docs/changes/W2-59-CIT-P.md"
     }
   ],
   "supplementary_batches": [
@@ -516,9 +628,46 @@
           "path": "governance/project/orchestration/packages/MEMORY-AUDIT-P1.md"
         },
         {
+          "id": "DEC-1178",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "W2-100-CIT-P",
+          "path": "docs/changes/W2-100-CIT-P.md"
+        },
+        {
+          "id": "W2-101-CIT-P",
+          "path": "docs/changes/W2-101-CIT-P.md"
+        },
+        {
+          "id": "W2-98-CIT-P",
+          "path": "docs/changes/W2-98-CIT-P.md"
+        },
+        {
+          "id": "W2-98-CIT-P",
+          "path": "docs/changes/W2-98-CIT-P.md"
+        },
+        {
+          "id": "W2-100-CIT-P",
+          "path": "docs/changes/W2-100-CIT-P.md"
+        },
+        {
+          "id": "W2-101-CIT-P",
+          "path": "docs/changes/W2-101-CIT-P.md"
+        },
+        {
+          "id": "6ac69d8c18165eb1271754a1",
+          "path": "governance/project/orchestration/packages/DECIDED-NOT-DONE.md"
+        },
+        {
           "id": "aa9e808019587c5a0103570b",
           "path": "governance/project/orchestration/packages/MEMORY-AUDIT-P1.md"
-        },
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
         {
           "id": "239aeefa22c2862dfe4efa61",
           "path": "tests/acceptance/W2-88a/test_w2_88a_matchers.py"
@@ -542,43 +691,6 @@
         {
           "id": "e2eee04e9e4c32b6fbd7d478",
           "path": "tests/acceptance/W2-88a/w2_88a_support.py"
-        },
-        {
-          "id": "DEC-1178",
-          "path": "docs/DECISION_REGISTER.md"
-        },
-        {
-          "id": "W2-100-CIT-P",
-          "path": "docs/changes/W2-100-CIT-P.md"
-        }
-      ],
-      "limit": 10
-    },
-    {
-      "items": [
-        {
-          "id": "W2-101-CIT-P",
-          "path": "docs/changes/W2-101-CIT-P.md"
-        },
-        {
-          "id": "W2-98-CIT-P",
-          "path": "docs/changes/W2-98-CIT-P.md"
-        },
-        {
-          "id": "W2-98-CIT-P",
-          "path": "docs/changes/W2-98-CIT-P.md"
-        },
-        {
-          "id": "W2-100-CIT-P",
-          "path": "docs/changes/W2-100-CIT-P.md"
-        },
-        {
-          "id": "W2-101-CIT-P",
-          "path": "docs/changes/W2-101-CIT-P.md"
-        },
-        {
-          "id": "4f809868f35e07a278a840f2",
-          "path": "governance/project/orchestration/packages/DECIDED-NOT-DONE.md"
         },
         {
           "id": "W2-11-CIT-P",
@@ -688,31 +800,137 @@
         }
       ],
       "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "74b4e6d462eda90aa48663bc",
+          "path": "docs/assessment/2026-10/I-SYNTHESIS.md"
+        },
+        {
+          "id": "5680a770700a0efdade0a405",
+          "path": "docs/changes/W2-153-evidence.md"
+        },
+        {
+          "id": "3260b37943590a298838fb5f",
+          "path": "governance/project/orchestration/packages/LIFT-1/D4-LIST-B.md"
+        },
+        {
+          "id": "4fe4a7b8836452d8de383582",
+          "path": "governance/project/orchestration/packages/REVIEW-BUNDLE-2026-10-22.md"
+        },
+        {
+          "id": "1b9055495cc572a893999f7d",
+          "path": "tests/acceptance/W2-59/README.md"
+        },
+        {
+          "id": "DAEO-6icv",
+          "path": ".tickets/DAEO-6icv.md"
+        },
+        {
+          "id": "DAEO-sdhj",
+          "path": ".tickets/DAEO-sdhj.md"
+        },
+        {
+          "id": "DAEO-sdhj",
+          "path": ".tickets/DAEO-sdhj.md"
+        },
+        {
+          "id": "DAEO-uw5h",
+          "path": ".tickets/DAEO-uw5h.md"
+        },
+        {
+          "id": "DAEO-wi46",
+          "path": ".tickets/DAEO-wi46.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "DEC-1141",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "DEC-702",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "DEC-814",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "DEC-817",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "DEC-863",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "DEC-879",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "998f5c05e978ae43d3a7e1c8",
+          "path": "docs/assessment/2026-10/C-decisions-to-spec.md"
+        },
+        {
+          "id": "e342d37f409280abeee31b37",
+          "path": "docs/changes/W2-153-evidence.md"
+        },
+        {
+          "id": "W2-59-CIT-P",
+          "path": "docs/changes/W2-59-CIT-P.md"
+        },
+        {
+          "id": "W2-59-CIT-P",
+          "path": "docs/changes/W2-59-CIT-P.md"
+        }
+      ],
+      "limit": 10
     }
   ],
   "dropped": [
     {
-      "id": "4934c63ab137446ea6b41677",
+      "id": "998f5c05e978ae43d3a7e1c8",
       "reason": "budget exceeded"
     },
     {
-      "id": "8dba4fabfb485b570da405ae",
+      "id": "DEC-1141",
       "reason": "budget exceeded"
     },
     {
-      "id": "W2-27-CIT-P",
+      "id": "DEC-702",
       "reason": "budget exceeded"
     },
     {
-      "id": "W2-49-CIT-P",
+      "id": "DEC-814",
       "reason": "budget exceeded"
     },
     {
-      "id": "be0e487772d0a34d5d56e6be",
+      "id": "DEC-817",
       "reason": "budget exceeded"
     },
     {
-      "id": "ceb7505fccf8e2ee1d5a9d7d",
+      "id": "DEC-863",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "DEC-879",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "W2-59-CIT-P",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "W2-59-CIT-P",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "e342d37f409280abeee31b37",
       "reason": "budget exceeded"
     },
     {
@@ -720,10 +938,10 @@
       "reason": "withheld from independent-test-designer (ticket DAEO-zlog): 0 paths, 0 chunks; none matched (DEC-1065 (2))"
     }
   ],
-  "tokens": 39897,
+  "tokens": 39850,
   "budget": {
     "limit": 40000,
-    "used": 39897
+    "used": 39850
   },
   "left_out": {
     "count": 3,
@@ -734,5 +952,5 @@
     ],
     "done": []
   },
-  "hash": "0abbc5529933a3b1061e4e94888d6ba4bdef3ed7366e3ea01c1fe4ed22b6c092"
+  "hash": "46471806bf89cbba1e6be53d66bb3d01bd22ad6a59360d9bad2c53f7c42a47eb"
 }

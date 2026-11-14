@@ -366,8 +366,10 @@
 W2-88 DAEO-2bdu W2-88-A5-p1.md W2-88-A5-p1.json
 # W2-61h-c39 DAEO-h2k3 W2-61h-A5-f3.md W2-61h-A5-f3.json  # DONE 13:25 40f997704f53 -> LAND; then the operator walled run (expect 7 passed, h03 listed)
 W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
-W2-188 DAEO-zlog W2-188-A5-run1.md W2-188-A5-run1.json
+# W2-188 DAEO-zlog W2-188-A5-run1.md W2-188-A5-run1.json  # PACKAGES 15:01: P-W2-188-S5 (a) by the CTO (DEC-1157 (12)); CIT-P yes to the owner
 W2-94-fix DAEO-g87r W2-94-A5-fix1.md W2-94-A5-fix1.json
 W2-61h-c39 DAEO-h2k3 W2-61h-A5-n2.md W2-61h-A5-n2.json
 # 14:48 W2-184 f2: narrow check rv-f1 with --owner-named DEC-1177 (P-W2-184-4 (a))
 W2-184 DAEO-6f0s W2-184-A5-f2.md W2-184-A5-f2.json
+# 15:04 W2-188 s5: one case revised (P-W2-188-S5 (a)), narrow check
+W2-188 DAEO-zlog W2-188-A5-s5.md W2-188-A5-s5.json
