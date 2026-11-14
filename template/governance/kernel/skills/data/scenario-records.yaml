@@ -1,0 +1,199 @@
+records:
+- skill: data
+  skill_version: 1.0.0
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.362725
+  seconds: 76.702
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:28:18+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.450633
+  seconds: 101.511
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:29:38+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.192311
+  seconds: 27.643
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:31:25+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.448231
+  seconds: 104.061
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:39:07+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.340445
+  seconds: 66.216
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:40:57+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.188404
+  seconds: 28.666
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:42:06+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.326983
+  seconds: 68.677
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:34:47+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.478765
+  seconds: 103.404
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:35:59+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.220368
+  seconds: 32.782
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:37:48+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.432092
+  seconds: 90.103
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:17:54+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: fail
+  cause: judged FAIL against the pass line
+  cost_usd: 0.390795
+  seconds: 76.756
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:19:28+00:00'
+- skill: data
+  skill_version: 1.0.1
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.193309
+  seconds: 29.663
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:20:51+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.498239
+  seconds: 108.89
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:25:23+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.465641
+  seconds: 97.677
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:27:18+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.203263
+  seconds: 29.153
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:29:01+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.484094
+  seconds: 105.074
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:29:38+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.48897
+  seconds: 101.302
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:31:30+00:00'
+- skill: data
+  skill_version: 1.0.2
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.203142
+  seconds: 32.566
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:33:20+00:00'
