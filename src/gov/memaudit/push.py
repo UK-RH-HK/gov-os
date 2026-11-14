@@ -2,13 +2,15 @@
 
 The wrapper's last step, after the audit steps that ran (never ``maintain``, a refresh or a close). A repository that
 declares its weekly push, ``GOV_MEMAUDIT_PUSH="<remote> <branch>"`` in its cron line's environment (absent or empty: no
-push; Gov OS declares nothing), gets one full secret scan of the repository, then ``git push <remote> <branch>`` only
-when that scan is clean. The scan is the only one in the memory audit and the wrapper. It is counted from its report,
+push; Gov OS declares nothing), gets one full secret scan of the repository, then ``git push <remote>
+<sha>:refs/heads/<branch>`` only when that scan is clean, ``<sha>`` being the commit the branch named when the scan began
+(a commit that lands during the scan waits for the next cycle's scan; review round 1 F-B). The scan is the only one in
+the memory audit and the wrapper. It is counted from its report,
 which is a 0600 temporary file outside the repository and deleted after the count; ``--redact`` keeps a secret out of
 it, and no finding's text (a secret, a match, a line) is read into a message, printed, logged or written anywhere.
 
 One line, counts and reason words only, through ``say``: ``PUSH none: no declaration`` (exit 0), ``PUSH pushed <remote>
-<branch> <12 hex>`` (0), ``PUSH blocked: findings <k>`` (1), ``PUSH blocked: scan failed <word>`` (1: ``missing``,
+<branch> <12 hex of the scanned commit>`` (0), ``PUSH blocked: findings <k>`` (1), ``PUSH blocked: scan failed <word>`` (1: ``missing``,
 ``timeout``, ``exit`` or ``report``) and ``PUSH failed: git push exit <c>`` (2; git's own output goes to a 0600 file
 in the key folder, never printed). When a push is declared (the scan or the push started), the same line ends the
 cycle's latest ``DIGEST.txt`` in the key folder and one more ``cron.log`` line carries the wrapper's six keys with the step
@@ -26,7 +28,7 @@ import tempfile
 from pathlib import Path
 
 from gov.memaudit import EXIT, layout, schedule
-from gov.memaudit.common import UsageError, git
+from gov.memaudit.common import UsageError
 
 DECLARATION = "GOV_MEMAUDIT_PUSH"
 SCAN_TIMEOUT_S, PUSH_TIMEOUT_S = 600.0, 600.0
@@ -119,18 +121,37 @@ def _write_private(path: Path, data: bytes) -> None:
     os.chmod(path, 0o600)
 
 
-def push(repo, remote: str, branch: str, state: Path) -> int:
-    """``git push <remote> <branch>``: its exit code (124 on a timeout, 127 when git cannot start). git's own output is
-    kept whole in ``PUSH.log`` of the key folder, mode 0600, never printed."""
-    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+def scanned(repo, branch: str) -> tuple[str | None, int, bytes]:
+    """The commit ``refs/heads/<branch>`` names now, read just before the scan begins: ``(sha, 0, b"")``, else
+    ``(None, <git's exit>, <git's output>)`` (review round 1 F-B: only that commit is pushed)."""
     try:
-        done = subprocess.run(["git", "-C", str(repo), "push", remote, branch], capture_output=True,
-                              stdin=subprocess.DEVNULL, timeout=PUSH_TIMEOUT_S, env=env)
-        code, out = done.returncode, done.stdout + done.stderr
-    except subprocess.TimeoutExpired:
-        code, out = 124, b""
+        done = subprocess.run(["git", "-C", str(repo), "rev-parse", "--verify", f"refs/heads/{branch}^{{commit}}"],
+                              capture_output=True, stdin=subprocess.DEVNULL)
     except OSError:
-        code, out = 127, b""
+        return None, 127, b""
+    sha = done.stdout.decode("ascii", "replace").strip()
+    if done.returncode == 0 and len(sha) == 40:
+        return sha, 0, b""
+    return None, done.returncode or 128, done.stdout + done.stderr
+
+
+def push(repo, remote: str, branch: str, state: Path, commit: str | None = None, why=(128, b"")) -> int:
+    """``git push <remote> <commit>:refs/heads/<branch>``, the scanned commit only: its exit code (124 on a timeout, 127
+    when git cannot start). With no commit (the branch named none when the scan began) nothing is pushed and the code is
+    the one git gave for the branch (``why``). git's own output is kept whole in ``PUSH.log`` of the key folder, mode
+    0600, never printed."""
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    if commit is None:
+        code, out = why
+    else:
+        try:
+            done = subprocess.run(["git", "-C", str(repo), "push", remote, f"{commit}:refs/heads/{branch}"],
+                                  capture_output=True, stdin=subprocess.DEVNULL, timeout=PUSH_TIMEOUT_S, env=env)
+            code, out = done.returncode, done.stdout + done.stderr
+        except subprocess.TimeoutExpired:
+            code, out = 124, b""
+        except OSError:
+            code, out = 127, b""
     try:
         state.mkdir(mode=0o700, parents=True, exist_ok=True)
         _write_private(state / PUSH_LOG, out)
@@ -173,17 +194,6 @@ def _log_line(state: Path, line: str, code: int) -> None:
         f.write(json.dumps(row) + "\n")
 
 
-def _pushed(repo, branch: str) -> str:
-    """The first 12 hex of the commit the branch names (else the checked-out one); the push is done, so a fault here
-    never fails the step."""
-    for rev in (f"{branch}^{{commit}}", "HEAD"):
-        try:
-            return git(repo, "rev-parse", "--verify", rev).decode().strip()[:12]
-        except Exception:  # noqa: BLE001
-            continue
-    return "unknown"
-
-
 def from_args(args, emit) -> str:
     """The subcommand's entry: ``run`` on the parsed ``add_arguments`` flags."""
     return run(args.sets_root, repo=args.repo, gitleaks=args.gitleaks, emit=emit)
@@ -203,15 +213,16 @@ def run(sets_root, *, repo=None, gitleaks=None, emit) -> str:
     if where is None:
         emit("PUSH none: no declaration")  # nothing started: no log line, no digest line, no scanner (I13)
         return "ok"
+    commit, why, said = scanned(repo, where[1])  # recorded as the scan begins: a later commit is never pushed (F-B)
     kind, detail = scan(repo, exe, state)
     if kind == "findings":
         line, word = f"PUSH blocked: findings {detail}", "refused"
     elif kind == "failed":
         line, word = f"PUSH blocked: scan failed {detail}", "refused"
     else:
-        code = push(repo, *where, state)
+        code = push(repo, *where, state, commit, (why, said))
         if code == 0:
-            line, word = f"PUSH pushed {where[0]} {where[1]} {_pushed(repo, where[1])}", "ok"
+            line, word = f"PUSH pushed {where[0]} {where[1]} {commit[:12]}", "ok"
         else:
             line, word = f"PUSH failed: git push exit {code}", "stopped"
     for write in (lambda: _append_digest(state, line), lambda: _log_line(state, line, EXIT[word])):

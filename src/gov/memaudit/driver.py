@@ -1,7 +1,10 @@
 """``python3 -m gov.memaudit run``: one audit through the launch script and W2-170's and W2-171's subcommands (W2-172
 Interface items 2 to 5, 7 and 8; S1-S4, F1-F3).
 
-Every step is a child process with cwd ``--repo``. The driver opens no path under the sets root: every figure it uses is
+Every step is a child process with cwd ``--repo``. The children that search the store or read the gold anchors
+(``preflight``, ``measure`` and ``judge``, on the fresh and the standing path) are handed the store link's work tree, at
+the audit commit, as their ``--repo``: the store every search reaches is then the store declared (W2-187 I6, review
+round 1 F-A). The driver opens no path under the sets root: every figure it uses is
 a child's last line of standard output. Its own folder is ``<runs>/indep/memaudit/``; it holds counts, codes, ids and
 repository paths only.
 """
@@ -171,29 +174,30 @@ class _Cycle:
 
     def standing(self, repo_flag, gov, claude) -> bool:
         """A standing week: the same judged path as ``run``'s steps 6 to 8 and 12, with no writer, checker, ``void``,
-        auditor, ``classes`` or ``pool`` (S3, S4)."""
+        auditor, ``classes`` or ``pool`` (S3, S4). ``repo_flag`` is unused here (every child of this path works in the
+        link); it keeps the two paths' calls alike."""
         gov_flag = ["--gov", gov] if gov else []
-        c = self.st["commit"]
-        if not self.child("preflight", "preflight", "--repo", repo_flag, "--commit", c):
+        c, at = self.st["commit"], self.link  # the children that search and read anchors work in the link (F-A)
+        if not self.child("preflight", "preflight", "--repo", at, "--commit", c):
             return False
         out = (self.a_dir / "preflight.out").read_text(encoding="utf-8", errors="replace")
         m = PRE.search(out)
         if m:
             self.st["live"] = {"n": int(m[1]), "n_set": int(m[2]), "dropped": int(m[3])}
         store = f"{self.link}/.gov-runtime/store.db"
-        if not self.child("measure", "measure", "--repo", repo_flag, "--commit", c, "--store", store, *gov_flag):
+        if not self.child("measure", "measure", "--repo", at, "--commit", c, "--store", store, *gov_flag):
             return False
-        if not self.child("judge", "judge", "--repo", repo_flag, *gov_flag, *(["--claude", claude] if claude else [])):
+        if not self.child("judge", "judge", "--repo", at, *gov_flag, *(["--claude", claude] if claude else [])):
             return False
         return self.child("figures", "figures")
 
     def run(self, repo_flag, gov, claude) -> bool:
         a = self.st["audit"]
         gov_flag = ["--gov", gov] if gov else []
-        c = self.st["commit"]
+        c, at = self.st["commit"], self.link  # as in ``standing``: the declared store is the store searched (F-A)
         if not self.launch("writer-1", "writer", "--round", "1"):
             return False
-        if not self.child("preflight", "preflight", "--repo", repo_flag, "--commit", c):
+        if not self.child("preflight", "preflight", "--repo", at, "--commit", c):
             return False
         if not self.launch("checker-1", "checker", "--round", "1"):
             return False
@@ -206,9 +210,9 @@ class _Cycle:
         if not self.child("void", "void"):
             return False
         store = f"{self.link}/.gov-runtime/store.db"
-        if not self.child("measure", "measure", "--repo", repo_flag, "--commit", c, "--store", store, *gov_flag):
+        if not self.child("measure", "measure", "--repo", at, "--commit", c, "--store", store, *gov_flag):
             return False
-        if not self.child("judge", "judge", "--repo", repo_flag, *gov_flag, *(["--claude", claude] if claude else [])):
+        if not self.child("judge", "judge", "--repo", at, *gov_flag, *(["--claude", claude] if claude else [])):
             return False
         if not self.launch("auditor", "auditor", "--audit", a):
             return False

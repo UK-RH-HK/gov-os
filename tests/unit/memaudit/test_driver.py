@@ -230,3 +230,49 @@ def test_a_refusal_for_a_fresh_run_ignores_the_standing_starts_and_a_standing_ru
     assert driver._refusal(st, state, str(tmp_path / "lock"), True, False, at, head, repo, standing=True) == "RN-LOCK"
     late = at + timedelta(days=2)
     assert driver._refusal(st, state, str(tmp_path / "lock"), False, True, late, head, repo, standing=True) == "RN-STALE"
+
+
+# ---- F-A (review round 1; S3, S6/I6, S7): the children that read the store and the anchors work in the store link
+
+READS = ("preflight", "measure", "judge")  # the children whose searches and anchors must be the declared store's
+
+
+def _recorded(tmp_path, monkeypatch, path: str):
+    """``_Cycle.<path>`` with every child stood in for: ``{step: argv}`` of the steps it started (nothing is run)."""
+    seen = {}
+
+    def spawn(argv, repo, env, out, err):
+        seen[argv[3] if argv[1:3] == ["-m", "gov.memaudit"] else out.stem] = list(argv)
+        out.write_text("PRE-FLIGHT standing: n 40 of 40; dropped 0\n" if out.stem == "preflight" else "")
+        err.write_text("")
+        return 0
+
+    monkeypatch.setattr(driver, "_spawn", spawn)
+    monkeypatch.setattr(driver._Cycle, "brief", lambda self, kind: (f"briefs/{kind}.md", "a" * 64))
+    a_dir = tmp_path / "a"
+    a_dir.mkdir()
+    st = {"audit": "memory-audit-20261111", "commit": "c" * 40, "steps": [], "cost": {}}
+    cycle = driver._Cycle(st, a_dir, tmp_path / "repository", {}, lambda line: None, str(tmp_path / "sets"), [],
+                          ["launch"], str(tmp_path / "link"), week="2026-W46" if path == "standing" else None)
+    cycle.counts = {}
+    assert getattr(cycle, path)(str(tmp_path / "repository"), "/g/gov", "/c/claude") is True
+    return seen
+
+
+def _repo_flag(argv):
+    return argv[argv.index("--repo") + 1]
+
+
+@pytest.mark.parametrize("path", ["standing", "run"])
+def test_preflight_measure_and_judge_are_handed_the_store_link_not_the_repository(tmp_path, monkeypatch, path):
+    seen = _recorded(tmp_path, monkeypatch, path)
+    assert {s: _repo_flag(seen[s]) for s in READS} == {s: str(tmp_path / "link") for s in READS}
+    m = seen["measure"]
+    assert m[m.index("--store") + 1] == f"{tmp_path / 'link'}/.gov-runtime/store.db"  # the store declared is the one searched
+    assert m[m.index("--commit") + 1] == "c" * 40 and seen["preflight"][seen["preflight"].index("--commit") + 1] == "c" * 40
+
+
+def test_the_fresh_path_still_starts_its_launch_steps_and_figures_as_before(tmp_path, monkeypatch):
+    seen = _recorded(tmp_path, monkeypatch, "run")
+    assert set(seen) >= {"writer-1", "checker-1", "void", "auditor", "classes", "pool", "figures", *READS}
+    assert "--repo" not in seen["figures"] and "--repo" not in seen["void"]

@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import timedelta
@@ -145,6 +147,13 @@ def _toplevel(out: Path) -> str:
     return done.stdout.strip() if done.returncode == 0 and done.stdout.strip() else str(here)
 
 
+def _gitleaks() -> str:
+    """The scanner for step 6's line: the absolute path ``shutil.which`` finds when A9 runs (cron's PATH lacks
+    ``~/.local/bin``; review round 1 R1), else the placeholder the operator fills in."""
+    found = shutil.which("gitleaks")
+    return os.path.abspath(found) if found else "<path to gitleaks>"
+
+
 def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], repo=None) -> Path:
     """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy, the sets root's spec (mode 0700), the
     approved list with the three variant briefs, the path map's hidden globs, the refresh the operator installs and the
@@ -178,7 +187,8 @@ def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[
         f"5. Install the refresh the operator runs after each update of the integration branch: `{REFRESH}` "
         "(W2-116), with the daily backstop.\n"
         "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
-        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} {GOV_OS / CRON} --repo {repo}` {PUSH_ORDER}\n", encoding="utf-8")
+        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} GOV_MEMAUDIT_GITLEAKS={_gitleaks()} {GOV_OS / CRON} "
+        f"--repo {repo}` {PUSH_ORDER}\n", encoding="utf-8")
     return act
 
 

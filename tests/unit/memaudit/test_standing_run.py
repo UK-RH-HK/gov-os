@@ -4,6 +4,7 @@ fake ``claude`` (never a real search, a real model call or the real sets root)."
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -27,7 +28,7 @@ class Standing:
     """A plant with a standing set (a copy of the plant's 40, five questions in unique words), a store link, the fake
     ``gov`` and ``claude``, and the set declared."""
 
-    def __init__(self, plant, monkeypatch, broken=()):
+    def __init__(self, plant, monkeypatch, broken=(), own_store=None):
         self.plant = plant
         monkeypatch.setenv("GOV_INDEP_RUNS_DIR", str(plant.runs))
         monkeypatch.delenv("GOV_MEMAUDIT_STATE", raising=False)
@@ -44,6 +45,10 @@ class Standing:
             q["sources"] = [{"path": "docs/gone/missing.md", "lines": [1, 2]}]
             self.rewrite(qid, q)
         self.head, self.repo = plant.repo["head"], plant.repo["path"]
+        if own_store is not None:  # the repository's own store, built at another commit than the link's (F-A)
+            self.repo = plant.tmp / "repository"
+            run("git", "clone", "-q", str(plant.repo["path"]), str(self.repo), env=plant.repo["env"])
+            store_at(self.repo, own_store)
         self.link = plant.tmp / "link"
         run("git", "clone", "-q", str(self.repo), str(self.link), env=plant.repo["env"])
         (self.link / ".gov-runtime").mkdir()
@@ -90,6 +95,17 @@ class Standing:
     def tree(self):
         return {**{f"sets/{k}": v for k, v in snapshot(self.plant.root).items()},
                 **{f"runs/{k}": v for k, v in snapshot(self.plant.runs).items()}}
+
+
+def store_at(folder: Path, commit: str) -> None:
+    """``<folder>/.gov-runtime/store.db`` with one fingerprints row at ``commit`` (the head ``gov retrieve`` answers)."""
+    import sqlite3
+    (folder / ".gov-runtime").mkdir(exist_ok=True)
+    conn = sqlite3.connect(folder / ".gov-runtime/store.db")
+    conn.execute("CREATE TABLE fingerprints (head TEXT NOT NULL, code TEXT, records TEXT, kind TEXT NOT NULL)")
+    conn.execute("INSERT INTO fingerprints VALUES (?, 'c', 'r', 'rebuild')", (commit,))
+    conn.commit()
+    conn.close()
 
 
 @pytest.fixture
@@ -274,6 +290,40 @@ def test_a_run_with_no_live_set_is_refused_with_its_code_and_writes_nothing(plan
         cwd=plant.tmp)
     assert (done.returncode, done.stdout) == (1, "STANDING_NONE\n")
     assert not schedule.state_dir(plant.runs, plant.repo["path"]).exists()
+
+
+def test_the_searches_reach_the_links_store_when_the_repositorys_own_store_is_at_another_commit(plant, monkeypatch):
+    """F-A (review round 1; S3, S6/I6): every search runs in the store link's work tree, so the commit of the store it
+    reaches is the declared one, though the repository's own store sits at another commit."""
+    s = Standing(plant, monkeypatch, own_store=plant.repo["earlier"])
+    s.fake.plan["store_from_cwd"] = True
+    del s.fake.plan["store_commit"]
+    s.fake.save()
+    done = s.standing_run()
+    assert done.returncode == 0, done.stdout + done.stderr
+    assert done.stdout.splitlines()[-1] == f"STANDING {s.week} right 40 of 40: passes"
+    said = (s.state / "standing" / SET / s.week / "measure.out").read_text()
+    assert "FAULT" not in said and "STOPPED" not in said
+    assert not (s.run_dir / "attempt-1" / "FAULT").exists()
+    calls = s.fake.calls()
+    assert calls and {c["cwd"] for c in calls} == {os.path.realpath(s.link)}  # the probe, measure and judge alike
+    decl = json.loads((s.run_dir / "DECLARATION.json").read_text())
+    assert decl["store_commit"] == s.head and decl["audit_commit"] == s.head
+    assert s.history()[-1]["commit"] == s.head
+
+
+def test_the_planted_gov_answers_the_store_of_the_folder_it_runs_in(plant, monkeypatch):
+    """The stand-in itself: run in the repository it answers the repository's store commit, so a search that reached
+    the repository's store would fault (the case above cannot pass for the wrong reason)."""
+    s = Standing(plant, monkeypatch, own_store=plant.repo["earlier"])
+    s.fake.plan["store_from_cwd"] = True
+    del s.fake.plan["store_commit"]
+    s.fake.save()
+    answers = {}
+    for where in (s.repo, s.link):
+        done = subprocess.run([str(plant.gov), "retrieve", "anything", "--json"], cwd=where, capture_output=True, text=True)
+        answers[where] = json.loads(done.stdout)["result"]["store"]["commit"]
+    assert answers == {s.repo: plant.repo["earlier"], s.link: s.head}
 
 
 def test_the_judged_path_is_the_fresh_audits_one_a_spy_sees_the_same_functions_called(stand, monkeypatch):

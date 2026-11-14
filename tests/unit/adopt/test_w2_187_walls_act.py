@@ -21,15 +21,47 @@ def act_text(out, sets, **kw):
     return (act / "ACT.md").read_text()
 
 
-def test_the_act_holds_the_cron_line_with_the_repositorys_path_as_step_6(tmp_path):
+def _which(found):
+    """A stand-in for ``shutil.which`` that answers ``found`` for ``gitleaks`` (never the machine's own PATH)."""
+    return lambda name, *a, **k: found if name == "gitleaks" else None
+
+
+def test_the_act_holds_the_cron_line_with_the_repositorys_path_as_step_6(tmp_path, monkeypatch):
     sets, repo = tmp_path / "sets", tmp_path / "adopted"
+    monkeypatch.setattr(memory_sets.shutil, "which", _which("/opt/planted/bin/gitleaks"))
     text = act_text(tmp_path / "out", sets, repo=repo)
     step = [x for x in text.splitlines() if x.startswith("6. ")]
     assert step == [
         "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
-        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets} {GOV_OS}/governance/project/orchestration/tools/memaudit_cron.sh "
-        f"--repo {repo}` " + PUSH_SENTENCE]
+        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets} GOV_MEMAUDIT_GITLEAKS=/opt/planted/bin/gitleaks "
+        f"{GOV_OS}/governance/project/orchestration/tools/memaudit_cron.sh --repo {repo}` " + PUSH_SENTENCE]
     assert [x[:2] for x in text.splitlines() if x[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5.", "6."]
+
+
+def test_step_6_names_the_scanner_found_when_a9_runs_because_crons_path_lacks_it(tmp_path, monkeypatch):
+    """R1 (review round 1): cron's PATH lacks ``~/.local/bin``, so the line names the scanner's absolute path."""
+    monkeypatch.setattr(memory_sets.shutil, "which", _which("/home/someone/.local/bin/gitleaks"))
+    step = next(x for x in act_text(tmp_path / "out", tmp_path / "sets", repo=tmp_path / "a").splitlines()
+                if x.startswith("6. "))
+    line = step.split("`")[1]
+    assert line.index("GOV_MEMAUDIT_GITLEAKS=/home/someone/.local/bin/gitleaks ") < line.index("memaudit_cron.sh")
+    assert step.count("GOV_MEMAUDIT_GITLEAKS=") == 1
+
+
+def test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator(tmp_path, monkeypatch):
+    monkeypatch.setattr(memory_sets.shutil, "which", _which(None))
+    step = next(x for x in act_text(tmp_path / "out", tmp_path / "sets", repo=tmp_path / "a").splitlines()
+                if x.startswith("6. "))
+    assert " GOV_MEMAUDIT_GITLEAKS=<path to gitleaks> " in step.split("`")[1]
+    assert step.endswith(PUSH_SENTENCE)
+
+
+def test_a_relative_answer_of_which_is_written_as_an_absolute_path(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(memory_sets.shutil, "which", _which("bin/gitleaks"))
+    step = next(x for x in act_text(tmp_path / "out", tmp_path / "sets", repo=tmp_path / "a").splitlines()
+                if x.startswith("6. "))
+    assert f" GOV_MEMAUDIT_GITLEAKS={tmp_path}/bin/gitleaks " in step
 
 
 def test_step_6_names_the_cycles_order_and_how_the_owner_declares_the_push_and_installs_nothing(tmp_path):

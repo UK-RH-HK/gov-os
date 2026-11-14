@@ -27,6 +27,13 @@ with open(os.path.join(here, "calls.jsonl"), "a") as f:
                         "name": os.path.basename(__file__)}) + "\\n")
 if plan.get("sleep"):
     time.sleep(plan["sleep"])
+if plan.get("land"):  # a commit lands on the branch while the scan runs (a merge from another worktree)
+    import subprocess
+    subprocess.run(["git", "-C", plan["land"], "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit",
+                    "-q", "--allow-empty", "-m", "late"], check=True, capture_output=True)
+if plan.get("branch"):  # a branch is made while the scan runs
+    import subprocess
+    subprocess.run(["git", "-C", plan["branch"][0], "branch", plan["branch"][1]], check=True, capture_output=True)
 if plan.get("report") is not None:
     open(path, "w").write(plan["report"])
 else:
@@ -267,3 +274,49 @@ def test_the_wrapper_may_name_the_log_the_line_goes_to(world):
 
 def test_a_usage_fault_writes_no_log_line(world):
     assert world.push(declare="origin").returncode == 4 and not (world.state / "cron.log").exists()
+
+
+def _local(world, ref="refs/heads/main"):
+    return run("git", "rev-parse", "--verify", ref, cwd=world.repo, env=world.env).stdout.strip()
+
+
+def test_a_commit_that_lands_during_the_scan_is_not_pushed_only_the_scanned_one_is(world):
+    """F-B (review round 1): the commit the branch named when the scan began is the one pushed, never a later one."""
+    digest = world.digest()
+    world.plan(land=str(world.repo))
+    done = world.push()
+    assert done.returncode == 0, done.stdout + done.stderr
+    late = _local(world)
+    assert late != world.head  # the branch moved while the scan ran
+    assert world.remote_head() == world.head  # the remote's branch is the scanned commit
+    assert done.stdout == f"PUSH pushed origin main {world.head[:12]}\n"
+    assert digest.read_text().splitlines()[-1] == done.stdout.strip()
+
+
+def test_a_second_cycle_pushes_the_late_commit_after_its_own_scan(world):
+    world.plan(land=str(world.repo))
+    assert world.push().returncode == 0
+    late = _local(world)
+    world.plan()
+    done = world.push()
+    assert done.returncode == 0 and done.stdout == f"PUSH pushed origin main {late[:12]}\n"
+    assert world.remote_head() == late and len(world.calls()) == 2
+
+
+def test_a_branch_that_names_no_commit_when_the_scan_begins_pushes_nothing(world):
+    done = world.push(declare="origin nosuch")
+    assert done.returncode == 2 and done.stdout == "PUSH failed: git push exit 128\n" and done.stderr == ""
+    assert subprocess.run(["git", "-C", str(world.bare), "rev-parse", "--verify", "-q", "refs/heads/nosuch"],
+                          capture_output=True, env=world.env).returncode != 0
+    assert stat.S_IMODE((world.state / "PUSH.log").stat().st_mode) == 0o600
+    assert len(world.calls()) == 1  # scanned once all the same: the order is the scan, then the push
+
+
+def test_a_branch_made_during_the_scan_is_not_pushed(world):
+    """The scan began with no ``late-side`` branch: one made while it ran is not pushed by that cycle."""
+    world.plan(branch=[str(world.repo), "late-side"])
+    done = world.push(declare="origin late-side")
+    assert _local(world, "refs/heads/late-side") == world.head  # made while the scan ran
+    assert done.returncode == 2 and done.stdout == "PUSH failed: git push exit 128\n"
+    assert subprocess.run(["git", "-C", str(world.bare), "rev-parse", "--verify", "-q", "refs/heads/late-side"],
+                          capture_output=True, env=world.env).returncode != 0

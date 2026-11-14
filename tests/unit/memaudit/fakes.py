@@ -47,7 +47,17 @@ result = {"stopping_reason": "SATURATED", "evidence": evidence,
           "facets": {"lexical": {"available": spec.get("lexical", True), "reason": None},
                      "semantic": {"available": spec.get("semantic", True), "reason": None}},
           "rerank": {"by": spec.get("rerank_by", "service")}, "gaps": [], "continuation": None}
-store_commit = spec.get("store_commit", plan.get("store_commit"))
+store_commit = plan.get("store_commit")
+if plan.get("store_from_cwd"):  # the commit of the store in the folder it runs from (its --root, else its cwd)
+    import sqlite3
+    folder = args[args.index("--root") + 1] if "--root" in args else os.getcwd()
+    try:
+        conn = sqlite3.connect("file:" + os.path.join(folder, ".gov-runtime", "store.db") + "?mode=ro", uri=True)
+        store_commit = conn.execute("SELECT head FROM fingerprints ORDER BY rowid DESC LIMIT 1").fetchone()[0]
+        conn.close()
+    except Exception:
+        store_commit = None
+store_commit = spec.get("store_commit", store_commit)
 if store_commit is not None:  # W2-138's field: the commit the store a search answered from was built at
     result["store"] = {"commit": store_commit, "root": here}
 if spec.get("pool_fallback"):
