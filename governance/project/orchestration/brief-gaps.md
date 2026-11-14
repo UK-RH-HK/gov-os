@@ -22,3 +22,4 @@ What a lead or its workers had to discover, look up or ask that the brief, the t
 | 2026-10-30 | W2-57 | flock is not first-come; a lock wait outlasted the two-hour window | common brief / tool | 15 (meas.) | common brief 2026-10-30: background waits |
 | 2026-10-30 | W2-57 | a run past its gate waiting on the lock when CLOSE-RUNNING appears | common brief | 5 (est.) | common brief 2026-10-30: a run held past 90 minutes |
 | 2026-10-30 | W2-57 | disk_gate.sh's printed verdict | tool | minor | open |
+| 2026-11-14 | W2-188 | the map-fix brief named only the self-check row; parse_map also refused the eight backticked KPI cells and an `S10` cell | the CTO's brief (memory: check-map-with-parse-map) | 10 (est.) | fixed: run parse_map before briefing a map fix |

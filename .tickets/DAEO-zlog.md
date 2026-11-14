@@ -52,7 +52,7 @@ non_goals:
 - 'no change to A9''s other six steps, to the Verify section or to W2-88''s closed ticket (its lines are re-baselined by the CTO''s record edit under DEC-1179 (7))'
 - 'no change to W2-88 S10''s standard or the forbidden second reranking model'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1181, DEC-1179, DEC-1176, DEC-1157, DEC-1156, DEC-981, DEC-832, DEC-136, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1071, DEC-1072, DEC-105, DEC-974, CAP-33, DAEO-pg6i, DAEO-2bdu]
+sources: [DEC-1184, DEC-1181, DEC-1179, DEC-1176, DEC-1157, DEC-1156, DEC-981, DEC-832, DEC-136, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1071, DEC-1072, DEC-105, DEC-974, CAP-33, DAEO-pg6i, DAEO-2bdu]
 acceptance_tests: {path: tests/acceptance/W2-188/}
 ---
 
@@ -164,3 +164,5 @@ the `.claude` copies ACT come after W2-187 merges (W2-88a's finding F4).
   - its §9 last bullet must be replaced by DEC-1179 (4)'s recorded text, recorded at `976e53791`.
 
 **P-W2-188-S5 (a), 2026-11-14 (the CTO within purpose, DEC-1157 (12), listed for the owner's reading):** S5's and I6's impact clause named a W2-11 case that does not exist (lead return 15:01, auditor au-1 F1). Re-baselined above, the old text kept. A fresh independent test designer revises the one case `test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged` (`Rewrite-Reason: DEC-1157 (12), P-W2-188-S5 (a)`), then a narrow independent check (DEC-1156 (7)) and one re-verify. The skill and the practice record do not change.
+
+**Map round 2026-11-14 23:06-23:31 (the CTO, DEC-1184, DEC-1156 (7)):** `gov accept W2-188` refused `ACCEPT_MAP_UNREADABLE` at dfe271298 (the suite ran 54/0 directly). The lead's README-only fix 199ea5103 (merged 4711c0fb5): the self-checks in their own list, the eight KPI cells' line names without backticks, `S10` in a code span. P-W2-188-MAP-1 (a), the lead's call beyond the brief's one-row scope, is accepted by the CTO (within purpose; no test or behaviour change; `gov accept` pass 54/0 is the check). Land 4711c0fb5b8e; the queue closes it.
