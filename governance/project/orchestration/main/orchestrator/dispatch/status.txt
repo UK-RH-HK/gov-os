@@ -1,23 +1,23 @@
-dispatcher 2026-11-14 18:33:05
+dispatcher 2026-11-14 18:37:05
 leads running (3, from the processes): W2-187, W2-88, W2-94
-load 19.0/15.2/11.6; real busy cores 13.72 of 20 (the embedding server 0.0); memory available 14495 MB; gate_check (for comparison) open (OPEN leads=3 load=19.0/11.6 nproc=20 have=15734376kB need=6291456kB); disk open
-Balance: CPU 13.72/20 busy (band 0-1000: within); RAM 14.2 GB available (floor 3.0 GB); GPU 8.0/15.9 GB used, 7.9 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: none listed); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 1 (0.1 GB RSS; 2 of 2 GPU slots held; reserve 0.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (14591 samples since 2026-11-02 13:00))
+load 16.8/17.2/13.2; real busy cores 8.39 of 20 (the embedding server 0.0); memory available 15186 MB; gate_check (for comparison) open (OPEN leads=3 load=16.8/13.2 nproc=20 have=16418680kB need=6291456kB); disk open
+Balance: CPU 8.39/20 busy (band 0-1000: within); RAM 14.8 GB available (floor 3.0 GB); GPU 8.0/15.9 GB used, 7.9 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: none listed); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 1 (0.1 GB RSS; 2 of 2 GPU slots held; reserve 0.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (14595 samples since 2026-11-02 13:00))
 Forecast: lead: admits, binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); pairing loads CPU 0.02, GPU 0.57
-Jobs by phase: lead W2-94 build (0.01 cores, 0.3 GB); lead W2-88 build (0.01 cores, 0.3 GB); lead W2-187 build (0.05 cores, 0.3 GB); slot pid 1563251 test (6.01 cores, 1.4 GB); slot pid 1678858 test (5.44 cores, 1.6 GB); slot pid 1821411 test (0.47 cores, 0.1 GB)
+Jobs by phase: lead W2-94 build (0.01 cores, 0.3 GB); lead W2-88 build (0.01 cores, 0.3 GB); lead W2-187 build (0.03 cores, 0.3 GB); slot pid 1563251 test (0.97 cores, 1.2 GB); slot pid 1678858 test (5.79 cores, 1.5 GB); rebuild pid 1913491 rebuild.lexical (0.0 cores, 0.0 GB)
 GPU rule: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 1575 MiB (floor 2048 MiB): no spill
 Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
 Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 0-1000, margin 2, heavy slots 3 x 6 workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 2), spill floor 2048 MiB; config.json overrides: cpu_band [0, 1000] (derived [14, 18]), gpu_shared_floor_mib 2048 (derived 1019)
-admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule "slots" in config.json read as the forecast); GPU memory 8136 MiB free >= 2048 MiB; forecast admits (binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))
+admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule "slots" in config.json read as the forecast); GPU memory 8135 MiB free >= 2048 MiB; forecast admits (binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))
 peaks 2026-11-14 18:28:09: a lead p95 438 MB, max 1824 MB
 heavy steps outside a slot: none
-heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: finished; main tree clean on w2/integrate
-inbox unread: 2 (oldest 0 min)
+heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: nothing to land; main tree clean on w2/integrate
+inbox unread: 0
 ready list: W2-88 DAEO-2bdu: running; W2-187 DAEO-0cd2: running; W2-94 DAEO-g87r: running
 sentinel: watched
 guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
 embedding server: shared IDLE 0 tasks/min; query IDLE 0 tasks/min
 GPU: RTX 5070 Ti 8.0/15.9 GB, 0 %; holders: embedder shared (0), reranker (0); layers: shared 29/29, query 29/29
 heavy slot holders: slot 1 pid 1563251 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c 
-  ) idle 0 min; slot 2 pid 1821411 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock bash -c 
+  ) idle 0 min; slot 2 pid 1913491 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock bash -c 
   ) idle 0 min; slot 3 pid 1678858 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock bash -c 
   ) idle 0 min

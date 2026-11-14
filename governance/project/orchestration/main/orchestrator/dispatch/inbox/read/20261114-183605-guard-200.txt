@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 201
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Gh5J15qEF64vA3MUSrhXqJ", "time": "2026-11-13T23:42:46.967Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-61h-c39/e22aaca5-3cc6-4ebb-adf3-b5effac94b46.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-61h-c39", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-61h-c39; python3 - <<'EOF' import pathlib j = pathlib.Path(\"governance/project/briefs/JUDGEMENT.md\").read_text() head = r'''# Narrow independent check: W2-61h (DAEO-", "rule": "the command names the sets root together with a command substitution, which is refused to this session (

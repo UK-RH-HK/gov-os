@@ -1,5 +1,5 @@
-Status at 2026-11-14 18:32:06 (the last report's block)
-- Progress: 160 closed / 3 merged-not-closed / 0 built-and-held / 6 in flight / 23 not started, of 192.
+Status at 2026-11-14 18:36:19 (the last report's block)
+- Progress: 161 closed / 3 merged-not-closed / 0 built-and-held / 5 in flight / 23 not started, of 192.
 - Leads: 3 running (W2-187, W2-88, W2-94); queued next: W2-88, W2-187, W2-94; the gate: open.
 - Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
 - Reopened since the last report: none. New tickets since the last report: none.

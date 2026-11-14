@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 232
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01T8j6Ki7DoAqPtyMhJaamYP", "time": "2026-11-14T18:05:35.997Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-42a/e09466c3-7b39-4b10-b09d-ead3a7c4651d.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-42a", "tool": "Bash", "form": "mkdir -p $TMPDIR/aud && cat > $TMPDIR/aud/plant.py <<'PLANT_EOF' \"\"\"Plant the project (same shape as the R4 module) under argv[1]; print root.\"\"\" import os, subprocess, sys base = os.path.realpath(sys", "rule": "the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-

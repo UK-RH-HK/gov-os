@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 217
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_017j3KFeKgXGvHbRfRNXeBvd", "time": "2026-11-14T06:31:16.108Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-42a/3d1b1a34-54a8-45b7-84ba-b5091bd2bf12.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-42a", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-42a; export HOME=$TMPDIR/empty-home; P='import sys,os,time;[os.environ.pop(k) for k in list(os.environ) if k.startswith(\"GOV_\")];sys.path.insert(0,sys.argv[1]);from ", "rule": "sudo is refused to every session (DEC-953 item 2)", "verdict": "", "cost": "", "note": ""}

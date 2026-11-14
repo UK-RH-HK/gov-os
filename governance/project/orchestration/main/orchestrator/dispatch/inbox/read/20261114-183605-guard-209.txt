@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 210
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01JJ3GNn9gbRvBzb1vhidX1X", "time": "2026-11-14T03:29:51.936Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-184/d4de9d3f-1794-4f4a-b076-ad0cb504f3fa.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-184", "tool": "Bash", "form": "HOME=\"$TMPDIR/home\" PYTHONPATH=src python3 - <<'EOF' import fnmatch, glob from pathlib import Path from gov.launch import criticality as crit from gov.guard.decide import _load_ticket g = \"fixtures/ev", "rule": "the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820

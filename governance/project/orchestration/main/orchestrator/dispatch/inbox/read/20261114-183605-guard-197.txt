@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 198
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_014vA32J1MTo5yux7xZA6uYR", "time": "2026-11-13T19:19:45.260Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-37/8d9e7a7b-46c4-4763-addf-de8a5e587fd6.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-37", "tool": "Bash", "form": "ls -d /home/usain/gov-os-worktrees/W2-37-tests 2>&1; rm -rf /home/usain/gov-os-tmp/p7-pathcheck /home/usain/gov-os-tmp/w237-scoped-6; cd /home/usain/gov-os-worktrees/W2-37 && PYTHONPATH=/home/usain/go", "rule": "a catastrophic delete: /home/usain/gov-os-tmp/p7-pathcheck is outside the project (the main tree, ~/gov-os-worktrees

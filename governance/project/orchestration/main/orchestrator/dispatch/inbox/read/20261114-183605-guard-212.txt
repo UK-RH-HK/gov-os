@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 213
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Hn2DFhjeBLQD7y6TkwrRfZ", "time": "2026-11-14T06:12:33.491Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-42a-tests/1eee15f0-14c5-4531-8589-930893293879.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-42a-tests", "tool": "Bash", "form": "cd $TMPDIR/rb && rm -rf w2 && mkdir -p w2/tests/acceptance/X && cd w2 && printf '#!/bin/bash\\ntouch tests/acceptance/X/zz.py \"$@\"\\n' > w.sh && chmod +x w.sh && v=./w.sh bash -c 'while read -r f; do \"$", "rule": "the call reads files whose names another command gives at run time, from a listing whose start th

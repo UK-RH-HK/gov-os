@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 202
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_014ciEYKz1FodFVRMCDn3z3R", "time": "2026-11-13T23:44:38.740Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-61h-c39/caf6f908-bf9f-4eb2-a144-7fb0a3978bbf.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-61h-c39", "tool": "Bash", "form": "mkdir -p \"$TMPDIR/n1gen\" && cat > \"$TMPDIR/n1gen/gen.py\" <<'EOF' import sys, os, json root, spread = sys.argv[1], json.loads(sys.argv[2]) d = os.path.join(root, \"fixtures/evaluation/memory-retrieval/h", "rule": "the call reads the hidden part of an evaluation set that measures this session, which is refused to i

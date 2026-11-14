@@ -1422,3 +1422,4 @@
 2026-11-14 18:31:08 return: W2-42a-A5-r4b.json -> inbox/20261114-183108-W2-42a-A5-r4b.txt
 2026-11-14 18:32:09 land started: ['W2-42a=2376e2a33485'] -> land-dispatch-20261114-183209.out (launcher exit 0)
 2026-11-14 18:33:05 land finished: {'W2-42a=2376e2a33485': 'CLOSED'}
+2026-11-14 18:36:05 guard refusals: 25 new
