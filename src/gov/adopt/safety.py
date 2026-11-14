@@ -57,6 +57,60 @@ def setup(root: Path) -> dict[str, str]:
 
 
 # --------------------------------------------------------------------------
+# S26 (W2-88 run 7, F-3): the repository's ignore rules, asked at the start
+# --------------------------------------------------------------------------
+
+def written_paths(root: Path) -> list[str]:
+    """Every path ``gov adopt`` writes and commits in the repository, in one list: A0's files (``.gitleaks.toml``,
+    ``.gitignore``, and the roster and a ticket where ``tk`` is vendored), every stage's record, A2's decision packages
+    and A8's CIT-E (a representative name each), and A9's copies (each file of the kernel folders and templates, and
+    ``governance/project/retrieval.yaml``). What a stage writes only later, from the caller's proposal (A6's targets,
+    A8's imports), is not known at the start."""
+    from gov.adopt import fabric, legacy, lite_gates
+    from gov.tasks import tickets
+
+    paths = [GITLEAKS, ".gitignore"]
+    if (root / tickets.TK_REL).is_file():  # A0 creates the coordination ticket and the roster's key only with tk
+        from gov.guard import install
+        paths += [install.ROSTER, f"{tickets.TICKETS_REL}/t-0000.md"]
+    paths += [project.record_path(stage) for stage in project.STAGES]
+    paths += [lite_gates.record_path(gate) for gate in lite_gates.GATES]
+    paths += [f"{project.FOLDER}/packages/DP-ADOPT-00000000.md", legacy.CIT_E]
+    paths += fabric.kernel_targets(root)
+    return list(dict.fromkeys(paths))
+
+
+def ignored(root: Path, paths: list[str]) -> list[dict]:
+    """The ``paths`` the repository's ignore rules ignore and its index does not track, each as ``{path, source, line,
+    pattern}`` as ``git check-ignore -v`` gives them (``.gitignore`` at any level, ``.git/info/exclude``,
+    ``core.excludesFile``). A path the index tracks is never reported (git does not judge it); a rule that re-includes
+    a path (a leading ``!``) is no finding."""
+    asked = "".join(f"{rel}\0" for rel in paths).encode("utf-8", "surrogateescape")
+    fields = project._run(root, ("check-ignore", "-v", "-z", "--stdin"), (0, 1), asked)[1].split(b"\0")
+    found = []
+    for at in range(0, len(fields) - 3, 4):
+        source, line, pattern, path = (field.decode("utf-8", "surrogateescape") for field in fields[at:at + 4])
+        if not pattern.startswith("!"):
+            found.append({"path": path, "source": source, "line": int(line) if line.isdigit() else line,
+                          "pattern": pattern})
+    return found
+
+
+def refuse_ignored(root: Path) -> None:
+    """``ADOPT_PATH_IGNORED`` (``details["ignored"]``) when a path of ``written_paths`` is ignored and untracked: the stage
+    refuses at once, before it writes, stages or commits anything. Gov never runs ``git add -f`` and never edits an
+    ignore file: the repository's owner decides."""
+    found = ignored(root, written_paths(root))
+    if found:
+        raise refuse("PATH_IGNORED", f"{len(found)} path(s) gov adopt writes and commits are ignored by this repository's "
+                     "own rules, so git would refuse them: "
+                     + "; ".join(f"{item['path']} ({item['source']}:{item['line']}:{item['pattern']})" for item in found)
+                     + ". Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and "
+                     "never edits an ignore file: change those rules (or the paths), then run the stage again",
+                     ignored=found)
+
+
+# --------------------------------------------------------------------------
 # S7: every target held by a namespace
 # --------------------------------------------------------------------------
 

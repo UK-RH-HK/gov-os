@@ -170,6 +170,16 @@ def _sources() -> list[tuple[str, str]]:
     return found
 
 
+def kernel_targets(root: Path) -> list[str]:
+    """Every path A9 writes in the repository ``root`` besides its record: the kernel copies and ``retrieval.yaml``. Where
+    the sources cannot be listed now, the skill folders' ``SKILL.md`` stands for their files: A9 itself refuses then."""
+    try:
+        listed = [target for _, target in _sources()]
+    except GovError:
+        listed = [f"{target}/SKILL.md" for _, target in KERNEL_FOLDERS] + [target for _, target in KERNEL_FILES]
+    return [*listed, RETRIEVAL]
+
+
 MODE = "100644"  # the index mode of a file A9 writes (``write_bytes``: never executable); ``undo`` judges by the blob
 
 
