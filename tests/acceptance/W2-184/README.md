@@ -32,6 +32,8 @@ at `<test HOME>/.local/bin/claude` records its arguments, `--settings` and the r
   `command.py` is outside the ticket's paths): `reason=`, `trial=`, `owner_named=` (`w2_184_support.DRIVER`, which
   ends as the CLI does: `gov launch: LAUNCH_REFUSED: <message>` on stderr, exit 1). Every other case drives `gov launch`.
   A launch function that does not take the keyword ends the child with exit 97 and a line naming the keyword.
+  Since interface 7.2a (the CTO's P-W2-184-2 (a)) the CLI carries the three options: batch td-6's cases drive them
+  through `gov launch` itself (`w2_184_support.cli_launch`, `test_w2_184_cli_options.py`); the keyword cases stay.
 - **Refusals** are asserted as exit code 1, `LAUNCH_REFUSED`, the stand-in not started, no new launch record, and the
   words the interface says the message names (`w2_184_support.refused`).
 
@@ -344,3 +346,58 @@ promoted in the first case: the record is well formed and seen from its own root
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_both_roots_is_read_from_the_launch_root_s_copy` | not promoted; a launcher that reads the ticket worktree's copy gives `a fail-open finding` on `01-review.md`, not `two failed reviews` on `03-review.md` |
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_two_other_roots_is_read_from_the_first_root_in_sorted_order` | not promoted; the later root's copy gives `a fail-open finding` on `01-review.md` |
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read` (2: another ticket's worktree, the main checkout) | not promoted; a launcher that reads that tree gives `a fail-open finding` on `00-open.md` |
+
+## The CLI options (batch td-6): `gov launch` carries `--reason`, `--trial` and `--owner-named` before `--`
+
+The CTO decided P-W2-184-2 (a) (2026-11-14): `src/gov/launch/command.py` joins the ticket's paths and the three options
+are wired (interface **7.2a**: `gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N]
+[--reason <text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]`, passed to `launcher.launch` as
+`reason`, `trial`, `owner_named`). File `test_w2_184_cli_options.py` (35 cases: 28 red, 7 green at the head; 11 s in all,
+at most 1.3 s each, measured). Written from the described behaviour only; the engineer's work (`src/gov/launch/`) was not
+read; the current CLI was observed from outside (`gov launch --help`, a run with each option). Nothing under
+`fixtures/evaluation/` or any `hidden` folder is opened.
+
+- **Support:** `w2_184_support.cli_launch(sandbox, cli, role, ticket, *cli_args, options=(...))` runs
+  `gov launch <role> <ticket> <options> [-- <cli_args>]` through the console-script entry point, always (never the
+  keyword call); `usage_of(text)` takes argparse's usage paragraph. Nothing existing changed.
+- **Each option as its keyword case:** the same records (`assert_session`) and the same refusals (`refused`: exit 1,
+  `LAUNCH_REFUSED`, no session, no new record), each case first showing the refusal without the option.
+- **The forms through the CLI:** a malformed `--owner-named`, a `--trial` id outside the form (a trial that would admit
+  the launch is planted at the path the id names, so a launcher that read it unchecked would start the session) and an
+  empty `--reason`, each refused with exit 1 before any record or session.
+- **Before `--` only:** the same word written after `--` reaches the CLI unchanged and is not recorded, and does not do
+  the option's work (a repeated review setting, a max, a trial's model stay refused); with the option before `--` too,
+  the record holds the value written before `--`.
+- **Usage and `--plan`:** `gov launch --help` and `gov launch` with no role or ticket (exit 2) print a usage line naming
+  the three options (before `[-- ...]`) and the ones it named; `--plan` prints the default line alone, also when the
+  three options are given (a planted trial whose model would show is not read).
+
+"Red" is why the case fails at this tree's head `42d0867d3`: the CLI has no such options, so argparse ends the run with
+exit code 2, `gov: error: unrecognized arguments: --owner-named DEC-1010` (or `--trial ...`, `--reason ...`). **No
+option:** a case that expects a session fails with `gov launch did not start exactly one session` at the launch that
+carries the option (every setup launch before it passes). **Exit 2:** a case that expects a refusal fails with `the launch
+was not refused with exit code 1`. **Green (guard):** passes at the head, and fails on a CLI that takes the option after
+`--` too.
+
+| KPI | Test | Red because (at `42d0867d3`) |
+|---|---|---|
+| success-4 | `test_w2_184_cli_options.py::test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_setting` | no option, at the third launch (round 1 and the refusal without the option pass) |
+| success-4 | `test_w2_184_cli_options.py::test_cli_owner_named_admits_a_third_review` | no option, at the fourth launch (rounds 1, 2 and the refused third pass) |
+| success-4 | `test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session` (5: `DEC-`, `dec-1010`, `1010`, `DEC-10x`, empty) | exit 2 |
+| success-4 | `test_w2_184_cli_options.py::test_cli_owner_named_after_the_double_dash_does_not_admit_a_repeated_setting` | green (guard) |
+| success-2 | `test_w2_184_cli_options.py::test_cli_a_planted_trial_admits_its_model_after_the_double_dash_and_the_record_holds_its_id` | no option, at the second launch (the refusal naming both models without `--trial` passes) |
+| success-2 | `test_w2_184_cli_options.py::test_cli_a_trial_with_nothing_after_the_double_dash_sets_the_session_s_model_and_effort` | no option |
+| success-2 | `test_w2_184_cli_options.py::test_cli_a_trial_that_does_not_admit_the_launch_is_refused_naming_the_file` (2: no file, the wrong role) | exit 2 |
+| success-2 | `test_w2_184_cli_options.py::test_cli_trial_and_reason_together_admit_a_trial_s_max` | exit 2 at the first launch (`--trial` alone, refused for want of a reason) |
+| success-2 | `test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session` (5: `x/y`, `../x`, `a b`, `té`, empty) | exit 2 |
+| success-2 | `test_w2_184_cli_options.py::test_cli_trial_after_the_double_dash_does_not_admit_its_model` | green (guard) |
+| success-2 | `test_w2_184_cli_options.py::test_cli_the_usage_line_names_the_three_options` (2: `--help`, no role or ticket) | the usage line does not name them: `usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]` |
+| success-1 | `test_w2_184_cli_options.py::test_cli_reason_admits_a_max_of_the_launch_s_own_choice_and_is_recorded` | no option, at the second launch (the refusal without `--reason` passes) |
+| success-1 | `test_w2_184_cli_options.py::test_cli_reason_is_recorded_whatever_the_effort` | no option |
+| success-1 | `test_w2_184_cli_options.py::test_cli_an_empty_reason_is_refused_before_any_record_or_session` (2: empty, blank) | exit 2 |
+| success-1 | `test_w2_184_cli_options.py::test_cli_reason_after_the_double_dash_does_not_admit_max` | green (guard) |
+| success-1 | `test_w2_184_cli_options.py::test_cli_plan_prints_the_default_line_alone_and_does_not_read_the_three_options` | exit 2 on the plan given the options (the plain plan passes) |
+| success-3 | `test_w2_184_cli_options.py::test_cli_the_three_options_together_are_each_recorded` | no option |
+| success-3 | `test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through` (3: owner-named, reason, trial) | no option; a CLI that takes the word after `--` records `DEC-2020`, the later reason, or `trial-2` (xhigh) |
+| success-3 | `test_w2_184_cli_options.py::test_cli_an_option_after_the_double_dash_is_passed_through_and_not_recorded` (3: owner-named, reason, trial) | green (guard) |
+| success-3 | `test_w2_184_cli_options.py::test_cli_a_launch_with_none_of_the_options_is_as_before` | green (guard) |
