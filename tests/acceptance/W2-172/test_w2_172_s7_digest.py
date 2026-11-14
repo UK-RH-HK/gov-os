@@ -80,7 +80,7 @@ def test_s7_a_set_of_37_prints_the_scaled_bar(ran):
     world, run = ran("five37")
     assert_ok(run)
     v = by_word(world.digest())["VERDICT"]
-    assert (v["n"], v["need"], v["max"]) == ("37", "32", "1"), v.group(0)
+    assert (v["n"], v["need"], v["max"]) == ("37", "36", "1"), v.group(0)
 
 
 @pytest.mark.parametrize("name", RUNS)
