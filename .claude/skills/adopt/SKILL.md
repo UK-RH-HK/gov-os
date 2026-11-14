@@ -55,8 +55,10 @@ An adopted repository gets its memory built in Wave 0, in the order below (A9 li
 3. Build the store with the standard (Gov OS's memory standard, pinned and written in the A9 record) and its refresh (the store rebuilt after every merge, a failed build leaving the last good store in service). [DEC-1098 (1), DEC-1072 (2)]
 4. Have the verdict set and the tuning set written, by independent writers under the rubric, both held outside every worktree. [DEC-1071 (1)-(3), DEC-1074 (4)]
 5. Measure the tuning set and fix only the structure, never a named question, until its halves agree within 5 points. [DEC-1071 (1)-(3), DEC-1074 (4)]
-6. Declare and measure the verdict set once. A miss stands as it is: the set is never run again. [DEC-1071 (1)-(3), DEC-1098 (1)]
+6. Declare and measure the verdict set once, at Wave 0, as the first verdict. From then on it is the repository's standing set: judged end to end every week on the same questions (monthly once the repository is stable), as Gov OS's memory is judged (the standard's bundle read whole by the reader, which ranks it itself, and search again once), against 95 %, behind the walls, counts only: only counts leave its run. It never chooses or judges a fix: fixes are chosen on the tuning set and on the fresh sets' misses. Each month a fresh set, measured once, checks it for fitting, and a standing set found fitted is replaced. A miss stands as it is: it is never re-run in the same week and never re-scored. [DEC-1179 (1)-(4), DEC-1071 (1), DEC-1074 (1), DEC-1098 (1)]
 7. Record every method and figure, in the adopted repository's copy of the practice record. [DEC-1072 (2)]
+
+The weekly audit runs from one cron line that A9's ACT package gives the repository's owner's operator, beside the walls; adoption never installs it. A standing set that falls below 95 % is a miss with counts only, handled as the practice record's section 9 states. [DEC-1179 (4), (5), DEC-1101 (2), DEC-1125 (2)]
 
 ## Verify clauses for adopted tickets
 
@@ -71,4 +73,4 @@ The tool is `gov adopt`. Its list option prints, for each open or in-progress ti
 
 ## Governing sources
 
-DEC-006, DEC-090, DEC-388, DEC-694, DEC-700, DEC-1050, DEC-1071, DEC-1072, DEC-1074, DEC-1083, DEC-1098, DEC-1130, CAP-44, CAP-54.
+DEC-006, DEC-090, DEC-388, DEC-694, DEC-700, DEC-1050, DEC-1071, DEC-1072, DEC-1074, DEC-1083, DEC-1098, DEC-1101, DEC-1125, DEC-1130, DEC-1179, CAP-44, CAP-54.

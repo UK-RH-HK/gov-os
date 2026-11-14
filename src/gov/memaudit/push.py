@@ -1,0 +1,234 @@
+"""``python3 -m gov.memaudit push``: the weekly secret scan and push (W2-187 I13; S12, F7; DEC-1182 (2), DEC-1052).
+
+The wrapper's last step, after the audit steps that ran (never ``maintain``, a refresh or a close). A repository that
+declares its weekly push, ``GOV_MEMAUDIT_PUSH="<remote> <branch>"`` in its cron line's environment (absent or empty: no
+push; Gov OS declares nothing), gets one full secret scan of the repository, then ``git push <remote>
+<sha>:refs/heads/<branch>`` only when that scan is clean, ``<sha>`` being the commit the branch named when the scan began
+(a commit that lands during the scan waits for the next cycle's scan; review round 1 F-B). The scan is the only one in
+the memory audit and the wrapper. It is counted from its report,
+which is a 0600 temporary file outside the repository and deleted after the count; ``--redact`` keeps a secret out of
+it, and no finding's text (a secret, a match, a line) is read into a message, printed, logged or written anywhere.
+
+One line, counts and reason words only, through ``say``: ``PUSH none: no declaration`` (exit 0), ``PUSH pushed <remote>
+<branch> <12 hex of the scanned commit>`` (0), ``PUSH blocked: findings <k>`` (1), ``PUSH blocked: scan failed <word>`` (1: ``missing``,
+``timeout``, ``exit`` or ``report``) and ``PUSH failed: git push exit <c>`` (2; git's own output goes to a 0600 file
+in the key folder, never printed). When a push is declared (the scan or the push started), the same line ends the
+cycle's latest ``DIGEST.txt`` in the key folder and one more ``cron.log`` line carries the wrapper's six keys with the step
+``push`` (``<key folder>/cron.log``, or the file ``GOV_MEMAUDIT_CRON_LOG`` names, which the wrapper sets to its own log);
+a repository with no declaration gets the first line only: nothing is written and no scanner is called (I13).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
+
+from gov.memaudit import EXIT, layout, schedule
+from gov.memaudit.common import UsageError
+
+DECLARATION = "GOV_MEMAUDIT_PUSH"
+SCAN_TIMEOUT_S, PUSH_TIMEOUT_S = 600.0, 600.0
+PUSH_LOG = "PUSH.log"
+CRON_LOG = "GOV_MEMAUDIT_CRON_LOG"
+
+
+def add_arguments(sp) -> None:
+    sp.add_argument("--sets-root", required=True, metavar="ROOT", help="the sets root (never opened by the push)")
+    sp.add_argument("--repo", metavar="DIR", help="the repository (default: the top level)")
+    sp.add_argument("--gitleaks", metavar="EXE",
+                    help="the scanner (default: $GOV_MEMAUDIT_GITLEAKS, else the one on PATH)")
+
+
+def declared() -> tuple[str, str] | None:
+    """``(remote, branch)`` from ``GOV_MEMAUDIT_PUSH``; ``None`` when absent or empty. A value that is not exactly two
+    words, or a word git would read as an option, is usage (exit 4): nothing is scanned or pushed."""
+    words = os.environ.get(DECLARATION, "").split()
+    if not words:
+        return None
+    if len(words) != 2 or any(w.startswith("-") for w in words):
+        raise UsageError("declaration")
+    return words[0], words[1]
+
+
+def _scan_timeout() -> float:
+    try:
+        given = float(os.environ.get("GOV_MEMAUDIT_SCAN_TIMEOUT_S") or SCAN_TIMEOUT_S)
+    except ValueError:
+        return SCAN_TIMEOUT_S
+    return given if given > 0 else SCAN_TIMEOUT_S
+
+
+def _outside(repo, state: Path) -> str | None:
+    """A folder for the report that is not inside the repository."""
+    for folder in (tempfile.gettempdir(), str(state)):
+        if os.path.isdir(folder) and not layout.inside(folder, repo):
+            return folder
+    return None
+
+
+def _entries(report: str) -> int | None:
+    """The number of entries in the report: 0 for an empty one; ``None`` when it is not a list. Only counted."""
+    try:
+        text = Path(report).read_text(encoding="utf-8", errors="replace").strip()
+        doc = json.loads(text) if text else None
+    except (OSError, ValueError):
+        return None
+    return 0 if doc is None else len(doc) if isinstance(doc, list) else None
+
+
+def scan(repo, exe: str, state: Path) -> tuple[str, int | str]:
+    """One full scan of ``repo``: ``("clean", 0)``, ``("findings", <k>)`` or ``("failed", <reason word>)``. Fails closed:
+    a report that cannot be counted is a failure, and a report with entries is a finding whatever the exit."""
+    found = shutil.which(exe, path=os.environ.get("PATH"))
+    folder = _outside(repo, state)
+    if not found:
+        return "failed", "missing"
+    if folder is None:
+        return "failed", "report"
+    fd, report = tempfile.mkstemp(prefix="scan-", suffix=".json", dir=folder)
+    os.close(fd)
+    os.chmod(report, 0o600)
+    try:
+        try:
+            done = subprocess.run([found, "detect", "--source", str(repo), "--no-banner", "--redact",
+                                   "--report-format", "json", "--report-path", report],
+                                  capture_output=True, stdin=subprocess.DEVNULL, timeout=_scan_timeout())
+        except subprocess.TimeoutExpired:
+            return "failed", "timeout"
+        except OSError:
+            return "failed", "missing"
+        count = _entries(report)
+        if done.returncode == 0:
+            return ("failed", "report") if count is None else ("clean", 0) if count == 0 else ("findings", count)
+        if done.returncode == 1:
+            return ("findings", count) if count else ("failed", "report")
+        return "failed", "exit"
+    finally:
+        try:
+            os.unlink(report)
+        except OSError:
+            pass
+
+
+def _write_private(path: Path, data: bytes) -> None:
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "wb") as f:
+        f.write(data)
+    os.chmod(path, 0o600)
+
+
+def scanned(repo, branch: str) -> tuple[str | None, int, bytes]:
+    """The commit ``refs/heads/<branch>`` names now, read just before the scan begins: ``(sha, 0, b"")``, else
+    ``(None, <git's exit>, <git's output>)`` (review round 1 F-B: only that commit is pushed)."""
+    try:
+        done = subprocess.run(["git", "-C", str(repo), "rev-parse", "--verify", f"refs/heads/{branch}^{{commit}}"],
+                              capture_output=True, stdin=subprocess.DEVNULL)
+    except OSError:
+        return None, 127, b""
+    sha = done.stdout.decode("ascii", "replace").strip()
+    if done.returncode == 0 and len(sha) == 40:
+        return sha, 0, b""
+    return None, done.returncode or 128, done.stdout + done.stderr
+
+
+def push(repo, remote: str, branch: str, state: Path, commit: str | None = None, why=(128, b"")) -> int:
+    """``git push <remote> <commit>:refs/heads/<branch>``, the scanned commit only: its exit code (124 on a timeout, 127
+    when git cannot start). With no commit (the branch named none when the scan began) nothing is pushed and the code is
+    the one git gave for the branch (``why``). git's own output is kept whole in ``PUSH.log`` of the key folder, mode
+    0600, never printed."""
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    if commit is None:
+        code, out = why
+    else:
+        try:
+            done = subprocess.run(["git", "-C", str(repo), "push", remote, f"{commit}:refs/heads/{branch}"],
+                                  capture_output=True, stdin=subprocess.DEVNULL, timeout=PUSH_TIMEOUT_S, env=env)
+            code, out = done.returncode, done.stdout + done.stderr
+        except subprocess.TimeoutExpired:
+            code, out = 124, b""
+        except OSError:
+            code, out = 127, b""
+    try:
+        state.mkdir(mode=0o700, parents=True, exist_ok=True)
+        _write_private(state / PUSH_LOG, out)
+    except OSError:
+        pass
+    return code
+
+
+def _latest_digest(state: Path) -> Path | None:
+    """The newest ``DIGEST.txt`` of the key folder: a fresh run's ``<audit>/`` or a standing run's
+    ``standing/<set>/<week>/``."""
+    found = [*state.glob("*/DIGEST.txt"), *state.glob("standing/*/*/DIGEST.txt")] if state.is_dir() else []
+    found = [p for p in found if p.is_file()]
+    return max(found, key=lambda p: (p.stat().st_mtime_ns, str(p)), default=None)
+
+
+def _append_digest(state: Path, line: str) -> None:
+    path = _latest_digest(state)
+    if path is None:
+        return
+    text = path.read_text(encoding="utf-8")
+    tmp = path.with_name("." + path.name + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text + ("" if not text or text.endswith("\n") else "\n") + line + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+    os.chmod(tmp, path.stat().st_mode & 0o7777)
+    os.replace(tmp, path)
+
+
+def _log_line(state: Path, line: str, code: int) -> None:
+    """One more line of the wrapper's ``cron.log``: its six keys, the step ``push`` as the mode, the line less ``PUSH `` as
+    the reason. Counts and reason words only (the line never holds a finding's text)."""
+    path = Path(os.environ.get(CRON_LOG) or state / "cron.log")
+    reason = line.removeprefix("PUSH ").replace('"', "").replace("\\", "")
+    row = {"at": schedule.stamp(schedule.now()), "due": True, "mode": "push", "reason": reason, "started": True,
+           "exit": code}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(row) + "\n")
+
+
+def from_args(args, emit) -> str:
+    """The subcommand's entry: ``run`` on the parsed ``add_arguments`` flags."""
+    return run(args.sets_root, repo=args.repo, gitleaks=args.gitleaks, emit=emit)
+
+
+def run(sets_root, *, repo=None, gitleaks=None, emit) -> str:
+    """The exit word: ``ok`` (no declaration, or pushed), ``refused`` (blocked: exit 1) or ``stopped`` (the push failed:
+    exit 2); a usage fault raises ``UsageError`` (exit 4)."""
+    root = layout.root_of(sets_root)
+    repo = schedule.repo_of(repo)
+    exe = str(gitleaks or os.environ.get("GOV_MEMAUDIT_GITLEAKS") or "gitleaks")
+    for flag in (repo, exe if "/" in exe else None):
+        if flag is not None and layout.inside(flag, root):
+            raise UsageError("flag inside the sets root")
+    where = declared()
+    state = schedule.state_of(repo)
+    if where is None:
+        emit("PUSH none: no declaration")  # nothing started: no log line, no digest line, no scanner (I13)
+        return "ok"
+    commit, why, said = scanned(repo, where[1])  # recorded as the scan begins: a later commit is never pushed (F-B)
+    kind, detail = scan(repo, exe, state)
+    if kind == "findings":
+        line, word = f"PUSH blocked: findings {detail}", "refused"
+    elif kind == "failed":
+        line, word = f"PUSH blocked: scan failed {detail}", "refused"
+    else:
+        code = push(repo, *where, state, commit, (why, said))
+        if code == 0:
+            line, word = f"PUSH pushed {where[0]} {where[1]} {commit[:12]}", "ok"
+        else:
+            line, word = f"PUSH failed: git push exit {code}", "stopped"
+    for write in (lambda: _append_digest(state, line), lambda: _log_line(state, line, EXIT[word])):
+        try:
+            write()
+        except OSError:
+            pass
+    emit(line)
+    return word

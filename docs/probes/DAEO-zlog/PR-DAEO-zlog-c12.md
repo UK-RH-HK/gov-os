@@ -1,0 +1,125 @@
+---
+type: probe
+task: DAEO-zlog
+ticket: W2-188
+round: 'narrow check (DEC-1156 (7)), not a review round'
+reviewer_role: independent-auditor
+reviewer_session: a424e6f3-2f58-44d8-ace5-488426d2e627
+implementer_session: 'independent test designer td-3 5281ba07-b3fa-4204-8148-813e59ea90d3 (1734f7422, merged 7604a3b0b); the lead''s record commit 7130a29c0'
+reviewer_wrote_nothing: true
+probed_commit: 7130a29c0a3c713a67f521f35af8b4d7db1e3399
+judgement: pass
+decisions: [DEC-1156, DEC-1181, DEC-136, DEC-105, CAP-33, DEC-861, DEC-801, DEC-808]
+commissioned_by: orchestrator
+judged_by: orchestrator
+---
+
+# W2-188 (DAEO-zlog): narrow independent check of the F2 guard revisions and the owner-approval line
+
+This is a narrow check of one change (DEC-1156 (7)), not a review round. The range is `5ada20fef..7130a29c0`. It covers:
+- td-3's revision of the two F2 cases (1734f7422, merged 7604a3b0b);
+- the lead's record commit 7130a29c0;
+- the CTO's `owner_approval` commit 0db33e558, which the record line rests on.
+
+The merge of `w2/integrate` (84ca16727) is judged only to confirm it touches no path of this ticket.
+
+## Checks
+
+1. **The two revisions (DEC-136).**
+   - The diff of `tests/acceptance/W2-188/` since 5ada20fef touches exactly two cases, both renamed, plus the README. No other case changed, and there are still 54 cases.
+   - The copy case passes when the bytes equal the base's, or when their sha256 is exactly `65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc`. Any other bytes are red, and the message names the copy's hash and both allowed values.
+   - The commit case adds the subject to the log format. It excuses `.claude/` paths only when the comma-split `Role:` trailers contain `owner` and the subject contains `ACT-CLAUDE-COPIES-`. Such a commit's `tests/` paths still count.
+   - Both cases state behaviour (bytes and trailers), not implementation.
+   - The README map row names both new node ids correctly. The `failure-2` note, the td-3 revision paragraph and the two readings (copy, commit) match the code.
+
+2. **Nothing refused before becomes allowed, save the ACT's own change.** Planted in a throwaway clone at the probed commit; each state is one commit with `Task: DAEO-zlog`.
+
+   | plant | copy case | commit case |
+   |---|---|---|
+   | P0 head untouched | pass | pass |
+   | P1 product-spec writes the copy, other bytes | **red** | **red** |
+   | P1b product-spec writes the copy with the ACT's bytes | pass | **red** |
+   | P2 the lead (`Role: orchestrator`) touches `.claude/` | pass | **red** |
+   | P3a product-spec touches `tests/` | pass | **red** |
+   | P3b `Role: owner` and the mark, ACT bytes, also touching `tests/` | pass | **red** |
+   | P4 `Role: owner`, subject without the mark | pass | **red** |
+   | P5 / P5b product-spec / orchestrator with the mark in the subject | pass | **red** |
+   | P6 the ACT itself (`Role: owner`, mark, ACT bytes) | pass | pass |
+   | P7 `Role: owner` and the mark, other bytes | **red** | pass |
+   | P8 `Role: owner, product-spec` and the mark | pass | pass (R3) |
+   | P8b two Role trailers (product-spec, owner) and the mark | pass | pass (R3) |
+   | P9 no Role, with the mark | pass | **red** |
+   | P10 `Role: Owner` (capital) and the mark | pass | **red** (closed) |
+   | P11 `Role: owner`, the mark in mid-subject | pass | pass (R3) |
+   | P12 `Role:` in an earlier paragraph, not the trailer block | pass | **red** (closed) |
+   | P13 uncommitted edit of the copy, other bytes | **red** | pass |
+   | P14 `Role: owner` and the mark, also touching another `.claude/` file | pass | pass (R4) |
+
+   - Every situation the old pair made red is still red by at least one case, save two kinds:
+     - a commit whose Role trailers include `owner` and whose subject holds the mark, touching `.claude/`;
+     - a `.claude` copy at exactly the ACT's bytes.
+   - That is the described change and nothing more. Without `Role: owner`, every writer stays red: the product-spec worker, the lead, any role with the mark in its subject, a missing Role.
+   - The copy case alone loosened only to the one hash (P1b); the commit case still catches a non-owner who writes those bytes.
+
+3. **The constant.**
+   - `gov.adapters.merge.generate_into` (the project's `rulesync generate`, run on the tree's `.rulesync/` into a scratch folder, nothing written in the tree) produces `.claude/skills/adopt/SKILL.md` with sha256 `65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc`.
+   - The lead's `act-bytes.py` first reproduces the base's `.claude` copy from the base's `.rulesync` copy, then gives the same hash for HEAD.
+   - Its reuse of the base's folded description is sound: the front matter differs between base and HEAD only in `version:`.
+   - The constant is the generated copy of the approved skill.
+
+4. **The record line.**
+   - The new value is `owner_approval: '6a884cf1…9489 approved by the owner, 2026-11-14, DEC-1181 (1) ("yes W2-188 adopt skill 6a884cf1", chat, ~15:40)'`.
+   - It is valid YAML (`yaml.safe_load` gives one string), in I6's form `'<sha256 after> approved by the owner, <date>, <reference>'`.
+   - The full hash equals the kernel copy. The date, the channel, the time and the owner's words match DEC-1181's Status and Basis word for word.
+   - The §6 sentence ("It is there: the owner's yes of 2026-11-14, DEC-1181 (1).") is true.
+   - Nothing else in the record changed since 5ada20fef: the other front-matter keys, the hashes and the counts are the same, and `verdict: PASS` is still the last verdict, as the S5 cases confirm.
+
+5. **Unchanged bytes.**
+   - The three skill copies are byte-equal at `6a884cf1…9489`.
+   - `docs/research/W2-88-memory-practice.md` and the skill copies are byte-unchanged from 5ada20fef.
+   - `.claude/skills/adopt/SKILL.md` equals the base's.
+   - `git log --full-history --no-merges 5ada20fef..7130a29c0 -- .claude/` is empty.
+
+6. **Trailers.**
+   - All five commits carry `Task: DAEO-zlog` and a Role matching their session: td-3 is `independent-test-designer`; the lead and the CTO are `orchestrator`.
+   - 1734f7422 carries `Rewrite-Reason: P-C12-1 (a), DEC-1156 (7)`.
+   - The trailers sit in one final paragraph in each commit.
+   - The `Implements:` ids of 1734f7422, 7604a3b0b, 84ca16727 and 7130a29c0 are all in `sources:`. 0db33e558 names DEC-1181, which is not (R2).
+
+7. **The folder.** `tests/acceptance/W2-188` gave 54 passed (0 deselected).
+
+## Rows (none blocks)
+
+- **R1:** The approval went into the CIT-P (0db33e558) before W2-187 (DAEO-0cd2) landed; it is still `in_progress` on `w2/integrate` at f2f28ed4e. DEC-1181 (1) orders "After W2-187 lands … the owner's approval goes into the CIT-P". The merge itself stays held by `waits_on` and DND row 207, and the bytes are those approved.
+  Ordinary work: yes, because an orchestrator recording an approval early is plain sequencing.
+  Consequence: other.
+  Reversed by: evidence that the CIT-P line alone opens the merge before W2-187 lands.
+- **R2:** 0db33e558 carries `Implements: DEC-1181, CAP-33`; DEC-1181 is not in the ticket's `sources:`.
+  Ordinary work: yes, because naming the decision that authorises a commit is natural.
+  Consequence: other (traceability only).
+  Reversed by: a rule that `Implements:` ids outside `sources:` block the landing check.
+- **R3:** The commit case excuses any commit whose Role trailers include `owner` (also `Role: owner, product-spec`, or a second Role trailer) and whose subject holds the mark anywhere.
+  Ordinary work: no, because a session may never put `Role: owner` on a commit (DEC-861); only the owner's operator does. This is a hardening-pass row (DEC-801).
+  Consequence: fails open (only for an owner-marked commit).
+  Reversed by: evidence that an agent session's commit can carry `Role: owner` in ordinary work.
+- **R4:** The excuse covers any `.claude/` path in the ACT's commit, not only the adopt copy, and the copy case guards only the adopt copy. This matches the described scope ("for `.claude/` paths only") and an ACT that regenerates copies.
+  Ordinary work: no, because only the owner's ACT commit gets the excuse.
+  Consequence: other.
+  Reversed by: a ruling that ACT-CLAUDE-COPIES-12 may write only `.claude/skills/adopt/SKILL.md`.
+
+## Found sound
+
+- the two revised cases;
+- the README map;
+- every previously refused writer;
+- the constant, regenerated by the project's generator;
+- the record line and §6;
+- the unchanged bytes;
+- the trailers of the change's commits;
+- the folder's 54 cases.
+
+```verdict
+{"kpis": [{"kpi": "F2", "verdict": "pass", "findings": [{"id": "R3", "scope": "in", "ordinary_work": "no", "consequence": "fails open"}, {"id": "R4", "scope": "in", "ordinary_work": "no", "consequence": "other"}]}, {"kpi": "S5", "verdict": "pass", "findings": [{"id": "R1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "R2", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "F1", "verdict": "pass", "findings": []}]}
+```
+
+verdict: PASS

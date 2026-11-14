@@ -102,3 +102,17 @@ def test_the_test_map_places_the_package_and_its_tests():
     suites = [s for c in doc["couplings"] if any(match(change, p) for p in c["paths"]) for s in c["suites"]]
     assert suites == ["tests/unit/memaudit/"]
     assert (root / suites[0]).is_dir()
+
+
+def test_every_help_text_is_printable_through_say():
+    """``say`` refuses a line holding a sets-root folder word: no help text of any subcommand may hold one (W2-187)."""
+    import io
+    from contextlib import redirect_stdout
+
+    from gov.memaudit.__main__ import main
+    for argv in ([], ["standing"], ["standing", "declare"], ["standing", "run"], ["standing", "live"], ["maintain"],
+                 ["due"], ["status"], ["pool-import"], ["figures"]):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = main([*argv, "--help"])
+        assert code == 0 and "REFUSED" not in out.getvalue(), argv

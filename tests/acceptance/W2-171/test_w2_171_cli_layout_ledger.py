@@ -89,7 +89,7 @@ def test_the_layout_under_the_run_folder(make_world):
 
 
 def test_the_ledger_events_have_item_3s_fields(make_world):
-    world = make_world("judged:five")
+    world = make_world("judged:clean")
     ledger = world.ledger()
     assert [e["seq"] for e in ledger] == list(range(1, len(ledger) + 1)), "seq consecutive"
     assert all(ISO.match(e["at"]) for e in ledger), "at is ISO UTC to the microsecond"
@@ -117,7 +117,7 @@ def test_the_ledger_events_have_item_3s_fields(make_world):
     assert (store["n"], store["same"], store["sha256"]) == (1, True, W.sha_file(world.store))
     assert by["counts"][0]["attempt"] == "attempt-1"
     figures = by["figures"][0]
-    assert {k: figures[k] for k in ("right", "wrong", "n", "passes")} == {"right": 35, "wrong": 2, "n": 40,
+    assert {k: figures[k] for k in ("right", "wrong", "n", "passes")} == {"right": 40, "wrong": 0, "n": 40,
                                                                           "passes": True}
     order = [e["event"] for e in ledger]
     assert order.index("counts") < order.index("spend") < order.index("figures")
