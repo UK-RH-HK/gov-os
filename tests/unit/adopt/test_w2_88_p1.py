@@ -56,8 +56,13 @@ def fake_tree(tmp_path: Path, leave_out: tuple = ()) -> Path:
     return tree
 
 
-def no_tree(monkeypatch, tree: Path | None = None) -> None:
+NO_PACKAGE = Path(os.devnull) / "_shipped"  # a package copy that cannot exist (run 8: the wheel's own is step (2))
+
+
+def no_tree(monkeypatch, tree: Path | None = None, package: Path = NO_PACKAGE) -> None:
+    """gov runs from ``tree`` (None: from no source tree), its package's shipped copies at ``package``."""
     monkeypatch.setattr(fabric, "_source_tree", lambda start=None: tree)
+    monkeypatch.setattr(fabric, "_package_copy", lambda: package)
 
 
 def with_kit(root: Path) -> None:
@@ -132,26 +137,30 @@ def test_a_file_found_nowhere_is_refused_by_name_with_each_place_looked(tmp_path
         fabric.shipped("template/.gitleaks.toml", root)
     err = raised.value
     assert err.code == "SHIPPED_FILE_MISSING" and err.details["file"] == "template/.gitleaks.toml"
-    assert err.details["looked"] == [str(tree / "template/.gitleaks.toml"), str(root / ".gitleaks.toml")]
+    assert err.details["looked"] == [str(tree / "template/.gitleaks.toml"), str(NO_PACKAGE / "template/.gitleaks.toml"),
+                                     str(root / ".gitleaks.toml")]
     assert "template/.gitleaks.toml" in err.message and all(place in err.message for place in err.details["looked"])
-    with pytest.raises(GovError) as raised:  # not under template/: only the tree is looked at
+    with pytest.raises(GovError) as raised:  # not under template/: the tree and the package's copy are looked at
         fabric.shipped(fabric.RETRIEVAL, root)
-    assert raised.value.details == {"file": fabric.RETRIEVAL, "looked": [str(tree / fabric.RETRIEVAL)]}
+    assert raised.value.details == {"file": fabric.RETRIEVAL,
+                                    "looked": [str(tree / fabric.RETRIEVAL), str(NO_PACKAGE / fabric.RETRIEVAL)]}
     no_tree(monkeypatch)
     package = str(Path(fabric.__file__).resolve().parents[1])
-    with pytest.raises(GovError) as raised:  # no tree, not under template/: the search for the tree is the one place
+    with pytest.raises(GovError) as raised:  # no tree, not under template/: the search for the tree, the package's copy
         fabric.shipped(fabric.RETRIEVAL, root)
     err = raised.value
     assert err.code == "SHIPPED_FILE_MISSING" and err.details["file"] == fabric.RETRIEVAL
-    assert len(err.details["looked"]) == 1 and package in err.details["looked"][0], err.details
+    assert len(err.details["looked"]) == 2 and package in err.details["looked"][0], err.details
     assert "no Gov OS source tree" in err.details["looked"][0] and "copier.yml" in err.details["looked"][0]
+    assert err.details["looked"][1] == str(NO_PACKAGE / fabric.RETRIEVAL)
     assert str(root / fabric.RETRIEVAL) not in err.details["looked"] and str(root / fabric.RETRIEVAL) not in err.message
     assert fabric.RETRIEVAL in err.message and all(place in err.message for place in err.details["looked"])
-    with pytest.raises(GovError) as raised:  # no tree, under template/, the project's copy missing: both places
+    with pytest.raises(GovError) as raised:  # no tree, under template/, the project's copy missing: all three places
         fabric.shipped("template/.gitleaks.toml", root)
     err = raised.value
-    assert len(err.details["looked"]) == 2 and package in err.details["looked"][0], err.details
-    assert "no Gov OS source tree" in err.details["looked"][0] and err.details["looked"][1] == str(root / ".gitleaks.toml")
+    assert len(err.details["looked"]) == 3 and package in err.details["looked"][0], err.details
+    assert "no Gov OS source tree" in err.details["looked"][0]
+    assert err.details["looked"][1:] == [str(NO_PACKAGE / "template/.gitleaks.toml"), str(root / ".gitleaks.toml")]
     assert all(place in err.message for place in err.details["looked"])
 
 
@@ -254,14 +263,13 @@ from gov.cli.errors import GovError
 root = Path(sys.argv[1])
 seen = {"gov": gov.__file__, "tree": fabric._source_tree(), "attrs": [n for n in ("STANDARD", "GOV_OS") if n in vars(fabric)]}
 seen["copy"] = str(fabric.shipped("template/governance/kernel/skills/retrieval", root))
+seen["package"] = str(fabric._package_copy())
+seen["three"] = {rel: str(fabric.shipped(rel, root)) for rel in fabric.PACKAGED}
+seen["pool"] = fabric.standard_of(root)["pool"]
 try:
-    fabric.shipped("governance/project/retrieval.yaml", root)
+    fabric.shipped("template/.gitleaks.toml", root)
 except GovError as exc:
     seen["refused"] = [exc.code, exc.details]
-try:
-    fabric.read_standard(root, [])
-except GovError as exc:
-    seen["standard"] = [exc.code, exc.details["file"]]
 print(json.dumps(seen))
 """
 
@@ -294,5 +302,13 @@ def test_a_wheel_in_the_release_form_runs_a9s_reads_with_no_source_tree(tmp_path
     seen = json.loads(done.stdout)
     assert seen["gov"].startswith(str(venv)) and seen["tree"] is None and seen["attrs"] == []
     assert seen["copy"] == str(project / "governance/kernel/skills/retrieval")
-    assert seen["refused"][0] == "SHIPPED_FILE_MISSING" and seen["refused"][1]["file"] == fabric.RETRIEVAL
-    assert seen["standard"] == ["SHIPPED_FILE_MISSING", fabric.RETRIEVAL]  # the pool is in neither the wheel nor the kit
+    package = Path(seen["package"])  # run 8, package 1 (a): the three ship inside the wheel, read through step (2)
+    assert str(package).startswith(str(venv)) and package.name == "_shipped"
+    for rel in fabric.PACKAGED:
+        assert seen["three"][rel] == str(package / rel), rel
+        for source in ([REPO / rel] if (REPO / rel).is_file() else sorted(p for p in (REPO / rel).iterdir() if p.is_file())):
+            assert (package / source.relative_to(REPO)).read_bytes() == source.read_bytes(), source
+    assert seen["pool"] == yaml.safe_load((REPO / fabric.RETRIEVAL).read_text())["pool"]
+    # a file of the kit only (not in the wheel), the project's copy missing: refused naming all three places
+    assert seen["refused"][0] == "SHIPPED_FILE_MISSING" and seen["refused"][1]["file"] == "template/.gitleaks.toml"
+    assert seen["refused"][1]["looked"][1:] == [str(package / "template/.gitleaks.toml"), str(project / ".gitleaks.toml")]

@@ -573,3 +573,23 @@ cases that pass on the old code are the ones that state what must stay the same)
   written under form 4 or 5 is not reused; a commit hash of the project is no finding. The cases only a batched scan
   meets (few processes, parallel batches, put-back and fence internals) are deleted. Run against the batched code
   first: 4 of 14 failed (the one-file and no-batch cases, and the form cases); after the revert: 14 of 14 pass.
+
+### Package 1 (a): the three files A9 needs ship inside the wheel
+
+- **Built:** byte-for-byte copies (`cp -p`, never re-typed) of `governance/project/retrieval.yaml`, every file of
+  `governance/project/indep-walls/` and the MEMORY-AUDIT-1 briefs (`auditor.md`, `checker.md`, `writer.md`) under
+  `src/gov/_shipped/`, each at its path in the Gov OS repository; `pyproject.toml` declares them package data of `gov`.
+  `fabric.PACKAGED` names the three once; `fabric._package_copy()` is `<the gov package's folder>/_shipped`.
+  `fabric.shipped(rel, root)` now looks (1) in the source tree, (2) in the package's copy `<package>/_shipped/<rel>`,
+  (3) for a `rel` under `template/`, in the project's copier copy; found nowhere, `SHIPPED_FILE_MISSING` names `rel` and
+  every place looked (the tree's search, the package's copy, and for `template/` the project's copy). The source
+  tree's own file is the original: gov run from the tree reads it there, first.
+- **Unit tests** (`tests/unit/adopt/test_w2_88_shipped.py`, 8 cases; `test_w2_88_p1.py` brought to the three places):
+  each shipped copy equals its source bytes, nothing missing from either side and nothing extra in the copy; the
+  package ships nothing but the three; `shipped` finds a `rel` in the package's copy when no source tree is found, the
+  project's own `retrieval.yaml` never read in its place; the order tree, package, project; the refusal names every
+  place looked; the release-form wheel case (an export of `src/` and `pyproject.toml`, `pip wheel --no-build-isolation
+  --no-index`, a fresh `--system-site-packages` venv, no `PYTHONPATH`) now finds the three in the venv's
+  `gov/_shipped/`, equal to the source bytes, and reads the standard's pool from it. Run before the change: 8 of 8 red.
+- **The copies must follow their sources:** a change of any of the three files in the tree without the same change in
+  `src/gov/_shipped/` fails `test_each_shipped_copy_equals_its_source_bytes` (the copy is refreshed by copying again).

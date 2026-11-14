@@ -64,19 +64,32 @@ def _source_tree(start: Path | None = None) -> Path | None:
     return None
 
 
+# The files A9 needs that are not under ``template/`` (so no ``copier copy`` installs them): the wheel carries a copy of
+# each, byte for byte, at its path in the Gov OS repository under the ``gov`` package's ``_shipped/`` folder
+# (``pyproject.toml``'s package data; run 8, package 1 (a)). The source tree's own file is the original.
+PACKAGED = (RETRIEVAL, memory_sets.WALLS, memory_sets.BRIEFS)
+
+
+def _package_copy() -> Path:
+    """The folder of the copies shipped inside the running ``gov`` package: ``<the gov package's folder>/_shipped``."""
+    return Path(__file__).resolve().parents[1] / "_shipped"
+
+
 def shipped(rel: str, root: Path | None) -> Path:
     """The path of the file or folder Gov OS ships at ``rel`` (its path in the Gov OS repository), for the adopted
     repository ``root``. It looks, in order, at (1) the Gov OS source tree, when gov runs from one (``<tree>/<rel>``),
-    and (2) for a ``rel`` under ``template/``, the adopted project's own copy that ``copier copy`` installed
-    (``template/X`` is ``<root>/X``). Found nowhere, it refuses ``SHIPPED_FILE_MISSING``, naming ``rel`` and each place
-    looked (``details``: ``file``, ``looked``): never a default in its place. Every read of a shipped file goes through
-    here, at the time it is needed, never at import."""
+    (2) the copy shipped inside the installed ``gov`` package (``<package>/_shipped/<rel>``), and (3) for a ``rel``
+    under ``template/``, the adopted project's own copy that ``copier copy`` installed (``template/X`` is
+    ``<root>/X``). Found nowhere, it refuses ``SHIPPED_FILE_MISSING``, naming ``rel`` and each place looked
+    (``details``: ``file``, ``looked``): never a default in its place. Every read of a shipped file goes through here,
+    at the time it is needed, never at import."""
     tree = _source_tree()
     # The search for the source tree is a place looked, so ``looked`` is never empty: where none was found it says where
     # the search began (the running gov package's folder) and what it needed; it is not a path that can exist.
     looked = [str(tree / rel) if tree is not None else
               f"no Gov OS source tree: no folder at or above the gov package's folder ({Path(__file__).resolve().parents[1]}) "
-              f"holds {', '.join(MARKERS[:2])}/ and {MARKERS[2]}/"]
+              f"holds {', '.join(MARKERS[:2])}/ and {MARKERS[2]}/",
+              str(_package_copy() / rel)]
     if rel.startswith("template/") and root is not None:
         looked.append(str(Path(root) / rel.removeprefix("template/")))
     for place in looked[(tree is None):]:

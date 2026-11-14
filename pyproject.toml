@@ -17,3 +17,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "gov.retrieval" = ["retrieve_baseline.yaml"]
+# The files A9 needs that are not under template/, byte for byte at their paths in the Gov OS repository
+# (gov.adopt.fabric.PACKAGED, read through fabric.shipped's step (2)).
+"gov" = ["_shipped/governance/project/retrieval.yaml", "_shipped/governance/project/indep-walls/*",
+         "_shipped/governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/*"]
