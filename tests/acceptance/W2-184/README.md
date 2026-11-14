@@ -343,8 +343,8 @@ promoted in the first case: the record is well formed and seen from its own root
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_a_launch_from_the_tests_worktree_naming_it` (2: with a probe record under the ticket worktree, with none anywhere) | not refused |
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_the_s4_setting_now_that_every_launch_reads_the_folder` | not refused |
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_the_same_record_under_both_roots_counts_once` | not promoted at the second test-designer launch; a launcher that counts the record twice promotes at the first (`two failed reviews`) |
-| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_both_roots_is_read_from_the_launch_root_s_copy` | not promoted; a launcher that reads the ticket worktree's copy gives `a fail-open finding` on `01-review.md`, not `two failed reviews` on `03-review.md` |
-| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_two_other_roots_is_read_from_the_first_root_in_sorted_order` | not promoted; the later root's copy gives `a fail-open finding` on `01-review.md` |
+| success-8 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_both_roots_is_promoted_by_the_other_root_s_copy_that_holds_a_fail_open_finding` | revised in td-7 to R3 (see "R1-R3"); was `..._is_read_from_the_launch_root_s_copy` (P-td5-2) |
+| success-8 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_two_other_roots_is_read_from_every_root` | revised in td-7 to R3 (see "R1-R3"); was `..._is_read_from_the_first_root_in_sorted_order` (P-td5-2) |
 | success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read` (2: another ticket's worktree, the main checkout) | not promoted; a launcher that reads that tree gives `a fail-open finding` on `00-open.md` |
 
 ## The CLI options (batch td-6): `gov launch` carries `--reason`, `--trial` and `--owner-named` before `--`
@@ -401,3 +401,71 @@ was not refused with exit code 1`. **Green (guard):** passes at the head, and fa
 | success-3 | `test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through` (3: owner-named, reason, trial) | no option; a CLI that takes the word after `--` records `DEC-2020`, the later reason, or `trial-2` (xhigh) |
 | success-3 | `test_w2_184_cli_options.py::test_cli_an_option_after_the_double_dash_is_passed_through_and_not_recorded` (3: owner-named, reason, trial) | green (guard) |
 | success-3 | `test_w2_184_cli_options.py::test_cli_a_launch_with_none_of_the_options_is_as_before` | green (guard) |
+
+## R1-R3 (batch td-7): the narrow check's F1-F3, reopened under DEC-1180 (4)
+
+The CTO reopened the ticket on 2026-11-14 for the narrow independent check's F1-F3
+(`docs/probes/DAEO-6f0s/PR-DAEO-6f0s-f1.md`): KPI lines **R1** (success-6), **R2** (success-7) and **R3** (success-8),
+interface **section 10**. Written from the described behaviour only (DEC-136); the engineer's work in `src/gov/launch/`
+was not read; nothing under `fixtures/evaluation/` or any `hidden` folder is opened.
+
+- **Where the cases are:** the KPI lines name `tests/unit/launch/`, so the R1-R3 cases are in
+  `tests/unit/launch/test_w2_184_r_fixes.py` (outside this folder: `gov accept` runs this folder alone, so it does not
+  measure success-6 and success-7; run that file directly, as below). It imports `w2_184_support.py` unchanged and
+  restates this folder's four fixtures. **success-8** is measured here too, through the two revised cases.
+- **Revised (committed with `Rewrite-Reason: DEC-1180 (4), rv-f1 F3`):** two cases of section 5 of
+  `test_w2_184_f1_tests_worktree.py` asserted P-td5-2's first-copy rule (the launch root's copy, else the first other
+  root's). Under R3 every root's copy of a path is read and the path holds a fail-open finding if any copy does:
+  `::test_f1_a_path_under_both_roots_is_read_from_the_launch_root_s_copy` is now
+  `::test_f1_a_path_under_both_roots_is_promoted_by_the_other_root_s_copy_that_holds_a_fail_open_finding`, and
+  `::test_f1_a_path_under_two_other_roots_is_read_from_the_first_root_in_sorted_order` is now
+  `::test_f1_a_path_under_two_other_roots_is_read_from_every_root`; each now expects `a fail-open finding` on
+  `docs/probes/DAEO-f1aa/01-review.md`. Every other case is kept unchanged.
+- **The lead fixture (R1):** an in-progress ticket on an approved ready list in the main tree
+  (`governance/project/orchestration/ready.txt`, batch 1, no waits), as W2-136 and W2-56 admit a lead; the open gate as
+  every case here. "The gate is not consulted": the gate's configuration is removed, a plain lead launch is then refused
+  by the gate (exit 1, naming `gate.json`), and the lead launch with an option must still end with R1's exit 2.
+- **R2's interruptions:** a child process calls `gov.launch.record.write` and is stopped inside it: with the file size
+  limit at 0 and `SIGXFSZ` at its default, the process is killed at the first byte written to a regular file (after the
+  create, before the bytes); or its first `os.fsync`/`os.fdatasync` ends it (`os._exit`). With `SIGXFSZ` ignored, or an
+  fsync that raises, the write fails with `OSError` instead. Two writers: two forked processes released by one barrier,
+  12 rounds, 400 KB records.
+
+Run: `env HOME=<empty folder> PYTHONPATH=<worktree>/src python3 -m pytest tests/unit/launch/test_w2_184_r_fixes.py
+tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py -q -p no:cacheprovider -o tmp_path_retention_policy=failed`.
+
+"Red" is why the case fails at this tree's head `bbe1510f8` (the landed ticket, before R1-R3). **Lead starts:** the
+lead launch given an option exits 0 and starts the CLI (`the lead launch was not refused with exit code 2`). **Gate
+first:** the gate's refusal, exit 1. **Lead direct:** `launcher.launch` with a lead role and an option starts the lead
+(`the launch was not refused with exit code 1`). **Empty final:** the write killed at the first byte leaves an empty
+`<session_id>.json` (0 bytes); killed at the fsync, a `<session_id>.json` that was never synced; the next worker launch
+is refused (`the launch record <id>.json cannot be read as JSON`). **First copy wins:** the launch takes only the first
+root's copy (not promoted, or `two failed reviews` on a later path, or not refused). **Pin:** green at the head, behaviour
+that must stay. The table below is the R1-R3 cases' list, not part of `gov accept`'s map (its cases are outside this
+folder); the revised cases are in the map above, under success-8.
+
+| KPI | Case in `tests/unit/launch/test_w2_184_r_fixes.py` | Red at `bbe1510f8` because |
+|---|---|---|
+| success-6 | test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts (10: orchestrator, lead x reason, trial, owner-named, all three, empty reason) | lead starts |
+| success-6 | test_r1_a_lead_given_an_option_is_refused_before_the_resource_gate_is_consulted (2: reason, all three) | gate first |
+| success-6 | test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses (6: orchestrator, lead x the three keywords) | lead direct |
+| success-6 | test_r1_a_lead_without_the_options_starts_as_before (2) | pin |
+| success-6 | test_r1_the_three_words_after_the_double_dash_of_a_lead_launch_are_passed_through_as_before | pin |
+| success-6 | test_r1_a_worker_launch_with_each_option_is_unchanged (3) | pin |
+| success-7 | test_r2_a_write_killed_after_the_create_leaves_no_final_name_file (2: at the first byte, at the fsync) | empty final |
+| success-7 | test_r2_a_launch_killed_inside_its_record_write_does_not_refuse_the_next_worker_launch | empty final |
+| success-7 | test_r2_a_write_that_fails_refuses_and_leaves_neither_a_final_nor_a_temporary_file (2) | pin |
+| success-7 | test_r2_a_normal_write_leaves_the_whole_record_under_its_final_name_and_no_temporary_file | pin |
+| success-7 | test_r2_a_leftover_temporary_file_does_not_refuse_a_later_write_of_the_same_session_id | pin |
+| success-7 | test_r2_an_existing_final_name_file_is_never_overwritten (3: another record, not JSON, empty) | pin |
+| success-7 | test_r2_a_second_write_of_the_same_session_id_is_refused_as_already_there | pin |
+| success-7 | test_r2_two_writers_of_one_session_id_leave_one_whole_record_and_the_other_is_refused | pin |
+| success-7 | test_r2_a_leftover_temporary_file_does_not_refuse_a_worker_launch (2: empty, partial) | pin |
+| success-7 | test_r2_a_final_name_record_that_is_not_json_still_refuses_a_worker_launch_naming_it (3: empty, partial, not JSON) | pin |
+| success-8 | test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_promote_the_test_designer | first copy wins (not promoted) |
+| success-8 | test_r3_the_reverse_a_launch_root_copy_with_the_finding_and_another_root_s_copy_without_it_promote | first copy wins: the test designer's launch is promoted (green there), the engineer's from the ticket worktree is not |
+| success-8 | test_r3_a_path_is_a_failed_review_when_any_copy_failed | first copy wins (not promoted) |
+| success-8 | test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_refuses_naming_the_file (2: front matter not YAML, verdict not JSON) | first copy wins (not refused) |
+| success-8 | test_r3_identical_copies_of_one_failed_record_under_three_roots_count_once | pin |
+| success-8 | test_r3_two_differing_copies_of_one_failed_record_are_one_failed_review | pin (fails on a launcher that counts each copy) |
+| success-8 | the two revised cases of `test_w2_184_f1_tests_worktree.py` above | first copy wins (`two failed reviews` on `03-review.md` / `02-review.md`, not `a fail-open finding` on `01-review.md`) |

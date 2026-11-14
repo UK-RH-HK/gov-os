@@ -960,17 +960,19 @@ def test_f1_a_path_under_two_roots_counts_once(project):
     assert project.last()["promotion"] is None  # one failed record, not two
 
 
-def test_f1_a_path_under_the_launch_root_and_another_is_read_from_the_launch_root(project):
+def test_r3_the_other_root_s_copy_beside_the_launch_root_s_is_read_a_bad_one_refuses_a_fail_open_one_promotes(project):
     project.ticket()
     other = _tree(project, "wt-ticket")
     project.probe("T-1", "a.md", judgement="pass", verdict=CLEAN)
-    _probe_at(other, "T-1", "a.md", judgement="pass", verdict="not json")  # not read: the launch root's copy counts
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict="not json")  # read too (R3): refuses, naming the file
     _names(project, other)
+    project.refused("docs/probes/T-1/a.md", str(other / "docs/probes/T-1/a.md"))
+    _probe_at(other, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)  # a stale launch-root copy, a newer one here
     project.launch()
-    assert project.last()["promotion"] is None
+    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-1/a.md"}
 
 
-def test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order(project):
+def test_r3_a_path_under_two_other_roots_fails_open_when_either_copy_does_and_is_one_review(project):
     project.ticket()
     first, second = _tree(project, "wt-a"), _tree(project, "wt-b")
     _probe_at(first, "T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
@@ -981,11 +983,23 @@ def test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order(
     assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-1/a.md"}
     project.ticket("T-2", wbs="W9-2")
     _probe_at(first, "T-2", "a.md", judgement="pass", verdict=CLEAN)
-    _probe_at(second, "T-2", "a.md", judgement="pass", verdict=FAIL_OPEN)
+    _probe_at(second, "T-2", "a.md", judgement="pass", verdict=FAIL_OPEN)  # the later root's copy counts as well
     _names(project, second, tid="T-2", role="engineer")
     _names(project, first, tid="T-2", role="independent-test-designer")
     project.launch(tid="T-2")
+    assert project.last()["promotion"] == {"reason": "a fail-open finding", "record": "docs/probes/T-2/a.md"}
+    project.ticket("T-3", wbs="W9-3")
+    _probe_at(first, "T-3", "a.md", judgement="failed", verdict=CLEAN)
+    _probe_at(second, "T-3", "a.md", judgement="fail")  # differing bytes, both failed: one path, one failed review
+    _names(project, second, tid="T-3", role="engineer")
+    _names(project, first, tid="T-3", role="independent-test-designer")
+    project.launch(tid="T-3")
     assert project.last()["promotion"] is None
+    _probe_at(second, "T-3", "b.md", judgement="failed")  # a second path that failed: two failed reviews
+    project.launch(tid="T-3")
+    assert project.last()["promotion"] == {"reason": "two failed reviews", "record": "docs/probes/T-3/b.md"}
+    _probe_at(second, "T-3", "a.md", judgement="pass", verdict="not json")  # the later root's bad copy refuses
+    project.refused("docs/probes/T-3/a.md", str(second / "docs/probes/T-3/a.md"), tid="T-3")
 
 
 def test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read(project):

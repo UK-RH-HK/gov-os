@@ -8,7 +8,9 @@ and a ``ticket`` that is one of the ticket's names (the id given, its ``id``, it
 JSON refuses the launch naming it (as 6.1). The records found are one set by their root-relative path: a path present
 under two roots counts once, the launch root's copy first, then the other roots in sorted order; 5.2's sorted path order
 and its ``record`` path are over that set (root-relative). With no probe record under any root, the launch is as before.
-Nothing that refuses today stops refusing.
+Nothing that refuses today stops refusing. Interface 10.3 (R3, DEC-1180 (4), rv-f1 F3) revises the "launch root's copy
+first": every root's copy of a path is read (identical bytes are one copy) and the path is one review, holding a
+fail-open finding if any copy does and failed if any copy failed; section 5's two cases are revised to it.
 
 The fixture is one repository with two real linked worktrees, the ticket's (branch ``w2/W2-f1aa``) and the tests'
 (``w2/W2-f1aa-tests``), both from the main checkout's commit that holds the tickets, the role files and a
@@ -227,30 +229,36 @@ def test_f1_the_same_record_under_both_roots_counts_once(repo, launch):
     _promoted(launch(TD, TK, cwd=repo.tests), TWO_FAILED, second)
 
 
-def test_f1_a_path_under_both_roots_is_read_from_the_launch_root_s_copy(repo, launch):
-    """``01-review.md`` passes in the tests tree and holds a fail-open finding in the ticket tree: the launch root's copy
-    counts, so the promotion is the two failed records ``02`` and ``03``, not the fail-open finding."""
+def test_f1_a_path_under_both_roots_is_promoted_by_the_other_root_s_copy_that_holds_a_fail_open_finding(repo, launch):
+    """Revised to R3 (interface 10.3, DEC-1180 (4), rv-f1 F3; was ``..._is_read_from_the_launch_root_s_copy``, P-td5-2).
+    ``01-review.md`` passes in the tests tree and holds a fail-open finding in the ticket tree: every root's copy is
+    read and the path holds a fail-open finding if any copy does, which is checked first (5.2), so the promotion is
+    ``a fail-open finding`` on ``01-review.md``, not the two failed records ``02`` and ``03``."""
     s.plant_probe(repo.tests, TK, "01-review.md", "pass")
     s.commit_all(repo.tests, "the tests branch's copy of the first review record")
-    _fail_open(repo.ticket, "01-review.md")
+    first = _fail_open(repo.ticket, "01-review.md")
     s.plant_probe(repo.ticket, TK, "02-review.md", "fail")
-    third = s.plant_probe(repo.ticket, TK, "03-review.md", "fail")
+    s.plant_probe(repo.ticket, TK, "03-review.md", "fail")
     s.commit_all(repo.ticket, "the ticket branch's review records")
     b.assert_launched(launch(ENG, TK, cwd=repo.ticket))
-    _promoted(launch(TD, TK, cwd=repo.tests), TWO_FAILED, third)
+    _promoted(launch(TD, TK, cwd=repo.tests), FAIL_OPEN, first)
 
 
-def test_f1_a_path_under_two_other_roots_is_read_from_the_first_root_in_sorted_order(repo, launch):
+def test_f1_a_path_under_two_other_roots_is_read_from_every_root(repo, launch):
+    """Revised to R3 (interface 10.3, DEC-1180 (4), rv-f1 F3; was ``..._is_read_from_the_first_root_in_sorted_order``,
+    P-td5-2). ``01-review.md`` fails in the first root and passes with a fail-open finding in the later one: both
+    copies are read, so the path holds a fail-open finding (checked first): ``a fail-open finding`` on
+    ``01-review.md``, not ``two failed reviews`` on ``02-review.md``."""
     first, last = repo.tree("W2-f1aa-a"), repo.tree("W2-f1aa-z")
     assert os.path.realpath(first) < os.path.realpath(last)
     for tree in (first, last):
         b.assert_launched(launch(ENG, TK, cwd=tree))
-    s.plant_probe(first, TK, "01-review.md", "fail")
+    record = s.plant_probe(first, TK, "01-review.md", "fail")
     s.commit_all(first, "the first review record")
     _fail_open(last, "01-review.md", "pass")
-    second = s.plant_probe(last, TK, "02-review.md", "fail")
+    s.plant_probe(last, TK, "02-review.md", "fail")
     s.commit_all(last, "another copy of the first review record and a second one")
-    _promoted(launch(TD, TK, cwd=repo.tests), TWO_FAILED, second)
+    _promoted(launch(TD, TK, cwd=repo.tests), FAIL_OPEN, record)
 
 
 # --------------------------------------------------------------------------
