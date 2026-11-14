@@ -1083,6 +1083,19 @@ _PATH_FIELDS = {"Read": ("file_path",), "Grep": ("path", "glob"),
                 "NotebookEdit": ("notebook_path",)}
 
 
+NO_PATH_REFUSAL = ("a path field of the call is not a path (not text, or text holding a "
+                   "NUL byte), so the guard cannot say what it names: refused to every "
+                   "role (DEC-1133 (2))")
+
+
+def _no_path(tool_name, tool_input: dict) -> bool:
+    """True when a path or a glob field of a file tool's call is given but is
+    no path the system takes: not a string, or one holding a NUL byte."""
+    fields = _PATH_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    return any(tool_input.get(key) is not None and (
+        not isinstance(tool_input[key], str) or "\0" in tool_input[key]) for key in fields)
+
+
 def _long_path(tool_name, tool_input: dict) -> bool:
     """True when a path or a glob of a file tool's call is longer than the
     guard resolves."""
@@ -1155,6 +1168,10 @@ def decide(
         command = tool_input.get("command")
         if isinstance(command, str) and len(command) > MOST_READ:
             return "deny", LONG_REFUSAL
+    # W2-42a R5: a file tool's path that is no path (not text, a NUL byte)
+    # is refused by its rule, before a rule resolves it.
+    if _no_path(tool_name, tool_input):
+        return "deny", NO_PATH_REFUSAL
     # DEC-880 item 1: a file tool's path with a leading ~ is judged as its
     # expanded form; one the guard cannot expand refuses.
     tool_input = _expand_home(tool_name, tool_input)

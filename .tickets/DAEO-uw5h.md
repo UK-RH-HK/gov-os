@@ -1,6 +1,6 @@
 ---
 id: DAEO-uw5h
-status: in_progress
+status: closed
 deps: [DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z

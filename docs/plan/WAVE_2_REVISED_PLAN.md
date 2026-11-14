@@ -293,12 +293,14 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 
 ### 4.6 Keystone 6: the sandbox and write lists per role; leads sandboxed
 
+> [RETIRED 2026-11-14, DEC-1128 (4): the "leads sandboxed" promise here, in the table row for keystone 6 and in section 4's W2-21 lines, is retired. W2-21 closed with the ticket-lead role and lead rights, no sandbox; the leads are not sandboxed; the path map and the guard are the controls; the workers' launcher sandbox stays. The text below is the old plan.]
+
 - **W2-20:** close only. The machine-wide resource gate, which W2-21 needs.
 - **W2-56 (FULL; DEC-799):** as carded. Widened with:
   - DEC-826 Q5's refused flags;
   - lens E F13's cleaned environment, shared with W2-60;
   - lens E F17's single retry on a missing git lock file.
-- **W2-21 (FULL; DEC-715):** `gov launch lead`, the ticket-lead role, leads sandboxed under their own role, and launch records.
+- **W2-21 (FULL; DEC-715):** `gov launch lead`, the ticket-lead role, leads sandboxed under their own role [retired 2026-11-14, DEC-1128 (4): leads are not sandboxed], and launch records.
   - Widened: lens F R1 for leads, through the same role defaults as W2-60.
   - Widened: lens G R3. A worker or a lead is resumed only through `gov launch … --resume`. Until this lands, the rule is in the prompt and the briefs.
 - **W2-42 (FULL):** as carded (missing role, links, late paths, atomic saves).
