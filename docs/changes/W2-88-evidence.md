@@ -403,3 +403,111 @@ A3's `--assessment`, A9 lite) on its clone at adoption, on W2-16's release; that
 | success S15, S16 (the kernel copy) | `fabric.install`, `undo`; called by `fabric.a9` | built (B-1.1, B-1.3); its own unit tests |
 | success S18 to S23 | `adopt/memory_sets.py` | built; its own unit tests |
 | failure 1 to 9 | the same modules; nothing is written in the repository by MA and the plan; no `tk` call | built; see the tests |
+
+## Run 7 (2026-11-14; the reopen under DEC-1164 (18) on DEC-1178 (3)(b) and (4)): S24 to S27
+
+Where each is built, and the unit tests that show it (`tests/unit/adopt/test_w2_88_p1.py`, `_f1.py`, `_ignored.py`;
+`tests/unit/secrets/test_w2_88_scan.py`). Each test file was run against the code before its item and failed there
+(S26 and S24: 17 of 21 failed on `a23678e27`; S25: 4 of 6 failed on S24's commit; S27: 4 of 12 failed on `a23678e27`; the
+cases that pass on the old code are the ones that state what must stay the same).
+
+### S24 (P-1): A9 from an installed release
+
+- **Built:** `fabric.shipped(rel, root)` and `fabric._source_tree()`. The source tree is the nearest ancestor of the running
+  `gov` package that holds `copier.yml`, `template/` and `src/gov/` (no fixed number of levels); then, for a `rel` under
+  `template/`, the project's own copy that `copier copy` installed (`template/X` read as `<root>/X`); else
+  `SHIPPED_FILE_MISSING` (`details`: `file`, `looked`), never a default. Every read of a shipped file goes through it, when
+  it is needed: A9's kernel copies (`fabric._sources`, `install`), its copy of `retrieval.yaml` and the standard's `pool:`
+  block (`fabric.standard_of`, read by `read_standard`; `fabric.STANDARD` is now a module attribute computed when read, and
+  `departures` takes the standard as an argument), the walls template (`memory_sets.walls_act`, with the new `root`
+  argument), the audit briefs (`fabric._stage`) and the `.gitleaks.toml` fallback (`safety.setup`, `assess._rules`;
+  `safety.TEMPLATE_GITLEAKS` is computed when read). A9 also asks for the walls and the briefs before it copies anything, so
+  a missing one refuses before the stores are built. `grep -n "parents\[3\]\|GOV_OS" src/gov/adopt/*.py` finds nothing.
+- **The release form, shown in a unit test** (`test_a_wheel_in_the_release_form_runs_a9s_reads_with_no_source_tree`): an
+  export of `src/` and `pyproject.toml` is built with `python3 -m pip wheel -q --no-deps --no-build-isolation --no-index`,
+  installed with `--no-deps --no-index` into a fresh `--system-site-packages` venv, and run from a folder outside the tree
+  with no `PYTHONPATH`: `gov.__file__` is in the venv, `_source_tree()` is None, importing `gov.adopt.fabric`,
+  `memory_sets` and `safety` reads no shipped file and does not fail.
+- **What an installed release now finds, and what it refuses (item 4 of the interface):** it finds the kit's files that
+  `copier copy` installs from `template/`: the retrieval and discovery skill folders (`governance/kernel/skills/...`),
+  `brief.md` and `role-cto.md` (`governance/kernel/templates/...`). It refuses `SHIPPED_FILE_MISSING` for the files that are
+  neither in the wheel nor under `template/`: `governance/project/retrieval.yaml` (the pool: the first read, so A9 refuses
+  at its start with nothing written), `governance/project/indep-walls` and
+  `governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs`; and `template/.gitleaks.toml` for a project that has no
+  `.gitleaks.toml` of its own (A0; MA's assessment then says "no secrets rules could be read"). So an installed release
+  cannot yet run A9 end to end: the three are the package's (the lead's). **What it would take (outside these paths):** the
+  wheel must carry them as package data of `gov` (`pyproject.toml`, `[tool.setuptools.package-data]`, or a `src/gov/...`
+  folder that holds copies) and the resolver gets that folder as a place after (1) and (2). Moving them under `template/`
+  is not enough and is wrong for the pool: `template/governance/project/` is the overlay copier installs once and never
+  overwrites, so (2) would read the project's own, possibly tuned, `retrieval.yaml` as Gov OS's standard, and the
+  departure check would compare the file with itself.
+
+### S25 (F-1): redis's code graph
+
+- **Built:** `fabric.refuse_too_large(root)`, called when `_stores` cannot read the graph, and `fabric.graph_counts(root)`
+  (two count queries of one row, in the same session class `gov.codeintel._graph` uses). Where either count is over
+  `fabric.GRAPH_CAP` (100,000), A9 refuses `CODEGRAPH_TOO_LARGE` (`details`: `nodes`, `edges`, `cap`, `tool`), the message
+  naming `codebase-memory-mcp`, its cap, the counts and that `gov.codeintel`'s read takes the whole graph in one query;
+  the copies are undone as for any refusal after them. Any other failure keeps `FABRIC_INCOMPLETE` naming `codegraph` and
+  the error text; a failed read is never 0 nodes and edges.
+- **Not built (outside the paths):** the cause. `gov.codeintel._graph` reads all edges in one query
+  (`MATCH (a)-[r]->(b) RETURN ...`), which the tool refuses over 100,000 rows before its own `offset`/`max_rows` paging; the
+  lead's probe measured 41,086 nodes and 143,008 edges on redis. **What it would take:** `_graph` reads each query in
+  pages the tool accepts (the probe in `.gov-runtime/scratch/lead/f1_probe2.py` asks `SKIP`/`LIMIT` under the cap), a change
+  of `src/gov/codeintel/__init__.py`; with it A9 on redis reads and checks the graph, and this refusal stays for a graph the
+  paging cannot bring under the cap. The unit tests plant a stand-in `codebase-memory-mcp` first on `PATH` (MCP over stdio)
+  that answers as the real tool does over its cap (`isError: true`, "result exceeded 100k rows"); the redis copy's A9
+  re-run is the lead's, outside the sandbox.
+
+### S26 (F-3): ignore rules found at the start
+
+- **Built:** `safety.written_paths(root)` (the one list: A0's `.gitleaks.toml` and `.gitignore`, the roster and a ticket
+  where `tk` is vendored, every stage's record, A2's packages, A8's CIT-E, and A9's copies, each file of the kernel folders
+  and templates, and `retrieval.yaml`), `safety.ignored(root, paths)` (`git check-ignore -v -z --stdin`; a path the index
+  tracks is not judged by git, a re-including rule `!` is no finding) and `safety.refuse_ignored(root)`, called first by
+  stage MA (`stages.run`) and by A0 (`stages.a0`). A path ignored and untracked refuses `ADOPT_PATH_IGNORED` at once, the
+  message naming each path with `source:line:pattern` as `git check-ignore -v` gives them (`details["ignored"]`: `path`,
+  `source`, `line`, `pattern`); nothing is written, staged or committed, no ignore file is edited, `git add -f` is never run.
+- **Not in the list:** what a stage writes later from the caller's proposal (A6's targets, A8's imports) is not known at the
+  start. **A change of behaviour to know:** an untracked file already standing at an ignored path of the list used to be
+  refused by the stage that writes it (`ADOPT_WOULD_OVERWRITE`); it is now refused at the start as ignored. The existing test
+  `tests/unit/adopt/test_safety.py::test_s1_a_stage_writes_nothing_over_an_untracked_file` plants exactly that (a
+  `.gitignore` of `governance/`) and expects the older code; it needs its expected code changed (outside these paths).
+
+### Run 7: the secret scan's speed (S27)
+
+- **Built:** `gov.secrets.indexable` reads each worker's group of files in batches (`_BATCH_BYTES` 1 MiB or `_BATCH_FILES` 256, a
+  file of 1 MiB or more alone), gives each batch to **one gitleaks process per rule set** (`_scan_batch`: each file's
+  chunks framed as `_scan` frames them, a blank line after every piece, each finding put back on its file by its line,
+  which gitleaks counts over the whole input: confirmed with a planted secret in two of 60 files), and runs the batches in
+  the one pool of `_workers()` (the CPU set within `GOV_HEAVY_THREAD_BUDGET`). A file the record holds clean is answered
+  from it; a file no finding names is clean (counted `scanned`, kept in the record); a file a finding names, a finding that
+  cannot be put back on a file, or a report that cannot be read sends the file (or the batch) to the one-per-file judgement
+  as ever, so the commit-hash exemption and every other rule of `_holds_secret` stand. `indexable`, `path_holds_secret`,
+  `pool_size` and `scan_counts` keep their signatures and meaning; `_holds_secret` is still the one verdict per file
+  (the batch's result reaches it through a thread-local, set around that worker's own calls). No secret's value is
+  printed or recorded; the planted secret in the tests and in the tree is built from parts.
+- **The measure** (`indexable` over every file of a planted tree, same machine, same slot kind, gitleaks 8.30.1,
+  `GOV_SECRETS_CACHE` empty so no clean result is reused; the tree: 5,000 files in 50 folders, 15.3 MB, 3,013 of 8 lines,
+  1,732 of 60 lines, 255 of 400 lines, one file in fifty holding the planted test secret = 100; the machine has 20 CPUs
+  and was shared with other slots; the slot's CPU set was 7 CPUs and its exported thread budget 1; the old code is `git
+  archive a23678e27 src` on `PYTHONPATH`):
+
+| form | thread budget (workers) | seconds | files per second | files left out |
+|---|---|---|---|---|
+| one gitleaks per file (`a23678e27`) | 1 | 2,808.4 | 1.8 | 100 |
+| batched (this change) | 1 | 46.2 | 108.2 | 100 |
+| one gitleaks per file (`a23678e27`) | 7 | 574.3 | 8.7 | 100 |
+| batched (this change) | 7 | 40.6, 40.2 (two runs) | 123.3, 124.5 | 100 |
+
+  **Ratio:** 60 times at the slot's own budget (1 worker), 14.3 times with the budget raised to the whole CPU set (7
+  workers), both at least 10 times; the verdicts are the same (the same 100 files left out in every run, and the unit
+  tests compare each file's verdict with the one-per-file form's). The old form's 1.8 files per second is grafana's A6
+  rate (about 2 a second). **What the figures say about the rest:** a gitleaks process already uses every CPU it may, so
+  more workers add little (108 to 124 files per second from 1 to 7): the scan now costs gitleaks' own time on the bytes
+  (about 0.37 MB a second here with this rule file), not a process per file. EXAMIN's copy of 36,000 files, at the same
+  shape (about 3 KB a file), is about 110 MB: roughly 5 minutes here, against about 5.5 hours one process per file.
+  If a repository's files are many and large the time follows the bytes; a faster scan then needs gitleaks' own rule cost
+  cut (the rule file), outside these paths. `gov.codeintel` still calls `path_holds_secret` once per allowed path (one
+  gitleaks per path on a cold record, each answered from the record once clean); batching those calls would take a
+  change of `src/gov/codeintel/__init__.py` and of `path_holds_secret`'s callers, outside these paths.

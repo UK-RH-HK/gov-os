@@ -63,6 +63,10 @@ _FORM = 4  # the form of the record and of what a scan reads (in the cache's fin
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
 _PIECE, _OVERLAP = 24_000, 9_216
+# The filter reads many small files to one gitleaks process (S27): a batch ends at this many bytes or files; a file of
+# ``_BATCH_BYTES`` or more is judged alone; a worker's group of files is at least ``_BATCH_MIN`` long, so no process is
+# started for a few files when there are more to judge.
+_BATCH_BYTES, _BATCH_FILES, _BATCH_MIN = 1 << 20, 256, 16
 # A BEGIN...END key block (PEM or armoured PGP) of up to 24 KiB, from its BEGIN marker to its END marker, also goes as
 # a piece of its own (DEC-909), so it is whole in one read wherever the pieces are cut. A larger block is read as the
 # rest of the text is (row W2-L419). A key piece begins and ends with a dash, no word byte, so no read seems to begin or
@@ -90,6 +94,10 @@ def scan_on(root: Path) -> bool:
 _KINDS = ("content", "path")  # what the filter judges: a file's content, a path's names
 _counts = {kind: {"scanned": 0, "remembered": 0} for kind in _KINDS}
 _counting = threading.Lock()
+# What a worker's batch has reached for the files it holds, by the digest of each file's bytes: ``("scanned", engine)``
+# (the batch's gitleaks found nothing in them) or ``("remembered", engine)`` (the record already held them clean). Set
+# around that worker's own per-file judgements only, so ``_holds_secret`` stays the one verdict per file (S27).
+_batched = threading.local()
 
 
 def scan_counts() -> dict[str, dict[str, int]]:
@@ -187,7 +195,15 @@ def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = No
     """
     if kind is None:
         return _scan(rules, _forms(content), root)
-    digest, engine = hashlib.sha256(content).hexdigest(), cache.engine(rules, _FORM)
+    digest = hashlib.sha256(content).hexdigest()
+    reached = getattr(_batched, "verdicts", {}).get(digest) if kind == "content" else None
+    if reached is not None:  # this worker's batch has just judged these bytes clean (S27): counted and kept as a scan is
+        what, engine = reached
+        _count(kind, what)
+        if what == "scanned":
+            cache.remember(kind, digest, engine)
+        return False
+    engine = cache.engine(rules, _FORM)
     if cache.remembered(kind, digest, engine):
         _count(kind, "remembered")
         return False
@@ -263,6 +279,61 @@ def _exempt(finding, root: Path | None) -> str | None:
     return secret if isinstance(secret, str) and _HASH.fullmatch(secret) else None
 
 
+def _frame(chunks) -> bytes:
+    """``chunks``, each in its pieces, a blank line after every piece: the text one scan reads for them."""
+    return b"".join(piece + b"\n\n" for chunk in chunks for piece in _pieces(chunk))
+
+
+def _gitleaks(each: str, data: bytes, env: dict[str, str]) -> subprocess.CompletedProcess:
+    """One gitleaks run over ``data`` with the rule set ``each``; raises when it neither finds nor clears the text."""
+    done = subprocess.run(
+        ["gitleaks", "stdin", "--no-banner", "--report-format", "json", "--report-path", "-",
+         "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
+         "--exit-code", str(_LEAKS)],
+        input=data, capture_output=True, timeout=_TIMEOUT_S + len(data) / _FLOOR,
+        env=env | {"GITLEAKS_CONFIG_TOML": each})
+    if done.returncode not in (0, _LEAKS):
+        raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
+    return done
+
+
+def _scan_batch(rules: tuple[str, ...], texts: list[list[bytes]]) -> set[int] | None:
+    """The indexes of the ``texts`` (each a file's chunks) in which gitleaks finds anything, by any of ``rules``: many
+    texts to each process (S27). Each text is set off as ``_scan`` sets it off, a blank line after every piece, so no
+    match runs from one text into the next but across blank lines; each finding is put back on its text by its line
+    (gitleaks counts the lines of the whole input), the finding's value dropped as it is read. A finding that is no
+    owned line, or a report that cannot be read, gives None: the caller judges each text alone. Raises as ``_scan`` does."""
+    parts, spans, line = [b"\n"], [], 2  # the leading newline keeps gitleaks from taking the input for a binary file
+    for index, chunks in enumerate(texts):
+        block = _frame(chunks)
+        lines = block.count(b"\n")
+        parts.append(block)
+        spans.append((line, line + lines - 1, index))
+        line += lines
+    data = b"".join(parts)
+    del parts
+    env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
+    owners: set[int] = set()
+    for each in rules:
+        done = _gitleaks(each, data, env)
+        if done.returncode != _LEAKS:
+            continue
+        try:
+            report = json.loads(done.stdout)
+        except ValueError:
+            return None
+        if not isinstance(report, list) or not report:
+            return None
+        for finding in report:
+            at = finding.get("StartLine") if isinstance(finding, dict) else None
+            owner = next((index for first, last, index in spans if isinstance(at, int) and first <= at <= last), None)
+            if owner is None:
+                return None
+            owners.add(owner)
+        del report
+    return owners
+
+
 def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list | None = None) -> bool:
     """Whether gitleaks finds a secret in any of ``chunks`` by any of ``rules``. Raises when gitleaks cannot run or does not decide.
 
@@ -272,23 +343,12 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list 
     anything at all, exempt or not, is added to ``found``.
     """
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
-    parts = [b"\n"]
-    for chunk in chunks:
-        for piece in _pieces(chunk):
-            parts += (piece, b"\n\n")
-    data = b"".join(parts)  # one copy, read by every scan
+    data = b"\n" + _frame(chunks)  # one copy, read by every scan
     # The rules go by the environment, so no file of them is written; a configuration path there would win over them.
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
     hashes = set()  # the matches that may be commit hashes, asked of git once every scan has run
     for each in rules:  # clean only when every scan ran and found nothing but such hashes
-        done = subprocess.run(
-            ["gitleaks", "stdin", "--no-banner", "--report-format", "json", "--report-path", "-",
-             "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
-             "--exit-code", str(_LEAKS)],
-            input=data, capture_output=True, timeout=_TIMEOUT_S + len(data) / _FLOOR,
-            env=env | {"GITLEAKS_CONFIG_TOML": each})
-        if done.returncode not in (0, _LEAKS):
-            raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
+        done = _gitleaks(each, data, env)
         if done.returncode == _LEAKS:
             if found is not None:
                 found.append(each)
@@ -348,20 +408,74 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
     rules = _rules(root) if scanning else ()
     namespaces = load_config(root)["path-map.yaml"]["namespaces"]
 
-    def allowed(rel: str) -> bool:
+    def read(rel: str) -> bytes | None:
         try:  # a link is judged by what it points to: its namespace and its content
             real = (root / rel).resolve(strict=True)
             target = real.relative_to(root).as_posix()
             content = real.read_bytes()
         except (OSError, ValueError, RuntimeError):  # no file, a link loop, or a place outside the root
-            return False
-        if not (_governance(namespaces, rel) and _governance(namespaces, target)):
-            return False
-        return not (scanning and _holds_secret(rules, content, root, "content"))
+            return None
+        return content if _governance(namespaces, rel) and _governance(namespaces, target) else None
 
-    with ThreadPoolExecutor(max_workers=_workers()) as pool:  # results in the order asked, whatever the width
-        verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
-    return [rel for rel, verdict in zip(dict.fromkeys(paths), verdicts) if verdict]
+    engine = cache.engine(rules, _FORM) if scanning else None  # taken once, before any scan
+
+    def judge(group: list[str]) -> list[bool]:
+        """The verdicts on ``group``: a file's content not yet judged clean waits in a batch of at most ``_BATCH_BYTES``
+        and ``_BATCH_FILES`` files, which one gitleaks reads (S27); a larger file, and any file the batch's findings
+        name, is judged alone as ever. Counted per file: the texts scanned, and those answered from the record."""
+        verdicts: dict[str, bool] = {}
+        held: list[tuple[str, bytes]] = []
+        size = 0
+
+        def flush() -> None:
+            """Judge what is held: the record answers what it holds clean, one gitleaks reads the rest, and then each
+            file's own verdict is ``_holds_secret``'s: answered from what the batch reached, or (a file the batch's
+            findings name, or any doubt) scanned alone as ever."""
+            nonlocal size
+            reached = {}
+            todo = []
+            for rel, content in held:
+                digest = hashlib.sha256(content).hexdigest()
+                if cache.remembered("content", digest, engine):
+                    reached[digest] = ("remembered", engine)
+                else:
+                    todo.append((digest, content))
+            owners = _scan_batch(rules, [_forms(content) for _, content in todo]) if todo else set()
+            if owners is not None:
+                reached |= {digest: ("scanned", engine) for index, (digest, _) in enumerate(todo) if index not in owners}
+            _batched.verdicts = reached
+            try:
+                for rel, content in held:
+                    verdicts[rel] = not _holds_secret(rules, content, root, "content")
+            finally:
+                _batched.verdicts = {}
+                held.clear()
+                size = 0
+
+        for rel in group:
+            content = read(rel)
+            if content is None:
+                verdicts[rel] = False
+            elif not scanning:
+                verdicts[rel] = True
+            elif len(content) >= _BATCH_BYTES:
+                verdicts[rel] = not _holds_secret(rules, content, root, "content")
+            else:
+                held.append((rel, content))
+                size += len(content)
+                if len(held) >= _BATCH_FILES or size >= _BATCH_BYTES:
+                    flush()
+        if held:
+            flush()
+        return [verdicts[rel] for rel in group]
+
+    asked = list(dict.fromkeys(paths))
+    workers = _workers()
+    size = min(_BATCH_FILES, max(_BATCH_MIN, -(-len(asked) // workers)))  # about a group for each worker, never a thin one
+    groups = [asked[at:at + size] for at in range(0, len(asked), size)]
+    with ThreadPoolExecutor(max_workers=workers) as pool:  # results in the order asked, whatever the width
+        verdicts = [verdict for group in pool.map(judge, groups) for verdict in group]
+    return [rel for rel, verdict in zip(asked, verdicts) if verdict]
 
 
 def path_holds_secret(root: Path, path: str) -> bool:
