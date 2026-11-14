@@ -1,10 +1,10 @@
 ---
 name: frontend
-version: "1.1.0"
+version: "1.2.0"
 description: "The engineer's skill for frontend tickets: interface conventions, accessibility, state and browser support, with a pre-commit checklist and the unit-test focus. Use beside the engineer role when a ticket changes interface code."
-output: "the ticket's own allowed paths"
+output: "<allowed_path>/** (one entry of the ticket's allowed_paths)"
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Frontend

@@ -1,10 +1,10 @@
 ---
 name: devops
-version: "1.0.0"
+version: "1.1.0"
 description: "The engineer's skill for build and release tickets: hermetic builds, pinned versions and rollback, with a pre-commit checklist and the unit-test focus. Use beside the engineer role when a ticket changes a build, image or pipeline file."
-output: "the ticket's own allowed paths"
+output: "<allowed_path>/** (one entry of the ticket's allowed_paths)"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # DevOps

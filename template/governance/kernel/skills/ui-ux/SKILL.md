@@ -1,10 +1,10 @@
 ---
 name: ui-ux
-version: "1.0.0"
+version: "1.1.0"
 description: "The engineer's skill for user-flow tickets: writes each flow as scenarios the owner reviews, never as code, then builds to them. Use beside the engineer role when a ticket adds or changes what a user sees or does."
-output: "the ticket's own allowed paths"
+output: "<allowed_path>/** (one entry of the ticket's allowed_paths)"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # UI/UX
