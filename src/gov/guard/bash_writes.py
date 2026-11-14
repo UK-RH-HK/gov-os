@@ -1306,6 +1306,10 @@ def qual(func, alias):
 
 # -- the judgement -----------------------------------------------------------------------------------------------
 
+# The git commands that take the diff option --output=<file> (W2-42a): it writes that file.
+_GIT_OUTPUT_SUBS = frozenset("diff show log whatchanged diff-tree diff-index diff-files format-patch range-diff".split())
+
+
 def _more_targets(name, args, ecwd):
     """The targets of writes the product's parser does not read: git checkout, restore, rm and mv on paths; dd
     of=; truncate; sort -o; rsync's destination; patch's file and -o. Each as (word, the folder it is read in)."""
@@ -1330,6 +1334,16 @@ def _more_targets(name, args, ecwd):
                     elif not w.startswith("-"):
                         words.append(w)
             out = [(w, where) for w in words]
+        elif sub in _GIT_OUTPUT_SUBS or (sub == "stash" and rest[:1] == ["show"]):
+            # W2-42a: git's own --output=<file> and --output <file> write that file (read from the command's cwd,
+            # after -C); a word after -- is a path, no option.
+            for k, w in enumerate(rest):
+                if w == "--":
+                    break
+                if w == "--output" and k + 1 < len(rest):
+                    out.append((rest[k + 1], where))
+                elif w.startswith("--output="):
+                    out.append((w[len("--output="):], where))
     elif name == "dd":
         out = [(a[3:], ecwd) for a in args if a.startswith("of=")]
     elif name == "truncate":
