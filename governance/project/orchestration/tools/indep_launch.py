@@ -514,11 +514,13 @@ def z_list(out):
 
 # -- the argument checks (17), first of all ------------------------------------------------------------------------
 def parse_args(argv):
+    # --help names no fix-flow flag (W2-149's pinned interface): the fix flow's usage line stays in the docstring only
     p = Parser(prog="indep_launch.py", allow_abbrev=False, add_help=True,
                formatter_class=argparse.RawDescriptionHelpFormatter,
                description=__doc__.split("\n\n")[0],
                epilog="The documented lines (the CTO's, from the repository):\n\n"
-                      + "\n".join(x.strip() for x in __doc__.splitlines() if x.strip().startswith("python3 "))
+                      + "\n".join(x.strip() for x in __doc__.splitlines()
+                                  if x.strip().startswith("python3 ") and "--fix" not in x.split())
                       + "\n\n--dry belongs on planted sets roots only: it leaves its wall and tree in place for "
                         "inspection.\nNo option takes a path list; the content is chosen by rule from the seed.")
     p.add_argument("--sets-root", help="the sets root (its real path); no folder under it is ever named")
