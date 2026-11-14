@@ -73,3 +73,21 @@ file is read. **With the file** it is read on every worker launch (an unreadable
 sections 2.3, 4.3, 5 and 6 apply as written. `criticality.py` is unchanged but for its docstring. The W2-60a red of the
 earlier section 5 is gone: its fixture has no file, so the second auditor launch is a plain launch.
 
+
+## 6. Review round 1 (batch eng-4, after `docs/probes/DAEO-6f0s/PR-DAEO-6f0s-round-1.md`)
+
+The FULL review's round 1 failed S1 on F1 (blocking, fails open): the project's `criticality.yaml` had no rule for DEC-1120 (1)'s
+hidden sets, so a ticket on `fixtures/evaluation/<set>/hidden/**` resolved to C2, or C1 beside a probe-record path, and launched
+below C3. The C3 rule now holds `fixtures/evaluation/*/hidden/*` (the path map's hidden halves; interface 1.5 as amended), and,
+riding along (DEC-802), F8's permission paths `.claude/settings.local.json`, `governance/project/secrets.yaml` and
+`governance/project/indep-walls/*` beside `.claude/settings.json` and `governance/project/held-out.yaml` (stricter only; a
+visible half stays at the default). F2 (fails open, rides along): `_rubric` (`launcher.py`) refuses an auditor launch on a FULL
+ticket whose `review_round` is 3 or more, naming the round and DEC-1010, unless `--owner-named` is given, whatever its setting
+(interface 6.3 as amended), so a round 2 on another effort (e.g. `--effort xhigh`) no longer opens a third round; the
+same-setting rule stays for round 2. Builder cases: each hidden-set and permission path at C3 in the project's own file, the same
+beside a `docs/probes/<id>/**  # ...` path on each profile; round 3 after a round 2 at xhigh refused, and accepted with
+`owner_named`; the same-setting case moved to round 2. Left for the CTO as rows: F3 (resuming round 1 after round 2 refused),
+F4 (a trial replaces the probe), F5 (five closed tickets' legacy verdict blocks refused), F6 (promotion on any fail-open finding,
+rows included; this record's F2 promotes W2-184's next round), F7 (no file, a launch off the table, recorded only as
+`criticality: null`), F9 (a probe-record path lowers an unlisted-area ticket to C1) and F10 (out of scope: an adopted repository
+with no file does not route by RUBRIC-2).

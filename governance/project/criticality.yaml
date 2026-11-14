@@ -10,8 +10,12 @@ rules:
       - "src/gov/guard/*"
       - ".claude/hooks/*"
       - ".claude/settings.json"
+      - ".claude/settings.local.json"
+      - "governance/project/secrets.yaml"
+      - "governance/project/indep-walls/*"
       - "governance/project/path-map.yaml"
       - "governance/project/held-out.yaml"
+      - "fixtures/evaluation/*/hidden/*"   # hidden sets: the path map's hidden halves
       - "governance/project/operator/*"
       - "template/governance/kernel/*"
       - "governance/kernel/*"

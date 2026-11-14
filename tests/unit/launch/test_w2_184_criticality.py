@@ -171,8 +171,24 @@ def test_the_project_s_own_file_is_well_formed_and_places_this_ticket_at_c2():
     (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
     (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
     (["docs/contract/x.md"], "C3"),
+    # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+    (["fixtures/evaluation/examin/hidden/**"], "C3"),
+    (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+    (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+    ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+    (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+    (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+    (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
     (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
     (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
 ))
 def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
     assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+
+
+@pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+@pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                  ".claude/settings.local.json", "governance/project/indep-walls/**"))
+def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+    ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+    assert criticality.ticket_criticality(REPO, ticket) == "C3"

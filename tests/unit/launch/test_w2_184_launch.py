@@ -685,15 +685,47 @@ def test_the_probe_sets_the_model_when_the_table_s_is_lower(full):
     assert (full.last()["model"], full.last()["model_source"], full.last()["effort"]) == (OPUS, "probe", "max")
 
 
-def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):
+def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):  # 6.3, on round 2
     _review(full)
-    _review(full)
-    first, second = (next(r for r in full.records() if r["review_round"] == n) for n in (1, 2))
-    error = full.refused(first["model"], "max", second["session_id"], role="independent-auditor", tid="T-a")
+    first = full.last()
+    error = full.refused(first["model"], "high", first["session_id"], args=["--effort", "high"],
+                         role="independent-auditor", tid="T-a")
     assert "--owner-named" in error.message
+    _review(full, args=["--effort", "high"], owner_named="DEC-1010")
+    second = full.last()
+    assert (second["review_round"], second["owner_named"], second["effort"]) == (2, "DEC-1010", "high")
+
+
+def test_round_three_after_the_probe_s_max_is_refused_by_the_round_and_accepted_with_the_owner(full):  # 6.3
+    _review(full)
+    _review(full)
+    full.refused("review round 3", "DEC-1010", "--owner-named", role="independent-auditor", tid="T-a")
     _review(full, owner_named="DEC-1010")
     third = full.last()
     assert (third["review_round"], third["owner_named"], third["effort"]) == (3, "DEC-1010", "max")
+
+
+def test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_dec_1010(full):  # 6.3, F2
+    _review(full)
+    _review(full, args=["--effort", "xhigh"])
+    assert (full.last()["review_round"], full.last()["effort"]) == (2, "xhigh")
+    error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Opus max: neither earlier setting
+    assert "--owner-named" in error.message
+    full.refused("3", "DEC-1010", args=["--effort", "high"], role="independent-auditor", tid="T-a")
+
+
+def test_round_three_is_accepted_when_the_owner_named_it(full):  # 6.3, F2
+    _review(full)
+    _review(full, args=["--effort", "xhigh"])
+    _review(full, owner_named="DEC-1010")
+    third = full.last()
+    assert (third["review_round"], third["owner_named"], third["model"], third["effort"]) == (3, "DEC-1010", OPUS, "max")
+
+
+def test_round_two_needs_no_owner_where_its_setting_is_new(full):  # 6.3, F2: the round cap starts at three
+    _review(full)
+    _review(full)
+    assert (full.last()["review_round"], full.last()["owner_named"]) == (2, None)
 
 
 def test_an_effort_after_the_double_dash_on_round_two_is_accepted_if_not_below_the_floor(full):

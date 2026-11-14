@@ -644,6 +644,9 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         if role == AUDITOR and profile == "FULL":
             counted = _counted_reviews(root, names, given["resume"])
             review_round = len(counted) + 1
+            if review_round >= 3 and owner_named is None:  # 6.3 as amended: at most two review rounds, whatever the setting
+                raise _refuse(f"review round {review_round} of {ticket_id} is refused: at most two review rounds "
+                              f"(DEC-1010); a third or later needs --owner-named <DEC-id>")
         probe = review_round is not None and review_round >= 2
         opus = crit.opus_model(root) if promotion is not None or probe else None
         if table is not None:
