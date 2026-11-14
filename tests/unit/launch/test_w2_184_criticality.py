@@ -67,6 +67,12 @@ def test_a_trailing_inline_comment_of_an_allowed_path_is_dropped(tmp_path):
     assert criticality.ticket_criticality(_write(tmp_path, FILE), ticket) == "C1"
 
 
+def test_the_comment_tail_matters_where_the_rule_names_the_path_exactly(tmp_path):
+    text = FILE.replace('paths: ["docs/*"]', 'paths: ["docs/exact.md"]')
+    assert criticality.ticket_criticality(_write(tmp_path, text), _ticket("STANDARD", "docs/exact.md  # a note")) == "C1"
+    assert criticality.ticket_criticality(_write(tmp_path, text), _ticket("STANDARD", "docs/other.md  # a note")) == "C2"
+
+
 def test_a_broad_allowed_path_matches_a_narrower_rule_glob(tmp_path):
     assert criticality.ticket_criticality(_write(tmp_path, FILE), _ticket("STANDARD", "src/**")) == "C3"
 
