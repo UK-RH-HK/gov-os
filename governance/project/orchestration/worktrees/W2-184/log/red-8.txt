@@ -1,0 +1,52 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 16:20:31)
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+............F........................................................... [ 31%]
+........................................................................ [ 41%]
+........................................................................ [ 52%]
+........................................................................ [ 62%]
+.........................................FF............................. [ 73%]
+........................................................................ [ 83%]
+........................................................................ [ 94%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+__________ test_a_project_under_the_root_gets_no_folder_made_or_added __________
+tests/unit/launch/test_runs.py:161: in test_a_project_under_the_root_gets_no_folder_made_or_added
+    assert len(_places(found["allow"])) == 1 and runs.ROOT_NAME not in found["allow"][0]
+E   AssertionError: assert (1 == 1 and 'gov-os-runs' not in '//home/usai...nch-lsw7tppi'
+E    +  where 1 = len(['//home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_a_project_under_the_root_0/temp/gov-launch-lsw7tppi'])
+E    +    where ['//home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_a_project_under_the_root_0/temp/gov-launch-lsw7tppi'] = _places(['//home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_a_project_under_the_root_0/temp/gov-launch-lsw7tppi', '//home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_a_project_under_the_root_0/home/.cache/gov-os/rerank.log'])
+E     
+E     'gov-os-runs' is contained here:
+E       //home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_a_project_under_the_root_0/temp/gov-launch-lsw7tppi
+E     ?              +++++++++++)
+_ test_f1_a_path_under_the_launch_root_and_another_is_read_from_the_launch_root _
+tests/unit/launch/test_w2_184_launch.py:969: in test_f1_a_path_under_the_launch_root_and_another_is_read_from_the_launch_root
+    project.launch()
+tests/unit/launch/test_w2_184_launch.py:112: in launch
+    assert launcher.launch(self.root, role, tid, list(args), **keywords) == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/launch/launcher.py:985: in launch
+    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/launch/launcher.py:776: in _worker_plan
+    chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/launch/launcher.py:694: in _rubric
+    promotion = _promotion(root, names, launches)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/launch/launcher.py:610: in _promotion
+    path_fails_open = _fails_open(shown, body) or path_fails_open
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+src/gov/launch/launcher.py:581: in _fails_open
+    raise _refuse(f"the probe record {rel} has a verdict block that is not JSON of the form "
+E   gov.cli.errors.GovError: the probe record docs/probes/T-1/a.md (/home/usain/gov-os-runs/pytest-of-usain/pytest-1/test_f1_a_path_under_the_launc0/wt-ticket/docs/probes/T-1/a.md) has a verdict block that is not JSON of the form {"kpis": [{"kpi": ..., "verdict": ..., "findings": [{"id": ..., "consequence": ...}]}]}
+_ test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order __
+tests/unit/launch/test_w2_184_launch.py:988: in test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order
+    assert project.last()["promotion"] is None
+E   AssertionError: assert {'reason': 'a fail-open finding', 'record': 'docs/probes/T-2/a.md'} is None
+=========================== short test summary info ============================
+FAILED tests/unit/launch/test_runs.py::test_a_project_under_the_root_gets_no_folder_made_or_added
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_path_under_the_launch_root_and_another_is_read_from_the_launch_root
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order
+3 failed, 683 passed, 86 deselected in 38.96s

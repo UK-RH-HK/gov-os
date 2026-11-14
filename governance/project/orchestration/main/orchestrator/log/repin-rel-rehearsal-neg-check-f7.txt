@@ -1,0 +1,107 @@
+======== rehearsal of the re-pin from release 0.1.0 (neg-check), 2026-11-14 16:47:02
+======== the live paths before
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at f2f28ed4ef40
+store halves: a at f2f28ed4ef40, b at 0b43625dad44
+w2/integrate: f2f28ed4ef40
+the stand-in C: f2f28ed4ef40 (the main tree's w2/integrate head now)
+======== the scratch release 0.1.0 at the stand-in C (a scratch clone only)
+record: /tmp/gov-os-rel-repin/neg-check-f7/release/docs/releases/0.1.0
+manifest.json: OK
+scratch status: ?? docs/releases/0.1.0/ 
+scratch tag: v0.1.0 -> 084e8e847814 (parent f2f28ed4ef40), tag
+scratch record: version 0.1.0 commit f2f28ed4ef40 cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl cb69013f7c04 files 278
+======== fill_release.sh from the scratch release
+C=f2f28ed4ef40 (tag v0.1.0 on 084e8e847814)
+EPOCH=1794673131
+SHA=cb69013f7c047cd5a5298c8cfc17e31615170d8df67ab3b87bf9b2a85df97250 (the record's wheel sha256)
+RECORD=88c7df9abd06f8ef424866d737963aa988c576ac0691d0dac177764537ce7bf6 (manifest.json's sha256)
+filled: /tmp/gov-os-rel-repin/neg-check-f7/REPIN-COMMANDS-REL-0.1.0.sh sha256 e735535d10c608263f21874519c738b0dfdb284feed4968ab82e0d5b7213607a
+hash list: /tmp/gov-os-rel-repin/neg-check-f7/REPIN-REL-0.1.0.sha256 (13 files) sha256 3f7abd283765676b05cbcfc90b22f024e79328fb72ac8a355a175d446e67e3ab
+the filled script differs from the template in the four value lines only
+half a: f2f28ed4ef40, store 586M
+half b: 0b43625dad44, store 586M
+registry clone at f2f28ed4ef40 on w2/integrate
+scratch hook: 099de326c45b (a copy of the live one)
+mirror ready: gov -> /tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/neg-check-f7/home/gov-os-worktrees/W2-00-store-a
+======== the operator's script (filled from the scratch release), against the mirror
+the hash list: 13 files OK (the operator's first check)
+== 0. preconditions
+ok (gov -> pin-797495bdfc70; store -> W2-00-store-a at f2f28ed4ef40; w2/integrate at f2f28ed4ef40, f2f28ed4ef40 and it the same wheel inputs; the hook is only read)
+== R. release 0.1.0: the tag v0.1.0 and its record, checked against the values filled in (RL-1)
+manifest.json: OK
+verify: 88c7df9abd06f8ef424866d737963aa988c576ac0691d0dac177764537ce7bf6
+ok (v0.1.0 -> 084e8e847814, parent f2f28ed4ef40; the record only; manifest.sha256 holds; record sha256 88c7df9abd06; version, commit, cli_version, wheel name and sha256 as filled in; verify holds)
+== A. the wheel of f2f28ed4ef40, built twice from clean exports, checked against the release record's sha256; its own environment
+build 1 cb69013f7c047cd5a5298c8cfc17e31615170d8df67ab3b87bf9b2a85df97250
+build 2 cb69013f7c047cd5a5298c8cfc17e31615170d8df67ab3b87bf9b2a85df97250
+/tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/wheels/f2f28ed4ef40/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/pin-f2f28ed4ef40/bin/python
+== S. the integration store rebuilt at w2/integrate's head in the spare half, by the code of f2f28ed4ef40 (the same bytes as that head's); the link flips on success
+waiting: measure.sh runs (GPU work takes turns)
+GPU before the rebuild: 8170 MiB used
+2026-11-14 16:49:39 built f2f28ed4ef40 in W2-00-store-b rc=0 in 102 s; link -> W2-00-store-b
+the rebuild: exit 0, 103 s wall, GPU peak 8172 MiB
+the store: /tmp/gov-os-rel-repin/neg-check-f7/home/gov-os-worktrees/W2-00-store -> W2-00-store-b at f2f28ed4ef40 (w2/integrate's head)
+== B. every check before the switch, through /tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/pin-f2f28ed4ef40 by its path
+ok   gov imports from the pin (/tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/pin-f2f28ed4ef40/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint, brief, links, plan, resources
+ok   gov accept --help and gov launch --help (with --gate-override)
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 64 texts (W2-137) and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   window 4's builds: W2-112's release, gov links, gov rebuild --integration, the launcher's GOV_STORE, the line cap, the measure's families
+ok   W2-32 S11: the pool module; the new pin accepts the five pool settings, and the main tree's own retrieval.yaml (the pool is on since window 4)
+ok   W2-137, W2-145: the service's bound, no private reranker beside it, the service holds the free slots
+ok   W2-141: the guard's search rule in gov.guard.reads; W2-150: the gov.util modules, and the old names still import
+ok   W2-56, W2-20, W2-136, W2-153: the launcher's sandbox, gate, environment and plan check import; the role template flag; portability.compose
+ok   W2-96: gov accept's opt-in suites
+ok   W2-152: gov brief --run; W2-20: gov resources --slot
+ok   3d: gov adapters, wait, dispatch, impact, session-watch, skilleval and release answer --help (P-2); gov.release's build and verify import
+ok   W2-20: gov resources reads this machine's gate.json, no fault (the gate is open)
+ok   W2-56: gov launch refuses an unknown ticket by name (LAUNCH_REFUSED), starting nothing
+ok   W2-136: gov plan --json answers (read-only)
+ok   W2-129, W2-55, W2-92: gov links --since HEAD~1 answers
+ok   the store W2-00-store-b at f2f28ed4ef40: embed_headers true, 31063 vectors
+ok   gov retrieve on the store: lexical and semantic available, rerank.by service, the result names the store's commit and folder (W2-138), 3.122047806 s (not a latency gate: DEC-1125 (1))
+ok   gov context DAEO-sdxk builds with a wide budget; at the default ceiling it answers CONTEXT_OVER_CEILING, as the old pin does; --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   the live hooks' 8 gov imports resolve in the new pin
+CHECK FAILED: a gov name the staged W2-141 hooks import is not in the new pin (Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+ModuleNotFoundError: No module named 'gov.guard.nonexistent_module')
+
+STOP: a check before the switch failed (above)
+the store link is back on W2-00-store-a
+Nothing was switched: /tmp/gov-os-rel-repin/neg-check-f7/home/.local/bin/gov is still pin-797495bdfc70. Tell the CTO.
+(to run this again later, the CTO says when: rm -rf /tmp/gov-os-rel-repin/neg-check-f7/home/.local/share/gov-os/pin-f2f28ed4ef40)
+======== the script ended: exit 1, 171 s
+======== the live paths after
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at f2f28ed4ef40
+store halves: a at f2f28ed4ef40, b at 0b43625dad44
+w2/integrate: f2f28ed4ef40
+the live gov link, script, pins, wheels, hook, registry file, reranker pid, main-tree tags and docs/releases: UNCHANGED (every line equal before and after)
+the live store link, its halves and w2/integrate: UNCHANGED
+the scratch hook after: 099de326c45b (the script only reads it)
+NEGATIVE RUN OK (neg-check): STOP at part B, the store link put back on W2-00-store-a, the gov link unchanged

@@ -1,0 +1,6 @@
+Merge w2/W2-42a-tests (e4ed39ca725f): td-11's cases for a revision-colon-path under a tree that is not the commit's top, a blob id alone shown as text, and git's own --output write (57; red 40 on eca7a70176de: S12 18, F3 22; 17 guards green) and their README map rows (DEC-1157 (12), W2-42a R4 R5, the lead's probe)
+
+Task: DAEO-03ub
+Role: orchestrator
+Implements: DEC-1157, DEC-1180
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

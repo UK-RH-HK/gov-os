@@ -1,0 +1,1 @@
+{"sid": "abcdef12-3456-7890-abcd-ef1234567890", "session": "write", "out": {"out/q02.yaml": "id: q02\nquestion: zqxw94-q02-new-question\ngold_answer: zqxw94-q02-new-answer\nmarker: zqxw94-q02-new-mark\n", "out/result.json": "{\"questions\": 1, \"action\": \"fixed\", \"by_kind\": {\"location\": 1}, \"by_area\": {\"code\": 1}}"}, "marker": "zqxw94-session-text"}

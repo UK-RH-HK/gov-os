@@ -1,0 +1,8 @@
+Merge w2/W2-88-tests: run 7 revision of the S25 and S26 refusal checks (td-10, 7646ebe895c4)
+
+The lead's interface correction (DEC-1052): under --json a refusal is checked in the envelope, as the suite checks every refusal.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-20
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

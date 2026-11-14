@@ -171,6 +171,8 @@
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-03
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-04
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-07
+--ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-100
+--ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-101
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-104
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-105
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-106
@@ -221,6 +223,7 @@
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-178
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-182
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-183
+--ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-185
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-23
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-32
 --ignore=/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-33

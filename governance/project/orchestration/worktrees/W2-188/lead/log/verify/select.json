@@ -3,9 +3,10 @@
  "why_full": [],
  "core_changed": [],
  "unplaced": [],
- "base": "18a279055d99251e04e5e4490c3d4c088eab92b3",
- "head": "c1c8685b8079f6011b82e3023e59ff91fdbf5c84",
+ "base": "bf04ed69c8935c8e472ff938f56d80597dea1dab",
+ "head": "7130a29c0a3c713a67f521f35af8b4d7db1e3399",
  "governance_left_out": [
+  "docs/probes/DAEO-zlog/PR-DAEO-zlog-s5.md",
   "docs/probes/DAEO-zlog/PR-DAEO-zlog.md",
   "docs/probes/DAEO-zlog/checks.md"
  ],
@@ -2081,6 +2082,7 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-178",
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-182",
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-183",
+  "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-184",
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-185",
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-20",
   "--ignore=/home/usain/gov-os-worktrees/W2-188/tests/acceptance/W2-23",
@@ -3313,6 +3315,7 @@
   "tests/acceptance/W2-178/",
   "tests/acceptance/W2-182/",
   "tests/acceptance/W2-183/",
+  "tests/acceptance/W2-184/",
   "tests/acceptance/W2-185/",
   "tests/acceptance/W2-20/",
   "tests/acceptance/W2-23/",

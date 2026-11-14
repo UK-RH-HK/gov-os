@@ -1,0 +1,19 @@
+2026-11-14T16:51:57Z run writer round 2 real
+2026-11-14T16:51:57Z B1 ok
+2026-11-14T16:51:57Z B2 ok
+2026-11-14T16:51:57Z B3 files 25
+2026-11-14T16:51:57Z B4 changed 0 sample 0 staged 3
+2026-11-14T16:51:57Z seed_check ok
+2026-11-14T16:51:57Z B5 ok B6 ok
+2026-11-14T16:51:57Z canary start
+2026-11-14T16:51:57Z canary exit 0
+2026-11-14T16:51:57Z canary refused ok
+2026-11-14T16:51:57Z traces checked 0
+2026-11-14T16:51:57Z session start
+2026-11-14T16:51:57Z session exit 0 group_gone True
+2026-11-14T16:51:57Z traces checked 0
+2026-11-14T16:51:57Z result schema ok
+2026-11-14T16:51:57Z delivered 1
+2026-11-14T16:51:57Z pack ok
+2026-11-14T16:51:57Z counts schema failed
+2026-11-14T16:51:57Z end delivered 0

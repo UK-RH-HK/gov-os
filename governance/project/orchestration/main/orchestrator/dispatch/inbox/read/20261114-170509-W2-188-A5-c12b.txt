@@ -1,0 +1,10 @@
+log: W2-188-A5-c12b.json
+W2: W2-188
+status: DONE. Head is `790357f0215d97b9ccab847211a78afd5835391a`. Not landed: the ticket waits on W2-187's land, then the CTO merges it by hand with ACT-CLAUDE-COPIES-12.
+
+task: DAEO-zlog (W2-188)
+status: DONE. Head is `790357f0215d97b9ccab847211a78afd5835391a`. Not landed: the ticket waits on W2-187's land, then the CTO merges it by hand with ACT-CLAUDE-COPIES-12.
+work_completed:
+- I resumed from the checkpoint's NEXT line, after the CTO's answer P-W2-188-C12-L (a). Step 1's merge (84ca16727) stands.
+- A fresh independent test designer, td-3 (opus, class C3), revised the two F2 guard cases as described behaviour and updated the README map. Commit 1734f7422 carries `Rewrite-Reason: P-C12-1 (a), DEC-1156 (7)`; I merged it as 7604a3b0b.
+- One more red needed a fix

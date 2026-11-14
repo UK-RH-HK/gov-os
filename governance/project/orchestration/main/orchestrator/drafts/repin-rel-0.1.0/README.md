@@ -52,8 +52,11 @@ The CTO's hold is on from "release ready at C" until you say "done": nothing lan
    lines, the filled script, its checks, its registry edit, the smoke test and the CTO's 9 tools, and stops the line
    if any file changed since the review; `fill_release.sh` writes the list at "released"):
 ```
-cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && sha256sum -c drafts/repin-rel-0.1.0/REPIN-REL-0.1.0.sha256 && bash drafts/repin-rel-0.1.0/REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee ~/repin-rel-0.1.0.log
+cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && sha256sum -c drafts/repin-rel-0.1.0/REPIN-REL-0.1.0.sha256 && bash drafts/repin-rel-0.1.0/REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee -ai ~/repin-rel-0.1.0.log
 ```
+- The log is appended to, never overwritten; an earlier run's working folder is kept beside the new one.
+- Ctrl-C is safe: before the switch it stops the store rebuild, puts the store link back and prints `STOP: interrupted`;
+  after it, it switches back (`ROLLED BACK`). Tell the CTO either way.
 - It stops at the first failure:
   - before the switch (parts 0, R, A, S, B, C), with `STOP: ...`: nothing is switched, the store link goes back;
   - after it (parts D, H), with `ROLLED BACK: ...`.

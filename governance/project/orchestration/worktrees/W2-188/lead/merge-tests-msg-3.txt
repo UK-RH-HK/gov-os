@@ -1,0 +1,6 @@
+W2-188 (DAEO-zlog): merge the test designer's td-3 revision of the two F2 guard cases (1734f74, P-C12-1 (a))
+
+Task: DAEO-zlog
+Role: orchestrator
+Implements: DEC-1157, DEC-1179, DEC-105, CAP-33
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

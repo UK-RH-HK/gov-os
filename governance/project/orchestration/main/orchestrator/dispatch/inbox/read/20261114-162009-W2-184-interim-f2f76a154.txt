@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-184
+status: interim result f2f76a154: W2-184 (DAEO-6f0s): R1-R3 (DEC-1180 (4)): a lead refuses --reason, --trial and --owner-named; the launch record written atomically; every root's copy of a probe record read

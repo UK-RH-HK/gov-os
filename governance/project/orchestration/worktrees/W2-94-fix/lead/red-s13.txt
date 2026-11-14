@@ -1,0 +1,179 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 16:50:04)
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...                                  [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:51: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:51: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:51: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 20, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:51: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 21, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:51: AssertionError: the counts schema refuses the fix key
+E   AssertionError: refused with code SOURCE_IS_SCAFFOLD: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code SOURCE_IS_SCAFFOLD: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code SOURCE_PATH_ABSENT: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code SOURCE_PATH_ABSENT: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code SOURCE_NOT_TEXT: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code SOURCE_NOT_TEXT: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code SPAN_OUT_OF_FILE: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code SPAN_OUT_OF_FILE: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code HEADING_NOT_FOUND: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code HEADING_NOT_FOUND: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code ANSWER_NOT_IN_SPANS: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code ANSWER_NOT_IN_SPANS: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code NONEXISTENT_NAME_FOUND: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code NONEXISTENT_NAME_FOUND: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: refused with code NONEXISTENT_NO_NAME: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+    assert not [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ...]
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:120: AssertionError: refused with code NONEXISTENT_NO_NAME: [('q00', 'corrected'), ('q00', 'replaced'), ('q00', None), ('q02', 'corrected'), ('q02', 'replaced'), ('q02', None), ('q99', 'corrected'), ('q99', 'replaced'), ('q99', None)]
+E   AssertionError: assert ['2026-11-14T...chema failed'] == []
+      
+      Left contains one more item: '2026-11-14T16:51:57Z counts schema failed'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:130: AssertionError: assert ['2026-11-14T...chema failed'] == []
+E   AssertionError: (17, {'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': None, 'code': 17, ...}, 'indep_launch: refused 17 argument
+      ')
+    assert 17 == 0
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:136: AssertionError: (17, {'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': None, 'code': 17, ...}, 'indep_launch: refused 17 argument
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+E   AssertionError: the counts schema refuses the fix key
+    assert False
+     +  where False = valid({'act': 'ACT-INDEP-WALLS-1', 'approved_sha256': '4059d3f611f6c3fd888f3e9ffaa3efc2b04c6c519fd2cc0e5dafbc2d1c9aa5fd', 'brief_sha256': '0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173', 'code': 0, ...})
+/home/usain/gov-os-worktrees/W2-94-fix/tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py:192: AssertionError: the counts schema refuses the fix key
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_delivered_fix_runs_counts_validate[corrected]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_delivered_fix_runs_counts_validate[replaced]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_dry_fix_runs_counts_validate_with_the_action_null
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_run_refused_at_the_result_or_stopped_validates_with_the_action_null[refused 20 at the result]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_run_refused_at_the_result_or_stopped_validates_with_the_action_null[stopped 21]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[SOURCE_IS_SCAFFOLD]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[SOURCE_PATH_ABSENT]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[SOURCE_NOT_TEXT]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[SPAN_OUT_OF_FILE]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[HEADING_NOT_FOUND]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[ANSWER_NOT_IN_SPANS]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[NONEXISTENT_NAME_FOUND]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_each_code_each_edge_id_and_each_action_validate[NONEXISTENT_NO_NAME]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_delivered_fix_runs_log_has_no_counts_schema_failure
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_counts_only_of_a_delivered_fix_run_exits_0_and_prints_its_counts_with_fix
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[an extra key]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[an extra key reason]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id missing]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[code missing]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[action missing]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[action another word]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[action Corrected]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[action empty]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[action a list]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id q2]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id Q02]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id q002]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id q0a]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[id null]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[code unknown]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[code lower case]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[code null]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[fix null]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[fix a list]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[fix a string]
+FAILED tests/acceptance/W2-94/test_w2_94_s13_counts_fix.py::test_s13_a_fix_object_of_another_form_is_refused[fix empty]
+36 failed, 3 passed in 2.29s
+rc=1

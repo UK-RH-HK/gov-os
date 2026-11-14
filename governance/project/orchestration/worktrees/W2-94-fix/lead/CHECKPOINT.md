@@ -1,9 +1,8 @@
 task: DAEO-g87r
-decisions_applied: DEC-1180, DEC-1178, DEC-1175, DEC-957, DEC-820
-STATE: DONE; verified and reviewed (pass) | HEAD: 66dd6e77abbd | NEXT: the queue lands w2/W2-94-fix at 66dd6e77abbd | WAITING ON: none
-Workers: td-1 a829686a (stopped, cp refused) · td-2 da4a1f0a done · en-1 8ad38fe1 done · en-2 ccf43198 done · au-1 3733ec73 pass
-Rounds: build converged; review converged (round 1 pass)
-Decisions taken: worktree W2-94-fix; interface made exact (briefs/interface.md); --fix/--reason SUPPRESSed from --help; --dry usage line folded into prose.
-Evidence: gov accept 551/0; lead_verify GREEN 6382/0/0 (6 skipped) at fac8d2026; probe record 66dd6e77a.
-Open packages: P1 variant cannot read fixed brief (owner: run as is or variant v2); P4 counts schema `fix`; P8 AUDITS.log last line check before the run.
-Paths: briefs .gov-runtime/scratch/lead/briefs/, logs .gov-runtime/scratch/lead/log/
+decisions_applied: DEC-1180, DEC-1175, DEC-136, DEC-1156, DEC-968
+STATE: S13 build run: tests merged 382924bd3 (TESTS-READY), en-3 running | HEAD: 382924bd3d91 | NEXT: wait_for.sh /home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/lead/log/en-3.exit, then gov accept, scoped run + W2-149/173/178, au-2 narrow check | WAITING ON: en-3 (pid 3893468)
+Workers: td-3 8cce39f1 done (0af5f2e1f, 36 red); en-3 (pid 3893468) running. Earlier run: td-1, td-2, en-1, en-2, au-1 done (fix flow landed 0b43625da).
+Rounds: build in progress (S13)
+Decisions taken: merged w2/integrate 5285ef173 (no conflict); gov context BLOCKED (DEC-1178 not in store) -> register quoted by id; S13 interface: action corrected|replaced|null (null = before the result passes, as the landed flow writes); S11/F6 diff case revised by td-3 to allow indep-counts.schema.json only.
+Open packages: none
+Paths: briefs .gov-runtime/scratch/lead/briefs/td-3.md; td log W2-94-fix-tests/.gov-runtime/scratch/lead/log/td-3.*

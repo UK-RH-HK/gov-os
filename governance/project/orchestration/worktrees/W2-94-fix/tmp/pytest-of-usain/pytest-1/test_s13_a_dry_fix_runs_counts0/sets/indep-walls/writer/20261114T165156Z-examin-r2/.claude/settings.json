@@ -1,0 +1,71 @@
+{
+  "model": "claude-sonnet-5-5",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/gov-os-wall-trees/writer-20261114T165156Z-examin-r2/**)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/out/**)",
+      "Write(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/out/**)"
+    ],
+    "deny": [
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Agent",
+      "NotebookEdit",
+      "Skill",
+      "Bash(gov retrieve *)",
+      "Bash(gov context *)",
+      "Bash(/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/.local/bin/gov *)",
+      "Bash(python3 -m gov.cli.main *)",
+      "Bash(python3 -m gov.retrieval.measure *)",
+      "Bash(git *)",
+      "Bash(ollama *)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/.claude/**)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/gov-os-wall-trees/writer-20261114T165156Z-examin-r2/**)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/input/**)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/WALL.json)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/brief.md)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/seed.txt)",
+      "Edit(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/CLAUDE.md)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/repo/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/gov-os-worktrees/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/gov-os-runs/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/.claude/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/.local/share/gov-os/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/fixtures/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/runs/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/transcripts/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/governance/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/APPROVED)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/checker/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/auditor/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/labeller/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261101T100000Z-examin-r1.tar/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261105T100000Z-examin-r1.tar/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261107T100000Z-examin-r1.tar/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261108T100000Z-examin-r2.tar/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261109T100000Z-other-r1.tar/**)",
+      "Read(//home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/zz-examin-r1.tar/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I /home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2/.claude/wall_hook.py /home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/sets/indep-walls/writer/20261114T165156Z-examin-r2 /home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s13_a_dry_fix_runs_counts0/home/gov-os-wall-trees/writer-20261114T165156Z-examin-r2",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": false,
+  "cleanupPeriodDays": 1
+}

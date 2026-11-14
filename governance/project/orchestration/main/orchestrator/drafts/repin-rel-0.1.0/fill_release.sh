@@ -2,12 +2,15 @@
 # The CTO's hand-over step at "released" (P-RELEASE-1 §4 step 8): fills the operator's script from the tag and the
 # release record, so no value is copied by hand (RL-1). Reads, writes only <out>; changes nothing in the repository.
 #     bash fill_release.sh <C, the commit named at "release ready" (12+ hex digits)> [<repo, default the main tree>] [<out>]
-# <out> defaults to REPIN-COMMANDS-REL-0.1.0.sh beside this file. It refuses (exit 1, no file written) unless: v0.1.0
+# <out> defaults to REPIN-COMMANDS-REL-0.1.0.sh beside this file. It refuses (exit 1, no file written) unless: the
+# bundle's files pass `sha256sum -c BUNDLE.sha256` (checked first, before anything is read); v0.1.0
 # is an annotated tag on a one-parent commit whose parent is <C>; between <C> and the tag only the record's two files
 # changed; manifest.sha256 holds; the manifest names version 0.1.0, commit <C> in full, cli_version 0.1.0 and the wheel
 # gov-0.1.0-py3-none-any.whl with a 64-digit sha256. It prints the four values and the filled script's sha256.
 set -euo pipefail
 B=$(cd "$(dirname "$0")" && pwd)
+# First: the bundle's files are the reviewed ones (review F6). Any edit since the review stops the fill here.
+(cd "$B" && sha256sum -c --strict --quiet BUNDLE.sha256) || { echo "REFUSED, nothing written: the bundle's files differ from BUNDLE.sha256 (the reviewed list)" >&2; exit 1; }
 C_IN=${1:?the commit named at release ready}
 REPO=${2:-/home/usain/Dynamic-Agentic-Engineering-OS}
 OUT=${3:-$B/REPIN-COMMANDS-REL-0.1.0.sh}

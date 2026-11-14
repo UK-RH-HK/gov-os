@@ -29,7 +29,10 @@
 #   neg-tag          the scratch tag moved onto C itself, not the record commit (part R; fill_release.sh refuses too);
 #   neg-manifest     manifest.json changed after manifest.sha256 was written, in a record commit on C (part R;
 #                    fill_release.sh refuses too);
-#   neg-sha          the filled script's SHA is not the record's wheel sha256 (a hand-copy slip; part R).
+#   neg-sha          the filled script's SHA is not the record's wheel sha256 (a hand-copy slip; part R);
+#   neg-int          a TERM to the script while part S's store refresh runs (the INT/TERM trap, review F7; a Ctrl-C
+#                    takes the same handler, but a background job in a script ignores INT, so TERM is sent): the
+#                    refresh's process group must be gone, the store link as at the start 20 s later, STOP.
 set -euo pipefail
 R=/home/usain/Dynamic-Agentic-Engineering-OS
 B=$R/.gov-runtime/scratch/orchestrator/drafts/repin-rel-0.1.0
@@ -38,7 +41,7 @@ MODE=${2:-run}
 LIVE=/home/usain/gov-os-worktrees
 LIVEPINS=/home/usain/.local/share/gov-os
 OLD=797495bdfc70
-case "$MODE" in run|neg-src|neg-uncommitted|neg-check|neg-tag|neg-manifest|neg-sha) ;; *) echo "unknown mode $MODE"; exit 2;; esac
+case "$MODE" in run|neg-src|neg-uncommitted|neg-check|neg-tag|neg-manifest|neg-sha|neg-int) ;; *) echo "unknown mode $MODE"; exit 2;; esac
 [ ! -e "$S" ] || { echo "$S exists: remove it first"; exit 2; }
 live_fixed() {
   echo "gov link: $(readlink /home/usain/.local/bin/gov) -> $(readlink -f /home/usain/.local/bin/gov)"
@@ -128,7 +131,7 @@ echo "mirror ready: gov -> $(readlink "$S/home/.local/bin/gov"); store -> $(read
 EXTRA=()
 FILLREF=""
 case "$MODE" in
-  run) ;;
+  run|neg-int) ;;
   neg-src|neg-uncommitted)
     git clone -q --shared "$R" "$S/inputs"
     if [ "$MODE" = neg-src ]; then
@@ -178,13 +181,30 @@ set +e
 sha256sum -c --quiet "$S/REPIN-REL-0.1.0.sha256" && echo "the hash list: $(wc -l < "$S/REPIN-REL-0.1.0.sha256") files OK (the operator's first check)" \
   || { [ "$MODE" = neg-sha ] && echo "the hash list fails on the edited script, as it would for the operator (neg-sha runs the script anyway, to show part R's stop)"; } \
   || { echo "the hash list does not hold"; exit 1; }
-env GOV_REPIN_LINK_HOME="$S/home" GOV_REPIN_PINS="$S/home/.local/share/gov-os" \
-    GOV_REPIN_STORE_LINK="$S/home/gov-os-worktrees/W2-00-store" GOV_REPIN_REGISTRY_REPO="$S/repo" \
-    GOV_REPIN_HOLD="$S/hold" GOV_REPIN_TMP="$S/x" GOV_REPIN_HOOKS="$S/hooks" GOV_REPIN_SKIP_RERANK=1 \
-    GOV_REPIN_RELEASE_REPO="$REL" \
-    GOV_STORE_LOG="$S/integration-store.log" SEED_LOG="$S/seed.jsonl" "${EXTRA[@]}" \
-    TMPDIR="$S/tmp" bash "$F" 2>&1 | tee "$S/script.out"
-rc=${PIPESTATUS[0]}
+RUNENV=(GOV_REPIN_LINK_HOME="$S/home" GOV_REPIN_PINS="$S/home/.local/share/gov-os"
+    GOV_REPIN_STORE_LINK="$S/home/gov-os-worktrees/W2-00-store" GOV_REPIN_REGISTRY_REPO="$S/repo"
+    GOV_REPIN_HOLD="$S/hold" GOV_REPIN_TMP="$S/x" GOV_REPIN_HOOKS="$S/hooks" GOV_REPIN_SKIP_RERANK=1
+    GOV_REPIN_RELEASE_REPO="$REL"
+    GOV_STORE_LOG="$S/integration-store.log" SEED_LOG="$S/seed.jsonl" "${EXTRA[@]}" TMPDIR="$S/tmp")
+INTPID=""; INTLATE=""
+if [ "$MODE" = neg-int ]; then
+  env "${RUNENV[@]}" bash "$F" > "$S/script.out" 2>&1 &
+  sp=$!
+  waited=0
+  while kill -0 "$sp" 2> /dev/null && [ ! -e "$S/x/refresh.out" ] && [ $waited -lt 7200 ]; do sleep 2; waited=$((waited + 2)); done
+  sleep 10
+  echo "neg-int: TERM to the script (pid $sp) $(( $(date +%s) - t0 )) s in, $([ -e "$S/x/refresh.out" ] && echo 'the store refresh started' || echo 'the store refresh NOT started')"
+  kill -TERM "$sp" 2> /dev/null
+  wait "$sp"; rc=$?
+  cat "$S/script.out"
+  INTPID=$(sed -n 's/^the store refresh (pid \([0-9]*\),.*/\1/p' "$S/script.out" | head -1)
+  sleep 20
+  INTLATE=$(readlink -f "$S/home/gov-os-worktrees/W2-00-store")
+  echo "neg-int: 20 s after the script ended, the store link -> $(basename "$INTLATE") (at the start $(basename "$START_STORE")); the refresh's process group ${INTPID:-?}: $([ -n "$INTPID" ] && [ -z "$(ps -o pid= -g "$INTPID" 2> /dev/null)" ] && echo gone || echo 'NOT gone or not named')"
+else
+  env "${RUNENV[@]}" bash "$F" 2>&1 | tee "$S/script.out"
+  rc=${PIPESTATUS[0]}
+fi
 set -e
 echo "======== the script ended: exit $rc, $(( $(date +%s) - t0 )) s"
 echo "======== the live paths after"
@@ -229,6 +249,12 @@ case "$MODE" in
     if nothing_switched && grep -q "^CHECK FAILED: a gov name the staged W2-141 hooks import" "$S/script.out" && grep -q "^STOP: a check before the switch failed" "$S/script.out" \
        && grep -q "the store link is back on" "$S/script.out"; then
       echo "NEGATIVE RUN OK ($MODE): STOP at part B, the store link put back on $(basename "$START_STORE"), the gov link unchanged"; exit 0
+    fi;;
+  neg-int)
+    if nothing_switched && grep -q "^STOP: interrupted (TERM) before the switch" "$S/script.out" && grep -q '^== S\.' "$S/script.out" \
+       && ! grep -q '^== B\.' "$S/script.out" && [ -n "$INTPID" ] && [ -z "$(ps -o pid= -g "$INTPID" 2> /dev/null)" ] \
+       && [ "$INTLATE" = "$START_STORE" ]; then
+      echo "NEGATIVE RUN OK ($MODE): TERM during part S's refresh: the refresh's group stopped, STOP, the store link on $(basename "$START_STORE") 20 s later, the gov link unchanged"; exit 0
     fi;;
   neg-tag|neg-manifest|neg-sha)
     case "$MODE" in

@@ -1,2 +1,147 @@
 heavy_slot: a landing or close waits first; waiting (2026-11-14 16:13:19)
-..........F....FF
+..........F....FFF.......FFFFFF.........                                 [100%]
+=================================== FAILURES ===================================
+_ test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_looked[not-under-template] _
+tests/acceptance/W2-88/test_w2_88_p1_installed.py:250: in test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_looked
+    assert isinstance(looked, list) and looked, f"details.looked names no place: {details!r}"
+E   AssertionError: details.looked names no place: {'file': 'governance/project/not-shipped-anywhere.yaml', 'looked': []}
+E   assert (True and [])
+E    +  where True = isinstance([], list)
+_ test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes _
+tests/acceptance/W2-88/test_w2_88_p1_installed.py:322: in test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes
+    W.assert_ok(run, "A9 run by a gov installed from a wheel, on a project whose kit copier installed")
+tests/acceptance/W2-88/w2_88_support.py:240: in assert_ok
+    assert run.returncode == 0 and run.envelope().get("ok") is True, f"{what} did not succeed\n{run.describe()}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: A9 run by a gov installed from a wheel, on a project whose kit copier installed did not succeed
+E   gov adopt --lite --stage A9 --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/p1-a8-noret0/box/p1-full-out
+E   exit code: 1 after 0.0 s
+E   stdout:
+E   {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-88", "error": {"code": "SHIPPED_FILE_MISSING", "message": "governance/project/retrieval.yaml: Gov OS ships no such file where this gov can find it (looked in: nowhere: gov runs from no Gov OS source tree, and the file is not under template/ for the project's copy): nothing is installed or written, and no default stands in its place", "details": {"file": "governance/project/retrieval.yaml", "looked": []}}}
+E   
+E   stderr:
+_ test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refused_by_name_and_copies_nothing _
+tests/acceptance/W2-88/test_w2_88_p1_installed.py:348: in test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refused_by_name_and_copies_nothing
+    assert isinstance(error.get("details", {}).get("looked"), list) and error["details"]["looked"], f"details.looked: {error.get('details')}"
+E   AssertionError: details.looked: {'file': 'governance/project/retrieval.yaml', 'looked': []}
+E   assert (True and [])
+E    +  where True = isinstance([], list)
+E    +    where [] = <built-in method get of dict object at 0x7d64673172c0>('looked')
+E    +      where <built-in method get of dict object at 0x7d64673172c0> = {'file': 'governance/project/retrieval.yaml', 'looked': []}.get
+E    +        where {'file': 'governance/project/retrieval.yaml', 'looked': []} = <built-in method get of dict object at 0x7d6467316040>('details', {})
+E    +          where <built-in method get of dict object at 0x7d6467316040> = {'code': 'SHIPPED_FILE_MISSING', 'details': {'file': 'governance/project/retrieval.yaml', 'looked': []}, 'message': "g...e is not under template/ for the project's copy): nothing is installed or written, and no default stands in its place"}.get
+_ test_s25_a_graph_over_the_tools_cap_is_refused_codegraph_too_large_naming_the_tool_the_cap_and_both_counts _
+tests/acceptance/W2-88/test_w2_88_f1_codegraph.py:137: in test_s25_a_graph_over_the_tools_cap_is_refused_codegraph_too_large_naming_the_tool_the_cap_and_both_counts
+    assert f"gov adopt: {CODE}: " in run.stderr, f"stderr does not hold `gov adopt: {CODE}: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold `gov adopt: CODEGRAPH_TOO_LARGE: <message>`
+E     gov adopt --lite --stage A9 --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/f1-world0/box/f1-cap-out --json --session adopter-w2-124
+E     exit code: 1 after 6.6 s
+E     stdout:
+E     {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "CODEGRAPH_TOO_LARGE", "message": "the code graph has 41086 nodes and 143008 edges, and codebase-memory-mcp refuses a query whose answer is over its cap of 100000 rows (100,000): gov's code-graph read (gov.codeintel, outside W2-88's paths) takes the whole graph in one query, so the graph of this repository cannot be read until that read is paged under the cap; nothing is recorded", "details": {"nodes": 41086, "edges": 143008, "cap": 100000, "tool": "codebase-memory-mcp"}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: CODEGRAPH_TOO_LARGE: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'A9', '--out', '/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-...des": 41086, "edges": 143008, "cap": 100000, "tool": "codebase-memory-mcp"}}}\n', stderr='', seconds=6.647320582997054).stderr
+_____ test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[exclude] ______
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:187: in test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "MA", project, before, log, out)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage MA --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ma-out --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     h-map.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A4-batched-plan.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A5-independent-review-of-the-path-map.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A6-controlled-migration.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A8-legacy-import-and-retirement.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A9-memory-fabric.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A7-independent-migration-verification.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A10-independent-memory-verification.md (.git/info/exclude:3:governance/adoption/); governance/adoption/packages/DP-ADOPT-00000000.md (.git/info/exclude:3:governance/adoption/); governance/adoption/CIT-E-ADOPT-A8.md (.git/info/exclude:3:governance/adoption/). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": "governance/adoption/A3-target-path-map.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A4-batched-plan.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A5-independent-review-of-the-path-map.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A6-controlled-migration.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A8-legacy-import-and-retirement.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A9-memory-fabric.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A7-independent-migration-verification.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A10-independent-memory-verification.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/packages/DP-ADOPT-00000000.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/CIT-E-ADOPT-A8.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'MA', '--out', '/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-...rce": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}]}}}\n', stderr='', seconds=0.4249151219846681).stderr
+___ test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[excludesfile] ___
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:187: in test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "MA", project, before, log, out)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage MA --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ma-out --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "ADOPT_PATH_IGNORED", "message": "2 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them: governance/kernel/templates/brief.md (/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ignore-rules-of-the-user:4:governance/kernel/templates/); governance/kernel/templates/role-cto.md (/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ignore-rules-of-the-user:4:governance/kernel/templates/). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": "governance/kernel/templates/brief.md", "source": "/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ignore-rules-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}, {"path": "governance/kernel/templates/role-cto.md", "source": "/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ignore-rules-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'MA', '--out', '/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-...les-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}]}}}\n', stderr='', seconds=0.43316475799656473).stderr
+____ test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[gitignore] _____
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:187: in test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "MA", project, before, log, out)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage MA --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_ma_refuses_at_once_a_0/box/ma-out --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "ADOPT_PATH_IGNORED", "message": "2 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them: .claude/skills/retrieval/SKILL.md (.gitignore:6:.claude/skills/*); .claude/skills/discovery/SKILL.md (.gitignore:6:.claude/skills/*). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": ".claude/skills/retrieval/SKILL.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}, {"path": ".claude/skills/discovery/SKILL.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'MA', '--out', '/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-...L.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}]}}}\n', stderr='', seconds=0.4319767220003996).stderr
+_ test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[exclude] _
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:203: in test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "A0", project, before, log, None)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage A0 --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     git/info/exclude:3:governance/adoption/); governance/adoption/A9-memory-fabric.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A7-independent-migration-verification.md (.git/info/exclude:3:governance/adoption/); governance/adoption/A10-independent-memory-verification.md (.git/info/exclude:3:governance/adoption/); governance/adoption/packages/DP-ADOPT-00000000.md (.git/info/exclude:3:governance/adoption/); governance/adoption/CIT-E-ADOPT-A8.md (.git/info/exclude:3:governance/adoption/). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": "governance/adoption/A0-safety-baseline.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A1-inventory.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A2-classification.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A3-target-path-map.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A4-batched-plan.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A5-independent-review-of-the-path-map.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A6-controlled-migration.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A8-legacy-import-and-retirement.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A9-memory-fabric.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A7-independent-migration-verification.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/A10-independent-memory-verification.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/packages/DP-ADOPT-00000000.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}, {"path": "governance/adoption/CIT-E-ADOPT-A8.md", "source": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'A0', '--json', '--session', 'adopter-w2-124'), returncode=1, stdout='{"ok": f...rce": ".git/info/exclude", "line": 3, "pattern": "governance/adoption/"}]}}}\n', stderr='', seconds=0.4290724380116444).stderr
+_ test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[excludesfile] _
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:203: in test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "A0", project, before, log, None)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage A0 --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "ADOPT_PATH_IGNORED", "message": "2 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them: governance/kernel/templates/brief.md (/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_a0_run_without_ma_ref0/box/ignore-rules-of-the-user:4:governance/kernel/templates/); governance/kernel/templates/role-cto.md (/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_a0_run_without_ma_ref0/box/ignore-rules-of-the-user:4:governance/kernel/templates/). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": "governance/kernel/templates/brief.md", "source": "/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_a0_run_without_ma_ref0/box/ignore-rules-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}, {"path": "governance/kernel/templates/role-cto.md", "source": "/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-0/test_s26_a0_run_without_ma_ref0/box/ignore-rules-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'A0', '--json', '--session', 'adopter-w2-124'), returncode=1, stdout='{"ok": f...ules-of-the-user", "line": 4, "pattern": "governance/kernel/templates/"}]}}}\n', stderr='', seconds=0.4370612839993555).stderr
+_ test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[gitignore] _
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:203: in test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore
+    assert_path_ignored_refusal(run, spec, "A0", project, before, log, None)
+tests/acceptance/W2-88/test_w2_88_f3_ignored.py:124: in assert_path_ignored_refusal
+    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
+E   AssertionError: stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`
+E     gov adopt --lite --stage A0 --json --session adopter-w2-124
+E     exit code: 1 after 0.4 s
+E     stdout:
+E     {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "ADOPT_PATH_IGNORED", "message": "2 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them: .claude/skills/retrieval/SKILL.md (.gitignore:6:.claude/skills/*); .claude/skills/discovery/SKILL.md (.gitignore:6:.claude/skills/*). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again", "details": {"ignored": [{"path": ".claude/skills/retrieval/SKILL.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}, {"path": ".claude/skills/discovery/SKILL.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}]}}}
+E     
+E     stderr:
+E     
+E   assert 'gov adopt: ADOPT_PATH_IGNORED: ' in ''
+E    +  where '' = Run(args=('adopt', '--lite', '--stage', 'A0', '--json', '--session', 'adopter-w2-124'), returncode=1, stdout='{"ok": f...L.md", "source": ".gitignore", "line": 6, "pattern": ".claude/skills/*"}]}}}\n', stderr='', seconds=0.4313600980094634).stderr
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-88/test_w2_88_p1_installed.py::test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_looked[not-under-template]
+FAILED tests/acceptance/W2-88/test_w2_88_p1_installed.py::test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes
+FAILED tests/acceptance/W2-88/test_w2_88_p1_installed.py::test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refused_by_name_and_copies_nothing
+FAILED tests/acceptance/W2-88/test_w2_88_f1_codegraph.py::test_s25_a_graph_over_the_tools_cap_is_refused_codegraph_too_large_naming_the_tool_the_cap_and_both_counts
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[exclude]
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[excludesfile]
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_ma_refuses_at_once_a_path_the_ignore_rules_ignore[gitignore]
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[exclude]
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[excludesfile]
+FAILED tests/acceptance/W2-88/test_w2_88_f3_ignored.py::test_s26_a0_run_without_ma_refuses_at_once_a_path_the_ignore_rules_ignore[gitignore]
+10 failed, 30 passed, 1 deselected in 215.63s (0:03:35)

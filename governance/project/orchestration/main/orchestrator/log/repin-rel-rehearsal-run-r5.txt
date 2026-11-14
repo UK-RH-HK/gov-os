@@ -80,3 +80,72 @@ ok   the staged W2-141 pair's 8 gov imports resolve in the new pin
 ok   guard4_check.py: PASS (453 cases)
 ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are let-throughs now refused (W2-42a, stricter): fix3 unterminated heredoc naming acceptance judged as before;fix3 python heredoc reading .env (gap as today);
 ok   tests/unit/hooks/test_live_hook.py and tests/unit/guard/test_w2_141_search.py: 267 passed
+ok   test_g14.py (the live hook, before W2-141's): 151 passed, 1 skipped
+ok   test_g14.py (the staged W2-141 pair): 4 failed, 147 passed, 1 skipped, the four W2-141 near-miss cases red by name
+ok   test_guard_fix_3.py: 49 failed, 236 passed, 1 skipped (old pin: 49 failed, 236 passed, 1 skipped); 48 cases fail under both (ACT-GUARD-FIX-4's LET_THROUGH); differing only stricter (W2-42a): 1 now refused, 1 let-throughs now refused
+ok   hook_timing.py: exit 0 out '' seconds [0.16, 0.17, 0.18, 0.19, 0.2]
+ALL CHECKS PASS (/tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-bf04ed69c893)
+== C. the quiet point
+the shared reranker: pid 32310, the same bytes as the new pin's: no restart needed
+== D. the switch (an atomic rename), then the shared reranker restarted from the new pin if its bytes changed
+/tmp/gov-os-rel-repin/run/home/.local/bin/gov -> /tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-bf04ed69c893/bin/gov
+1 Read README.md: exit 0;  
+2 Write tests/acceptance: exit 0; "permissionDecision": "deny" 
+3 no judge reachable: exit 2; gov hook: no pinned gov at /tmp/gov-os-rel-repin/run/x/smoke/smoke-nohome/.local/bin/gov or on PATH, so /home/usain/Dynamic-Agentic-Engineering-OS/.claude/hooks
+a search through /tmp/gov-os-rel-repin/run/home/.local/bin/gov on the store: both facets available, rerank.by service, the store's commit named, 3.234248622 s
+release check: the wheel's sha256 = the record's (59cfc7237dae91001a0950e2b79957674addab3d3c28300e9215f4ff7b42df7b); readlink -f /tmp/gov-os-rel-repin/run/home/.local/bin/gov names pin-bf04ed69c893
+gov adapters and gov wait are there (P-2)
+== H. W2-116's hook (window 4's, with the later ACTs' lines; not rewritten): it refreshes the store through the new pin
+the hook is unchanged and refreshes through the gov link, now the new pin; the new pin's gov rebuild offers --integration
+== E. the registry entry (refuses unless R, A and D hold), committed as the owner's
+  - name: gov
+    version: "0.1.0"
+    sha256: "59cfc7237dae91001a0950e2b79957674addab3d3c28300e9215f4ff7b42df7b"
+    install: "python3 -m venv --system-site-packages ~/.local/share/gov-os/pin-bf04ed69c893 && ~/.local/share/gov-os/pin-bf04ed69c893/bin/python -m pip install --no-deps --no-index ~/.local/share/gov-os/wheels/bf04ed69c893/gov-0.1.0-py3-none-any.whl && ln -s ~/.local/share/gov-os/pin-bf04ed69c893/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov"
+    uninstall: "ln -s ~/.local/share/gov-os/pin-797495bdfc70/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov && rm -rf ~/.local/share/gov-os/pin-bf04ed69c893"
+    date: "2026-11-14"
+    approved_by: "DEC-1178"
+    note: "Re-pin from release 0.1.0 (DEC-1178 (3), P-RELEASE-1 §6): a non-editable install of the wheel of the numbered release 0.1.0 (W2-16, DEC-772), tag v0.1.0 on the release record commit whose parent is bf04ed69c893; the record docs/releases/0.1.0/manifest.json (sha256 71e998f490e1e16fb65797bf83806579c2d2d965bae6738f348d1bd03f830636) states this wheel sha256. The wheel was built twice here from commit bf04ed69c893 (git archive, then pip wheel --no-deps --no-build-isolation with SOURCE_DATE_EPOCH=1794671739, the commit's time; the same bytes, equal to the record's), in its own environment ~/.local/share/gov-os/pin-bf04ed69c893 (Python 3.12, with the system and user site packages for PyYAML, pytest, pytest-xdist, pytest-timeout and sqlite-vec), linked from ~/.local/bin/gov by an atomic rename; the integration store rebuilt before the switch at the head of w2/integrate at that time (its src and pyproject.toml the commit's: the script stops if they differ); the shared reranker restarted from the new pin only if its bytes changed (class 3); the git hooks not touched. sha256 is the wheel's; the installed script ~/.local/bin/gov (a link) has sha256 dff58d194ee770d3b4a9920c9f38f7ec9d572f21a922c8c843c29c33777cf401. Replaces window 5's entry (pin-797495bdfc70, DEC-1037); pin-797495bdfc70 stays for a one-command rollback (the uninstall line)."
+
+written: /tmp/gov-os-rel-repin/run/repo/governance/project/tool-registry.yaml; commit it with the decision trailer DEC-1178 (Role: owner)
+committed: 8527681fe DEC-1178 (3): re-pin from release 0.1.0, gov from the release's wheel (tag v0.1.0, commit 
+
+RE-PIN DONE: pin-bf04ed69c893 (release 0.1.0) is live; pin-797495bdfc70 kept for the rollback; the store at bf04ed69c893; the hooks untouched. Tell the CTO.
+======== the script ended: exit 0, 1008 s
+======== the live paths after
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at f2f28ed4ef40
+store halves: a at f2f28ed4ef40, b at 0b43625dad44
+w2/integrate: f2f28ed4ef40
+the live gov link, script, pins, wheels, hook, registry file, reranker pid, main-tree tags and docs/releases: UNCHANGED (every line equal before and after)
+the live store link and halves moved WITH w2/integrate (the CTO's landing during the run: the live hook refreshed the live store, not this rehearsal):
+1,3c1,3
+< store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at d3f3326c4a56
+< store halves: a at dc67c4f6be39, b at d3f3326c4a56
+< w2/integrate: bf04ed69c893
+---
+> store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at f2f28ed4ef40
+> store halves: a at f2f28ed4ef40, b at 0b43625dad44
+> w2/integrate: f2f28ed4ef40
+the live store log's new lines (the hook's runs):
+2026-11-14 16:05:46 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at d3f3326c4a56fae7faf63cc65c9ada3530ea47fc, behind this tree's
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at d3f3326c4a56fae7faf63cc65c9ada3530ea47fc, behind this tree's head bf04ed69c8935c
+2026-11-14 16:18:21 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at b36bcad122e79ed938ffd6d9ef74c121ef94426d, behind this tree's
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at b36bcad122e79ed938ffd6d9ef74c121ef94426d, behind this tree's head 0b43625dad44c6
+2026-11-14 16:19:08 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 0b43625dad44c66e0fa7242d095b5e627e8979f8, behind this tree's
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 0b43625dad44c66e0fa7242d095b5e627e8979f8, behind this tree's head f2f28ed4ef4050
+the scratch hook after: 099de326c45b (the script only reads it)
+the scratch registry commit: 8527681fe DEC-1178 (3): re-pin from release 0.1.0, gov from the release's wheel (tag v0.1.0, commit bf04ed69c893, record sha256 71e998f490e1
+the scratch registry parses; gov entries: 1 59cfc7237dae 2026-11-14 DEC-1178
+  its trailers: Task: decision-record;Implements: DEC-1178;Role: owner;;
+REHEARSAL OK: exit 0

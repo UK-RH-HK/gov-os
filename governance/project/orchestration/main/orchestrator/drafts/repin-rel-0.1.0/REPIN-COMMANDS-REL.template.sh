@@ -9,8 +9,10 @@
 # head, RL-3), the shared reranker restarted from the new pin if its bytes changed (class 3). The git hooks are NOT
 # touched: .git/hooks/reference-transaction refreshes the store through ~/.local/bin/gov and follows the new pin.
 # Run in a PLAIN TERMINAL (not inside a Claude session: it reinstalls gov, DEC-928 item 3):
-#     bash REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee ~/repin-rel-0.1.0.log
-# It stops at the first failure. Before the switch (parts 0, R, A, S, B, C) a failure prints STOP and leaves what
+#     bash REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee -ai ~/repin-rel-0.1.0.log
+# (tee -a keeps an earlier run's log; -i keeps tee writing through a Ctrl-C, so the log shows what the script did then.)
+# It stops at the first failure. A Ctrl-C or a TERM is handled as a failure of the part it lands in: before the switch,
+# the store rebuild (if running) is stopped, the store link goes back, STOP; after it, ROLLED BACK. Before the switch (parts 0, R, A, S, B, C) a failure prints STOP and leaves what
 # sessions use as it was (the new pin beside the old; the store link back on its old half). After the switch (parts D,
 # H) a failed check switches straight back to the old pin, restarts the reranker from it, and prints ROLLED BACK: then
 # tell the CTO.
@@ -55,8 +57,10 @@ SMI=/usr/lib/wsl/lib/nvidia-smi
 # What the wheel is built from: src/ (the packages and their package data) and pyproject.toml; and, should they ever
 # appear, the files setuptools would also read from the export's root.
 INPUTS=(src pyproject.toml setup.py setup.cfg MANIFEST.in ':(glob)LICEN[CS]E*' ':(glob)COPYING*' ':(glob)NOTICE*' ':(glob)AUTHORS*')
-PREV=""; PHASE=before; SVC_RESTARTED=""; STOREREF=""; TAGC=""
-rm -rf "$X"; mkdir -p "$X"
+PREV=""; PHASE=before; SVC_RESTARTED=""; STOREREF=""; TAGC=""; PREV_CUR=""; rp=""
+# An earlier run's folder is kept, moved aside with its time (its diagnostics), never removed.
+if [ -e "$X" ]; then XOLD=$X.$(date +%Y%m%d-%H%M%S); mv -T "$X" "$XOLD" && echo "an earlier run's $X is kept as $XOLD"; fi
+mkdir -p "$X"
 
 restore_store() {
   if [ -n "$PREV" ] && [ "$(readlink -f "$LINK")" != "$PREV" ]; then
@@ -94,6 +98,27 @@ on_err() {
   esac
 }
 trap 'on_err $LINENO' ERR
+# A Ctrl-C or a TERM (window 5's review F5, this act's F7). The store refresh of part S runs in its own session
+# (setsid), so a Ctrl-C does not reach it: it is stopped here by its process group, given 60 s, then killed; if it moved
+# the store link, the link goes back (restore_store). Then as a failure of the phase: STOP, or ROLLED BACK.
+on_signal() {  # $1 the signal
+  trap - ERR; trap '' INT TERM PIPE; set +e
+  if [ -n "$rp" ] && kill -0 "$rp" 2> /dev/null; then
+    kill -TERM -- "-$rp" 2> /dev/null
+    ( sleep 60; kill -KILL -- "-$rp" 2> /dev/null ) & local wd=$!
+    wait "$rp" 2> /dev/null; kill "$wd" 2> /dev/null; wait "$wd" 2> /dev/null
+    [ -z "$(ps -o pid= -g "$rp" 2> /dev/null)" ] || kill -KILL -- "-$rp" 2> /dev/null
+    echo; echo "the store refresh (pid $rp, its process group) was stopped"
+  fi
+  if [ -z "$PREV" ] && [ -n "$PREV_CUR" ] && [ "$(readlink -f "$LINK")" != "$PREV_CUR" ]; then PREV=$PREV_CUR; fi
+  case $PHASE in
+    before) stop "interrupted ($1) before the switch";;
+    switched) rollback "interrupted ($1) after the switch";;
+    *) echo; echo "INTERRUPTED ($1) after the live checks: pin-$C is live and checked; the registry step may not have finished. Tell the CTO."; exit 1;;
+  esac
+}
+trap 'on_signal INT' INT
+trap 'on_signal TERM' TERM
 
 # The frozen-src rule (RL-3): the wheel is built from C's clean export, so nothing it is built from may differ between C
 # and the branch's head now (the CTO's hold keeps src/ still from "release ready" to this act; record commits go on),
@@ -214,6 +239,7 @@ while kill -0 $rp 2>/dev/null; do
   sleep 2
 done
 rrc=0; wait $rp || rrc=$?
+rp=""
 t1=$(date +%s)
 cat "$X/refresh.out"
 [ "$(readlink -f "$LINK")" != "$PREV_CUR" ] && PREV=$PREV_CUR

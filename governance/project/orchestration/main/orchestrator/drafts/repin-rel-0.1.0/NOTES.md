@@ -8,12 +8,13 @@ For the CTO and the reviewer. The operator's page is `README.md` beside this fil
 | file | what | from |
 |---|---|---|
 | `REPIN-COMMANDS-REL.template.sh` | the operator's script with four slots: `C`, `EPOCH`, `SHA` (the record's wheel sha256), `RECORD` (manifest.json's sha256); VERSION `0.1.0`, TAG `v0.1.0`, OLD `797495bdfc70` fixed | window 5's script, plus part R; built-from-C check now against the record's sha256; §5's two lines and P-2's line after the switch; the registry commit cites DEC-1178 |
-| `fill_release.sh` | the CTO's step at "released": `bash fill_release.sh <C>` reads the tag and the record, refuses unless they agree with C, writes `REPIN-COMMANDS-REL-0.1.0.sh` and the hash list `REPIN-REL-0.1.0.sha256` (13 files, absolute paths) | new (RL-1: nothing copied by hand) |
+| `fill_release.sh` | the CTO's step at "released": `bash fill_release.sh <C>` first checks `sha256sum -c BUNDLE.sha256` (the reviewed files; review F6), then reads the tag and the record, refuses unless they agree with C, writes `REPIN-COMMANDS-REL-0.1.0.sh` and the hash list `REPIN-REL-0.1.0.sha256` (13 files, absolute paths) | new (RL-1: nothing copied by hand) |
 | `rel_checks.sh` | part B's checks | `repin7_checks.sh` unchanged but: the old pin `797495bdfc70`; section 3d (the builds since window 5: `gov adapters`, `wait`, `dispatch`, `impact`, `session-watch`, `skilleval`, `release` answer `--help`; `gov.release` build/verify and `gov.wait.liveness` import) |
 | `rel_registry.py` | part E's registry edit | `repin7_registry.py`: replaces window 5's entry (`797495bdfc70`, `04b094fb…7c3`); six arguments (adds version, tag, record sha256); the note names the release and the record; `approved_by: DEC-1178` (see 4, R-1) |
 | `rehearse_rel.sh` | the rehearsal: the scratch mirror plus a scratch release in a scratch clone | `rehearse_repin7.sh` plus the scratch release, fill and three new negative modes |
 | `README.md` | the operator's page (draft) | `ACT-REPIN-W5.md`'s form |
-| `pin/smoke_repin5.sh` and the 9 CTO tools | used unchanged, by path | window 5's |
+| `pin/smoke_repin5.sh` and the 9 CTO tools | used by path; the 13-file hash list `fill_release.sh` writes | 12 of them are window 5's reviewed bytes (`sha256sum -c pin/REPIN-W5.sha256` OK). **`tools/heavy_slot.sh` is not:** it is the DEC-1157 version (11-12 23:46, `heavy_slot.sh.pre-dec1157` beside it), which no review record covers. This bundle's rehearsals ran with it, and `fill_release.sh` hashes whatever is there at fill time, so the post-fill review covers its bytes (review F3) |
+| what part B also runs, outside the hash list (as in window 5) | read or run by path | `drafts/act-guard-fix-4/test_guard_fix_4.py`, `drafts/g14/test_g14.py`, `tools/heavy_slots.conf`, the staged W2-141 pair `docs/changes/W2-141-hook/{pretooluse.py,role_reads.py}`, and the main tree's `tests/unit/hooks/test_live_hook.py`, `tests/unit/guard/test_w2_141_search.py` and live `.claude/hooks/` (review F3) |
 
 ## 2. Part R (RL-1), in order; each failure is `STOP`, nothing built
 1. `v0.1.0` is an annotated tag (`git cat-file -t` = `tag`) in the release repository (live: the main tree).
@@ -32,25 +33,70 @@ For the CTO and the reviewer. The operator's page is `README.md` beside this fil
 Then part A's two builds must equal `SHA`, the record's, so the pin is the release's wheel; after the switch the script
 prints §5's two added lines (wheel sha256 = the record's; `readlink -f ~/.local/bin/gov` names `pin-<C12>`).
 
-## 3. The rehearsal (stand-in C = `w2/integrate` head `494d5c9335fa` at 14:16)
-REHEARSAL-OUTCOMES
+## 3. The rehearsal (`rehearse_rel.sh`; stand-in C = the main tree's `w2/integrate` head when each run started)
+Each run builds a scratch release in a shared clone under `/tmp/gov-os-rel-repin/<mode>/release`, using the live
+pin's own `gov.release.build` (what `gov release 0.1.0` runs, without the typed code). It commits the record as
+§4 step 5 does, puts an annotated scratch tag `v0.1.0` on the record commit, fills the script with `fill_release.sh`,
+checks the hash list, and runs the filled script against the mirror. The main tree got no tag, ref or commit: every
+log's "main tree tags v*" and "docs/releases" lines are the same before and after.
+
+**Final logs (the files as in this bundle):**
+
+| log | stand-in C | outcome |
+|---|---|---|
+| `log/repin-rel-rehearsal-run-r5.txt` | `bf04ed69c893` | **REHEARSAL OK, exit 0, 1,008 s.** R: tag on the record commit, record only, `manifest.sha256` OK, record sha256 `71e998f490e1`, `verify` holds. A: both builds `59cfc7237dae…2df7b` = the record's wheel sha256. S: 183 s. B: ALL CHECKS PASS (3d included; FIX-4 2 stricter, FIX-3 48 both + 1 + 1 stricter; g14 151 and 4 red by name; live hook 267; guard4 453; hook 0.16 to 0.20 s). C: the reranker has the new pin's bytes, so no restart. D: the smoke calls; the search 3.2 s; §5's two lines; P-2. H. E: the registry commit has trailers `Task: decision-record`, `Implements: DEC-1178`, `Role: owner`; one gov entry. The live fixed paths are UNCHANGED; the live store moved with the CTO's landings, as shown. |
+| `-neg-src.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part 0 (src differs), before R |
+| `-neg-uncommitted.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part 0 (uncommitted src) |
+| `-neg-tag.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part R ("not on the record commit whose parent is C"); `fill_release.sh` REFUSED too; nothing built |
+| `-neg-manifest.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part R (manifest.json does not match manifest.sha256); `fill_release.sh` REFUSED too |
+| `-neg-sha.txt` | `18a279055d99` | NEGATIVE RUN OK: the hash list fails on the edited script (the operator's line would stop there); run anyway, STOP at part R (the manifest's wheel sha256 is not the one filled in) |
+| `-neg-check.txt` | `4ac8f7955359` | NEGATIVE RUN OK: STOP at part B (the staged pair's planted import), "the store link is back on W2-00-store-b", gov link unchanged |
+
+**Earlier runs (kept, each fixed before the final logs):**
+- `-run-r1-stopped.txt`: stopped by me at part S. I had edited the rehearsal script during the run, and bash reads a
+  script as it runs. Every later edit was an atomic replace.
+- `-run-r2.txt`: STOP at B. The 3d check's pattern missed `session-watch`, whose help line wraps. Fixed. The STOP path
+  worked: the store link went back.
+- `-run-r3.txt`: STOP at B, `test_guard_fix_4.py` 2 failed. This is W2-42a's stricter guard (R-5); the checks were
+  changed. `log/repin-rel-checks-direct.txt` is the direct run that found the FIX-3 difference of the same kind.
+- `-run-r4.txt`: ALL CHECKS PASS, then STOP at C because the CTO's merge queue was landing (R-7).
+- `-neg-check-r1-verdict-bug.txt`: the script stopped correctly. The rehearsal's verdict wrongly required that no pin
+  was built (B comes after A). Fixed.
+- In runs r2, r4 and r5, two separate commits gave the same bytes from the release's build and from the re-pin's:
+  `494d5c9335fa` gave `4376c78ba335…`, `eb63df3c349c` gave `e68caaa25c6d…` and `bf04ed69c893` gave `59cfc7237dae…`
+  (R-4).
 
 ## 4. Open points for the review and the owner
 - **R-1, `approved_by` in the registry entry.** Every window's gov entry so far cites DEC-1037 (the re-pin windows).
   This one cites DEC-1178 (the owner's decision of the release and the re-pin from it). Within the CTO's purpose; the
   reviewer may ask for DEC-1037 kept. No owner question.
-- **R-2, the registry commit's trailers:** `Task: decision-record`, `Implements: DEC-1178`, `Role: owner`, as window 5's
-  (`Implements: DEC-1125`). The record commit of §4 step 5 takes `Task: DAEO-sdxk` (P-RELEASE-1's proposal); this commit
-  changes a governance record (the tool registry), so `decision-record` is window 5's form.
+- **R-2, the registry commit's trailers:** `Task: decision-record`, `Implements: DEC-1178`, `Role: owner`, the form of
+  window 5's identical commit `8f00bb908` (`Implements: DEC-1125`). What carries the commit is `Role: owner`, which the
+  landing check passes (P-RELEASE-1 §4, `landing_check.py:10-13`). Gate (h) does not measure it: its governance-record
+  list does not include `governance/project/tool-registry.yaml` (`src/gov/close/gates.py:27-30, 144-165`). The record
+  commit of §4 step 5 takes `Task: DAEO-sdxk` (P-RELEASE-1's proposal). (Review F5 corrected the reason given here.)
 - **R-3, the restart of the reranker** stays unrehearsed (the live service is never restarted in a rehearsal), as in
   windows 4 and 5.
 - **R-5, the guard is stricter under the new pin (W2-42a, landed since `797495bdfc70`).** Its fail-closed shell
   reading refuses two forms window 5's pin let through: "fix3 unterminated heredoc naming acceptance judged as before"
   and "fix3 python heredoc reading .env (gap as today)". Window 5's checks required ACT-GUARD-FIX-4's suite to pass in
   full and FIX-3's failures to equal the old pin's; both stopped run r3 (a correct STOP: the store link went back).
-  `rel_checks.sh` now accepts a difference only in the stricter direction: FIX-4 failures only "want allow, got deny";
-  FIX-3 cases failing only under the new pin only "want allow, got deny", and those failing only under the old pin only
-  "want deny, got allow" there. A lost refusal still fails the check. Reviewer: check this is the right bar.
+  `rel_checks.sh` accepts these differences **by name only** (review F1, as `G14_RED`): `FIX4_ACCEPT` holds FIX-4's two
+  `test_planted` cases, each only as "want allow, got deny"; `FIX3_NEWONLY_ACCEPT` holds the one case failing only
+  under the new pin ("fix3 python heredoc reading .env (gap as today)", "want allow, got deny"), and
+  `FIX3_OLDONLY_ACCEPT` the one failing only under the old pin ("fix3 unterminated heredoc naming acceptance judged as
+  before", "want deny, got allow" there). Any other failure fails part B: a lost refusal, and also a new false refusal
+  of ordinary work (such as "rule 5: a reviewer's record"). Both ok lines print the case names, so the logs keep them
+  (review F2). A dry run on r5's kept outputs passed, and three planted variants failed: an unnamed FIX-4 refusal, an
+  unnamed FIX-3 new-only refusal, and the named old-only case in the wrong direction. g14 and FIX-4 also fail on a
+  pytest error now, not only on a failure (window 5's review F6).
+- **R-8, an interrupt, a rerun (review F7, window 5's F5).** An INT/TERM trap (`on_signal`): before the switch it stops
+  part S's store refresh by its process group (TERM, 60 s, then KILL; the refresh runs under `setsid`, so a Ctrl-C does
+  not reach it), puts the store link back if the refresh moved it, and STOPs; after the switch it rolls back. An
+  earlier run's `/tmp/repin-rel-0.1.0` is moved aside with its time, never removed, and the operator's line uses
+  `tee -ai` (it appends, and tee keeps logging through a Ctrl-C). The new mode `neg-int` rehearses the trap: a TERM
+  while the refresh runs. A refresh stopped part-way leaves the spare half unfinished; the next forced refresh rebuilds
+  it, and the link never names it.
 - **R-6, the heavy slots.** In runs r2 and r3, part S waited for a free heavy-job slot (other sessions' tests): the
   rebuild took 1,013 and 695 s wall, nearly all of it waiting; with the slots free (r4) it took 71 s. Part B's suites
   wait the same way. At the owner's sitting the CTO's hold should also leave the slots free (no worker test runs from

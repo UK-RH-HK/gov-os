@@ -1,0 +1,5 @@
+sets_root_hidden:
+  root: "~/gov-os-eval"
+  hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "transcripts/**",
+           "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**"]
+  refused_roles: [orchestrator]

@@ -8,12 +8,12 @@ task: DAEO-g87r
 task_status: in_progress
 trigger: stop
 next_action: Resume after stop
-created: '2026-11-14T14:47:00Z'
+created: '2026-11-14T16:49:05Z'
 inputs:
 - id: DAEO-g87r
-  version: 340cd0efb
-  hash: sha256:599dfd4661d7b8a38ebfa33477faacfcc49770ba4dbab3236875e2c941257c8b
-head_commit: 8a6beb7e411c74f55064878052c2c824e0330e60
+  version: f2f28ed4e
+  hash: sha256:0641d3b5c090802862c632e6033731ecd716a7e022e7ecd09017219591973798
+head_commit: 0af5f2e1f5745e47d217aa2dffdfd96837ecf9b6
 ---
 
 # CP-DAEO-g87r-0002 — DAEO-g87r at stop
