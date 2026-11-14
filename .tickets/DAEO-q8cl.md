@@ -1,6 +1,6 @@
 ---
 id: DAEO-q8cl
-status: in_progress
+status: closed
 deps: [DAEO-q7lk, DAEO-n0wb]
 links: []
 created: 2026-11-06T13:56:01Z
