@@ -1,8 +1,8 @@
-Status at 2026-11-14 09:04:17 (the last report's block)
-- Progress: 158 closed / 4 merged-not-closed / 3 built-and-held / 2 in flight / 23 not started, of 190.
-- Leads: 2 running (W2-130, W2-88b); queued next: W2-88b, W2-130; the gate: open.
-- Closes: none running; next: W2-130 pin run 2 (nightly reds) -> land; W2-100 and W2-101 after your CIT-P yeses (hand merge, then COPIES-10/-11); W2-134 after the hidden-form result; W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-37, W2-42a (x2), W2-60a, W2-88, W2-93, W2-94, W2-104 (x2), W2-116, W2-128, W2-136, W2-147, W2-174, W2-61h, W2-130, W2-185; refused since the last report: none.
-- Memory chain: W2-61 closed; W2-61h closed; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
-- Toward EXAMIN's copy: EXAMIN's copy: W2-88 and W2-60a merged; W2-27 waits on the first numbered release (P-RELEASE-1: your seven lines), then the re-pin, the clone and the EXAMIN CTO (DEC-1174 (2)); about one day from your yeses to its start.
+Status at 2026-11-14 12:47:06 (the last report's block)
+- Progress: 159 closed / 5 merged-not-closed / 0 built-and-held / 3 in flight / 23 not started, of 190.
+- Leads: 2 running (W2-184, W2-88); queued next: W2-184, W2-88; the gate: open.
+- Closes: none running; next: W2-100 and W2-101 on a fresh accept once COPIES-10/-11 are applied (queued 12:45); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:44, DEC-1178 (1)); refused since the last report: none.
+- Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
+- Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 merged; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO.
 - Emergency plan: none (lifted, DEC-1158).
-- OWNER_ACTION: yes W2-100-CIT-P 7bb4f1ac + yes ACT-CLAUDE-COPIES-10 f535215e; yes W2-101-CIT-P 42c1cc38 + yes ACT-CLAUDE-COPIES-11 3b4e462f; P-RELEASE-1 (7 lines); P-W2-184-1; approve q02 variant 0703aebf; MEMORY-AUDIT-P1; W2-61h hidden-form result (closes W2-134)
+- OWNER_ACTION: MEMORY-AUDIT-P1's O3: (b) or (a)? (then DEC-1179, W2-187, W2-188); q02: your operator installs the variant 0703aebf and runs writer, checker, check_gold; the evening sitting (release 0.1.0 + re-pin), time in the report

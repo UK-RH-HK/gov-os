@@ -15,4 +15,153 @@
 ........................................................................ [ 75%]
 ........................................................................ [ 80%]
 ........................................................................ [ 85%]
-.............................................................
+........................................................................ [ 90%]
+........................................................................ [ 96%]
+.........................................................                [100%]
+=================================== FAILURES ===================================
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-test-designer DAEO-f1aa
+    exit code: 1
+    stdout:
+    
+    stderr:
+    Traceback (most recent call last):
+      File "<string>", line 7, in <module>
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/cli/main.py", line 251, in main
+        outcome = command.handler(root, args, config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/command.py", line 43, in run
+        return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 957, in launch
+        plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 754, in _worker_plan
+        chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 672, in _rubric
+        promotion = _promotion(root, names, launches)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 584, in _promotion
+        for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 511, in _probe_roots
+        named = data.get("root")
+                ^^^^^^^^
+    AttributeError: 'tuple' object has no attribute 'get'
+    
+    CLI starts recorded: 0
+    records before: ['874ad22c-bc68-4272-96ce-1842ac9f58e4.json']
+    records after: ['874ad22c-bc68-4272-96ce-1842ac9f58e4.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-test-designer DAEO-f1aa
+    exit code: 1
+    stdout:
+    
+    stderr:
+    Traceback (most recent call last):
+      File "<string>", line 7, in <module>
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/cli/main.py", line 251, in main
+        outcome = command.handler(root, args, config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/command.py", line 43, in run
+        return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 957, in launch
+        plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 754, in _worker_plan
+        chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 672, in _rubric
+        promotion = _promotion(root, names, launches)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 584, in _promotion
+        for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 511, in _probe_roots
+        named = data.get("root")
+                ^^^^^^^^
+    AttributeError: 'tuple' object has no attribute 'get'
+    
+    CLI starts recorded: 0
+    records before: ['6705d340-16ec-423e-8912-2e149370e937.json']
+    records after: ['6705d340-16ec-423e-8912-2e149370e937.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-test-designer DAEO-f1aa
+    exit code: 1
+    stdout:
+    
+    stderr:
+    Traceback (most recent call last):
+      File "<string>", line 7, in <module>
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/cli/main.py", line 251, in main
+        outcome = command.handler(root, args, config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/command.py", line 43, in run
+        return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 957, in launch
+        plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 754, in _worker_plan
+        chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 672, in _rubric
+        promotion = _promotion(root, names, launches)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 584, in _promotion
+        for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 511, in _probe_roots
+        named = data.get("root")
+                ^^^^^^^^
+    AttributeError: 'tuple' object has no attribute 'get'
+    
+    CLI starts recorded: 0
+    records before: ['659acbea-7814-4100-8004-dcd80b0b2de4.json']
+    records after: ['659acbea-7814-4100-8004-dcd80b0b2de4.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-test-designer DAEO-f1aa
+    exit code: 1
+    stdout:
+    
+    stderr:
+    Traceback (most recent call last):
+      File "<string>", line 7, in <module>
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/cli/main.py", line 251, in main
+        outcome = command.handler(root, args, config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/command.py", line 43, in run
+        return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 957, in launch
+        plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 754, in _worker_plan
+        chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 672, in _rubric
+        promotion = _promotion(root, names, launches)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 584, in _promotion
+        for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-184/src/gov/launch/launcher.py", line 511, in _probe_roots
+        named = data.get("root")
+                ^^^^^^^^
+    AttributeError: 'tuple' object has no attribute 'get'
+    
+    CLI starts recorded: 0
+    records before: ['c3292daa-fec2-4895-8da2-09465003a51d.json']
+    records after: ['c3292daa-fec2-4895-8da2-09465003a51d.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_a_fail_open_record_on_the_ticket_branch_promotes_the_test_designer_in_the_tests_worktree[STANDARD]
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_a_fail_open_record_on_the_ticket_branch_promotes_the_test_designer_in_the_tests_worktree[FULL]
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_two_failed_records_on_the_ticket_branch_promote_the_test_designer_in_the_tests_worktree[STANDARD]
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_two_failed_records_on_the_ticket_branch_promote_the_test_designer_in_the_tests_worktree[FULL]
+4 failed, 1421 passed, 463 deselected in 406.35s (0:06:46)

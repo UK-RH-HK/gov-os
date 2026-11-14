@@ -1,27 +1,25 @@
 {
   "merged_not_closed": [
-    "W2-134",
     "W2-138",
     "W2-145",
-    "W2-155"
-  ],
-  "built_held": [
+    "W2-155",
     "W2-100",
     "W2-101"
   ],
-  "closes_next": "W2-134 on your P-W2-61H-HEAD-1 Q2 (fresh accept 28/0 at c451c2180); W2-100 and W2-101 after your CIT-P yeses (hand merge, then COPIES-10/-11); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28)",
-  "examin": "EXAMIN's copy: W2-88 and W2-60a merged; W2-27 waits on the first numbered release (P-RELEASE-1: your seven lines), then the re-pin, the clone and the EXAMIN CTO (DEC-1174 (2)); about one day from your yeses to its start",
+  "built_held": [],
+  "closes_next": "W2-100 and W2-101 on a fresh accept once COPIES-10/-11 are applied (queued 12:45); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:44, DEC-1178 (1))",
+  "examin": "EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 merged; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO",
   "emergency": "none (lifted, DEC-1158)",
   "countdown": [
-    "W2-88b CLOSED 12:28 (7ccc0bb61); its findings F-1 and F-3 to you (P-W2-88B-FINDINGS-1), to ride with P-1's run",
-    "W2-184: F1 fix run (P-W2-184-1 (a)) running since 12:02, narrow check, DONE, land (~2 h)",
-    "W2-134: your P-W2-61H-HEAD-1 line, then close (5 min); W2-61h's F3 test revision (~2 h)",
-    "W2-100 and W2-101: your CIT-P and copies-ACT yeses, then hand merges and the operator's ACTs (~1 h each)",
-    "P-RELEASE-1: your seven lines, then P-1's fix, the release, the hash check and the re-pin (~7 h to one evening sitting)",
-    "EXAMIN CTO: clone, kit, A0, start (DEC-1174 (2) probes) (~1 h after the re-pin)"
+    "W2-88 reopen (P-1 + F-1 + F-3 (b) + the secret scan in parallel): lead running since 12:43; TD tests, engineer, accept, narrow check, land (~4-6 h)",
+    "W2-100 and W2-101: MERGED 969c9b8d3 / abfd25a96; COPIES-10/-11 queued for the operator agent 12:45; closes on fresh accepts (~1 h)",
+    "W2-184: F1 fix 94b48c130; accept and narrow check, DONE, land (~1 h)",
+    "W2-61h: reopened for F3's revision (DEC-1178 (1)); brief next (~2 h), then your operator's walled re-run (expect 7 passed, h03 listed)",
+    "Release 0.1.0: after W2-88 lands: 'release ready at <C>', the re-pin bundle built, rehearsed and reviewed (~2-3 h), your evening sitting",
+    "EXAMIN CTO: clone, kit, A0 by your operator, then the start (~1 h after the re-pin); W2-81 on the release alongside"
   ],
-  "owner_action": "P1 P-W2-61H-HEAD-1 (W2-61h check's structural fix + W2-134's close); P-W2-88B-FINDINGS-1 (F-1/F-3 with P-1's run); the eleven lines (P-RELEASE-1 x7, W2-100/101 CIT-Ps + copies ACTs) after reading the packages; approve q02 variant 0703aebf; MEMORY-AUDIT-P1",
-  "last_report": "2026-11-14 09:04:17",
+  "owner_action": "MEMORY-AUDIT-P1's O3: (b) or (a)? (then DEC-1179, W2-187, W2-188); q02: your operator installs the variant 0703aebf and runs writer, checker, check_gold; the evening sitting (release 0.1.0 + re-pin), time in the report",
+  "last_report": "2026-11-14 12:47:06",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -30,8 +28,8 @@
     "W2-32": "S9 re-worded to DEC-1097's end-to-end bar (DEC-1129 (1)), merged 824919dc7; open with W2-15a",
     "W2-91": "MERGED in D-4b; formal close at the lift",
     "W2-13": "MERGED in D-4b; formal close at the lift",
-    "W2-61h": "MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift",
-    "W2-134": "MERGED 50d79efe (S8's re-anchoring + S7's F1/F3 fix; gov accept 28/28; review READY); 26 kept runs re-scored with families: no count changes",
+    "W2-61h": "REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer",
+    "W2-134": "CLOSED 11-14 (accept 28/0 at c451c2180; DEC-1178 (1) Q2 (i))",
     "W2-112": "MERGED as built (D-1); its memory release in window 4; formal close at the lift",
     "W2-135": "MERGED ff64f148 (a line over 4,000 characters cut; review READY in round 2); window 4",
     "W2-129": "MERGED 34eed411 (gov links, S1-S16; review READY in round 2; 3,037 standing); window 4",
@@ -77,5 +75,5 @@
     ],
     "keystone-7": "done: DEC-1089"
   },
-  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+  "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }
