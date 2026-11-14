@@ -40,7 +40,7 @@ non_goals:
 - 'not semantic search inside the sandbox (a proxy-aware Ollama client and its port: parked, DEC-1168 (1))'
 - 'not a gate for EXAMIN''s copy: built after W2-27 starts (DEC-1168 (1))'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1168, DEC-1167, DEC-158, DEC-1114, DEC-1128, W2-56]
+sources: [DEC-1168, DEC-1167, DEC-158, DEC-1114, DEC-1128, DAEO-wnnz]
 acceptance_tests: {path: tests/acceptance/W2-186/}
 ---
 

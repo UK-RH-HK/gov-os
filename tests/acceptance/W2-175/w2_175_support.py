@@ -40,6 +40,12 @@ BASE = {
     "role-test-designer": "baa2696f713f",
 }
 
+# W2-175's landing commit: the merge "Merge w2/W2-175 (DAEO-wahn) ...". The S7 line says the record holds each
+# template's sha256 "at the ticket's head". A closed ticket's head is a fixed commit, so the case reads the
+# templates there, through git, and not in the working tree: an owner-approved template change after the close
+# (b88a76172 moved role-cto.md and role-lead.md) must not turn the record's row red (DEC-1156 (7), DEC-1164 (18)).
+LANDING = "61cae50dc5b45e84145cc398f14ad7cd9ef7485b"
+
 # The stop sentence of brief.md's return section, word for word (DEC-1137 (2); the ticket's S4 line).
 STOP = "Refused twice for the same call: stop and say so. Never work around a refusal: report it."
 
@@ -106,6 +112,16 @@ def git_show(commit: str, rel: str) -> bytes:
 
 def base_bytes(stem: str) -> bytes:
     return git_show(BASE[stem], f"{TEMPLATES_REL}/{stem}.md")
+
+
+def landing_bytes(stem: str) -> bytes:
+    """The template's bytes at W2-175's landing commit (``LANDING``)."""
+    return git_show(LANDING, f"{TEMPLATES_REL}/{stem}.md")
+
+
+def landing_is_ancestor_of_head() -> bool:
+    done = subprocess.run(["git", "-C", str(REPO), "merge-base", "--is-ancestor", LANDING, "HEAD"], capture_output=True)
+    return done.returncode == 0
 
 
 def base_text(stem: str) -> str:
