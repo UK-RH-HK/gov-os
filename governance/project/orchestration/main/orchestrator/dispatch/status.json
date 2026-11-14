@@ -1,5 +1,5 @@
 {
- "time": "2026-11-14 15:21:05",
+ "time": "2026-11-14 15:22:08",
  "leads": [
   "W2-187",
   "W2-188",
@@ -10,15 +10,15 @@
  ],
  "lead_count": 6,
  "load": [
-  10.74,
-  13.34,
-  14.01
+  12.99,
+  13.42,
+  13.99
  ],
- "mem_available_mb": 14871,
+ "mem_available_mb": 15261,
  "gate_open": true,
- "gate": "OPEN leads=6 load=10.7/14.0 nproc=20 have=17032748kB need=8650752kB",
+ "gate": "OPEN leads=6 load=13.0/14.0 nproc=20 have=17247800kB need=8650752kB",
  "disk_open": true,
- "disk": "disk gate open: 658 GiB free, 53454899 inodes free",
+ "disk": "disk gate open: 658 GiB free, 53509877 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-1.lock",
   "gov-os-heavy-slot-2.lock",
@@ -28,8 +28,21 @@
  "close_running": false,
  "closing_w2s": [],
  "queue_busy": false,
- "main_clean": true,
- "main_dirty": [],
+ "main_clean": false,
+ "main_dirty": [
+  "docs/DECISION_REGISTER.md",
+  "docs/changes/W2-56-CIT-E.md",
+  "docs/plan/WAVE_2_REVISED_PLAN.md",
+  "docs/plan/WAVE_2_WBS.md",
+  "docs/plan/WAVE_3_PARKING.md",
+  "governance/project/orchestration/DECISIONS-IN-FORCE.md",
+  "governance/project/orchestration/packages/ACT-INDEP-WALLS-1.md",
+  "governance/project/orchestration/packages/DECIDED-NOT-DONE.md",
+  "governance/project/orchestration/packages/LIFT-1/P1-PLAN.md",
+  "governance/project/orchestration/packages/SANDBOX-GUARD-EXP-1.md",
+  "governance/project/orchestration/packages/SANDBOX-GUARD-EXP-DECLARATION.md",
+  "governance/project/prompts/w2-orchestrator.md"
+ ],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
   "DAEO-g87r",
@@ -40,24 +53,24 @@
   "DAEO-0cd2"
  ],
  "lead_rss_kb": {
-  "W2-94-fix": 407892,
-  "W2-61h-c39": 272572,
-  "W2-188": 252828,
-  "W2-42a": 353104,
-  "W2-88": 264948,
-  "W2-187": 231812
+  "W2-94-fix": 292212,
+  "W2-61h-c39": 269692,
+  "W2-188": 258180,
+  "W2-42a": 302972,
+  "W2-88": 263232,
+  "W2-187": 245572
  },
  "outside_slot": [],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1495432,
-  "codegraph": 598492
+  "embedding": 1495736,
+  "codegraph": 0
  },
- "busy_cores": 7.12,
- "embedding_cores": 0.13,
+ "busy_cores": 7.64,
+ "embedding_cores": 0.05,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 134624,
+ "rerankers_outside_kb": 134244,
  "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-14 14:25:09",
@@ -66,19 +79,19 @@
  },
  "rerankers": {
   "n": 1,
-  "rss_kb": 134624,
+  "rss_kb": 134244,
   "each_kb": [
-   134624
+   134244
   ],
-  "outside_kb": 134624,
+  "outside_kb": 134244,
   "gpu_held": 2,
   "gpu_slots": 2
  },
  "reranker_reserve": {
   "kb": 31728,
-  "how": "the rerankers' p95, under 2 x the 3589 MB peak (14393 samples since 2026-11-02 13:00)",
-  "samples": 14393,
-  "span_s": 1042380,
+  "how": "the rerankers' p95, under 2 x the 3589 MB peak (14394 samples since 2026-11-02 13:00)",
+  "samples": 14394,
+  "span_s": 1042443,
   "peak_kb": 3675196,
   "allowed": 2
  },
@@ -86,7 +99,7 @@
   "used_mib": 8198,
   "total_mib": 16303,
   "free_mib": 8105,
-  "age_s": 55,
+  "age_s": 63,
   "holders": {}
  },
  "slots_target": 3,
@@ -97,9 +110,9 @@
    "kind": "lead",
    "name": "W2-94-fix",
    "pid": 507931,
-   "phase": "test",
-   "cpu": 1.05,
-   "rss_kb": 407892,
+   "phase": "build",
+   "cpu": 0.54,
+   "rss_kb": 292212,
    "rr": 0,
    "recent_cpu": null
   },
@@ -108,8 +121,8 @@
    "name": "W2-61h-c39",
    "pid": 525883,
    "phase": "build",
-   "cpu": 0.03,
-   "rss_kb": 272572,
+   "cpu": 0.01,
+   "rss_kb": 269692,
    "rr": 0,
    "recent_cpu": 0.03
   },
@@ -118,8 +131,8 @@
    "name": "W2-188",
    "pid": 1606606,
    "phase": "build",
-   "cpu": 0.01,
-   "rss_kb": 252828,
+   "cpu": 0.02,
+   "rss_kb": 258180,
    "rr": 0,
    "recent_cpu": null
   },
@@ -128,8 +141,8 @@
    "name": "W2-42a",
    "pid": 1903497,
    "phase": "start",
-   "cpu": 0.09,
-   "rss_kb": 353104,
+   "cpu": 0.14,
+   "rss_kb": 302972,
    "rr": 0,
    "recent_cpu": null
   },
@@ -139,7 +152,7 @@
    "pid": 3395055,
    "phase": "build",
    "cpu": 0.01,
-   "rss_kb": 264948,
+   "rss_kb": 263232,
    "rr": 0,
    "recent_cpu": 0.02
   },
@@ -149,37 +162,37 @@
    "pid": 3815645,
    "phase": "build",
    "cpu": 0.01,
-   "rss_kb": 231812,
+   "rss_kb": 245572,
    "rr": 0,
    "recent_cpu": 0.03
   },
   {
    "kind": "slot",
-   "name": "pid 1887399",
-   "pid": 1887399,
+   "name": "pid 1955136",
+   "pid": 1955136,
    "phase": "test",
-   "cpu": 1.71,
-   "rss_kb": 86820,
+   "cpu": 0.93,
+   "rss_kb": 428552,
    "rr": 0,
    "recent_cpu": null
   },
   {
-   "kind": "rebuild",
-   "name": "pid 1921500",
-   "pid": 1921500,
-   "phase": "rebuild.embedding",
-   "cpu": 0.31,
-   "rss_kb": 161388,
+   "kind": "slot",
+   "name": "pid 1956642",
+   "pid": 1956642,
+   "phase": "test",
+   "cpu": 0.08,
+   "rss_kb": 249768,
    "rr": 0,
    "recent_cpu": null
   },
   {
-   "kind": "rebuild",
-   "name": "pid 1926418",
-   "pid": 1926418,
-   "phase": "rebuild.embedding",
-   "cpu": 0.0,
-   "rss_kb": 24820,
+   "kind": "slot",
+   "name": "pid 1957208",
+   "pid": 1957208,
+   "phase": "test",
+   "cpu": 0.01,
+   "rss_kb": 50008,
    "rr": 0,
    "recent_cpu": null
   }
@@ -190,18 +203,18 @@
    "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 30.2,
+     "need": 26.1,
      "cap": 1000,
      "ok": true,
-     "frac": 0.03023,
-     "text": "CPU 30.2 of 1000 cores (busy 7.12 + running jobs' peaks 21.1 + the newcomer's 2.0)"
+     "frac": 0.0261,
+     "text": "CPU 26.1 of 1000 cores (busy 7.64 + running jobs' peaks 16.5 + the newcomer's 2.0)"
     },
     "ram": {
-     "need": 6251900.0,
-     "cap": 12082176,
+     "need": 4548072.0,
+     "cap": 12481536,
      "ok": true,
-     "frac": 0.5174481815196204,
-     "text": "RAM 8.6 GB left of 14.5 available (floor 3.0; running jobs' peaks 5.5 + the newcomer's 0.5)"
+     "frac": 0.364383998892444,
+     "text": "RAM 10.6 GB left of 14.9 available (floor 3.0; running jobs' peaks 3.8 + the newcomer's 0.5)"
     },
     "gpu": {
      "need": 8198,
@@ -221,21 +234,21 @@
   },
   "slot": {
    "ok": true,
-   "binding": "RAM",
+   "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 33.9,
+     "need": 29.8,
      "cap": 1000,
      "ok": true,
-     "frac": 0.0339,
-     "text": "CPU 33.9 of 1000 cores (busy 7.12 + running jobs' peaks 21.1 + the newcomer's 5.67)"
+     "frac": 0.029770000000000005,
+     "text": "CPU 29.8 of 1000 cores (busy 7.64 + running jobs' peaks 16.5 + the newcomer's 5.67)"
     },
     "ram": {
-     "need": 7220464.0,
-     "cap": 12082176,
+     "need": 5516636.0,
+     "cap": 12481536,
      "ok": true,
-     "frac": 0.5976128803288414,
-     "text": "RAM 7.6 GB left of 14.5 available (floor 3.0; running jobs' peaks 5.5 + the newcomer's 1.4)"
+     "frac": 0.4419837430264993,
+     "text": "RAM 9.6 GB left of 14.9 available (floor 3.0; running jobs' peaks 3.8 + the newcomer's 1.4)"
     },
     "gpu": {
      "need": 8198,
@@ -251,25 +264,25 @@
     "gpu": 0,
     "util": 0
    },
-   "reason": "forecast admits (binding RAM: RAM 7.6 GB left of 14.5 available (floor 3.0; running jobs' peaks 5.5 + the newcomer's 1.4))"
+   "reason": "forecast admits (binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
   },
   "rebuild": {
    "ok": true,
-   "binding": "RAM",
+   "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 34.7,
+     "need": 30.6,
      "cap": 1000,
      "ok": true,
-     "frac": 0.03474,
-     "text": "CPU 34.7 of 1000 cores (busy 7.12 + running jobs' peaks 21.1 + the newcomer's 6.51)"
+     "frac": 0.03061,
+     "text": "CPU 30.6 of 1000 cores (busy 7.64 + running jobs' peaks 16.5 + the newcomer's 6.51)"
     },
     "ram": {
-     "need": 7602104.0,
-     "cap": 12082176,
+     "need": 5898276.0,
+     "cap": 12481536,
      "ok": true,
-     "frac": 0.6291999057123485,
-     "text": "RAM 7.3 GB left of 14.5 available (floor 3.0; running jobs' peaks 5.5 + the newcomer's 1.8)"
+     "frac": 0.47256010798670933,
+     "text": "RAM 9.3 GB left of 14.9 available (floor 3.0; running jobs' peaks 3.8 + the newcomer's 1.8)"
     },
     "gpu": {
      "need": 8198,
@@ -285,12 +298,12 @@
     "gpu": 0,
     "util": 71
    },
-   "reason": "forecast admits (binding RAM: RAM 7.3 GB left of 14.5 available (floor 3.0; running jobs' peaks 5.5 + the newcomer's 1.8))"
+   "reason": "forecast admits (binding GPU: GPU memory 8.0 of 13.9 GB (used 8.0 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
   }
  },
  "pair_load": {
-  "cpu": 0.03,
-  "gpu": 1.45
+  "cpu": 0.02,
+  "gpu": 0.58
  },
  "machine": {
   "cpus": 20,
@@ -320,9 +333,9 @@
   },
   "spill": false
  },
- "inbox_unread": 1,
- "inbox_oldest_age_s": 57,
- "started_this_tick": null,
+ "inbox_unread": 0,
+ "inbox_oldest_age_s": null,
+ "started_this_tick": "W2-184",
  "ready_waits": {
   "W2-88 DAEO-2bdu": "running",
   "W2-187 DAEO-0cd2": "running",
@@ -331,22 +344,22 @@
   "W2-188 DAEO-zlog": "running",
   "W2-42a DAEO-03ub": "running"
  },
- "ready_count": 6,
+ "ready_count": 7,
  "max_leads": null,
  "land": "nothing to land",
  "land_pending": [],
  "new_returns": [],
- "last_start": "2026-11-14 15:19:05 W2-42a",
+ "last_start": "2026-11-14 15:22:08 W2-184",
  "failures": [],
  "balance": {
-  "busy_cores": 7.12,
+  "busy_cores": 7.64,
   "nproc": 20,
   "cpu_band": [
    0,
    1000
   ],
   "cpu_in_band": "within",
-  "mem_available_mb": 14871,
+  "mem_available_mb": 15261,
   "floor_kb": 3145728,
   "gpu": {
    "used_mib": 8198,
@@ -371,7 +384,7 @@
    "shared": {
     "state": "BUSY",
     "judged": true,
-    "tasks_per_min": 33,
+    "tasks_per_min": 9,
     "waiting": 0,
     "quiet_s": 0
    },
@@ -380,7 +393,7 @@
     "judged": true,
     "tasks_per_min": 0,
     "waiting": 0,
-    "quiet_s": 1079
+    "quiet_s": 1142
    }
   },
   "embedder_state": "BUSY",
@@ -389,19 +402,19 @@
   "lead_cap": null,
   "rerankers": {
    "n": 1,
-   "rss_kb": 134624,
+   "rss_kb": 134244,
    "each_kb": [
-    134624
+    134244
    ],
-   "outside_kb": 134624,
+   "outside_kb": 134244,
    "gpu_held": 2,
    "gpu_slots": 2
   },
   "reranker_reserve": {
    "kb": 31728,
-   "how": "the rerankers' p95, under 2 x the 3589 MB peak (14393 samples since 2026-11-02 13:00)",
-   "samples": 14393,
-   "span_s": 1042380,
+   "how": "the rerankers' p95, under 2 x the 3589 MB peak (14394 samples since 2026-11-02 13:00)",
+   "samples": 14394,
+   "span_s": 1042443,
    "peak_kb": 3675196,
    "allowed": 2
   }
@@ -409,11 +422,11 @@
  "targets": {
   "T1": {
    "breached": false,
-   "detail": "7.12 busy cores (band 0-1000)"
+   "detail": "7.64 busy cores (band 0-1000)"
   },
   "T2": {
    "breached": false,
-   "detail": "14.5 GB available (floor 3.0 GB)"
+   "detail": "14.9 GB available (floor 3.0 GB)"
   },
   "T3": {
    "breached": false,
@@ -442,7 +455,7 @@
   "tail": "guard refusals since ACT 1: 87 total, 79 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 17598,
+  "passes": 17599,
   "last_check_at": 1793624949.9938116,
   "last_result": "ok",
   "last_secs": 0.21,
@@ -450,19 +463,19 @@
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1794669665.584474,
+  "last_ok_at": 1794669728.8989208,
   "state": "BUSY",
   "servers": {
    "shared": {
     "off": {
      "path": "/home/usain/.ollama/serve-11434.log",
-     "off": 190395148,
+     "off": 190400846,
      "ino": 1239422
     },
-    "tasks_per_min": 33,
-    "requests_per_min": 8,
-    "read_at": 1794669665.584474,
-    "last_progress_at": 1794669665.584474,
+    "tasks_per_min": 9,
+    "requests_per_min": 2,
+    "read_at": 1794669728.8989208,
+    "last_progress_at": 1794669728.8989208,
     "judged": true,
     "why": "",
     "quiet_s": 0,
@@ -479,7 +492,7 @@
     "client_errors": 0,
     "t4_new": [],
     "t4_n": 0,
-    "t4_at": 1794669665.584474,
+    "t4_at": 1794669728.8989208,
     "hung_since": null
    },
    "query": {
@@ -490,11 +503,11 @@
     },
     "tasks_per_min": 0,
     "requests_per_min": 0,
-    "read_at": 1794669665.5849202,
+    "read_at": 1794669728.8991814,
     "last_progress_at": 1794668586.7186015,
     "judged": true,
     "why": "",
-    "quiet_s": 1079,
+    "quiet_s": 1142,
     "waiting": 0,
     "oldest_wait_s": 0.0,
     "listening": true,
@@ -508,7 +521,7 @@
     "client_errors": 0,
     "t4_new": [],
     "t4_n": 0,
-    "t4_at": 1794669665.5849202,
+    "t4_at": 1794669728.8991814,
     "hung_since": null
    }
   },
@@ -517,37 +530,37 @@
  "slot_holders": [
   {
    "slot": "1",
-   "pid": 1926418,
-   "cpu": 9,
-   "since": 1794669667.1309662,
+   "pid": 1956642,
+   "cpu": 148,
+   "since": 1794669730.5353374,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c \n        w=\"$0\"; l=\"$1\"; shift 1\n        [ \"$w\" -gt 0 ] && printf \"{\\\"t\\\": \\\"%s\\\", \\\"waited_s\\\": %s, \\\"slot\\\": %s, \\\"priority\\\": false, \\\"cwd\\\"",
-   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS"
+   "cwd": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/copies12/work/rehearsal-merged"
   },
   {
    "slot": "2",
-   "pid": 1921500,
-   "cpu": 1474,
-   "since": 1794669667.1310346,
+   "pid": 1955136,
+   "cpu": 421,
+   "since": 1794669730.535492,
    "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock bash -c \n        rm -f \"$0\"; m=\"$1\"; w=\"$2\"; l=\"$3\"; shift 3; echo $$ > \"$m\"; trap \"rm -f \\\"$m\\\"\" EXIT\n        [ \"$w\" -gt 0 ] && printf \"{\\\"t\\\": \\\"%s\\\"",
-   "cwd": "/home/usain/gov-os-worktrees/W2-00-store-a"
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock bash -c \n        w=\"$0\"; l=\"$1\"; shift 1\n        [ \"$w\" -gt 0 ] && printf \"{\\\"t\\\": \\\"%s\\\", \\\"waited_s\\\": %s, \\\"slot\\\": %s, \\\"priority\\\": false, \\\"cwd\\\"",
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS"
   },
   {
    "slot": "3",
-   "pid": 1887399,
-   "cpu": 489,
-   "since": 1794669667.1310842,
+   "pid": 1957208,
+   "cpu": 102,
+   "since": 1794669730.5356195,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock bash -c \n        w=\"$0\"; l=\"$1\"; shift 1\n        [ \"$w\" -gt 0 ] && printf \"{\\\"t\\\": \\\"%s\\\", \\\"waited_s\\\": %s, \\\"slot\\\": %s, \\\"priority\\\": false, \\\"cwd\\\"",
-   "cwd": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/copies12/work/window-merged"
+   "cwd": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/copies12/work/rehearsal-merged"
   }
  ],
  "gpu": {
   "line": "GPU: RTX 5070 Ti 8.0/15.9 GB, 0 %; holders: embedder shared (0), reranker (0); layers: shared 29/29, query 29/29",
   "state": {
    "ok": true,
-   "at": 1794669665.6233275,
+   "at": 1794669728.9414582,
    "name": "NVIDIA GeForce RTX 5070 Ti",
    "used_mib": 8198,
    "total_mib": 16303,

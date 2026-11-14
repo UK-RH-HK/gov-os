@@ -1,0 +1,170 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "18a279055d99",
+   "after": "ad0b102ffd38"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "19c1b935d3d6",
+   "after": "f83fac5f2a4f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "18a279055d99",
+   "after": "49c91c557d2e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "18a279055d99",
+   "after": "49c91c557d2e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "494d5c9335fa",
+   "after": "ad0b102ffd38"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "head",
+   "before": "fb2ea8460857",
+   "after": "0a2dde35c0cc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "acceptance folder",
+   "folder": "W2-100"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "acceptance folder",
+   "folder": "W2-101"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M src/gov/memaudit/__main__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M tests/unit/memaudit/test_cli.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "head",
+   "before": "ccc5b32256a9",
+   "after": "f71c82430100"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "acceptance folder",
+   "folder": "W2-188"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "head",
+   "before": "c24a414f1d49",
+   "after": "d9e7dc8599be"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-100"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-101"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-130"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-175"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-61h-c39",
+   "change": "head",
+   "before": "dbe1236733f9",
+   "after": "1a2bf4a16a0f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "head",
+   "before": "4d49108fb3a9",
+   "after": "2da02b28ef1d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-88-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M src/gov/secrets/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": "?? tests/unit/secrets/test_w2_88_scan.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "head",
+   "before": "560293740ca6",
+   "after": "fac8d2026c73"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/indep_launch.py"
+  }
+ ]
+}

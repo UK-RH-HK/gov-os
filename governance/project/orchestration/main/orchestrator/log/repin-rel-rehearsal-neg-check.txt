@@ -49,3 +49,4 @@ build 2 93d49015ec40ec8114be58cd60f01bf4878622f28dae312ee4736bf4a828a270
 #!/tmp/gov-os-rel-repin/neg-check/home/.local/share/gov-os/pin-4ac8f7955359/bin/python
 == S. the integration store rebuilt at w2/integrate's head in the spare half, by the code of 4ac8f7955359 (the same bytes as that head's); the link flips on success
 waiting: rebuild_slot.sh runs (GPU work takes turns)
+GPU before the rebuild: 8198 MiB used

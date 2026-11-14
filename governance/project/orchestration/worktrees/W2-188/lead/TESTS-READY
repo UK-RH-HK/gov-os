@@ -1,1 +1,1 @@
-TESTS-READY DAEO-zlog (W2-188): tests/acceptance/W2-188/ merged at 599fa2a22d7d from 3c5167c47; 54 cases
+TESTS-READY DAEO-zlog (W2-188), td-2: merge 1074c9d04 of f71c82430; 54 cases; S5 impact case revised (Rewrite-Reason: DEC-1157 (12), P-W2-188-S5 (a)); red: S5 impact statement 1 (CIT-P wording), owner_approval (by design)

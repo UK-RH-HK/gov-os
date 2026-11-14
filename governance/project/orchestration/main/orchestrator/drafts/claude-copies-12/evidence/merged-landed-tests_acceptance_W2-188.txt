@@ -1,0 +1,53 @@
+....F.F.........F.....................................                   [100%]
+=================================== FAILURES ===================================
+_ test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged _
+
+    def test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged():
+        rows = [line for line in _record().splitlines() if line.lstrip().startswith("|")]
+        flat_rows = [support.flat(row) for row in rows]
+        problems = []
+        if not any(support.flat(W2_11_CASE) in row and "red" in row for row in flat_rows):
+            problems.append(f"no table row names `{W2_11_CASE}` with `red`")
+        if not any("w2-88a" in row and "unchanged" in row for row in flat_rows):
+            problems.append("no table row names W2-88a's cases with `unchanged`")
+>       assert not problems, f"{support.CITP_REL}'s impact table: {'; '.join(problems)}"
+E       AssertionError: docs/changes/W2-188-CIT-P.md's impact table: no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`
+E       assert not ['no table row names `test_every_copy_carries_the_kernel_skills_body[adopt]` with `red`']
+
+tests/acceptance/W2-188/test_w2_188_citp.py:104: AssertionError
+____________ test_s5_the_owner_approval_line_names_the_after_sha256 ____________
+
+    def test_s5_the_owner_approval_line_names_the_after_sha256():
+        """Red until the owner's approval, by design: the owner writes it after the review, before the merge; the line reads
+        `pending` (or has no hash) until then."""
+        text = _record()
+        after, _ = _after_or_fail()
+        lines = [m.group(1) for m in re.finditer(r"(?mi)^\s*owner_approval:\s*(.*)$", text)]
+        assert lines, f"{support.CITP_REL} has no `owner_approval:` line"
+        value = lines[-1].strip().strip("'\"")
+>       assert after in value.lower(), f"the `owner_approval:` line does not name the after sha256 {after[:12]}...: {value[:80]!r}"
+E       AssertionError: the `owner_approval:` line does not name the after sha256 6a884cf1639f...: 'pending'
+E       assert '6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489' in 'pending'
+E        +  where 'pending' = <built-in method lower of str object at 0x7e50a5f025e0>()
+E        +    where <built-in method lower of str object at 0x7e50a5f025e0> = 'pending'.lower
+
+tests/acceptance/W2-188/test_w2_188_citp.py:124: AssertionError
+_____________ test_f2_the_claude_copy_of_the_skill_equals_the_base _____________
+
+    def test_f2_the_claude_copy_of_the_skill_equals_the_base():
+        """Guard (holds on the base): the copies ACT regenerates it after the owner's approval, not this ticket."""
+        now = support.read_bytes(support.CLAUDE_COPY_REL)
+        then = support.base_blob(support.CLAUDE_COPY_REL)
+>       assert now == then, f"{support.CLAUDE_COPY_REL} differs from the base's"
+E       AssertionError: .claude/skills/adopt/SKILL.md differs from the base's
+E       assert b'---\nname: ...44, CAP-54.\n' == b'---\nname: ...44, CAP-54.\n'
+E         
+E         At index 4424 diff: b',' != b'.'
+E         Use -v to get more diff
+
+tests/acceptance/W2-188/test_w2_188_copies.py:113: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-188/test_w2_188_citp.py::test_s5_the_impact_table_names_w2_11s_body_case_red_and_w2_88as_cases_unchanged
+FAILED tests/acceptance/W2-188/test_w2_188_citp.py::test_s5_the_owner_approval_line_names_the_after_sha256
+FAILED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base
+3 failed, 51 passed in 2.54s
