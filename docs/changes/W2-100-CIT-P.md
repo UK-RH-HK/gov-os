@@ -10,7 +10,7 @@ ticket: DAEO-uw5h (W2-100)
 author: orchestrator (the ticket lead of W2-100), for seven product-spec sessions and two test-designer sessions
 review: 'two narrow independent checks by fresh read-only auditors (independent-auditor, Opus, high): check 1 PASS on f8e7c0fad6c6 (all twelve KPI lines; rows F1, F3-F5; F2 out of scope, package P-W2-100-F2), check 2 PASS on f7637bd03e25 (the follow-up to F1 and F3; rows N1-N4) (docs/probes/DAEO-uw5h/)'
 decisions_carried: [DEC-959, DEC-957, DEC-832, DEC-616, DEC-645, DEC-315, DEC-1112, DEC-1157]
-owner_approval: 'pending'
+owner_approval: '"W2-100 CIT-P approved at 7bb4f1ac" (the owner, chat, 2026-11-14; DEC-1178 (2))'
 state_class: EVIDENCE
 ---
 
