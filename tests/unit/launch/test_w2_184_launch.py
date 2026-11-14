@@ -548,15 +548,28 @@ def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):
 def test_an_effort_after_the_double_dash_on_round_two_is_accepted_if_not_below_the_floor(full):
     _review(full)
     full.refused("high", args=["--effort", "medium"], role="independent-auditor", tid="T-a")
-    full.refused("--reason", args=["--effort", "max"], role="independent-auditor", tid="T-a")
     _review(full, args=["--effort", "xhigh"])
     assert (full.last()["effort"], full.last()["effort_source"], full.last()["review_round"]) == ("xhigh", "after --", 2)
 
 
-def test_max_on_round_two_chosen_after_the_double_dash_needs_a_reason_not_the_probe(full):
+def test_a_max_after_the_double_dash_equal_to_the_probe_s_needs_no_reason_and_is_the_probe(full):  # interface 3.2a
     _review(full)
-    _review(full, args=["--effort", "max"], reason="the probe, as the plan says")
-    assert (full.last()["effort_source"], full.last()["effort_reason"]) == ("after --", "the probe, as the plan says")
+    argv = _review(full, args=["--effort", "max"])
+    assert (full.last()["effort"], full.last()["effort_source"], full.last()["effort_reason"]) == ("max", "probe", None)
+    assert full.last()["review_round"] == 2 and argv.count("--effort") == 1
+
+
+def test_a_max_after_the_double_dash_equal_to_the_table_s_needs_no_reason_and_is_after_dashes(project):  # interface 3.2a
+    project.role_file("engineer", pair(SONNET, "max"), table(pair(OPUS, "max"), pair(SONNET, "max"), pair(SONNET, "max"), pair(HAIKU, "max")))
+    project.ticket()
+    project.launch(args=["--effort", "max"])
+    assert (project.last()["effort"], project.last()["effort_source"], project.last()["effort_reason"]) == ("max", "after --", None)
+
+
+def test_a_max_after_the_double_dash_that_differs_from_the_resolved_effort_still_needs_a_reason(full):  # interface 3.2a
+    full.refused("--reason", args=["--effort", "max"], role="independent-auditor", tid="T-a")
+    _review(full, args=["--effort", "max"], reason="the plan names it")
+    assert (full.last()["effort_source"], full.last()["effort_reason"], full.last()["review_round"]) == ("after --", "the plan names it", 1)
 
 
 @pytest.mark.parametrize("value", ("DEC", "dec-1", "DEC-", "DEC-1x", "1010", " DEC-1", ""))

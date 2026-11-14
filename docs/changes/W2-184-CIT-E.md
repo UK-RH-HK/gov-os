@@ -36,6 +36,8 @@ medium; 3.2 a max the table or the probe sets needs no reason, a launch's own ma
 is accepted, a trial's max needs `--reason`; 5.2 a fail-open finding is checked before two failed reviews; 6.2 `probe` is a
 sixth `model_source` value, set only when the probe changed the model; 7.2 `command.py` is not edited here.
 
+3.2a (the lead's amendment, batch eng-2): a max after `--` equal to the effort already resolved (the table's max, or the probe's max on a FULL ticket's round 2+) needs no `--reason`, and its `effort_source` is `probe` when it equals the probe's, `after --` when it equals the table's; only a max that differs from the resolved effort, or a trial's max, needs `--reason` (`_rubric` in `launcher.py`).
+
 ## 3. The `command.py` package (outside the ticket's paths)
 
 `src/gov/launch/command.py` is not in `allowed_paths` (interface 7.2). The patch the lead applies is

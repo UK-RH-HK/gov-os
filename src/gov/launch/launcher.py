@@ -673,8 +673,13 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         if given["effort"] in BELOW_FLOOR and table_effort not in BELOW_FLOOR:
             raise _refuse(f"the CLI arguments carry --effort {given['effort']}, below the floor '{FLOOR}' of "
                           f"{role}'s {table_effort} (DEC-1120 (3))")
+        resolved = "max" if probe else table_effort  # interface 3.2a: the effort already resolved for this launch
         if given["effort"] is not None:
             effort, effort_source = given["effort"], "after --"
+            if effort == resolved:  # not the launch's own choice: needs no --reason; the probe's max stays `probe`
+                own = False
+                if probe:
+                    effort_source = "probe"
         elif probe:
             effort, effort_source, own = "max", "probe", False
         else:
