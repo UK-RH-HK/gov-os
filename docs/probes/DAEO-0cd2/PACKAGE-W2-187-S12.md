@@ -1,6 +1,6 @@
 ---
 task: DAEO-0cd2
-kind: package (interim, the ticket lead; DEC-1052: an interface not stated in the ticket before the pair starts)
+kind: "package (interim, the ticket lead; DEC-1052: an interface not stated in the ticket before the pair starts); answered by the CTO: items 1-6 as (a), the ticket's I13 at 144d993d3"
 blocks: S12 and F7 only (the weekly secret scan and push, DEC-1182 (2)); S1-S11 go on
 ---
 # PACKAGE W2-187-S12: S12 and F7's interface is not stated in the ticket
