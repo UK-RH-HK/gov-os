@@ -1,0 +1,9 @@
+Merge w2/integrate into w2/W2-88: run 8, W2-184's launcher (the promotion) before the workers start
+
+The tree's gov launch refused claude-opus-5-5 for the test designer and engineer (DEC-839 item 1, the
+pre-W2-184 launcher). The CTO's allowed_paths commit is merged again when it lands.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-1178
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

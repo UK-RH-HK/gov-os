@@ -4191,3 +4191,31 @@
 {"at": "2026-11-14 21:47:01", "avail_mb": 16000, "leads": {"W2-187": {"mb": 1575, "kb": 1613688, "procs": 17, "in_status": true}}}
 {"at": "2026-11-14 21:48:01", "avail_mb": 17209, "leads": {"W2-187": {"mb": 302, "kb": 309816, "procs": 1, "in_status": true}}}
 {"at": "2026-11-14 21:49:01", "avail_mb": 17550, "leads": {"W2-187": {"mb": 0, "kb": 0, "procs": 0, "in_status": true}}}
+{"at": "2026-11-14 21:50:01", "avail_mb": 17175, "leads": {}}
+{"at": "2026-11-14 21:51:01", "avail_mb": 17497, "leads": {}}
+{"at": "2026-11-14 21:52:01", "avail_mb": 17021, "leads": {}}
+{"at": "2026-11-14 21:53:01", "avail_mb": 15857, "leads": {"W2-88": {"mb": 271, "kb": 277760, "procs": 1, "in_status": false}}}
+{"at": "2026-11-14 21:54:01", "avail_mb": 16018, "leads": {"W2-88": {"mb": 453, "kb": 464200, "procs": 6, "in_status": true}}}
+{"at": "2026-11-14 21:55:01", "avail_mb": 15941, "leads": {"W2-88": {"mb": 275, "kb": 281992, "procs": 1, "in_status": true}}}
+{"at": "2026-11-14 21:56:01", "avail_mb": 15797, "leads": {"W2-88": {"mb": 279, "kb": 285964, "procs": 1, "in_status": true}}}
+{"at": "2026-11-14 21:57:01", "avail_mb": 15653, "leads": {"W2-88": {"mb": 281, "kb": 288292, "procs": 1, "in_status": true}}}
+{"at": "2026-11-14 21:58:01", "avail_mb": 15486, "leads": {"W2-88": {"mb": 297, "kb": 304588, "procs": 1, "in_status": true}}}
+{"at": "2026-11-14 21:59:01", "avail_mb": 15543, "leads": {"W2-88": {"mb": 322, "kb": 330328, "procs": 4, "in_status": true}}}
+{"at": "2026-11-14 22:00:01", "avail_mb": 15588, "leads": {"W2-88": {"mb": 0, "kb": 0, "procs": 0, "in_status": true}}}
+{"at": "2026-11-14 22:01:01", "avail_mb": 15472, "leads": {}}
+{"at": "2026-11-14 22:02:01", "avail_mb": 15807, "leads": {}}
+{"at": "2026-11-14 22:03:01", "avail_mb": 15545, "leads": {"W2-20": {"mb": 6, "kb": 6312, "procs": 1, "in_status": false}}}
+{"at": "2026-11-14 22:04:01", "avail_mb": 15533, "leads": {}}
+{"at": "2026-11-14 22:05:01", "avail_mb": 15285, "leads": {"W2-88": {"mb": 266, "kb": 273228, "procs": 1, "in_status": false}}}
+{"at": "2026-11-14 22:06:01", "avail_mb": 15646, "leads": {"W2-88": {"mb": 299, "kb": 306564, "procs": 1, "in_status": true}}}
+{"at": "2026-11-14 22:07:02", "avail_mb": 15001, "leads": {"W2-88": {"mb": 875, "kb": 896768, "procs": 14, "in_status": true}}}
+{"at": "2026-11-14 22:08:02", "avail_mb": 15073, "leads": {"W2-88": {"mb": 879, "kb": 901020, "procs": 12, "in_status": true}}}
+{"at": "2026-11-14 22:09:02", "avail_mb": 15455, "leads": {"W2-88": {"mb": 1023, "kb": 1047916, "procs": 28, "in_status": true}}}
+{"at": "2026-11-14 22:10:02", "avail_mb": 15012, "leads": {"W2-88": {"mb": 1003, "kb": 1027348, "procs": 28, "in_status": true}}}
+{"at": "2026-11-14 22:11:03", "avail_mb": 15249, "leads": {"W2-88": {"mb": 1010, "kb": 1035204, "procs": 28, "in_status": true}}}
+{"at": "2026-11-14 22:12:03", "avail_mb": 15389, "leads": {"W2-88": {"mb": 1008, "kb": 1032780, "procs": 28, "in_status": true}}}
+{"at": "2026-11-14 22:13:04", "avail_mb": 15089, "leads": {"W2-88": {"mb": 1067, "kb": 1093008, "procs": 30, "in_status": true}}}
+{"at": "2026-11-14 22:14:05", "avail_mb": 15523, "leads": {"W2-88": {"mb": 1022, "kb": 1046976, "procs": 28, "in_status": true}}}
+{"at": "2026-11-14 22:15:06", "avail_mb": 16540, "leads": {"W2-88": {"mb": 1020, "kb": 1045344, "procs": 26, "in_status": true}}}
+{"at": "2026-11-14 22:16:07", "avail_mb": 16529, "leads": {"W2-88": {"mb": 1005, "kb": 1029540, "procs": 26, "in_status": true}}}
+{"at": "2026-11-14 22:17:08", "avail_mb": 16258, "leads": {"W2-88": {"mb": 997, "kb": 1021460, "procs": 26, "in_status": true}}}

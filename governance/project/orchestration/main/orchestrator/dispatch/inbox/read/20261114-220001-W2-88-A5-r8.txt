@@ -1,0 +1,7 @@
+log: W2-88-A5-r8.json
+W2: W2-88
+status: LAUNCH_BLOCKED. Both workers were refused twice, so I stopped (DEC-1137). The first refusal came from the branch's old `gov launch`, which only allows the role's own model (DEC-839 item 1), so Opus was refused. I merged `w2/integrate` to bring in W2-184's launcher. That launcher then refused because
+
+task: DAEO-2bdu (W2-88), run 8 (resume, then build), after the owner's answer at 21:50 (to be recorded as DEC-1183: P-W2-88-S27-1 (b), package 1 (a), package 2 (a))
+status: LAUNCH_BLOCKED. Both workers were refused twice, so I stopped (DEC-1137). The first refusal came from the branch's old `gov launch`, which only allows the role's own model (DEC-839 item 1), so Opus was refused. I merged `w2/integrate` to bring in W2-184's launcher. That launcher then refused because `docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md` has a verdict block in the old form.
+work_completed: Read the checkpoint and w

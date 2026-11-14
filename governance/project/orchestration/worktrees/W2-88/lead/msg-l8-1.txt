@@ -1,0 +1,37 @@
+W2-88 (DAEO-2bdu): round-1 and round-2 verdict blocks in JUDGEMENT.md's form for W2-184's launcher (P-W2-88-L8-1 (a))
+
+Each finding id string in the two fenced verdict blocks becomes
+{"id", "scope", "ordinary_work", "consequence"}. No verdict, KPI, finding
+id, "overall" or prose outside the two fences changed (checked by script:
+same KPIs, verdicts, overall and finding ids in order; git diff touches
+round-1 lines 157-187 within its fence 155-190 and round-2 lines 108-137
+within 106-141).
+
+Where each value comes from (the record's own text):
+- round-1 RV1-1, RV1-2, RV1-3: in / yes / fails open (round-1 line 88,
+  and lines 94, 105, 112).
+- round-1 RV1-4 to RV1-8: ordinary_work yes, consequence other (lines 117,
+  124, 130, 135, 140); scope in (each listed under this ticket's KPI line,
+  triage "fix" in the lead's table, lines 29-33).
+- round-1 RV1-9 to RV1-11 (package items, line 88, 142-146): scope in
+  (listed under this ticket's KPI lines, triage "the CTO"); the record
+  gives no ordinary_work and no consequence (B-1.3 "fails closed", line 85),
+  so the form's neutral, non-blocking values are written: ordinary_work
+  "no", consequence "other".
+- round-2 RV1-1 to RV1-11: the record gives them as fixed (lines 22,
+  43-56) with no ordinary_work or consequence; scope in, and the neutral
+  values "no" / "other" are written.
+- round-2 RV2-1: in / yes / loses work (lines 77, 90).
+- round-2 RV2-2: ordinary_work yes, consequence other (line 96); scope in
+  (triage "fix with RV2-1", line 27).
+Neutral here means the form's value that adds no blocking weight; JUDGEMENT.md
+names no neutral value, so this is stated for the reader.
+
+W2-184's launcher parse (_probe_record, _fails_open) now reads all six of
+the ticket's probe records without refusal.
+
+Rewrite-Reason: DEC-1183, P-W2-88-L8-1 (a): verdict block in JUDGEMENT.md's form for W2-184's launcher; content unchanged
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-1010, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

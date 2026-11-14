@@ -1,0 +1,1 @@
+launch_worker independent-test-designer DAEO-2bdu: session exit 1; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-88-tests/.gov-runtime/scratch/lead/log/td-13.json; spend recorded (projection none)

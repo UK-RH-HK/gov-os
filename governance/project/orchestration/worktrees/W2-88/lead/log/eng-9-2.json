@@ -1,0 +1,1 @@
+gov launch: LAUNCH_REFUSED: the probe record docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md has a verdict block that is not JSON of the form {"kpis": [{"kpi": ..., "verdict": ..., "findings": [{"id": ..., "consequence": ...}]}]}
