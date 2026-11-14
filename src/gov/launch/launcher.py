@@ -486,10 +486,10 @@ def _ticket_names(ticket_id: str, ticket: dict) -> list[str]:
     return list(dict.fromkeys(name for name in names if isinstance(name, str) and name))
 
 
-def _launch_records(root: Path) -> list[dict]:
+def _launch_records(root: Path) -> list[tuple[str, dict]]:
     """The shared record folder's launch records (``record: gov-launch``), read once for the probe records' roots
     (W2-184 5.1a) and the review count (6.1). A file there that cannot be read as JSON refuses: a skipped record could
-    hide a promotion or a review (P-td5-1, fail closed)."""
+    hide a promotion or a review (P-td5-1, fail closed). Each is returned as ``(file stem, record)``."""
     found = []
     for path in sorted(record.folder(root).glob("*.json")):
         try:
@@ -498,16 +498,16 @@ def _launch_records(root: Path) -> list[dict]:
             raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the roots of the ticket's probe "
                           f"records cannot be found and its reviews cannot be counted") from None
         if isinstance(data, dict) and data.get("record") == "gov-launch":
-            found.append({**data, "session_id": data.get("session_id") or path.stem})
+            found.append((path.stem, data))
     return found
 
 
-def _probe_roots(root: Path, names: list[str], launches: list[dict]) -> list[Path]:
+def _probe_roots(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> list[Path]:
     """W2-184 5.1a (P-W2-184-1 (a), DEC-1010): the launch root, then, in sorted order, every other folder that a
     launch record of this ticket (under any of its names, any role) gives as its ``root``. A named root that is not
     there, or is not a folder, is skipped."""
     others = set()
-    for data in launches:
+    for _, data in launches:
         named = data.get("root")
         if not isinstance(data.get("ticket"), str) or data["ticket"] not in names or not isinstance(named, str) \
                 or not os.path.isabs(named) or not os.path.isdir(named):
@@ -576,7 +576,7 @@ def _fails_open(rel: str, body: str) -> bool:
     return found
 
 
-def _promotion(root: Path, names: list[str], launches: list[dict]) -> dict | None:
+def _promotion(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> dict | None:
     """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records, under the launch root and every root the
     ticket's launch records name (5.1a), hold a fail-open finding (checked first), or two or more of them have
     ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path."""
@@ -598,14 +598,14 @@ def _promotion(root: Path, names: list[str], launches: list[dict]) -> dict | Non
     return None
 
 
-def _counted_reviews(launches: list[dict], names: list[str], resume: str | None) -> list[dict]:
+def _counted_reviews(launches: list[tuple[str, dict]], names: list[str], resume: str | None) -> list[dict]:
     """W2-184 6.1: of the shared record folder's launch records (``_launch_records``), this ticket's auditor launches
     that resume nothing, leaving out the record of the session being resumed."""
     counted = []
-    for data in launches:
+    for stem, data in launches:
         if data.get("role") == AUDITOR and isinstance(data.get("ticket"), str) and data["ticket"] in names \
-                and data.get("resumes") is None and data["session_id"] != resume:
-            counted.append({"session_id": data["session_id"], "model": data.get("model"),
+                and data.get("resumes") is None and data.get("session_id") != resume:
+            counted.append({"session_id": data.get("session_id") or stem, "model": data.get("model"),
                             "effort": data.get("effort")})
     return counted
 
