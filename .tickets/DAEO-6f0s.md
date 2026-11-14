@@ -21,6 +21,7 @@ allowed_paths:
 - tests/unit/launch/test_w2_184_*.py
 - docs/changes/W2-184-CIT-E.md
 - docs/probes/DAEO-6f0s/**  # the probe record
+- src/gov/launch/command.py
 reads:
 - .tickets/DAEO-cv58.md
 - governance/project/orchestration/packages/P1-W2-60a-P5.md
@@ -41,7 +42,7 @@ non_goals:
 - 'not W2-60a''s reviewed core (role text, skills, the record''s base fields, no compaction, the refused arguments): W2-60a lands it first'
 - 'not a gate for W2-27 (EXAMIN''s copy): launches during the copy use each role''s `Launch default` line (P1-W2-60a-P5 (B), DEC-1167)'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010, CAP-35.c, DEC-1014, DEC-1015, W2-60a]
+sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010, CAP-35.c, DEC-1014, DEC-1015, DAEO-cv58]
 acceptance_tests: {path: tests/acceptance/W2-184/}
 ---
 
@@ -54,3 +55,5 @@ rounds and never built, move here, so W2-60a lands its reviewed core and EXAMIN'
 form, the effort floor and `--reason`, `--trial` reading `governance/project/trials/<id>.yaml`, promotion from the probe
 records, S10 counting the auditor's launch records with `--owner-named <DEC-id>`. Starts after W2-60a merges; its own
 review rounds (new scope).
+
+**The CTO, 2026-11-14:** P-W2-184-2 (a), `src/gov/launch/command.py` added (the interface at claim puts `--trial`, `--reason` and `--owner-named` before `--`). P-W2-184-3 confirmed: 1.4 (no `criticality.yaml`: a launch behaves as before W2-184, DEC-1167 (2)); 3.2a (a max after `--` equal to the resolved effort needs no `--reason`); `probe` as a sixth `model_source`/`effort_source`; the lead's matching rule. P-W2-184-1 (round 2's F1) is the owner's (DEC-1010).

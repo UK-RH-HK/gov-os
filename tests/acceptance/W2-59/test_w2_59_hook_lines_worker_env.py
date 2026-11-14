@@ -21,10 +21,17 @@ take the pinned form. The preToolUse, postToolUse and postToolUseFailure ids are
 ``governance/kernel/hooks/``, where the line looks: the preToolUse ids no longer run this repository's five-rule line,
 and the two post-tool ids ACT 1 removed exist again. The lifecycle lines' ids stay on this repository's lines (the
 template's keep DEC-608's plain form, DEC-917) (``tests/acceptance/W2-90b/README.md``).
+
+Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The template's ``postToolUse`` holds a second entry beside
+the guard's, the context watch (``context_watch.py``), whose program imports only the standard library: like
+subagentStop's, its case reads the pin's interpreter and the import path itself (the ``sitecustomize`` marker), and
+no package of the pin. Which programs import the governance package is read from the program, not from its event.
 """
 
 from __future__ import annotations
 
+import ast
+import re
 import sys
 from pathlib import Path
 
@@ -56,6 +63,32 @@ OTHERS, OTHER_IDS = _entries({"postToolUse", "postToolUseFailure", "stop", "suba
                               "sessionStart"})
 PROGRAM_ADDS_SRC = {"preCompact", "sessionStart"}
 IMPORTS_NO_GOV = {"subagentStop"}
+
+
+# Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The template's ``postToolUse`` holds a second entry beside
+# the guard's: the context watch (``context_watch.py``), whose program imports only the standard library. Which
+# programs import the governance package is read from the program itself, not from its event.
+def _program_of(command):
+    found = re.search(r"/hooks/([A-Za-z_]+\.py)", command)
+    return found.group(1) if found else None
+
+
+def imports_only_the_standard_library(command):
+    """Whether the kernel program the line starts imports no package but the standard library and the kernel's own
+    hooks (read from its syntax tree). ``context_watch`` reads ``precompact`` when an orchestrator's session needs its
+    CHECKPOINT's path; that is the kernel's own module, so the program imports no governance package for any
+    other session."""
+    folder = Path(__file__).resolve().parents[3] / "template" / "governance" / "kernel" / "hooks"
+    name = _program_of(command)
+    if not name or not (folder / name).is_file():
+        return False
+    roots = set()
+    for node in ast.walk(ast.parse((folder / name).read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            roots |= {alias.name.split(".")[0] for alias in node.names}
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            roots.add(node.module.split(".")[0])
+    return all(root in sys.stdlib_module_names or (folder / f"{root}.py").is_file() for root in roots)
 
 
 def _worker(src):
@@ -151,7 +184,7 @@ def test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code(
     assert not box.marks("tree-gov-"), (
         f"with PYTHONPATH={src}, {event}[{index}]'s program imported that folder's gov, not the pin's\n"
         f"{done.describe()}")
-    if event in IMPORTS_NO_GOV:
+    if event in IMPORTS_NO_GOV or imports_only_the_standard_library(entry["command"]):
         assert pin_markers.marks("pin-python-"), (
             f"{event}[{index}] did not start the pin's interpreter ({pin_markers.python})\n{done.describe()}")
         assert not box.marks("tree-site-"), (

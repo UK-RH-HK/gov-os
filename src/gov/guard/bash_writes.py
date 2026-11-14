@@ -105,13 +105,111 @@ def joined(command):
 
 # -- the shell text: heredocs and substitutions out --------------------------------------------------------------
 
-def heredocs(command, comments=None, legacy=False):
+def _here_word_end(command, i):
+    """Where the word that starts at ``i`` ends, as the shell reads it: quotes, escapes, ``$(...)``, backticks and
+    ``${...}`` inside it are part of it; an unquoted blank, newline, ``;&|()<>`` ends it. Raises Unreadable when a
+    quote or a substitution in it does not close."""
+    n, k, stack = len(command), i, []  # stack: '"', ["$(", depth], ["${", 0], or "`"
+    while k < n:
+        ch = command[k]
+        top = stack[-1] if stack else None
+        if top is None and ch in " \t\n;&|()<>":
+            break
+        if ch == "\\":
+            k += 2
+            continue
+        if ch == "'" and top != '"':
+            end = command.find("'", k + 1)
+            if end < 0:
+                raise UnclosedQuote("an unclosed single quote")
+            k = end + 1
+            continue
+        if top == "`":
+            if ch == "`":
+                stack.pop()
+            k += 1
+            continue
+        if top == '"' and ch == '"':
+            stack.pop()
+            k += 1
+            continue
+        if ch == '"':
+            stack.append('"')
+        elif ch == "`":
+            stack.append("`")
+        elif command.startswith("${", k):
+            stack.append(["${", 0])
+            k += 1
+        elif command.startswith("$(", k):
+            stack.append(["$(", 0])
+            k += 1
+        elif isinstance(top, list) and top[0] == "$(" and ch in "()":
+            if ch == "(":
+                top[1] += 1
+            elif top[1]:
+                top[1] -= 1
+            else:
+                stack.pop()
+        elif isinstance(top, list) and top[0] == "${" and ch == "}":
+            stack.pop()
+        k += 1
+    if stack:
+        raise UnclosedQuote("an unclosed quote or substitution in a here-string's word")
+    return k
+
+
+def _here_text(word):
+    """The text of a here-string's ``word`` after quote removal, and whether the shell expands it first (an unquoted
+    or double-quoted ``$`` or backtick: then the text is not known, and the word's own characters are kept)."""
+    out, i, n, expanded = [], 0, len(word), False
+    while i < n:
+        ch = word[i]
+        if ch == "\\":
+            if word.startswith("\\\n", i):
+                i += 2
+            else:
+                out.append(word[i + 1:i + 2])
+                i += 2
+            continue
+        if ch == "'":
+            end = word.find("'", i + 1)
+            out.append(word[i + 1:end])
+            i = end + 1
+            continue
+        if ch == '"':
+            i += 1
+            while i < n and word[i] != '"':
+                if word[i] == "\\" and i + 1 < n and word[i + 1] in '"\\$`\n':
+                    if word[i + 1] != "\n":
+                        out.append(word[i + 1])
+                    i += 2
+                    continue
+                if word[i] in "$`":
+                    expanded = True
+                out.append(word[i])
+                i += 1
+            i += 1
+            continue
+        if ch in "$`":
+            expanded = True
+        out.append(ch)
+        i += 1
+    if expanded and ("$(" in word or "`" in word):
+        return word, True  # the substitutions are judged as the commands they are: their own quoting, kept
+    return "".join(out), expanded
+
+
+def heredocs(command, comments=None, legacy=False, hstr=False, lenient=False):
     """``command`` without its heredoc bodies and its comments, and the bodies. Each heredoc operator and its
     delimiter become ``< __gov_hdl_<k>__`` (an input redirect the parser skips), so the reader is known by position.
     A comment's text (a ``#`` that starts a word, outside quotes, to the end of its line) is dropped, so a quote in it
     is no quote (DEC-1174 (1)); its span is added to ``comments`` when a list is given. Raises Unreadable for
     anything the scan cannot read for certain. ``legacy``: ``${`` is not followed, so a ``#`` inside it may start a
-    comment, as the scan read it before APOS-3 (judge's fail-closed second reading only)."""
+    comment, as the scan read it before APOS-3 (judge's fail-closed second reading only). ``hstr`` (judge's
+    fail-closed reading, R3, DEC-1164 (18)): a here-string is a heredoc of its own text, so the reader that runs it
+    judges it as it judges a body (``bash <<< 'touch x'``, ``xargs touch <<< x``); its body is marked ``hs`` and,
+    when the shell expands the word first, not quoted. ``lenient`` (the same): as bash reads it, a heredoc with no end
+    line takes the rest of the text as its body, and one at the end of the text an empty one."""
     out, bodies, pending = [], [], []
     # The shell's contexts: "top"; '"' (double quotes); "$(" (a command substitution, whose quoting starts
     # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic); "${" (a
@@ -226,6 +324,19 @@ def heredocs(command, comments=None, legacy=False):
             continue
         if command.startswith("<<<", i):
             # A here-string (APOS-4, DEC-1174 (1)): its word is read as any word, not taken for a heredoc's delimiter.
+            if hstr:
+                j = i + 3
+                while j < n and command[j] in " \t":
+                    j += 1
+                k = _here_word_end(command, j)
+                if k == j:
+                    raise Unreadable("a here-string without a word")
+                text, expanded = _here_text(command[j:k])
+                body = {"text": text, "quoted": not expanded, "span": (i, k), "hs": True}
+                pending.append((None, False, not expanded, len(bodies) + len(pending), body))
+                out.append(f" < __gov_hdl_{pending[-1][3]}__ ")
+                i = k
+                continue
             out.append("<<<")
             i += 3
             continue
@@ -267,17 +378,22 @@ def heredocs(command, comments=None, legacy=False):
             delim = "".join(word)
             if not delim:
                 raise Unreadable("a heredoc without a delimiter")
-            pending.append((delim, strip, quoted, len(bodies) + len(pending)))
+            pending.append((delim, strip, quoted, len(bodies) + len(pending), None))
             out.append(f" < __gov_hdl_{pending[-1][3]}__ ")
             i = k
             continue
         if c == "\n" and pending:
             out.append("\n")
             i += 1
-            for delim, strip, quoted, _ in pending:
+            for delim, strip, quoted, _, inline in pending:
+                if inline is not None:
+                    bodies.append(inline)
+                    continue
                 start, lines = i, []
                 while True:
                     if i >= n:
+                        if lenient:
+                            break  # bash takes the rest of the text as the body
                         raise Unreadable("an unterminated heredoc")
                     e = command.find("\n", i)
                     line = command[i:n if e < 0 else e]
@@ -293,22 +409,219 @@ def heredocs(command, comments=None, legacy=False):
     if any(ctx[0] in ('"', "`", "${") for ctx in stack):
         # An unclosed ${ too: bash runs nothing of a line it cannot close (APOS-3).
         raise UnclosedQuote("an unclosed double quote, backtick or ${")
-    if len(stack) > 1 or pending:
+    if len(stack) > 1:
         raise Unreadable("unbalanced quotes or a heredoc with no body")
+    for delim, strip, quoted, _, inline in pending:
+        if inline is not None:
+            bodies.append(inline)
+        elif lenient:
+            bodies.append({"text": "", "quoted": quoted, "span": (n, n)})
+        else:
+            raise Unreadable("unbalanced quotes or a heredoc with no body")
     return "".join(out), bodies
+
+
+# Readers that take a here-string's text as data whatever it is, and never run it (DEC-1164 (18), R3 F1): the shell's
+# own read builtins, and the filters whose script, when it has one, is read below (sed, awk) or none (bc).
+_HS_READ = frozenset(("read", "mapfile", "readarray", "bc"))
+# Commands that read their standard input as commands or code: a loop whose body holds one runs the loop's here-string.
+_STDIN_RUNNERS = frozenset(("xargs", "parallel", "source", ".", "eval", "perl", "node", "ruby", "php"))
+
+
+def _sed_reads_only(args):
+    """Whether the ``sed`` words (after its name) are a script that only edits its input: no -i, no script file, no
+    ``w``, ``W`` or ``e`` command and no flag ``w`` or ``e`` on an ``s``. Anything not understood: not."""
+    scripts, positional, i = [], [], 0
+    while i < len(args):
+        a = args[i]
+        if a == "--":
+            positional += args[i + 1:]
+            break
+        if a.startswith("--"):
+            if a in ("--quiet", "--silent", "--regexp-extended", "--posix", "--separate", "--null-data",
+                     "--unbuffered", "--sandbox"):
+                i += 1
+            elif a == "--expression" and i + 1 < len(args):
+                scripts.append(args[i + 1])
+                i += 2
+            elif a.startswith("--expression="):
+                scripts.append(a.split("=", 1)[1])
+                i += 1
+            else:
+                return False
+            continue
+        if a.startswith("-") and len(a) > 1:
+            letters = a[1:]
+            ends_e = letters.endswith("e")
+            if not set(letters[:-1] if ends_e else letters) <= set("nErsuz"):
+                return False
+            if ends_e:
+                if i + 1 >= len(args):
+                    return False
+                scripts.append(args[i + 1])
+                i += 2
+            else:
+                i += 1
+            continue
+        positional.append(a)
+        i += 1
+    if not scripts:
+        if not positional:
+            return False
+        scripts = positional[:1]
+    return all(_sed_script_reads_only(s) for s in scripts)
+
+
+def _sed_script_reads_only(script):
+    """Scans a sed script command by command; True only when every command is one that writes no file and runs
+    nothing."""
+    i, n = 0, len(script)
+    while i < n:
+        c = script[i]
+        if c in " \t\n;{}!":
+            i += 1
+            continue
+        if c.isdigit() or c in ",$~+":
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:  # an address /re/ with its own delimiter: \cREc
+            i = _skip_delimited(script, i + 2, script[i + 1])
+            if i < 0:
+                return False
+            continue
+        if c == "/":
+            i = _skip_delimited(script, i + 1, "/")
+            if i < 0:
+                return False
+            while i < n and script[i] in "IM":
+                i += 1
+            continue
+        if c in "sy" and i + 1 < n:
+            delim = script[i + 1]
+            if delim in " \t\n\\;":
+                return False
+            i = _skip_delimited(script, i + 2, delim)
+            i = _skip_delimited(script, i, delim) if i >= 0 else -1
+            if i < 0:
+                return False
+            start = i
+            while i < n and script[i] not in ";}\n \t#":
+                i += 1
+            flags = script[start:i]
+            if c == "y" and flags or not set(flags) <= set("gpiImM0123456789"):
+                return False  # a w or e flag, or one not known
+            continue
+        if c in "pdqQnNgGhHxlP=D":
+            i += 1
+            continue
+        if c in "aic":  # the rest of the line is text
+            end = script.find("\n", i)
+            i = n if end < 0 else end
+            continue
+        return False  # w, W, e, r, R, b, t, T, labels, comments and the rest
+    return True
+
+
+def _skip_delimited(text, i, delim):
+    """The index after the next unescaped ``delim`` in ``text`` from ``i``, or -1."""
+    n = len(text)
+    while i < n:
+        if text[i] == "\\":
+            i += 2
+            continue
+        if text[i] == delim:
+            return i + 1
+        i += 1
+    return -1
+
+
+def _awk_reads_only(args):
+    """Whether the ``awk`` words only compute on their input: no program file, in-place include, ``system(``,
+    ``getline`` from a command, redirect or pipe (any ``>``, ``|`` or ``system`` in a word: not known to be free)."""
+    for a in args:
+        if a in ("-f", "--file", "-i", "--include", "-l", "--load", "-E", "--exec") or a.startswith(("-f", "--file=")):
+            return False
+        if re.search(r"system|[>|]|inplace|getline|\bclose\b|fflush", a):
+            return False
+    return True
+
+
+def _hs_data(words, loop_ok):
+    """Whether the command ``words`` takes a here-string's text as data (DEC-1164 (18), R3 F1): ``_kind`` says data;
+    or it is ``read``, ``mapfile``, ``readarray`` or ``bc``; or ``sed`` or ``awk`` with a script that writes nothing
+    and runs nothing; or ``done`` ending a loop none of whose commands reads its input as code (the loop's body is
+    judged by its own words)."""
+    if _kind(words) == "data":
+        return True
+    head = lead(words)
+    if not head:
+        return False
+    name = os.path.basename(head[0])
+    if name in _HS_READ:
+        return True
+    if name == "sed":
+        return _sed_reads_only(head[1:])
+    if name in ("awk", "gawk", "mawk"):
+        return _awk_reads_only(head[1:])
+    return words == ["done"] and loop_ok
+
+
+def _runs_stdin(words):
+    head = lead(words)
+    return bool(head) and (_kind(words) in ("shell", "python") or os.path.basename(head[0]) in _STDIN_RUNNERS)
+
+
+def _read_bound(cmds):
+    """The variables ``read`` binds in the simple commands ``cmds`` (the words that are no option, an ``-a`` array,
+    REPLY when it names none). A here-string is data to ``read``, but what it binds may be run as a command later
+    (DEC-1164 (18), R3 F1 second batch)."""
+    out = set()
+    for words, _, _ in cmds:
+        head = lead(words)
+        if not head or os.path.basename(head[0]) != "read":
+            continue
+        args, i, bound = head[1:], 0, []
+        while i < len(args):
+            a = args[i]
+            i += 1
+            if a == "--":
+                bound += args[i:]
+                break
+            if len(a) > 1 and a[0] == "-":
+                k = next((k for k, ch in enumerate(a) if k and ch in "adinNptu"), None)
+                if k is not None:  # the option's value: the rest of the word, or the next word
+                    value = a[k + 1:]
+                    if not value and i < len(args):
+                        value, i = args[i], i + 1
+                    if a[k] == "a":
+                        bound.append(value)
+            else:
+                bound.append(a)
+        out |= {m.group(0) for w in bound or ["REPLY"] for m in [re.match(r"[A-Za-z_]\w*", w)] if m}
+    return out
+
+
+def _uses_var(word, names):
+    """Whether ``word`` expands one of the variables ``names``."""
+    return any(re.search(_NAME_USE.format(re.escape(n)), word) for n in names)
+
+
+# Programs that run a command given in their words: a variable there may name the command that runs.
+_RUN_WRAPPERS = frozenset("xargs sudo doas parallel watch stdbuf setsid chrt ionice taskset strace ltrace".split())
 
 
 def _check_here_strings(cmds):
     """Raises Unreadable when a here-string's text reaches, by its own command or through a pipe, a command that
     may run it (``bash <<< ...``, ``cat <<< ... | sh``, an unknown program): such a call is read as it was before
     here-strings were read (APOS-4, DEC-1174 (1)); a here-string only data readers take is read."""
+    loop_ok = not any(_runs_stdin(words) for words, _, _ in cmds)
     stage, at = [], None
     for words, reds, sep in cmds:
-        stage.append(_kind(words))
+        stage.append(words)
         if at is None and any(op == "<<<" for op, _ in reds):
             at = len(stage) - 1
         if sep not in ("|", "|&"):
-            if at is not None and any(kind != "data" for kind in stage[at:]):
+            if at is not None and not all(_hs_data(w, loop_ok) for w in stage[at:]):
                 raise Unreadable("a here-string a command may run")
             stage, at = [], None
 
@@ -1095,6 +1408,11 @@ _NOT_RUNNERS = frozenset(
     "dos2unix unix2dos fold fmt iconv expand unexpand du df wait sleep cd pushd popd pwd export unset read set "
     "declare local typeset readonly shift exit return break continue git ruff black flake8 pyflakes pylint mypy "
     "isort yamllint for select case in esac done fi".split())  # a loop's words: a run inside it is judged there
+# What a mapfile/readarray -C callback may be and still be judged as the command it is: a command the walker knows
+# (anything else may be a function the guard cannot read).
+_CALLBACK_KNOWN = _NOT_RUNNERS | frozenset(_SHELLS)
+# xargs options that take no value (xargs runs its command with the words of a here-string, R3).
+_XARGS_FLAGS = frozenset(("--no-run-if-empty", "--verbose", "--exit", "--open-tty", "--interactive"))
 # Programs that run the file they are given as Python.
 _PY_RUNNERS = frozenset("pytest py.test coverage ipython".split())
 
@@ -1255,7 +1573,7 @@ class Judgement:
     naming of the acceptance tests refuses an unresolvable target; ``code``: it is code (Python, perl or node, a
     script body), whose naming counts in any spelling (names_tests)."""
 
-    def __init__(self, parse, expand, bodies=None, loose=frozenset()):
+    def __init__(self, parse, expand, bodies=None, loose=frozenset(), readvars=None):
         self.parse = parse    # the product's parser: (command, cwd) -> targets or None
         self.expand = expand  # the product's word expansion: (word) -> text or None
         # judge's second readings of a command the first cannot read (APOS-3/APOS-4): "strings", a here-string a
@@ -1267,6 +1585,9 @@ class Judgement:
         self.bodies = [] if bodies is None else bodies  # every heredoc body met, nested commands' too
         self.ctx = ({}, {}, set())  # the variables of the command being walked
         self.prefix = set()  # the variables the simple command being judged sets for itself (X=1 cmd, env X=1 cmd)
+        # The variables ``read`` binds in a command with a here-string, shared with the commands nested in it
+        # (DEC-1164 (18), R3 F1 second batch): one used as a command's name is a command the guard cannot know.
+        self.readvars = set() if readvars is None else readvars
 
     def targets(self):
         """What the product's write parser enforces (W2-42a): the shell's own writes, the writes the line parser
@@ -1289,7 +1610,8 @@ class Judgement:
         if depth > MOST_DEPTH:
             self.shell.append(SENT)
             return
-        text, bodies = heredocs(command, legacy="legacy" in self.loose)
+        text, bodies = heredocs(command, legacy="legacy" in self.loose, hstr="hstr" in self.loose,
+                                lenient="open" in self.loose)
         base = len(self.bodies)
         self.bodies += bodies
         # This command's own heredocs get their number among all met so far (a nested command's marks are
@@ -1298,6 +1620,8 @@ class Judgement:
         text, subs = lift(text)
         if "<<<" in text and "strings" not in self.loose:
             _check_here_strings(simples(tokens(text)))
+        if "<<<" in text:
+            self.readvars |= _read_bound(simples(tokens(text)))
 
         def expand(value, env):
             with environ(env, ()):
@@ -1323,6 +1647,8 @@ class Judgement:
                 name = os.path.basename(head[0]) if head else ""
                 args = head[1:]
                 part = " ".join(words)
+                if self.readvars and self.names_read_var(words, head):
+                    self.unread.append(SENT)
                 for names, body in scripts:
                     self.script(names, body, words, reds, subs, part, ecwd, whole, depth, staged)
                 if name in ("cd", "pushd", "popd"):
@@ -1349,6 +1675,8 @@ class Judgement:
                     for t, where in mine:
                         raw, full = self.place(t, where)
                         self.writes.append(SENT if full is None else os.path.realpath(full))
+                elif name in ("mapfile", "readarray"):
+                    self.callback(args, ecwd, whole, depth)
                 elif _INLINE.search(part):
                     # perl, node, ruby: code the guard does not read (ACT-GUARD-FIX-2's judgement of the part; any
                     # spelling of the tests' folder counts, round 2, F4)
@@ -1375,6 +1703,50 @@ class Judgement:
                             if targets:
                                 scripts.append(({self.basename(t) for t in targets}, self.bodies[k]))
                     stage, held, staged = [], [], []
+
+    def names_read_var(self, words, head):
+        """Whether the simple command ``words`` runs a command named by a variable ``read`` bound from a here-string,
+        or hands one to a program that runs its words (xargs, sudo, find -exec, ...): the guard cannot know it."""
+        if head:
+            name = os.path.basename(head[0])
+            if _uses_var(head[0], self.readvars):
+                return True
+            if name in _RUN_WRAPPERS or (name == "find" and any(a in ("-exec", "-execdir", "-ok", "-okdir")
+                                                                 for a in head[1:])):
+                return any(_uses_var(w, self.readvars) for w in head[1:])
+            return False
+        first = next((w for w in words if not _ASSIGN.match(w) and w not in _OPENS), "")
+        return os.path.basename(first) in _RUN_WRAPPERS and any(_uses_var(w, self.readvars) for w in words)
+
+    def callback(self, args, ecwd, whole, depth):
+        """``mapfile``/``readarray -C CALLBACK`` (also joined, ``-tC``) runs the callback as a command: a literal one is
+        judged as that command; one the guard cannot know (a variable, a substitution, a function or a program it does
+        not read) is unresolvable (DEC-1164 (18), R3 F1 second batch)."""
+        cb, i = None, 0
+        while i < len(args) and len(args[i]) > 1 and args[i][0] == "-" and args[i] != "--":
+            a = args[i]
+            i += 1
+            k = next((k for k, ch in enumerate(a) if k and ch in "dnOsuCc"), None)
+            if k is not None:  # the option's value: the rest of the word, or the next word
+                value = a[k + 1:]
+                if not value and i < len(args):
+                    value, i = args[i], i + 1
+                if a[k] == "C":
+                    cb = value
+        if not cb:
+            return
+        text = self.expand(cb)
+        if text is None or "`" in text:
+            self.unread.append(SENT)
+            return
+        try:
+            self.sub(text, ecwd, whole, depth)
+            known = all(not (h := lead(w)) or os.path.basename(h[0]) in _CALLBACK_KNOWN or _PY.match(
+                os.path.basename(h[0])) for w, _, _ in simples(tokens(text)))
+        except Unreadable:
+            known = False
+        if not known:
+            self.unread.append(SENT)
 
     def basename(self, word):
         """The name of the file a word names, or None when it does not expand."""
@@ -1436,7 +1808,7 @@ class Judgement:
         """A script file's shell body, run by this command: its writes are the command's (rule 5); under rule 1 a
         target that names the tests refuses wherever the script runs, and one it cannot work out refuses when the
         body names them."""
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         try:
             sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:
@@ -1457,7 +1829,7 @@ class Judgement:
         self.findings.append(([(SENT, None)], part + "\n" + text, True))
         if shell:
             self.unread.append(SENT)
-            sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+            sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
             try:
                 sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
                 self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
@@ -1511,7 +1883,7 @@ class Judgement:
 
     def unknown_cwd(self, command, whole, depth):
         """A command judged where the shell's folder is unknown: its relative targets are unresolvable."""
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         sub.run(command, UNKNOWN, whole, depth + 1)
         self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
         self.adopt(sub)
@@ -1606,7 +1978,7 @@ class Judgement:
         name = os.path.basename(reader[0]) if reader else ""
         if name in _PRODUCT_DATA:
             return
-        sub = Judgement(self.parse, self.expand, self.bodies, self.loose)
+        sub = Judgement(self.parse, self.expand, self.bodies, self.loose, self.readvars)
         try:
             sub.run(body["text"], UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
         except Unreadable:
@@ -1614,7 +1986,50 @@ class Judgement:
             return
         self.writes += [SENT if t.startswith(UNKNOWN) else t for t in sub.targets()]
 
+    def xargs(self, reader, body, ecwd, whole, depth):
+        """``xargs [options] CMD <<< WORDS`` runs CMD with the text's words as its arguments (R3, DEC-1164 (18)), and
+        is judged as that command. A text the guard cannot know, an option it does not read (a replacement string, a
+        delimiter, an argument file) or words it cannot split are unresolvable."""
+        if not body["quoted"]:
+            return  # unknown text: already unresolvable
+        args, i = reader[1:], 0
+        while i < len(args) and args[i].startswith("-"):
+            a = args[i]
+            if a == "--":
+                i += 1
+                break
+            if a in _XARGS_FLAGS or (not a.startswith("--") and len(a) > 1 and set(a[1:]) <= set("rtxop")):
+                i += 1
+            elif a in ("-n", "-P", "-L", "-s", "-E") and i + 1 < len(args):
+                i += 2
+            elif re.fullmatch(r"-[nPLsE].+|--(max-args|max-procs|max-lines|max-chars|eof)=.*", a):
+                i += 1
+            else:
+                self.unread.append(SENT)
+                return
+        cmd = args[i:]
+        if not cmd:
+            return  # xargs runs echo
+        try:
+            words = cmd + shlex.split(body["text"])
+        except ValueError:
+            self.unread.append(SENT)
+            return
+        try:
+            self.sub(" ".join(shlex.quote(w) for w in words), ecwd, whole, depth)
+        except Unreadable:
+            self.unread.append(SENT)
+
     def body(self, body, kind, part, ecwd, whole, depth, argv=None, reader=None):
+        if body.get("hs") and kind != "data" and not body["quoted"]:
+            # A here-string's word the shell expands before its reader runs the text (R3, DEC-1164 (18)): the text is
+            # known when the command's own variables give it, otherwise the reader runs code the guard cannot know.
+            text = body["text"]
+            value = None if "$(" in text or "`" in text else self.expand(text)
+            if value is None:
+                self.unread.append(SENT)
+            else:
+                body = dict(body, text=value, quoted=True)
         if not body["quoted"]:
             # The shell runs an unquoted body's substitutions before its reader sees the text, whoever reads it
             # (W2-42a: the Python reader and an unknown one too, not only a data reader). A shell reader too: the
@@ -1635,7 +2050,10 @@ class Judgement:
             self.findings.append(([(SENT, None)], part + "\n" + body["text"], False))
         else:
             if kind == "code":
-                self.foreign(body, reader, ecwd, whole, depth)
+                if body.get("hs") and reader and os.path.basename(reader[0]) == "xargs":
+                    self.xargs(reader, body, ecwd, whole, depth)
+                else:
+                    self.foreign(body, reader, ecwd, whole, depth)
             # code the guard does not read (an unknown reader, or a shell body the shell rewrites first)
             self.findings.append(([(SENT, None)], part + "\n" + body["text"],
                                   bool(re.search(r"\b(perl|node|ruby|php)\b", part))))
@@ -1657,8 +2075,13 @@ def judge(command, cwd, parse, expand):
     # read with here-strings as data and with the earlier comment rule. Where one of those readings works, its
     # targets join what the caller gives an unreadable command (the line parser, and the unresolvable target for a
     # quote open or in a comment), so no target either reading gives is lost.
+    # R3 (DEC-1164 (18)): a here-string is also read as a heredoc of its own text ("hstr", so the shell or xargs that
+    # runs it is judged by it), and a heredoc with no end line as bash reads it, its rest as the body ("open").
     found = []
-    for loose in (("strings",), ("legacy",), ("strings", "legacy")):
+    for base, legacy, opened in product(((), ("strings",), ("hstr",)), ((), ("legacy",)), ((), ("open",))):
+        loose = base + legacy + opened
+        if not loose:
+            continue
         try:
             again = Judgement(parse, expand, loose=frozenset(loose))
             again.run(command, cwd, whole)

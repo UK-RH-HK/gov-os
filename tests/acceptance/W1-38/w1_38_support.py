@@ -91,7 +91,8 @@ ROLE_NAMES = (
     "research",
 )
 
-HOOK_SCRIPTS = (
+HOOK_SCRIPTS = (   # the seven kernel hooks: context_watch.py added (DEC-1167 (4), DEC-1156 (7))
+    "context_watch.py",
     "posttooluse.py",
     "precompact.py",
     "pretooluse.py",
