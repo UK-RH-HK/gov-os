@@ -1,6 +1,6 @@
 ---
 id: DAEO-g87r
-status: closed
+status: in_progress
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:09Z
@@ -23,6 +23,7 @@ allowed_paths:
 - fixtures/evaluation/examin/hidden/**
 - governance/project/orchestration/tools/indep_launch.py  # the one-question fix flow (reopen 2026-11-14, DEC-1180 (3))
 - tests/unit/orchestration/test_w2_94_fix_flow_unit.py  # the engineer's unit tests of the fix flow
+- governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json  # S13: the optional fix object (rv P4, DEC-1180 (4))
 kpis:
   success:
   - 'Between 10 and 20 questions about EXAMIN''s code and governance, each with its gold answer and the source or sources an answer must cite (file and section or line), in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, splits the set into a development half (`hidden/visible/`) and a hidden half, both written by the walled writer inside the hidden folder; the owner''s release step (`release_visible.sh`) then copies the development half into `visible/` Verify: a planted stand-in set: a count outside 10 to 20 is refused; the record holds the seed and the draw; the two halves each hold half (within one) with each category in both halves; the release step copies exactly the development half into `visible/` and refuses a second release [DEC-957, DEC-828 items 3 and 4, DEC-954 Q9f]'
@@ -37,6 +38,7 @@ kpis:
   - 'S10 The owner''s approved variant (`EXAMIN-writer-q02-fix.md`, sha256 0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173) launches through the fix flow end to end, byte for byte unchanged, on a planted sets root and launch clone with the fake session: its front matter is accepted as written. Verify: the planted end-to-end run, exit 0, the delivered file in place'
   - 'S11 The script''s docstring gains the fix flow''s usage line; `governance/project/indep-walls/**` and `governance/project/indep-briefs/**` are unchanged (the owner''s class O). Verify: `git diff --stat` of the branch names only the ticket''s paths'
   - 'S12 Without `--fix`, every existing flow behaves as before. Verify: the W2-149, W2-173 and W2-178 launcher unit suites pass unchanged'
+  - 'S13 The counts schema takes the fix flow''s `fix` key (rv P4, 2026-11-14): `indep-counts.schema.json` allows an optional `fix` object with exactly `id` (a question id), `code` (the reason code) and `action` (`corrected` or `replaced`), and nothing else; a fix run''s counts validate, so `finish()` no longer logs "counts schema failed" and `--counts-only` of a fix run no longer refuses with 17; every other flow''s counts validate as before [rv-fix P4, DEC-1180 (4)] Verify: a fix run''s counts with `fix` validate; a `fix` with an extra key or another action is refused; the W2-149 counts cases pass unchanged'
   failure:
   - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work. Verify: a planted stand-in hidden file: a read, a grep and a `git log` from a measured session''s sandbox (the guard''s path map) are refused or find it 0 times'
   - 'A write in the workbench, the owner''s copy or EXAMIN''s real repository; a clone outside ~/gov-os-runs/W2-94/. Verify: `git status` in the workbench, the owner''s copy and EXAMIN''s real repository shows no change after the run; a `find` for a clone of the copy outside `~/gov-os-runs/W2-94/` finds none'
@@ -75,3 +77,5 @@ Card: MEMORY-SPEC-MAP gap 7, resolved by the owner in DEC-957; W2-61's KPI 6 mov
 **Role changed 2026-11-13 (P-W2-94-GOLD-2 (A), the CTO):** class audit -> implementation and role independent-auditor -> engineer, so the launcher lets the engineer the owner's W2-94 GOLD (a) names change `check_gold.py`; the walled writers' delivery is done, and the narrow check stays independent.
 
 **Reopened 2026-11-14 (DEC-1180 (3), the owner's P-Q02-RUN-1 (a): "run today, as soon as it is built and reviewed").** Hidden question q02 fails the gold check (ANSWER_NOT_IN_SPANS). The owner approved the writer's fix variant 0703aebf (DEC-1178 (5)), but the launch script's writer round 2 stages the whole set plus a checker's notes (EXAMIN's round 1 had none) and replaces the whole hidden folder, so the variant cannot run. S6-S12 add a one-question fix flow to `indep_launch.py`, which changes by a ticket (the class rules' catch-all), not an ACT; the walls' `kinds.yaml` and the briefs stay unchanged. After the land, the owner's operator installs the variant (its APPROVED line), commits it into the launch clone, runs the fix flow and `check_gold.py` (expected 20 of 20). No checker run: round 1 had none (FOR-THE-OWNER C8), and `check_gold` is the bar. The same flow can later carry the weekly re-anchor request (DECIDED-NOT-DONE row 203).
+
+**Kept open and reopened 2026-11-14 16:20 by the CTO (DEC-1180 (4), DEC-1157 (12); listed for the owner's reading):** the fix flow landed at 0b43625da (the queue closed the ticket in the same step). W2-94 stays open for q02's run with the owner's variant version 2 (DEC-1182 (5), sha 7aa6d88c, launch clone scaffold 3 6325d7ff17a3) and `check_gold` 20 of 20, and gains S13 for the review's P4 (the closed counts schema refuses the fix key). P1 was answered by the owner's v2; P8 is checked before the run; P2, P3, P5 stand as rows.
