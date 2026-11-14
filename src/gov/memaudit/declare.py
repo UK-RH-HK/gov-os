@@ -23,14 +23,16 @@ PIN_RE = re.compile(r"pin-[0-9a-f]{12}")
 DECISION_RE = re.compile(r"DEC-[0-9]+")
 RETRIEVAL = "governance/project/retrieval.yaml"
 ROLES = ["engineer", "research", "product-spec", "independent-test-designer", "independent-auditor"]
-ROUNDING = ("need_right = ceil(85 n / 100); max_wrong = floor(5 n / 100); target_right = ceil(95 n / 100); "
-            "integer arithmetic")
+ROUNDING = ("need_right = ceil(95 n / 100); max_wrong = floor(5 n / 100); target_right = need_right; "
+            "integer arithmetic; standing and fresh runs alike (DEC-1179 (2))")
 SETS_KEY = "evaluation_sets"
 WAIT_S = 5.0
 
 
 def bar(n: int) -> dict:
-    return {"need_right": -(-85 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
+    """The bar at 95 % (DEC-1179 (2)): 38, 76 and 76 right for n = 40, 79 and 80; a verdict passes when right end to end
+    reaches ``need_right``. ``max_wrong`` follows from it (n - ceil(0.95 n) = floor(0.05 n))."""
+    return {"need_right": -(-95 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
 
 
 def entry_of(audit: str) -> dict:
@@ -216,10 +218,15 @@ def preflighted(pre, hidden: Path) -> bool:
     return True
 
 
-def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None) -> tuple[str, dict]:
+def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None,
+            week=None) -> tuple[str, dict]:
     """Returns the exit word (``ok``, ``refused`` with its codes, or ``used``) and the counts the subcommand prints. A
-    usage fault raises ``UsageError``."""
-    p = layout.paths(sets_root, audit)
+    usage fault raises ``UsageError``. With ``week`` (a standing run, W2-187 I4) the run folder is the week's, ``n`` is
+    the live count of its ``PREFLIGHT.json`` (``n_set`` and ``dropped`` are recorded beside it), ``DC-DROPS`` is not
+    asked and a non-standard ``retrieval.yaml`` is ``DC-DECISION`` with no way to allow it."""
+    p = layout.paths(sets_root, audit, week)
+    if week and decision is not None:
+        raise UsageError("decision")
     repo = Path(repo) if repo is not None else toplevel()
     store = Path(os.path.expanduser(str(store))) if store is not None else repo / ".gov-runtime/store.db"
     gov = os.path.expanduser(str(gov) if gov is not None else "~/.local/bin/gov")
@@ -235,13 +242,20 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
         return "used", {"used": True}
 
     codes = []
-    if not preflighted(read_json(p["preflight"]), p["hidden"]):
+    pre = read_json(p["preflight"])
+    if not preflighted(pre, p["hidden"]):
         codes.append("DC-PREFLIGHT")
-    drops = read_json(p["drops"])
     digest = set_digest(p["hidden"])
-    if not (isinstance(drops, dict) and "void" in drops and drops["void"] is None
-            and drops.get("set_digest") == digest and isinstance(drops.get("kept"), int)):
-        codes.append("DC-DROPS")
+    if week:
+        drops = {"kept": pre.get("n") if isinstance(pre, dict) else None}
+        if "DC-PREFLIGHT" not in codes and (not isinstance(drops["kept"], int) or pre.get("set_digest") != digest
+                                            or not all(isinstance(pre.get(k), int) for k in ("n_set", "dropped"))):
+            codes.append("DC-PREFLIGHT")
+    else:
+        drops = read_json(p["drops"])
+        if not (isinstance(drops, dict) and "void" in drops and drops["void"] is None
+                and drops.get("set_digest") == digest and isinstance(drops.get("kept"), int)):
+            codes.append("DC-DROPS")
     head = store_head(store)
     if head != commit:
         codes.append("DC-STORE")
@@ -259,7 +273,7 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
 
     pool = pool_on(doc)
     nonstandard = [] if pool else ["pool"]
-    ok = not nonstandard or decision is not None
+    ok = not nonstandard or (decision is not None and not week)
     n = drops["kept"]
     record = {
         "audit": audit, "audit_commit": commit, "store_commit": head, "store_sha256": sha256_file(store),
@@ -268,6 +282,8 @@ def declare(sets_root, audit, *, commit, repo=None, store=None, gov=None, decisi
         "nonstandard": nonstandard, "decision": decision, "ok": ok, "bar": bar(n), "rounding": ROUNDING,
         "declared_at": utc_iso(),
     }
+    if week:
+        record.update(standing=True, week=week, n_set=pre["n_set"], dropped=pre["dropped"])
     run_dir = layout.make_run(p)
     if not ok:  # DC-DECISION: the declaration with ok false, no map entry and no USED (section 10 item 8)
         write_whole(run_dir, "DECLARATION.json", record)

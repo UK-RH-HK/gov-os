@@ -60,10 +60,10 @@ def test_s3_declare_writes_every_key_of_the_declaration_with_its_value(world, n)
     assert "USED written" in run.lines, run
 
 
-def test_s3_the_bar_for_37_is_32_right_1_wrong_target_36(world):
+def test_s3_the_bar_for_37_is_36_right_1_wrong_target_36(world):
     _ready(world, DROPS[37])
     assert world.declare().code == 0
-    assert world.json_of("DECLARATION.json")["bar"] == {"need_right": 32, "max_wrong": 1, "target_right": 36}
+    assert world.json_of("DECLARATION.json")["bar"] == {"need_right": 36, "max_wrong": 1, "target_right": 36}
 
 
 def test_f2_declaration_then_used_by_file_times_and_ledger_order(world):

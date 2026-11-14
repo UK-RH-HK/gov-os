@@ -22,9 +22,29 @@ def _pick(doc, *keys):
     return doc
 
 
-def figures(sets_root, audit, emit) -> str:
-    """One JSON line from ``FIGURES.json`` and ``DROPS.json``; a missing file gives ``null`` for its keys."""
-    run = layout.paths(sets_root, audit)["run"]
+def standing_figures(fig, pre, audit, week) -> dict:
+    """A standing week's counts: numbers and fixed words only (no id, question, gold, answer or citation)."""
+    verdict = _pick(fig, "verdict")
+    return {
+        "audit": audit, "week": week, "n": _pick(fig, "n"), "n_gold": _pick(fig, "n_gold"),
+        "n_set": _pick(pre, "n_set"), "dropped": _pick(pre, "dropped"),
+        "verdict": {k: verdict.get(k) for k in ("right", "wrong", "passes", "interval_exact")}
+        if isinstance(verdict, dict) else None,
+        "bar": _pick(fig, "bar"), "hit5": _pick(fig, "beside", "hit5"), "in_bundle": _pick(fig, "beside", "in_bundle"),
+        "not_found": _pick(fig, "beside", "not_found"), "a1_right": _pick(fig, "beside", "a1_right"),
+        "mcnemar": _pick(fig, "beside", "mcnemar_a1_a2"), "by_rank": _pick(fig, "misses", "by_rank"),
+        "by_outcome": _pick(fig, "misses", "by_outcome"), "usd": _pick(fig, "spend", "usd"),
+    }
+
+
+def figures(sets_root, audit, emit, week=None) -> str:
+    """One JSON line from ``FIGURES.json`` and ``DROPS.json``; a missing file gives ``null`` for its keys. With ``week``
+    (a standing run) the counts of that week's ``FIGURES.json`` and ``PREFLIGHT.json``."""
+    run = layout.paths(sets_root, audit, week)["run"]
+    if week:
+        emit(json.dumps(standing_figures(read_json(run / "FIGURES.json"), read_json(run / "PREFLIGHT.json"), audit, week),
+                        sort_keys=True))
+        return "ok"
     fig, drops = read_json(run / "FIGURES.json"), read_json(run / "DROPS.json")
     verdict = _pick(fig, "verdict")
     line = {
@@ -99,6 +119,51 @@ def lines(st: dict) -> list[str]:
     else:
         out.append("STOP none")
     stop = st.get("stop")
+    out.append(f"OWNER stopped after USED at {stop['step']} exit {stop['exit']}: the set is not run again"
+               if stop and stop.get("used") else "OWNER none")
+    if "drift" in st:  # with a live standing set only (W2-187 I12)
+        out += [drift_line(st["drift"]), st.get("maintain") or "MAINTAIN none"]
+    return out
+
+
+def drift_line(d: dict) -> str:
+    if d.get("word") is None:
+        return f"DRIFT not yet ({d.get('k', 0)} of 4)"
+    return f"DRIFT S {d['S']:.1f} F {d['F']:.1f}: {d['word']}"
+
+
+def standing_lines(st: dict) -> list[str]:
+    """A standing run's block (W2-187 I12): counts and fixed words only; no line holds an id, a question, a gold, an answer,
+    a citation or a path of the set."""
+    f = st.get("figures") or {}
+    v, bar, rank, by, live = f.get("verdict"), f.get("bar"), f.get("by_rank"), f.get("by_outcome"), st.get("live") or {}
+    out = [f"STANDING {st['audit']} week {st['week']} commit {st['commit'][:12]}"]
+    if v and bar and f.get("n") is not None:
+        out.append(f"VERDICT right {v['right']} of {f['n']}; wrong {v['wrong']}; not found {f.get('not_found')}; "
+                   f"bar {bar['need_right']} right: {'passes' if v['passes'] else 'misses'}")
+    else:
+        out.append(f"VERDICT {NOT}")
+    out.append(f"MISSES outcome wrong {by['wrong']} incomplete {by['incomplete']} not_found {by['not_found']}; "
+               f"rank 1-5 {rank['rank_1_5']} 6-20 {rank['rank_6_20']} absent {rank['not_in_20']}" if by and rank
+               else f"MISSES {NOT}")
+    if live.get("n") is not None:
+        out.append(f"QUESTIONS live {live['n']} of {live['n_set']}; dropped {live['dropped']}")
+        if live["n"] < 70:
+            out.append(f"STANDING_THIN {live['n']}")
+    else:
+        out.append(f"QUESTIONS {NOT}")
+    mc = f.get("mcnemar")
+    out.append(f"BESIDE hit5 {f['hit5']} of {f['n_gold']}; first bundle {f['in_bundle']}; A1 {f['a1_right']} A2 "
+               f"{v['right']}: {mc['gains']} gains {mc['losses']} losses, exact McNemar p {mc['p']:.4f}"
+               if v and mc and f.get("hit5") is not None and f.get("n_gold") is not None
+               and f.get("in_bundle") is not None else f"BESIDE {NOT}")
+    out.append(st.get("maintain") or "MAINTAIN none")
+    out.append(f"P1 memory below 95 %: wrong {by['wrong']} incomplete {by['incomplete']} not_found {by['not_found']}"
+               if v and by and not v["passes"] else "P1 none")
+    out.append("REPAIR open" if st.get("repair") else "REPAIR none")
+    out.append(f"NEXT standing {st['next']} {st['next_mode']}; fresh {st['next_fresh']}")
+    stop = st.get("stop")
+    out.append(f"STOP {stop['step']} exit {stop['exit']}" if stop else "STOP none")
     out.append(f"OWNER stopped after USED at {stop['step']} exit {stop['exit']}: the set is not run again"
                if stop and stop.get("used") else "OWNER none")
     return out

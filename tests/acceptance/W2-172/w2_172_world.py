@@ -22,6 +22,7 @@ Rewrite-Reason: the merge queue's clone path (21:19 ejection)
 from __future__ import annotations
 
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -104,6 +105,13 @@ def sha(data: bytes) -> str:
     return W171.sha_bytes(data)
 
 
+def state_key(repo) -> str:
+    """The driver's folder key for a repository (W2-187 Interface I2): its directory name, a hyphen and the first 8 hex of
+    the sha256 of its real path. Rewrite-Reason: DEC-1179 (5)."""
+    real = os.path.realpath(str(repo))
+    return os.path.basename(real) + "-" + hashlib.sha256(real.encode()).hexdigest()[:8]
+
+
 # -- the template -----------------------------------------------------------------------------------------------------
 def build_template(base: Path) -> None:
     original = W171.repo_files
@@ -181,7 +189,7 @@ class Driver:
         rest = [p for p in os.environ.get("PYTHONPATH", "").split(os.pathsep) if p and Path(p).resolve() != SRC]
         env.update(HOME=str(self.home), GIT_CONFIG_NOSYSTEM="1", PYTHONDONTWRITEBYTECODE="1",
                    PYTHONPATH=os.pathsep.join([str(SRC), *([str(self.spy_dir)] if spy else []), *rest]),
-                   GOV_INDEP_RUNS_DIR=str(self.runs), W171_STATE=str(self.state), W172_STATE=str(self.state))
+                   GOV_INDEP_RUNS_DIR=str(getattr(self, "runs_env", self.runs)), W171_STATE=str(self.state), W172_STATE=str(self.state))
         env.setdefault("PYTHONUSERBASE", site.getuserbase())
         if path:
             env["PATH"] = f"{self.base / 'fakebin'}{os.pathsep}{os.environ.get('PATH', '')}"
@@ -277,9 +285,10 @@ class World(Driver, W171.World):
 
     def __init__(self, base: Path, now: str = NOW):
         super().__init__(base)
-        self.runs = self.base / "launch-log"
-        self.mem = self.runs / "indep" / "memaudit"
-        self.audits_log = self.runs / "indep" / "AUDITS.log"
+        self.runs = self.runs_env = self.base / "launch-log"
+        self.mem = self.runs / "indep" / "memaudit" / state_key(self.base / "repo")  # W2-187 I2: one folder per repository
+        self.audits_log = self.mem / "indep" / "AUDITS.log"
+        self.relocate_state()
         self.link = self.base / "link"
         self.delivery = self.base / "delivery"
         self.stub = self.base / "bin" / "launch_stub.py"
@@ -288,6 +297,17 @@ class World(Driver, W171.World):
         self.spy_dir = self.base / "spy"
         self.set_now(now)
         self.write_world_json()
+
+    def relocate_state(self) -> None:
+        """The template's baseline line and a copied world's earlier key folder move to this repository's key folder
+        (the template and the copies lie at other paths than the key's). Rewrite-Reason: DEC-1179 (5)."""
+        old = self.runs / "indep" / "AUDITS.log"
+        if old.exists():
+            self.audits_log.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(old), str(self.audits_log))
+        kept = [p for p in (self.runs / "indep" / "memaudit").glob("*-????????") if p.is_dir() and p != self.mem]
+        if kept and not self.mem.exists():
+            kept[0].rename(self.mem)
 
     def set_now(self, now: str | None) -> None:
         self.now = now

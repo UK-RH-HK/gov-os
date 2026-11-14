@@ -21,7 +21,10 @@ from pathlib import Path
 
 import yaml
 
-from gov.memaudit import declare, events, fault, layout, runner, scores, wrapper
+import re
+
+from gov.memaudit import declare, events, fault, layout, runner, schedule, scores, wrapper
+from gov.memaudit import standing as record
 from gov.memaudit.common import UsageError, read_json, set_digest, toplevel, write_whole
 
 POOL_SET, DRAW_SET, DRAW_N = layout.POOL_SET, "memory-pool-draw", 400
@@ -30,6 +33,7 @@ VERDICT_2, EARLIER = "memory-verdict-2", ("memory-retrieval", "memory-verdict")
 IMPORT_PARTS = {VERDICT_2: ("hidden",), "memory-retrieval": ("visible", "hidden"), "memory-verdict": ("hidden",)}
 WANT_VERDICT_2, WANT_EARLIER = 79, 138
 LEFT_OUT_IDS = ("h24", "m60")  # the nonexistent-id questions of the earlier sets
+SET_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
 def _names(folder: Path, audit: str | None) -> list[str]:
@@ -104,6 +108,9 @@ def run(sets_root, audit, *, repo=None, gov=None, seed=None, emit) -> str:
     for flag in (repo, gov):
         if layout.inside(flag, p["root"]):
             raise UsageError("flag inside the sets root")
+    if record.is_standing(sets_root, audit, repo):  # a standing set never joins the pool or is fixed against (F1)
+        emit("MS-STANDING")
+        return "refused"
     run_dir = p["run"]
     figures = read_json(run_dir / "FIGURES.json")
     if not isinstance(figures, dict):
@@ -192,6 +199,12 @@ def run(sets_root, audit, *, repo=None, gov=None, seed=None, emit) -> str:
          f"{beside}")
     for word, before, now in regress:
         emit(f"POOL REGRESSION {word} {before:.1f} -> {now:.1f} %")
+    try:  # the retired standing sets, measured in place, retrieval only, counts only (W2-187 I7)
+        retired = record.retired_sets(schedule.state_of(repo))
+    except Exception:  # noqa: BLE001: no state to read: no diagnostic set
+        retired = []
+    for name in retired:
+        _diagnostic(p, run_dir, name, repo, shim, emit)
     # the audit's own kept questions join the pool, byte-equal; a present equal file is skipped
     folder.mkdir(parents=True, exist_ok=True)
     for src in sorted(p["hidden"].glob("*.yaml")):
@@ -211,6 +224,25 @@ def run(sets_root, audit, *, repo=None, gov=None, seed=None, emit) -> str:
     return "ok"
 
 
+def _diagnostic(p: dict, run_dir: Path, name: str, repo, shim, emit) -> None:
+    """A retired standing set re-measured in place into ``runs/<set>/diagnostic-<audit>/``: retrieval only, nothing copied
+    into the pool. Prints its counts and no id."""
+    hidden = p["root"] / layout.EVALUATION / name / "hidden"
+    folder = p["root"] / "runs" / name / f"diagnostic-{p['run'].name}"
+    if not hidden.is_dir() or os.path.lexists(folder):
+        return
+    os.makedirs(folder.parent, mode=0o700, exist_ok=True)
+    runner.start(folder)
+    rc = runner.measure(name, "hidden", repo=repo, root=p["root"], folder=folder, wrapper=shim, run=run_dir,
+                        phase="pool", attempt=None)
+    parsed = fault.read_parsed(folder)
+    if rc != 0 or not parsed["questions"]:
+        emit(f"POOL DIAGNOSTIC {name} not measured")
+        return
+    r = scores.retrieval(parsed["questions"], scores.apart_ids(hidden))
+    emit(f"POOL DIAGNOSTIC {name} hit5 {r['hit5']} of {r['n']}; full {r['full']}")
+
+
 def _text_of(path: Path) -> str | None:
     try:
         return Path(path).read_text().strip() or None
@@ -218,9 +250,62 @@ def _text_of(path: Path) -> str | None:
         return None
 
 
-def importing(sets_root, *, emit) -> str:
-    """The one-time import: ``refused`` (``MS-IMPORTED``, ``MS-IMPORTCOUNT``, ``MS-POOLDIFF``) or ``ok``."""
+def _importing_sets(root: Path, names, emit) -> str:
+    """``pool-import --sets <name>...``: exactly those sets' kept questions (``hidden``, and ``visible`` where present),
+    the nonexistent-id ones left out; no count check; each set once (``IMPORTED-<set>.json``); a standing set is refused."""
+    names = list(dict.fromkeys(names))
+    if not all(SET_NAME.fullmatch(n) for n in names):
+        raise UsageError("sets")
+    run_dir = root / "runs" / POOL_SET
+    for name in names:
+        if record.is_standing(root, name):
+            emit("MS-STANDING")
+            return "refused"
+        if os.path.lexists(run_dir / f"IMPORTED-{name}.json"):
+            emit("MS-IMPORTED")
+            return "refused"
+    plan, counts = {}, {}
+    for name in names:
+        counts[name] = 0
+        for part in ("hidden", "visible"):
+            folder = root / layout.EVALUATION / name / part
+            for src in sorted(folder.glob("*.yaml")) if folder.is_dir() else []:
+                try:
+                    data = yaml.safe_load(src.read_text(encoding="utf-8"))
+                except (OSError, UnicodeDecodeError, yaml.YAMLError):
+                    data = None
+                if isinstance(data, dict) and data.get("category") == scores.APART:
+                    continue
+                dest = f"{name}-{src.stem}.yaml"
+                if dest in plan:
+                    emit("MS-IMPORTCOUNT")
+                    return "refused"
+                plan[dest] = src
+                counts[name] += 1
+    folder = root / layout.EVALUATION / POOL_SET / "hidden"
+    if any(os.path.lexists(folder / d) and (folder / d).read_bytes() != src.read_bytes() for d, src in plan.items()):
+        emit("MS-POOLDIFF")
+        return "refused"
+    folder.mkdir(parents=True, exist_ok=True)
+    for d, src in plan.items():
+        if not os.path.lexists(folder / d):
+            shutil.copyfile(src, folder / d)
+    if not run_dir.is_dir():
+        os.makedirs(run_dir.parent, exist_ok=True)
+        os.mkdir(run_dir, 0o700)
+        os.chmod(run_dir, 0o700)
+    for name in names:
+        write_whole(run_dir, f"IMPORTED-{name}.json", {"set": name, "count": counts[name]})
+    emit(f"IMPORTED {len(plan)} from {len(names)} sets")
+    return "ok"
+
+
+def importing(sets_root, *, emit, sets=None) -> str:
+    """The one-time import: ``refused`` (``MS-IMPORTED``, ``MS-IMPORTCOUNT``, ``MS-POOLDIFF``) or ``ok``. With ``sets``
+    (W2-187 I9) the named sets only, from the sets root, with no 79 and 138 count check."""
     root = layout.root_of(sets_root)
+    if sets:
+        return _importing_sets(root, sets, emit)
     evaluation = root / layout.EVALUATION
     run_dir = root / "runs" / POOL_SET
     if os.path.lexists(run_dir / "IMPORTED.json"):

@@ -55,8 +55,8 @@ QUOTAS = {"decision": 6, "contract": 4, "plan": 4, "ticket": 4, "exact-string": 
           "nonexistent-id": 1}
 FINAL_OK = "PRE-FLIGHT: every check as expected"
 FINAL_NOT = "PRE-FLIGHT: NOT as expected: stop, fix before any search"
-ROUNDING = ("need_right = ceil(85 n / 100); max_wrong = floor(5 n / 100); target_right = ceil(95 n / 100); "
-            "integer arithmetic")
+ROUNDING = ("need_right = ceil(95 n / 100); max_wrong = floor(5 n / 100); target_right = need_right; "
+            "integer arithmetic; standing and fresh runs alike (DEC-1179 (2))")
 REFUSED_LINE = "REFUSED: a line that names a sets-root folder was not printed"
 DECLARATION_KEYS = ("audit", "audit_commit", "store_commit", "store_sha256", "gov_pin", "retrieval_yaml_sha256",
                     "set_digest", "n", "settings", "nonstandard", "decision", "ok", "bar", "rounding", "declared_at")
@@ -118,7 +118,7 @@ def most_subsystem(n: int) -> int:
 
 
 def bar(n: int) -> dict:
-    return {"need_right": -(-85 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
+    return {"need_right": -(-95 * n // 100), "max_wrong": 5 * n // 100, "target_right": -(-95 * n // 100)}
 
 
 # -- the repository's files --------------------------------------------------------------------------------------

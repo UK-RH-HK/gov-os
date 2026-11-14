@@ -118,16 +118,28 @@ def read_parsed(folder) -> dict:
     return parse(text)
 
 
-def not_whole(folder, n: int, families, part: str = "hidden") -> str | None:
-    """None when the run folder's output is whole, else the first cause (``whole`` or ``degraded``): its question
-    lines number ``n`` and are all of ``part``; it has a total line and a ``families:`` line (equal to ``families``
-    when that is given); the kept files number the sum of its calls; and no kept output is degraded."""
+def store_commit_of(result) -> str | None:
+    """``result.store.commit`` (W2-138's field): the commit the store a search answered from was built at."""
+    store = result.get("store") if isinstance(result, dict) else None
+    commit = store.get("commit") if isinstance(store, dict) else None
+    return commit if isinstance(commit, str) and commit else None
+
+
+def not_whole(folder, n: int, families, store_commit: str | None = None, part: str = "hidden") -> str | None:
+    """None when the run folder's output is whole, else the first cause (``whole``, ``degraded`` or ``store_commit``):
+    its question lines number ``n`` and are all of ``part``; it has a total line and a ``families:`` line (equal to
+    ``families`` when that is given); the kept files number the sum of its calls; and no kept output is degraded.
+    With ``store_commit`` (a standing run, W2-187 I4) every kept result's ``result.store.commit`` must be present and
+    equal to it, else the cause is ``store_commit``: a result from another store."""
     parsed = read_parsed(folder)
     qs = parsed["questions"]
     kept = kept_files(folder)
     if (len(qs) != n or any(q["part"] != part for q in qs) or not parsed["total"] or parsed["families"] is None
             or (families is not None and parsed["families"] != families) or len(kept) != sum(q["calls"] for q in qs)):
         return "whole"
-    if any(degraded(kept_result(f)) for f in kept):
+    results = [kept_result(f) for f in kept]
+    if any(degraded(r) for r in results):
         return "degraded"
+    if store_commit is not None and any(store_commit_of(r) != store_commit for r in results):
+        return "store_commit"
     return None

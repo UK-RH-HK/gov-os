@@ -1,7 +1,10 @@
 """``python3 -m gov.memaudit run``: one audit through the launch script and W2-170's and W2-171's subcommands (W2-172
 Interface items 2 to 5, 7 and 8; S1-S4, F1-F3).
 
-Every step is a child process with cwd ``--repo``. The driver opens no path under the sets root: every figure it uses is
+Every step is a child process with cwd ``--repo``. The children that search the store or read the gold anchors
+(``preflight``, ``measure`` and ``judge``, on the fresh and the standing path) are handed the store link's work tree, at
+the audit commit, as their ``--repo``: the store every search reaches is then the store declared (W2-187 I6, review
+round 1 F-A). The driver opens no path under the sets root: every figure it uses is
 a child's last line of standard output. Its own folder is ``<runs>/indep/memaudit/``; it holds counts, codes, ids and
 repository paths only.
 """
@@ -19,7 +22,8 @@ import time
 from datetime import timedelta
 from pathlib import Path
 
-from gov.memaudit import digest, schedule
+from gov.memaudit import declare, digest, schedule
+from gov.memaudit import standing as record
 from gov.memaudit.common import GitError, blob_at, git_code, sha256_bytes, write_whole
 
 BRIEFS = "governance/project/indep-briefs/memory-audit"
@@ -29,6 +33,7 @@ ORDER = ("writer-1", "preflight", "checker-1", "writer-2", "checker-2", "void", 
 GATED = ("measure", "judge", "pool")  # the steps that search the store (item 8)
 CANARY = 16
 SPENT = re.compile(r"spent ([0-9]+(?:\.[0-9]+)?) USD")
+PRE = re.compile(r"PRE-FLIGHT standing: n ([0-9]+) of ([0-9]+); dropped ([0-9]+)")
 
 
 def _spawn(argv, repo, env, out: Path, err: Path) -> int:
@@ -83,14 +88,15 @@ def _used(step: str, code: int, gate: bool) -> bool:
 
 
 class _Cycle:
-    def __init__(self, st, a_dir, repo, env, emit, root, gate, launch_argv, link):
+    def __init__(self, st, a_dir, repo, env, emit, root, gate, launch_argv, link, week=None):
         self.st, self.a_dir, self.repo, self.env, self.emit, self.root = st, a_dir, repo, env, emit, root
-        self.gate, self.launch_argv, self.link = gate, launch_argv, link
+        self.gate, self.launch_argv, self.link, self.week = gate, launch_argv, link, week
         self.stopped = False
 
     def save(self):
-        write_whole(self.a_dir, "COUNTS.json", {k: self.st.get(k) for k in (
-            "audit", "commit", "force", "mode", "reason", "steps", "stop", "refused", "cost")})
+        keys = ("audit", "commit", "force", "mode", "reason", "steps", "stop", "refused", "cost")
+        write_whole(self.a_dir, "COUNTS.json", {k: self.st.get(k) for k in keys}
+                    | ({"week": self.week} if self.week else {}))
 
     def gate_open(self) -> bool:
         if not self.gate:
@@ -164,15 +170,34 @@ class _Cycle:
 
     def child(self, step: str, sub: str, *flags) -> bool:
         return self.go(step, [sys.executable, "-m", "gov.memaudit", sub, "--sets-root", self.root,
-                              "--audit", self.st["audit"], *flags])
+                              "--audit", self.st["audit"], *(["--week", self.week] if self.week else []), *flags])
+
+    def standing(self, repo_flag, gov, claude) -> bool:
+        """A standing week: the same judged path as ``run``'s steps 6 to 8 and 12, with no writer, checker, ``void``,
+        auditor, ``classes`` or ``pool`` (S3, S4). ``repo_flag`` is unused here (every child of this path works in the
+        link); it keeps the two paths' calls alike."""
+        gov_flag = ["--gov", gov] if gov else []
+        c, at = self.st["commit"], self.link  # the children that search and read anchors work in the link (F-A)
+        if not self.child("preflight", "preflight", "--repo", at, "--commit", c):
+            return False
+        out = (self.a_dir / "preflight.out").read_text(encoding="utf-8", errors="replace")
+        m = PRE.search(out)
+        if m:
+            self.st["live"] = {"n": int(m[1]), "n_set": int(m[2]), "dropped": int(m[3])}
+        store = f"{self.link}/.gov-runtime/store.db"
+        if not self.child("measure", "measure", "--repo", at, "--commit", c, "--store", store, *gov_flag):
+            return False
+        if not self.child("judge", "judge", "--repo", at, *gov_flag, *(["--claude", claude] if claude else [])):
+            return False
+        return self.child("figures", "figures")
 
     def run(self, repo_flag, gov, claude) -> bool:
         a = self.st["audit"]
         gov_flag = ["--gov", gov] if gov else []
-        c = self.st["commit"]
+        c, at = self.st["commit"], self.link  # as in ``standing``: the declared store is the store searched (F-A)
         if not self.launch("writer-1", "writer", "--round", "1"):
             return False
-        if not self.child("preflight", "preflight", "--repo", repo_flag, "--commit", c):
+        if not self.child("preflight", "preflight", "--repo", at, "--commit", c):
             return False
         if not self.launch("checker-1", "checker", "--round", "1"):
             return False
@@ -185,9 +210,9 @@ class _Cycle:
         if not self.child("void", "void"):
             return False
         store = f"{self.link}/.gov-runtime/store.db"
-        if not self.child("measure", "measure", "--repo", repo_flag, "--commit", c, "--store", store, *gov_flag):
+        if not self.child("measure", "measure", "--repo", at, "--commit", c, "--store", store, *gov_flag):
             return False
-        if not self.child("judge", "judge", "--repo", repo_flag, *gov_flag, *(["--claude", claude] if claude else [])):
+        if not self.child("judge", "judge", "--repo", at, *gov_flag, *(["--claude", claude] if claude else [])):
             return False
         if not self.launch("auditor", "auditor", "--audit", a):
             return False
@@ -198,24 +223,26 @@ class _Cycle:
         return self.child("figures", "figures")
 
 
-def _refusal(st, runs, folder, link_lock, locked, force, at, head, repo) -> str | None:
-    """The first check of item 3 that fails: its code, else ``None``."""
+def _refusal(st, state, link_lock, locked, force, at, head, repo, standing=False) -> str | None:
+    """The first check of item 3 that fails: its code, else ``None``. A standing run has no RN-NOBASE, RN-RECENT or
+    RN-NAME: its week rule stands in for them (W2-187 I4)."""
     if locked:
         return "RN-LOCK"
-    try:
-        base = [x for x in (runs / "indep" / "AUDITS.log").read_text(encoding="utf-8").splitlines() if x.strip()]
-    except OSError:
-        base = []
-    if not base:
-        return "RN-NOBASE"
-    starts = schedule.read_lines(folder / "STARTS.log")
-    if starts and not force:
+    starts = [x for x in schedule.read_lines(state / "STARTS.log") if schedule.kind_of(x) == "fresh"]
+    if not standing:
         try:
-            recent = at - schedule.parse_time(starts[-1].get("at")) < timedelta(days=schedule.RECENT_DAYS)
-        except Exception:  # an unreadable stamp counts as recent: never a start by mistake
-            recent = True
-        if recent:
-            return "RN-RECENT"
+            base = [x for x in (state / "indep" / "AUDITS.log").read_text(encoding="utf-8").splitlines() if x.strip()]
+        except OSError:
+            base = []
+        if not base:
+            return "RN-NOBASE"
+        if starts and not force:
+            try:
+                recent = at - schedule.parse_time(starts[-1].get("at")) < timedelta(days=schedule.RECENT_DAYS)
+            except Exception:  # an unreadable stamp counts as recent: never a start by mistake
+                recent = True
+            if recent:
+                return "RN-RECENT"
     if _held(link_lock):
         return "RN-REBUILD"
     line = schedule.mainline(repo)
@@ -223,38 +250,40 @@ def _refusal(st, runs, folder, link_lock, locked, force, at, head, repo) -> str 
         return "RN-SIDE"
     if at.timestamp() - schedule.committer_time(repo, head) > 24 * 3600:
         return "RN-STALE"
-    if any(x.get("audit") == st["audit"] for x in starts):
+    if not standing and any(x.get("audit") == st["audit"] for x in starts):
         return "RN-NAME"
     return None
 
 
 def run(sets_root, *, repo, link, launch, gov, claude, gate_cmd, force, emit) -> str:
-    repo, runs, at = schedule.repo_of(repo), schedule.runs_dir(), schedule.now()
-    folder = schedule.folder(runs)
+    repo, at = schedule.repo_of(repo), schedule.now()
+    state = schedule.state_of(repo)
     link = schedule.store_link(repo, link)
     head = schedule.head_of(link)
     audit = "memory-audit-" + at.strftime("%Y%m%d")
-    before = schedule.decide(repo, runs, head, at)
+    before = schedule.decide(repo, state, head, at)
+    kind = "fresh" if record.live(state) else None  # with a live standing set the lines say which kind they are
     st = {"audit": audit, "commit": head, "force": bool(force), "mode": before["mode"], "reason": before["reason"],
           "steps": [], "stop": None, "refused": None, "cost": {}, "figures": None, "retrieval": []}
-    os.makedirs(folder, exist_ok=True)
-    a_dir = folder / audit
-    lock = os.open(folder / "LOCK", os.O_RDWR | os.O_CREAT, 0o600)
+    os.makedirs(state, exist_ok=True)
+    a_dir = state / audit
+    lock = os.open(state / "LOCK", os.O_RDWR | os.O_CREAT, 0o600)
     try:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             locked = False
         except BlockingIOError:
             locked = True
-        code = _refusal(st, runs, folder, link + ".lock", locked, force, at, head, repo)
-        last = schedule.last_audit_commit(runs)
-        st["retrieval"] = schedule.retrieval_changed(repo, last, head)
+        code = _refusal(st, state, link + ".lock", locked, force, at, head, repo)
+        last = schedule.last_audit_commit(state)
+        st["retrieval"] = schedule.retrieval_changed(repo, last, head, gov)
         if code:
             return _refuse(st, a_dir, code, before, emit)
         a_dir.mkdir(parents=True, exist_ok=True)
-        with open(folder / "STARTS.log", "a", encoding="utf-8") as f:
-            f.write(json.dumps({"audit": audit, "commit": head, "at": schedule.stamp(at), "force": bool(force)}) + "\n")
-        env = dict(os.environ, GOV_INDEP_RUNS_DIR=str(runs))
+        with open(state / "STARTS.log", "a", encoding="utf-8") as f:
+            f.write(json.dumps({"audit": audit, "commit": head, "at": schedule.stamp(at), "force": bool(force)}
+                               | ({"kind": kind} if kind else {})) + "\n")
+        env = dict(os.environ, GOV_INDEP_RUNS_DIR=str(state), GOV_MEMAUDIT_STATE=str(state))
         launch_argv = [sys.executable, launch or str(repo / LAUNCH)]
         cycle = _Cycle(st, a_dir, repo, env, emit, sets_root, shlex.split(gate_cmd or ""), launch_argv, link)
         cycle.counts = {}
@@ -264,36 +293,156 @@ def run(sets_root, *, repo, link, launch, gov, claude, gate_cmd, force, emit) ->
         if done:
             fig = _last_json(a_dir / "figures.out")
             st["figures"] = fig
-            _history(folder, st, at, churn, retrieval_28d, measured=True, fig=fig)
+            _history(state, st, at, churn, retrieval_28d, measured=True, fig=fig, kind=kind)
+            if kind:  # the check against fitting, at each fresh run (S7)
+                st["drift"], st["maintain"] = record.drift(state, fig), record.latest_maintain(state)
         elif st["stop"]["used"]:
-            _history(folder, st, at, churn, retrieval_28d, measured=False, fig={})
+            _history(state, st, at, churn, retrieval_28d, measured=False, fig={}, kind=kind)
         cycle.save()
-        _finish(st, a_dir, repo, runs, head, at, before, emit, write=True)
+        _finish(st, a_dir, repo, state, head, at, before, emit, write=True)
         return "ok" if done else "stopped"
     finally:
         os.close(lock)
 
 
-def _history(folder, st, at, churn, retrieval_28d, *, measured: bool, fig: dict) -> None:
+def _history(state, st, at, churn, retrieval_28d, *, measured: bool, fig: dict, kind=None) -> None:
     pool = fig.get("pool") if isinstance(fig.get("pool"), dict) else {}
     verdict = fig.get("verdict") if isinstance(fig.get("verdict"), dict) else {}
     line = {"audit": st["audit"], "commit": st["commit"], "at": schedule.stamp(at), "mode": st["mode"],
             "churn": churn, "retrieval_28d": retrieval_28d,
             "passes": verdict.get("passes") if measured and isinstance(verdict.get("passes"), bool) else None,
             "pool_regression": bool(pool.get("regression")), "measured": measured, "used": True}
-    with open(folder / "HISTORY.jsonl", "a", encoding="utf-8") as f:
+    if kind:
+        line = {"kind": kind, **line}
+    with open(state / "HISTORY.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(line) + "\n")
 
 
-def _finish(st, a_dir, repo, runs, head, at, before, emit, *, write: bool) -> None:
+def _finish(st, a_dir, repo, state, head, at, before, emit, *, write: bool) -> None:
     try:
-        after = schedule.decide(repo, runs, head, at)
+        after = schedule.decide(repo, state, head, at)
     except (GitError, ValueError, OSError):
         after = before
     st["next"], st["next_mode"] = after["next"], after["mode"]
     block = digest.lines(st)
     if write:
         _write_text(a_dir / "DIGEST.txt", "\n".join(block) + "\n")
+    for line in block:
+        emit(line)
+
+
+# ---- the standing run (W2-187 I4): one judged run a week, counts only
+
+def _sha_at(repo, commit, path):
+    data = blob_at(repo, commit, path)
+    return None if data is None else sha256_bytes(data)
+
+
+def _standing_line(state, st, at, churn, r28, fig, repo, gov, measured) -> dict:
+    v = fig.get("verdict") if isinstance(fig.get("verdict"), dict) else {}
+    n, right = fig.get("n"), v.get("right")
+    live = st.get("live") or {}
+    fresh = [x for x in record.history(state) if schedule.kind_of(x) == "fresh" and "pool_regression" in x]
+    line = {"kind": "standing", "set": st["audit"], "week": st["week"], "audit": st["audit"], "commit": st["commit"],
+            "at": schedule.stamp(at), "mode": st["mode"], "churn": churn, "retrieval_28d": r28,
+            "passes": v.get("passes") if measured and isinstance(v.get("passes"), bool) else None,
+            "pool_regression": bool(fresh and fresh[-1]["pool_regression"]), "measured": measured, "used": True}
+    if measured:
+        word = "pass" if v.get("passes") else "miss"
+        line.update(n=n, right=right, wrong=v.get("wrong"), not_found=fig.get("not_found"), dropped=live.get("dropped"),
+                    pct=round(100 * right / n, 4) if isinstance(n, int) and n > 0 and isinstance(right, int) else None,
+                    word=word)
+        if isinstance(n, int) and n < record.MIN_LIVE:  # I6: below 70 live questions the word is a list that names it
+            line["word"] = [word, f"STANDING_THIN {n}"]
+    line.update(gov_pin=declare.gov_pin(gov or "~/.local/bin/gov"),
+                retrieval_yaml_sha256=_sha_at(repo, st["commit"], declare.RETRIEVAL),
+                path_map_sha256=_sha_at(repo, st["commit"], "governance/project/path-map.yaml"))
+    return line
+
+
+def standing(sets_root, *, repo, link, gov, claude, gate_cmd, emit) -> str:
+    """The exit word: ``ok`` (a miss is data, not a failure), ``refused``, ``stopped`` or ``used`` (the week is spent)."""
+    from gov.memaudit import layout
+    from gov.memaudit.common import set_digest
+    repo, at = schedule.repo_of(repo), schedule.now()
+    state = schedule.state_of(repo)
+    link = schedule.store_link(repo, link)
+    head = schedule.head_of(link)
+    rec = record.live(state)
+    if rec is None:
+        emit("STANDING_RETIRED" if record.records(state) else "STANDING_NONE")
+        return "refused"
+    name, week = rec["set"], record.week_of(at)
+    p = layout.paths(sets_root, name, week)
+    if record.week_state(p) == "used":  # nothing is written: no STARTS line, no digest
+        emit("USED")
+        return "used"
+    if set_digest(p["hidden"]) != rec["set_digest"]:  # before any search; the week is not spent
+        emit("STANDING_DIGEST")
+        return "refused"
+    mine = record.lines_of(state, name)
+    before = schedule.decide(repo, state, head, at, mine, standing=True)
+    st = {"audit": name, "week": week, "commit": head, "force": False, "mode": before["mode"],
+          "reason": before["reason"], "steps": [], "stop": None, "refused": None, "cost": {}, "figures": None,
+          "live": None}
+    os.makedirs(state, exist_ok=True)
+    lock = os.open(state / "LOCK", os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            locked = False
+        except BlockingIOError:
+            locked = True
+        code = _refusal(st, state, link + ".lock", locked, False, at, head, repo, standing=True)
+        if code:
+            emit(f"REFUSED {code}")
+            return "refused"
+        if record.week_state(p) == "restart":  # stopped before its reader run began: once more, the first folder kept
+            record.restart(p)
+        a_dir = state / "standing" / name / week
+        a_dir.mkdir(parents=True, exist_ok=True)
+        with open(state / "STARTS.log", "a", encoding="utf-8") as f:
+            f.write(json.dumps({"audit": name, "commit": head, "at": schedule.stamp(at), "force": False,
+                                "kind": "standing", "week": week}) + "\n")
+        env = dict(os.environ, GOV_INDEP_RUNS_DIR=str(state), GOV_MEMAUDIT_STATE=str(state))
+        cycle = _Cycle(st, a_dir, repo, env, emit, sets_root, shlex.split(gate_cmd or ""), None, link, week=week)
+        cycle.save()
+        churn, r28 = schedule.churn_at(repo, head)
+        done = cycle.standing(str(repo), gov, claude)
+        fig = {}
+        if done:
+            fig = _last_json(a_dir / "figures.out")
+            st["figures"] = fig
+        if done or st["stop"]["used"]:
+            row = _standing_line(state, st, at, churn, r28, fig, repo, gov, measured=done)
+            record.append(state, "HISTORY.jsonl", row)
+            if done:
+                record.repair_after(state, name, week)
+        cycle.save()
+        _finish_standing(st, a_dir, repo, state, head, at, before, emit)
+        if done:
+            v = fig.get("verdict") or {}
+            emit(f"STANDING {week} right {v.get('right')} of {fig.get('n')}: {'passes' if v.get('passes') else 'misses'}")
+        return "ok" if done else "stopped"
+    finally:
+        os.close(lock)
+
+
+def _finish_standing(st, a_dir, repo, state, head, at, before, emit) -> None:
+    name = st["audit"]
+    mine = record.lines_of(state, name)
+    try:
+        after = schedule.decide(repo, state, head, at, mine, standing=True)
+    except (GitError, ValueError, OSError):
+        after = before
+    last = [x for x in mine if x.get("measured") is True]
+    fresh = schedule.fresh_due([x for x in schedule.read_lines(state / "STARTS.log") if schedule.kind_of(x) == "fresh"],
+                               last[-1] if last else None, at)
+    is_open, week = record.repair_state(record.history(state))
+    st.update(next=after["next"], next_mode=after["mode"], next_fresh=fresh["next"], repair=week if is_open else None,
+              maintain=record.latest_maintain(state))
+    block = digest.standing_lines(st)
+    _write_text(a_dir / "DIGEST.txt", "\n".join(block) + "\n")
     for line in block:
         emit(line)
 

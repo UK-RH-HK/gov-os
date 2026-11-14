@@ -44,13 +44,20 @@ def write_text(path: Path, text: str) -> None:
 
 def last_control(p: dict) -> tuple[int, str | None]:
     """``(last, last_audit)``: ``control.hit5`` of the ``FIGURES.json`` of the latest earlier ``memory-audit-<date>`` run
-    folder that has one; none: E0's 34."""
+    folder that has one; none: E0's 34. A standing run (``p["week"]``) looks at the set's earlier weeks first, then at
+    every fresh audit's."""
     runs = p["root"] / "runs"
-    audit = p["run"].name
+    audit = "~" if p.get("week") else p["run"].name  # "~" sorts after every audit name: all fresh audits are earlier
+    where = []
+    if p.get("week") and p["run"].parent.is_dir():
+        weeks = sorted((n for n in os.listdir(p["run"].parent) if layout.WEEK_RE.fullmatch(n) and n < p["week"]),
+                       reverse=True)
+        where += [(f"{p['run'].parent.name}/{n}", p["run"].parent / n) for n in weeks]
     names = sorted((n for n in os.listdir(runs) if layout.AUDIT_RE.fullmatch(n) and n < audit), reverse=True) \
         if runs.is_dir() else []
-    for name in names:
-        doc = read_json(runs / name / "FIGURES.json")
+    where += [(n, runs / n) for n in names]
+    for name, folder in where:
+        doc = read_json(folder / "FIGURES.json")
         control = doc.get("control") if isinstance(doc, dict) else None
         if isinstance(control, dict) and isinstance(control.get("hit5"), int):
             return control["hit5"], name
@@ -123,8 +130,9 @@ class _Run:
         cause = None if same else "store"
         if cause is None and rc != 0:
             cause = "exit"
-        if cause is None:
-            cause = fault.not_whole(folder, self.decl["n"], self.families)
+        if cause is None:  # a standing run measures the whole set (n_set) and every result is from the declared store
+            cause = fault.not_whole(folder, self.decl.get("n_set", self.decl["n"]), self.families,
+                                    store_commit=self.decl["store_commit"] if self.decl.get("standing") else None)
         if cause is not None:
             write_text(folder / "FAULT", cause)
             events.append(self.run, "attempt", n=n, state="fault", cause=cause)
@@ -137,22 +145,28 @@ class _Run:
         write_text(self.run / "COUNTS", f"attempt-{n}")
         events.append(self.run, "counts", attempt=f"attempt-{n}")  # item 3: the counting attempt's name, as COUNTS
         parsed = fault.read_parsed(folder)
-        self.emit(scores.retrieval_line(n, scores.retrieval(parsed["questions"], scores.apart_ids(self.p["hidden"]))))
+        apart, questions = scores.apart_ids(self.p["hidden"]), parsed["questions"]
+        if self.decl.get("standing"):  # the figures beside count the live questions only
+            gone = set((read_json(self.p["preflight"]) or {}).get("dropped_ids") or [])
+            questions = [x for x in questions if x["id"] not in gone]
+        self.emit(scores.retrieval_line(n, scores.retrieval(questions, apart)))
         return True
 
 
-def _flags(sets_root, audit, repo, store, gov):
-    p = layout.paths(sets_root, audit)
+def _flags(sets_root, audit, repo, store, gov, week=None):
+    p = layout.paths(sets_root, audit, week)
     repo = Path(repo) if repo is not None else toplevel()
     store = Path(os.path.expanduser(str(store))) if store is not None else repo / ".gov-runtime/store.db"
     gov = os.path.abspath(os.path.expanduser(str(gov) if gov is not None else "~/.local/bin/gov"))
     return p, repo, store, gov
 
 
-def run(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None, emit) -> str:
-    """The exit word (``ok``, ``refused``, ``used`` or ``stopped``); every line goes to ``emit``."""
-    p, repo, store, gov = _flags(sets_root, audit, repo, store, gov)
-    word, counts = declare.declare(sets_root, audit, commit=commit, repo=repo, store=store, gov=gov, decision=decision)
+def run(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=None, emit, week=None) -> str:
+    """The exit word (``ok``, ``refused``, ``used`` or ``stopped``); every line goes to ``emit``. With ``week`` the run
+    is a standing set's week: its folder is ``runs/<set>/<week>/`` and its questions are never printed."""
+    p, repo, store, gov = _flags(sets_root, audit, repo, store, gov, week)
+    word, counts = declare.declare(sets_root, audit, commit=commit, repo=repo, store=store, gov=gov, decision=decision,
+                                   week=week)
     for line in declare.lines(word, counts):
         emit(line)
     if word != "ok":
@@ -178,10 +192,15 @@ def run(sets_root, audit, *, commit, repo=None, store=None, gov=None, decision=N
         return "stopped"
 
 
-def rescore(sets_root, audit, n: int, *, repo=None, emit) -> str:
+def rescore(sets_root, audit, n: int, *, repo=None, emit, week=None) -> str:
     """``measure --kept <n>``: ``attempt-<n>``'s kept outputs through ``gov.retrieval.measure --kept``; the ``RETRIEVAL``
-    line; nothing is written. ``ok``, or ``refused`` with ``MS-KEPT``; never ``used``."""
+    line; nothing is written. ``ok``, or ``refused`` with ``MS-KEPT``; ``used`` (``USED``, nothing written) for a
+    standing set, whose labels and figures are never re-scored (F2)."""
     p = layout.paths(sets_root, audit)
+    from gov.memaudit import standing
+    if week or standing.is_standing(sets_root, audit, repo, by_name=False):  # before anything else: a standing set's
+        emit("USED")  # labels and figures are never re-scored, whatever directory this is run from
+        return "used"
     repo = Path(repo) if repo is not None else toplevel()
     if layout.inside(repo, p["root"]):
         raise UsageError("flag inside the sets root")

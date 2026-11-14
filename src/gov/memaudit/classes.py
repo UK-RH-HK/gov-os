@@ -11,12 +11,16 @@ import json
 
 from gov.memaudit import figures as figs
 from gov.memaudit import layout
+from gov.memaudit import standing as record
 from gov.memaudit.common import read_json
 
 
 def run(sets_root, audit, *, emit) -> str:
     """``ok`` or ``refused`` (``MS-NOFIGURES``, ``MS-CLASSES``)."""
     p = layout.paths(sets_root, audit)
+    if record.is_standing(sets_root, audit):  # no auditor's classes for a standing set (F1)
+        emit("MS-STANDING")
+        return "refused"
     run_dir = p["run"]
     figures = read_json(run_dir / "FIGURES.json")
     if not isinstance(figures, dict):

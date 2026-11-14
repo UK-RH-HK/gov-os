@@ -49,7 +49,7 @@ def test_the_declaration_holds_every_key_and_the_bar_scaled_to_n(plant):
     assert decl["audit_commit"] == decl["store_commit"] == plant.repo["head"]
     assert decl["gov_pin"] == "pin-0123456789ab"
     assert decl["settings"] == {"reranker": "shared", "pool": True, "bundle_tokens": 6000, "search_again_once": True}
-    assert decl["n"] == 39 and decl["bar"] == {"need_right": 34, "max_wrong": 1, "target_right": 38}
+    assert decl["n"] == 39 and decl["bar"] == {"need_right": 38, "max_wrong": 1, "target_right": 38}
     assert decl["ok"] is True and decl["nonstandard"] == [] and decl["decision"] is None
     assert decl["set_digest"] == set_digest(plant.hidden)
     assert decl["store_sha256"] == declare.sha256_file(plant.store)

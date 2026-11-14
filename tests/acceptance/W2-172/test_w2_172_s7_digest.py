@@ -80,7 +80,7 @@ def test_s7_a_set_of_37_prints_the_scaled_bar(ran):
     world, run = ran("five37")
     assert_ok(run)
     v = by_word(world.digest())["VERDICT"]
-    assert (v["n"], v["need"], v["max"]) == ("37", "32", "1"), v.group(0)
+    assert (v["n"], v["need"], v["max"]) == ("37", "36", "1"), v.group(0)
 
 
 @pytest.mark.parametrize("name", RUNS)
@@ -213,7 +213,7 @@ def test_f2_no_question_gold_answer_answer_or_source_path_reaches_the_digest_the
     for path in sorted(world.runs.rglob("*")):
         if path.is_file():
             targets[str(path.relative_to(world.runs))] = path.read_bytes() + path.name.encode()
-    assert "indep/memaudit/%s/DIGEST.txt" % world.audit in targets
+    assert "indep/memaudit/%s/%s/DIGEST.txt" % (world.mem.name, world.audit) in targets  # I2: <key>/<audit>/
     for where, data in targets.items():
         for word in words:
             assert word not in data, f"{word.decode()} found in {where}"

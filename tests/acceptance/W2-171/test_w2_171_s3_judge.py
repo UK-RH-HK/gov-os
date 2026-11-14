@@ -98,25 +98,25 @@ def test_s3_the_verdict_bar_and_beside_lines_are_printed_as_item_8_gives_them(ma
     assert positions == sorted(positions), "the lines come in item 8's order"
     right, wrong = S.Expected(S.SCENARIOS[name], world).right_wrong()
     assert (right, wrong) == {"five": (35, 2), "clean": (40, 0), "below": (33, 2), "five37": (33, 1)}[name]
-    assert ("PASSES" in expected[1]) == (name != "below")
+    assert ("PASSES" in expected[1]) == (name == "clean")
 
 
-def test_s3_the_verdict_names_the_scaled_bar_34_and_2_with_target_38(make_world):
+def test_s3_the_verdict_names_the_scaled_bar_38_and_2_with_target_38(make_world):
     world = make_world("judged:five")
     out = world.staged["judge"]["out"]
-    assert "BAR at least 34 right (met) and at most 2 wrong claims (met): PASSES; target at least 38: not reached" in out
+    assert "BAR at least 38 right (NOT met) and at most 2 wrong claims (met): MISSES; target at least 38: not reached" in out
     assert "exact 95 % interval 73.2 to 95.8 %" in out and "right end to end 35 of 40 (87.5 %" in out
 
 
-def test_s3_the_scaled_bar_for_a_set_of_37_is_32_right_1_wrong_target_36(make_world):
-    """The bar scales with n (ceil(0.85 n) right, floor(0.05 n) wrong claims, target ceil(0.95 n)): a set of 37 after the
-    checker's drops has its bar at 32, 1 and 36; ``n`` is 37 on every line and in the figures, the apart question inside."""
+def test_s3_the_scaled_bar_for_a_set_of_37_is_36_right_1_wrong_target_36(make_world):
+    """The bar scales with n (ceil(0.95 n) right, floor(0.05 n) wrong claims, target the same): a set of 37 after the
+    checker's drops has its bar at 36, 1 and 36; ``n`` is 37 on every line and in the figures, the apart question inside."""
     world = make_world("judged:five37")
     out = world.staged["judge"]["out"]
-    assert "BAR at least 32 right (met) and at most 1 wrong claims (met): PASSES; target at least 36: not reached" in out
+    assert "BAR at least 36 right (NOT met) and at most 1 wrong claims (met): MISSES; target at least 36: not reached" in out
     assert "right end to end 33 of 37 (89.2 %" in out and "wrong claims 1 of 37 (2.7 %)" in out
     figures = world.json_of("FIGURES.json")
-    assert (figures["n"], figures["n_gold"], figures["bar"]) == (37, 36, {"need_right": 32, "max_wrong": 1,
+    assert (figures["n"], figures["n_gold"], figures["bar"]) == (37, 36, {"need_right": 36, "max_wrong": 1,
                                                                           "target_right": 36})
     assert world.json_of("DECLARATION.json")["n"] == 37
     assert not [p for p in world.hidden.glob("q*.yaml") if p.stem in ("q27", "q33", "q34")]

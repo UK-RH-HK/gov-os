@@ -421,3 +421,68 @@ def lines(word: str, counts: dict) -> list[str]:
             out.append(" ".join([code, "refused", str(c["refused"]), *tail]))
     out.append(OK_WORD if word == "ok" else NOT_OK_WORD)
     return out
+
+
+# ---- the standing pre-flight (W2-187 I6; S6, F2)
+
+def _dropped(q: dict) -> bool:
+    """A question whose source entry has every alternative unresolved at the audit commit."""
+    return any(not kept and any(u == f"entry {i}" or u.startswith(f"entry {i}.") for u in q["unresolved"])
+               for i, kept in enumerate(q["sources"], 1))
+
+
+def standing(sets_root, name, *, week, commit, repo=None) -> tuple[str, dict]:
+    """The standing set's pre-flight: each question is loaded alone, as the measure loads it, at the measured root
+    ``repo``; one whose gold anchors no longer resolve (some entry with every alternative unresolved), or whose
+    nonexistent id now exists, is dropped from the week's ``n`` and counted. Nothing in the set is edited or moved.
+    ``PREFLIGHT.json`` goes to the week folder (ids stay there); the word is ``ok``, ``refused`` (``STANDING_DIGEST``:
+    the set's digest is not the record's) or ``used``."""
+    from gov.memaudit import declare, matcher, schedule
+    from gov.memaudit import standing as record
+    from gov.retrieval import lexical
+    p = layout.paths(sets_root, name, week)
+    repo = Path(repo) if repo is not None else toplevel()
+    if layout.inside(repo, p["root"]):
+        raise UsageError("flag inside the sets root")
+    commit = resolve_commit(repo, commit)
+    if os.path.lexists(p["used"]):
+        return "used", {"used": True}
+    files, _ = layout.entries(p["hidden"])
+    at, default = _Files(repo, commit), declare.entry_of(name)
+    dropped, apart = [], 0
+    for f in files:
+        try:
+            found = matcher.questions(p["root"], name, "hidden", repo, only=f.stem, default=default)
+            q = found[0] if len(found) == 1 else None
+        except matcher.MatcherError:
+            raise
+        except Exception:  # noqa: BLE001: a load fault drops that one question, never the set; nothing of it is printed
+            q = None
+        if q is None or _dropped(q):
+            dropped.append(f.stem)
+        elif q["apart"]:
+            if any(id_exists(repo, commit, nm, at) for nm in lexical.ids_in(q["question"])):
+                dropped.append(f.stem)
+            else:
+                apart += 1
+    digest = set_digest(p["hidden"])
+    recorded = record.live(schedule.state_of(repo))
+    ok = not (recorded is not None and recorded.get("set") == name and recorded.get("set_digest") != digest)
+    hidden = p["hidden"]
+    counts = {"mode": "standing", "audit": name, "week": week, "audit_commit": commit, "at": utc_iso(), "ok": ok,
+              "n_set": len(files), "n": len(files) - len(dropped), "dropped": len(dropped), "dropped_ids": dropped,
+              "n_apart": apart, "set_digest": digest,
+              FILES_KEY: {e.name[:-5]: sha256_file(hidden / e.name) for e in sorted(os.scandir(hidden), key=lambda e: e.name)
+                          if e.name.endswith(".yaml") and e.is_file()} if hidden.is_dir() else {}}
+    run_dir = layout.make_run(p)
+    write_whole(run_dir, "PREFLIGHT.json", counts)
+    ledger.append(run_dir, "preflight", ok=ok, n=counts["n"], n_set=counts["n_set"], dropped=counts["dropped"])
+    return ("ok" if ok else "refused"), counts
+
+
+def standing_lines(word: str, counts: dict) -> list[str]:
+    if word == "used":
+        return ["USED"]
+    if word == "refused":
+        return ["STANDING_DIGEST"]
+    return [f"PRE-FLIGHT standing: n {counts['n']} of {counts['n_set']}; dropped {counts['dropped']}"]
