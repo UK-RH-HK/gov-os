@@ -1423,3 +1423,4 @@
 2026-11-14 18:32:09 land started: ['W2-42a=2376e2a33485'] -> land-dispatch-20261114-183209.out (launcher exit 0)
 2026-11-14 18:33:05 land finished: {'W2-42a=2376e2a33485': 'CLOSED'}
 2026-11-14 18:36:05 guard refusals: 25 new
+2026-11-14 18:39:05 interim result: W2-94-fix 4480c451c W2-94 (DAEO-g87r): the probe record of the path case's narrow independent check 

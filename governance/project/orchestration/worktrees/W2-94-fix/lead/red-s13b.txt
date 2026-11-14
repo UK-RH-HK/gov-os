@@ -1,0 +1,4 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 18:38:00)
+........................                                                 [100%]
+24 passed in 6.20s
+rc=0
