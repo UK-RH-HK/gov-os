@@ -19,6 +19,21 @@ answers the protocol ``gov.codeintel`` speaks (``config``, ``cli ... index_repos
 its settings (the counts it answers, what the whole-graph read of the edges does, whether the count queries answer) are the case's. The
 plant is a C repository with a vendored folder (``src/``, ``deps/<lib>/``), code intelligence called for in its path map, the suite's chain
 A0 to A8 run once per module and forked per case (the suite's A9 cases).
+
+Run 8 (DEC-1183, the owner's package 2 (a); run 8 interface items 7-10): ``gov.codeintel`` reads the graph in pages by type, each under the
+tool's cap: the counts first (edges by type, nodes by label), then each edge type with its typed match and each label with its label match,
+never by ``SKIP``/``LIMIT``; the rows read for each type and label equal its count, else the read refuses. The stand-in now behaves as the
+lead's probe found the real tool does (``standin_f1/tool.py``: count queries in full, the typed and label matches in full, any result over
+100,000 rows refused with the real tool's text, ``SKIP``/``LIMIT`` answered short), its graph generated from ``W2_88_F1_TYPES`` and
+``W2_88_F1_LABELS``. So:
+
+* (a) a graph over 100,000 edges (or nodes) whose every type and label is within the cap: A9 completes, its record's code graph counts
+  the planted totals (this replaces run 7's case that expected ``CODEGRAPH_TOO_LARGE`` for redis's figures: Rewrite-Reason DEC-1183,
+  package 2 (a));
+* (b) one edge type (or label) over 100,000: ``CODEGRAPH_TOO_LARGE`` naming the tool, the cap, the type (or label) and its count,
+  ``details.kind`` the type (or label);
+* (c) a typed (or label) read that answers fewer rows than its count: ``FABRIC_INCOMPLETE`` naming the store, the type (or label) and both
+  figures.
 """
 
 from __future__ import annotations
@@ -123,30 +138,99 @@ def assert_nothing_left(adoption, start: str, run) -> None:
 
 
 # ------------------------------------------------------------------------------------------------------------
-# The graph is over the tool's cap: A9 names it
+# Run 8 (package 2 (a)): a graph over the cap whose every type and label is within it is read by type; A9 completes
 # ------------------------------------------------------------------------------------------------------------
 
-def test_s25_a_graph_over_the_tools_cap_is_refused_codegraph_too_large_naming_the_tool_the_cap_and_both_counts(c_world):
-    """success-S25 (F-1): redis's figures (41,086 nodes, 143,008 edges) with the whole-graph read of the edges refused as the real tool refuses
-    it (``isError: true``, ``result exceeded 100k rows``). A9 is refused ``CODEGRAPH_TOO_LARGE`` (the envelope's ``ok: false``, its ``error.code`` and
-    ``error.message``, as the suite checks every refusal; not exit 2): the message names ``codebase-memory-mcp``, the cap of 100,000 and both counts, and that gov's read takes the whole
-    graph in one query (``gov.codeintel``); ``details`` are ``{nodes: 41086, edges: 143008, cap: 100000, tool: "codebase-memory-mcp"}``. A9 asked the
-    tool for the counts (two ``count(`` queries). Never ok; no record; HEAD unmoved; A9's copies taken back."""
-    adoption, run, log, start = a9_with(c_world, "f1-cap", nodes=41086, edges=143008, read="cap")
-    W.assert_refused(run, CODE, "A9 on a code graph over the tool's cap")
+def spec(parts: dict) -> str:
+    """``{"USAGE": 60000}`` as the stand-in's setting ``USAGE=60000``."""
+    return ",".join(f"{name}={count}" for name, count in parts.items())
+
+
+# redis's figures (the lead's probe, run 8 item 7): 41,086 nodes over labels, 142,983 edges over 20 types, the largest USAGE 40,849.
+REDIS_TYPES = {"USAGE": 40849, "CALLS": 29000, "IMPORTS": 15000, "READS": 12000, "WRITES": 10000, "REFERENCES": 8000, "RETURNS": 6000,
+               "TAKES": 5000, "INCLUDES": 4000, "CASTS": 3000, "ASSIGNS": 2500, "EXPANDS": 2000, "OVERRIDES": 1500, "INHERITS": 1200,
+               "IMPLEMENTS": 1000, "THROWS": 800, "TESTS": 600, "CONFIGURES": 400, "MEMBER_OF": 134}
+REDIS_LABELS = {"Function": 20000, "Variable": 9000, "Field": 6000, "Macro": 4000, "Struct": 2086}
+
+WITHIN_THE_CAP = [
+    pytest.param(REDIS_LABELS, REDIS_TYPES, id="redis-figures-edges-over-the-cap"),
+    pytest.param({"Function": 60000, "Variable": 45000}, {"USAGE": 60000, "CALLS": 50000, "IMPORTS": 40000}, id="nodes-and-edges-over-the-cap"),
+    pytest.param({"Function": 30000}, {"USAGE": 100_000, "CALLS": 5000}, id="one-type-exactly-at-the-cap"),
+]
+
+
+@pytest.mark.parametrize("labels,types", WITHIN_THE_CAP)
+def test_s25_a_graph_over_the_cap_whose_every_type_and_label_is_within_it_is_read_whole_and_a9_completes(c_world, labels, types):
+    """success-S25 (run 8 items 8-10, DEC-1183 package 2 (a); revises run 7's case that expected ``CODEGRAPH_TOO_LARGE`` for redis's figures,
+    Rewrite-Reason: DEC-1183, package 2 (a)): the stand-in's planted graph (generated rows: every node's file a staged file, every edge unique)
+    is over the tool's cap of 100,000 rows in edges (redis's figures: 41,086 nodes, 142,983 edges in 19 types, the largest 40,849), in nodes and
+    edges (105,000 nodes in two labels, 150,000 edges in three types), or has one type of exactly 100,000 (the cap is exceeded, not reached).
+    Any one query whose result exceeds 100,000 rows is refused as the real tool refuses it; ``SKIP``/``LIMIT`` answers short. A9 completes (exit
+    0, ok) and its record's code graph holds the planted totals of nodes and edges; A9 asked no ``SKIP``/``LIMIT`` query and no query of its
+    was refused for the cap."""
+    nodes, edges = sum(labels.values()), sum(types.values())
+    assert edges > CAP or nodes > CAP, "the plant: the graph is not over the cap"
+    assert max([*labels.values(), *types.values()]) <= CAP, "the plant: a type or label is over the cap"
+    adoption, run, log, _start = a9_with(c_world, f"f1-within-{nodes}-{edges}", labels=spec(labels), types=spec(types))
+    assert CODE not in W.error_text(run), f"A9 is refused {CODE} for a graph whose every type and label is within the cap\n{run.describe()}"
+    W.assert_ok(run, f"A9 on a code graph of {nodes} nodes and {edges} edges, every type and label within the cap")
+    assert run.returncode == 0, f"A9 exited {run.returncode}\n{run.describe()}"
+    store = (W.a9_record(adoption.project, run).get("stores") or {}).get("codegraph") or {}
+    assert store.get("nodes") == nodes and store.get("edges") == edges, (
+        f"the record's code graph holds {store.get('nodes')} nodes and {store.get('edges')} edges, the planted graph {nodes} and {edges}: {store!r}")
+    asked = queries(log)
+    paged = [q["query"] for q in asked if re.search(r"\b(SKIP|LIMIT)\b", q["query"], re.I)]
+    assert not paged, f"A9's read paged by SKIP/LIMIT (not a sound page: the tool answers it short): {paged[:3]}"
+    refused = [q["query"] for q in asked if q.get("rows") == "error"]
+    assert not refused, f"a query of A9's read was refused by the tool (over its cap): {refused[:3]}"
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Run 8: a type or label over the cap is refused by name; a read that ends short is refused
+# ------------------------------------------------------------------------------------------------------------
+
+@pytest.mark.parametrize("labels,types,kind,count", [
+    pytest.param({"Function": 30000}, {"USAGE": 100_001, "CALLS": 20000}, "USAGE", 100_001, id="an-edge-type-one-over"),
+    pytest.param({"Method": 100_001, "Function": 2000}, {"CALLS": 50000, "USAGE": 10000}, "Method", 100_001, id="a-node-label-one-over"),
+])
+def test_s25_a_type_or_label_over_the_cap_is_refused_codegraph_too_large_naming_it_and_its_count(c_world, labels, types, kind, count):
+    """success-S25 (run 8 item 9): one edge type (or node label) of 100,001 rows cannot be read under the cap by type. A9 is refused
+    ``CODEGRAPH_TOO_LARGE``: the message names ``codebase-memory-mcp``, the cap of 100,000, the type (or label) and its count (100,001);
+    ``details`` hold ``nodes`` and ``edges`` (the planted totals), ``cap`` (100000), ``tool`` and ``kind`` (the type or label). Never ok, never
+    0 nodes and edges; no record; HEAD unmoved; A9's copies taken back."""
+    nodes, edges = sum(labels.values()), sum(types.values())
+    adoption, run, _log, start = a9_with(c_world, f"f1-over-{kind}", labels=spec(labels), types=spec(types))
+    W.assert_refused(run, CODE, f"A9 on a code graph whose {kind} holds {count} rows")
     error = run.error
-    assert error.get("code") == CODE and str(error.get("message", "")).strip(), f"the envelope's error does not hold the code {CODE} and a message: {error!r}\n{run.describe()}"
     message = digits(str(error.get("message", "")))
     assert TOOL in message, f"the message does not name the tool {TOOL!r}: {message!r}"
     assert "100000" in message, f"the message does not name the tool's cap of 100,000 rows: {message!r}"
-    assert "41086" in message and "143008" in message, f"the message does not name both counts (41,086 nodes, 143,008 edges): {message!r}"
-    assert "gov.codeintel" in message, f"the message does not say that gov's code-graph read (gov.codeintel) takes the whole graph in one query: {message!r}"
-    assert "one query" in message or "single query" in message or "whole graph" in message, f"the message does not say the read takes the whole graph at once: {message!r}"
+    assert kind in message, f"the message does not name the type or label over the cap ({kind}): {message!r}"
+    assert str(count) in message, f"the message does not name {kind}'s count ({count}): {message!r}"
     details = error.get("details") or {}
-    assert details.get("nodes") == 41086 and details.get("edges") == 143008, f"details.nodes/edges: {details!r}"
+    assert details.get("kind") == kind, f"details.kind is {details.get('kind')!r}, expected {kind!r}: {details!r}"
+    assert details.get("nodes") == nodes and details.get("edges") == edges, f"details.nodes/edges, expected {nodes}/{edges}: {details!r}"
     assert details.get("cap") == CAP and details.get("tool") == TOOL, f"details.cap/tool: {details!r}"
-    counted = [q for q in queries(log) if "count(" in q["query"]]
-    assert len(counted) >= 2, f"A9 asked the tool for no counts (count queries seen: {len(counted)})"
+    assert_nothing_left(adoption, start, run)
+
+
+@pytest.mark.parametrize("labels,types,short,counted", [
+    pytest.param({"Function": 20000}, {"USAGE": 50000, "CALLS": 40000, "IMPORTS": 30000}, ("CALLS", 7), 40000, id="an-edge-type-read-short"),
+    pytest.param({"Function": 60000, "Variable": 45000}, {"CALLS": 20000}, ("Variable", 7), 45000, id="a-node-label-read-short"),
+])
+def test_s25_a_typed_read_that_answers_fewer_rows_than_its_count_is_refused_fabric_incomplete(c_world, labels, types, short, counted):
+    """success-S25 (run 8 item 9, never a silent partial count): a graph over the cap (so it is read by type or label), whose typed match of
+    ``CALLS`` (or label match of ``Variable``) answers 7 rows fewer than its count. A9 is refused ``FABRIC_INCOMPLETE`` naming the store
+    (``codegraph``), the type (or label) and both figures (its count and the rows read); never ``CODEGRAPH_TOO_LARGE``; never ok; no record;
+    HEAD unmoved; A9's copies taken back."""
+    kind, fewer = short
+    adoption, run, _log, start = a9_with(c_world, f"f1-short-{kind}", labels=spec(labels), types=spec(types), short=f"{kind}={fewer}")
+    W.assert_refused(run, "FABRIC_INCOMPLETE", f"A9 where the read of {kind} ends {fewer} rows short of its count")
+    text = digits(W.error_text(run))
+    assert "codegraph" in text, f"the refusal does not name the store (codegraph): {text!r}"
+    assert kind in text, f"the refusal does not name the type or label read short ({kind}): {text!r}"
+    assert str(counted) in text and str(counted - fewer) in text, f"the refusal does not name both figures ({counted} counted, {counted - fewer} read): {text!r}"
+    assert CODE not in text, f"the refusal is {CODE} for a read that ended short: {text!r}"
     assert_nothing_left(adoption, start, run)
 
 

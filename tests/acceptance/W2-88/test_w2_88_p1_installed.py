@@ -20,9 +20,14 @@ interface (the lead's statement, DEC-1052, DEC-136; the ticket's S24):
    tree, ``gov.__file__`` is in the venv.
 4. Known before the work (the lead's reading, not a reason to change a line): the pool (``governance/project/retrieval.yaml``), the walls template
    and the MEMORY-AUDIT-1 briefs are not under ``template/`` and not in the wheel at ``a23678e27``, so from an installed release with the kit from
-   copier (1) and (2) find them nowhere and A9 refuses ``SHIPPED_FILE_MISSING`` naming the first it meets. Shipping them is outside the ticket's
-   paths (package data or ``template/``: a package for the CTO). **Case (a) below, the full line, stays red for that cause until the package is
-   decided** (README: "red for the package"); every other case of this module is within the ticket's paths.
+   copier (1) and (2) find them nowhere and A9 refuses ``SHIPPED_FILE_MISSING`` naming the first it meets.
+
+Run 8 (DEC-1183, the owner's package 1 (a); run 8 interface items 3, 4 and 6): the three ship inside the wheel, as copies under
+``src/gov/_shipped/`` declared package data, and ``shipped(rel, root)`` looks (1) in the source tree, (2) in ``<the gov package's folder>/_shipped/<rel>``,
+(3) for ``template/`` in the project's copier copy, else refuses ``SHIPPED_FILE_MISSING`` naming ``rel`` and every place looked. So the full line
+(a) is a live case expected to pass once the package lands (red at ``0821e8514``: the wheel ships no pool, walls or briefs, A9 refuses
+``SHIPPED_FILE_MISSING`` for the first met); the installed wheel's ``gov`` folder holds ``_shipped/`` with the three, byte for byte; and a file
+found nowhere names the shipped copy's place among those looked.
 
 Everything is built in the case's tmp folders (the wheel, the venv, the clone, the projects); nothing is installed on the machine; no network.
 """
@@ -253,7 +258,8 @@ def test_s24_from_an_installed_wheel_a_template_file_is_the_projects_copy_that_c
 def test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_looked(release, kit_project, tmp_path, rel):
     """success-S24 (item 1 (3)): from the wheel, a ``template/`` folder whose copy the project does not hold (the project's discovery skill removed), and a
     path outside ``template/`` that nothing ships, are refused ``SHIPPED_FILE_MISSING``: the message names ``rel`` and each place looked; ``details.file``
-    is ``rel`` and ``details.looked`` lists the places (the project's copy among them for the first); no default is answered in its place."""
+    is ``rel`` and ``details.looked`` lists the places (the project's copy among them for the first); no default is answered in its place.
+    Run 8 (item 4): the copy shipped inside the installed ``gov`` package, ``<gov package folder>/_shipped/<rel>``, is among the places looked."""
     root = tmp_path / "project"
     shutil.copytree(kit_project, root)
     shutil.rmtree(root / "governance/kernel/skills/discovery")
@@ -268,6 +274,10 @@ def test_s24_a_shipped_file_found_nowhere_is_refused_by_name_with_the_places_loo
     assert rel in message, f"the message does not name {rel!r}: {message!r}"
     for place in looked:
         assert str(place) in message, f"the message does not name the place looked {place!r}: {message!r}"
+    # run 8 item 4 (2): the copy shipped inside the installed gov package is a place looked, and the message names it
+    inside = os.path.realpath(Path(answer.get("gov_file", "")).parent / "_shipped" / rel)
+    assert any(os.path.realpath(str(p).rstrip("/")) == inside for p in looked), (
+        f"the installed package's shipped copy {inside} is not among the places looked: {looked}")
     if rel.startswith("template/"):
         expected = str(root / "governance/kernel/skills/discovery")
         assert any(str(p) == expected or str(p).rstrip("/") == expected for p in looked), f"the project's copy {expected} is not among the places looked: {looked}"
@@ -327,13 +337,34 @@ def test_s24_the_standards_pool_is_read_from_the_shipped_file_when_a9_runs(world
         assert not (W.a9_record(adoption.project, run).get("standard") or {}).get("departures"), "the record names a departure"
 
 
+SHIPPED_ITEMS = [POOL, "governance/project/indep-walls", "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs"]
+
+
+def test_s24_the_installed_wheels_gov_package_holds_shipped_with_the_pool_the_walls_and_the_audit_briefs(release):
+    """success-S24 (run 8 items 3 and 6): the wheel built in the release form and installed in the venv holds, in its ``gov`` package folder (found by
+    ``importlib`` from the venv's python, no ``PYTHONPATH``), ``_shipped/`` with the three items at their Gov OS paths: ``governance/project/
+    retrieval.yaml``, every file of ``governance/project/indep-walls/`` and of the MEMORY-AUDIT-1 ``briefs/``, each byte for byte the checkout's."""
+    probe = "import importlib.util, pathlib; print(pathlib.Path(importlib.util.find_spec('gov').origin).parent)"
+    folder = Path(run([release.python, "-c", probe], clean_env(release.scratch), release.scratch, "finding gov in the venv").stdout.strip())
+    assert str(folder).startswith(str(release.venv)), f"gov was found at {folder}, not in the venv {release.venv}"
+    shipped = folder / "_shipped"
+    assert shipped.is_dir(), f"the installed gov package ({folder}) holds no _shipped/ folder: the wheel ships no pool, walls or briefs"
+    for rel in SHIPPED_ITEMS:
+        source, copy = W.REPO_ROOT / rel, shipped / rel
+        assert copy.exists(), f"the installed wheel does not ship {rel} (no {copy})"
+        names = [""] if source.is_file() else sorted(p.relative_to(source).as_posix() for p in source.rglob("*") if p.is_file())
+        for name in names:
+            src, dst = (source / name, copy / name) if name else (source, copy)
+            assert dst.is_file(), f"the installed wheel does not ship {rel}/{name}"
+            assert dst.read_bytes() == src.read_bytes(), f"the installed wheel's {dst.relative_to(folder)} is not byte for byte the checkout's {src.relative_to(W.REPO_ROOT)}"
+
+
 def test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes(worlds, release):
-    """success-S24 (the full line; **red for the package while item 4 is open**, README): the kit installed by ``copier copy`` from the planted tag
-    in the planted adoption at A8 (the repository tracks no ``retrieval.yaml``), A9 run by the wheel's gov (no ``PYTHONPATH``, working folder in
-    tmp). A9 is ok; the kernel files it copies (the retrieval and discovery skills, T-0, T-8) are byte for byte the tag's; ``governance/project/
-    retrieval.yaml`` is installed with Gov OS's bytes (read from the shipped pool); the walls copy (``memory-audit/ACT-WALLS/``) and the audit
-    briefs (``memory-audit/briefs/``) are written from shipped bytes. Until the pool, the walls template and the audit briefs are shipped where
-    the resolver looks (outside the ticket's paths: a package), A9 refuses ``SHIPPED_FILE_MISSING`` naming the first of them it meets."""
+    """success-S24 (the full line; run 8, DEC-1183 package 1 (a): a live case expected to pass once the three ship inside the wheel): the kit
+    installed by ``copier copy`` from the planted tag in the planted adoption at A8 (the repository tracks no ``retrieval.yaml``), A9 run by the
+    wheel's gov (no ``PYTHONPATH``, working folder in tmp). A9 is ok; the kernel files it copies (the retrieval and discovery skills, T-0, T-8)
+    are byte for byte the tag's; ``governance/project/retrieval.yaml`` is installed with Gov OS's bytes (read from the shipped pool); the walls
+    copy (``memory-audit/ACT-WALLS/``) and the audit briefs (``memory-audit/briefs/``) are written from shipped bytes."""
     adoption, run, out, _start = installed_a9(worlds, release, "p1-full", no_retrieval=True)
     W.assert_ok(run, "A9 run by a gov installed from a wheel, on a project whose kit copier installed")
     project = adoption.project
@@ -351,7 +382,8 @@ def test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_b
 def test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refused_by_name_and_copies_nothing(worlds, release):
     """success-S24 (b): the same installed-release A9, the project's copy of ``governance/kernel/skills/discovery/`` removed (committed). A9 is refused
     ``SHIPPED_FILE_MISSING``, ``details.file`` a ``rel`` the message names (the first shipped file it could not find: the discovery skill, or, while
-    item 4's package is open, the pool: either is a shipped file found nowhere), and nothing is copied in its place: no ``.claude/skills/discovery``
+    the wheel ships no pool (at 0821e8514), the pool: either is a shipped file found nowhere; run 8: the message names every place looked), and
+    nothing is copied in its place: no ``.claude/skills/discovery``
     and none of A9's copies in the tree or the index, HEAD unmoved, no A9 record, the tree clean."""
     def remove_discovery(project):
         shutil.rmtree(project / "governance/kernel/skills/discovery")
@@ -362,6 +394,8 @@ def test_s24_a9_from_an_installed_release_with_a_shipped_folder_missing_is_refus
     file = (error.get("details") or {}).get("file")
     assert isinstance(file, str) and file in str(error.get("message", "")), f"the refusal does not name the missing file: {error}"
     assert isinstance(error.get("details", {}).get("looked"), list) and error["details"]["looked"], f"details.looked: {error.get('details')}"
+    for place in error["details"]["looked"]:  # run 8 item 4: the message names every place looked
+        assert str(place) in str(error.get("message", "")), f"the message does not name the place looked {place!r}: {error.get('message')!r}"
     project = adoption.project
     assert not (project / ".claude/skills/discovery").exists(), "a default copy of the discovery skill was written in its place"
     left = [t for t, _s in W.copy_plan() if (project / t).exists() and t.startswith(".claude/")]
