@@ -40,7 +40,11 @@ def test_s2_a_run_writes_the_declaration_then_used_before_any_search(ran_std):
     first = min(c["t"] for c in world.searches())
     assert used.stat().st_mtime_ns / 1e9 <= first, "USED before the first search (the planted gov's own clock)"
     events = [e["event"] for e in world.std_ledger()]
-    assert events[:2] == ["declaration", "used"], f"the ledger's first lines: {events[:4]}"
+    # I2 puts the standing pre-flight's ledger in the week folder, so its `preflight` line may come first
+    head = events[:events.index("search")] if "search" in events else events
+    assert [e for e in head if e != "preflight"] == ["declaration", "used"], f"the ledger before the first search: {events[:5]}"
+    assert head.index("declaration") < head.index("used"), f"the ledger's first lines: {events[:5]}"
+    assert set(head[:head.index("declaration")]) <= {"preflight"}, f"only the pre-flight before the declaration: {events[:5]}"
     assert stat.S_IMODE(os.stat(world.std_week).st_mode) == 0o700, "the week folder is mode 0700"
 
 
