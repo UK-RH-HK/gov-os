@@ -1,6 +1,6 @@
 ---
 id: DAEO-g87r
-status: closed
+status: in_progress
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:09Z
@@ -21,6 +21,8 @@ allowed_paths:
 - docs/probes/DAEO-g87r/**  # the probe record
 - fixtures/evaluation/examin/visible/**
 - fixtures/evaluation/examin/hidden/**
+- governance/project/orchestration/tools/indep_launch.py  # the one-question fix flow (reopen 2026-11-14, DEC-1180 (3))
+- tests/unit/orchestration/test_w2_94_fix_flow_unit.py  # the engineer's unit tests of the fix flow
 kpis:
   success:
   - 'Between 10 and 20 questions about EXAMIN''s code and governance, each with its gold answer and the source or sources an answer must cite (file and section or line), in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, splits the set into a development half (`hidden/visible/`) and a hidden half, both written by the walled writer inside the hidden folder; the owner''s release step (`release_visible.sh`) then copies the development half into `visible/` Verify: a planted stand-in set: a count outside 10 to 20 is refused; the record holds the seed and the draw; the two halves each hold half (within one) with each category in both halves; the release step copies exactly the development half into `visible/` and refuses a second release [DEC-957, DEC-828 items 3 and 4, DEC-954 Q9f]'
@@ -28,13 +30,26 @@ kpis:
   - 'Written by the walled writer session (the approved brief `governance/project/indep-briefs/examin-sets/EXAMIN-writer.md`; no shell or network; counts only returned), independent of the adopting team: no session of W2-26, W2-27, W2-88 or a retrieval ticket writes or reads the hidden half; nothing hidden quoted in a commit message, a return, a log or a ticket note Verify: the walls'' launch log names the approved brief''s sha256; the guard''s log shows no session of W2-26, W2-27, W2-88 or a retrieval ticket opened the hidden folder; a grep of commit messages, return, log and ticket notes for a planted unique question word finds 0 hits [DEC-820 (d), DEC-845]'
   - 'Every gold source exists at the copy''s recorded commit and holds the answer Verify: a counts-only script, written by the ticket''s independent test designer and run by the CTO with `--sets-root` (the writer has no shell), prints only counts and ids: for each question, its gold source exists at the copy''s recorded commit and holds the answer ("n of n hold"); a planted source that is absent or does not hold its answer is reported by id [DEC-828 item 4]'
   - 'W2-61''s KPI 6 ("the same split for EXAMIN''s set") is met by this ticket; W2-61''s close record names it as moved here Verify: a grep of W2-61''s close record finds KPI 6 named as moved to W2-94; this ticket''s visible and hidden folders hold the split of S1 [DEC-954, DEC-957]'
+  - 'S6 A writer round 2 run with `--fix <id> --reason <code>` (`--kind writer --round 2` only; `<id>` matches `q` and two digits; `<code>` is one of check_gold.py''s per-question failure codes SOURCE_IS_SCAFFOLD, SOURCE_PATH_ABSENT, SOURCE_NOT_TEXT, SPAN_OUT_OF_FILE, HEADING_NOT_FOUND, ANSWER_NOT_IN_SPANS, NONEXISTENT_NAME_FOUND, NONEXISTENT_NO_NAME) is the one-question fix flow; either flag alone, another kind or round, a bad id or an unknown code refuses 17 with nothing built. Verify: planted runs of each wrong form, exit 17, no wall and no run folder made'
+  - 'S7 The fix flow stages exactly three inputs: `input/<id>.yaml` (a byte copy of the set''s `hidden/<id>.yaml`; absent or a link refuses 10), `input/verdict.txt` (the one line `<id> <code>`), and `input/sample.json` (`{"sample": [...]}`, the ordered `sample` list of the selection staged in the latest delivered round-1 writer run of the same set, read from that run''s own record; none found refuses 10); besides the wall''s fixed files, nothing else of the set or the sets root is staged (no `input/set/`, no `input/notes.md`). Verify: a planted set of several questions, the wall''s file list and bytes after staging'
+  - 'S8 The fix flow delivers only `out/<id>.yaml`: a plain file whose YAML parses to a mapping with `id` equal to `<id>`, else 20 and nothing lands; any file in `out/` other than it, `result.json` and `conflicts.md` refuses 20. On delivery it replaces `hidden/<id>.yaml` alone; every other file under the set''s folder (both halves, `DRAW.txt`, `hidden/dropped/`, any `XCHECK-r*.md`, the release record) is byte-unchanged; the replaced file is packed into the run''s archive and removed from the set. Verify: sha256 of every planted file before and after; the archive holds the old file'
+  - 'S9 The fix flow''s result is the writer schema''s (`questions`, `by_kind`, `by_area`, optional `stopped`) plus `action`, one of `corrected` or `replaced`; `questions` is 1 and each of `by_kind` and `by_area` sums to 1, else 20; a stopped result delivers nothing (21, as today). The counts object records `fix: {"id": <id>, "code": <code>, "action": <action>}` and nothing of the question''s content. Verify: planted results of each wrong form; the counts object''s keys'
+  - 'S10 The owner''s approved variant (`EXAMIN-writer-q02-fix.md`, sha256 0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173) launches through the fix flow end to end, byte for byte unchanged, on a planted sets root and launch clone with the fake session: its front matter is accepted as written. Verify: the planted end-to-end run, exit 0, the delivered file in place'
+  - 'S11 The script''s docstring gains the fix flow''s usage line; `governance/project/indep-walls/**` and `governance/project/indep-briefs/**` are unchanged (the owner''s class O). Verify: `git diff --stat` of the branch names only the ticket''s paths'
+  - 'S12 Without `--fix`, every existing flow behaves as before. Verify: the W2-149, W2-173 and W2-178 launcher unit suites pass unchanged'
   failure:
   - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work. Verify: a planted stand-in hidden file: a read, a grep and a `git log` from a measured session''s sandbox (the guard''s path map) are refused or find it 0 times'
   - 'A write in the workbench, the owner''s copy or EXAMIN''s real repository; a clone outside ~/gov-os-runs/W2-94/. Verify: `git status` in the workbench, the owner''s copy and EXAMIN''s real repository shows no change after the run; a `find` for a clone of the copy outside `~/gov-os-runs/W2-94/` finds none'
   - 'A gold source that does not hold its answer. Verify: the S4 script on a planted source that does not hold its answer reports that question''s id as failing'
+  - 'F4 A hidden file other than the fixed question reaches the fix flow''s wall, its result or its counts. Verify: S7''s planted wall listing; a grep of the counts object for planted content markers'
+  - 'F5 A fix run changes, moves or removes any set file other than `hidden/<id>.yaml`, or leaves the set changed after a refusal. Verify: S8''s sha256 comparison, also after a planted refusal at delivery'
+  - 'F6 The fix flow needs a change to the approved variant''s bytes or to the walls'' class O files to run. Verify: S10 runs the variant at its approved sha256; S11''s diff'
 profile: STANDARD
 sources:
 - DEC-957
+- DEC-1175
+- DEC-1178
+- DEC-1180
 - DEC-954
 - DEC-828
 - DEC-820
@@ -58,3 +73,5 @@ Card: MEMORY-SPEC-MAP gap 7, resolved by the owner in DEC-957; W2-61's KPI 6 mov
 - **Verify re-worded (CTO, 2026-11-13, DEC-1157 (12), DEC-1167 (3)):** S3's brief path is where it is installed; S4's script is the test designer's, run by the CTO (the walled writer has no shell); the KPI text before each Verify unchanged except the brief's path.
 
 **Role changed 2026-11-13 (P-W2-94-GOLD-2 (A), the CTO):** class audit -> implementation and role independent-auditor -> engineer, so the launcher lets the engineer the owner's W2-94 GOLD (a) names change `check_gold.py`; the walled writers' delivery is done, and the narrow check stays independent.
+
+**Reopened 2026-11-14 (DEC-1180 (3), the owner's P-Q02-RUN-1 (a): "run today, as soon as it is built and reviewed").** Hidden question q02 fails the gold check (ANSWER_NOT_IN_SPANS). The owner approved the writer's fix variant 0703aebf (DEC-1178 (5)), but the launch script's writer round 2 stages the whole set plus a checker's notes (EXAMIN's round 1 had none) and replaces the whole hidden folder, so the variant cannot run. S6-S12 add a one-question fix flow to `indep_launch.py`, which changes by a ticket (the class rules' catch-all), not an ACT; the walls' `kinds.yaml` and the briefs stay unchanged. After the land, the owner's operator installs the variant (its APPROVED line), commits it into the launch clone, runs the fix flow and `check_gold.py` (expected 20 of 20). No checker run: round 1 had none (FOR-THE-OWNER C8), and `check_gold` is the bar. The same flow can later carry the weekly re-anchor request (DECIDED-NOT-DONE row 203).
