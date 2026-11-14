@@ -53,13 +53,31 @@ def head_findings(head_tree, home) -> list:
 
 
 @pytest.fixture(scope="session")
-def start_findings(clone_at, home) -> list:
-    return support.links_json(clone_at(support.START), home)
+def pinned_findings(clone_at, home):
+    """``pinned_findings(rev)``: ``(tree, findings)`` of ``gov links --all --json`` on the clone at ``rev``, run by the
+    clone's own ``src`` (``PYTHONPATH=<clone>/src``), made once. A case pinned to a commit reads its counts here, so
+    neither a later ticket edit nor a later change to ``gov links`` on the branch moves them (DEC-1156 (7))."""
+    made: dict = {}
+
+    def get(rev: str):
+        tree = clone_at(rev)
+        if tree not in made:
+            made[tree] = support.links_json(tree, home, src=support.pinned_src(tree))
+        return tree, made[tree]
+
+    return get
+
+
+@pytest.fixture(scope="session")
+def start_findings(pinned_findings) -> list:
+    """The starting head's findings, by the starting head's own ``gov links`` (pinned tree and pinned tool)."""
+    return pinned_findings(support.START)[1]
 
 
 @pytest.fixture(scope="session")
 def variant_findings(tmp_path_factory, home):
-    """``variant_findings(commit)``: ``gov links --all`` on ``commit``'s tree with the marks it appends taken off."""
+    """``variant_findings(commit)``: ``gov links --all`` on ``commit``'s tree with the marks it appends taken off. Run by
+    the branch's tool on purpose (README.md and test_w2_130_audit.py state "HEAD's tool"); not pinned in pin run 2."""
     made: dict = {}
 
     def get(commit: str) -> list:
@@ -77,14 +95,14 @@ def variant_findings(tmp_path_factory, home):
 @pytest.fixture(scope="session")
 def propose_sources_at(clone_at, home):
     """``propose_sources_at(commit)``: ``{ticket path: [ids]}`` of ``gov links --propose-sources`` on the commit's
-    parent, for the tickets open or in progress there."""
+    parent, for the tickets open or in progress there. Run by the parent clone's own ``src`` (pinned tool, pin run 2)."""
     made: dict = {}
 
     def get(commit: str) -> dict:
         before = support.parent(commit)
         if before not in made:
             tree = clone_at(before)
-            done = support.run_links(tree, home, "--propose-sources", "--all")
+            done = support.run_links(tree, home, "--propose-sources", "--all", src=support.pinned_src(tree))
             if done.returncode not in (0, 1):
                 pytest.fail(f"gov links --propose-sources failed at {before}: {done.stderr.strip()[-300:]}")
             wanted = {}

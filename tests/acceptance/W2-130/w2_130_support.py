@@ -587,25 +587,53 @@ def src_dir() -> Path:
     return Path(first).resolve() if first else ROOT / "src"
 
 
-def child_env(home: Path) -> dict:
+def child_env(home: Path, src: Path | None = None) -> dict:
+    """The environment of a ``gov links`` run: ``src`` is the tool's source folder; None is the test run's own (the
+    branch's ``src``), a clone's ``<clone>/src`` runs the tool of the tree under test (``pinned_src``)."""
     env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
-    env.update({"HOME": str(home), "PYTHONPATH": str(src_dir()), "PYTHONDONTWRITEBYTECODE": "1", "LC_ALL": "C",
-                "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    env.update({"HOME": str(home), "PYTHONPATH": str(src if src is not None else src_dir()), "PYTHONDONTWRITEBYTECODE": "1",
+                "LC_ALL": "C", "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
     return env
 
 
-def run_links(tree: Path, home: Path, *flags: str) -> subprocess.CompletedProcess:
+def pinned_src(tree: Path) -> Path:
+    """The ``src`` of a clone: the ``gov links`` the tree itself holds. A case pinned to a commit runs this tool, so a
+    later change to ``gov links`` on the branch cannot move a pinned count (DEC-1156 (7), DEC-1164 (18))."""
+    src = tree / "src"
+    assert (src / "gov" / "links.py").is_file() or (src / "gov" / "links").is_dir(), f"{tree} holds no gov links source under src/"
+    return src
+
+
+def run_links(tree: Path, home: Path, *flags: str, src: Path | None = None) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, "-m", "gov.cli.main", "links", *flags, "--root", str(tree)], cwd=tree,
-                          capture_output=True, text=True, env=child_env(home), check=False, timeout=900)
+                          capture_output=True, text=True, env=child_env(home, src), check=False, timeout=900)
 
 
-def links_json(tree: Path, home: Path) -> list[dict]:
-    """The findings of ``gov links --all --json`` on ``tree`` (exit 0 or 1 both mean it ran)."""
-    done = run_links(tree, home, "--all", "--json")
+def links_json(tree: Path, home: Path, src: Path | None = None) -> list[dict]:
+    """The findings of ``gov links --all --json`` on ``tree`` (exit 0 or 1 both mean it ran). ``src`` None runs the
+    branch's tool; ``pinned_src(tree)`` runs the tree's own."""
+    done = run_links(tree, home, "--all", "--json", src=src)
     try:
         return json.loads(done.stdout)["result"]["findings"]
     except (ValueError, KeyError, TypeError):
         pytest.fail(f"gov links --all --json gave no result (exit {done.returncode}): {done.stderr.strip()[-400:]}")
+
+
+def measured_at(record: "Record") -> str:
+    """``counts-after.measured_at``: the tree the record says it counted. Pinned, not HEAD: a ticket closed or reopened
+    after the land moves what ``gov links`` finds at HEAD (122 -> 124 CLOSED_TICKET_EDITED in five hours), and the
+    record's counts must not turn red for it (DEC-1156 (7), DEC-1164 (18)). The tree is one this branch really holds:
+    a full hash, ``counts-after.head`` (the last clean-up commit) or a descendant of it, and an ancestor of HEAD."""
+    after = record.data("counts-after")
+    if not isinstance(after, dict) or "head" not in after:
+        pytest.fail("counts-after lacks head")
+    if "measured_at" not in after:
+        pytest.fail("counts-after lacks measured_at, the tree the counts were taken at")
+    measured = need_hash(after["measured_at"], "counts-after.measured_at")
+    last_cleanup = need_hash(after["head"], "counts-after.head")
+    assert is_ancestor(last_cleanup, measured), "counts-after.measured_at is not counts-after.head or a descendant of it"
+    assert is_ancestor(measured, head()), "counts-after.measured_at is not an ancestor of HEAD"
+    return measured
 
 
 def make_clone(dest: Path, rev: str) -> Path:
