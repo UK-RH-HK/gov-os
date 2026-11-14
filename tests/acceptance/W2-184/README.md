@@ -257,3 +257,43 @@ launcher that refuses every launch with no file for a role with a table line, a 
 | success-4 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_owner_named_is_recorded_with_no_file` | no option | refused naming the file |
 | success-4 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_a_malformed_owner_named_is_refused_with_no_file` (4) | no option | refused, but naming the file |
 | success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_a_present_malformed_file_refuses_a_role_with_only_a_default_line` (3: not YAML, empty, `rules` missing) | no refusal (the base reads no file) | green (refuses): a guard against a launcher that reads the file only for a role with a table line |
+
+## Review round 1's findings F1, F8, F2 (batch td-4)
+
+The FULL review's round 1 failed on F1; F8 and F2 ride along (interface 1.5 and 6.3 as amended on 2026-11-14). File
+`test_w2_184_r1_rows.py` (38 cases). Written from the described behaviours only; the engineer's work and the review
+record's code pointers were not read; nothing under `fixtures/evaluation/` or any `hidden` folder is opened (the hidden-set
+paths are strings in the tickets the cases build).
+
+- **F1, F8** call `gov.launch.criticality.ticket_criticality(ROOT, ticket)` with `ROOT` found from the test file's own path
+  (`parents[3]`: the repository the test lives in, so the project's own `governance/project/criticality.yaml` of the tree
+  under test) and a ticket built as a front-matter map (`_load_ticket` on a planted ticket file in a temp tree).
+  **Red on this tests tree's base** (`77887edc6`): the project file does not exist ("no file": the first case) and
+  `gov.launch.criticality` does not exist ("no module": every other F1/F8 case). **Red at the engineer's current head**
+  (the project file without the hidden-set and permission globs): each F1 case and the first four F8 paths give C2, not C3.
+  `governance/project/held-out.yaml` is already C3 there, so its cases are guards; so are `test_r1_f1_this_ticket_s_own_paths_stay_c2`
+  and the two "no round limit" cases of F2.
+- **F2** drives `gov launch` (and `launcher.launch` where `--owner-named` is given, interface 7.2) on a FULL ticket in the
+  fixture project that has a `criticality.yaml`. **Red on the base:** no table (the launch line carries the default line's
+  Sonnet, medium) and no keys. **Red on a launcher that only refuses a repeated setting:** round 3 after a round 2 on
+  `--effort xhigh` is the probe's Opus max, a setting no earlier round used, so it is accepted where the interface refuses.
+  The round-3 refusal asserts the words `round`, `3` and `DEC-1010`.
+
+| KPI | Test | Red because |
+|---|---|---|
+| success-1 | `test_w2_184_r1_rows.py::test_r1_the_project_has_its_own_criticality_file` | no file (the project file does not exist on the tests tree's base) |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f1_a_ticket_working_in_a_hidden_set_is_c3` (8: two sets x STANDARD, FULL x alone, with the probe record) | no module; at the head: C2, no hidden-set glob |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f1_a_ticket_naming_a_file_inside_a_hidden_set_is_c3` (2) | no module; at the head: C2 |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f1_this_ticket_s_own_paths_stay_c2` | no module; green at the head (guard, interface 1.5) |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_ticket_working_in_a_permission_file_is_c3` (10: five paths x STANDARD, FULL) | no module; at the head: C2 for four paths, held-out green |
+| success-1 | `test_w2_184_r1_rows.py::test_r1_f8_a_permission_path_beside_the_probe_record_is_still_c3` (5) | no module; at the head: as above |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_second_round_on_xhigh_is_accepted` | no table / no keys |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_third_round_with_no_option_after_a_second_on_xhigh_is_refused_naming_the_round_and_dec_1010` | no table; at the head: round 3 accepted |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_refused_third_round_leaves_no_record_so_the_owner_named_one_is_still_round_3` | no table; at the head: round 3 accepted |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_third_round_the_owner_named_is_accepted_and_recorded_after_a_second_on_xhigh` | no table / no option |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_third_round_on_another_effort_after_the_probe_is_refused_without_the_owner` | no table; at the head: accepted |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_third_round_after_the_probe_at_its_max_is_still_refused_without_the_owner` | no table; green at the head (the existing same-setting rule; also `test_w2_184_s4_reviews.py::test_s4_a_third_review_repeats_the_probe_and_is_refused_without_the_owner`) |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_fourth_round_is_refused_without_the_owner_whatever_its_setting` | no table; at the head: accepted |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_the_owner_naming_a_decision_opens_a_fourth_round_too` | no table / no option |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_ticket_that_is_not_full_has_no_round_limit` (2: STANDARD, LITE) | no table; guard |
+| success-4 | `test_w2_184_r1_rows.py::test_r1_f2_another_role_on_a_full_ticket_has_no_round_limit` | no table; guard |
