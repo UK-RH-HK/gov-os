@@ -10,7 +10,7 @@ ticket: DAEO-6icv (W2-101)
 author: orchestrator (the ticket lead of W2-101), for five product-spec sessions and one test-designer session
 review: 'two narrow independent checks by fresh read-only auditors (independent-auditor, Opus, high): round 1 FAIL on 0b0d4cb3053d (F1, the harness would show scenario-summaries.md to the session under test; fixed in W2-104 under DEC-1164 (18)), round 2 PASS on 1ef54a70037a (F1 and the lead''s L1 fixed; rows F2-F9) (docs/probes/DAEO-6icv/)'
 decisions_carried: [DEC-959, DEC-957, DEC-616, DEC-645, DEC-315, DEC-1112, DEC-1157, DEC-1164]
-owner_approval: 'pending'
+owner_approval: '"W2-101 CIT-P approved at 42c1cc38" (the owner, chat, 2026-11-14; DEC-1178 (2))'
 state_class: EVIDENCE
 ---
 
