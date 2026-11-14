@@ -1,6 +1,6 @@
 ---
 id: DAEO-g87r
-status: in_progress
+status: closed
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-30T22:14:09Z
