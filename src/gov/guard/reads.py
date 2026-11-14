@@ -131,6 +131,16 @@ REV_REFUSAL = ("the call names a revision the guard cannot resolve: git does not
                "time (a variable, a substitution, --stdin), so what the call shows cannot "
                "be judged against the parts refused to this session (DEC-820): refused; "
                "name a revision and a path that exist")
+# W2-42a R4: in <rev>:<path> the path starts at the top of the tree <rev> names;
+# only a commit (or the index) places it at the repository's top. A subtree's
+# id, or a blob named by its id alone and shown as text, leaves the file's path
+# unknown to the guard, so it cannot be judged against the parts refused here.
+PLACE_REFUSAL = ("the call shows a git object whose path in the repository the guard "
+                 "cannot place: a <rev>:<path> whose <rev> names a tree that is not a "
+                 "commit's top (a subtree's id), or a blob named by its id alone and "
+                 "shown as text, so what it shows cannot be judged against the parts "
+                 "refused to this session (DEC-820): refused; name the file as "
+                 "<commit>:<path from the top> or :<path>")
 # The options of a patch route that widen or choose its sides, carried into
 # the guard's own question; a count is carried too (W2-84).
 _GIT_SIDES = frozenset("--all --branches --tags --remotes -g --walk-reflogs --reflog "
@@ -208,6 +218,20 @@ def _blob_ref(word: str) -> tuple[str, str] | None:
     if not path or ".." in rev or rev.startswith("^"):
         return None
     return rev, path
+
+
+def _output_joined(words: list[str]) -> list[str]:
+    """git's ``--output <file>`` as one word, ``--output=<file>`` (W2-42a):
+    the file it writes is no revision word."""
+    out, k = [], 0
+    while k < len(words):
+        if words[k] == "--output" and k + 1 < len(words):
+            out.append("--output=" + words[k + 1])
+            k += 2
+        else:
+            out.append(words[k])
+            k += 1
+    return out
 
 
 def _pathspecs(hidden: list[_Part]) -> list[str]:
@@ -1611,10 +1635,17 @@ class _Judge:
         hidden = [p for p in self.parts if p.strict]
         if sub not in ("show", "log", "diff", "grep", "whatchanged"):
             why = self.reads("git", args, cwd)
-            if why or not hidden or sub not in ("cat-file", "format-patch", "archive"):
+            # W2-42a R4: git cat-file is judged on for any session with a
+            # refused part (the object's place), the other two for the hidden.
+            if why or sub not in ("cat-file", "format-patch", "archive") or not (
+                    hidden or (sub == "cat-file" and self.parts)):
                 return why
         dd = rest.index("--") if "--" in rest else len(rest)
         before, specs = rest[:dd], rest[dd + 1:]
+        if sub in ("show", "log", "diff", "whatchanged"):
+            # W2-42a: --output <file> is a write (the write rules judge it);
+            # its file is no revision word.
+            before = _output_joined(before)
         operands = [a for a in before if not a.startswith("-")]
         if sub == "grep":
             # W2-141 (F1): the engineer's own folder, with the pathspecs'
@@ -1653,7 +1684,7 @@ class _Judge:
             if why:
                 return why
         if sub == "cat-file":
-            return ""
+            return self.cat_file(before, operands, shown, cwd, addr)
         if diffing and shown:
             # git diff <blob> <blob>, or <blob> <file>: those paths alone, not
             # a tree; with a revision beside them it is judged as revisions.
@@ -1715,13 +1746,16 @@ class _Judge:
         if any(h.inside(p) for h in hidden for p in names) or (
                 inside and any(h.match(rel) for h in hidden)):
             return HIDDEN_REFUSAL
-        if sub == "cat-file" or not self.parts:
+        if not self.parts:
             return ""
         if word is None:
             return REV_REFUSAL
         kind = self.ask(cwd, addr, "cat-file", "-t", "--end-of-options", word)
         if kind is None:
             return REV_REFUSAL
+        # The path starts at the top of the tree <rev> names (W2-42a R4).
+        if not self.placed(rev, cwd, addr):
+            return PLACE_REFUSAL
         if sub != "diff" or kind.strip() == "blob":
             return ""
         why = self.above(path, at)
@@ -1733,6 +1767,47 @@ class _Judge:
             return REV_REFUSAL
         return HIDDEN_REFUSAL if any(h.match(os.path.normpath(os.path.join(rel, n)))
                                      for h in hidden for n in out.split("\0") if n) else ""
+
+    def placed(self, rev: str, cwd: str, addr: list[str]) -> bool:
+        """W2-42a R4: whether ``<rev>:<path>`` places its path at the
+        repository's top: the index (an empty *rev*), a commit, a commit's
+        ``^{tree}``, or the tree HEAD's top is. A subtree's id, or what git
+        cannot answer, is not placed (fail closed)."""
+        if not rev:
+            return True
+        base = rev
+        while base.endswith("^{tree}"):
+            base = base[:-len("^{tree}")]
+        if base and self.ask(cwd, addr, "rev-parse", "--verify", "--quiet",
+                             "--end-of-options", base + "^{commit}") is not None:
+            return True
+        out = (self.ask(cwd, addr, "rev-parse", "--end-of-options", rev + "^{tree}",
+                        "HEAD^{tree}") or "").split()
+        return len(out) == 2 and out[0] == out[1]
+
+    def cat_file(self, before: list[str], operands: list[str], shown: list[str],
+                 cwd: str, addr: list[str]) -> str:
+        """W2-42a R4: git cat-file of an object named by its id alone (no
+        ``<rev>:<path>``) that it prints as a file's text (``-p``,
+        ``--textconv``, ``--filters``, or ``<type> <object>``) and that is a
+        blob: its path cannot be placed, so a session with a refused part is
+        refused; ``-t``, ``-s``, ``-e`` and a commit or a tree stay open."""
+        if not self.parts:
+            return ""
+        objs = [o for o in operands if o not in shown]
+        typed = len(objs) >= 2  # <type> <object>
+        if not (typed or any(a in ("-p", "--textconv", "--filters") for a in before)):
+            return ""
+        for o in objs[1:] if typed else objs:
+            word = _expand_token(o)
+            if word is None:
+                return REV_REFUSAL
+            kind = self.ask(cwd, addr, "cat-file", "-t", "--end-of-options", word)
+            if kind is None:
+                return REV_REFUSAL
+            if kind.strip() == "blob":
+                return PLACE_REFUSAL
+        return ""
 
     def covers(self, specs: list[str], cwd: str, hidden: list[_Part]) -> bool:
         """Whether pathspecs take the hidden part in: none, a glob or magic

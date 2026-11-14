@@ -290,3 +290,18 @@ closed. In `decide.py`, `_no_path` refuses a file tool's path field that is not 
 `NO_PATH_REFUSAL`, before any rule resolves it. **Counts:** test_w2_42a_r4_blob_refs.py with test_w2_42a_r5_error_path.py
 went from 48 failed, 197 passed to **245 passed**; the builder file tests/unit/guard/test_w2_42a_blob_refs.py holds
 **56 passed** (46 red before the fix); tests/acceptance/W2-42a with tests/unit/guard: **2095 passed, 2 xfailed**.
+
+**R4, second batch: a path under a subtree, a blob by its id alone, and git's own `--output` (DEC-1157 (12), DEC-1180 (4)).**
+In `<rev>:<path>` the path starts at the top of the tree `<rev>` names. In `reads.py`, `_Judge.colon` now asks the new
+`_Judge.placed` whether `<rev>` places its path at the repository's top: the index (an empty `<rev>`), a commit, a
+commit's `^{tree}`, or HEAD's top tree. Any other tree (a subtree's id) is the ruled `PLACE_REFUSAL` for a session with a
+refused part, in `git diff`, `git show` and `git cat-file` alike. `_Judge.git` now judges `git cat-file` on for every
+such session, not only one with a hidden part. The new `_Judge.cat_file` refuses, with `PLACE_REFUSAL`, an object named by
+its id alone that git prints as text (`-p`, `--textconv`, `--filters`, or `<type> <object>`) when it is a blob. `-t`, `-s`,
+`-e`, a commit and a tree stay open. An object git cannot resolve there is `REV_REFUSAL`. In `bash_writes.py`,
+`_more_targets` gives git's `--output=<file>` and `--output <file>` (diff, show, log, whatchanged, diff-tree, diff-index,
+diff-files, format-patch, range-diff, stash show; not after `--`) as a write target, read from the command's cwd after
+`-C` and `cd`. In `reads.py`, `_output_joined` folds `--output <file>` into one word, so the file is no revision word.
+**Counts:** test_w2_42a_r4_blob_refs_2.py with test_w2_42a_r4_blob_refs.py and test_w2_42a_r5_error_path.py went from
+40 failed, 262 passed to **302 passed**. The builder file tests/unit/guard/test_w2_42a_blob_refs_2.py holds **62 passed**
+(35 red before the reads.py change). tests/acceptance/W2-42a with tests/unit/guard: **2214 passed, 2 xfailed**.
