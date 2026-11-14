@@ -27,6 +27,7 @@ ALLOWED = [
     "tests/unit/memaudit/**", "tests/unit/adopt/test_w2_187*", "tests/acceptance/W2-170/test_w2_170_s3_declare.py",
     "tests/acceptance/W2-170/w2_170_world.py", "tests/acceptance/W2-171/test_w2_171_s3_judge.py",
     "tests/acceptance/W2-171/w2_171_world.py", "tests/acceptance/W2-171/w2_171_scenario.py",
+    "tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py", "tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py",
     "tests/acceptance/W2-172/test_w2_172_s7_digest.py", "docs/changes/W2-187-evidence.md", "docs/probes/DAEO-0cd2/**",
     "tests/acceptance/W2-187/**", "tests/acceptance/W2-172/w2_172_world.py", "tests/acceptance/W2-172/w2_172_git.py",
 ]
