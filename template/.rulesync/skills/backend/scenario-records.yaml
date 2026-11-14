@@ -98,3 +98,36 @@ records:
   model: claude-opus-5-5
   effort: high
   run_at: '2026-11-14T02:37:17+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 1
+  title: A handler that a retry runs twice
+  verdict: pass
+  cause: null
+  cost_usd: 0.441262
+  seconds: 87.497
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:17:54+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 2
+  title: A column rename on a table a running service reads
+  verdict: pass
+  cause: null
+  cost_usd: 0.244629
+  seconds: 42.036
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:19:26+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 3
+  title: A fix that needs another stream's shared module
+  verdict: pass
+  cause: null
+  cost_usd: 0.187167
+  seconds: 26.906
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:20:12+00:00'
