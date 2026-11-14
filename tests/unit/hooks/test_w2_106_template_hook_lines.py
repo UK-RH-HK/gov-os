@@ -11,6 +11,11 @@ Builder regression evidence (DEC-966 item 2, DEC-822, W2-59's form). Each guard 
 - is not moved by a session's ``PYTHONPATH``: an edited gov planted there does not let a refused write through.
 
 The four lifecycle lines keep DEC-608's plain form (DEC-917): they are held unchanged here.
+
+Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The source's ``postToolUse`` holds a second entry beside the
+guard's, the context watch (``context_watch.py``, matcher ``Bash``, timeout 10). A line is found by the program it runs
+(never by its place in the list); the guard's ``postToolUse`` line is the one that runs ``posttooluse.py``, still the
+only one the kernel settings register and still equal to it. The context watch's line is held here too.
 """
 
 from __future__ import annotations
@@ -54,9 +59,22 @@ def _load_jsonc(path):
     return json.loads(text)
 
 
+WATCH_PROGRAM = "context_watch.py"
+
+
+def _runs(entry, program):
+    """Whether the entry's command runs ``program`` of the kernel's hooks folder (``stop.py`` is not ``subagentstop.py``)."""
+    return f"/hooks/{program}\"" in entry.get("command", "")
+
+
+def source_entries(key, program):
+    return [e for e in _load_jsonc(SOURCE)["hooks"][key] if e.get("type") == "command" and _runs(e, program)]
+
+
 def source_line(key):
-    entries = [e for e in _load_jsonc(SOURCE)["hooks"][key] if e.get("type") == "command"]
-    assert len(entries) == 1, f"{SOURCE}: {key} holds {len(entries)} command entries; one is expected"
+    program = GUARD[key][1] if key in GUARD else LIFECYCLE[key]
+    entries = source_entries(key, program)
+    assert len(entries) == 1, f"{SOURCE}: {key} holds {len(entries)} command entries running {program}; one is expected"
     return entries[0]["command"]
 
 
@@ -82,6 +100,19 @@ LINE_IDS = list(GUARD)
 def test_the_settings_line_equals_its_rulesync_source(key):
     event, _program = GUARD[key]
     assert settings_line(event) == source_line(key), f"{event}: the settings line and its rulesync source differ"
+
+
+def test_post_tool_use_holds_the_guard_line_and_the_context_watch_line_and_no_other():
+    """The two entries of the after-call event, each found by its program: the guard's (``posttooluse.py``, which the
+    kernel settings register) and the context watch's (matcher ``Bash``, timeout 10)."""
+    entries = [e for e in _load_jsonc(SOURCE)["hooks"]["postToolUse"] if e.get("type") == "command"]
+    assert len(entries) == 2, f"{SOURCE}: postToolUse holds {len(entries)} command entries; two are expected"
+    watch = source_entries("postToolUse", WATCH_PROGRAM)
+    assert len(watch) == 1, f"{SOURCE}: postToolUse holds {len(watch)} entries running {WATCH_PROGRAM}; one is expected"
+    assert watch[0].get("matcher") == "Bash" and watch[0].get("timeout") == 10 and type(watch[0]["timeout"]) is int, (
+        f"the {WATCH_PROGRAM} entry is {watch[0]!r}: matcher Bash and timeout 10 are expected")
+    assert len(source_entries("postToolUse", "posttooluse.py")) == 1
+    assert len(source_entries("postToolUseFailure", WATCH_PROGRAM)) == 0, "the context watch runs after a call only"
 
 
 @pytest.mark.parametrize("key", LINE_IDS)
