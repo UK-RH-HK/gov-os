@@ -105,13 +105,111 @@ def joined(command):
 
 # -- the shell text: heredocs and substitutions out --------------------------------------------------------------
 
-def heredocs(command, comments=None, legacy=False):
+def _here_word_end(command, i):
+    """Where the word that starts at ``i`` ends, as the shell reads it: quotes, escapes, ``$(...)``, backticks and
+    ``${...}`` inside it are part of it; an unquoted blank, newline, ``;&|()<>`` ends it. Raises Unreadable when a
+    quote or a substitution in it does not close."""
+    n, k, stack = len(command), i, []  # stack: '"', ["$(", depth], ["${", 0], or "`"
+    while k < n:
+        ch = command[k]
+        top = stack[-1] if stack else None
+        if top is None and ch in " \t\n;&|()<>":
+            break
+        if ch == "\\":
+            k += 2
+            continue
+        if ch == "'" and top != '"':
+            end = command.find("'", k + 1)
+            if end < 0:
+                raise UnclosedQuote("an unclosed single quote")
+            k = end + 1
+            continue
+        if top == "`":
+            if ch == "`":
+                stack.pop()
+            k += 1
+            continue
+        if top == '"' and ch == '"':
+            stack.pop()
+            k += 1
+            continue
+        if ch == '"':
+            stack.append('"')
+        elif ch == "`":
+            stack.append("`")
+        elif command.startswith("${", k):
+            stack.append(["${", 0])
+            k += 1
+        elif command.startswith("$(", k):
+            stack.append(["$(", 0])
+            k += 1
+        elif isinstance(top, list) and top[0] == "$(" and ch in "()":
+            if ch == "(":
+                top[1] += 1
+            elif top[1]:
+                top[1] -= 1
+            else:
+                stack.pop()
+        elif isinstance(top, list) and top[0] == "${" and ch == "}":
+            stack.pop()
+        k += 1
+    if stack:
+        raise UnclosedQuote("an unclosed quote or substitution in a here-string's word")
+    return k
+
+
+def _here_text(word):
+    """The text of a here-string's ``word`` after quote removal, and whether the shell expands it first (an unquoted
+    or double-quoted ``$`` or backtick: then the text is not known, and the word's own characters are kept)."""
+    out, i, n, expanded = [], 0, len(word), False
+    while i < n:
+        ch = word[i]
+        if ch == "\\":
+            if word.startswith("\\\n", i):
+                i += 2
+            else:
+                out.append(word[i + 1:i + 2])
+                i += 2
+            continue
+        if ch == "'":
+            end = word.find("'", i + 1)
+            out.append(word[i + 1:end])
+            i = end + 1
+            continue
+        if ch == '"':
+            i += 1
+            while i < n and word[i] != '"':
+                if word[i] == "\\" and i + 1 < n and word[i + 1] in '"\\$`\n':
+                    if word[i + 1] != "\n":
+                        out.append(word[i + 1])
+                    i += 2
+                    continue
+                if word[i] in "$`":
+                    expanded = True
+                out.append(word[i])
+                i += 1
+            i += 1
+            continue
+        if ch in "$`":
+            expanded = True
+        out.append(ch)
+        i += 1
+    if expanded and ("$(" in word or "`" in word):
+        return word, True  # the substitutions are judged as the commands they are: their own quoting, kept
+    return "".join(out), expanded
+
+
+def heredocs(command, comments=None, legacy=False, hstr=False, lenient=False):
     """``command`` without its heredoc bodies and its comments, and the bodies. Each heredoc operator and its
     delimiter become ``< __gov_hdl_<k>__`` (an input redirect the parser skips), so the reader is known by position.
     A comment's text (a ``#`` that starts a word, outside quotes, to the end of its line) is dropped, so a quote in it
     is no quote (DEC-1174 (1)); its span is added to ``comments`` when a list is given. Raises Unreadable for
     anything the scan cannot read for certain. ``legacy``: ``${`` is not followed, so a ``#`` inside it may start a
-    comment, as the scan read it before APOS-3 (judge's fail-closed second reading only)."""
+    comment, as the scan read it before APOS-3 (judge's fail-closed second reading only). ``hstr`` (judge's
+    fail-closed reading, R3, DEC-1164 (18)): a here-string is a heredoc of its own text, so the reader that runs it
+    judges it as it judges a body (``bash <<< 'touch x'``, ``xargs touch <<< x``); its body is marked ``hs`` and,
+    when the shell expands the word first, not quoted. ``lenient`` (the same): as bash reads it, a heredoc with no end
+    line takes the rest of the text as its body, and one at the end of the text an empty one."""
     out, bodies, pending = [], [], []
     # The shell's contexts: "top"; '"' (double quotes); "$(" (a command substitution, whose quoting starts
     # afresh, with the depth of its own parentheses); "`" (a backtick substitution); "((" (arithmetic); "${" (a
@@ -226,6 +324,19 @@ def heredocs(command, comments=None, legacy=False):
             continue
         if command.startswith("<<<", i):
             # A here-string (APOS-4, DEC-1174 (1)): its word is read as any word, not taken for a heredoc's delimiter.
+            if hstr:
+                j = i + 3
+                while j < n and command[j] in " \t":
+                    j += 1
+                k = _here_word_end(command, j)
+                if k == j:
+                    raise Unreadable("a here-string without a word")
+                text, expanded = _here_text(command[j:k])
+                body = {"text": text, "quoted": not expanded, "span": (i, k), "hs": True}
+                pending.append((None, False, not expanded, len(bodies) + len(pending), body))
+                out.append(f" < __gov_hdl_{pending[-1][3]}__ ")
+                i = k
+                continue
             out.append("<<<")
             i += 3
             continue
@@ -267,17 +378,22 @@ def heredocs(command, comments=None, legacy=False):
             delim = "".join(word)
             if not delim:
                 raise Unreadable("a heredoc without a delimiter")
-            pending.append((delim, strip, quoted, len(bodies) + len(pending)))
+            pending.append((delim, strip, quoted, len(bodies) + len(pending), None))
             out.append(f" < __gov_hdl_{pending[-1][3]}__ ")
             i = k
             continue
         if c == "\n" and pending:
             out.append("\n")
             i += 1
-            for delim, strip, quoted, _ in pending:
+            for delim, strip, quoted, _, inline in pending:
+                if inline is not None:
+                    bodies.append(inline)
+                    continue
                 start, lines = i, []
                 while True:
                     if i >= n:
+                        if lenient:
+                            break  # bash takes the rest of the text as the body
                         raise Unreadable("an unterminated heredoc")
                     e = command.find("\n", i)
                     line = command[i:n if e < 0 else e]
@@ -293,8 +409,15 @@ def heredocs(command, comments=None, legacy=False):
     if any(ctx[0] in ('"', "`", "${") for ctx in stack):
         # An unclosed ${ too: bash runs nothing of a line it cannot close (APOS-3).
         raise UnclosedQuote("an unclosed double quote, backtick or ${")
-    if len(stack) > 1 or pending:
+    if len(stack) > 1:
         raise Unreadable("unbalanced quotes or a heredoc with no body")
+    for delim, strip, quoted, _, inline in pending:
+        if inline is not None:
+            bodies.append(inline)
+        elif lenient:
+            bodies.append({"text": "", "quoted": quoted, "span": (n, n)})
+        else:
+            raise Unreadable("unbalanced quotes or a heredoc with no body")
     return "".join(out), bodies
 
 
@@ -1095,6 +1218,8 @@ _NOT_RUNNERS = frozenset(
     "dos2unix unix2dos fold fmt iconv expand unexpand du df wait sleep cd pushd popd pwd export unset read set "
     "declare local typeset readonly shift exit return break continue git ruff black flake8 pyflakes pylint mypy "
     "isort yamllint for select case in esac done fi".split())  # a loop's words: a run inside it is judged there
+# xargs options that take no value (xargs runs its command with the words of a here-string, R3).
+_XARGS_FLAGS = frozenset(("--no-run-if-empty", "--verbose", "--exit", "--open-tty", "--interactive"))
 # Programs that run the file they are given as Python.
 _PY_RUNNERS = frozenset("pytest py.test coverage ipython".split())
 
@@ -1289,7 +1414,8 @@ class Judgement:
         if depth > MOST_DEPTH:
             self.shell.append(SENT)
             return
-        text, bodies = heredocs(command, legacy="legacy" in self.loose)
+        text, bodies = heredocs(command, legacy="legacy" in self.loose, hstr="hstr" in self.loose,
+                                lenient="open" in self.loose)
         base = len(self.bodies)
         self.bodies += bodies
         # This command's own heredocs get their number among all met so far (a nested command's marks are
@@ -1614,7 +1740,50 @@ class Judgement:
             return
         self.writes += [SENT if t.startswith(UNKNOWN) else t for t in sub.targets()]
 
+    def xargs(self, reader, body, ecwd, whole, depth):
+        """``xargs [options] CMD <<< WORDS`` runs CMD with the text's words as its arguments (R3, DEC-1164 (18)), and
+        is judged as that command. A text the guard cannot know, an option it does not read (a replacement string, a
+        delimiter, an argument file) or words it cannot split are unresolvable."""
+        if not body["quoted"]:
+            return  # unknown text: already unresolvable
+        args, i = reader[1:], 0
+        while i < len(args) and args[i].startswith("-"):
+            a = args[i]
+            if a == "--":
+                i += 1
+                break
+            if a in _XARGS_FLAGS or (not a.startswith("--") and len(a) > 1 and set(a[1:]) <= set("rtxop")):
+                i += 1
+            elif a in ("-n", "-P", "-L", "-s", "-E") and i + 1 < len(args):
+                i += 2
+            elif re.fullmatch(r"-[nPLsE].+|--(max-args|max-procs|max-lines|max-chars|eof)=.*", a):
+                i += 1
+            else:
+                self.unread.append(SENT)
+                return
+        cmd = args[i:]
+        if not cmd:
+            return  # xargs runs echo
+        try:
+            words = cmd + shlex.split(body["text"])
+        except ValueError:
+            self.unread.append(SENT)
+            return
+        try:
+            self.sub(" ".join(shlex.quote(w) for w in words), ecwd, whole, depth)
+        except Unreadable:
+            self.unread.append(SENT)
+
     def body(self, body, kind, part, ecwd, whole, depth, argv=None, reader=None):
+        if body.get("hs") and kind != "data" and not body["quoted"]:
+            # A here-string's word the shell expands before its reader runs the text (R3, DEC-1164 (18)): the text is
+            # known when the command's own variables give it, otherwise the reader runs code the guard cannot know.
+            text = body["text"]
+            value = None if "$(" in text or "`" in text else self.expand(text)
+            if value is None:
+                self.unread.append(SENT)
+            else:
+                body = dict(body, text=value, quoted=True)
         if not body["quoted"]:
             # The shell runs an unquoted body's substitutions before its reader sees the text, whoever reads it
             # (W2-42a: the Python reader and an unknown one too, not only a data reader). A shell reader too: the
@@ -1635,7 +1804,10 @@ class Judgement:
             self.findings.append(([(SENT, None)], part + "\n" + body["text"], False))
         else:
             if kind == "code":
-                self.foreign(body, reader, ecwd, whole, depth)
+                if body.get("hs") and reader and os.path.basename(reader[0]) == "xargs":
+                    self.xargs(reader, body, ecwd, whole, depth)
+                else:
+                    self.foreign(body, reader, ecwd, whole, depth)
             # code the guard does not read (an unknown reader, or a shell body the shell rewrites first)
             self.findings.append(([(SENT, None)], part + "\n" + body["text"],
                                   bool(re.search(r"\b(perl|node|ruby|php)\b", part))))
@@ -1657,8 +1829,13 @@ def judge(command, cwd, parse, expand):
     # read with here-strings as data and with the earlier comment rule. Where one of those readings works, its
     # targets join what the caller gives an unreadable command (the line parser, and the unresolvable target for a
     # quote open or in a comment), so no target either reading gives is lost.
+    # R3 (DEC-1164 (18)): a here-string is also read as a heredoc of its own text ("hstr", so the shell or xargs that
+    # runs it is judged by it), and a heredoc with no end line as bash reads it, its rest as the body ("open").
     found = []
-    for loose in (("strings",), ("legacy",), ("strings", "legacy")):
+    for base, legacy, opened in product(((), ("strings",), ("hstr",)), ((), ("legacy",)), ((), ("open",))):
+        loose = base + legacy + opened
+        if not loose:
+            continue
         try:
             again = Judgement(parse, expand, loose=frozenset(loose))
             again.run(command, cwd, whole)

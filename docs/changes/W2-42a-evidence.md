@@ -232,3 +232,19 @@ containment and tests/acceptance/W1-28 **1847 passed, 2 xfailed, 2 failed** (tes
 failing alike on c461d79de with the sandbox's scratch HOME). **Fail closed:** across 136,925 generated commands (`${…}`,
 comment, here-string and write fragments under five wrappers), each of the 11,117 whose answer changed toward allow,
 run in real bash with a stand-in `gov`, neither writes the acceptance folder nor runs the lift form.
+
+**R3 and the here-string fail-opens (DEC-1164 (18)).** `_line_write_targets` (`src/gov/guard/decide.py`) no longer ends
+the command at `<<<`: the word after it is the here-string's text and the words after that stay the command's
+arguments, so `tee <<< "x" T`, `tee -a <<< "x" T` and `cp <<< x x.py T` give T. In `bash_writes.judge` a command the
+first reading cannot read is also read with each here-string as a heredoc of its own text (`hstr`: the shell it feeds
+judges it as commands, `bash <<< 'touch T'`, `cat <<< '…' | sh`; `xargs CMD <<< WORDS` is judged as CMD with the words
+as arguments; a word the shell expands that the command's own variables do not give, `bash <<< "$X"`, `sh <<< "$(…)"`,
+and an xargs option the scan does not read, is the unresolvable target) and with a heredoc that has no end line as bash
+reads it (`open`: its rest, or nothing, is the body), so a `python3 -c` write before a body-less `cat <<EOF` is kept;
+all readings join what the line parser gives, so nothing the base gave is lost. Read-only forms (`grep -c b <<< "a"`,
+`wc -l <<< "$v"`, `cat <<< T`, `bash <<< 'echo hi'`) stay free. A Python here-string is read as a Python heredoc is
+(opaque to the product, KPI 8). **Counts:** test_w2_42a_here_string.py went from 12 failed, 19 passed to **31 passed**
+(ed77eb353); the builder file tests/unit/guard/test_w2_42a_here_string.py holds **51 passed**; the acceptance folder
+alone **912 passed, 2 xfailed**; with tests/unit/guard, hooks, pause, containment and tests/acceptance/W1-28 and W1-50
+**1959 passed, 2 xfailed, 2 failed** (test_live_hook's `rm -f ~/.bashrc` cases, failing alike on the base with the
+sandbox's scratch HOME).
