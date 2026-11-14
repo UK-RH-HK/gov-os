@@ -144,7 +144,9 @@ separate commits, so a split into W2-187b leaves S1 to S9 clean.
 3. **I4, refusals.** `STANDING_NONE`, `STANDING_RETIRED` (a record exists, none live), `STANDING_DIGEST` and `USED` print as
    the bare code; an `RN-` refusal prints `REFUSED RN-<x>`. Nothing is written for any of them but the `LOCK` file of an `RN-`
    refusal (as in `run`). `RN-NOBASE`, `RN-RECENT` and `RN-NAME` are not asked of a standing run.
-4. **I6, the root.** The pre-flight loads each question at `--repo` (the same root `measure` and `judge` use), with the set's
+4. **I6, the root (revised by the fix batch after review round 1, F-A).** The driver now hands `preflight`, `measure` and
+   `judge` the store link's work tree as `--repo`, on both paths (see "Fix batch 5" below); before that it handed them the
+   repository. The pre-flight loads each question at `--repo` (the same root `measure` and `judge` use), with the set's
    default map entry when the sets root's map has none yet (`declare` adds it at the first week). A set-level fault
    (`MatcherError`) is raised, not a drop. `ok` is False only when a standing record exists whose digest differs; the driver
    finds the record through `GOV_MEMAUDIT_STATE`.
@@ -233,3 +235,47 @@ other tickets' merged files). The ticket's own source (`src/gov/memaudit/`, `src
 wrapper): `17 files, 1532 insertions, 145 deletions`; this batch added `push.py` (206 lines with its docstring), the section
 rule (about 45 lines in `matcher.py` and `maintain.py`) and the wrapper's `push_step` (about 18 lines). Tests: `test_push.py`
 (23 cases), nine S10 cases, seven S12 cases in `test_cron.py`, one ACT case.
+
+## Fix batch 5 (eng-5): F-A, F-B and R1 after review round 1 (the CTO, 2026-11-14; DEC-1157 (12), DEC-1180 (4), DEC-1156 (7))
+
+Review round 1 (`docs/probes/DAEO-0cd2/PR-DAEO-0cd2.md`) passed. The CTO had F-A fixed in this ticket, with F-B and R1
+fixed alongside it.
+
+| finding | KPI | behaviour now | code | unit cases (each red before the change, green after) |
+|---|---|---|---|---|
+| F-A, the searched store is the declared store | S3, S6/I6, S7 | `preflight`, `measure` and `judge` get the store link's work tree as `--repo`. They get it on the standing path and on the fresh path. The link's `HEAD` is the audit commit: the driver takes the commit from it. So every search (the probe, the control, the measure, judge's later searches) runs in the link and reaches the link's store, the store the declaration names and checks. The anchors are read in that tree, and the fresh run's figures come from the store S7 compares. Nothing changed in `prompts.py`, the reader, the grader or the matcher. The children's cwd stays the repository: the launch steps, `void`, `classes`, `pool` and `figures` are unchanged. | `driver._Cycle.standing`, `driver._Cycle.run` | `test_standing_run.py::test_the_searches_reach_the_links_store_when_the_repositorys_own_store_is_at_another_commit`: the repository's own store sits at the earlier commit and the link's at the head; the planted `gov` answers the commit of the store in its cwd. Before the change the run ended `STOPPED measure 2` on the store-commit fault; now it gives `right 40 of 40: passes` with no `FAULT`, and every `gov` call's cwd is the link. `test_standing_run.py::test_the_planted_gov_answers_the_store_of_the_folder_it_runs_in` shows the stand-in cannot pass for the wrong reason. `test_driver.py::test_preflight_measure_and_judge_are_handed_the_store_link_not_the_repository[standing,run]`, `test_driver.py::test_the_fresh_path_still_starts_its_launch_steps_and_figures_as_before` |
+| F-B, push only the scanned commit | S12, F7 | Just before the scan, `push.scanned` records the commit `refs/heads/<branch>` names. A clean scan then pushes with `git push <remote> <sha>:refs/heads/<branch>`, so the remote's branch is the scanned commit. The line stays `PUSH pushed <remote> <branch> <12 hex of the scanned commit>`. A commit that lands during the scan waits for the next cycle's own scan. A branch that names no commit when the scan begins pushes nothing (`PUSH failed: git push exit <git's rev-parse exit, 128>`, exit 2, git's output in the 0600 `PUSH.log`); a branch made during the scan is not pushed either. | `push.scanned`, `push.push`, `push.run` (`_pushed` removed) | `test_push.py::test_a_commit_that_lands_during_the_scan_is_not_pushed_only_the_scanned_one_is` (the planted scanner commits on `main` while it runs: before the change the remote held the late commit; now it holds the scanned one), `test_a_second_cycle_pushes_the_late_commit_after_its_own_scan`, `test_a_branch_that_names_no_commit_when_the_scan_begins_pushes_nothing`, `test_a_branch_made_during_the_scan_is_not_pushed` |
+| R1, gitleaks on step 6's cron line | S11, S12 | A9's ACT.md step 6 line is `` `0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT=<sets_root> GOV_MEMAUDIT_GITLEAKS=<gitleaks> <GOV_OS>/…/memaudit_cron.sh --repo <repo>` `` followed by I13's sentence, unchanged. `<gitleaks>` is `os.path.abspath(shutil.which("gitleaks"))` when A9 runs, else the literal `<path to gitleaks>`. The rest of the line is unchanged. | `memory_sets._gitleaks`, `memory_sets.walls_act` | `tests/unit/adopt/test_w2_187_walls_act.py`: `test_the_act_holds_the_cron_line_with_the_repositorys_path_as_step_6` (revised to the new line), `test_step_6_names_the_scanner_found_when_a9_runs_because_crons_path_lacks_it`, `test_with_no_scanner_on_path_step_6_holds_the_placeholder_for_the_operator`, `test_a_relative_answer_of_which_is_written_as_an_absolute_path` (`shutil.which` stood in for each time, never the machine's PATH) |
+
+**Red, then green.** The ten new or revised cases above ran first against `46d131ab9`: `10 failed, 62 passed` over
+`test_driver.py`, `test_push.py`, `test_standing_run.py` and `test_w2_187_walls_act.py`. Each failed for the reason it
+names: the children got `.../repository`, the run ended `STOPPED measure 2`, the remote held the late commit, the push
+printed `exit 1` from git's refspec error, the line had no `GOV_MEMAUDIT_GITLEAKS`. After the change the same files gave
+`72 passed`.
+
+**The planted `gov` (`tests/unit/memaudit/fakes.py`).** With `plan["store_from_cwd"]` set, it answers
+`result.store.commit` from the fingerprints head of `<its --root, else its cwd>/.gov-runtime/store.db`. With no store
+there it gives no field, which is itself a fault. A per-question `store_commit` override still wins. Without the key the
+stand-in behaves as before.
+
+**Left as it was (outside the decided fix):** the fresh path's `pool` child still gets the repository as `--repo`, so the
+pool's retrieval-only re-measure still searches the repository's own store. The brief named `preflight`, `measure` and
+`judge` only. See discoveries in the return.
+
+**Run after the change** (each folder alone through the heavy-slot gate, empty HOME, `-m "not local_only" -k "not real
+and not green_here and not time_limit"`; the exclusion left out the `local_only`, `real`, `green_here` and `time_limit`
+cases):
+
+- `tests/unit/memaudit`: `363 passed, 1 deselected`.
+- `tests/unit/adopt/test_w2_187_walls_act.py`: `7 passed`.
+- `tests/acceptance/W2-187`: `205 passed`. The test designer's F-A, F-B and R1 cases are not merged yet, so they did not run.
+- `tests/acceptance/W2-172`: `162 passed, 1 skipped`. No W2-172 case pinned the repository as the children's root.
+- `tests/acceptance/W2-170`: `184 passed, 1 skipped`.
+- `tests/acceptance/W2-171`: `139 passed, 2 skipped`. With `-rs`, the skips are
+  `test_w2_171_f3_f4_order_and_servers.py:147` (the sandbox forbids AF_UNIX sockets) and `test_w2_171_f5_paths.py:53` (F5
+  judges only the branch `w2/W2-171`). Both are environment skips.
+- `tests/acceptance/W2-173`: `91 passed, 2 skipped`.
+- `tests/acceptance/W2-88`: `215 passed, 2 skipped`.
+
+**Size.** `git diff --numstat 46d131ab9 -- src`: `driver.py` +14 -10, `push.py` +38 -27, `memory_sets.py` +11 -1
+(docstrings included). Tests: +201 -4 over five files.
