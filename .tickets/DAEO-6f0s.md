@@ -21,6 +21,7 @@ allowed_paths:
 - tests/unit/launch/test_w2_184_*.py
 - docs/changes/W2-184-CIT-E.md
 - docs/probes/DAEO-6f0s/**  # the probe record
+- src/gov/launch/command.py
 reads:
 - .tickets/DAEO-cv58.md
 - governance/project/orchestration/packages/P1-W2-60a-P5.md
@@ -54,3 +55,5 @@ rounds and never built, move here, so W2-60a lands its reviewed core and EXAMIN'
 form, the effort floor and `--reason`, `--trial` reading `governance/project/trials/<id>.yaml`, promotion from the probe
 records, S10 counting the auditor's launch records with `--owner-named <DEC-id>`. Starts after W2-60a merges; its own
 review rounds (new scope).
+
+**The CTO, 2026-11-14:** P-W2-184-2 (a), `src/gov/launch/command.py` added (the interface at claim puts `--trial`, `--reason` and `--owner-named` before `--`). P-W2-184-3 confirmed: 1.4 (no `criticality.yaml`: a launch behaves as before W2-184, DEC-1167 (2)); 3.2a (a max after `--` equal to the resolved effort needs no `--reason`); `probe` as a sixth `model_source`/`effort_source`; the lead's matching rule. P-W2-184-1 (round 2's F1) is the owner's (DEC-1010).
