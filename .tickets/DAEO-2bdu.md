@@ -136,8 +136,6 @@ sources:
 - DEC-1112
 - DEC-1132
 - DEC-1178
-- W2-124
-- W2-26
 est_loc: 750  # [changed, DEC-1099 (2)] was 500 (W2-88-STANDARD-1 §4)
 acceptance_tests:
   path: tests/acceptance/W2-88/
