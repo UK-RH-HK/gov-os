@@ -51,6 +51,7 @@ sources:
 - DEC-1010
 - DEC-1098
 - DEC-1088
+- DEC-1123
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-130/

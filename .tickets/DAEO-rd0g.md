@@ -46,6 +46,7 @@ sources:
 - DEC-1072
 - DEC-1083
 - DAEO-swdu
+- DEC-1171
 est_loc: 100
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
