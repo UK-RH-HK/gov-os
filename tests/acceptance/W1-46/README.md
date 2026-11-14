@@ -366,7 +366,9 @@ The `local_only` tests were not run in batch 7.
 
 `test_w1_46_live_sessions.py`, 36 tests over **two** real headless sessions per run (DEC-232), started through
 `gov launch` with the CLI at `~/.local/bin/claude` and the caller's credentials (`-p`, `--permission-mode
-acceptEdits`, `--model haiku`, `--max-turns 8`, `--allowedTools Bash,Write`). They are not behind an opt-in
+acceptEdits`, `--max-turns 8`, `--allowedTools Bash,Write`; on Haiku 4.5 at effort low, which since W2-60a the
+project's copy of the role file names in its default line, `w1_46_support.set_live_launch_default`, in place of
+`--model haiku`: DEC-839 items 2 and 5). They are not behind an opt-in
 variable, so the ticket cannot close on skipped tests. A run in which the model does not execute the stated command
 fails with that reason and is repeated; it is not a finding against the launcher.
 

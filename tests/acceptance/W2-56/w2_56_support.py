@@ -242,12 +242,21 @@ TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-desi
 TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-56 fixture template copy {stem}\n"
                   for stem in TEMPLATE_STEMS}
 
+# W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a worker launch without the role's role file, its
+# version line and its default line; the fixture project plants one per worker role (no skills line, so no skill copy
+# is needed), so that check is never what refuses a launch here. A test's own ``extra`` may still replace one.
+FIXTURE_MODEL = "claude-opus-5-5"
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-56 fixture)\n\n- **Version:** 1.0.0\n"
+    f"- **Launch default:** model {FIXTURE_MODEL}, effort high\n") for role in WORKER_ROLES}
+
 
 def make_project(box: Box, extra=None, project=None) -> Path:
     """The fixture project: one commit on ``w2/integrate`` holding every ticket, the files and the settings."""
     project = Path(project or box.project)
     files = dict(BASE_FILES)
     files.update(TEMPLATE_FILES)
+    files.update(ROLE_FILES)
     files[".gitignore"] = repo_gitignore()
     for ticket in TICKETS:
         files[f".tickets/{ticket.tk}.md"] = ticket_text(ticket)

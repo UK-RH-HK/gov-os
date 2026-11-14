@@ -20,14 +20,35 @@ import pytest
 
 import w2_56_support as s
 
+# W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): gov launch refuses a project without the role's role file, its version line
+# and its default line; the fixture plants one per worker role, so that check is never what refuses a launch here.
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-56 fixture)\n\n- **Version:** 1.0.0\n"
+    "- **Launch default:** model claude-opus-5-5, effort high\n") for role in s.WORKER_ROLES}
+
 
 @pytest.fixture
 def box(tmp_path):
     box = s.make_box(tmp_path)
-    s.make_project(box)
+    s.make_project(box, extra=ROLE_FILES)
     s.install_stand_in_cli(box)
     s.set_plan(box)
     return box
+
+
+# W2-60a (DAEO-cv58, KPI success 4, DEC-839 item 3): the launcher sets CLAUDE_CODE_SUBAGENT_MODEL itself, to the
+# session's model (the planted role's default): like LAUNCHER_OWNED's names it may be there, never with the parent's
+# value. Every other planted name is judged by w2_56_support.leaks as before (and a parent's value under any name,
+# this one included, is still caught by its mark).
+SESSION_OWNED = {"CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5"}
+
+
+def _leaks(env: dict, planted: dict) -> list[str]:
+    found = s.leaks(env, {name: value for name, value in planted.items() if name not in SESSION_OWNED})
+    for name, own in SESSION_OWNED.items():
+        if name in planted and name in env and env[name] != own:
+            found.append(f"{name}={env[name]!r} (not the session's {own!r})")
+    return found
 
 
 def _planted(names) -> dict:
@@ -47,8 +68,8 @@ def _launch_with(box, planted: dict, role=s.ENGINEER, extra=None):
 def test_s5_no_parent_claude_gov_or_pythonpath_value_reaches_the_session(box, role):
     planted = _planted(s.PARENT_VARIABLES)
     launch = _launch_with(box, planted, role)
-    process = s.leaks(launch.call["env"], planted)
-    settings = s.leaks(launch.settings().get("env") or {}, planted)
+    process = _leaks(launch.call["env"], planted)
+    settings = _leaks(launch.settings().get("env") or {}, planted)
     assert not process, f"{role}: the parent's values reached the session's process environment: {process}"
     assert not settings, f"{role}: the parent's values reached the env block of --settings: {settings}"
 
@@ -57,8 +78,8 @@ def test_s5_no_parent_claude_gov_or_pythonpath_value_reaches_the_session(box, ro
 def test_s5_each_parent_variable_set_alone_is_kept_from_the_session(box, name):
     planted = _planted([name])
     launch = _launch_with(box, planted)
-    process = s.leaks(launch.call["env"], planted)
-    settings = s.leaks(launch.settings().get("env") or {}, planted)
+    process = _leaks(launch.call["env"], planted)
+    settings = _leaks(launch.settings().get("env") or {}, planted)
     assert not process and not settings, (f"the parent's {name} reached the session: process {process}, "
                                           f"--settings env {settings}")
 

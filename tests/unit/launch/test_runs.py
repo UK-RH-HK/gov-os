@@ -21,6 +21,15 @@ from gov.launch import launcher  # noqa: E402
 
 TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: engineer\nallowed_paths:\n- src/**\n---\n"
 
+# The engineer's role file each launch reads (W2-60a, DEC-826 Q1): its version and default lines, nothing else.
+ROLE = "# engineer\n\n- **Version:** 1.0.0\n- **Launch default:** model claude-opus-5-5, effort high\n"
+
+
+def _role_file(project):
+    path = project / "template" / "governance" / "kernel" / "roles" / "engineer.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(ROLE, encoding="utf-8")
+
 
 def _plant_template(project: Path, role: str = "engineer") -> None:
     """The role's template copy every session starts with (W2-153 S1, DEC-1112 (3))."""
@@ -60,6 +69,7 @@ def started(tmp_path, monkeypatch):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    _role_file(project)
     _plant_template(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
@@ -128,6 +138,7 @@ def test_a_project_under_the_root_gets_no_folder_made_or_added(tmp_path, monkeyp
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    _role_file(project)
     _plant_template(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)

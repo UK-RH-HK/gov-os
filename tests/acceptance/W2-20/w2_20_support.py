@@ -61,13 +61,27 @@ TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-desi
                   "role-reviewer", "role-lead", "role-cto")
 
 
+# W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a worker launch without the role's role file, its
+# version line and its default line; every repository a launch runs in here holds one per worker role (no skills line,
+# so no skill copy is needed), planted with the templates, so that check is never what refuses either.
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "product-spec", "research")
+ROLES_REL = Path("template") / "governance" / "kernel" / "roles"
+
+
 def plant_templates(root: Path) -> None:
-    """Write the eight ``.claude/templates/<stem>.md`` copies into the repository at ``root``."""
+    """Write the eight ``.claude/templates/<stem>.md`` copies and the worker roles' role files into the repository at
+    ``root``."""
     folder = Path(root) / ".claude" / "templates"
     folder.mkdir(parents=True, exist_ok=True)
     for stem in TEMPLATE_STEMS:
         (folder / f"{stem}.md").write_text(f"---\nname: {stem}\n---\n# W2-20 fixture template copy {stem}\n",
                                            encoding="utf-8")
+    roles = Path(root) / ROLES_REL
+    roles.mkdir(parents=True, exist_ok=True)
+    for role in WORKER_ROLES:
+        (roles / f"{role}.md").write_text(f"# {role} role (W2-20 fixture)\n\n- **Version:** 1.0.0\n"
+                                          "- **Launch default:** model claude-opus-5-5, effort high\n",
+                                          encoding="utf-8")
 
 
 def today() -> str:
@@ -314,7 +328,7 @@ class Machine:
         self._git(path, "init", "-q")
         (path / "README.md").write_text(f"{name}: a W2-20 test repository\n")
         plant_templates(path)
-        self._git(path, "add", "README.md", ".claude")
+        self._git(path, "add", "README.md", ".claude", "template")
         self._git(path, "commit", "-q", "-m", "initial")
         return path.resolve()
 

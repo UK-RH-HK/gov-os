@@ -274,6 +274,18 @@ BRANCH_FILES = {
     ),
     f"{T.acceptance}/README.md": f"# The tests of W2-95 {TEST_WORD} {WORD}\n",
 }
+# W2-60a (DEC-826 Q1): gov launch reads the role file of the tree it starts in, with its version line and its
+# default line (DEC-839 items 1 and 5), and refuses a tree without one. One fixture role file per worker role.
+ROLES_REL = "template/governance/kernel/roles"
+ROLE_EFFORT = {ENGINEER: "high", TEST_DESIGNER: "high", AUDITOR: "max", PRODUCT_SPEC: "high", RESEARCH: "high"}
+
+
+def role_file_text(role, model="claude-opus-5-5", effort=None):
+    return (f"# {role} role (W2-58 fixture)\n\n- **Version:** 1.0.0\n"
+            f"- **Launch default:** model {model}, effort {effort or ROLE_EFFORT[role]}\n")
+
+
+ROLE_FILES = {f"{ROLES_REL}/{role}.md": role_file_text(role) for role in ROLE_EFFORT}
 # W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
 # base commit holds the eight copies (any bytes), so the template check is never what refuses a launch here.
 TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
@@ -338,6 +350,7 @@ def make_project(sandbox, base=True, extra=None, branch_extra=None, orphan=False
         files[f".tickets/{ticket.tk}.md"] = ticket_text(ticket)
     files[SETTINGS_REL] = settings_text()
     files[HELD_OUT_LIST_REL] = held_out_text(sandbox.held_out)
+    files.update(ROLE_FILES)
     files.update(extra or {})
     for rel, text in files.items():
         write(project / rel, text)

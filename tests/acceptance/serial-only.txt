@@ -98,6 +98,7 @@ tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_test_des
 tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_session_shows_no_phantom_deletion  # nightly: live-session: two real sessions through gov launch
 tests/acceptance/W2-62/test_w2_62_live_resume.py  # nightly: live-session: a real session is resumed from its section
 tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py  # nightly: live-session: a real haiku worker started through gov launch
+tests/acceptance/W2-60a/test_w2_60a_live_sessions.py  # nightly: live-session: one real engineer session through gov launch shows its role text, its named skill and a start with no connector, user-level agent or skill, or memory
 
 # --- real-model: routed to the nightly (DEC-889 item 5; I3 F6)
 tests/acceptance/W1-19/test_w1_19_real_models.py  # nightly: real-model: the pinned embedder and the reranker; one case is a warm p95

@@ -6,7 +6,7 @@ type: task
 class: implementation
 role: engineer
 profile: STANDARD
-status: open
+status: in_progress
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-11 15:21:33+00:00

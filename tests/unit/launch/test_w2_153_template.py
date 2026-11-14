@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -41,6 +42,45 @@ def _open_gate(home: Path, monkeypatch) -> None:
         monkeypatch.setenv(name, str(value))
 
 
+# W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): a worker launch refuses a project without its role's role file (version line,
+# default line). The worker roles' default model is the one the cases pass after ``--`` (a model not the role's is
+# refused since W2-60a). Since W2-60a (P-4 (A)) a worker is handed ONE appended file, ``<TMPDIR>/role-<role>.md``: the
+# role file's bytes, one blank line, then the role template's bytes.
+ROLE_MODEL = "claude-opus-5-5"
+ROLES_REL = Path("template/governance/kernel/roles")
+appended: list[dict] = []  # per started session: its TMPDIR and the bytes of each appended file, read at its start
+
+
+def _role_text(role: str) -> str:
+    return (f"# {role} role (W2-153 fixture)\n\nThe marker zq153-role-{role}.\n\n- **Version:** 1.0.0\n"
+            f"- **Launch default:** model {ROLE_MODEL}, effort high\n")
+
+
+def _plant_role_files(root: Path) -> None:
+    for role in launcher.WORKER_ROLES:
+        path = root / ROLES_REL / f"{role}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(_role_text(role), encoding="utf-8")
+
+
+def _assert_one_appended_role_file(project, role: str, argv: list[str]) -> None:
+    """A worker's one appended file: ``role-<role>.md`` in the session's temp folder, by absolute path, last on the
+    line; it starts with the role file's bytes and ends with the role template's bytes (only blank between)."""
+    root = Path(os.path.realpath(project[0]))
+    [seen] = appended
+    assert argv.count("--append-system-prompt-file") == 1, argv
+    assert argv[-2] == "--append-system-prompt-file" and os.path.isabs(argv[-1]), argv
+    assert Path(argv[-1]).name == f"role-{role}.md", argv[-1]
+    assert seen["tmpdir"] and Path(argv[-1]).parent == Path(seen["tmpdir"]), (argv[-1], seen["tmpdir"])
+    [data] = seen["files"]
+    assert data is not None, f"the appended file {argv[-1]} could not be read when the session started"
+    role_bytes = (root / ROLES_REL / f"{role}.md").read_bytes()
+    template_bytes = (root / launcher.TEMPLATES_REL / f"{STEMS[role]}.md").read_bytes()
+    assert data.startswith(role_bytes), f"{role}: the appended file does not start with the role file: {data!r}"
+    assert data.endswith(template_bytes), f"{role}: the appended file does not end with the template: {data!r}"
+    assert data[len(role_bytes):len(data) - len(template_bytes)].strip() == b"", data
+
+
 def _ticket(root: Path, role: str, allowed: list[str]) -> str:
     tid = f"T-{role}"
     front = {"id": tid, "wbs_id": f"W9-{role}", "status": "in_progress", "priority": 1, "role": role,
@@ -63,6 +103,7 @@ def project(tmp_path, monkeypatch):
     (root / launcher.TEMPLATES_REL).mkdir(parents=True)
     for stem in set(STEMS.values()):
         (root / launcher.TEMPLATES_REL / f"{stem}.md").write_text(f"# {stem}\n", encoding="utf-8")
+    _plant_role_files(root)
     for name in ("GOV_ROLE", "GOV_TICKET"):
         monkeypatch.delenv(name, raising=False)
     home = tmp_path / "home"
@@ -73,10 +114,16 @@ def project(tmp_path, monkeypatch):
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
     monkeypatch.setattr(launcher, "check_lead", lambda root, tid: {"admitted": True, "reason": "", "override": None})
     started = []
+    appended.clear()
 
     class Session:
         def __init__(self, argv, cwd, env):
             started.append(argv)
+            # The appended file lives in the session's temp folder, which goes when the session ends: read it now.
+            values = [argv[i + 1] for i, arg in enumerate(argv[:-1]) if arg == "--append-system-prompt-file"]
+            appended.append({"tmpdir": env.get("TMPDIR"),
+                             "files": [Path(value).read_bytes() if os.path.isfile(value) else None
+                                       for value in values]})
 
         def wait(self):
             return 0
@@ -107,9 +154,12 @@ def test_every_launched_role_has_a_template_in_the_map():
 
 @pytest.mark.parametrize("role", ALL_ROLES)
 def test_the_flag_comes_after_the_callers_arguments_by_absolute_path(project, role):
-    args = ["-p", "go", "--model", "haiku"]
+    args = ["-p", "go", "--model", ROLE_MODEL]
     argv = _launch(project, role, args)
-    assert argv[-2:] == ["--append-system-prompt-file", _template(project, role)]
+    if role in launcher.WORKER_ROLES:
+        _assert_one_appended_role_file(project, role, argv)
+    else:
+        assert argv[-2:] == ["--append-system-prompt-file", _template(project, role)]
     assert os.path.isabs(argv[-1])
     assert argv[-2 - len(args):-2] == args
 
@@ -120,8 +170,32 @@ def test_the_launch_is_otherwise_what_it_was(project, role):
     args = ["-p", "go"]
     argv = _launch(project, role, args)
     assert argv[0] == str(Path(os.environ["HOME"]) / launcher.CLI_REL)
-    assert argv[1] == "--settings" and argv[3:-2] == args and len(argv) == 3 + len(args) + 2
-    assert argv.count("--append-system-prompt-file") == 1
+    assert argv[1] == "--settings" and argv[-2 - len(args):-2] == args
+    assert argv.count("--append-system-prompt-file") == 1 and argv[-2] == "--append-system-prompt-file"
+    # W2-60a (DAEO-cv58): a worker's line also carries the role's default model and effort, its session id and the
+    # two switches that keep user-level context out; nothing else is added. A lead's line is as it was.
+    between = _options(argv[3:-2 - len(args)])
+    if role in launcher.WORKER_ROLES:
+        assert set(between) == {"--model", "--effort", "--session-id", "--strict-mcp-config", "--setting-sources"}, argv
+        assert (between["--model"], between["--effort"]) == (ROLE_MODEL, "high"), argv
+        assert between["--strict-mcp-config"] is None and between["--setting-sources"] == "project,local", argv
+        assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", between["--session-id"])
+    else:
+        assert between == {}, argv
+
+
+def _options(items: list[str]) -> dict:
+    """``{option: value or None}`` of a run of options; a repeated option or a stray value fails."""
+    found, index = {}, 0
+    while index < len(items):
+        name = items[index]
+        assert name.startswith("--") and name not in found, f"not one run of distinct options: {items}"
+        if name == "--strict-mcp-config":
+            found[name], index = None, index + 1
+        else:
+            assert index + 1 < len(items), f"{name} without a value: {items}"
+            found[name], index = items[index + 1], index + 2
+    return found
 
 
 @pytest.mark.parametrize("role", ALL_ROLES)

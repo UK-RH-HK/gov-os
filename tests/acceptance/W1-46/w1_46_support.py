@@ -108,9 +108,19 @@ OWN_PATH = {
 # ``.claude/hooks`` since ACT-GUARD-FIX-4: the settings' PreToolUse line runs
 # ``$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py``, so a project that copies the settings without it refuses every
 # call (D-4's red fix R-2, DEC-1061). In the project, ``role_reads`` finds no ``role_paths:`` and checks nothing.
-PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", SETTINGS_REL,
-                     "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
+# ``.claude/skills`` since W2-60a (DAEO-cv58; P-8 (a), DEC-1156 (7)): gov launch refuses a role file whose
+# ``- **Skills:**`` line names a skill that is not at ``.claude/skills/<name>/SKILL.md`` with a version; the kernel's
+# role files are copied, so the skills they name are too (the three vendored Superpowers skills take their version from
+# ``template/governance/kernel/skills/superpowers/vendored.yaml``, copied with the kernel template).
+PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", ".claude/skills",
+                     SETTINGS_REL, "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
                      ":(exclude)template/governance/kernel/vendor")
+# W2-60a (DAEO-cv58; P-8 (a)): gov launch refuses a model after ``--`` that is not the role file's (DEC-839 item 1).
+# The launch cases here hand a worker ``--model claude-opus-5-5`` after ``--``; the project's copies of the worker role
+# files say that model at effort high (the rest of each file, its version and skills lines included, is this
+# repository's). A live case still sets Haiku at effort low on its own copy (``set_live_launch_default``).
+FIXTURE_MODEL = "claude-opus-5-5"
+FIXTURE_LAUNCH_DEFAULT = f"- **Launch default:** model {FIXTURE_MODEL}, effort high"
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
@@ -180,6 +190,9 @@ def make_project(directory, root=REPO_ROOT):
             target = directory / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
+    for role in WORKER_ROLES:
+        if (directory / ROLES_REL / f"{role}.md").is_file():
+            set_live_launch_default(directory, role, FIXTURE_LAUNCH_DEFAULT)
     files = dict(PROJECT_FILES)
     tickets = check_support.default_tickets()
     tickets[f"{RESEARCH_TICKET}.md"] = check_support.ticket_text(
@@ -490,17 +503,37 @@ def assert_refused(result, *words):
     )
 
 
-def caller_args_then_template_pair(argv, args):
-    """True when ``args`` are one contiguous, ordered run at the end of ``argv``, followed by nothing or by exactly
-    ``--append-system-prompt-file <...>/.claude/templates/<stem>.md`` (W2-153's S1, DEC-1050; DEC-866). The rule is
-    W2-56's revised S6. An extra argument, a dropped one or a reordering still fails."""
+ROLE_PROMPT_FLAG = "--append-system-prompt-file"
+
+
+def caller_args_then_template_pair(argv, args, role=None):
+    """True when ``args`` are one contiguous, ordered run at the end of ``argv``, followed by nothing or by exactly one
+    ``--append-system-prompt-file <path>`` pair whose file name is ``role-<role>.md`` (any one role when ``role`` is
+    None): since P-4 (A) (DEC-1167) a worker launch hands its role text, a blank line and the template's bytes as one
+    file in its TMPDIR, placed last (W2-153's S1, DEC-1050; DEC-866; DEC-1156 (7)). The rule is W2-56's revised S6.
+    An extra, dropped or reordered caller argument, a second pair, a pair before or inside the caller's run, and
+    anything after the pair still fail."""
     argv, args = list(argv), list(args)
-    if argv[-len(args):] == args:
-        return True
-    if len(argv) < len(args) + 2 or argv[-len(args) - 2:-2] != args or argv[-2] != "--append-system-prompt-file":
+    n = len(args)
+
+    def pairs(items):
+        return sum(1 for item in items if item == ROLE_PROMPT_FLAG or item.startswith(ROLE_PROMPT_FLAG + "="))
+
+    if not args:
         return False
-    head, sep, stem = argv[-1].replace("\\", "/").rpartition("/.claude/templates/")
-    return bool(sep and head and stem.endswith(".md") and len(stem) > 3 and "/" not in stem)
+    if argv[-n:] == args:
+        return pairs(argv) == 0
+    if len(argv) < n + 2 or argv[-n - 2:-2] != args or argv[-2] != ROLE_PROMPT_FLAG:
+        return False
+    if pairs(argv[:-2]):
+        return False
+    head, sep, name = argv[-1].replace("\\", "/").rpartition("/")
+    if not (sep and head) or (head + "/").endswith("/.claude/templates/"):
+        return False  # the bare template is the old pair: a worker now gets the composed file in its TMPDIR
+    if role is not None:
+        return name == f"role-{role}.md"
+    stem = name[len("role-"):-len(".md")] if name.startswith("role-") and name.endswith(".md") else ""
+    return bool(stem) and not stem.startswith("-")
 
 
 # --------------------------------------------------------------------------
@@ -768,3 +801,32 @@ def write_probe_wheel(directory):
         for name, text in files.items():
             archive.writestr(name, text)
     return directory / WHEEL_NAME
+
+
+# --------------------------------------------------------------------------
+# W2-60a: a live session's model and effort come from the role file's default line
+# --------------------------------------------------------------------------
+
+ROLES_REL = "template/governance/kernel/roles"
+LAUNCH_DEFAULT = "- **Launch default:**"
+# DEC-839 item 2: live harness tests run on Haiku 4.5 at effort low where the case only checks that a hook fired.
+LIVE_LAUNCH_DEFAULT = f"{LAUNCH_DEFAULT} model claude-haiku-4-5-20251001, effort low"
+
+
+def set_live_launch_default(project, role, line=LIVE_LAUNCH_DEFAULT):
+    """Write ``line`` as the role's default line in the project's own copy of its role file.
+
+    Since W2-60a the launcher takes the session's model and effort from the role
+    file's default line and refuses a model after ``--`` that is not the role's
+    (DEC-839 items 1 and 5), so a live case no longer passes ``--model haiku``:
+    its copy of the role file says Haiku at effort low instead, in place of the
+    line W2-11 writes, or after the file's last line when it has none. The rest
+    of the file, its version line included, is this repository's.
+    """
+    path = Path(project) / ROLES_REL / f"{role}.md"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    at = next((index for index, text in enumerate(lines) if text.startswith(LAUNCH_DEFAULT)), len(lines))
+    kept = [text for text in lines if not text.startswith(LAUNCH_DEFAULT)]
+    kept.insert(min(at, len(kept)), line)
+    path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return path

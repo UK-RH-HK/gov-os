@@ -25,6 +25,7 @@ FIELDS = ("evidence", "batches", "budget", "gaps", "continuation", "expansions",
 
 
 STORE_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
+FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
 
 
 def _payload(token):
@@ -47,7 +48,7 @@ def _without_store(bundle):
     if not bundle.get("continuation"):
         return bundle
     payload = _payload(bundle["continuation"])
-    return {**bundle, "continuation": {key: value for key, value in payload.items() if key != STORE_KEY}}
+    return {**bundle, "continuation": {key: value for key, value in payload.items() if key not in (STORE_KEY, FOLDER_KEY)}}
 
 
 def _account_for_the_store_key(now, before):
