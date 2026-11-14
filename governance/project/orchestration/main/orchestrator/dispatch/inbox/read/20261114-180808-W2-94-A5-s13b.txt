@@ -1,0 +1,8 @@
+log: W2-94-A5-s13b.json
+W2: W2-94
+status: PACKAGES
+
+task: DAEO-g87r (W2-94)
+status: PACKAGES
+work_completed: Step 1 is done: `w2/integrate` is merged into `w2/W2-94-fix` with `--no-ff` and no conflicts (820f5d3ab). Step 2 was refused before any session started. `gov launch` would not run the engineer on `--model claude-sonnet-5-5` because the launcher now promotes this ticket's workers to opus. As ordered, I did not retry with other options. Steps 3 to 5 were not started: the narrow check, `gov accept` and lead_verify all depend on the revision.
+files_changed: none committed by me except the merge (820f5d3ab). Outside git: the brief `.gov-runti

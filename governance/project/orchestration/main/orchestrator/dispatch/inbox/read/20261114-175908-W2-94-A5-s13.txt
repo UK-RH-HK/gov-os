@@ -1,0 +1,9 @@
+log: W2-94-A5-s13.json
+W2: W2-94
+status: PACKAGES. S13 is built, `gov accept` passes and the narrow check passed, but the branch is not green. One W2-149 unit test that S13 conflicts with is red, and it is outside this ticket's paths (P-W2-94-S13-1).
+
+task: DAEO-g87r (W2-94), the build run for S13: the counts schema's optional `fix` object
+status: PACKAGES. S13 is built, `gov accept` passes and the narrow check passed, but the branch is not green. One W2-149 unit test that S13 conflicts with is red, and it is outside this ticket's paths (P-W2-94-S13-1).
+work_completed:
+- Merged `w2/integrate` into `w2/W2-94-fix` in one command (`5285ef173`, no conflicts).
+- A fresh test designer wrote S13's cases, 36 red on the merged base for the stated reason, and revised the S11/F6 diff case so that only `indep-counts.schema.json` may change under `indep

@@ -47,3 +47,4 @@
 {"t": "2026-11-14 13:15:05", "w2": "W2-188", "ticket": "DAEO-zlog", "log": "W2-188-A5-run1.json", "leads_running": 4, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
 {"t": "2026-11-14 14:07:18", "w2": "W2-61h-c39", "ticket": "DAEO-h2k3", "log": "W2-61h-A5-n2.json", "leads_running": 5, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
 {"t": "2026-11-14 14:08:25", "w2": "W2-61h-c39", "ticket": "DAEO-h2k3", "log": "W2-61h-A5-n2.json", "leads_running": 5, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
+{"t": "2026-11-14 18:05:01", "w2": "W2-94", "ticket": "DAEO-g87r", "log": "W2-94-A5-s13b.json", "leads_running": 3, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}

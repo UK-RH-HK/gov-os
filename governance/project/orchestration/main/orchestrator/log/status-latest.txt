@@ -1,6 +1,6 @@
-Status at 2026-11-14 17:49:26 (the last report's block)
+Status at 2026-11-14 18:03:10 (the last report's block)
 - Progress: 160 closed / 3 merged-not-closed / 0 built-and-held / 6 in flight / 23 not started, of 192.
-- Leads: 4 running (W2-187, W2-42a, W2-88, W2-94); queued next: W2-88, W2-187, W2-42a, W2-94; the gate: open.
+- Leads: 3 running (W2-187, W2-42a, W2-88); queued next: W2-88, W2-187, W2-42a, W2-94; the gate: open.
 - Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
 - Reopened since the last report: none. New tickets since the last report: none.
 - Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
