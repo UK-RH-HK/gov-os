@@ -71,7 +71,8 @@ def test_s1_the_visible_four_are_the_stratified_draw_s_share():
 def test_s4_f3_every_new_visible_gold_source_resolves_at_head():
     """DEC-1178 (1): each gold source of q21-q24 is judged at its own commit (its ``commit``, else the question's):
     the path is a file there and its heading or lines are a span there, else it is red. At HEAD a cited block that
-    moved unchanged is no fault; one whose lines changed is not failed, it is listed by question file and entry number
+    moved unchanged is no fault; one whose lines changed, or a heading-cited section whose text changed under a heading
+    still found (DEC-1180 (1)), is not failed, it is listed once by question file and entry number
     (a ``GoldBlockChanged`` warning in the default summary, for the walled writer)."""
     faults, changed = s.judge_all(_new())
     s.notify_changed(changed)
@@ -112,7 +113,10 @@ def _plant_two_commits(tmp_path):
     p01 moved unchanged (6 lines inserted above); p02 changed (its lines rewritten); p03 never held its answer at its
     own commit (the heading it cites exists only from commit 2 on); p04 the control (lines appended below, the block
     steady); p05 never held it either (its path is a file only from commit 2 on); p06 changed (the block gone from
-    its lines, found twice elsewhere); p07 changed (its file deleted)."""
+    its lines, found twice elsewhere); p07 changed (its file deleted). DEC-1180 (1) adds p08 (a heading-cited section
+    rewritten under its unchanged heading: changed), p09 (a heading-cited section moved unchanged, 4 lines inserted
+    above it and trailing blanks put on one of its lines: not changed) and p10 (one entry of three alternatives, all
+    changed, then an unchanged control entry)."""
     repo = tmp_path / "repo"
     docs = repo / "docs"
     docs.mkdir(parents=True)
@@ -124,6 +128,10 @@ def _plant_two_commits(tmp_path):
     for name in ("zqxwmoved", "zqxwchanged", "zqxwdup", "zqxwgone", "zqxwcontrol"):
         put(f"{name}.md", _lines(name))
     put("zqxwheading.md", ["# zqxw top", "zqxw early text", "## zqxw Early", "zqxw early body"])
+    section = ["# zqxw top", "zqxw intro", "## zqxw Sect", "zqxw sect body one", "zqxw sect body two",
+               "### zqxw Sub", "zqxw sub body", "## zqxw After", "zqxw after body"]
+    put("zqxwsection.md", section)
+    put("zqxwsmoved.md", section)
     _git(repo, "add", "-A")
     _git(repo, "commit", "-q", "-m", "one")
     one = _git(repo, "rev-parse", "HEAD")
@@ -137,6 +145,10 @@ def _plant_two_commits(tmp_path):
     put("zqxwheading.md", ["# zqxw top", "zqxw early text", "## zqxw Early", "zqxw early body", "## zqxw Later",
                            "zqxw later body"])
     put("zqxwlater.md", _lines("zqxwlater"))
+    # the section rewritten (its heading and its place unchanged); the other moved unchanged (4 lines above, trailing
+    # spaces on one line of it)
+    put("zqxwsection.md", section[:3] + ["zqxw sect body REWRITTEN", "zqxw sect body two"] + section[5:])
+    put("zqxwsmoved.md", _lines("zqxwabove", 4) + section[:4] + [section[4] + "  \t"] + section[5:])
     _git(repo, "add", "-A")
     _git(repo, "commit", "-q", "-m", "two")
 
@@ -150,34 +162,45 @@ def _plant_two_commits(tmp_path):
         "p05": {"path": "docs/zqxwlater.md", "lines": [1, 2]},
         "p06": {"path": "docs/zqxwdup.md", "lines": [3, 4]},
         "p07": {"path": "docs/zqxwgone.md", "lines": [3, 4]},
+        "p08": {"path": "docs/zqxwsection.md", "heading": "## zqxw Sect"},
+        "p09": {"path": "docs/zqxwsmoved.md", "heading": "## zqxw Sect"},
+        # one entry of three alternatives, all changed (lines rewritten; lines found twice away; the section
+        # rewritten), then a control entry
+        "p10": [[{"path": "docs/zqxwchanged.md", "lines": [3, 4]}, {"path": "docs/zqxwdup.md", "lines": [3, 4]},
+                 {"path": "docs/zqxwsection.md", "heading": "## zqxw Sect"}],
+                {"path": "docs/zqxwcontrol.md", "lines": [3, 4]}],
     }
     for qid, source in cites.items():
         (sets / f"{qid}.yaml").write_text(yaml.safe_dump({
             "question": f"zqxw planted question {qid}?", "gold_answer": f"zqxw planted answer {qid}",
-            "category": "zqxwcategory", "commit": one, "sources": [source]}), encoding="utf-8")
+            "category": "zqxwcategory", "commit": one, "sources": source if isinstance(source, list) else [source]}),
+            encoding="utf-8")
     return repo, sets
 
 
 def test_s4_f3_judges_each_source_at_its_own_commit_on_planted_data(tmp_path):
-    """DEC-1178 (1) on planted data, with the support function the real hidden and visible cases use: a block that
-    moved unchanged at HEAD (p01) passes and is not listed; a block whose lines changed (p02; also p06, found twice
-    away from its lines, and p07, its file gone) passes and is listed by file and entry number only; a source that
-    never held its answer at its own commit (p03's heading, p05's path: both exist only at HEAD) is red, named by file
-    and entry number only; the control (p04) passes and is not listed. No planted question, answer, category, path,
-    heading or span text is in any message. The list shows as a warning in the default summary; an empty list shows
-    nothing."""
+    """DEC-1178 (1) and DEC-1180 (1), (4) on planted data, with the support function the real hidden and visible
+    cases use: a block that moved unchanged at HEAD (p01) passes and is not listed; a block whose lines changed (p02;
+    also p06, found twice away from its lines, and p07, its file gone) passes and is listed by file and entry number
+    only; a source that never held its answer at its own commit (p03's heading, p05's path: both exist only at HEAD)
+    is red, named by file and entry number only; the control (p04) passes and is not listed. N2 (b): a heading-cited
+    section rewritten under its unchanged heading (p08) passes and is listed; one that moved unchanged (p09, lines
+    inserted above, trailing whitespace on a line) passes and is not listed. N1: an entry whose three alternatives all
+    changed (p10) is listed once. No planted question, answer, category, path, heading or span text is in any
+    message. The list shows as a warning in the default summary; an empty list shows nothing."""
     repo, sets = _plant_two_commits(tmp_path)
     named = {f.name: s.load(f) for f in sorted(sets.glob("*.yaml"))}
-    assert len(named) == 7 and all(named.values()), "the planted sets root did not load"
+    assert len(named) == 10 and all(named.values()), "the planted sets root did not load"
     faults, changed = s.judge_all(named, repo)
     assert sorted(f.split(": ", 2)[0] + " " + f.split(": ", 2)[1] for f in faults) == [
         "p03.yaml source entry 1", "p05.yaml source entry 1"], f"the red sources: {faults}"
-    assert changed == ["p02.yaml entry 1", "p06.yaml entry 1", "p07.yaml entry 1"], f"the listed sources: {changed}"
+    assert changed == ["p02.yaml entry 1", "p06.yaml entry 1", "p07.yaml entry 1", "p08.yaml entry 1",
+                       "p10.yaml entry 1"], f"the listed sources (p10's entry once, p09 not at all): {changed}"
     with pytest.warns(s.GoldBlockChanged) as shown:
         s.notify_changed(changed)
     messages = [str(w.message) for w in shown]
     assert len(messages) == 1 and all(item in messages[0] for item in changed), messages
-    assert not any(name in messages[0] for name in ("p01", "p03", "p04", "p05")), messages
+    assert not any(name in messages[0] for name in ("p01", "p03", "p04", "p05", "p09")), messages
     everything = "\n".join(faults + changed + messages).lower()
     for planted in ("zqxw", "docs/", ".md"):      # every planted text, path and heading carries one of these
         assert planted not in everything, f"a planted text or path ({planted!r}) is in the messages:\n{everything}"

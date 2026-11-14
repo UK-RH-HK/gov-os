@@ -100,7 +100,7 @@ holds thousands of transcripts and would pass the 10,000-file cap. Rule 2c inste
 and `projects` as the hidden folder. The sealed folder is refused to the tuner by the seal (the engineer is a measured
 role; cases T5). **The settings layer for the tuner** is the CTO's launch line, not a live file:
 `--settings '{"permissions":{"deny":["Read(//home/usain/.claude/projects/**)","Read(//home/usain/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/**)"]}}'`.
-**Its wall** is set-up B's sandbox, once proven (§7 residual 1).
+**Its wall** was to be set-up B's sandbox, once proven; no sandbox will come (set-up B dropped, DEC-1128 (4), 2026-11-14), so the wall is the seal and this settings layer, and the residual stays named (§7 residual 1).
 
 **(d) Content by rule, the seed first, only counts out** are the launch script's job (LAUNCH-SPEC §2-§4). This ACT
 gives it the template, the approved list and the walls' places.
@@ -201,7 +201,7 @@ The earlier runs found the two design changes in §1: the trees outside the sets
    hook rather than the repository's guard, the sandbox added when proven. Recommended: yes.
 2. **Rule 2c for the tuner** (§2 (c)): a hook change, scoped to the engineer on W2-56. Recommended: yes. Its limits:
    - a script that opens the transcripts in its own code, and a recursive search from `~` or `/`, are let through
-     (2b's limits); the tuner's brief forbids both, and set-up B's sandbox closes them;
+     (2b's limits); the tuner's brief forbids both; no sandbox will close them (set-up B dropped, DEC-1128 (4), 2026-11-14), so they stay named residuals of 2b and 2c;
    - the tuner's settings layer is its launch line (§2 (c)).
 3. **The operator's two folders** (`~/gov-os-writer`, `~/gov-os-checker`) are left as they are until the launch
    script is the default (DEC-1101 (3)). Found while reading them, for your note:
