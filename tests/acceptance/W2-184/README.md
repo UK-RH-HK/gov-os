@@ -13,7 +13,7 @@ The cases were written before the implementation exists and run red on the base.
 Every `gov` the cases start runs through `pyproject.toml`'s console-script entry point with `PYTHONPATH` taken from the
 runner's environment (W2-60a's `python_path`). No case starts a real CLI, model, embedder or reranker: a stand-in CLI
 at `<test HOME>/.local/bin/claude` records its arguments, `--settings` and the record folder. Nothing is marked
-`local_only`. About 0.6 s per case on a quiet machine (327 cases: 134 s measured on the base, with the machine busy).
+`local_only`. About 0.6 s per case on a quiet machine (413 cases: 185 s measured on the base, with the machine busy).
 
 ## What the cases use
 
@@ -52,7 +52,7 @@ at `<test HOME>/.local/bin/claude` records its arguments, `--settings` and the r
 `::test_s1_green_on_base_gov_launch_plan_prints_the_default_line_alone`,
 `test_w2_184_s2_model_and_trial.py::test_s2_green_on_base_a_model_that_is_not_the_default_line_s_is_still_refused_naming_both` (3),
 `::test_s2_green_on_base_the_subagent_model_is_the_final_model_in_the_settings_and_the_record` (2),
-`test_w2_184_s3_record.py::test_s3_green_on_base_the_record_keeps_its_base_fields`. Eight cases; every other case is red.
+`test_w2_184_s3_record.py::test_s3_green_on_base_the_record_keeps_its_base_fields`, and three td-3 cases: `test_w2_184_s1_no_criticality_file.py::test_nf_f_a_model_after_the_double_dash_that_is_not_the_default_is_refused_naming_both` (2) and `::test_nf_f_the_table_s_model_after_the_double_dash_is_refused_naming_both_with_no_file`. Eleven cases; every other case is red.
 
 ## KPI lines and their tests
 
@@ -82,7 +82,7 @@ takes no `reason`, `trial` or `owner_named`: the child ends 97).
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_a_criticality_file_is_read_and_recorded_for_a_role_with_only_a_default_line` | no keys |
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_a_malformed_criticality_file_refuses_a_launch_that_reads_it` (26) | no refusal |
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_a_malformed_file_refuses_even_a_role_with_only_a_default_line` (4) | no refusal |
-| success-1 | `test_w2_184_s1_criticality.py::test_s1_a_missing_criticality_file_refuses_a_role_with_a_table_line` | no refusal |
+| success-1 | `test_w2_184_s1_criticality.py::test_s1_a_missing_criticality_file_launches_a_role_with_a_table_line_on_its_default_line` | no keys (revised in td-3, interface 1.4 as amended) |
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_an_unreadable_criticality_file_refuses` | no refusal |
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_a_missing_criticality_file_is_recorded_null_for_a_role_with_only_a_default_line` | no keys |
 | success-1 | `test_w2_184_s1_criticality.py::test_s1_ticket_criticality_is_the_highest_matching_class` (5) | no module |
@@ -160,7 +160,7 @@ takes no `reason`, `trial` or `owner_named`: the child ends 97).
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_a_promotion_applies_to_every_worker_role_at_the_table_s_effort` (5) | no promotion |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_the_promoted_model_is_the_one_the_criticality_file_names` | no promotion |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_a_ticket_already_on_opus_is_still_recorded_as_promoted` | no promotion |
-| success-5 | `test_w2_184_s5_promotion.py::test_s5_a_promotion_needs_the_criticality_file_even_for_a_role_with_only_a_default_line` | no refusal |
+| success-5 | `test_w2_184_s5_promotion.py::test_s5_with_no_criticality_file_two_failed_reviews_promote_nothing` | no keys (revised in td-3, interface 1.4 as amended) |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_a_lower_model_after_the_double_dash_on_a_promoted_ticket_is_refused_naming_both` (3) | no refusal |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_the_promoted_model_after_the_double_dash_is_accepted` | no promotion: the base refuses Opus as not the default |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_an_effort_after_the_double_dash_applies_on_a_promoted_ticket_down_to_the_floor` | no promotion |
@@ -208,3 +208,52 @@ cases fail at round 2 for that reason (round 1 passes there). The `still_refused
 
 `w2_184_support.py` gained one name, `ANY`: `assert_session(..., model_source=ANY)` leaves `model_source` unpinned, used by
 the probe cases that do not turn on it.
+
+## Interface 1.4 as amended (batch td-3): no `criticality.yaml` means the launch as before W2-184
+
+The lead replaced interface 1.4 on 2026-11-14 (DEC-1167 (2)): with no `governance/project/criticality.yaml` the role's
+`Launch default` line serves every role and class (a `Launch by criticality` line is read, a malformed one still refuses,
+none is applied); no promotion, no review count, no probe, no same-setting refusal; `criticality`, `promotion` and
+`review_round` null; a model after `--` other than the default, the floor, max and `--reason` (judged on the default line's
+effort), the forms of `--reason`/`--owner-named`, `--trial` (refused naming the file) still apply. A present file is read on
+every launch; a malformed or unreadable one refuses.
+
+**Revised (two cases of td-1, committed with `Rewrite-Reason`):** `test_w2_184_s1_criticality.py::test_s1_a_missing_criticality_file_launches_a_role_with_a_table_line_on_its_default_line`
+(was `..._refuses_a_role_with_a_table_line`) and `test_w2_184_s5_promotion.py::test_s5_with_no_criticality_file_two_failed_reviews_promote_nothing`
+(was `test_s5_a_promotion_needs_the_criticality_file_even_for_a_role_with_only_a_default_line`). Kept as they were, because
+the amended 1.4 still states them: `test_s1_an_unreadable_criticality_file_refuses` (a folder where the file is: present
+but unreadable), `test_s1_a_malformed_file_refuses_even_a_role_with_only_a_default_line` (a present malformed file; interface 1.4),
+`test_s1_a_missing_criticality_file_is_recorded_null_for_a_role_with_only_a_default_line`, `test_s2_a_trial_needs_the_criticality_file`,
+the `ticket_criticality`/`opus_model` cases (1.3: called directly, a missing file raises).
+
+**New file `test_w2_184_s1_no_criticality_file.py` (61 cases, no `criticality.yaml` in the fixture).** "Earlier 1.4" is a
+launcher that refuses every launch with no file for a role with a table line, a trial or a promotion; "base" is
+`54afbf9a8`. Letters are the lead's (a)-(f).
+
+| KPI | Test | Red on the base because | Fails on a launcher that applies the earlier 1.4 because |
+|---|---|---|---|
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_a_role_with_a_table_line_launches_on_its_default_line_with_no_criticality_file` (10: five roles x C3, C0) | no keys | refused naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_a_the_full_form_table_line_is_not_applied_either` | no keys | refused naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_a_the_kernel_role_file_s_own_lines_launch_on_the_default_line` (2: the kernel engineer's and test designer's own lines) | no keys | refused naming the file (the 76 refused cases) |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_b_a_malformed_table_line_still_refuses_naming_the_role_file` (5) | no refusal | green (still refuses): a guard against a launcher that skips the line with no file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_b_a_second_table_line_still_refuses_with_no_file` | no refusal | green (guard) |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_b_a_malformed_table_line_refuses_every_role_with_no_file` (5) | no refusal | green (guard) |
+| success-4 | `test_w2_184_s1_no_criticality_file.py::test_nf_c_a_full_ticket_s_auditor_launches_all_start_on_the_default_line` (2: with a table line, default line only; three launches each) | no keys | refused naming the file (table role); round 2 the Opus max probe and round 3 refused (a launcher that counts with no file) |
+| success-5 | `test_w2_184_s1_no_criticality_file.py::test_nf_d_probe_records_promote_nothing_with_no_file` (6: engineer, test designer x two failed, fail-open, both) | no keys | refused naming the file; or Opus promotion if a launcher promotes with no file |
+| success-5 | `test_w2_184_s1_no_criticality_file.py::test_nf_d_probe_records_on_a_full_ticket_change_no_auditor_launch` (2) | no keys | as above, plus a probe at round 2 |
+| success-2 | `test_w2_184_s1_no_criticality_file.py::test_nf_e_a_trial_with_no_criticality_file_is_refused_naming_the_file` (2: table role, default-only role; a well-formed trial planted) | no option | green (refused naming the file): a guard against a launcher that admits the trial with no file |
+| success-2 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_a_model_after_the_double_dash_that_is_not_the_default_is_refused_naming_both` (2) | green on base | green |
+| success-2 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_the_table_s_model_after_the_double_dash_is_refused_naming_both_with_no_file` | green on base | green; red on a launcher that applies the C3 table's Opus with no file |
+| success-2 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_the_default_model_after_the_double_dash_is_accepted_and_recorded_as_after` | no keys | refused naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_an_effort_below_the_floor_of_a_high_default_is_refused` (2) | no refusal | refused naming the file, not the effort and the floor |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_the_floor_follows_the_default_line_not_a_lower_table_entry` | no refusal | as above |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_there_is_no_floor_under_a_medium_default_whatever_the_table_says` (2) | no keys | refused; or refused by the floor of the table's high |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_an_effort_of_high_or_more_after_the_double_dash_is_the_launch_s_own` (2) | no keys | refused naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_max_after_the_double_dash_on_a_default_below_max_needs_a_reason` (2) | no refusal | refused naming the file, not max and `--reason` |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_max_after_the_double_dash_with_a_reason_is_accepted_and_the_reason_recorded` | no option | refused naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_max_equal_to_a_default_of_max_needs_no_reason` | no keys | refused (naming the file) |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_an_empty_reason_is_refused_with_no_file` | no option | refused, but naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_a_reason_is_recorded_with_no_file_whatever_the_effort` | no option | refused naming the file |
+| success-4 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_owner_named_is_recorded_with_no_file` | no option | refused naming the file |
+| success-4 | `test_w2_184_s1_no_criticality_file.py::test_nf_f_a_malformed_owner_named_is_refused_with_no_file` (4) | no option | refused, but naming the file |
+| success-1 | `test_w2_184_s1_no_criticality_file.py::test_nf_a_present_malformed_file_refuses_a_role_with_only_a_default_line` (3: not YAML, empty, `rules` missing) | no refusal (the base reads no file) | green (refuses): a guard against a launcher that reads the file only for a role with a table line |
