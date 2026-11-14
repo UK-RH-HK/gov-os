@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result 1e74a47b7: W2-88 (DAEO-2bdu) package 1 (a): the pool, the walls template and the MEMORY-AUDIT-1 briefs ship inside the wheel (src/gov/_shipped, package data); fabric.shipped looks in the package's copy second
