@@ -59,8 +59,11 @@ def test_the_front_matter_is_the_templates_with_nothing_more(skill):
     assert set(front) == {"name", "version", "description", "output", "metadata"}, (
         f"front matter keys are {sorted(front)}; the template's are name, version, description, output, metadata")
     assert front["name"] == skill, f"name is {front['name']!r}, the folder's name is {skill!r}"
-    assert front["version"] == "1.0.0", f"version is {front['version']!r}, expected the string 1.0.0"
-    assert front["metadata"] == {"version": "1.0.0"}, f"metadata is {front['metadata']!r}, expected only version 1.0.0"
+    version = front["version"]
+    assert isinstance(version, str) and re.fullmatch(r"\d+\.\d+\.\d+", version), (
+        f"version is {version!r}, expected a YAML string of the form <digits>.<digits>.<digits>")
+    assert front["metadata"] == {"version": version}, (
+        f"metadata is {front['metadata']!r}, expected only version, equal to the top-level {version!r}")
     assert str(front["output"]).strip().lower() == "none", f"output is {front['output']!r}: a domain skill's output is none"
 
 

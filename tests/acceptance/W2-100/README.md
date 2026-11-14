@@ -53,8 +53,10 @@ them are named in the table. `test_w2_100_guard.py` drives the kernel PreToolUse
 - **No permission grant in any file:** the permission-line rule is applied to the `.md`, `.yaml`, `.yml` and `.txt` files of the
   skill folder (the Python script holds the words as patterns, and cannot grant anything). **No finding below P1:** the rule is
   applied to `SKILL.md` (I1's reach), not to `scenarios.md`, whose pass line may say "not P2".
-- **Front matter:** exactly `name`, `version`, `description`, `output`, `metadata`; `name` = the folder; `version` = `"1.0.0"`;
-  `metadata` = `{version: "1.0.0"}`; `output: none`; third-person description (no first or second person, not opening with a
+- **Front matter:** exactly `name`, `version`, `description`, `output`, `metadata`; `name` = the folder; `version` = a YAML string of the form
+  `<digits>.<digits>.<digits>` (not a number, not pinned to the first version: the skill template raises a changed skill's
+  version, DEC-832 item 2; revised in run 2, read as W2-98's suite reads it); `metadata` = exactly `{version: <that same
+  string>}`; `output: none`; third-person description (no first or second person, not opening with a
   command verb, says when). The template's HTML comment is gone from `SKILL.md`.
 - **scenarios.md:** exactly `## 1.`, `## 2.`, `## 3.` headings, each with the bullets `Situation`, `Expected`, `Pass line`, in
   that order, none empty; the security skill has a scenario with `finding` in its Situation and `P1` in its Pass line. The
