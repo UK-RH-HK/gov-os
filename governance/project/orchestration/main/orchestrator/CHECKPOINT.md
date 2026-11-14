@@ -4,6 +4,9 @@
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 
+- **18:59:** W2-88 interim 2491c9bec: S27 narrow re-check FAIL P1R-1 (curl-auth-user 5-line gap + private-key body cross the `#` fence; filtered match swallows next file's secret; fails open, ordinary yes). DEC-1010: 2nd check -> lead packages to the OWNER once. MY EVIDENCE: `gitleaks dir` scans files separately (A+B stdin 0 findings, dir 1 on B; 403 files 0.34 s; scratchpad/glk) -> sent to lead w2-88-c3 as an option to cost with (b) drop S27 from this run (land S24-S26 for tonight's release) and (c) a fence fix. Release ready waits on W2-88. W2-94 land in flight (4480c451c955).
+- **18:40:** W2-94 s13c DONE 4480c451c955 -> LAND QUEUED (NO COMMIT DURING THE LAND). The queue closes W2-94 -> REOPEN at once to in_progress (it closes on the operator's q02 20 of 20; DEC-1182 (5)).
+- **18:40:** STALE 6: my stamps after the digest ran ahead (18:45/18:47/18:52/18:53 vs clock 18:35-18:39; ticket notes 18:05 vs commit 18:01) -> all corrected (a8e1eb27b; digest header 18:35). W2-94 s13c interim 4480c451c: path-case narrow check PASS at 900035fdd51c, no findings -> DONE expected after accept + verify. Trial: stale 6, corrections 0, missed 7, compactions 6.
 - **18:37 (was stamped 18:53, ahead):** W2-187 lead (w2-187-10) message: I13 vs W2-172 S9 conflict -> its reading (1)-(4) ACCEPTED by the CTO with one condition (no-declaration line reaches the wrapper's stdout); I13 amended b0488850d (listed for the owner's reading); lead told by SendMessage.
 - **18:36 (was stamped 18:47, ahead; stale 6):** 18:00 DIGEST delivered + marked (drafts/digest-1800-20261114.md; trial stale 5, corrections 0, missed 7, compactions 6).
 - **18:36:** W2-42a LANDED + CLOSED 18:33 (02bdb4fb0); rows F1-F6 into DND 215 (7aef16dd1).

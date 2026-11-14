@@ -1,2 +1,13 @@
 heavy_slot: all 3 slots taken; waiting (2026-11-14 18:25:14)
-...F..
+...F..........                                                           [100%]
+=================================== FAILURES ===================================
+_____________ test_s27_many_texts_are_judged_per_gitleaks_process ______________
+tests/acceptance/W2-88/test_w2_88_scan_speed.py:239: in test_s27_many_texts_are_judged_per_gitleaks_process
+    assert started * 10 <= len(tree.paths), (f"{started} gitleaks processes were started for {len(tree.paths)} files: many texts per "
+E   AssertionError: 38 gitleaks processes were started for 300 files: many texts per process means at most one process per ten files
+E   assert (38 * 10) <= 300
+E    +  where 300 = len(['src/d01/f00151.txt', 'src/d44/f00044.txt', 'src/d02/f00152.txt', 'src/d03/f00253.txt', 'src/d25/f00025.txt', 'src/d35/f00185.txt', ...])
+E    +    where ['src/d01/f00151.txt', 'src/d44/f00044.txt', 'src/d02/f00152.txt', 'src/d03/f00253.txt', 'src/d25/f00025.txt', 'src/d35/f00185.txt', ...] = Tree(root=PosixPath('/home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-1/test_s27_many_texts_are_judged0/b...ey secret withheld>, <forge-token secret withheld>, <cloud-access-key secret withheld>, <forge-token secret withheld>]).paths
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-88/test_w2_88_scan_speed.py::test_s27_many_texts_are_judged_per_gitleaks_process
+1 failed, 13 passed in 185.58s (0:03:05)

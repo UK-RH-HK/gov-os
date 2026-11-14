@@ -1,0 +1,31 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-94 (DAEO-g87r, STANDARD) at 4480c451c955: pre-check passed
+W2-94: kernel gate at 4480c451c955: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-14 18:41:10 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-14 18:41:10 merged W2-94 onto a8e1eb27bd1b: 36423324c84f
+2026-11-14 19:00:07 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-14 19:00:14 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-14 19:00:17 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-14 19:00:18 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-14 19:00:19 flaky candidate (passes alone, decides nothing): tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s9_on_delivery_the_counts_carry_the_fix_and_no_content[corrected-extra0]
+2026-11-14 19:00:20 flaky candidate (passes alone, decides nothing): tests/acceptance/W2-94/test_w2_94_fix_flow.py::test_s9_a_result_of_a_wrong_form_is_20_nothing_delivered_and_the_action_null[by_kind absent]
+2026-11-14 19:00:20 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-14 19:00:20 ADVANCED refs/heads/w2/integrate a8e1eb27bd1b -> 36423324c84f; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/36423324c84f.json
+2026-11-14 19:00:21 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-14 19:01:17 integration store promoted: the merged clone's stores at 36423324c84f into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-94: fdf397527 W2-94 (DAEO-g87r): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 67 findings: .tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-170/test_w2_170_s3_declare.py' covers tests/acceptance/ | .tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-170/w2_170_world.py' covers tests/acceptance/ | .tickets/DAEO-0cd2.md: implementer allowed_paths pattern 'tests/acceptance/W2-171/test_w2_171_s3_judge.py' covers tests/acceptance/ (+64 more)
+structural pass: authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since a8e1eb27bd1b)
+structural pass: links: ok (0 new since a8e1eb27bd1ba1c471a5c8588802d09b94fbb4aa, 1767 standing)
+structural pass: structural pass at fdf3975277a4: NOTICE in mutation, authority (7 of 9 families ok), 14.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261114-190132-structural-notice.txt

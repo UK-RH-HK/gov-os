@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_s25_real_redis_copy_a9_is_ok_or_names_the_cause _____________
+tests/acceptance/W2-88/test_w2_88_f1_codegraph.py:226: in test_s25_real_redis_copy_a9_is_ok_or_names_the_cause
+    W.assert_refused(run, CODE, "A9 on the copy of redis")
+tests/acceptance/W2-88/w2_88_support.py:254: in assert_refused
+    assert code in error_text(run), f"{what}: the refusal does not name {code}\n{run.describe()}"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: A9 on the copy of redis: the refusal does not name CODEGRAPH_TOO_LARGE
+E   gov adopt --lite --stage A9 --out /home/usain/gov-os-runs/W2-88/tmp-lead/pytest-of-usain/pytest-2/test_s25_real_redis_copy_a9_is0/box/redis-out --json --session adopter-w2-124
+E   exit code: 1 after 195.7 s
+E   stdout:
+E   {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-124", "error": {"code": "FABRIC_INCOMPLETE", "message": "a store the path map calls for was not built: codegraph (codegraph: RuntimeError: codebase-memory-mcp config set ui_enabled false failed: query_graph is not run); the rebuild says not built: ['codeintel']", "details": {"missing": [], "short": [], "not_built": ["codegraph", "codeintel"]}}}
+E   
+E   stderr:
+E   semantic: 1 file(s) hold a chunk over 10000 characters, embedded from its first 10000: deps/jemalloc/doc_internal/jemalloc.svg
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-88/test_w2_88_f1_codegraph.py::test_s25_real_redis_copy_a9_is_ok_or_names_the_cause
+1 failed in 197.28s (0:03:17)

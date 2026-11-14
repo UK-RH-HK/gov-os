@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result 2491c9bec: W2-88 run 7: probe records of the two narrow checks (check 1 at ef9c773c3: S24-S26 pass, S27 P1-1; re-check at d766514fd: S27 P1R-1), both FAIL on S27

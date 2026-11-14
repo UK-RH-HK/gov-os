@@ -57,4 +57,197 @@ F....................................................................... [ 22%]
 ........................................................................ [ 55%]
 ........................................................................ [ 56%]
 ........................................................................ [ 57%]
-..........
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+.........................sss............................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................F............................................... [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+............................sss......................................... [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+...............F........................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+____________ test_s1_a_stage_writes_nothing_over_an_untracked_file _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+root = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw5/test_s1_a_stage_writes_nothing0/project')
+
+    def test_s1_a_stage_writes_nothing_over_an_untracked_file(root):
+        write(root, ".gitignore", ".gov-runtime/\ngovernance/\n")
+        commit(root, "ignore the records' folder")
+        write(root, project.record_path("A0"), "the user's own, ignored\n")
+>       refused("WOULD_OVERWRITE", root, "A0")
+
+tests/unit/adopt/test_safety.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 'WOULD_OVERWRITE'
+root = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw5/test_s1_a_stage_writes_nothing0/project')
+name = 'A0', more = {}
+caught = <ExceptionInfo GovError("16 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git wo...ath (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again") tblen=5>
+@py_assert1 = GovError("16 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them...ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again")
+@py_assert3 = 'ADOPT_PATH_IGNORED', @py_assert6 = 'ADOPT_'
+@py_assert9 = 'ADOPT_WOULD_OVERWRITE', @py_assert5 = False
+@py_format10 = "'ADOPT_PATH_IGNORED' == 'ADOPT_WOULD_OVERWRITE'\n~\n~- ADOPT_WOULD_OVERWRITE\n~+ ADOPT_PATH_IGNORED"
+
+    def refused(code, root, name, **more):
+        with pytest.raises(GovError) as caught:
+            stage(root, name, **more)
+>       assert caught.value.code == "ADOPT_" + code, caught.value.message
+E       AssertionError: 16 path(s) gov adopt writes and commits are ignored by this repository's own rules, so git would refuse them: governance/adoption/A0-safety-baseline.md (.gitignore:2:governance/); governance/adoption/A1-inventory.md (.gitignore:2:governance/); governance/adoption/A2-classification.md (.gitignore:2:governance/); governance/adoption/A3-target-path-map.md (.gitignore:2:governance/); governance/adoption/A4-batched-plan.md (.gitignore:2:governance/); governance/adoption/A5-independent-review-of-the-path-map.md (.gitignore:2:governance/); governance/adoption/A6-controlled-migration.md (.gitignore:2:governance/); governance/adoption/A8-legacy-import-and-retirement.md (.gitignore:2:governance/); governance/adoption/A9-memory-fabric.md (.gitignore:2:governance/); governance/adoption/A7-independent-migration-verification.md (.gitignore:2:governance/); governance/adoption/A10-independent-memory-verification.md (.gitignore:2:governance/); governance/adoption/packages/DP-ADOPT-00000000.md (.gitignore:2:governance/); governance/adoption/CIT-E-ADOPT-A8.md (.gitignore:2:governance/); governance/kernel/templates/brief.md (.gitignore:2:governance/); governance/kernel/templates/role-cto.md (.gitignore:2:governance/); governance/project/retrieval.yaml (.gitignore:2:governance/). Nothing was written, staged or committed. gov never forces an ignored path (git add -f) and never edits an ignore file: change those rules (or the paths), then run the stage again
+E       assert 'ADOPT_PATH_IGNORED' == 'ADOPT_WOULD_OVERWRITE'
+E         
+E         - ADOPT_WOULD_OVERWRITE
+E         + ADOPT_PATH_IGNORED
+
+tests/unit/adopt/test_adopt.py:78: AssertionError
+_____________ test_s27_many_texts_are_judged_per_gitleaks_process ______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw4/test_s27_many_texts_are_judged0/box'), ...h('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw4/test_s27_many_texts_are_judged0/box/locks/rebuild.lock'))
+
+    def test_s27_many_texts_are_judged_per_gitleaks_process(box):
+        """success-S27: 300 files with a planted secret in some are judged by far fewer gitleaks processes than files (at most one process per
+        ten files; the one-per-file form starts one for each). The logging ``gitleaks`` first on ``PATH`` counts the starts; the verdict is the
+        list of the case above (no planted secret kept)."""
+        tree = plant_tree(box.base, "batches", 300, every=29, extras=False)
+        log = Path(box.base) / "gitleaks-calls.log"
+        tools = logging_gitleaks(Path(box.base) / "tools-count", log)
+        answer, _ = judge(W.SRC, tree, box, "paths.json", tools=(tools,))
+        started, _peak = calls_of(log)
+        assert started >= 1, "the plant did not take: no gitleaks process was started through the logging program on PATH"
+>       assert started * 10 <= len(tree.paths), (f"{started} gitleaks processes were started for {len(tree.paths)} files: many texts per "
+                                                  f"process means at most one process per ten files")
+E       AssertionError: 40 gitleaks processes were started for 300 files: many texts per process means at most one process per ten files
+E       assert (40 * 10) <= 300
+E        +  where 300 = len(['src/d01/f00151.txt', 'src/d44/f00044.txt', 'src/d02/f00152.txt', 'src/d03/f00253.txt', 'src/d25/f00025.txt', 'src/d35/f00185.txt', ...])
+E        +    where ['src/d01/f00151.txt', 'src/d44/f00044.txt', 'src/d02/f00152.txt', 'src/d03/f00253.txt', 'src/d25/f00025.txt', 'src/d35/f00185.txt', ...] = Tree(root=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw4/test_s27_many_texts_are_judged0/box/ba...ey secret withheld>, <forge-token secret withheld>, <cloud-access-key secret withheld>, <forge-token secret withheld>]).paths
+
+tests/acceptance/W2-88/test_w2_88_scan_speed.py:239: AssertionError
+_____________ test_s25_real_redis_copy_a9_is_ok_or_names_the_cause _____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/test_s25_real_redis_copy_a9_is0/box'), ...h('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/test_s25_real_redis_copy_a9_is0/box/locks/rebuild.lock'))
+host = '127.0.0.1:36995'
+
+    @pytest.mark.real
+    @pytest.mark.skipif(not REDIS.is_dir(), reason="no copy of redis under ~/gov-os-runs/W2-88/ on this machine")
+    def test_s25_real_redis_copy_a9_is_ok_or_names_the_cause(box, host):
+        """success-S25 (the real tool; the lead runs it outside the sandbox; not run by the whole-folder runs: its name holds ``real``): A9 on a fresh
+        copy of ``~/gov-os-runs/W2-88/redis`` (W2-88b's, at A8's commit) made in tmp, with the real ``codebase-memory-mcp`` on PATH. Exit 0, or
+        the refusal ``CODEGRAPH_TOO_LARGE`` naming 41,086 and 143,008 (the graph is the same one); never ``FABRIC_INCOMPLETE`` with ``exit code 0``."""
+        copy = Path(box.base) / "redis"
+        shutil.copytree(REDIS, copy, symlinks=True)
+        adoption = W.Adoption(copy, box, host, code_graph=True)
+        run = adoption.a9(Path(box.base) / "redis-out")
+        if run.returncode == 0:
+            assert run.prints_ok, run.describe()
+            return
+>       W.assert_refused(run, CODE, "A9 on the copy of redis")
+
+tests/acceptance/W2-88/test_w2_88_f1_codegraph.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('adopt', '--lite', '--stage', 'A9', '--out', '/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/tes...0000 characters, embedded from its first 10000: deps/jemalloc/doc_internal/jemalloc.svg\n', seconds=240.12502433199552)
+code = 'CODEGRAPH_TOO_LARGE', what = 'A9 on the copy of redis', stage = 'A9'
+
+    def assert_refused(run, code: str, what: str, stage: str = "A9") -> None:
+        assert_offered(run, stage)
+>       assert run.returncode != 0 and run.envelope().get("ok") is False, f"{what}: expected a refusal\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: A9 on the copy of redis: expected a refusal
+E       gov adopt --lite --stage A9 --out /tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/test_s25_real_redis_copy_a9_is0/box/redis-out --json --session adopter-w2-124
+E       exit code: None after 240.1 s
+E       stdout:
+E       
+E       stderr:
+E       semantic: 1 file(s) hold a chunk over 10000 characters, embedded from its first 10000: deps/jemalloc/doc_internal/jemalloc.svg
+
+tests/acceptance/W2-88/w2_88_support.py:252: AssertionError
+_ test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+worlds = <conftest.Worlds object at 0x7e5b395cc7d0>
+release = namespace(base=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-release0'), venv=PosixPath('/t...0/tmp'), decoy=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-release0/venv/lib/python3.12'))
+
+    def test_s24_a9_from_an_installed_release_copies_reads_and_writes_from_shipped_bytes(worlds, release):
+        """success-S24 (the full line; **red for the package while item 4 is open**, README): the kit installed by ``copier copy`` from the planted tag
+        in the planted adoption at A8 (the repository tracks no ``retrieval.yaml``), A9 run by the wheel's gov (no ``PYTHONPATH``, working folder in
+        tmp). A9 is ok; the kernel files it copies (the retrieval and discovery skills, T-0, T-8) are byte for byte the tag's; ``governance/project/
+        retrieval.yaml`` is installed with Gov OS's bytes (read from the shipped pool); the walls copy (``memory-audit/ACT-WALLS/``) and the audit
+        briefs (``memory-audit/briefs/``) are written from shipped bytes. Until the pool, the walls template and the audit briefs are shipped where
+        the resolver looks (outside the ticket's paths: a package), A9 refuses ``SHIPPED_FILE_MISSING`` naming the first of them it meets."""
+        adoption, run, out, _start = installed_a9(worlds, release, "p1-full", no_retrieval=True)
+>       W.assert_ok(run, "A9 run by a gov installed from a wheel, on a project whose kit copier installed")
+
+tests/acceptance/W2-88/test_w2_88_p1_installed.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('adopt', '--lite', '--stage', 'A9', '--out', '/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-...lease0/venv/lib/python3.12/site-packages/gov) holds copier.yml, template/ and src/gov/"]}}}\n', stderr='', seconds=0.0)
+what = 'A9 run by a gov installed from a wheel, on a project whose kit copier installed'
+
+    def assert_ok(run, what: str) -> dict:
+>       assert run.returncode == 0 and run.envelope().get("ok") is True, f"{what} did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: A9 run by a gov installed from a wheel, on a project whose kit copier installed did not succeed
+E       gov adopt --lite --stage A9 --out /tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-a8-noret0/box/p1-full-out
+E       exit code: 1 after 0.0 s
+E       stdout:
+E       {"ok": false, "command": "adopt", "result": {}, "session": "adopter-w2-88", "error": {"code": "SHIPPED_FILE_MISSING", "message": "governance/project/retrieval.yaml: Gov OS ships no such file where this gov can find it (looked in: no Gov OS source tree: no folder at or above the gov package's folder (/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-release0/venv/lib/python3.12/site-packages/gov) holds copier.yml, template/ and src/gov/): nothing is installed or written, and no default stands in its place", "details": {"file": "governance/project/retrieval.yaml", "looked": ["no Gov OS source tree: no folder at or above the gov package's folder (/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-94/popen-gw3/p1-release0/venv/lib/python3.12/site-packages/gov) holds copier.yml, template/ and src/gov/"]}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-88/w2_88_support.py:240: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-88/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=1679041) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [3] tests/acceptance/W2-124/test_w2_124_s4_close_and_prepare_gate.py:115: rebuild_slot.sh got no heavy-job slot within 120 s (the slots are taken): it cannot run here now
+SKIPPED [1] tests/acceptance/W2-20/test_w2_20_measured.py:183: S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+4 failed, 6833 passed, 10 skipped, 6 warnings in 1324.53s (0:22:04)
