@@ -1,6 +1,6 @@
 ---
 id: DAEO-f58b
-status: in_progress
+status: closed
 deps: [DAEO-lrre]
 links: []
 created: 2026-10-31T23:52:57Z
@@ -31,6 +31,13 @@ allowed_paths:
 - src/gov/retrieval/retrieve.py  # R2-F3, Q3 (a) (CTO): the continuation token carries the half it was made on (about 20 lines)
 - tests/unit/status/test_w2_116*
 - tests/unit/retrieval/test_w2_116*
+- tests/acceptance/W2-131/test_w2_131_unchanged.py  # R2-F3's `f` token key (Q3 (a)): the helper drops `f` beside `s` when it compares tokens from two folders; a test designer, Rewrite-Reason (CTO, DEC-1156 (7))
+- tests/acceptance/W2-133/test_w2_133_unchanged.py  # the same
+- tests/acceptance/W2-135/test_w2_135_unchanged.py  # the same
+- tests/unit/retrieval/test_w2_131_register_ids.py  # the same
+- tests/unit/retrieval/test_w2_133_gap_label.py  # the same
+- tests/unit/retrieval/test_w2_135_item_cap.py  # the same
+- tests/unit/status/test_status.py  # S2's new `integration_store` part in gov status's PARTS (the same route)
 kpis:
   success:
   - '`gov rebuild --integration <branch>` keeps a store of that branch''s head in two detached worktrees outside the project, building into the one not in use and switching a link to it only when the build succeeded; a search during a build is answered from the ready one [DEC-963, DEC-983, DEC-982] Verify: the success-1 cases in tests/acceptance/W2-116/test_w2_116_double_buffer.py (the build in a detached worktree behind the link, the two halves alternating, a search during a build and a killed build answered from the ready half) pass [Verify clause added, DEC-1157 (12)]'

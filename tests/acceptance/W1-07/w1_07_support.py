@@ -66,6 +66,9 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 # approved ``gov`` command ``impact`` (``src/gov/impact/command.py``) is recorded, one line in the form of DEC-542.
 # The set stays exact (W1-32's suite).
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)
+
+# DEC-747 (W2-104): ``skilleval`` joins them too.
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("skilleval",)
 RECORDED_MODULE_COMMANDS = ("lock",)
 
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).

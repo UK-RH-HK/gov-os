@@ -465,7 +465,9 @@ Round 2's code already writes one file and keys it by the whole text; these case
 
 `test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written` starts **one
 real worker session through `gov launch`** under its OS sandbox, as W1-46's live cases do: W1-46's fixture project
-(`w1_46_support.make_project`, its held-out stand-in), the engineer role on W1-46's ticket, `--model haiku`,
+(`w1_46_support.make_project`, its held-out stand-in), the engineer role on W1-46's ticket, Haiku 4.5 at effort
+low (named since W2-60a by the project's copy of the role file, `w1_46_support.set_live_launch_default`, in place of
+`--model haiku`: DEC-839 items 2 and 5),
 `--permission-mode acceptEdits`, `--allowedTools Bash`, `--max-turns 6`, and the environment of DEC-784 (no `CLAUDE*`,
 `GOV_ROLE` or `GOV_TICKET`). The session runs one Bash command, a probe the case wrote into
 `.gov-runtime/scratch/w2-54/`.

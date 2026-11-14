@@ -28,11 +28,17 @@ import w2_56_support as s
 
 SIGNALS = (signal.SIGTERM, signal.SIGINT, signal.SIGHUP)
 
+# W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): gov launch refuses a project without the role's role file, its version line
+# and its default line; the fixture plants one per worker role, so that check is never what refuses a launch here.
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-56 fixture)\n\n- **Version:** 1.0.0\n"
+    "- **Launch default:** model claude-opus-5-5, effort high\n") for role in s.WORKER_ROLES}
+
 
 @pytest.fixture
 def box(tmp_path):
     box = s.make_box(tmp_path)
-    s.make_project(box)
+    s.make_project(box, extra=ROLE_FILES)
     s.install_stand_in_cli(box)
     return box
 

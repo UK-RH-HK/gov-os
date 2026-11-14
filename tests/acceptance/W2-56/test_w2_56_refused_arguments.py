@@ -63,10 +63,17 @@ def _id(case):
     return " ".join(case[1])[:60]
 
 
+# W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): gov launch refuses a project without the role's role file, its version line
+# and its default line; the fixture plants one per worker role, so that check is never what refuses a launch here.
+ROLE_FILES = {f"template/governance/kernel/roles/{role}.md": (
+    f"# {role} role (W2-56 fixture)\n\n- **Version:** 1.0.0\n"
+    "- **Launch default:** model claude-opus-5-5, effort high\n") for role in s.WORKER_ROLES}
+
+
 @pytest.fixture
 def box(tmp_path):
     box = s.make_box(tmp_path)
-    s.make_project(box)
+    s.make_project(box, extra=ROLE_FILES)
     s.install_stand_in_cli(box)
     s.set_plan(box)
     return box
@@ -101,21 +108,24 @@ def test_s6_every_worker_role_is_refused_each_new_argument(box, role, name):
 def test_s6_guard_arguments_that_are_not_refused_start_the_session(box, args):
     launch = s.run_launch(box, s.ENGINEER, s.T.tk, args)
     assert launch.returncode == 0 and launch.started, f"the launch did not start\n{launch.describe()}"
-    assert _caller_args_then_template_pair(launch.call["args"], args), (
-        f"the session did not get the arguments {args}, followed by nothing or by the one template pair: "
+    tmpdir = launch.call["env"].get("TMPDIR") or (launch.settings().get("env") or {}).get("TMPDIR")
+    assert _caller_args_then_appended_pair(launch.call["args"], args, s.ENGINEER, tmpdir), (
+        f"the session did not get the arguments {args}, followed by nothing or by the one appended pair: "
         f"{launch.call['args']}")
 
 
-def _caller_args_then_template_pair(argv, args):
+def _caller_args_then_appended_pair(argv, args, role, tmpdir):
     """True when ``args`` are one contiguous, ordered run in ``argv`` followed by nothing or by exactly
-    ``--append-system-prompt-file <...>/.claude/templates/<stem>.md`` (W2-153's S1, DEC-1050; DEC-866)."""
+    ``--append-system-prompt-file <session TMPDIR>/role-<role>.md``: since W2-60a (P-4 (A)) the one appended file is
+    the role file's text then the role template's, written in the session's temp folder (W2-153's S1 placed it last,
+    DEC-1050; DEC-866)."""
     argv, args = list(argv), list(args)
     if argv[-len(args):] == args:
         return True
     if len(argv) < len(args) + 2 or argv[-len(args) - 2:-2] != args or argv[-2] != "--append-system-prompt-file":
         return False
-    head, sep, stem = argv[-1].replace("\\", "/").rpartition("/.claude/templates/")
-    return bool(sep and head and stem.endswith(".md") and len(stem) > 3 and "/" not in stem)
+    head, sep, name = argv[-1].replace("\\", "/").rpartition("/")
+    return bool(sep and tmpdir and head == tmpdir.rstrip("/") and name == f"role-{role}.md")
 
 
 @pytest.mark.parametrize("case", TODAY_REFUSED, ids=_id)

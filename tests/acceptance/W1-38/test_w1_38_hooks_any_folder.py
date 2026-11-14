@@ -13,6 +13,12 @@ the orchestrator's measurement after the merge (DEC-607).
 No case here chooses between a command line with the ``PYTHONPATH`` prefix and one without it: that is package
 P-7 of the README. The stand-in home holds the ``gov`` package as an installed one and the project holds none,
 which both forms serve alike.
+
+Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The template's ``postToolUse`` holds two entries, the
+guard's (``posttooluse.py``) and the context watch's (``context_watch.py``, which imports only the standard library).
+The cases for an event start its guard line, found by its program, never by index; the context watch's line is
+started from every folder too, by its own answer (a reminder for a session at 90 % of its window). The PreCompact
+program writes its read-first line before its JSON message (W2-176): the case reads the message from the last line.
 """
 
 from __future__ import annotations
@@ -47,11 +53,27 @@ def session_sandbox(tmp_path):
     return hooks.make_session_sandbox(tmp_path / "session")
 
 
+def _commands_of(settings, programs, event, watch):
+    """The commands registered under ``event`` that run the context watch (``watch``) or that run any other program."""
+    return [command for command in hooks.registered_commands(settings, programs, event)
+            if bool(hooks.own_programs(command, (hooks.WATCH_PROGRAM,))) == watch]
+
+
 def _one_command(settings, programs, event):
-    commands = hooks.registered_commands(settings, programs, event)
+    """The one guard line under ``event`` (the context watch's line is the other entry of PostToolUse, not it)."""
+    commands = _commands_of(settings, programs, event, watch=False)
     assert len(commands) == 1, (
         f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
-        f"under {event}; one is expected: {commands}"
+        f"under {event} besides the context watch's; one is expected: {commands}"
+    )
+    return commands[0]
+
+
+def _watch_command(settings, programs):
+    commands = _commands_of(settings, programs, "PostToolUse", watch=True)
+    assert len(commands) == 1, (
+        f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} PostToolUse entries "
+        f"that run {hooks.WATCH_PROGRAM}; one is expected: {commands}"
     )
     return commands[0]
 
@@ -102,6 +124,20 @@ class TestEveryEntryStartsFromAnyFolder:
         _assert_started(started, f"{folder} ({where})")
 
 
+class TestTheContextWatchStartsFromAnyFolder:
+    """The template's second ``PostToolUse`` entry, run through the shell as registered, starts its program and
+    gives the program's own answer whatever the session's current folder is (DEC-603, DEC-1167 (4))."""
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+        started = hooks.start_entry("PostToolUse", _watch_command(settings, programs), product, session_sandbox,
+                                    where, settings)
+        _assert_started(started, f"{folder} ({where})")
+
+
 # ===================================================================
 # A project folder whose name holds a space
 # ===================================================================
@@ -129,6 +165,15 @@ class TestAProjectFolderWithASpace:
         settings = support.load_settings(spaced_product)
         where = hooks.folder_of(spaced_product, "subfolder", tmp_path / "elsewhere")
         started = hooks.start_entry(event, _one_command(settings, programs, event), spaced_product,
+                                    session_sandbox, where, settings)
+        _assert_started(started, f"a subfolder of a project whose folder name holds a space ({where})")
+
+    @needs_rulesync
+    def test_the_context_watch_command_starts_from_a_subfolder(self, spaced_product, session_sandbox, programs,
+                                                               tmp_path):
+        settings = support.load_settings(spaced_product)
+        where = hooks.folder_of(spaced_product, "subfolder", tmp_path / "elsewhere")
+        started = hooks.start_entry("PostToolUse", _watch_command(settings, programs), spaced_product,
                                     session_sandbox, where, settings)
         _assert_started(started, f"a subfolder of a project whose folder name holds a space ({where})")
 

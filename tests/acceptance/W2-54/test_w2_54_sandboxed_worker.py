@@ -211,6 +211,7 @@ def test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_c
         pytest.fail(str(exc), pytrace=False)
     sandbox = L.cli_support.make_sandbox(tmp_path / "sandbox")
     L.w47.configure_stand_in(project, L.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
+    L.set_live_launch_default(project, L.ENGINEER)
     scratch = project / SCRATCH
     scratch.mkdir(parents=True)
     env = {key: value for key, value in S.embed_env(box, None).items()
@@ -229,7 +230,7 @@ def test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_c
     (scratch / "probe.sh").write_text(_PROBE, encoding="utf-8")
 
     run = L.run_gov(project, sandbox, "launch", L.ENGINEER, L.TICKET_OF[L.ENGINEER], "--", "-p", PROMPT,
-                    "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "6",
+                    "--permission-mode", "acceptEdits", "--max-turns", "6",
                     "--allowedTools", "Bash", env=_launch_environment(project, sandbox), timeout=SESSION_TIMEOUT_S)
     results_path = scratch / "results.txt"
     if not results_path.is_file() or "end=1" not in results_path.read_text(encoding="utf-8"):

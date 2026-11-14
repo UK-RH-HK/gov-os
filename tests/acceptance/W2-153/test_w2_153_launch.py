@@ -7,19 +7,87 @@ whose ``.local/bin/claude`` is a stand-in that records its arguments (README, "H
 
 from __future__ import annotations
 
+import json
 import os
+import re
+import sys
+from pathlib import Path
 
 import pytest
 
 import w2_153_support as support
-from w2_153_support import ALL_ROLES, FLAG, REFUSAL, LaunchBed
+from w2_153_support import ALL_ROLES, FLAG, REFUSAL, WORKER_ROLES, LaunchBed
 
-CALLER = ["-p", "--model", "claude-opus-5-5", "--output-format", "json"]
+ROLE_MODEL = "claude-opus-5-5"
+CALLER = ["-p", "--model", ROLE_MODEL, "--output-format", "json"]
+
+# W2-60a (DAEO-cv58; P-3, DEC-1156 (7)): gov launch refuses a worker without its role file (version line, default line
+# naming a full model id; a model after -- that is not the role's is refused), so the bed plants one per worker role,
+# its default the caller's model. Since W2-60a (P-4 (A)) a worker is handed ONE appended file, <TMPDIR>/role-<role>.md:
+# the role file's bytes, one blank line, then the role template's bytes, still placed last after the caller's
+# arguments. A lead has no role file here and is still handed its template copy.
+ROLES_REL = "template/governance/kernel/roles"
+
+
+def role_text(role: str) -> str:
+    return (f"# {role} role (W2-153 fixture)\n\nThe marker zq153-role-{role}.\n\n- **Version:** 1.0.0\n"
+            f"- **Launch default:** model {ROLE_MODEL}, effort high\n")
+
+
+def _stub_reading_appended(path: Path) -> None:
+    """The bed's stand-in, which also records the bytes of each appended file as it finds them when it starts (the
+    file lives in the session's temp folder, which goes when the session ends)."""
+    support.write(path, (
+        f"#!{sys.executable}\n"
+        "import json, os, sys\n"
+        f"with open({str(support.record_pointer(path))!r}, encoding='utf-8') as pointer:\n"
+        "    record = pointer.read().strip()\n"
+        "argv = sys.argv[1:]\n"
+        f"flag = {FLAG!r}\n"
+        "appended = []\n"
+        "for i, arg in enumerate(argv[:-1]):\n"
+        "    if arg == flag:\n"
+        "        try:\n"
+        "            with open(argv[i + 1], 'rb') as f:\n"
+        "                appended.append(f.read().decode('latin-1'))\n"
+        "        except OSError:\n"
+        "            appended.append(None)\n"
+        "with open(record, 'a', encoding='utf-8') as f:\n"
+        "    f.write(json.dumps({'argv': argv, 'cwd': os.getcwd(), 'tmpdir': os.environ.get('TMPDIR'),\n"
+        "                        'appended': appended}) + '\\n')\n"
+    ))
+    path.chmod(0o755)
 
 
 @pytest.fixture
 def bed(tmp_path):
-    return LaunchBed(tmp_path / "bed")
+    bed = LaunchBed(tmp_path / "bed")
+    for role in WORKER_ROLES:
+        support.write(bed.root / ROLES_REL / f"{role}.md", role_text(role))
+    _stub_reading_appended(bed.cli)
+    return bed
+
+
+def _assert_appended(bed, role: str, run: dict, argv: list[str]) -> None:
+    """The flag once, last; a worker's value is ``role-<role>.md`` in its session's temp folder, whose bytes start
+    with the role file's and end with the role template's (only blank between); a lead's is its template copy."""
+    assert len(support.flag_values(argv)) == 1,f"{role}: {FLAG} must be passed once: {support.shown(argv)}"
+    assert argv[-2] == FLAG and os.path.isabs(argv[-1]), f"{role}: the flag must come last: {support.shown(argv)}"
+    if role not in WORKER_ROLES:
+        assert argv[-1] == bed.expected_path(role), f"{role}: {support.shown(argv)}"
+        return
+    call = run["calls"][0]
+    assert Path(argv[-1]).name == f"role-{role}.md", f"{role}: the appended file is {argv[-1]}"
+    assert call["tmpdir"] and Path(argv[-1]).parent == Path(call["tmpdir"]), (
+        f"{role}: the appended file {argv[-1]} is not in the session's temp folder {call['tmpdir']}")
+    [text] = call["appended"]
+    assert text is not None, f"{role}: the appended file could not be read when the session started"
+    data = text.encode("latin-1")
+    role_bytes = (bed.root / ROLES_REL / f"{role}.md").read_bytes()
+    template_bytes = bed.template(support.ROLE_TEMPLATE[role]).read_bytes()
+    assert data.startswith(role_bytes), f"{role}: the appended file does not start with the role text: {data!r}"
+    assert data.endswith(template_bytes), f"{role}: the appended file does not end with the template: {data!r}"
+    assert data[len(role_bytes):len(data) - len(template_bytes)].strip() == b"", f"{role}: {data!r}"
 
 
 def _started(run: dict) -> list[str]:
@@ -32,20 +100,17 @@ def _started(run: dict) -> list[str]:
 
 @pytest.mark.parametrize("role", ALL_ROLES)
 def test_s1_the_launch_passes_the_role_s_template_after_the_caller_s_arguments(bed, role):
-    argv = _started(bed.launch(role, CALLER))
-    expected = bed.expected_path(role)
-    assert os.path.isabs(expected)
-    assert support.flag_values(argv) == [expected], (
-        f"{role}: {FLAG} must name {expected} once; the arguments were {support.shown(argv)}")
-    assert argv[-2:] == [FLAG, expected], f"{role}: the flag must come after the caller's arguments: {support.shown(argv)}"
+    run = bed.launch(role, CALLER)
+    argv = _started(run)
+    _assert_appended(bed, role, run, argv)
     assert argv[-2 - len(CALLER):-2] == CALLER, f"{role}: the caller's arguments must stay as given: {support.shown(argv)}"
 
 
 @pytest.mark.parametrize("role", ["engineer", "lead"])
 def test_s1_with_no_caller_arguments_the_flag_is_still_passed_last(bed, role):
-    argv = _started(bed.launch(role, []))
-    assert argv[-2:] == [FLAG, bed.expected_path(role)], support.shown(argv)
-    assert support.flag_values(argv) == [bed.expected_path(role)], support.shown(argv)
+    run = bed.launch(role, [])
+    argv = _started(run)
+    _assert_appended(bed, role, run, argv)
 
 
 @pytest.mark.parametrize("role", ALL_ROLES)
@@ -82,7 +147,58 @@ def test_f2_the_built_arguments_are_integrate_s_but_for_the_one_flag(bed, baseli
     assert ours["result"]["module"].startswith(str(support.SRC)), ours["result"]
     mine = support.without_flag(bed.normalised(ours["calls"][0]))
     base = bed.normalised(theirs["calls"][0])
-    assert mine == base, f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
+    if role in WORKER_ROLES:  # the settings compared as values: the JSON text is rebuilt once W2-60a's are taken out
+        mine = _without_w2_60a(mine, role)
+        mine, base = [mine[0], _rules_sorted(json.loads(mine[1])), *mine[2:]], [
+            base[0], _rules_sorted(json.loads(base[1])), *base[2:]]
+    assert mine == base,f"{role}: the launch changed beyond the one flag\nthis tree: {mine}\nintegrate: {base}"
+
+
+W2_60A_SWITCHES = {"--setting-sources": "project,local", "--strict-mcp-config": None, "--effort": "high",
+                   "--session-id": "<uuid>"}
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
+
+def _rules_sorted(settings: dict) -> dict:
+    """The settings with each permission list as its distinct rules, sorted: a rule's place in its list and a rule
+    written twice mean nothing to the CLI, and this tree writes the deny rules in another order than integrate's
+    launcher did, and once each (integrate's wrote a research worker's ``.claude`` and ``.tickets`` rules twice)."""
+    for name, rules in (settings.get("permissions") or {}).items():
+        if isinstance(rules, list):
+            settings["permissions"][name] = sorted(set(rules))
+    return settings
+
+
+def _without_w2_60a(argv: list[str], role: str) -> list[str]:
+    """A worker's normalised arguments with what W2-60a (DAEO-cv58) adds taken out, each checked present first: on the
+    line, the role's effort, the session id and the two switches that keep user-level context out (the model is the
+    caller's here, so none is added); in ``--settings``, ``autoMemoryEnabled: false``, the subagent model (the role's)
+    in ``env`` and the deny rules on the launch-record folder ``.gov-runtime/launches/``. What is left must be
+    integrate's."""
+    assert argv[:1] == ["--settings"], argv
+    rest, seen, index = argv[2:], {}, 0
+    kept = []
+    while index < len(rest):
+        arg = rest[index]
+        if arg in W2_60A_SWITCHES and arg not in seen:
+            if W2_60A_SWITCHES[arg] is None:
+                seen[arg], index = None, index + 1
+            else:
+                seen[arg], index = rest[index + 1], index + 2
+            continue
+        kept.append(arg)
+        index += 1
+    assert set(seen) == set(W2_60A_SWITCHES), f"{role}: W2-60a's switches are not all on the line: {argv}"
+    assert UUID.fullmatch(seen.pop("--session-id")), f"{role}: --session-id is not a UUID: {argv}"
+    assert seen == {k: v for k, v in W2_60A_SWITCHES.items() if k != "--session-id"}, f"{role}: {seen}"
+    settings = json.loads(argv[1])
+    assert settings.pop("autoMemoryEnabled", None) is False, f"{role}: no autoMemoryEnabled false: {argv[1]}"
+    assert settings["env"].pop("CLAUDE_CODE_SUBAGENT_MODEL", None) == ROLE_MODEL, f"{role}: {argv[1]}"
+    deny = settings["permissions"]["deny"]
+    records = [rule for rule in deny if "/.gov-runtime/launches/" in rule]
+    assert records, f"{role}: no deny rule on the launch-record folder: {deny}"
+    settings["permissions"]["deny"] = [rule for rule in deny if rule not in records]
+    return ["--settings", json.dumps(settings), *kept]
 
 
 @pytest.mark.parametrize("role", ["engineer", "lead"])

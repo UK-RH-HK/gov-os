@@ -1,18 +1,21 @@
-# Re-anchored at c9742b08910a (D-10 run 2, DEC-1122 (3)): W2-150 moved set_fault into src/gov/util/parts.py (28c586930)
-# and the three call sites moved with later edits (reads.py 465 -> 227, 483 -> 245; measure.py 247 -> 477). Same three
-# callers, same facts; only the line numbers of the gold answer and the sources changed.
+# Re-anchored at 00a2f3e2557a (DEC-1122 (3)): reads.py gained 119 lines after the run-2 anchor (c9742b08910a), so its two
+# cited lines drifted (227 -> 233, 245 -> 251). Same three callers, same facts; the two reads.py sources now cite the
+# calling function's def line as the heading (the measure's rule: the heading governs, the stated lines give the span's
+# width), so a later edit above them does not move the gold again. measure.py's source already cited a heading.
 category: callers
-commit: c9742b08910a
+commit: 00a2f3e2557a
 question: "Which functions call set_fault?"
 gold_answer: >-
-  Three: check_sets (src/gov/guard/reads.py, line 227) and _hidden (reads.py, line 245), each raising PolicyError
+  Three: check_sets (src/gov/guard/reads.py, line 233) and _hidden (reads.py, line 251), each raising PolicyError
   on a fault, and measure in src/gov/retrieval/measure.py (line 477), which refuses a set that is not declared well
   formed in the path map's evaluation_sets.
 sources:
   - path: src/gov/guard/reads.py
-    lines: [227, 227]
+    heading: "def check_sets(root: str) -> None:"
+    lines: [230, 233]
   - path: src/gov/guard/reads.py
-    lines: [245, 245]
+    heading: "def _hidden(root: str, role: str, ticket_id: str | None) -> list[str]:"
+    lines: [238, 251]
   - path: src/gov/retrieval/measure.py
     heading: "        if not isinstance(entry, dict) or set_fault(entry):"
     lines: [477, 477]

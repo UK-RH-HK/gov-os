@@ -235,8 +235,11 @@ Readings these cases take:
 ### The live cases
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
-credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script by one call,
+credentials, at most 6 turns, Bash only) in a fixture project built from scratch
+(`w2_58_support.make_project`, with `w2/integrate` as T's base). Since W2-60a the builder writes one fixture role
+file per worker role (DEC-826 Q1), and a live case's copy names Haiku 4.5 at effort low in its default line in place
+of `--model haiku` (DEC-839 items 2 and 5); no `--model` is passed. The live case also plants an open resource gate
+(`plant_open_gate`, W2-20 S19). The session runs one probe script by one call,
 `bash .gov-runtime/scratch/w2-58/probe.sh`, the form W1-46's, W1-50's and W2-54's live sessions run and one the
 session's permissions allow (`--allowedTools Bash`; the fixture's settings carry no permission rules). A long
 compound line in its place (`;`, redirections, several programs) was refused by the CLI's permission layer before

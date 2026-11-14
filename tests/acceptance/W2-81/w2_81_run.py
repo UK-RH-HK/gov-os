@@ -2,7 +2,7 @@
 
     PYTHONPATH=<a tree>/src python3 tests/acceptance/W2-81/w2_81_run.py --folder <path> --mode build|run|read
         [--seed N] [--gov <exe>] [--pinned-gov <exe>] [--close-ticket [<repository>=]<id>]...
-        [--hidden <dir>] [--manifests <dir>] [--large-size <bytes>] [--stages A0,A1,A2]
+        [--hidden <dir> | --sets-root <root>] [--manifests <dir>] [--large-size <bytes>] [--stages A0,A1,A2]
 
 - ``--folder``: the run folder, by literal path: a temporary folder, or ``~/gov-os-runs/W2-81/<run>`` (DEC-728).
   It is refused inside this repository or inside any git work tree the runner did not build.
@@ -17,7 +17,11 @@
 - The report: ``<folder>/report.json`` and ``<folder>/report.md``; a log of steps, ``<folder>/run.log``.
 
 The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists; a ``--hidden``
-that names no existing folder is refused. READY needs it present and asked in every repository: at least
+that names no existing folder is refused. ``--sets-root <root>`` (W2-93, DEC-1144 (6)) names the evaluation sets' root
+instead, and the hidden folder is ``<root>/HIDDEN_UNDER_SETS_ROOT``, read exactly as ``--hidden`` is: a root without it
+is refused (``--sets-root holds no hidden half: <that relative path>``, exit 2, in every mode, before anything is
+built), and ``--sets-root`` with ``--hidden`` is refused, so neither a person nor a session names the hidden folder on
+a command line. READY needs it present and asked in every repository: at least
 ``HIDDEN_NEEDED`` (10) hidden questions each. Its questions are named by id only, and its variants by number and id;
 its texts and answers are in no report, log or output. The secrets' values are drawn from the
 seed in memory and are in no report, log or output either (checked before anything is written). The runner writes
@@ -51,6 +55,9 @@ DEFAULT_STAGES = ("A0", "A1", "A2")
 # The measurement half's size: at least 10 hidden questions per repository (docs/plan/WAVE_2_WBS.md, the card
 # "W2-81's held-out half", its first KPI). A repository with fewer is not counted present (README, "The runner").
 HIDDEN_NEEDED = 10
+# Where the hidden half sits under an evaluation sets' root (the sets' convention, as gov.retrieval.measure and
+# gov.memaudit use ``<sets-root>/fixtures/evaluation/<set>/hidden/``): the one place ``--sets-root`` reads.
+HIDDEN_UNDER_SETS_ROOT = "fixtures/evaluation/adoption-proving-ground/hidden"
 
 
 class RunnerError(Exception):
@@ -103,10 +110,26 @@ def held_secrets(manifest):
             for e in manifest["planted"] if e["kind"] == "secret"]
 
 
-def _hidden(options):
+def _hidden_folder(options):
+    """The folder the hidden half is read from, or None for the default; a refusal when the options name a wrong one.
+
+    ``--sets-root`` and ``--hidden`` together are refused, and a sets root without its hidden folder is refused naming
+    the folder relative to the root (never the root's own path)."""
+    sets_root = getattr(options, "sets_root", None)
+    if sets_root and options.hidden:
+        raise RunnerError("--sets-root and --hidden are both given: name the sets root or the hidden folder, not both")
+    if sets_root:
+        folder = Path(sets_root).expanduser() / HIDDEN_UNDER_SETS_ROOT
+        if not folder.is_dir():
+            raise RunnerError(f"--sets-root holds no hidden half: {HIDDEN_UNDER_SETS_ROOT}")
+        return folder
     if options.hidden and not Path(options.hidden).expanduser().is_dir():
         raise RunnerError("--hidden names no existing folder: the measurement half cannot be read")
-    folder = Path(options.hidden).expanduser() if options.hidden else questions.HIDDEN_DEFAULT
+    return Path(options.hidden).expanduser() if options.hidden else None
+
+
+def _hidden(options):
+    folder = _hidden_folder(options) or questions.HIDDEN_DEFAULT
     if not folder.is_dir():
         return None, [], {}
     variants = []
@@ -225,6 +248,7 @@ def follow_moves(asked, moves):
 def run(options, built=None):
     """The run; returns the report (also written in the folder). ``built``: the capabilities counted as built (the
     judge's ``built``); the command leaves it to today's code, and only the self-tests pass it."""
+    _hidden_folder(options)  # a wrong --sets-root or --hidden is refused first, before anything is built or written
     folder = _refuse_place(options.folder)
     log = _Log()
     if options.mode in ("build", "run"):
@@ -360,6 +384,7 @@ def parse(argv):
     parser.add_argument("--pinned-gov", dest="pinned_gov", default=None)
     parser.add_argument("--close-ticket", dest="close_ticket", action="append", default=[])
     parser.add_argument("--hidden", default=None)
+    parser.add_argument("--sets-root", dest="sets_root", default=None)
     parser.add_argument("--manifests", default=None)
     parser.add_argument("--large-size", dest="large_size", type=int, default=build.REAL_RUN_LARGE)
     parser.add_argument("--stages", default=None)
