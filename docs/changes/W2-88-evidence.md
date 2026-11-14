@@ -490,6 +490,17 @@ cases that pass on the old code are the ones that state what must stay the same)
   `pool_size` and `scan_counts` keep their signatures and meaning; `_holds_secret` is still the one verdict per file
   (the batch's result reaches it through a thread-local, set around that worker's own calls). No secret's value is
   printed or recorded; the planted secret in the tests and in the tree is built from parts.
+- **Fix 3 (P1-1, the narrow check's blocker):** a bare generic key at one file's end (`password:`, `token =`) had its `\s`
+  classes run over the blank line between two files in a batch and take the next file's first line as its value; the match
+  was then dropped by the rule's own filter (stopwords or entropy, on a value such as `token=...`), so gitleaks reported
+  nothing and the next file's own secret was shadowed: it was written to the reuse record as clean. Built:
+  (1) every text of a batch ends with a line of one `#` and a blank line (`_FENCE`), which no rule's value class takes in,
+  so no match runs from one file into the next (this is the cause fixed; a report cannot name a swallowed match that a
+  filter dropped, so lines alone could not); (2) a finding is put back on **every** file its `StartLine` to `EndLine`
+  covers, and on the file after the last of them, each then judged alone; (3) `_FORM` is 5, so every record the batched
+  scan wrote under form 4 is ignored. Unit tests: the pair in both orders, 4 bare tails by 4 head forms, with a clean file
+  before and after, in a batch of 16 with the pair in the middle; the rules without the fence (`_FENCE` empty) still give
+  the one-per-file verdict through (2); a form-4 record is not reused.
 - **The measure** (`indexable` over every file of a planted tree, same machine, same slot kind, gitleaks 8.30.1,
   `GOV_SECRETS_CACHE` empty so no clean result is reused; the tree: 5,000 files in 50 folders, 15.3 MB, 3,013 of 8 lines,
   1,732 of 60 lines, 255 of 400 lines, one file in fifty holding the planted test secret = 100; the machine has 20 CPUs
@@ -503,7 +514,18 @@ cases that pass on the old code are the ones that state what must stay the same)
 | one gitleaks per file (`a23678e27`) | 7 | 574.3 | 8.7 | 100 |
 | batched (this change) | 7 | 40.6, 40.2 (two runs) | 123.3, 124.5 | 100 |
 
-  **Ratio:** 60 times at the slot's own budget (1 worker), 14.3 times with the budget raised to the whole CPU set (7
+  **Re-measure after fix 3 (P1-1, 2026-11-14; same slot kind, a freshly generated tree of the same shape: 5,000 files in 50
+  folders, 15.6 MB, 100 holding the planted secret; `GOV_SECRETS_CACHE` empty; the batched code of this change, now with
+  the `#` fence and the owner's neighbours):** budget 1 (1 worker): **41.7 s, 119.8 files per second, 100 files left
+  out**; budget raised to 7 (the CPU set gave 6 workers): **34.3 s, 145.8 files per second, 100 left out**. The old form
+  (`a23678e27`) was not re-run over all 5,000 files (47 minutes at budget 1, over this run's hour): on every 20th file (250
+  files, 5 holding the secret) at budget 1 it took 122.3 s, 2.0 files per second, 5 left out, so the whole tree at that rate
+  is about 2,500 s. **Ratio now:** about 60 times at budget 1 (2,500 s extrapolated over 41.7 s; 67 times against the
+  measured 2,808.4 s above) and 16.7 times at budget 7 (574.3 s measured above over 34.3 s). S27's line is at least 10
+  times: met. The fix cost nothing visible (42 s here against 46 s above; the machine is shared, so the small difference
+  is noise): a file a finding names was already judged alone, and now so is the file after it (two per finding).
+
+  **Ratio (the first measure, before fix 3):** 60 times at the slot's own budget (1 worker), 14.3 times with the budget raised to the whole CPU set (7
   workers), both at least 10 times; the verdicts are the same (the same 100 files left out in every run, and the unit
   tests compare each file's verdict with the one-per-file form's). The old form's 1.8 files per second is grafana's A6
   rate (about 2 a second). **What the figures say about the rest:** a gitleaks process already uses every CPU it may, so

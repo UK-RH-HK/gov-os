@@ -114,7 +114,8 @@ def test_a_findings_batch_mates_are_kept_and_only_the_owner_is_left_out(project,
     monkeypatch.setattr(secrets, "_scan", lambda rules, chunks, *rest: alone.append(chunks[0]) or real(rules, chunks, *rest))
     got = secrets.indexable(project, rels)
     assert got == [rel for rel in rels if rel != "notes/f007.md"]
-    assert len(alone) == 1 and PLANTED.encode() in alone[0]  # the owner alone is scanned again, no batch mate
+    # the owner alone is scanned again, and the text after it (P1-1); no other batch mate
+    assert len(alone) == 2 and PLANTED.encode() in alone[0] and PLANTED.encode() not in alone[1]
 
 
 def test_a_finding_that_cannot_be_put_back_sends_its_batch_to_one_per_file(project, monkeypatch):
@@ -180,6 +181,80 @@ def test_a_clean_file_is_remembered_and_not_scanned_again(project, monkeypatch, 
     assert after["remembered"] - before["remembered"] == 9  # the nine clean files; the finding is scanned every time
     assert after["scanned"] - before["scanned"] == 1
     assert len(processes) >= 1  # the one with the finding only: its batch of one
+
+
+VALUE = "".join(["Zq8W", "m4Xk", "2Vn7", "Bp3R", "t9Yh"])  # a generic-key value, built from parts; never printed
+TAILS = ["password:", "token =", "secret:", "token:\n\n"]  # a bare generic key at a file's end
+HEADS = [f"API_KEY={VALUE}\n", f"api_key = '{VALUE}'\n", f"secret: {VALUE}\n", f"token={VALUE}\nmore text\n"]
+
+
+def test_a_finding_that_runs_over_the_separator_is_put_back_on_every_file_it_covers(project):
+    """A bare generic key at one file's end can take the next file's first line into one match (P1-1): the next file
+    holds a secret that only that rule finds, and its verdict is the one-per-file form's, whatever the order."""
+    cases = 0
+    for tail in TAILS:
+        for head in HEADS:
+            root = project / f"case{cases}"
+            cases += 1
+            _write(root, "governance/project/path-map.yaml", MAP)
+            _write(root, ".gitleaks.toml", (REPO / "template/.gitleaks.toml").read_text(encoding="utf-8"))
+            a = _write(root, "config/a-tail.txt", "Plain notes.\nMore plain notes.\n" + tail)
+            b = _write(root, "config/b-head.env", head)
+            c = _write(root, "config/c-clean.txt", "Nothing here.\n")
+            for order in ([a, b], [b, a], [c, a, b, c]):
+                assert secrets.indexable(root, order) == _one_per_file(root, order), (tail, head, order)
+            assert b not in secrets.indexable(root, [a, b, c]), (tail, head)  # it holds a secret by itself
+
+
+def test_the_pair_in_the_middle_of_a_larger_batch_is_judged_as_one_per_file(project):
+    rels = _plant(project, 14)
+    rels.insert(6, _write(project, "config/a-tail.txt", "Plain notes.\npassword:"))
+    rels.insert(7, _write(project, "config/b-head.env", f"API_KEY={VALUE}\n"))
+    got = secrets.indexable(project, rels)
+    assert got == _one_per_file(project, rels) and "config/b-head.env" not in got and "config/a-tail.txt" in got
+
+
+def test_a_file_after_a_finding_is_judged_alone_whatever_the_reported_lines(project, monkeypatch):
+    """With no fence between the texts (as run 7 had), a match that runs over into the next text is reported at A;
+    if the report's lines were short of the match, the file after an owner is still judged alone."""
+    monkeypatch.setattr(secrets, "_FENCE", b"")
+    real = secrets._gitleaks
+
+    def short(each, data, env):
+        done = real(each, data, env)
+        if done.returncode == secrets._LEAKS:
+            import json
+            report = json.loads(done.stdout)
+            for finding in report:
+                finding["EndLine"] = finding["StartLine"]
+            done.stdout = json.dumps(report).encode()
+        return done
+
+    monkeypatch.setattr(secrets, "_gitleaks", short)
+    rels = [_write(project, "config/a-tail.txt", "Plain notes.\npassword:"),
+            _write(project, "config/b-head.env", f"API_KEY={VALUE}\n"),
+            _write(project, "config/c-clean.txt", "Nothing here.\n")]
+    assert secrets.indexable(project, rels) == [rels[0], rels[2]]
+
+
+def test_a_finding_over_the_separator_covers_the_next_text_by_its_lines(project, monkeypatch):
+    """With no fence, the report's own StartLine to EndLine covers the next text, whose verdict is its own."""
+    monkeypatch.setattr(secrets, "_FENCE", b"")
+    rels = [_write(project, "config/a-tail.txt", "Plain notes.\npassword:"),
+            _write(project, "config/b-head.env", f"API_KEY={VALUE}\n")]
+    assert secrets.indexable(project, rels) == _one_per_file(project, rels) == [rels[0]]
+
+
+def test_a_record_written_by_the_earlier_batched_form_is_not_reused(project, monkeypatch, tmp_path):
+    monkeypatch.setenv("GOV_SECRETS_CACHE", str(tmp_path / "cache.sqlite"))
+    rels = [_write(project, "config/b-head.env", f"API_KEY={VALUE}\n")]
+    rules = secrets._rules(project)
+    old = 4  # the form run 7's batching wrote under
+    digest = __import__("hashlib").sha256((project / rels[0]).read_bytes()).hexdigest()
+    secrets.cache.remember("content", digest, secrets.cache.engine(rules, old))
+    assert secrets.cache.remembered("content", digest, secrets.cache.engine(rules, old))
+    assert secrets.indexable(project, rels) == []  # the old record says clean; it is not asked
+    assert secrets._FORM != old
 
 
 def test_a_commit_hash_of_the_project_is_still_no_finding_in_a_batch(project):
