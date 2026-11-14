@@ -11,10 +11,12 @@ that starts it anyway (written to ``~/.gov-os/machine/launch.log`` and stderr).
 and starts nothing: no session, no record, no gate; it refuses as a launch does (exit 1).
 ``--reason``, ``--trial`` and ``--owner-named`` (W2-184, RUBRIC-2, DEC-1120) go to ``launcher.launch`` as the keywords
 ``reason``, ``trial`` and ``owner_named``; ``--plan`` does not read them, and written after ``--`` they are CLI arguments.
+A lead (``orchestrator``, ``lead``) given any of them is refused here with exit 2, before the launcher (W2-184 R1).
 """
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 from gov.launch.gate import EXIT_GATE_SHUT
@@ -45,13 +47,23 @@ def add_arguments(parser) -> None:
                         "repeating a recorded setting, or a third review")
 
 
+OPTIONS = (("reason", "--reason"), ("trial", "--trial"), ("owner_named", "--owner-named"))
+EXIT_USAGE = 2  # the command line's own usage code (gov.cli.main), as argparse ends a usage error
+
+
 def run(root: Path, args, config: dict) -> int:
     from gov.launch import launcher
     if getattr(args, "plan", False):
         return launcher.plan(root, args.worker_role, args.ticket)
     # a given option only (an empty one too, for the launcher to refuse); absent, the launcher's default is None
-    options = {key: value for key in ("reason", "trial", "owner_named")
-               if (value := getattr(args, key, None)) is not None}
+    options = {key: value for key, _ in OPTIONS if (value := getattr(args, key, None)) is not None}
+    if args.worker_role in launcher.LEAD_ROLES and options:
+        # W2-184 R1 (interface 10.1, DEC-1180 (4)): a usage error, before the launcher: nothing starts or is recorded,
+        # the gate is not asked and no plan override is logged. Written after "--" they stay CLI arguments.
+        given = ", ".join(flag for key, flag in OPTIONS if key in options)
+        print(f"gov launch: error: a lead launch ({args.worker_role}) takes none of --reason, --trial and "
+              f"--owner-named; given: {given}", file=sys.stderr)
+        return EXIT_USAGE
     return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
                   gate_override=getattr(args, "gate_override", None), gpu_need_mib=getattr(args, "gpu_need_mib", None),
                   **options)

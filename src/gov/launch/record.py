@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import secrets
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -89,15 +90,20 @@ def original(records: Path, session_id: str, role: str, ticket_id: str) -> dict:
 
 
 def write(records: Path, record: dict) -> Path:
-    """Write the record whole and flushed, only where no file of its name is; a partly written file is removed."""
-    path = records / f"{record['session_id']}.json"
+    """Write the record atomically, only where no file of its name is (W2-184 R2, interface 10.2).
+
+    The bytes go, written, flushed and fsynced, to ``.<session id>.<unique part>.tmp`` in the same folder (a name no
+    reader of ``*.json`` takes), which is then hard-linked to ``<session id>.json`` (a link never overwrites) and
+    removed. So a launch killed at any point leaves no record of its name or a whole one, and a leftover ``.tmp`` at
+    most; a refusal leaves neither file."""
+    session = record["session_id"]
+    path = records / f"{session}.json"
     data = (json.dumps(record, indent=2) + "\n").encode()
+    cannot = f"the launch record cannot be written in {records}"
     try:
-        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
-    except FileExistsError:
-        raise _refuse(f"a launch record of the session {record['session_id']} is already there") from None
+        temporary, descriptor = _temporary(records, session)
     except OSError:
-        raise _refuse(f"the launch record cannot be written in {records}") from None
+        raise _refuse(cannot) from None
     try:
         try:
             view = memoryview(data)
@@ -106,14 +112,42 @@ def write(records: Path, record: dict) -> Path:
             os.fsync(descriptor)
         finally:
             os.close(descriptor)
+        os.link(temporary, path, follow_symlinks=False)
+    except FileExistsError:
+        _discard(temporary)
+        raise _refuse(f"a launch record of the session {session} is already there") from None
     except OSError:
-        remove(path)
-        raise _refuse(f"the launch record cannot be written in {records}") from None
+        _discard(temporary)
+        raise _refuse(cannot) from None
+    try:
+        os.unlink(temporary)
+    except OSError:
+        _discard(path)  # the record is whole, but a refusal leaves no file of either name
+        _discard(temporary)
+        raise _refuse(cannot) from None
     return path
+
+
+def _temporary(records: Path, session: str) -> tuple[Path, int]:
+    """A new hidden temporary file ``.<session>.<unique part>.tmp`` in ``records``, opened for writing only."""
+    while True:
+        temporary = records / f".{session}.{secrets.token_hex(8)}.tmp"
+        try:
+            return temporary, os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
+        except FileExistsError:
+            continue
 
 
 def remove(path: Path) -> None:
     try:
         os.unlink(path)
     except FileNotFoundError:
+        pass
+
+
+def _discard(path: Path) -> None:
+    """Remove ``path`` if it can be: a write that refuses removes what it made, and its refusal stands either way."""
+    try:
+        os.unlink(path)
+    except OSError:
         pass
