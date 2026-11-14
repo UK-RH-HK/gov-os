@@ -257,6 +257,9 @@ def refused(result, *words):
     b.assert_refused(result, *words)
 
 
+ANY = object()  # for ``model_source``: the case does not pin it (a reading the interface leaves open)
+
+
 def assert_session(result, model, effort, *, criticality, model_source, effort_source, trial=None, promotion=None,
                    effort_reason=None, owner_named=None, review_round=None):
     """One launch, stated whole: one session started; ``--model`` and ``--effort`` on its line once each; the record's
@@ -270,6 +273,8 @@ def assert_session(result, model, effort, *, criticality, model_source, effort_s
               "model_source": model_source, "effort_source": effort_source, "trial": trial, "promotion": promotion,
               "effort_reason": effort_reason, "owner_named": owner_named, "review_round": review_round,
               "subagent_model": model}
+    if model_source is ANY:
+        del expect["model_source"]
     got = {key: record.get(key, MISSING) for key in expect}
     assert got == expect, f"the launch record differs from what RUBRIC-2 states:\nexpected {expect}\ngot      {got}"
     assert result.env_block().get("CLAUDE_CODE_SUBAGENT_MODEL") == model, (
