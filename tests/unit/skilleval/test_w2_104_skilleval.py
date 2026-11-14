@@ -240,6 +240,19 @@ def test_w2_104_fresh_sessions_with_only_the_skill(project, capsys):
     assert records(root)[0]["model"] == "m-x" and records(root)[0]["effort"] == "low"
 
 
+def test_w2_104_session_folder_leaves_out_scenarios_records_and_summaries(project, capsys):
+    root, log, _ = project
+    skill = plant_skill(root)
+    (skill / "scenario-records.yaml").write_text("records: []\n", encoding="utf-8")
+    (skill / "scenario-summaries.md").write_text("# Summaries\nhand-written\n", encoding="utf-8")
+    code, _, _ = skilleval(root, capsys)
+    assert code == 0
+    files = calls(log)[0]["files"]
+    assert "SKILL.md" in files
+    for left_out in ("scenarios.md", "scenario-records.yaml", "scenario-summaries.md"):
+        assert left_out not in files
+
+
 def test_w2_104_no_secret_or_stderr_reaches_the_output(project, capsys):
     root, _, _ = project
     plant_skill(root)
