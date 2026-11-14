@@ -52,12 +52,28 @@ IDENT = ["-c", "user.name=W2-88 acceptance", "-c", "user.email=w2-88@example.inv
          "-c", "core.hooksPath=/dev/null"]
 
 
-def archive(paths: list, dest: Path) -> None:
-    """``git archive HEAD <paths>`` of the tests worktree into ``dest`` (HEAD, never the working tree)."""
-    data = subprocess.run(["git", "-C", str(W.REPO_ROOT), "archive", "--format=tar", "HEAD", *paths], capture_output=True, check=True).stdout
+WHEEL_PATHS = ["src", "pyproject.toml"]                                   # what the wheel build needs (setuptools: ``src`` and the project file)
+KIT_PATHS = ["copier.yml", "template"]                                    # what ``copier copy`` reads
+SOURCE_TREE_PATHS = ["copier.yml", "template", "src", "pyproject.toml",    # a relocated Gov OS source tree: the markers, the code, and the three
+                     POOL, "governance/project/indep-walls", "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs"]   # not under ``template/``
+GIT_FROM = W.REPO_ROOT / "src"                                            # a named folder of the worktree: git finds the repository above it
+
+
+def archive(paths: list, dest: Path, rev: str = "HEAD") -> None:
+    """Export each **named path** of ``rev`` (HEAD, never the working tree) of the tests worktree into ``dest``: a folder by ``git archive <rev>:<folder>``,
+    a file by ``git show <rev>:<file>``; git runs in the named folder itself (``src`` for a file), where ``git archive`` takes that folder alone
+    (DEC-385: never the whole tree, so never ``governance/project/held-out.yaml``)."""
     dest.mkdir(parents=True, exist_ok=True)
-    with tarfile.open(fileobj=io.BytesIO(data)) as handle:
-        handle.extractall(dest, filter="data")
+    for name in paths:
+        kind = subprocess.run(["git", "-C", str(GIT_FROM), "cat-file", "-t", f"{rev}:{name}"], capture_output=True, text=True, check=True).stdout.strip()
+        if kind == "tree":
+            data = subprocess.run(["git", "-C", str(W.REPO_ROOT / name), "archive", "--format=tar", f"--prefix={name}/", rev], capture_output=True,
+                                  check=True).stdout
+            with tarfile.open(fileobj=io.BytesIO(data)) as handle:
+                handle.extractall(dest, filter="data")
+        else:
+            (dest / name).parent.mkdir(parents=True, exist_ok=True)
+            (dest / name).write_bytes(subprocess.run(["git", "-C", str(GIT_FROM), "show", f"{rev}:{name}"], capture_output=True, check=True).stdout)
 
 
 def clean_env(base: Path, **extra) -> dict:
@@ -85,7 +101,7 @@ def release(tmp_path_factory):
     scratch.mkdir()
     env = clean_env(scratch, PIP_NO_INDEX="1", PIP_DISABLE_PIP_VERSION_CHECK="1")
     export = base / "export"
-    archive([], export)
+    archive(WHEEL_PATHS, export)
     wheels = base / "wheelhouse"
     wheels.mkdir()
     run([sys.executable, "-m", "pip", "wheel", "-q", "--no-deps", "--no-build-isolation", "--no-index", "-w", wheels, export], env, base,
@@ -101,7 +117,7 @@ def release(tmp_path_factory):
     assert where.startswith(str(venv)), f"gov imported from {where}, not from the venv {venv}"
     # the kit: a clone holding the planted tag (a mini repository of copier.yml and template/ at HEAD)
     clone = base / "clone"
-    archive(["copier.yml", "template"], clone)
+    archive(KIT_PATHS, clone)
     for step in (["init", "-q", "-b", "main"], ["add", "-A"], ["commit", "-q", "-m", "the kit"], ["tag", TAG]):
         run(["git", "-C", clone, *IDENT, *step], env, base, f"git {step[0]} in the clone")
     # decoys where the base's ``parents[3]`` of the installed fabric.py stands: the folder above site-packages
@@ -141,10 +157,10 @@ def kit_project(release, tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def pool_tree(tmp_path_factory):
-    """A relocated Gov OS source tree (``copier.yml``, ``template/``, ``governance/``, ``src/``, ``pyproject.toml`` of HEAD) whose shipped pool differs
+    """A relocated Gov OS source tree (``copier.yml``, ``template/``, ``src/``, ``pyproject.toml`` and the shipped governance files of HEAD) whose shipped pool differs
     from the one the planted repository tracks: ``pool.route_depth`` is 61 here, 60 in HEAD's file."""
     tree = tmp_path_factory.mktemp("p1-pool") / "gov-os"
-    archive(["copier.yml", "template", "governance", "src", "pyproject.toml"], tree)
+    archive(SOURCE_TREE_PATHS, tree)
     path = tree / POOL
     text = path.read_text(encoding="utf-8")
     assert re.search(r"^  route_depth: 60\b", text, re.M), "the plant: the shipped pool has no `route_depth: 60` line"
