@@ -644,9 +644,6 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
         if role == AUDITOR and profile == "FULL":
             counted = _counted_reviews(root, names, given["resume"])
             review_round = len(counted) + 1
-            if review_round >= 3 and owner_named is None:  # 6.3 as amended: at most two review rounds, whatever the setting
-                raise _refuse(f"review round {review_round} of {ticket_id} is refused: at most two review rounds "
-                              f"(DEC-1010); a third or later needs --owner-named <DEC-id>")
         probe = review_round is not None and review_round >= 2
         opus = crit.opus_model(root) if promotion is not None or probe else None
         if table is not None:
@@ -697,10 +694,16 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
     if effort == "max" and own and reason is None:
         raise _refuse(f"an effort of max that the launch chooses ({effort_source}) needs --reason \"<text>\" "
                       f"(DEC-1120 (3))")
-    for earlier in counted:  # DEC-1010: the same setting twice only when the owner named it
-        if (earlier["model"], earlier["effort"]) == (model, effort) and owner_named is None:
-            raise _refuse(f"the review of session {earlier['session_id']} ran on model {model}, effort {effort}, "
-                          f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
+    repeated = next((e for e in counted if (e["model"], e["effort"]) == (model, effort)), None)
+    if review_round is not None and review_round >= 3 and owner_named is None:
+        # 6.3 as amended: at most two review rounds, whatever the setting (DEC-1010); a repeated setting is named too
+        also = (f"; its setting, model {model}, effort {effort}, repeats the review of session "
+                f"{repeated['session_id']}") if repeated is not None else ""
+        raise _refuse(f"review round {review_round} of {ticket_id} is refused: at most two review rounds "
+                      f"(DEC-1010){also}; a third or later needs --owner-named <DEC-id>")
+    if repeated is not None and owner_named is None:  # DEC-1010: the same setting twice only when the owner named it
+        raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
+                      f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
     return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
             "tier": model.split("-")[1], "criticality": ticket_class,
             "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,

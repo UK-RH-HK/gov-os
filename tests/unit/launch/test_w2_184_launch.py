@@ -699,7 +699,10 @@ def test_the_same_setting_twice_is_refused_unless_the_owner_named_it(full):  # 6
 def test_round_three_after_the_probe_s_max_is_refused_by_the_round_and_accepted_with_the_owner(full):  # 6.3
     _review(full)
     _review(full)
-    full.refused("review round 3", "DEC-1010", "--owner-named", role="independent-auditor", tid="T-a")
+    second = full.last()
+    # both rules hold here: the round names the cap, and the repeated setting names the record it repeats
+    full.refused("review round 3", "DEC-1010", "--owner-named", second["session_id"], OPUS, "max",
+                 role="independent-auditor", tid="T-a")
     _review(full, owner_named="DEC-1010")
     third = full.last()
     assert (third["review_round"], third["owner_named"], third["effort"]) == (3, "DEC-1010", "max")
@@ -710,7 +713,7 @@ def test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_
     _review(full, args=["--effort", "xhigh"])
     assert (full.last()["review_round"], full.last()["effort"]) == (2, "xhigh")
     error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Opus max: neither earlier setting
-    assert "--owner-named" in error.message
+    assert "--owner-named" in error.message and "repeats" not in error.message
     full.refused("3", "DEC-1010", args=["--effort", "high"], role="independent-auditor", tid="T-a")
 
 

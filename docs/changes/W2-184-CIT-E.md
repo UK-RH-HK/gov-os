@@ -84,7 +84,8 @@ riding along (DEC-802), F8's permission paths `.claude/settings.local.json`, `go
 visible half stays at the default). F2 (fails open, rides along): `_rubric` (`launcher.py`) refuses an auditor launch on a FULL
 ticket whose `review_round` is 3 or more, naming the round and DEC-1010, unless `--owner-named` is given, whatever its setting
 (interface 6.3 as amended), so a round 2 on another effort (e.g. `--effort xhigh`) no longer opens a third round; the
-same-setting rule stays for round 2. Builder cases: each hidden-set and permission path at C3 in the project's own file, the same
+same-setting rule stays for round 2, and where a round 3 also repeats a counted setting the one refusal names both (the round
+and DEC-1010, and the repeated record's session, model and effort). Builder cases: each hidden-set and permission path at C3 in the project's own file, the same
 beside a `docs/probes/<id>/**  # ...` path on each profile; round 3 after a round 2 at xhigh refused, and accepted with
 `owner_named`; the same-setting case moved to round 2. Left for the CTO as rows: F3 (resuming round 1 after round 2 refused),
 F4 (a trial replaces the probe), F5 (five closed tickets' legacy verdict blocks refused), F6 (promotion on any fail-open finding,
