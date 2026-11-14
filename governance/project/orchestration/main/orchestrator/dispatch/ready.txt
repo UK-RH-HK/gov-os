@@ -363,7 +363,7 @@
 # W2-130 DAEO-q8cl W2-130-A5-pin2.md W2-130-A5-pin2.json  # DONE 09:11 aafaf6259d10; PIN2-HEAD (a) + F1 -> pin3, land once
 # W2-130 DAEO-q8cl W2-130-A5-pin3.md W2-130-A5-pin3.json  # DONE 09:53 6f8158a0eed5 -> LAND; PIN3-WT (a) rows F1 F2
 # W2-184 DAEO-6f0s W2-184-A5-f1.md W2-184-A5-f1.json  # PACKAGES 14:43: P-W2-184-4 (a) by the CTO (launch_worker.sh --owner-named); config.lock to the operator
-W2-88 DAEO-2bdu W2-88-A5-p1.md W2-88-A5-p1.json
+# 19:04 returned ESCALATION P-W2-88-S27-1 + packages 1-3 at 2491c9bec (DO NOT LAND): W2-88 DAEO-2bdu W2-88-A5-p1.md W2-88-A5-p1.json
 # W2-61h-c39 DAEO-h2k3 W2-61h-A5-f3.md W2-61h-A5-f3.json  # DONE 13:25 40f997704f53 -> LAND; then the operator walled run (expect 7 passed, h03 listed)
 W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
 # W2-188 DAEO-zlog W2-188-A5-run1.md W2-188-A5-run1.json  # PACKAGES 15:01: P-W2-188-S5 (a) by the CTO (DEC-1157 (12)); CIT-P yes to the owner

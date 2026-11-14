@@ -1,9 +1,9 @@
-Status at 2026-11-14 18:36:19 (the last report's block)
+Status at 2026-11-14 19:04:20 (the last report's block)
 - Progress: 161 closed / 3 merged-not-closed / 0 built-and-held / 5 in flight / 23 not started, of 192.
-- Leads: 3 running (W2-187, W2-88, W2-94); queued next: W2-88, W2-187, W2-94; the gate: open.
+- Leads: 1 running (W2-187); queued next: W2-187; the gate: open.
 - Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
-- Reopened since the last report: none. New tickets since the last report: none.
+- Reopened since the last report: W2-94 (W2-94 (DAEO-g87r): kept open after S13's land (fdf397527); it closes on the owner's operator's q02 run, check_gold 20 …). New tickets since the last report: none.
 - Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
 - Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 closed; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO.
 - Emergency plan: none (lifted, DEC-1158).
-- OWNER_ACTION: now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))
+- OWNER_ACTION: now: P-W2-88-S27-1 with packages 1 and 2 (W2-88 stopped; decides tonight's release); now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))

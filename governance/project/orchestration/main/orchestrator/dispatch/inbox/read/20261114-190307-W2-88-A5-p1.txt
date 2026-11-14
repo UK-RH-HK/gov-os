@@ -1,0 +1,8 @@
+log: W2-88-A5-p1.json
+W2: W2-88
+status: ESCALATION. The run did not reach the DoD. S27's batched secret scan failed open in both narrow independent checks (P1-1, then P1R-1) after three engineer iterations. By DEC-1010 and DEC-096 this goes to the owner once, with options (P-W2-88-S27-1 below). S24 to S26 are built and passed check 1. S24
+
+task: DAEO-2bdu (W2-88), run 7 (build), the reopen for S24 to S27 (DEC-1178 (3)(b), (4))
+status: ESCALATION. The run did not reach the DoD. S27's batched secret scan failed open in both narrow independent checks (P1-1, then P1R-1) after three engineer iterations. By DEC-1010 and DEC-096 this goes to the owner once, with options (P-W2-88-S27-1 below). S24 to S26 are built and passed check 1. S24's full line also stays red until package 1 is decided.
+work_completed:
+- **S26, ignore rules found at the start:** MA and A0 refuse `ADOPT_PATH_IGNORED` at once. The refusal names each ignored path with
