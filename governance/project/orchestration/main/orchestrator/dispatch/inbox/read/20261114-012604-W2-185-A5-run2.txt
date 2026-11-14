@@ -1,0 +1,10 @@
+log: W2-185-A5-run2.json
+W2: W2-185
+status: PACKAGES. The 18 named cases are revised and pass, and the narrow check is PASS. lead_verify found 2 more reds caused by this ticket, in a file outside the widened paths. Head 39779395d99d.
+
+task: DAEO-qyt2 (W2-185), run 2 (build), resumed after P-W2-185-REDS-1 (a)
+status: PACKAGES. The 18 named cases are revised and pass, and the narrow check is PASS. lead_verify found 2 more reds caused by this ticket, in a file outside the widened paths. Head 39779395d99d.
+work_completed:
+- Merged w2/integrate into w2/W2-185 with `--no-ff` and no conflicts (0c7e4d68f).
+- A fresh test designer (td-3, sonnet, high) revised the 18 cases to DEC-1167 (4), one commit per file, each with `Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2)`. It kept every id, deleted no case and added 16 cases.
+

@@ -1,0 +1,5 @@
+bash <<'EOF'
+# don't
+echo x > tests/acceptance/X/zz.py
+# it's
+EOF

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 196
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Lm65RJuAK7YVkp7vTdbSpH", "time": "2026-11-13T17:35:28.164Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-94", "tool": "Bash", "form": "cd /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50/scratchpad/gold-diag && V=/home/usain/gov-os-eval/fixtures/evaluation/examin/visible; PYTHONDONTWRIT", "rule": "the command names the sets root together with a shell variable after it, which is refused to this session (D

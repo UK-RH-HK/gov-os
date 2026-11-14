@@ -1,0 +1,11 @@
+log: W2-185-A5-run3.json
+W2: W2-185
+status: DONE. The head to land is 47e708a2317cec2269d1799a31376615b1537fba.
+
+task: DAEO-qyt2 (W2-185), run 3, resumed after the CTO's answer (a) to P-W2-185-REDS-2
+status: DONE. The head to land is 47e708a2317cec2269d1799a31376615b1537fba.
+work_completed:
+- Merged w2/integrate (e2a0d6191) into w2/W2-185 in one `--no-ff` command, with no conflicts (6b4bafb71).
+- Ran the widened file first: 2 failed, 17 passed.
+- A fresh test designer (td-4) revised the two `[PostToolUse]` cases in one commit (4808016ac). It added a helper, `_the_guard_line`, which picks the guard's entry by its program and requires exactly the context watch beside it under PostToolUse only.
+- Merged the

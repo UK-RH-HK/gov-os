@@ -1,0 +1,47 @@
+{
+ "127.0.0.1:47311": {
+  "status": "HTTP/1.1 200 Connection Established",
+  "reply": "B3-OK 47311\n"
+ },
+ "127.0.0.1:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "127.1:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "127.0.0.1.:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "0x7f.0.0.1:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "2130706433:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "::1:47312": {
+  "status": "HTTP/1.1 400 Bad Request"
+ },
+ "[::1]:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "127.0.0.2:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "LOCALHOST:47312": {
+  "status": "HTTP/1.1 403 host is not on the allow list"
+ },
+ "127.0.0.1:0": {
+  "status": "HTTP/1.1 400 Bad Request"
+ },
+ "127.1:47311": {
+  "status": "HTTP/1.1 200 Connection Established",
+  "reply": "B3-OK 47311\n"
+ },
+ "127.0.0.1.:47311": {
+  "status": "HTTP/1.1 200 Connection Established",
+  "reply": "B3-OK 47311\n"
+ },
+ "127.0.0.1:47312:47311": {
+  "status": "HTTP/1.1 400 Bad Request"
+ }
+}

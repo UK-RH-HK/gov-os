@@ -1,0 +1,10 @@
+log: W2-130-A5-run3.json
+W2: W2-130
+status: DONE
+
+task: DAEO-q8cl (W2-130), the link clean-up, run 3 (build), resumed after P-W2-130-4 (a)
+status: DONE
+work_completed:
+- Merged `w2/integrate` into the branch with `--no-ff` (11c4d7a5a). There was no conflict.
+- A fresh test designer (td-2) revised S4 to DEC-1123 (2) (d5b07cc72, `Rewrite-Reason: P-W2-130-4 (a)`), merged at ba9f5ed4d.
+- Follow-up (1), the sources commit, is 57cbacfbf. It adds 32 ids to `sources:` on 12 open or in-progress tickets: `gov links --propose-sources` at 11c4d7a5a, less the 65 ids that DEC-1123 (2)'s forms already link (53 `list_rows`, 11 WBS, 1 DEC-798). It changes onl

@@ -1,0 +1,12 @@
+log: W2-42a-A5-resume.json
+W2: W2-42a
+status: DONE. Land w2/W2-42a at 5d58123b11c4567b8ebe0cd513772cee16fa5ca2. `git status --short` is empty.
+
+task: DAEO-03ub (W2-42a): the product's guard reads what a Bash command writes. FULL profile, class C3, build run (the resume after DEC-1158).
+
+status: DONE. Land w2/W2-42a at 5d58123b11c4567b8ebe0cd513772cee16fa5ca2. `git status --short` is empty.
+
+work_completed:
+- **Merge:** merged w2/integrate once more (a11ddc51e: one command, `--no-ff`, `Task: DAEO-03ub`, `Role: orchestrator`). Removed the stale tests worktree after checking that 6f4a6f3c9 was merged.
+- **Acceptance run:** 33 failed and 419 passed. All 33 were reds of the environment, not of this ticket or another ticket:
+  - every one w

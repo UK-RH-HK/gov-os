@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-182
+status: interim result 04914c869: W2-182 (DAEO-5y8d): run 4's narrow independent check in the probe record, on 5110578c8 (reviewer PASS, no findings; the revert and the map without line E; scoped run: 2 reds, both integrate's: W2-23 S

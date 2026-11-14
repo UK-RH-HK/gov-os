@@ -1,0 +1,606 @@
+diff --git a/tests/unit/hooks/fixtures/f1_round2_cases.json b/tests/unit/hooks/fixtures/f1_round2_cases.json
+new file mode 100644
+index 000000000..77fd7e342
+--- /dev/null
++++ b/tests/unit/hooks/fixtures/f1_round2_cases.json
+@@ -0,0 +1,320 @@
++{
++ "about": "ACT-GUARD-FIX-5 round 2: unquoted heredocs read by a shell with options or a stdin word (F1 of review round 1), their quoted twins, and controls. An engineer writing under tests/acceptance/ (the case's folder holds tests/acceptance/X/, script.sh). Every case but the controls must be refused after the apply.",
++ "cases": [
++  {
++   "id": "subst-o-pipefail",
++   "command": "bash -o pipefail <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "-o's value; the substitution writes"
++  },
++  {
++   "id": "subst-o-pipefail-quoted",
++   "command": "bash -o pipefail <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "-o's value; the substitution writes (quoted twin)"
++  },
++  {
++   "id": "subst-euo-pipefail",
++   "command": "bash -euo pipefail <<EOF\nx=$(echo y > tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options"
++  },
++  {
++   "id": "subst-euo-pipefail-quoted",
++   "command": "bash -euo pipefail <<'EOF'\nx=$(echo y > tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options (quoted twin)"
++  },
++  {
++   "id": "subst-O-extglob",
++   "command": "bash -O extglob <<EOF\necho `touch tests/acceptance/X/zz.py`\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "-O; backticks"
++  },
++  {
++   "id": "subst-O-extglob-quoted",
++   "command": "bash -O extglob <<'EOF'\necho `touch tests/acceptance/X/zz.py`\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "-O; backticks (quoted twin)"
++  },
++  {
++   "id": "subst-rcfile",
++   "command": "bash --rcfile /dev/null <<EOF\n$(cp /tmp/x tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "--rcfile"
++  },
++  {
++   "id": "subst-rcfile-quoted",
++   "command": "bash --rcfile /dev/null <<'EOF'\n$(cp /tmp/x tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "--rcfile (quoted twin)"
++  },
++  {
++   "id": "subst-init-file",
++   "command": "bash --init-file /dev/null <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "--init-file"
++  },
++  {
++   "id": "subst-init-file-quoted",
++   "command": "bash --init-file /dev/null <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "--init-file (quoted twin)"
++  },
++  {
++   "id": "subst-dev-stdin",
++   "command": "bash /dev/stdin <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "/dev/stdin as the script"
++  },
++  {
++   "id": "subst-dev-stdin-quoted",
++   "command": "bash /dev/stdin <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "/dev/stdin as the script (quoted twin)"
++  },
++  {
++   "id": "subst-dash",
++   "command": "bash - <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "- as the script"
++  },
++  {
++   "id": "subst-dash-quoted",
++   "command": "bash - <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "- as the script (quoted twin)"
++  },
++  {
++   "id": "subst-sh-eu",
++   "command": "sh -eu <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "options with no value"
++  },
++  {
++   "id": "subst-sh-eu-quoted",
++   "command": "sh -eu <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "options with no value (quoted twin)"
++  },
++  {
++   "id": "subst-rm",
++   "command": "bash -o pipefail <<EOF\necho $(rm -rf tests/acceptance/X)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the substitution deletes the folder"
++  },
++  {
++   "id": "subst-rm-quoted",
++   "command": "bash -o pipefail <<'EOF'\necho $(rm -rf tests/acceptance/X)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the substitution deletes the folder (quoted twin)"
++  },
++  {
++   "id": "subst-cat-pipe",
++   "command": "cat <<EOF | bash -o pipefail\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the body reaches the shell through a pipe"
++  },
++  {
++   "id": "subst-cat-pipe-quoted",
++   "command": "cat <<'EOF' | bash -o pipefail\necho $(touch tests/acceptance/X/zz.py)\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the body reaches the shell through a pipe (quoted twin)"
++  },
++  {
++   "id": "file-redirect-run",
++   "command": "bash -o pipefail > s.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the body goes to s.sh (a shell with options), then bash s.sh"
++  },
++  {
++   "id": "file-redirect-run-quoted",
++   "command": "bash -o pipefail > s.sh <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the body goes to s.sh (a shell with options), then bash s.sh (quoted twin)"
++  },
++  {
++   "id": "file-redirect-run-expansion",
++   "command": "bash -o pipefail > s.sh <<EOF\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the same, the body holds an expansion"
++  },
++  {
++   "id": "file-redirect-run-expansion-quoted",
++   "command": "bash -o pipefail > s.sh <<'EOF'\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the same, the body holds an expansion (quoted twin)"
++  },
++  {
++   "id": "file-tee-pipe-run",
++   "command": "tee s.sh <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "tee writes s.sh, a shell with options reads it from the pipe, then bash s.sh"
++  },
++  {
++   "id": "file-tee-pipe-run-quoted",
++   "command": "tee s.sh <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "tee writes s.sh, a shell with options reads it from the pipe, then bash s.sh (quoted twin)"
++  },
++  {
++   "id": "file-tee-pipe-run-expansion",
++   "command": "tee s.sh <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the same, the body holds an expansion"
++  },
++  {
++   "id": "file-tee-pipe-run-expansion-quoted",
++   "command": "tee s.sh <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "the same, the body holds an expansion (quoted twin)"
++  },
++  {
++   "id": "file-euo-redirect-run",
++   "command": "bash -euo pipefail > s.sh <<EOF\necho x > tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options"
++  },
++  {
++   "id": "file-euo-redirect-run-quoted",
++   "command": "bash -euo pipefail > s.sh <<'EOF'\necho x > tests/acceptance/X/zz.py\nEOF\nbash s.sh",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options (quoted twin)"
++  },
++  {
++   "id": "plain-eu-o-pipefail",
++   "command": "bash -eu -o pipefail <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "W2-42a's bash-eu-o-pipefail-unquoted"
++  },
++  {
++   "id": "plain-eu-o-pipefail-quoted",
++   "command": "bash -eu -o pipefail <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "W2-42a's bash-eu-o-pipefail-unquoted (quoted twin)"
++  },
++  {
++   "id": "plain-euo",
++   "command": "bash -euo pipefail <<EOF\necho x > tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options, no expansion"
++  },
++  {
++   "id": "plain-euo-quoted",
++   "command": "bash -euo pipefail <<'EOF'\necho x > tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "combined options, no expansion (quoted twin)"
++  },
++  {
++   "id": "plain-cat-pipe",
++   "command": "cat <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "through a pipe, no expansion"
++  },
++  {
++   "id": "plain-cat-pipe-quoted",
++   "command": "cat <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "through a pipe, no expansion (quoted twin)"
++  },
++  {
++   "id": "plain-bash",
++   "command": "bash <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "plain bash, unquoted (allowed today under G-1; now judged as the body)"
++  },
++  {
++   "id": "plain-bash-quoted",
++   "command": "bash <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "deny",
++   "note": "plain bash, unquoted (allowed today under G-1; now judged as the body) (quoted twin)"
++  },
++  {
++   "id": "control-cat-unquoted",
++   "command": "cat <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "data for cat"
++  },
++  {
++   "id": "control-cat-subst-unquoted",
++   "command": "cat <<EOF\necho $(date)\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "cat, a harmless substitution"
++  },
++  {
++   "id": "control-bash-script",
++   "command": "bash script.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "the body is script.sh's input"
++  },
++  {
++   "id": "control-bash-o-script",
++   "command": "bash -o pipefail script.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "-o's value skipped, script.sh is the script"
++  },
++  {
++   "id": "control-bash-c",
++   "command": "bash -c 'echo hi' <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "-c: the program is in the words"
++  },
++  {
++   "id": "control-shell-harmless",
++   "command": "bash -o pipefail <<EOF\necho $(date)\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "a shell with options, a harmless body"
++  },
++  {
++   "id": "control-shell-harmless-quoted",
++   "command": "bash -o pipefail <<'EOF'\necho hi\nEOF",
++   "role": "engineer",
++   "expect_after": "allow",
++   "note": "a shell with options, a harmless quoted body"
++  }
++ ]
++}
+\ No newline at end of file
+diff --git a/tests/unit/hooks/fixtures/f1_shell_options.json b/tests/unit/hooks/fixtures/f1_shell_options.json
+new file mode 100644
+index 000000000..180e72a8d
+--- /dev/null
++++ b/tests/unit/hooks/fixtures/f1_shell_options.json
+@@ -0,0 +1,138 @@
++{
++  "about": "W2-42a (DAEO-03ub), FULL review round 1, finding F1 (and F4's /dev/stdin ride-along): a shell that reads its commands from standard input is a shell, whatever options it is given; its heredoc body is commands. Each command's first line is its head, its last line the heredoc's delimiter, the lines between the body. Paths are relative to the case's folder, which holds tests/acceptance/X/t.py, x.py, src/ and script.sh (`echo hi`). expect 'write': the parser gives each of targets_include, or the unresolvable target. expect 'no-write': the parser gives targets_include and nothing else (no body target, no unresolvable target). Reusable to check the live hook's own reading.",
++  "cases": [
++    {
++      "id": "bash-euo-pipefail-auditor",
++      "command": "bash -euo pipefail <<'EOF'\nsed -i s/a/b/ tests/acceptance/X/t.py; cp x.py src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/t.py", "src/other.py"],
++      "note": "the auditor's example: no target on the review head; the base parser gave 3"
++    },
++    {
++      "id": "bash-euo-pipefail",
++      "command": "bash -euo pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "combined short options with an option value (pipefail)"
++    },
++    {
++      "id": "bash-e-u-o-pipefail",
++      "command": "bash -e -u -o pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "separate short options; -o's value is not a script name"
++    },
++    {
++      "id": "bash-eu-o-pipefail-unquoted",
++      "command": "bash -eu -o pipefail <<EOF\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "unquoted delimiter; the body holds no expansion"
++    },
++    {
++      "id": "sh-o-errexit",
++      "command": "sh -o errexit <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "sh with a long-named -o option"
++    },
++    {
++      "id": "bash-O-extglob",
++      "command": "bash -O extglob <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "-O takes a shopt name as its value"
++    },
++    {
++      "id": "bash-plus-o-posix",
++      "command": "bash +o posix <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "a + option (unset) with a value"
++    },
++    {
++      "id": "bash-noprofile-norc",
++      "command": "bash --noprofile --norc <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "long options without a value"
++    },
++    {
++      "id": "bash-rcfile-f",
++      "command": "bash --rcfile f <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "a long option with a separate value (f is not a script name)"
++    },
++    {
++      "id": "cat-pipe-bash-o-pipefail",
++      "command": "cat <<'EOF' | bash -o pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "the body reaches the shell through a pipe from cat"
++    },
++    {
++      "id": "cat-pipe-bash-euo-pipefail",
++      "command": "cat <<'EOF' | bash -euo pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "through a pipe, combined options with a value"
++    },
++    {
++      "id": "bash-s",
++      "command": "bash -s <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "-s: commands from standard input, still a shell"
++    },
++    {
++      "id": "bash-dev-stdin",
++      "command": "bash /dev/stdin <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "F4 ride-along: /dev/stdin as the script is standard input"
++    },
++    {
++      "id": "sh-dev-fd-0",
++      "command": "sh /dev/fd/0 <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "F4 ride-along: /dev/fd/0 as the script is standard input"
++    },
++    {
++      "id": "bash-unknown-flag-fails-closed",
++      "command": "bash --some-new-flag <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF",
++      "expect": "write",
++      "targets_include": ["tests/acceptance/X/new_test.py", "src/other.py"],
++      "note": "fail closed: an option the reader does not know is read as a shell, never as data"
++    },
++    {
++      "id": "data-cat",
++      "command": "cat <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
++      "expect": "no-write",
++      "targets_include": [],
++      "note": "control: cat takes the body as data"
++    },
++    {
++      "id": "data-tee-f",
++      "command": "tee f <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
++      "expect": "no-write",
++      "targets_include": ["f"],
++      "note": "control: tee writes only f"
++    },
++    {
++      "id": "data-grep-e",
++      "command": "grep -e x <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
++      "expect": "no-write",
++      "targets_include": [],
++      "note": "control: grep's -e value is a pattern, the body data"
++    },
++    {
++      "id": "data-bash-script-sh",
++      "command": "bash script.sh <<'EOF'\ntouch tests/acceptance/X/x.py\necho z > src/y.py\nEOF",
++      "expect": "no-write",
++      "targets_include": [],
++      "note": "control: the body is script.sh's standard input, not code; script.sh (echo hi) is not written"
++    }
++  ]
++}
+diff --git a/tests/unit/hooks/test_live_hook.py b/tests/unit/hooks/test_live_hook.py
+index 1160d4419..7196bb71f 100644
+--- a/tests/unit/hooks/test_live_hook.py
++++ b/tests/unit/hooks/test_live_hook.py
+@@ -248,6 +248,50 @@ RULE_1 = {
+         ("an unreadable command naming the tests", E, "Bash", b("python3 -c 'open(\"tests/acceptance/x\" ; ls"),
+          "allow"),
+     ],
++    # P1-GUARD-HEREDOC-OPTS-1 (ACT-GUARD-FIX-5): the value of a shell's option is not a script file
++    "a heredoc run by a shell that has options": [
++        ("bash -euo pipefail", E, "Bash", b(f"bash -euo pipefail <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash -o pipefail", E, "Bash", b(f"bash -o pipefail <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash +o history", E, "Bash", b(f"bash +o history <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash -O extglob", E, "Bash", b(f"bash -O extglob <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash +O extglob", E, "Bash", b(f"bash +O extglob <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash --rcfile", E, "Bash", b(f"bash --rcfile /dev/null <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash --init-file", E, "Bash", b(f"bash --init-file /dev/null <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("sh -eu (no value)", E, "Bash", b(f"sh -eu <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("cat | bash -o pipefail", E, "Bash", b(f"cat <<'EOF' | bash -o pipefail\necho x > {T}\nEOF"), "deny"),
++        ("cat | bash -euo pipefail -s", E, "Bash", b(f"cat <<'EOF' | bash -euo pipefail -s\necho x > {T}\nEOF"),
++         "deny"),
++        ("bash - (standard input)", E, "Bash", b(f"bash - <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash /dev/stdin", E, "Bash", b(f"bash /dev/stdin <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash /dev/fd/0", E, "Bash", b(f"bash /dev/fd/0 <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("bash -s", E, "Bash", b(f"bash -s <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("an option the guard does not know", E, "Bash", b(f"bash --nosuchoption <<'EOT'\necho x > {T}\nEOT"),
++         "deny"),
++        ("a letter the guard does not know", E, "Bash", b(f"bash -Z <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        ("plain bash (MR-3, unchanged)", E, "Bash", b(f"bash <<'EOT'\necho x > {T}\nEOT"), "deny"),
++        # round 2: an unquoted body with nothing for the shell to expand is read as the quoted one
++        ("plain bash, unquoted body with nothing to expand", E, "Bash", b(f"bash <<EOT\necho x > {T}\nEOT"), "deny"),
++        ("bash -euo pipefail, unquoted body with nothing to expand", E, "Bash",
++         b(f"bash -euo pipefail <<EOT\necho x > {T}\nEOT"), "deny"),
++        ("the test designer through bash -euo pipefail", TD, "Bash",
++         b(f"bash -euo pipefail <<'EOT'\necho x > {T}\nEOT"), "allow"),
++    ],
++    "a heredoc that is data for a shell, as before": [
++        ("bash -c with the heredoc as its input", E, "Bash", b(f"bash -c 'echo hi' <<'EOT'\necho x > {T}\nEOT"),
++         "allow"),
++        ("bash -euo pipefail -c", E, "Bash", b(f"bash -euo pipefail -c 'echo hi' <<'EOT'\necho x > {T}\nEOT"),
++         "allow"),
++        ("bash script.sh", E, "Bash", b(f"bash script.sh <<'EOT'\necho x > {T}\nEOT"), "allow"),
++        ("bash -euo pipefail script.sh", E, "Bash", b(f"bash -euo pipefail script.sh <<'EOT'\necho x > {T}\nEOT"),
++         "allow"),
++        ("bash -o pipefail script.sh", E, "Bash", b(f"bash -o pipefail script.sh <<'EOT'\necho x > {T}\nEOT"),
++         "allow"),
++        ("bash --norc script.sh", E, "Bash", b(f"bash --norc script.sh <<'EOT'\necho x > {T}\nEOT"), "allow"),
++        ("cat takes a heredoc as data", E, "Bash", b(f"cat <<'EOF'\necho x > {T}\nEOF"), "allow"),
++        ("cat into a file outside the tests", E, "Bash",
++         b(f"cat > /tmp/gov-live-hook-o.txt <<'EOF'\necho x > {T}\nEOF"), "allow"),
++        ("a pipe into grep", E, "Bash", b(f"cat <<'EOF' | grep -c x\necho x > {T}\nEOF"), "allow"),
++    ],
+     "code's writes into a tree of this repository": [
+         ("inline Python into the project's worktree's tests", E, "Bash",
+          b(f"python3 -c \"open('{P}-wt/{T}', 'w')\""), "deny"),
+@@ -699,6 +743,79 @@ def test_bash_writes_lists_deletes_and_folders_and_falls_back_when_unreadable():
+     _in_process(MODULE)
+ 
+ 
++# W2-42a's F1 spelling list (DAEO-03ub, round 1 of its FULL review), run through this hook as an engineer writing under
++# tests/acceptance/: a copy of tests/acceptance/W2-42a/fixtures/f1_shell_options.json on w2/W2-42a (2381791e3457). 15
++# shell spellings (expect "write": refused) and 4 data controls (expect "no-write": the verdict stays what it was). The
++# case's folder holds tests/acceptance/X/t.py, x.py, src/ and script.sh (echo hi).
++F1_CASES = json.loads((Path(__file__).parent / "fixtures" / "f1_shell_options.json").read_text())["cases"]
++# Its unquoted-delimiter case (bash-eu-o-pipefail-unquoted) is refused since round 2: an unquoted body with nothing for
++# the shell to expand is read as the quoted one.
++
++
++@pytest.mark.parametrize("case", F1_CASES, ids=lambda c: c["id"])
++def test_w2_42a_f1_spellings_as_an_engineer(projects, case):
++    root = projects["patched"]
++    for rel, text in (("script.sh", "echo hi\n"), ("x.py", "x = 1\n"), ("tests/acceptance/X/t.py", "x = 1\n")):
++        path = Path(root) / rel
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text(text, encoding="utf-8")
++    (Path(root) / "src").mkdir(exist_ok=True)
++    refused = case["expect"] == "write"
++    got, why = hook(root, E, "Bash", b(case["command"]))
++    assert got == ("deny" if refused else "allow"), f"{case['id']}: {case['note']}: {got} {why.strip()[:200]}"
++
++
++# ACT-GUARD-FIX-5 round 2 (review round 1, F1): an unquoted heredoc read by a shell with options or a stdin word, whose
++# body's command substitutions write into tests/acceptance/ (or delete it), or whose body goes to a file the command
++# then runs; the same with a quoted delimiter; an unquoted body with nothing to expand; and controls that stay allowed.
++ROUND2 = json.loads((Path(__file__).parent / "fixtures" / "f1_round2_cases.json").read_text())["cases"]
++
++
++@pytest.mark.parametrize("case", ROUND2, ids=lambda c: c["id"])
++def test_round_2_unquoted_bodies_and_files_run_by_a_shell(projects, case):
++    root = projects["patched"]
++    for rel, text in (("script.sh", "echo hi\n"), ("tests/acceptance/X/t.py", "x = 1\n")):
++        path = Path(root) / rel
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text(text, encoding="utf-8")
++    got, why = hook(root, case["role"], "Bash", b(case["command"]))
++    assert got == case["expect_after"], f"{case['id']}: {case['note']}: {got} {why.strip()[:200]}"
++
++
++KIND_OPTS = """
++import sys
++sys.path.insert(0, sys.argv[1])
++import bash_writes as bw
++SHELL, DATA = "shell", "data"
++for words, want in (
++        # a value is not a script (P1-GUARD-HEREDOC-OPTS-1)
++        ("bash -euo pipefail", SHELL), ("bash -o pipefail", SHELL), ("bash -O extglob", SHELL),
++        ("bash +o history", SHELL), ("bash +O extglob", SHELL), ("bash -oe pipefail", SHELL),
++        ("bash --rcfile f", SHELL), ("bash --init-file f", SHELL), ("zsh -o pipefail", SHELL),
++        ("bash -o a -O b", SHELL), ("bash -oo a b", SHELL), ("bash -x -e -u -o pipefail", SHELL),
++        # standard input named as the script
++        ("bash -", SHELL), ("bash /dev/stdin", SHELL), ("bash /dev/fd/0", SHELL), ("bash -eu -", SHELL),
++        ("bash -- -", SHELL), ("bash -s", SHELL), ("bash -s a b", SHELL), ("bash -es a", SHELL), ("bash", SHELL),
++        # an option it does not know
++        ("bash --nosuchoption", SHELL), ("bash --nosuchoption script.sh", SHELL), ("bash -Z script.sh", SHELL),
++        ("bash +c script.sh", SHELL),
++        # the program is in the words, or in a script file
++        ("bash -c x", DATA), ("bash -ec x", DATA), ("bash -euo pipefail -c x", DATA), ("bash -Z -c x", DATA),
++        ("bash script.sh", DATA), ("bash -- script.sh", DATA), ("bash -x script.sh", DATA),
++        ("bash -o pipefail script.sh", DATA), ("bash -euo pipefail script.sh", DATA),
++        ("bash -O extglob script.sh", DATA), ("bash --rcfile f script.sh", DATA), ("bash --norc script.sh", DATA),
++        ("bash --posix --noprofile script.sh a b", DATA), ("sh script.sh", DATA), ("env bash script.sh", DATA),
++        ("cat", DATA), ("tee x", DATA)):
++    got = bw._kind(words.split())
++    assert got == want, (words, got, want)
++print("OK")
++"""
++
++
++def test_a_shell_s_option_values_are_not_its_script():
++    _in_process(KIND_OPTS)
++
++
+ # ---------------------------------------------------------------------------------------------------------------
+ # The logged refusals (guard-refusals.jsonl), replayed from the CTO's rebuilt corpus when it is here
+ # ---------------------------------------------------------------------------------------------------------------

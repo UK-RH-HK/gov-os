@@ -1,0 +1,199 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 14:17:29)
+bringing up nodes...
+bringing up nodes...
+
+.................................................................FF..... [  1%]
+....................................................s................... [  2%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................F.F............F................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+................s....................................................... [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+.............................s...............sss........................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+...............................................ss....................... [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+.............................................................s.......... [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-lead', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-lead.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+_____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-cto', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-cto.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+_ test_curl_download_into_path[curl -Lo /usr/local/bin/tool https://example.invalid/t] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+cmd = 'curl -Lo /usr/local/bin/tool https://example.invalid/t'
+
+    @pytest.mark.parametrize("cmd", [
+        "curl -Lo /usr/local/bin/tool https://example.invalid/t",
+        "curl -sLo /usr/local/bin/tool https://example.invalid/t",
+        "curl -fsSLo /usr/local/bin/tool https://example.invalid/t",
+        "curl --output /usr/local/bin/tool https://example.invalid/t",
+        "curl --output=/usr/local/bin/tool https://example.invalid/t",
+        "curl -o/usr/local/bin/tool https://example.invalid/t",
+    ])
+    def test_curl_download_into_path(cmd):
+>       assert has_install(cmd), f"not detected: {cmd}"
+E       AssertionError: not detected: curl -Lo /usr/local/bin/tool https://example.invalid/t
+E       assert False
+E        +  where False = has_install('curl -Lo /usr/local/bin/tool https://example.invalid/t')
+
+tests/unit/install/test_install.py:493: AssertionError
+_ test_wget_download_into_path[wget -O/usr/local/bin/tool https://example.invalid/t] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+cmd = 'wget -O/usr/local/bin/tool https://example.invalid/t'
+
+    @pytest.mark.parametrize("cmd", [
+        "wget -O/usr/local/bin/tool https://example.invalid/t",
+        "wget --output-document /usr/local/bin/tool https://example.invalid/t",
+        "wget --output-document=/usr/local/bin/tool https://example.invalid/t",
+    ])
+    def test_wget_download_into_path(cmd):
+>       assert has_install(cmd), f"not detected: {cmd}"
+E       AssertionError: not detected: wget -O/usr/local/bin/tool https://example.invalid/t
+E       assert False
+E        +  where False = has_install('wget -O/usr/local/bin/tool https://example.invalid/t')
+
+tests/unit/install/test_install.py:512: AssertionError
+_ test_wget_combined_option_into_path[wget -qO /usr/local/bin/tool https://example.invalid/t] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+cmd = 'wget -qO /usr/local/bin/tool https://example.invalid/t'
+
+    @pytest.mark.parametrize("cmd", [
+        "wget -qO /usr/local/bin/tool https://example.invalid/t",
+    ])
+    def test_wget_combined_option_into_path(cmd):
+>       assert has_install(cmd), f"not detected: {cmd}"
+E       AssertionError: not detected: wget -qO /usr/local/bin/tool https://example.invalid/t
+E       assert False
+E        +  where False = has_install('wget -qO /usr/local/bin/tool https://example.invalid/t')
+
+tests/unit/install/test_install.py:624: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/landing-select/20261113-141600-2391461/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2448942) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+5 failed, 5545 passed, 9 skipped, 6 warnings in 884.06s (0:14:44)

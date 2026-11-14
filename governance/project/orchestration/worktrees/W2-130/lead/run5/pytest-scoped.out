@@ -1,0 +1,23 @@
+...............................................F........................ [ 54%]
+............................................................             [100%]
+=================================== FAILURES ===================================
+_ test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form _
+
+record = <w2_130_support.Record object at 0x7ed4799d5a30>
+head_findings = [{'code': 'UNMARKED_CHANGE', 'fix': 'add "**Changed by:** DEC-017" to DEC-056\'s status line', 'form': 'text: replaced...d by:** DEC-884 (item 4)" to DEC-853\'s status line', 'form': '**Changes:**', 'ids': ['DEC-853', 'DEC-884'], ...}, ...]
+head_tree = PosixPath('/home/usain/gov-os-worktrees/W2-130/.gov-runtime/scratch/tmp/run5/pytest-of-usain/pytest-0/w2-130-clone0/repo')
+
+    def test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form(
+            record, head_findings, head_tree):
+        linked = _linked(record)
+        listed = {(ticket, item["id"]) for ticket, items in linked.items() for item in items}
+        unlinked = {(ticket, ident) for ticket, ids in s.unlinked_on_live(head_findings, head_tree).items() for ident in ids}
+        left = sorted(unlinked - listed)
+>       assert not left, f"{len(left)} UNLINKED_ID on open or in-progress tickets that dec-1123-linked does not list: {left[:6]}"
+E       AssertionError: 3 UNLINKED_ID on open or in-progress tickets that dec-1123-linked does not list: [('DAEO-6f0s', 'W2-60a'), ('DAEO-6w5n', 'W2-H046'), ('DAEO-sq3a', 'W2-56')]
+E       assert not [('DAEO-6f0s', 'W2-60a'), ('DAEO-6w5n', 'W2-H046'), ('DAEO-sq3a', 'W2-56')]
+
+tests/acceptance/W2-130/test_w2_130_sources.py:72: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-130/test_w2_130_sources.py::test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form
+1 failed, 131 passed in 55.83s

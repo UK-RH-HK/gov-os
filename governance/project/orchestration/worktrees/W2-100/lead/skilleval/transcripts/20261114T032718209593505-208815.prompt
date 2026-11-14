@@ -1,0 +1,6 @@
+You have one skill, "data", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+the ticket asks for a nightly import of partner shipment records into the `shipments` table. In last week's sample, 2 % of the rows have an empty `shipment_id`, some `shipment_id` values appear twice, and a few `weight_kg` values are negative. The first draft loads whatever parses.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

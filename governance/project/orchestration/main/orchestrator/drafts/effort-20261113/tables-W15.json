@@ -1,0 +1,1193 @@
+{
+ "A": {
+  "window": [
+   "2026-11-11 13:31",
+   "2026-11-13 16:14"
+  ],
+  "total_usd": 1714.5840385200013,
+  "pts_total": 71.0,
+  "pts_unattributed": 0.0,
+  "gap_h": 0.0,
+  "slot_h": 23.140833333333333,
+  "slot_moved": 23.140833333333333,
+  "buckets": {
+   "5": {
+    "usd": 337.607076400001,
+    "lead_h": 0.0,
+    "other_h": 18.77273472176658,
+    "qE": 337.607076400001,
+    "qM": 0.0,
+    "hE": 18.77273472176658,
+    "hM": 0.0,
+    "n_units": 4,
+    "pts": 12.727328735712613,
+    "subs": {
+     "CTO: orchestration (tickets, tools, notes, briefs)": {
+      "usd": 246.41179919999965,
+      "lead_h": 0.0,
+      "other_h": 14.740880832937016,
+      "pts": 9.364464205086234
+     },
+     "CTO: decisions (register)": {
+      "usd": 25.709804000000005,
+      "lead_h": 0.0,
+      "other_h": 1.3362113889720708,
+      "pts": 0.8186129983550469
+     },
+     "CTO: orchestration (no artefact within the window)": {
+      "usd": 65.48547319999993,
+      "lead_h": 0.0,
+      "other_h": 2.695642499857477,
+      "pts": 2.5442515322713275
+     }
+    }
+   },
+   "4": {
+    "usd": 83.11633679999998,
+    "lead_h": 0.0,
+    "other_h": 5.430202778246605,
+    "qE": 83.11633679999998,
+    "qM": 0.0,
+    "hE": 4.204282222655087,
+    "hM": 1.225920555591581,
+    "n_units": 9,
+    "pts": 3.5070960027491993,
+    "subs": {
+     "CTO: packages and CIT-Ps": {
+      "usd": 30.11113959999999,
+      "lead_h": 0.0,
+      "other_h": 1.6584338890843928,
+      "pts": 1.2442609637237108
+     },
+     "CTO: close records": {
+      "usd": 34.73908100000002,
+      "lead_h": 0.0,
+      "other_h": 2.5458483335706927,
+      "pts": 1.7301664921542035
+     },
+     "helper: CIT-Ps, records, packages": {
+      "usd": 18.266116199999992,
+      "lead_h": 0.0,
+      "other_h": 1.225920555591581,
+      "pts": 0.5326685468712855
+     }
+    }
+   },
+   "3": {
+    "usd": 297.9836677000001,
+    "lead_h": 0.0,
+    "other_h": 34.3437797217776,
+    "qE": 249.96589640000005,
+    "qM": 48.0177713,
+    "hE": 6.225195277531942,
+    "hM": 28.118584444245073,
+    "n_units": 73,
+    "pts": 12.637886731186345,
+    "subs": {
+     "CTO: ACTs (artefact timing)": {
+      "usd": 104.08447559999993,
+      "lead_h": 0.0,
+      "other_h": 6.225195277531942,
+      "pts": 4.784652204489421
+     },
+     "ACTs: building": {
+      "usd": 113.87937140000004,
+      "lead_h": 0.0,
+      "other_h": 20.62936916642716,
+      "pts": 4.957139740920839
+     },
+     "ACTs: reviewing": {
+      "usd": 80.01982069999998,
+      "lead_h": 0.0,
+      "other_h": 7.489215277817534,
+      "pts": 2.8960947857760835
+     }
+    }
+   },
+   "7": {
+    "usd": 37.716044600000025,
+    "lead_h": 0.0,
+    "other_h": 21.38525138874849,
+    "qE": 37.716044600000025,
+    "qM": 0.0,
+    "hE": 2.1392791665262645,
+    "hM": 19.245972222222225,
+    "n_units": 39,
+    "pts": 2.3206508790221996,
+    "subs": {
+     "CTO: merges and lands (hand merges)": {
+      "usd": 34.45956460000002,
+      "lead_h": 0.0,
+      "other_h": 1.9337202776802898,
+      "pts": 1.2949990260911863
+     },
+     "CTO: nightly record": {
+      "usd": 3.25648,
+      "lead_h": 0.0,
+      "other_h": 0.20555888884597356,
+      "pts": 1.025651852931013
+     },
+     "landing queue (machine hours, no LLM)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 16.949861111111115,
+      "pts": 0.0
+     },
+     "nightly (machine hours, no LLM)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 2.296111111111111,
+      "pts": 0.0
+     }
+    }
+   },
+   "2": {
+    "usd": 185.1285454,
+    "lead_h": 6.796527777777778,
+    "other_h": 4.259936063992071,
+    "qE": 32.65071739999998,
+    "qM": 152.47782800000002,
+    "hE": 7.320028286223817,
+    "hM": 3.7364355555460156,
+    "n_units": 130,
+    "pts": 7.890445854030519,
+    "subs": {
+     "CTO: narrow checks and review records": {
+      "usd": 9.118364200000002,
+      "lead_h": 0.0,
+      "other_h": 0.4692091666989857,
+      "pts": 0.21238538018301445
+     },
+     "helper reviews and narrow checks": {
+      "usd": 23.532353200000014,
+      "lead_h": 0.0,
+      "other_h": 2.4268641666571265,
+      "pts": 1.0489321382353776
+     },
+     "independent reviews (ticket review rounds)": {
+      "usd": 131.495113,
+      "lead_h": 6.796527777777778,
+      "other_h": 0.14097439730260797,
+      "pts": 5.942765204616646
+     },
+     "narrow checks and probes": {
+      "usd": 20.982715000000002,
+      "lead_h": 0.0,
+      "other_h": 1.2228883333333334,
+      "pts": 0.6863631309954791
+     }
+    }
+   },
+   "6": {
+    "usd": 111.61903206999989,
+    "lead_h": 0.0,
+    "other_h": 16.207731111049675,
+    "qE": 111.61903206999989,
+    "qM": 0.0,
+    "hE": 0.0,
+    "hM": 16.207731111049675,
+    "n_units": 54,
+    "pts": 4.625551294450283,
+    "subs": {
+     "helpers (research, briefs, tools, sweeps)": {
+      "usd": 111.61903206999989,
+      "lead_h": 0.0,
+      "other_h": 16.207731111049675,
+      "pts": 4.625551294450283
+     }
+    }
+   },
+   "U": {
+    "usd": 0.23610705000000004,
+    "lead_h": 0.0,
+    "other_h": 0.0,
+    "qE": 0.0,
+    "qM": 0.23610705000000004,
+    "hE": 0.0,
+    "hM": 0.0,
+    "n_units": 3,
+    "pts": 0.013853856849515197,
+    "subs": {
+     "unplaced: usage recorder, sentinel, dead-man, side sessions": {
+      "usd": 0.23610705000000004,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 0.013853856849515197
+     }
+    }
+   },
+   "1": {
+    "usd": 533.1806653000002,
+    "lead_h": 90.47652777777776,
+    "other_h": 2.585713265077153,
+    "qE": 0.0,
+    "qM": 533.1806653000002,
+    "hE": 115.53731882063268,
+    "hM": 0.6657555555555555,
+    "n_units": 231,
+    "pts": 22.07041832416114,
+    "subs": {
+     "tests (designers)": {
+      "usd": 103.62967470000002,
+      "lead_h": 6.624722222222223,
+      "other_h": 2.2071627095215978,
+      "pts": 4.297716661191421
+     },
+     "build (engineers, product-spec, research)": {
+      "usd": 94.01809999999998,
+      "lead_h": 17.13375,
+      "other_h": 0.21432833333333334,
+      "pts": 3.2998248544124293
+     },
+     "land: merge and premerge workers": {
+      "usd": 9.5725541,
+      "lead_h": 0.0,
+      "other_h": 0.16422222222222221,
+      "pts": 0.40067433873834685
+     },
+     "lead own time: verify, accept, merge, reading returns (no worker running)": {
+      "usd": 0.0,
+      "lead_h": 66.71805555555558,
+      "other_h": 0.0,
+      "pts": 0.0
+     },
+     "lead's own session cost (orchestration, verify, accept, land; all phases)": {
+      "usd": 325.96033650000027,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 14.072202469818938
+     }
+    }
+   },
+   "8": {
+    "usd": 127.9965632,
+    "lead_h": 7.288888888888889,
+    "other_h": 4.42393130730699,
+    "qE": 108.22545980000002,
+    "qM": 19.7711034,
+    "hE": 3.831687140640323,
+    "hM": 7.881133055555555,
+    "n_units": 119,
+    "pts": 5.206768321838185,
+    "subs": {
+     "8b redo rounds: tests round >= 2 (est.)": {
+      "usd": 68.06686350000001,
+      "lead_h": 0.0,
+      "other_h": 1.0301593628625452,
+      "pts": 2.7460793357561557
+     },
+     "8b redo rounds: build round >= 2 (est.)": {
+      "usd": 40.1585963,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 1.5940463124264146
+     },
+     "8a failed or errored worker (measured)": {
+      "usd": 2.3569988000000004,
+      "lead_h": 0.0,
+      "other_h": 0.5922441666666667,
+      "pts": 0.09073199812536592
+     },
+     "8a failed or errored lead run (measured)": {
+      "usd": 17.4141046,
+      "lead_h": 7.288888888888889,
+      "other_h": 0.0,
+      "pts": 0.7759106755302502
+     },
+     "8a ejected or refused landing (measured outcome; hours share est.)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 2.8015277777777774,
+      "pts": 0.0
+     }
+    }
+   },
+   "9": {
+    "usd": 0.0,
+    "lead_h": 23.140833333333333,
+    "other_h": 199.46149888919456,
+    "qE": 0.0,
+    "qM": 0.0,
+    "hE": 19.00677666697237,
+    "hM": 203.5955555555555,
+    "n_units": 88,
+    "pts": 0.0,
+    "subs": {
+     "ticket waits: on the CTO or the owner (between lead runs)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 174.27916666666667,
+      "pts": 0.0
+     },
+     "ticket waits: on the gate or a launch refusal": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 6.175555555555556,
+      "pts": 0.0
+     },
+     "slot waits for a test run (carved out of lead or worker hours)": {
+      "usd": 0.0,
+      "lead_h": 23.140833333333333,
+      "other_h": -1.4210854715202004e-14,
+      "pts": 0.0
+     },
+     "CTO idle between turns (>10 min; owner, leads or queue: cause not recorded)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 19.00677666697237,
+      "pts": 0.0
+     }
+    }
+   }
+  }
+ },
+ "B": {
+  "window": [
+   "2026-11-12 16:14",
+   "2026-11-13 16:14"
+  ],
+  "total_usd": 740.3295258143569,
+  "pts_total": 30.792434046789445,
+  "pts_unattributed": 0.0,
+  "gap_h": 0.0,
+  "slot_h": 23.140833333333333,
+  "slot_moved": 23.140833333333333,
+  "buckets": {
+   "5": {
+    "usd": 149.71751420000004,
+    "lead_h": 0.0,
+    "other_h": 8.15421694417794,
+    "qE": 149.71751420000004,
+    "qM": 0.0,
+    "hE": 8.15421694417794,
+    "hM": 0.0,
+    "n_units": 2,
+    "pts": 5.322824721035848,
+    "subs": {
+     "CTO: orchestration (tickets, tools, notes, briefs)": {
+      "usd": 110.42642700000015,
+      "lead_h": 0.0,
+      "other_h": 6.427602221899556,
+      "pts": 3.908206633545706
+     },
+     "CTO: orchestration (no artefact within the window)": {
+      "usd": 28.976299,
+      "lead_h": 0.0,
+      "other_h": 1.1331319444047085,
+      "pts": 1.14028412072493
+     },
+     "CTO: decisions (register)": {
+      "usd": 10.314788200000002,
+      "lead_h": 0.0,
+      "other_h": 0.5934827778736753,
+      "pts": 0.2743339667652115
+     }
+    }
+   },
+   "3": {
+    "usd": 111.43711579999997,
+    "lead_h": 0.0,
+    "other_h": 12.738918888767484,
+    "qE": 111.43711579999997,
+    "qM": 0.0,
+    "hE": 1.89313277774387,
+    "hM": 10.845786111023667,
+    "n_units": 25,
+    "pts": 5.1119172246259215,
+    "subs": {
+     "CTO: ACTs (artefact timing)": {
+      "usd": 37.881201400000016,
+      "lead_h": 0.0,
+      "other_h": 1.89313277774387,
+      "pts": 1.9153937058642863
+     },
+     "ACTs: reviewing": {
+      "usd": 21.490521400000002,
+      "lead_h": 0.0,
+      "other_h": 3.0920044444666708,
+      "pts": 0.919373668722446
+     },
+     "ACTs: building": {
+      "usd": 52.06539300000004,
+      "lead_h": 0.0,
+      "other_h": 7.753781666557046,
+      "pts": 2.277149850039188
+     }
+    }
+   },
+   "7": {
+    "usd": 16.809426400000003,
+    "lead_h": 0.0,
+    "other_h": 10.438928888705043,
+    "qE": 16.809426400000003,
+    "qM": 0.0,
+    "hE": 0.6075399998161527,
+    "hM": 9.83138888888889,
+    "n_units": 23,
+    "pts": 1.544363359483905,
+    "subs": {
+     "CTO: merges and lands (hand merges)": {
+      "usd": 13.836705600000005,
+      "lead_h": 0.0,
+      "other_h": 0.5883519442876178,
+      "pts": 0.5337560793691382
+     },
+     "CTO: nightly record": {
+      "usd": 2.9727208,
+      "lead_h": 0.0,
+      "other_h": 0.019188055528534784,
+      "pts": 1.0106072801147667
+     },
+     "landing queue (machine hours, no LLM)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 8.46638888888889,
+      "pts": 0.0
+     },
+     "nightly (machine hours, no LLM)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 1.365,
+      "pts": 0.0
+     }
+    }
+   },
+   "4": {
+    "usd": 47.34000460000002,
+    "lead_h": 0.0,
+    "other_h": 2.881166389120973,
+    "qE": 47.34000460000002,
+    "qM": 0.0,
+    "hE": 1.9970133335722822,
+    "hM": 0.8841530555486674,
+    "n_units": 5,
+    "pts": 2.0243080114976153,
+    "subs": {
+     "CTO: close records": {
+      "usd": 22.482648599999997,
+      "lead_h": 0.0,
+      "other_h": 1.366895277831289,
+      "pts": 1.1707904968818574
+     },
+     "CTO: packages and CIT-Ps": {
+      "usd": 10.2579216,
+      "lead_h": 0.0,
+      "other_h": 0.6301180557409922,
+      "pts": 0.4747175582177653
+     },
+     "helper: CIT-Ps, records, packages": {
+      "usd": 14.599434399999991,
+      "lead_h": 0.0,
+      "other_h": 0.8841530555486674,
+      "pts": 0.3787999563979926
+     }
+    }
+   },
+   "2": {
+    "usd": 93.31401050000001,
+    "lead_h": 3.650181947775287,
+    "other_h": 2.9991998610798487,
+    "qE": 22.7661798,
+    "qM": 70.5478307,
+    "hE": 3.8333002811282237,
+    "hM": 2.816081527726907,
+    "n_units": 69,
+    "pts": 3.7304363611544047,
+    "subs": {
+     "CTO: narrow checks and review records": {
+      "usd": 3.3368067999999997,
+      "lead_h": 0.0,
+      "other_h": 0.18311833335293665,
+      "pts": 0.07201363447823689
+     },
+     "helper reviews and narrow checks": {
+      "usd": 19.429373000000016,
+      "lead_h": 0.0,
+      "other_h": 2.2287304166157957,
+      "pts": 0.898128400868756
+     },
+     "independent reviews (ticket review rounds)": {
+      "usd": 63.359025300000006,
+      "lead_h": 3.650181947775287,
+      "other_h": 0.0,
+      "pts": 2.567555908496069
+     },
+     "narrow checks and probes": {
+      "usd": 7.188805400000001,
+      "lead_h": 0.0,
+      "other_h": 0.587351111111111,
+      "pts": 0.1927384173113434
+     }
+    }
+   },
+   "6": {
+    "usd": 45.95862930000003,
+    "lead_h": 0.0,
+    "other_h": 4.3024502776728655,
+    "qE": 45.95862930000003,
+    "qM": 0.0,
+    "hE": 0.0,
+    "hM": 4.3024502776728655,
+    "n_units": 18,
+    "pts": 1.757263542962156,
+    "subs": {
+     "helpers (research, briefs, tools, sweeps)": {
+      "usd": 45.95862930000003,
+      "lead_h": 0.0,
+      "other_h": 4.3024502776728655,
+      "pts": 1.757263542962156
+     }
+    }
+   },
+   "U": {
+    "usd": 0.12980428000000002,
+    "lead_h": 0.0,
+    "other_h": 0.0,
+    "qE": 0.0,
+    "qM": 0.12980428000000002,
+    "hE": 0.0,
+    "hM": 0.0,
+    "n_units": 1,
+    "pts": 0.009527415151331308,
+    "subs": {
+     "unplaced: usage recorder, sentinel, dead-man, side sessions": {
+      "usd": 0.12980428000000002,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 0.009527415151331308
+     }
+    }
+   },
+   "1": {
+    "usd": 205.882930044649,
+    "lead_h": 33.862595830002476,
+    "other_h": 0.0,
+    "qE": 0.0,
+    "qM": 205.882930044649,
+    "hE": 57.00342916333581,
+    "hM": 0.0,
+    "n_units": 102,
+    "pts": 8.589908188351705,
+    "subs": {
+     "build (engineers, product-spec, research)": {
+      "usd": 27.631767500000002,
+      "lead_h": 8.550888692095864,
+      "other_h": 0.0,
+      "pts": 1.1652268788652123
+     },
+     "tests (designers)": {
+      "usd": 35.7239052,
+      "lead_h": 4.554583333333333,
+      "other_h": 0.0,
+      "pts": 1.5245168480777147
+     },
+     "land: merge and premerge workers": {
+      "usd": 4.609159999999999,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 0.15226263911054588
+     },
+     "lead own time: verify, accept, merge, reading returns (no worker running)": {
+      "usd": 0.0,
+      "lead_h": 20.757123804573297,
+      "other_h": 0.0,
+      "pts": 0.0
+     },
+     "lead's own session cost (orchestration, verify, accept, land; all phases)": {
+      "usd": 137.91809734464906,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 5.747901822298231
+     }
+    }
+   },
+   "8": {
+    "usd": 69.74009068970777,
+    "lead_h": 5.831666666666666,
+    "other_h": 2.7869516305612683,
+    "qE": 55.44898848970779,
+    "qM": 14.291102200000001,
+    "hE": 2.2234646861168237,
+    "hM": 6.395153611111111,
+    "n_units": 63,
+    "pts": 2.7018852225265606,
+    "subs": {
+     "8b redo rounds: tests round >= 2 (est.)": {
+      "usd": 42.37761470000001,
+      "lead_h": 0.0,
+      "other_h": 0.8054091305612681,
+      "pts": 1.7264318391340385
+     },
+     "8b redo rounds: build round >= 2 (est.)": {
+      "usd": 13.071373789707785,
+      "lead_h": 0.0,
+      "other_h": 0.0,
+      "pts": 0.3248290020660116
+     },
+     "8a failed or errored worker (measured)": {
+      "usd": 1.0141476,
+      "lead_h": 0.0,
+      "other_h": 0.5634869444444445,
+      "pts": 0.0
+     },
+     "8a failed or errored lead run (measured)": {
+      "usd": 13.276954600000002,
+      "lead_h": 5.831666666666666,
+      "other_h": 0.0,
+      "pts": 0.6506243813265101
+     },
+     "8a ejected or refused landing (measured outcome; hours share est.)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 1.4180555555555556,
+      "pts": 0.0
+     }
+    }
+   },
+   "9": {
+    "usd": 0.0,
+    "lead_h": 23.140833333333333,
+    "other_h": 138.8431780557499,
+    "qE": 0.0,
+    "qM": 0.0,
+    "hE": 11.283733611305555,
+    "hM": 150.70027777777764,
+    "n_units": 42,
+    "pts": 0.0,
+    "subs": {
+     "ticket waits: on the CTO or the owner (between lead runs)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 127.41555555555554,
+      "pts": 0.0
+     },
+     "ticket waits: on the gate or a launch refusal": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 0.1438888888888889,
+      "pts": 0.0
+     },
+     "slot waits for a test run (carved out of lead or worker hours)": {
+      "usd": 0.0,
+      "lead_h": 23.140833333333333,
+      "other_h": -1.4210854715202004e-14,
+      "pts": 0.0
+     },
+     "CTO idle between turns (>10 min; owner, leads or queue: cause not recorded)": {
+      "usd": 0.0,
+      "lead_h": 0.0,
+      "other_h": 11.283733611305555,
+      "pts": 0.0
+     }
+    }
+   }
+  }
+ },
+ "bykind": {
+  "A": {
+   "cto": [
+    553.3761814000012,
+    4
+   ],
+   "helper": [
+    299.29892227000045,
+    118
+   ],
+   "ambient": [
+    0.23610705000000004,
+    3
+   ],
+   "worker": [
+    518.2983866999997,
+    287
+   ],
+   "lead": [
+    343.37444110000024,
+    133
+   ]
+  },
+  "B": {
+   "cto": [
+    240.4855189999998,
+    2
+   ],
+   "helper": [
+    153.54335110000008,
+    53
+   ],
+   "ambient": [
+    0.12980428000000002,
+    1
+   ],
+   "worker": [
+    194.97579948970778,
+    122
+   ],
+   "lead": [
+    151.19505194464904,
+    64
+   ]
+  }
+ },
+ "helper_tiers": {
+  "A": {
+   "sonnet|6": 69.15429530000002,
+   "sonnet|3": 72.81933359999994,
+   "sonnet|4": 3.6666817999999997,
+   "opus|2": 23.532353200000014,
+   "opus|3": 73.06208719999998,
+   "haiku|6": 0.19144916999999997,
+   "opus|6": 42.27328760000001,
+   "opus|4": 14.599434399999991
+  },
+  "B": {
+   "opus|6": 35.16736180000002,
+   "opus|3": 62.55055919999999,
+   "opus|2": 19.429373000000016,
+   "opus|4": 14.599434399999991,
+   "sonnet|3": 11.00535519999999,
+   "sonnet|6": 10.79126750000001
+  }
+ },
+ "act_review": {
+  "A": {
+   "first": 32.2880489,
+   "r2plus": 15.7297224,
+   "helper": 32.00204939999998
+  },
+  "B": {
+   "helper": 21.490521400000002
+  }
+ },
+ "top": {
+  "A": [
+   {
+    "key": [
+     "cto",
+     "b2f0511f"
+    ],
+    "usd": 390.27781120000134,
+    "hours": 22.678373610708423,
+    "label": "CTO session b2f0511f",
+    "bucket": 5,
+    "sub": "CTO: packages and CIT-Ps"
+   },
+   {
+    "key": [
+     "cto",
+     "b40cba91"
+    ],
+    "usd": 75.50120380000007,
+    "hours": 4.874865555564561,
+    "label": "CTO session b40cba91",
+    "bucket": 5,
+    "sub": "CTO: merges and lands (hand merges)"
+   },
+   {
+    "key": [
+     "cto",
+     "f3886235"
+    ],
+    "usd": 54.765115000000016,
+    "hours": 2.729542777803209,
+    "label": "CTO session f3886235",
+    "bucket": 5,
+    "sub": "CTO: orchestration (no artefact within the window)"
+   },
+   {
+    "key": [
+     "cto",
+     "8ddb8b14"
+    ],
+    "usd": 32.83205140000002,
+    "hours": 1.5279186111026344,
+    "label": "CTO session 8ddb8b14",
+    "bucket": 5,
+    "sub": "CTO: ACTs (artefact timing)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-115/eng-1"
+    ],
+    "usd": 11.429865800000002,
+    "hours": 0.7576861111111112,
+    "label": "W2-115 engineer eng-1",
+    "bucket": 1,
+    "sub": "build (engineers, product-spec, research)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/eng-1"
+    ],
+    "usd": 10.113096900000004,
+    "hours": 2.3740566666666667,
+    "label": "W2-88 engineer eng-1",
+    "bucket": 1,
+    "sub": "build (engineers, product-spec, research)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/td-3"
+    ],
+    "usd": 9.893381100000003,
+    "hours": 0.8054091305612681,
+    "label": "W2-88 independent-test-designer td-3",
+    "bucket": 8,
+    "sub": "8b redo rounds: tests round >= 2 (est.)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-170/td-1"
+    ],
+    "usd": 9.1522242,
+    "hours": 0.7450723732479886,
+    "label": "W2-170 independent-test-designer td-1",
+    "bucket": 1,
+    "sub": "tests (designers)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/td-1"
+    ],
+    "usd": 8.712156299999998,
+    "hours": 0.7092469359031234,
+    "label": "W2-88 independent-test-designer td-1",
+    "bucket": 1,
+    "sub": "tests (designers)"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a7495755"
+    ],
+    "usd": 7.873242999999999,
+    "hours": 0.8955872222450044,
+    "label": "helper general-purpose a7495755 (of b2f0511f)",
+    "bucket": 3,
+    "sub": "ACTs: building"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a514d4cb"
+    ],
+    "usd": 7.844676200000002,
+    "hours": 0.5463152778148657,
+    "label": "helper general-purpose a514d4cb (of b2f0511f)",
+    "bucket": 6,
+    "sub": "helpers (research, briefs, tools, sweeps)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-171/td-1"
+    ],
+    "usd": 7.390038199999999,
+    "hours": 0.601614774697859,
+    "label": "W2-171 independent-test-designer td-1",
+    "bucket": 1,
+    "sub": "tests (designers)"
+   },
+   {
+    "key": [
+     "lead",
+     "W2-88/run4"
+    ],
+    "usd": 7.3061572,
+    "hours": 4.3277777777777775,
+    "label": "lead W2-88 run4 (ERROR)",
+    "bucket": 8,
+    "sub": "8a failed or errored lead run (measured)"
+   },
+   {
+    "key": [
+     "lead",
+     "W2-157/run1"
+    ],
+    "usd": 6.889033399999999,
+    "hours": 1.8305555555555555,
+    "label": "lead W2-157 run1 (DONE)",
+    "bucket": 1,
+    "sub": "lead's own session cost (orchestration, verify, accept, land; all phases)"
+   }
+  ],
+  "B": [
+   {
+    "key": [
+     "cto",
+     "b2f0511f"
+    ],
+    "usd": 185.7204039999999,
+    "hours": 10.10547861085995,
+    "label": "CTO session b2f0511f",
+    "bucket": 5,
+    "sub": "CTO: packages and CIT-Ps"
+   },
+   {
+    "key": [
+     "cto",
+     "f3886235"
+    ],
+    "usd": 54.765115000000016,
+    "hours": 2.729542777803209,
+    "label": "CTO session f3886235",
+    "bucket": 5,
+    "sub": "CTO: orchestration (no artefact within the window)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/eng-1"
+    ],
+    "usd": 10.113096900000004,
+    "hours": 2.3740566666666667,
+    "label": "W2-88 engineer eng-1",
+    "bucket": 1,
+    "sub": "build (engineers, product-spec, research)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/td-3"
+    ],
+    "usd": 9.893381100000003,
+    "hours": 0.8054091305612681,
+    "label": "W2-88 independent-test-designer td-3",
+    "bucket": 8,
+    "sub": "8b redo rounds: tests round >= 2 (est.)"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-88/td-1"
+    ],
+    "usd": 8.712156299999998,
+    "hours": 0.7092469359031234,
+    "label": "W2-88 independent-test-designer td-1",
+    "bucket": 1,
+    "sub": "tests (designers)"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a7495755"
+    ],
+    "usd": 7.873242999999999,
+    "hours": 0.8955872222450044,
+    "label": "helper general-purpose a7495755 (of b2f0511f)",
+    "bucket": 3,
+    "sub": "ACTs: building"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a514d4cb"
+    ],
+    "usd": 7.844676200000002,
+    "hours": 0.5463152778148657,
+    "label": "helper general-purpose a514d4cb (of b2f0511f)",
+    "bucket": 6,
+    "sub": "helpers (research, briefs, tools, sweeps)"
+   },
+   {
+    "key": [
+     "lead",
+     "W2-88/run4"
+    ],
+    "usd": 7.3061572,
+    "hours": 4.3277777777777775,
+    "label": "lead W2-88 run4 (ERROR)",
+    "bucket": 8,
+    "sub": "8a failed or errored lead run (measured)"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a567439d"
+    ],
+    "usd": 6.282856000000001,
+    "hours": 0.3297149999936417,
+    "label": "helper general-purpose a567439d (of b2f0511f)",
+    "bucket": 6,
+    "sub": "helpers (research, briefs, tools, sweeps)"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/aca3bbb2"
+    ],
+    "usd": 6.2183550000000025,
+    "hours": 0.823495277762415,
+    "label": "helper independent-auditor aca3bbb2 (of b2f0511f)",
+    "bucket": 2,
+    "sub": "helper reviews and narrow checks"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a894749f"
+    ],
+    "usd": 6.1843912,
+    "hours": 0.26259416666295843,
+    "label": "helper general-purpose a894749f (of b2f0511f)",
+    "bucket": 4,
+    "sub": "helper: CIT-Ps, records, packages"
+   },
+   {
+    "key": [
+     "lead",
+     "W2-37/resume-dec1163"
+    ],
+    "usd": 6.0814156,
+    "hours": 2.180277777777778,
+    "label": "lead W2-37 resume-dec1163 (PACKAGES)",
+    "bucket": 1,
+    "sub": "lead's own session cost (orchestration, verify, accept, land; all phases)"
+   },
+   {
+    "key": [
+     "helper",
+     "b2f0511f/a35a8a1c"
+    ],
+    "usd": 6.059952400000001,
+    "hours": 0.6908127778106272,
+    "label": "helper general-purpose a35a8a1c (of b2f0511f)",
+    "bucket": 3,
+    "sub": "ACTs: building"
+   },
+   {
+    "key": [
+     "worker",
+     "W2-172/td-1"
+    ],
+    "usd": 5.989764099999999,
+    "hours": 0.48762002062652715,
+    "label": "W2-172 independent-test-designer td-1",
+    "bucket": 1,
+    "sub": "tests (designers)"
+   }
+  ]
+ },
+ "top_lands": {
+  "A": [
+   [
+    3.649722222222222,
+    "landing run 20261112-085008 (1 ticket(s))",
+    7
+   ],
+   [
+    1.2175,
+    "landing run 20261112-151606 (1 ticket(s))",
+    7
+   ],
+   [
+    1.2158333333333333,
+    "landing run 20261112-173908 (1 ticket(s))",
+    7
+   ],
+   [
+    0.7836111111111111,
+    "landing run 20261113-151808 (1 ticket(s))",
+    7
+   ],
+   [
+    0.6161111111111112,
+    "landing run 20261112-202304 (1 ticket(s))",
+    7
+   ],
+   [
+    0.5669444444444445,
+    "landing run 20261111-202501 (1 ticket(s))",
+    7
+   ]
+  ],
+  "B": [
+   [
+    1.2158333333333333,
+    "landing run 20261112-173908 (1 ticket(s))",
+    7
+   ],
+   [
+    0.7836111111111111,
+    "landing run 20261113-151808 (1 ticket(s))",
+    7
+   ],
+   [
+    0.6161111111111112,
+    "landing run 20261112-202304 (1 ticket(s))",
+    7
+   ],
+   [
+    0.43333333333333335,
+    "landing run 20261113-015405 (1 ticket(s))",
+    7
+   ],
+   [
+    0.43333333333333335,
+    "landing run 20261113-012405 ejections",
+    8
+   ],
+   [
+    0.41694444444444445,
+    "landing run 20261112-235304 (1 ticket(s))",
+    7
+   ]
+  ]
+ },
+ "produced": {
+  "A": {
+   "commits": 817,
+   "merges_first_parent": 47,
+   "subjects_naming_closed": 92,
+   "act_applied_commits": 50,
+   "citp_commits": 50,
+   "reviews_files": 26,
+   "packages_files": 48,
+   "close_records_files": 70,
+   "land_closed": 34,
+   "land_closed_tickets": 33,
+   "land_ejected": 9,
+   "land_no_outcome": 3,
+   "land_not_landed_still_approved": 1
+  },
+  "B": {
+   "commits": 284,
+   "merges_first_parent": 23,
+   "subjects_naming_closed": 41,
+   "act_applied_commits": 10,
+   "citp_commits": 17,
+   "reviews_files": 2,
+   "packages_files": 10,
+   "close_records_files": 36,
+   "land_closed": 20,
+   "land_closed_tickets": 20,
+   "land_ejected": 3,
+   "land_no_outcome": 3,
+   "land_not_landed_still_approved": 1
+  }
+ },
+ "decisions": {
+  "A": {
+   "version_rows": 41,
+   "first": "0.510",
+   "last": "0.550",
+   "uncommitted_rows": 0,
+   "first_dec": "1126",
+   "last_dec": "1170"
+  },
+  "B": {
+   "version_rows": 22,
+   "first": "0.529",
+   "last": "0.550",
+   "uncommitted_rows": 0,
+   "first_dec": "1147",
+   "last_dec": "1170"
+  }
+ },
+ "now": "2026-11-13 16:14"
+}

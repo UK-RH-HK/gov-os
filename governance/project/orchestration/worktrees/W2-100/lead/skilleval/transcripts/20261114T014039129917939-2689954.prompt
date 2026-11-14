@@ -1,0 +1,121 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply states an idempotence mechanism that holds for a second delivery, replaces the swallowing `except`, and names the test of a duplicate delivery.
+
+Expected behaviour:
+the session makes the handler safe to run twice (a key taken from the message and a unique constraint or an upsert), separates a failure worth retrying from one that is not, lets the failure be seen (logged and returned or raised) instead of swallowed, and names a unit test that delivers the same message twice and asserts one invoice.
+
+The session's reply:
+<<<
+Quick update: the file write was refused, and so was `gov`. I'm stopping there instead of trying another path, and returning the design and code here as the payload.
+
+task: Queue worker that creates one invoice per "order paid" message (STANDARD ticket); fix the first draft's insert on every delivery and its bare `except Exception: pass`.
+status: BLOCKED. Nothing was written. The design and code are below.
+work_completed:
+- I loaded the backend skill and did Step 1, listing every operation that changes state and what happens when it runs twice:
+  - **Insert invoice:** under the current draft, every redelivery after the 30 s ack deadline adds another invoice row.
+  - **Commit, then crash before ack:** the redelivery makes a duplicate invoice.
+  - **The bare `except Exception: pass`:** a failed write still looks like success, so the message is lost without a trace.
+- I wrote the unit tests first (Step 2). Writing them to `tests/test_worker.py` was refused, so they don't exist on disk yet.
+files_changed: none.
+evidence: Two permission refusals. Writing `tests/test_worker.py` was refused, and running `gov --help` needs approval I don't have. I didn't retry either one or route around it.
+tests: Not run, because no files were written. The planned unit tests:
+- One delivery makes one row and acks.
+- A redelivery adds no second row and still acks.
+- Commit succeeds, the ack fails, the message is redelivered: still one row.
+- Three orders delivered twice each make three rows.
+- The same `order_id` with a different amount is dead-lettered and doesn't overwrite.
+- Eight bad-input cases are dead-lettered with no row and an ERROR log.
+- An amount of zero is accepted.
+- A transient DB error is requeued and logged with `message_id` and `order_id`.
+- A transient error at the delivery limit is dead-lettered.
+- An unexpected error is logged, requeued and never acked.
+- A failed write leaves no partial row.
+- Logs never contain customer data.
+- The migration runs forward, back, then forward again.
+- Config fails at start if a value is missing or invalid.
+discoveries (P3 choices I made and logged):
+- The message fields aren't given. I assumed `order_id`, `customer_id`, `amount_cents` and `currency`, with `order_id` as the idempotency key.
+- The queue client isn't named. I assumed a message with `message_id`, `delivery_count`, `ack()` and `nack(requeue)`.
+- No storage or allowed paths were given. I chose SQLite and an `invoice_worker/` package with `tests/`.
+- The DB timeout must be shorter than the 30 s ack deadline, and config checks this at start-up.
+risks:
+- `gov accept` and `gov retrieve` were not run because `gov` needs approval.
+- The ticket's allowed paths are unknown, so I couldn't check the "diff stays inside the ticket's paths" line.
+- The migration's down step is `DROP TABLE invoices`. It's only safe before any real invoices exist.
+lessons: A redelivering queue plus "insert per delivery" always gives duplicates. The unique key has to come from the message, not from the delivery.
+proposed_decisions: Ack only after the commit. Bad input or a conflicting duplicate goes to the dead-letter queue. A transient error is requeued until `INVOICE_MAX_DELIVERIES` is reached, then dead-lettered.
+unresolved: The real message schema, the queue client, the database and the allowed paths.
+recommended_next_action: Allow writes to this folder and `gov` (or give me the target repo and paths). I'll then write the files, run the suite and `gov accept`.
+
+**Payload: core code**
+
+```sql
+-- migrations/0001_invoices.up.sql
+CREATE TABLE IF NOT EXISTS invoices (
+  id INTEGER PRIMARY KEY, order_id TEXT NOT NULL UNIQUE, customer_id TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL CHECK (amount_cents >= 0), currency TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+-- 0001_invoices.down.sql:  DROP TABLE IF EXISTS invoices;
+```
+
+```python
+# invoice_worker/worker.py
+import enum, json, logging, re, sqlite3
+log = logging.getLogger("invoice_worker")
+
+class PermanentError(Exception): ...
+class Outcome(enum.Enum): CREATED = 1; DUPLICATE = 2; RETRY = 3; DEAD_LETTERED = 4
+
+def parse(body):
+    try: d = json.loads(body)
+    except ValueError as e: raise PermanentError("body is not JSON") from e
+    if not isinstance(d, dict): raise PermanentError("body is not an object")
+    oid, amt, cur = d.get("order_id"), d.get("amount_cents"), d.get("currency")
+    if not isinstance(oid, str) or not oid: raise PermanentError("order_id missing")
+    if type(amt) is not int or amt < 0: raise PermanentError(f"order {oid}: bad amount_cents")
+    if not isinstance(cur, str) or not re.fullmatch(r"[A-Z]{3}", cur): raise PermanentError(f"order {oid}: bad currency")
+    return {"order_id": oid, "customer_id": str(d.get("customer_id", "")), "amount_cents": amt, "currency": cur}
+
+class InvoiceStore:
+    def __init__(self, conn): self.conn = conn
+    def create_invoice(self, o):            # True = created, False = already existed (same content)
+        with self.conn:                       # one transaction; rolled back on error
+            cur = self.conn.execute(
+                "INSERT INTO invoices (order_id, customer_id, amount_cents, currency) VALUES (?,?,?,?) "
+                "ON CONFLICT(order_id) DO NOTHING",
+                (o["order_id"], o["customer_id"], o["amount_cents"], o["currency"]))
+            if cur.rowcount == 1: return True
+            row = self.conn.execute("SELECT amount_cents, currency FROM invoices WHERE order_id=?",
+                                    (o["order_id"],)).fetchone()
+            if row != (o["amount_cents"], o["currency"]):
+                raise PermanentError(f"order {o['order_id']}: duplicate with different content")
+            return False
+
+def handle(msg, store, settings):
+    ids = f"message={msg.message_id} delivery={msg.delivery_count}"
+    try:
+        o = parse(msg.body)
+        created = store.create_invoice(o)
+    except PermanentError as e:
+        log.error("dead-lettered %s: %s", ids, e); msg.nack(requeue=False); return Outcome.DEAD_LETTERED
+    except Exception as e:                   # transient (e.g. sqlite3.OperationalError) or unexpected
+        oid = locals().get("o", {}).get("order_id", "?")
+        if msg.delivery_count >= settings.max_deliveries:
+            log.error("dead-lettered after %d deliveries %s order=%s: %r",
+                      msg.delivery_count, ids, oid, e); msg.nack(requeue=False); return Outcome.DEAD_LETTERED
+        level = logging.WARNING if isinstance(e, sqlite3.OperationalError) else logging.ERROR
+        log.log(level, "retrying %s order=%s: %r", ids, oid, e, exc_info=level == logging.ERROR)
+        msg.nack(requeue=True); return Outcome.RETRY
+    try: msg.ack()                           # ack only after commit
+    except Exception as e: log.warning("ack failed %s order=%s: %r; redelivery will be a no-op", ids, o["order_id"], e)
+    log.info("%s %s order=%s", "created" if created else "duplicate", ids, o["order_id"])
+    return Outcome.CREATED if created else Outcome.DUPLICATE
+```
+
+Config (`Settings.from_env`) reads `INVOICE_DB_PATH`, `INVOICE_DB_TIMEOUT_SECONDS`, `QUEUE_ACK_DEADLINE_SECONDS` and `INVOICE_MAX_DELIVERIES`. All four are required, and start-up fails with `ConfigError` if one is missing or invalid, or if the DB timeout isn't below the ack deadline. The SQLite connection is opened with `timeout=db_timeout_seconds`.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

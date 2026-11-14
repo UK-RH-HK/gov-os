@@ -1,0 +1,56 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "head",
+   "before": "e51b1fdf6659",
+   "after": "a97503b39f9d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-116/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_r2f3_continuation.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_config.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_status.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_when_due.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/w2_116_s2_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "acceptance folder",
+   "folder": "W2-116"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "head",
+   "before": "547bf1030e8f",
+   "after": "f2b751829490"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-46/w1_46_support.py"
+  }
+ ]
+}

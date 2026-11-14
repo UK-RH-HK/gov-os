@@ -1,0 +1,353 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 05:09:47)
+FFFFF.......FFF...FFFF.........                                          [100%]
+=================================== FAILURES ===================================
+__ test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee] __
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after0/proj'
+template = 'tee <<< "x" {w}'
+
+    @pytest.mark.parametrize("template", R3_FORMS)
+    def test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused(proj, template):
+>       assert_refused_naming_t(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'tee <<< "x" tests/acceptance/X/zz.py'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after0/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         tee <<< "x" tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:113: AssertionError
+_ test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee-append] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after1/proj'
+template = 'tee -a <<< "x" {w}'
+
+    @pytest.mark.parametrize("template", R3_FORMS)
+    def test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused(proj, template):
+>       assert_refused_naming_t(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'tee -a <<< "x" tests/acceptance/X/zz.py'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after1/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         tee -a <<< "x" tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:113: AssertionError
+__ test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[cp] ___
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after2/proj'
+template = 'cp <<< x x.py {w}'
+
+    @pytest.mark.parametrize("template", R3_FORMS)
+    def test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused(proj, template):
+>       assert_refused_naming_t(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'cp <<< x x.py tests/acceptance/X/zz.py'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after2/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         cp <<< x x.py tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:113: AssertionError
+_ test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee-then-a-list] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after3/proj'
+template = 'tee <<< "x" {w}; echo done'
+
+    @pytest.mark.parametrize("template", R3_FORMS)
+    def test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused(proj, template):
+>       assert_refused_naming_t(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'tee <<< "x" tests/acceptance/X/zz.py; echo done'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after3/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         tee <<< "x" tests/acceptance/X/zz.py; echo done
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:113: AssertionError
+_ test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[here-string-inside-a-list] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after4/proj'
+template = 'echo a && tee <<< "$v" {w}'
+
+    @pytest.mark.parametrize("template", R3_FORMS)
+    def test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused(proj, template):
+>       assert_refused_naming_t(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'echo a && tee <<< "$v" tests/acceptance/X/zz.py'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_r3_a_write_argument_after4/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         echo a && tee <<< "$v" tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:113: AssertionError
+_ test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[bash-text-is-a-command] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri0/proj'
+template = "bash <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", FALLBACK_FORMS)
+    def test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash <<< 'touch tests/acceptance/X/zz.py'"
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri0/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         bash <<< 'touch tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[sh-text-is-a-command] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri1/proj'
+template = "sh <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", FALLBACK_FORMS)
+    def test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "sh <<< 'touch tests/acceptance/X/zz.py'"
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri1/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         sh <<< 'touch tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[xargs-passes-the-text-as-arguments] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri2/proj'
+template = 'xargs touch <<< {w}'
+
+    @pytest.mark.parametrize("template", FALLBACK_FORMS)
+    def test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'xargs touch <<< tests/acceptance/X/zz.py'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri2/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         xargs touch <<< tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused[bash-variable-text] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri3/proj'
+command = 'bash <<< "$X"'
+
+    @pytest.mark.parametrize("command", UNKNOWABLE_SHELL_TEXT)
+    def test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'bash <<< "$X"'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri3/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         bash <<< "$X"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused[sh-substitution-text] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri4/proj'
+command = 'sh <<< "$(cat x.py)"'
+
+    @pytest.mark.parametrize("command", UNKNOWABLE_SHELL_TEXT)
+    def test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'sh <<< "$(cat x.py)"'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_here_stri4/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         sh <<< "$(cat x.py)"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused[unquoted-delimiter] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_bodyless_0/proj'
+template = 'python3 -c "open(\'{w}\',\'w\').write(\'x\')"; cat <<EOF'
+
+    @pytest.mark.parametrize("template", BODYLESS_HEREDOC)
+    def test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'python3 -c "open(\'tests/acceptance/X/zz.py\',\'w\').write(\'x\')"; cat <<EOF'
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_bodyless_0/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         python3 -c "open('tests/acceptance/X/zz.py','w').write('x')"; cat <<EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+_ test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused[quoted-delimiter] _
+
+proj = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_bodyless_1/proj'
+template = 'python3 -c "open(\'{w}\',\'w\').write(\'x\')"; cat <<\'EOF\''
+
+    @pytest.mark.parametrize("template", BODYLESS_HEREDOC)
+    def test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'python3 -c "open(\'tests/acceptance/X/zz.py\',\'w\').write(\'x\')"; cat <<\'EOF\''
+root = '/tmp/w242a-lead/pytest-of-usain/pytest-0/test_hstr_fallback_a_bodyless_1/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         python3 -c "open('tests/acceptance/X/zz.py','w').write('x')"; cat <<'EOF'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string.py:120: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee-append]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[cp]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[tee-then-a-list]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_r3_a_write_argument_after_a_here_string_is_seen_and_t_is_refused[here-string-inside-a-list]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[bash-text-is-a-command]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[sh-text-is-a-command]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_here_string_whose_text_writes_t_is_refused[xargs-passes-the-text-as-arguments]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused[bash-variable-text]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_here_string_to_a_shell_whose_text_cannot_be_known_is_refused[sh-substitution-text]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused[unquoted-delimiter]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string.py::test_hstr_fallback_a_bodyless_heredoc_after_a_python_write_of_t_is_refused[quoted-delimiter]
+12 failed, 19 passed in 0.37s

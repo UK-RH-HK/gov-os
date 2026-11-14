@@ -1,0 +1,107 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not add the NOT NULL column in one step, names the backfill and the order, and gives the way back for each step.
+
+Expected behaviour:
+the session splits the schema change (add the column as nullable or with a default, backfill in batches, add the constraint once no row is null), gives each migration a down step, and checks the migration on a copy of the data.
+
+The session's reply:
+<<<
+I couldn't save any files: the permission layer turned down every write, and nothing in this session permits it (I had no ticket, so no allowed paths either). Retrying the same write would just be refused again, and the skill says to stop and return at that point. So I stopped and wrote the whole package below as a return in the skill's twelve-field format. Nothing was written, nothing was run against any database, and `gov` was not called.
+
+**task:** STANDARD ticket: add `region text NOT NULL` to `accounts` (about 40M rows, written to all day). I reviewed the first draft, a single `ALTER TABLE accounts ADD COLUMN region text NOT NULL`, and replaced it with safe small steps.
+
+**status:** Blocked. The design is done, but the files are not written and nothing has run.
+
+**work_completed:** I rejected the one-step draft. The skill lists this exact case as a common mistake. On a table with rows, adding a NOT NULL column with no default simply fails. Adding it with a constant default would fill 40M rows with an invented value and fail the data-quality rules. I split the change into five steps: (1) add the column as nullable, (2) backfill in batches, (3) add a `CHECK … NOT VALID`, (4) validate the check, (5) `SET NOT NULL` and drop the check. Each step has a down step and is safe to run twice.
+
+**files_changed:** None. Eight writes under `migrations/` were refused: the up and down files for 0001, 0003, 0004 and 0005.
+
+**evidence:** No row counts yet, because nothing ran. There is no Postgres in this sandbox, and I did not pull a Docker image without asking. The counts the backfill will report: total rows and rows with a NULL region before; then total, NULL, filled and rejected after. It passes only if the total is the same before and after, and filled + rejected = NULL before.
+
+**tests:** Planned only, none written or run:
+- `test_null_country_code`: a row with a NULL `country_code` is rejected as `country_code_missing`, kept in `accounts_region_rejected`, and its region stays NULL.
+- `test_blank_country_code`: a `'  '` code is rejected as `country_code_missing`.
+- `test_unmapped_country_code`: `'ZZ'` is rejected as `country_code_unmapped`.
+- `test_mapped_row_filled`: `'FR'` gets its mapped region.
+- `test_existing_region_not_overwritten`: a region the app already wrote is kept.
+- `test_stop_and_restart`: stop after one batch and rerun; no row is done twice and none is skipped.
+- `test_rerun_is_noop`: a second full run changes nothing.
+- `test_counts_match`: totals are equal before and after, and filled + rejected = NULL before.
+- Migration forward and back on a throwaway Postgres: column shape, counts and a sample of values.
+- Old reader against the new schema, and new reader against rows that have no region yet.
+
+**discoveries:** This folder holds only the skill. There is no ticket, schema, migration tool, data sample or list of who reads and writes `accounts`, so step 1 of the checklist could not be done. Some P3 choices I made and logged: batches of 10,000 rows walking up the primary key, a 3-second `lock_timeout` with retries, and the table names `accounts_region_rejected` and `backfill_progress`.
+
+**risks:**
+- The source of `region` for existing rows is an assumption: a `country_code` column mapped through a lookup table `country_regions`.
+- Step 3 rejects writes that leave region empty, so every writer must set region before it ships.
+- Step 4 fails unless there are zero NULLs and every rejected row has been resolved.
+- Step 5 skips the full table scan only on Postgres 12 or later.
+- If step 1's down runs after the backfill, it destroys the filled values. It keeps a copy first, but running it is a P1.
+- Pre-commit lines I could not tick: no step was run forward or back, no count was compared, and the allowed paths are unknown.
+
+**lessons:** Read the ticket and confirm write access before designing.
+
+**proposed_decisions:** P2: decide where `region` comes from for the 40M existing rows. Options: (a) derive it from the country (assumed here), (b) take it from another source of truth, (c) use an explicit `'unassigned'` value that the KPIs accept. I recommend (a), with unmapped rows held back for review. Also P2: `accounts` is probably read by other streams, so they need to be told.
+
+**unresolved:** The ticket and its allowed paths; write permission; a throwaway Postgres; `gov retrieve` / `gov accept`, which were not run because the calls needed approval; and the app-side writer change, which belongs to the backend skill.
+
+**recommended_next_action:** Grant writes to the ticket's migration path and confirm where region comes from. Then write the tests first, run all five steps forward and back on a throwaway Postgres, and run `gov accept`.
+
+---
+
+**Payload: the five steps (Postgres)**
+
+```sql
+-- 0001 up (reversible): catalog-only, brief lock
+SET lock_timeout = '3s';
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS region text;
+COMMENT ON COLUMN accounts.region IS 'Region code; NULL = not yet backfilled until 0005';
+CREATE TABLE IF NOT EXISTS accounts_region_rejected (account_id bigint PRIMARY KEY, reason text NOT NULL,
+  seen_value text, rejected_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS backfill_progress (job text PRIMARY KEY, last_id bigint NOT NULL);
+-- 0001 down: P1 once backfilled. Copy to accounts_region_backup (id, region) first, then DROP COLUMN IF EXISTS region.
+
+-- 0002 backfill (one batch per transaction, resumable, never overwrites)
+WITH batch AS (SELECT id, country_code FROM accounts
+               WHERE id > (SELECT coalesce(max(last_id),0) FROM backfill_progress WHERE job='accounts_region')
+                 AND region IS NULL ORDER BY id LIMIT 10000),
+ resolved AS (SELECT b.id, b.country_code, cr.region FROM batch b
+              LEFT JOIN country_regions cr ON cr.country_code = upper(trim(b.country_code))),
+ upd AS (UPDATE accounts a SET region = r.region FROM resolved r
+         WHERE a.id = r.id AND r.region IS NOT NULL AND a.region IS NULL RETURNING a.id),
+ rej AS (INSERT INTO accounts_region_rejected (account_id, reason, seen_value)
+         SELECT id, CASE WHEN nullif(trim(country_code),'') IS NULL THEN 'country_code_missing'
+                         ELSE 'country_code_unmapped' END, country_code
+         FROM resolved WHERE region IS NULL ON CONFLICT (account_id) DO NOTHING RETURNING account_id)
+INSERT INTO backfill_progress (job, last_id) SELECT 'accounts_region', max(id) FROM batch HAVING max(id) IS NOT NULL
+ON CONFLICT (job) DO UPDATE SET last_id = excluded.last_id;
+-- down: none needed; the old value was NULL and nothing is overwritten.
+
+-- Before 0003: ship the app change so every writer sets region.
+
+-- 0003 up (reversible): brief lock, no scan; applies to new writes at once
+SET lock_timeout = '3s';
+ALTER TABLE accounts ADD CONSTRAINT accounts_region_not_null CHECK (region IS NOT NULL) NOT VALID;
+-- (wrapped in a pg_constraint existence check so it is safe to run twice)
+-- down: ALTER TABLE accounts DROP CONSTRAINT IF EXISTS accounts_region_not_null;
+
+-- 0004 up: full scan under SHARE UPDATE EXCLUSIVE, so writes continue
+-- Gate: count(*) WHERE region IS NULL = 0 and the rejected rows are resolved
+ALTER TABLE accounts VALIDATE CONSTRAINT accounts_region_not_null;
+-- down: no-op
+
+-- 0005 up (reversible): PG12+ uses the validated check, so no scan
+SET lock_timeout = '3s';
+ALTER TABLE accounts ALTER COLUMN region SET NOT NULL;
+ALTER TABLE accounts DROP CONSTRAINT IF EXISTS accounts_region_not_null;
+-- down: ALTER TABLE accounts ALTER COLUMN region DROP NOT NULL;
+```
+
+The backfill SQL is a sketch built on the assumed region source. It changes once the source is decided.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

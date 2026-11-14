@@ -1,0 +1,8 @@
+Merge w2/W2-42a-tests (00e0b93e2b17): review round 1's F1 as acceptance cases (td-2)
+
+A shell given options (an option with a value, --rcfile, /dev/stdin, /dev/fd/0) reading a heredoc judges its body
+as commands: 39 product cases (24 red on e9e4f7bac for the finding's reason) and 2 hook-fixture xfails;
+fixtures/f1_shell_options.json is the spelling list the CTO reuses for the live hook's fix (DEC-136, DEC-802).
+
+Task: DAEO-03ub
+Role: orchestrator

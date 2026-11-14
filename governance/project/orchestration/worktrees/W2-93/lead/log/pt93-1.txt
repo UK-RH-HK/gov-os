@@ -1,0 +1,18 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 17:05:59)
+........................................................................ [ 54%]
+...F.......................................................              [100%]
+=================================== FAILURES ===================================
+E   AssertionError: exit 0: python-app: 10 hidden questions
+      rust-workspace: 10 hidden questions
+      typescript-monorepo: 10 hidden questions
+      legacy-docs: 10 hidden questions
+      secret-history: 10 hidden questions
+      python-app-clean: 10 hidden questions
+      python-app: hidden variants secret=1, legacy-document=1, large-file=0
+      rust-workspace
+    assert 0 == 2
+     +  where 0 = Run(code=0, out='python-app: 10 hidden questions\nrust-workspace: 10 hidden questions\ntypescript-monorepo: 10 hidden ...ts (seed 8128)\n', tmpdir=PosixPath('/tmp/w2-93-lead/pytest-of-usain/pytest-0/test_s1_a_question_missing_a_f0/tmpdir')).code
+/home/usain/gov-os-worktrees/W2-93/tests/acceptance/W2-93/test_w2_93_validator.py:27: AssertionError: exit 0: python-app: 10 hidden questions
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-93/test_w2_93_validator.py::test_s1_a_question_missing_a_field_or_of_a_wrong_type_is_refused_naming_its_id[forbidden]
+1 failed, 130 passed in 45.20s

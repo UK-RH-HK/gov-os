@@ -1,0 +1,8 @@
+backend exit 0
+api exit 3
+data exit 3
+security exit 0
+ M template/governance/kernel/skills/api/scenario-records.yaml
+ M template/governance/kernel/skills/backend/scenario-records.yaml
+ M template/governance/kernel/skills/data/scenario-records.yaml
+ M template/governance/kernel/skills/security/scenario-records.yaml

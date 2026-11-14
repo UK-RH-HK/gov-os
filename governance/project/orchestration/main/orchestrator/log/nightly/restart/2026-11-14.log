@@ -1,0 +1,5 @@
+2026-11-14 04:00:03 nightly_restart: start (pid 491353)
+2026-11-14 04:00:04 nightly_restart: estimate 3093 s; latest start 06:12
+2026-11-14 04:04:22 nightly_restart: nothing but leads running for 5 looks (--beside-leads, DEC-1159 (1)); waited 258 s; no dispatch/OFF
+2026-11-14 04:04:22 nightly_restart: memory available 16380 MB; cap 12288 MB (MemoryMax, no swap); 16 pytest workers; unit gov-nightly-20261114-040422.scope; max run 10800 s
+2026-11-14 06:13:13 nightly_restart: run ended: exit 0, unit result success

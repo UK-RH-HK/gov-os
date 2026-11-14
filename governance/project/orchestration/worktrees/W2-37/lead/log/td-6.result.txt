@@ -1,0 +1,108 @@
+task: DAEO-6n5k (W2-37) P-7 (a), DEC-812 item 6: record `impact` in W1-07's lists and W1-32's command set (test designer, MR-3)
+status: done. Commit `df75fbd109aa875469c48e06c5cae0e5a2e36acb` exists. `git status --short` is empty afterwards.
+
+**Sandbox check (step 0):**
+- (a) The write to `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k` failed with `OSError: [Errno 30] Read-only file system`, and no file exists.
+- (b) `git hash-object -w` and `git update-index --refresh` both exited 0.
+- Identity: `GOV_ROLE`=`independent-test-designer`, `GOV_TICKET`=`DAEO-6n5k`. Worktree `/home/usain/gov-os-worktrees/W2-37-tests`, branch `w2/W2-37-tests`, HEAD was `f141d6366…`, status was empty.
+- `PYTHONPATH=/home/usain/gov-os-worktrees/W2-37-tests/src python3 -c "import gov; print(gov.__file__)"` printed `/home/usain/gov-os-worktrees/W2-37-tests/src/gov/__init__.py`.
+- `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` shows nothing.
+
+work_completed:
+- `RECORDED_GOV_COMMANDS` gains `impact`, one line in DEC-542's form with a revision comment.
+- The count case's list gains `"impact"` (ten names) with a revision comment. The case keeps its name.
+- The README has one new paragraph after D-10's, reporting 11 cases in the section.
+- W1-32's first assert's set gains `impact`, with a docstring paragraph for this revision. `RECORDED_HERE` is unchanged.
+- I added one thing the brief did not list: a short revision paragraph in the docstring of `test_a_recorded_gov_command_is_offered_and_answers_its_help`. That docstring counted the recorded commands, so it would have been stale. It is a docstring only and does not change behaviour.
+
+files_changed (all in commit `df75fbd10`, 21 insertions and 2 deletions):
+- `tests/acceptance/W1-07/w1_07_support.py`
+- `tests/acceptance/W1-07/test_w1_07_recorded_commands.py`
+- `tests/acceptance/W1-07/README.md`
+- `tests/acceptance/W1-32/test_w1_32_command_set.py`
+
+evidence: the diff of the three code files is below. The README diff is two added lines, a blank line and one paragraph.
+```
+--- test_w1_07_recorded_commands.py
+@@ -47,7 +47,12 @@ def test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve():
+     # and ``plan`` are recorded beside them: nine.
+-    assert sorted(recorded) == ["accept", "brief", "ci", "launch", "links", "lock", "plan", "resources",
++    # Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite, DEC-491): ``impact`` is recorded
++    # beside them: ten. DEC-812 item 6 renames this case; it keeps its name for now, as it did for DEC-970, because
++    # ``tests/optin-lifted-breadth.txt`` (line 42) names this function and ``test_optin_lifted.py``'s
++    # ``test_every_entry_of_the_real_lists_names_a_test_path_or_function_that_exists`` fails on an entry naming a
++    # function that no longer exists; that list is outside W2-37's paths, so the rename waits on its line.
++    assert sorted(recorded) == ["accept", "brief", "ci", "impact", "launch", "links", "lock", "plan", "resources",
+                                 "telemetry"], recorded
+@@ -59,6 +64,9 @@ (docstring of test_a_recorded_gov_command_is_offered_and_answers_its_help)
+     (W2-129, DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088); one case each, read from the support's lines.
++
++    Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite, DEC-491): ``impact`` joins them, so
++    the recorded ``gov`` commands are nine; the case gains ``[impact]``, read from the support's lines.
+     """
+--- w1_07_support.py
+@@ -61,6 +61,11 @@
+ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
++
++# Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite by a fresh test designer, DEC-491): the
++# approved ``gov`` command ``impact`` (``src/gov/impact/command.py``) is recorded, one line in the form of DEC-542.
++# The set stays exact (W1-32's suite).
++RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)
+ RECORDED_MODULE_COMMANDS = ("lock",)
+--- test_w1_32_command_set.py
+@@ -99,9 +99,13 @@
+     alone is still excused until recorded (DEC-753).
++
++    Revised for W2-37 (DAEO-6n5k; DEC-812 item 6, P-7 (a); a recorded rewrite by a fresh test designer, DEC-491):
++    W1-07's lines record ``impact`` (``gov impact``, approved and built), so the first assert's set gains it; nothing
++    else in the case changes, and ``RECORDED_HERE`` stays as it is.
+     """
+     assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) - set(RECORDED_HERE) == {
+-        "accept", "brief", "ci", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
++        "accept", "brief", "ci", "impact", "launch", "links", "plan", "resources", "telemetry"}, RECORDED
+```
+The commit message, trailers included, is as the brief gave it, plus the `Co-Authored-By: Claude Sonnet 5.5` line.
+
+tests: all runs used `--optin=breadth`, `HOME` set to an empty scratch folder and the heavy slot. The first run did not use `--optin=breadth`, and the opt-in cut then deselected 30 of the 33 cases, W1-07's and W1-26's included. I report the breadth runs because they cover every case.
+- **Before (33 cases, 32 passed, 1 failed):**
+  - W1-07 recorded commands: 10 passed (the count case, `[ci]`, `[launch]`, `[telemetry]`, `[accept]`, `[resources]`, `[brief]`, `[links]`, `[plan]`, and `test_lock_is_recorded_as_the_module_command_and_is_no_gov_command`).
+  - W1-32 command set: `test_status_is_one_of_the_wave_1_operations` passed and `test_status_has_no_sub_command_and_no_argument_that_acts` passed. `test_the_command_set_is_the_twelve_and_the_three_recorded_ones` **failed**, at `test_w1_32_command_set.py:113`: `AssertionError: gov has commands the command list does not record: ['impact']`. So W1-32 was already red on `impact` before my change, because `gov --help` offers `impact` and no list records it.
+  - W1-26 recorded commands: all 20 passed. There was no `[impact]` parameter yet, because W1-26 reads its list from W1-07's support.
+- **After (36 cases, 34 passed, 2 failed):**
+  - W1-07: 11 passed, including the new `test_a_recorded_gov_command_is_offered_and_answers_its_help[impact]` and the count case at ten names.
+  - W1-32: all 3 passed, including `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`.
+  - W1-26: 18 passed and 2 **red**, as expected, both parametrised on `[impact]`:
+    - `test_a_recorded_command_without_its_module_is_a_finding_that_names_it[impact]` fails with `AssertionError: no finding of the check on the command list names 'impact': []`. The `gov check --json` run exits 3 with `CHECK_FAILED`, and its `result` is empty. Its stderr lists the checks as RED or GREEN, and it does not name `impact`.
+    - `test_a_skill_may_name_a_recorded_gov_command[impact]` fails with `AssertionError: a skill that names `gov impact` is flagged: [{'code': 'SKILL_UNKNOWN_COMMAND', … "message": "unknown gov c…`. So a skill that names `gov impact` is flagged as an unknown command.
+  - The first red's reason matches the brief's description in effect. `src/gov/check/commands.py` does not record `impact`, so the core-commands check gives no finding about it. The second red is a related symptom, the skill validator not knowing `impact`. Both should go green when the engineer adds `impact` to `commands.py`.
+- **Left out by exclusions:** I ran only the three named files, so nothing else. I did not use the `-m "not local_only" -k "not real…"` filter, since no real-model case is in these files. The breadth runs collected all cases, and none were skipped.
+
+discoveries:
+- The README's `-o` and opt-in note matters: a plain run of these files deselects W1-07's and W1-26's cases. Run the engineer's check with `--optin=breadth` or `GOV_TESTS_OPTIN=breadth`.
+- The lead's reasoning for keeping the count test's name is right. `tests/optin-lifted-breadth.txt:42` names `test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve`. `tests/unit/optin/test_optin_lifted.py:180-199` fails on an entry whose function no longer exists, with the finding `(no such function)`. So the rename must move with that list's line, which is outside W2-37's paths. I wrote this into the case's comment and the README paragraph.
+- The Write tool refused a script path under `.gov-runtime/scratch/` with "denied by your permission settings". I did not retry or work around it. I ran the pytest as one single-line command instead (see guard_refusals).
+- `/tmp` is read-only in the sandbox, so `mkdir /tmp/gov-os-w237-td6` failed. I used `/tmp/gov-launch-xx0434go/claude-1000/gov-os-w237-td6` as TMPDIR, which is outside the repository and `~/gov-os-runs`.
+- `heavy_slot.sh` printed `all 3 slots taken; waiting` once and then ran. It also printed `…/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system`. I read that as a wait-log write failing in the sandbox, not as a refusal, and the run proceeded.
+
+risks:
+- W1-26's two `[impact]` cases stay red until the engineer's `commands.py` line lands. Any run that includes W1-26 before then fails on them. This is by design (P-7 (a)).
+- The count case keeps a name that says "four", though it pins ten. The rename is still owed, along with `tests/optin-lifted-breadth.txt:42`. That is a follow-up for the owner or CTO, outside this ticket's paths.
+
+lessons:
+- When a rewrite adds a recorded command, W1-26's parametrised cases pick it up from W1-07's support, so the R→G pair is predictable: W1-07 and W1-32 turn green on this change, and W1-26 goes red until `commands.py` records the command.
+- Run the cases with `--optin=breadth`, or a "green" run silently skips most of them.
+
+proposed_decisions: none
+- Optionally for the owner or CTO: the follow-up that renames the count case and `tests/optin-lifted-breadth.txt:42` together, as DEC-812 item 6 wants. It can be one small ticket or part of an existing one, and it needs the owner's decision.
+
+unresolved:
+- The count test's rename (see risks).
+- W1-26's two `[impact]` reds wait for the engineer.
+
+recommended_next_action: the engineer adds `impact` to `RECORDED_GOV_COMMANDS` in `src/gov/check/commands.py`, one line, and nothing else there. Then the CTO re-runs the three files with `--optin=breadth`. Expected result: 36 of 36 green.
+
+guard_refusals:
+- One refusal. A Write to `/home/usain/gov-os-worktrees/W2-37-tests/.gov-runtime/scratch/run-td6.sh` (a runner script) was denied: "File is in a directory that is denied by your permission settings." I did not retry or work around it. The `Bash` call `mkdir -p …/.gov-runtime/scratch/empty-home-td6` in the same folder worked. I ran the one-line pytest command directly.
+- No other refusals, and none twice for the same call.
+
+TESTS-READY: not applicable. This revises existing suites and adds no new W2-37 acceptance tests.

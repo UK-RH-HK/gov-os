@@ -1,0 +1,15 @@
+allow      'echo "$v" | sh'                                                       
+allow      "echo 'touch tests/acceptance/X/zz.py' | sh"                           
+allow      "echo 'touch src/ok.py' | sh"                                          
+allow      "x=$(echo 'touch tests/acceptance/X/zz.py'); $x"                       
+allow      "x=$(echo 'touch src/ok.py'); $x"                                      
+deny       'L=(touch tests/acceptance/X/zz.py); "${L[@]}"'                        Bash write to '/tmp/w242a-lead/tmp/tmpbgyp7311/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'L=(touch src/ok.py); "${L[@]}"'                                       
+allow      'read -r a < x.py; $a'                                                 
+allow      'cat x.py | while read -r f; do $f; done'                              
+allow      'a="$v"; $a'                                                           
+allow      'f=$(cat x.py); $f'                                                    
+allow      'read -r a < x.py; echo "$a" | sh'                                     
+allow      'mapfile -t L < x.py; "${L[@]}"'                                       
+allow      'printf \'%s\\n\' "$v" | bash'                                         
+deny       'x=$(read -r y <<< "$v"; echo $y); echo $x'                            Bash write to '/<guard-unresolvable>' denied for role 'engineer'

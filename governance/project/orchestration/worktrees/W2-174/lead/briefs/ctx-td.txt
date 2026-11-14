@@ -1,0 +1,592 @@
+{
+  "ticket": "DAEO-zmo4",
+  "ticket_text": "---\nid: DAEO-zmo4\nwbs_id: W2-174\ntitle: An adopted repository's tickets get their Verify clauses by a checked pass, so gov brief builds their briefs (a list and an apply tool, the adopt skill's step, a marker)\ntype: task\nclass: implementation\nrole: engineer\nprofile: STANDARD\nstatus: in_progress\nstate_class: AUTHORITATIVE\npriority: 1\ncreated: 2026-11-11 15:21:33+00:00\ndepends_on:\n- DAEO-o5x1  # W2-152: kpi_rows and ready_check in src/gov/brief/build.py, which the tool imports and never changes\n- DAEO-2bdu  # W2-88: holds src/gov/adopt/command.py, stages.py and the adopt skill\n- DAEO-kmcr  # W2-23: holds src/gov/adopt/** (this ticket adds one module and two flags)\nallowed_paths:\n- src/gov/adopt/verify_pass.py\n- src/gov/adopt/command.py\n- src/gov/adopt/facts.py  # the adoption's facts file (DEC-1148 (2), item 4 (a1))\n- tests/unit/adopt/test_w2_174*\nreads:\n- src/gov/brief/build.py\n- src/gov/adopt/**\n- template/governance/kernel/templates/ticket.md\n- template/governance/kernel/schemas/ticket.schema.json\n- tests/acceptance/W2-152/**\nneeds:\n- src/gov/brief/build.py       # kpi_rows and the KPI_NO_VERIFY check finished (W2-152)\n- src/gov/adopt/command.py     # W2-88's and W2-23's finished state\n- template/governance/kernel/skills/adopt/SKILL.md\nwaits_on:\n- ref: DAEO-o5x1\n  reason: the tool reads KPI lines with W2-152's kpi_rows, so the list and the check agree\n- ref: DAEO-2bdu\n  reason: it holds the adopt command and skill files this ticket adds a flag and a step to\nest_loc: 180\nkpis:\n  success:\n  - line: \"`gov adopt --verify-list --root <repo>` prints, for each open or in-progress ticket in `<repo>/.tickets/` that has a KPI line with no verify, the ticket id and the labels of those lines (S<n>, F<n>), read with `kpi_rows`; it prints `none` and exits 0 when no ticket lacks one [DEC-1130, DEC-1083]\"\n    verify: \"tests/unit/adopt/test_w2_174_list.py: a fixture repository with three tickets (all lines verified, two lines missing, a closed ticket with a missing line) gives exactly the second ticket's two labels; the all-verified fixture prints `none`\"\n  - line: \"`gov adopt --verify-apply <answers-file> --root <repo>` appends ` Verify: <clause>` to each named KPI line of each named ticket, the form `gov brief` already reads, and adds one front-matter line `verify_pass: <date> <session>`; every other byte of the ticket file is unchanged, comments and key order included [DEC-1130, DEC-1050]\"\n    verify: \"tests/unit/adopt/test_w2_174_apply.py: a fixture ticket with YAML comments and a block of five lines; after apply, a byte diff shows only the appended clauses and the one added line\"\n  - line: \"After an apply, `ready_check` of that ticket returns no `KPI_NO_VERIFY` finding, and `gov brief engineer <ticket>` builds its brief on the fixture repository [DEC-1083, DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_ready.py: calls `gov.brief.build.ready_check` on the applied fixture and finds none; runs `gov brief engineer` on the fixture and gets exit 0 (the fixture carries its own `governance/project/facts.yaml` with every command filled, as an adopted project's CTO fills it after the defaults; DEC-1148 (2))\"\n  - line: \"The answers file is checked by code before anything is written: every named ticket exists and is not closed, every named label exists on it, every line still lacking a verify is answered, and each clause is text of its own (not empty, not only TBD, TODO, n/a or none) [DEC-1130, DEC-1083]\"\n    verify: \"tests/unit/adopt/test_w2_174_checks.py: one case per refusal (unknown ticket, closed ticket, unknown label, an unanswered line, an empty clause, a `TBD` clause), each refused with a named code and nothing written\"\n  - line: \"`gov adopt` writes `governance/project/facts.yaml` when the repository has none: it validates against `template/governance/kernel/schemas/facts.schema.json`, `ready.new_since` is the adoption's UTC date as a quoted ISO string, and every other key holds a product default (gov commands only, nothing of this repository); a command with no product equivalent (`lead_verify`, and `wait_for` until `gov wait` lands) is written as a named placeholder that `gov brief` refuses by name; an existing facts file is left byte for byte [DEC-1148 (2), DEC-1147, DEC-1088 (3)]\"\n    verify: \"tests/unit/adopt/test_w2_174_facts.py: a fixture repository without a facts file has, after the adoption step, a file that validates against the kernel schema and carries ready.new_since equal to the step's date, and `gov brief` there no longer answers BRIEF_FACTS_MISSING (it names the placeholder commands instead); a fixture with its own facts file keeps it byte-identical\"\n  failure:\n  - line: \"The apply never writes anything if one entry is refused (all or nothing), never edits a ticket the answers file does not name, never edits a closed ticket, and never marks a ticket `verify_pass` while one of its lines still has no verify [DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_checks.py: a file with nine good entries and one bad one leaves the whole tree byte-identical; a ticket with one line unanswered is refused and unmarked\"\n  - line: \"The pass never changes `gov brief`, the ready check or the ticket template and schema: a ticket is READY by the same code whether adopted or written here [DEC-1083, DEC-1121, DEC-1122]\"\n    verify: \"the close's diff against the base names no file under `src/gov/brief/`, `template/governance/kernel/templates/` or `template/governance/kernel/schemas/`; `tests/acceptance/W2-152` still passes unchanged\"\n  - line: \"The tool never reads or writes outside `<repo>/.tickets/` and the answers file it is given, and never calls a model or the network [DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_scope.py: a fixture repository with a decoy file outside `.tickets/` is byte-identical after list and apply; the module imports no network or model package\"\nnon_goals:\n- no change to `gov brief` or its ready check (option (c), reading the acceptance folder, is not built here; it is a recorded option for after EXAMIN's copy)\n- 'no tracker importer, and no writing of the clauses by the tool: a product-spec session writes them, the tool checks and applies'\n- no change to the ticket template or schema; the marker is one extra front-matter line the schema already allows\n- no change to W2-88's refactoring-plan text (the CTO's one-line note, below)\ndone_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]\nsources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh]\nacceptance_tests: {path: tests/acceptance/W2-174/}\n---\n\n# W2-174 An adopted repository's tickets get their Verify clauses by a checked pass\n\n**Problem.** `gov brief` refuses a ticket whose KPI lines have no `Verify:` (`ready_check`, `src/gov/brief/build.py`\nline 163, `KPI_NO_VERIFY`). A repository adopted by Gov OS brings tickets written before adoption, so no brief can\nbe built there, and W2-27 (EXAMIN's copy) would stop at its first ticket. DEC-1130 (2) asks for a ticket that lands\nfirst. The approach, with the options (c) the acceptance folder, (d) the pass, (e) combinations, and the costs, is\n`governance/project/orchestration/packages/ADOPT-VERIFY-1/APPROACH.md`.\n\n**Approach (if known).** Option (d): a pass for the tickets about to launch. The ready check stays unchanged, so\nDEC-1083 holds for every ticket. A product-spec session writes the clauses; the tool lists what is missing, checks\nthe answers and applies them by editing the lines' text only (no YAML dump, which would lose comments), then marks\nthe ticket. (c) was set aside: the acceptance folder is written by the test designer after the first brief, so\nthere is nothing to read for that role, and a folder-level check is coarser than a line-level one.\n\n**Interface.**\n- `src/gov/adopt/verify_pass.py`: `missing(root) -> list[{ticket, labels}]`; `apply(root, answers_path, session, today)\n  -> list[str]` (the tickets changed); both import `kpi_rows` from `gov.brief.build`. Errors are `GovError` with codes\n  `VERIFY_PASS_UNKNOWN_TICKET`, `VERIFY_PASS_CLOSED`, `VERIFY_PASS_UNKNOWN_LABEL`, `VERIFY_PASS_UNANSWERED`,\n  `VERIFY_PASS_EMPTY_CLAUSE`.\n- Flags on `gov adopt` (they do not need `--lite`): `--verify-list`, `--verify-apply <answers-file>`, `--root`.\n- Answers file (YAML, outside the repository): `{<ticket id>: {S1: \"<clause>\", F2: \"<clause>\"}}`.\n- The marker line: `verify_pass: 2026-11-12 <session id>`, added before the closing `---`.\n- A line given as a plain string gets ` Verify: <clause>` appended; a `{line, verify}` mapping already carries a verify\n  (the schema requires it) and is never edited.\n\n**Rabbit holes.**\n- Do not rewrite a ticket with a YAML dump; edit the text of the lines.\n- Do not decide what a clause means (a weak clause is the designer's and auditor's to catch); check only that it is text of its own.\n- Do not touch `gov brief`, the template or the schema; do not add an adoption stage (A0 to A8 stay as W2-88 leaves them).\n\n## Widened by the owner (DEC-1148 (2), item 4 (a1), 2026-11-12)\n\nOne KPI line (the last success line) and `src/gov/adopt/facts.py`: the adoption writes the facts file `gov brief` needs (`BRIEF_FACTS_MISSING` otherwise), with product defaults and named placeholders; the project's CTO fills its own commands afterwards (for EXAMIN's copy, W2-27's line). S3's fixture carries its own filled facts file. The failure line \"the tool never reads or writes outside `<repo>/.tickets/`\" concerns the verify pass, not this facts step.\n\n## Its skill line moved (the owner, DEC-1150 (1), 2026-11-12)\n\nS5 (the adopt skill states the Verify pass) moved word for word to W2-88a (DAEO-pg6i, product-spec), with the three skill paths: one ticket of one role writes the adopt skill once, under one CIT-P (DEC-995).\n",
+  "authority": [
+    {
+      "id": "DEC-1130",
+      "sha256": "5ab0080f7f976ce8e6c34ab226ef63bad8eec55fb5a87df46e32d083e71e43b1",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "5ab0080f7f976ce8e6c34ab226ef63bad8eec55fb5a87df46e32d083e71e43b1",
+      "reason": "declared in sources",
+      "tokens": 428
+    },
+    {
+      "id": "DEC-1083",
+      "sha256": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "reason": "declared in sources",
+      "tokens": 711
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "0074d4e1c3f918d264c472e2090276ee374784efa4ccecd568e8deb627233f14",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "0074d4e1c3f918d264c472e2090276ee374784efa4ccecd568e8deb627233f14",
+      "reason": "declared in sources",
+      "tokens": 1880
+    },
+    {
+      "id": "DEC-1050",
+      "sha256": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "reason": "declared in sources",
+      "tokens": 948
+    },
+    {
+      "id": "DEC-1088",
+      "sha256": "babbfcb83b2201ee2254f43f2fc13bf013207ed13e05caf2ae80c13d7c852f44",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "babbfcb83b2201ee2254f43f2fc13bf013207ed13e05caf2ae80c13d7c852f44",
+      "reason": "declared in sources",
+      "tokens": 769
+    },
+    {
+      "id": "DEC-1121",
+      "sha256": "3b95bd803a7f6356d8ea3ef54a0449090efaab7afe4b0a355ef22133c19ec9b8",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "3b95bd803a7f6356d8ea3ef54a0449090efaab7afe4b0a355ef22133c19ec9b8",
+      "reason": "declared in sources",
+      "tokens": 237
+    },
+    {
+      "id": "DEC-1122",
+      "sha256": "010a77f5f492ab94e1857bf07c34ebe64757f3e3f85e40888a8263ad638d3966",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "010a77f5f492ab94e1857bf07c34ebe64757f3e3f85e40888a8263ad638d3966",
+      "reason": "declared in sources",
+      "tokens": 417
+    },
+    {
+      "id": "DEC-1112",
+      "sha256": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "reason": "declared in sources",
+      "tokens": 498
+    },
+    {
+      "id": "DAEO-o5x1",
+      "sha256": "d20e753eb081d100ddcb911b80ceb37d8627886971003b1f8b6dad7f13342d46",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "d20e753eb081d100ddcb911b80ceb37d8627886971003b1f8b6dad7f13342d46",
+      "reason": "declared in sources",
+      "tokens": 907
+    },
+    {
+      "id": "DAEO-t8mp",
+      "sha256": "5a097faaac40cb1855b780bc63ad1adffd06e88ba329077de9ac8034bb84c30a",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "5a097faaac40cb1855b780bc63ad1adffd06e88ba329077de9ac8034bb84c30a",
+      "reason": "declared in sources",
+      "tokens": 4903
+    },
+    {
+      "id": "DAEO-2bdu",
+      "sha256": "b3653385a5191d85946b54ad0df10498611ef55d7e1091c793bc0bed88273b5a",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "b3653385a5191d85946b54ad0df10498611ef55d7e1091c793bc0bed88273b5a",
+      "reason": "declared in sources",
+      "tokens": 5721
+    },
+    {
+      "id": "DAEO-kmcr",
+      "sha256": "7b14fcf321c9c5ad74b4b5f995670a603f73294e2a26682c77d9ab98f2e6348f",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "7b14fcf321c9c5ad74b4b5f995670a603f73294e2a26682c77d9ab98f2e6348f",
+      "reason": "declared in sources",
+      "tokens": 649
+    },
+    {
+      "id": "DAEO-h4rh",
+      "sha256": "d49c18d1c4d62d26ff05185d0e5b9ecbca9ee13a4f73f95bd60817022aff0f07",
+      "authority": "task",
+      "lifecycle": "open",
+      "constraint": "d49c18d1c4d62d26ff05185d0e5b9ecbca9ee13a4f73f95bd60817022aff0f07",
+      "reason": "declared in sources",
+      "tokens": 3349
+    }
+  ],
+  "mandatory": [
+    {
+      "id": "DEC-1130",
+      "sha256": "5ab0080f7f976ce8e6c34ab226ef63bad8eec55fb5a87df46e32d083e71e43b1",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "5ab0080f7f976ce8e6c34ab226ef63bad8eec55fb5a87df46e32d083e71e43b1",
+      "reason": "declared in sources",
+      "tokens": 428
+    },
+    {
+      "id": "DEC-1083",
+      "sha256": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "reason": "declared in sources",
+      "tokens": 711
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "0074d4e1c3f918d264c472e2090276ee374784efa4ccecd568e8deb627233f14",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "0074d4e1c3f918d264c472e2090276ee374784efa4ccecd568e8deb627233f14",
+      "reason": "declared in sources",
+      "tokens": 1880
+    },
+    {
+      "id": "DEC-1050",
+      "sha256": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "reason": "declared in sources",
+      "tokens": 948
+    },
+    {
+      "id": "DEC-1088",
+      "sha256": "babbfcb83b2201ee2254f43f2fc13bf013207ed13e05caf2ae80c13d7c852f44",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "babbfcb83b2201ee2254f43f2fc13bf013207ed13e05caf2ae80c13d7c852f44",
+      "reason": "declared in sources",
+      "tokens": 769
+    },
+    {
+      "id": "DEC-1121",
+      "sha256": "3b95bd803a7f6356d8ea3ef54a0449090efaab7afe4b0a355ef22133c19ec9b8",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "3b95bd803a7f6356d8ea3ef54a0449090efaab7afe4b0a355ef22133c19ec9b8",
+      "reason": "declared in sources",
+      "tokens": 237
+    },
+    {
+      "id": "DEC-1122",
+      "sha256": "010a77f5f492ab94e1857bf07c34ebe64757f3e3f85e40888a8263ad638d3966",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "010a77f5f492ab94e1857bf07c34ebe64757f3e3f85e40888a8263ad638d3966",
+      "reason": "declared in sources",
+      "tokens": 417
+    },
+    {
+      "id": "DEC-1112",
+      "sha256": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "reason": "declared in sources",
+      "tokens": 498
+    },
+    {
+      "id": "DAEO-o5x1",
+      "sha256": "d20e753eb081d100ddcb911b80ceb37d8627886971003b1f8b6dad7f13342d46",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "d20e753eb081d100ddcb911b80ceb37d8627886971003b1f8b6dad7f13342d46",
+      "reason": "declared in sources",
+      "tokens": 907
+    },
+    {
+      "id": "DAEO-t8mp",
+      "sha256": "5a097faaac40cb1855b780bc63ad1adffd06e88ba329077de9ac8034bb84c30a",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "5a097faaac40cb1855b780bc63ad1adffd06e88ba329077de9ac8034bb84c30a",
+      "reason": "declared in sources",
+      "tokens": 4903
+    },
+    {
+      "id": "DAEO-2bdu",
+      "sha256": "b3653385a5191d85946b54ad0df10498611ef55d7e1091c793bc0bed88273b5a",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "b3653385a5191d85946b54ad0df10498611ef55d7e1091c793bc0bed88273b5a",
+      "reason": "declared in sources",
+      "tokens": 5721
+    },
+    {
+      "id": "DAEO-kmcr",
+      "sha256": "7b14fcf321c9c5ad74b4b5f995670a603f73294e2a26682c77d9ab98f2e6348f",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "7b14fcf321c9c5ad74b4b5f995670a603f73294e2a26682c77d9ab98f2e6348f",
+      "reason": "declared in sources",
+      "tokens": 649
+    },
+    {
+      "id": "DAEO-h4rh",
+      "sha256": "d49c18d1c4d62d26ff05185d0e5b9ecbca9ee13a4f73f95bd60817022aff0f07",
+      "authority": "task",
+      "lifecycle": "open",
+      "constraint": "d49c18d1c4d62d26ff05185d0e5b9ecbca9ee13a4f73f95bd60817022aff0f07",
+      "reason": "declared in sources",
+      "tokens": 3349
+    }
+  ],
+  "supplementary": [
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "  - line: \"`gov adopt --verify-list --root <repo>` prints, for each open or in-progress ticket in `<repo>/.tickets/` that has a KPI line with no verify, the ticket id and the labels of those lines (S<n>, F<n>), read with `kpi_rows`; it prints `none` and exits 0 when no ticket lacks one [DEC-1130, DEC-1083]\"\n    verify: \"tests/unit/adopt/test_w2_174_list.py: a fixture repository with three tickets (all lines verified, two lines missing, a closed ticket with a missing line) gives exactly the second ticket's two labels; the all-verified fixture prints `none`\"\n  - line: \"`gov adopt --verify-apply <answers-file> --root <repo>` appends ` Verify: <clause>` to each named KPI line of each named ticket, the form `gov brief` already reads, and adds one front-matter line `verify_pass: <date> <session>`; every other byte of the ticket file is unchanged, comments and key order included [DEC-1130, DEC-1050]\"\n    verify: \"tests/unit/adopt/test_w2_174_apply.py: a fixture ticket with YAML comments and a block of five lines; after apply, a byte diff shows only the appended clauses and the one added line\"\n",
+      "tokens": 276
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "    verify: \"tests/unit/adopt/test_w2_174_apply.py: a fixture ticket with YAML comments and a block of five lines; after apply, a byte diff shows only the appended clauses and the one added line\"\n  - line: \"After an apply, `ready_check` of that ticket returns no `KPI_NO_VERIFY` finding, and `gov brief engineer <ticket>` builds its brief on the fixture repository [DEC-1083, DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_ready.py: calls `gov.brief.build.ready_check` on the applied fixture and finds none; runs `gov brief engineer` on the fixture and gets exit 0\"\n  - line: \"The answers file is checked by code before anything is written: every named ticket exists and is not closed, every named label exists on it, every line still lacking a verify is answered, and each clause is text of its own (not empty, not only TBD, TODO, n/a or none) [DEC-1130, DEC-1083]\"\n    verify: \"tests/unit/adopt/test_w2_174_checks.py: one case per refusal (unknown ticket, closed ticket, unknown label, an unanswered line, an empty clause, a `TBD` clause), each refused with a named code and nothing written\"\n",
+      "tokens": 275
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "  - line: \"The tool never reads or writes outside `<repo>/.tickets/` and the answers file it is given, and never calls a model or the network [DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_scope.py: a fixture repository with a decoy file outside `.tickets/` is byte-identical after list and apply; the module imports no network or model package\"\nnon_goals:\n- no change to `gov brief` or its ready check (option (c), reading the acceptance folder, is not built here; it is a recorded option for after EXAMIN's copy)\n- no tracker importer, and no writing of the clauses by the tool: a product-spec session writes them, the tool checks and applies\n- no change to the ticket template or schema; the marker is one extra front-matter line the schema already allows\n- no change to W2-88's refactoring-plan text (the CTO's one-line note, below)\ndone_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]\nsources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh]\nacceptance_tests: {path: tests/acceptance/W2-174/}\n---\n\n",
+      "tokens": 275
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "  - line: \"The apply never writes anything if one entry is refused (all or nothing), never edits a ticket the answers file does not name, never edits a closed ticket, and never marks a ticket `verify_pass` while one of its lines still has no verify [DEC-1130]\"\n    verify: \"tests/unit/adopt/test_w2_174_checks.py: a file with nine good entries and one bad one leaves the whole tree byte-identical; a ticket with one line unanswered is refused and unmarked\"\n  - line: \"The pass never changes `gov brief`, the ready check or the ticket template and schema: a ticket is READY by the same code whether adopted or written here [DEC-1083, DEC-1121, DEC-1122]\"\n    verify: \"the close's diff against the base names no file under `src/gov/brief/`, `template/governance/kernel/templates/` or `template/governance/kernel/schemas/`; `tests/acceptance/W2-152` still passes unchanged\"\n  - line: \"The tool never reads or writes outside `<repo>/.tickets/` and the answers file it is given, and never calls a model or the network [DEC-1130]\"\n",
+      "tokens": 257
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "the ticket. (c) was set aside: the acceptance folder is written by the test designer after the first brief, so\nthere is nothing to read for that role, and a folder-level check is coarser than a line-level one.\n\n**Interface.**\n- `src/gov/adopt/verify_pass.py`: `missing(root) -> list[{ticket, labels}]`; `apply(root, answers_path, session, today)\n  -> list[str]` (the tickets changed); both import `kpi_rows` from `gov.brief.build`. Errors are `GovError` with codes\n  `VERIFY_PASS_UNKNOWN_TICKET`, `VERIFY_PASS_CLOSED`, `VERIFY_PASS_UNKNOWN_LABEL`, `VERIFY_PASS_UNANSWERED`,\n  `VERIFY_PASS_EMPTY_CLAUSE`.\n- Flags on `gov adopt` (they do not need `--lite`): `--verify-list`, `--verify-apply <answers-file>`, `--root`.\n- Answers file (YAML, outside the repository): `{<ticket id>: {S1: \"<clause>\", F2: \"<clause>\"}}`.\n- The marker line: `verify_pass: 2026-11-12 <session id>`, added before the closing `---`.\n- A line given as a plain string gets ` Verify: <clause>` appended; a `{line, verify}` mapping already carries a verify\n  (the schema requires it) and is never edited.\n\n**Rabbit holes.**\n- Do not rewrite a ticket with a YAML dump; edit the text of the lines.\n",
+      "tokens": 291
+    },
+    {
+      "id": "W2-152-CIT-P",
+      "path": "docs/changes/W2-152-CIT-P.md",
+      "text": "## 5. Impact\n\n- This repository's facts file carries `ready.new_since: \"2026-11-10\"`; every ticket filed since must declare its three fields\n  (W2-121b's brief was refused for it on 2026-11-12 until they were declared).\n- An adopted repository has no facts file today (`gov adopt` writes none), so `gov brief` there refuses with BRIEF_FACTS_MISSING before\n  it reads `ready`; that is a separate item with the owner (DEC-1147 (2)).\n- Every brief built with `gov brief` since 11-09, and the 11-11 re-pin (DEC-1125 (3)), use this schema.\n\n",
+      "tokens": 134
+    },
+    {
+      "id": "a76067335f26477e7ef28876",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md",
+      "text": "Ordinary work: no.\nConsequence: fails open.\n\n**F12 \u2014 reads slightly beyond the single ticket file.** F3, `build.py:62-63,127`, scope: in.\n- Resolving a W2 id reads every ticket's front matter.\n- A `waits_on` path is checked with a stat.\n- Both are what the interface and S9 require, and they affect only id resolution.\n\nOrdinary work: yes.\nConsequence: other.\n\n**Robustness that passed:**\n- missing template: `BRIEF_TEMPLATE_MISSING`;\n- missing facts file: `BRIEF_FACTS_MISSING`;\n- missing command in facts: `PLACEHOLDER_LEFT CMD:<name>`;\n- missing `keys.yaml`: named `PLACEHOLDER_LEFT` lines;\n- unknown role: argparse \"invalid choice\" (exit 2);\n- unknown ticket: `BRIEF_TICKET_UNKNOWN`;\n- lead without `--run`: `BRIEF_RUN_MISSING`;\n- `--part` missing or a directory: `BRIEF_FILE_MISSING`.\n\n```verdict\n{\"kpis\": [\n {\"kpi\": \"S1\", \"verdict\": \"pass\", \"findings\": []},\n {\"kpi\": \"S2\", \"verdict\": \"pass\", \"findings\": [{\"id\": \"F2\", \"scope\": \"in\", \"ordinary_work\": \"yes\", \"consequence\": \"other\"}, {\"id\": \"F7\", \"scope\": \"in\", \"ordinary_work\": \"yes\", \"consequence\": \"other\"}]},\n {\"kpi\": \"S3\", \"verdict\": \"pass\", \"findings\": [{\"id\": \"F8\", \"scope\": \"in\", \"ordinary_work\": \"yes\", \"consequence\": \"other\"}]},\n",
+      "tokens": 299
+    },
+    {
+      "id": "3eed9becf83636613dd9ee44",
+      "path": "src/gov/brief/build.py",
+      "text": "def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: str | None = None,\n          repair: str | None = None) -> dict:\n    \"\"\"``{brief, warnings, findings, size, budget, ticket}``; findings non-empty means BRIEF_NOT_READY.\"\"\"\n    if (role == \"lead\") != (run is not None):\n        raise GovError(\"BRIEF_RUN_MISSING\", \"--run <kind> goes with the lead role, and only with it\",\n                       {\"role\": role, \"run\": run})\n    tickets = Tickets(root)\n    ticket_path = tickets.find(ticket_ref)\n    if ticket_path is None:\n        raise GovError(\"BRIEF_TICKET_UNKNOWN\", f\"no ticket {ticket_ref} in {root / '.tickets'}\", {\"ticket\": ticket_ref})\n    front, body = tickets.load(ticket_path)\n    facts_path = root / \"governance/project/facts.yaml\"\n    if not facts_path.is_file():\n        raise GovError(\"BRIEF_FACTS_MISSING\", f\"no facts file at {facts_path}\", {\"path\": str(facts_path)})\n    facts = _yaml(facts_path, \"BRIEF_FACTS_UNREADABLE\")\n    budgets = facts.get(\"budgets\") if isinstance(facts.get(\"budgets\"), dict) else {}\n    if ticket_path in tickets.unreadable:  # F6: refused by its own name, not as the fields it seems to miss\n",
+      "tokens": 291
+    },
+    {
+      "id": "4d4cd470d6cbabdb22e72933",
+      "path": "docs/changes/W2-152-evidence.md",
+      "text": "| S7 | A line holding a `{STEP:name}` switched off is dropped whole; an on step is its filled `line` | success-7 2/2; unit `test_step_switch_changes_only_its_line` |\n| S8 | Refused: `ALLOWED_PATHS_EMPTY`, `KPI_NO_VERIFY`, `DEPENDS_NOT_CLOSED <id>`; `KPI_NO_VERIFY kpis` when `kpis` is missing, not a mapping or has no success line; an unclosed or non-mapping front-matter block, or a ticket that is not UTF-8, is `TICKET_UNREADABLE` alone; warned only: `NON_GOALS_MISSING`, `EST_LOC_OVER <n>` (> 400) | success-8 15/15; unit `test_refusals_name_each_finding`, `test_advisory_items_only_warn`, `test_no_readable_kpi_lines_is_refused`, `test_unreadable_front_matter_is_ticket_unreadable` |\n| S9 | Created on or after `ready.new_since`: `READS_MISSING`, `NEEDS_MISSING`, `WAITS_ON_MISSING` (an empty list declares none); every `waits_on` ref must be a ticket or an existing path (`WAITS_ON_UNKNOWN <ref>`); no `ready.new_since` is `READY_NEW_SINCE_MISSING ready.new_since`, one that is not a date `READY_NEW_SINCE_NOT_DATE ready.new_since` | success-9 12/12; unit `test_dependency_fields_from_the_date_on`, `test_no_readable_new_since_is_refused` |\n",
+      "tokens": 287
+    },
+    {
+      "id": "191702fb8ce3a7b61519c0f5",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md",
+      "text": "### Verdict per line\n\n| line | verdict | notes |\n|---|---|---|\n| S1 | pass | Golden file per role passes. No clock, no environment reads, sorted globs. An absolute and a relative `--root` give byte-identical output. |\n| S2 | pass | Both refusals are named. Row: F7. |\n| S3 | pass | Warnings and the size line go to stderr; a warning never stops it. Row: F8. |\n| S4 | pass | On the real templates: 0 role-template lines in each of the five worker briefs. A lead brief carries only the selected block. |\n| S5 | **fail** | F1. Rows: F11. |\n| S6 | pass | `run_section` stops at the next `**<kind>**:` line or the first `{STEP:` line. A missing kind gives `BRIEF_RUN_MISSING`. |\n| S7 | pass | `step_off` drops the whole line before filling; nothing else changes. |\n| S8 | pass | Follows DEC-1083: `non_goals` and `est_loc` only warn; ALLOWED_PATHS_EMPTY, KPI_NO_VERIFY and DEPENDS_NOT_CLOSED refuse. Rows: F4, F9. |\n| S9 | pass | DEC-1088 (3) holds on both sides of the date, and an empty list counts as a declared none. Rows: F3, F10. |\n| S10 | pass | The schema has `format: date` and a date pattern; W2-128's guard case passes. |\n| F1 | pass | Same as S1. |\n| F2 | pass | Row: F4. |\n",
+      "tokens": 296
+    },
+    {
+      "id": "4149f7942baae7172f3e2bb5",
+      "path": "docs/changes/W2-152-evidence.md",
+      "text": "# W2-152 evidence: `gov brief` and the ready check (DAEO-o5x1)\n\nBuilt by a launched engineer session on `w2/W2-152` (base `61231e618`, the designer's cases merged at `a176f5060`,\nTESTS-READY `b08ede6890c6`). Code: `src/gov/brief/__init__.py`, `build.py`, `command.py`; facts: `ready.new_since`;\nschema: `ready` declared. The acceptance cases were run only through `gov accept W2-152` (DEC-820 (c)).\n\n| KPI | How it is met | Evidence |\n|---|---|---|\n| S1 | `gov brief <role> <ticket>` prints T-0's body (front matter left out) filled from the ticket, facts.yaml and the kernel templates with `keys.yaml`; no clock, no randomness, sorted reads | `gov accept W2-152` success-1 8/8; unit `test_fills_the_brief_deterministically` |\n| S2 | `GovError(\"BRIEF_NOT_READY\")`, `details.findings` each `{code, detail}`: `PLACEHOLDER_LEFT <key>` (a key not in keys.yaml, or a `CMD:`/`STEP:` name not in facts.yaml), `KPI_NO_VERIFY <S|F><n>` | success-2 5/5; unit `test_refusals_name_each_finding` |\n",
+      "tokens": 247
+    },
+    {
+      "id": "49afbe0183e5a6a144e71743",
+      "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md",
+      "text": "- `\"soon\"`, `\"2026-13-45\"` and `20261110` all give `READY_NEW_SINCE_NOT_DATE`.\n- An unquoted YAML date and a timestamp are accepted.\n\n**F4 is closed.** `kpis` missing, a list, or a string, and `success` empty or missing, all give `KPI_NO_VERIFY kpis`. A `{line, verify: ''}` item gives `KPI_NO_VERIFY S1`.\n\n**F6 is closed.** An unclosed block, a quoting slip in the title (by tk id and by W2 id), and front matter that is a list all give `TICKET_UNREADABLE <ref>: front matter unclosed|not_yaml|not_mapping` alone, with no `ALLOWED_PATHS_EMPTY`.\n\n**F5 is closed** for each case round 1 named:\n- A ticket that is not UTF-8 gives `TICKET_UNREADABLE \u2026 not UTF-8`, by tk id and by W2 id.\n- Another such ticket in `.tickets/` no longer breaks a lookup by W2 id (exit 0).\n- facts.yaml with bad YAML or not UTF-8 gives `BRIEF_FACTS_UNREADABLE`.\n- `keys.yaml` with bad YAML, a role template that is not UTF-8, and a `--part` or `--repair` file that is not UTF-8 all give `BRIEF_FILE_UNREADABLE`.\n- None of these prints a traceback, and a refusal prints 0 bytes on stdout.\n- CRLF line endings are read fine.\n- A dependency on an unreadable ticket gives `DEPENDS_NOT_CLOSED`.\n",
+      "tokens": 292
+    },
+    {
+      "id": "c0ff704a047c70e047cda19a",
+      "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md",
+      "text": "- `_w2_of_unreadable` calls `path.read_bytes()` outside any `try`. A directory named `X.md`, or a ticket file without read permission, makes `gov brief <role> W2-\u2026` crash with `IsADirectoryError` or `PermissionError`.\n- Related: `Tickets.load` (`:63-64`) labels any `OSError` as \"not UTF-8\".\n- Ordinary work: no, because tk writes only plain files that can be read.\n- Consequence: other (it fails closed, with a traceback).\n- Evidence that would reverse it: such an entry appearing in `.tickets/` in normal flow.\n\n**F14 (new): a ticket that starts with a BOM is refused under the wrong names.** `build.py:62,71-72`, with `frontmatter.py:35`; scope: out.\n- The first line is `\\ufeff---`, which is not `---`, so the ticket reads as having no front matter. It is refused as `ALLOWED_PATHS_EMPTY` and `KPI_NO_VERIFY kpis`, not `TICKET_UNREADABLE`.\n- Ordinary work: no, because tk and this repository's editors write no BOM.\n- Consequence: other (it fails closed, under the wrong reason).\n- Evidence that would reverse it: a ticket with a BOM appearing in normal flow.\n\n**F15 (new): a ticket with no `created` is never held to the dependency fields.** `build.py:167-168`; scope: in (S9).\n",
+      "tokens": 296
+    },
+    {
+      "id": "c188ac688a33bbcbbd7fa1b9",
+      "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md",
+      "text": "  - `facts.yaml` passes the schema, and the schema now lists `ready` as required.\n  - I did not run `gov accept W2-152` itself; I rely on the CTO's 67/67.\n- **discoveries:**\n  1. F1 is closed. `build.py:352` now scans T-0's whole text, the whole role template for every role, and `--part`.\n  2. A directory named `*.md` (or a ticket file that cannot be opened) in `.tickets/` still crashes a lookup by W2 id with a traceback. The cause is `_w2_of_unreadable` at `build.py:81`, which reads outside any `try`. This is F13, a row.\n  3. A ticket that starts with a byte-order mark (BOM) is read as having no front matter. It is refused under the wrong names, `ALLOWED_PATHS_EMPTY` and `KPI_NO_VERIFY kpis`. This is F14, a row.\n  4. A ticket with no `created` field is never held to the dependency fields. The evidence file records this as a choice. This is F15, a row.\n- **risks:** Once W2-56 closes, every `gov brief lead \u2026` refuses with `UNTIL_CLOSED W2-56` until W2-128's `role-lead.md:27` is edited. That is S5 working as intended; whoever closes W2-56 should know it is coming.\n",
+      "tokens": 270
+    },
+    {
+      "id": "c5abdfef3816ced3b4c40792",
+      "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md",
+      "text": "### Verdict per line\n\n| line | verdict | notes |\n|---|---|---|\n| S1 | pass | No clock and no environment read; `datetime` is used only to parse the date. Byte-identical runs; the golden files pass. |\n| S2 | pass | `PLACEHOLDER_LEFT` and `KPI_NO_VERIFY S/F<n>` are named. F2 was decided as (a). F7 is a row. |\n| S3 | pass | Warnings and `SIZE` go to stderr and never refuse. F8 is a row. |\n| S4 | pass | 0 role-template lines in the worker briefs; a lead brief has only its block. |\n| S5 | pass | F1 is closed (probes above). F11 is a row. |\n| S6 | pass | One block per kind; `BRIEF_RUN_MISSING` is unchanged. |\n| S7 | pass | One line removed, nothing else changed. |\n| S8 | pass | F4 and F6 are closed. F9, F13 and F14 are rows. |\n| S9 | pass | F3 is closed. F10 and F15 are rows. |\n| S10 | pass | The schema requires `ready`; `new_since` has `format: date` and a pattern. The W2-128 guard case passes. |\n| F1 | pass | Same as S1. |\n| F2 | pass | Advisory items only warn. A missing `kpis` now refuses (F4 closed). |\n| F3 | pass | The tree is unchanged after my runs. The extra raw read is of ticket files only. F12 is a row. |\n\n",
+      "tokens": 283
+    },
+    {
+      "id": "24372c7e5f1b82e29567a270",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/APPROACH.md",
+      "text": "## The problem in four sentences\n\n`gov brief` refuses any ticket whose KPI lines have no `Verify:` clause. The code is\n`src/gov/brief/build.py`: `ready_check` (line 163) raises `KPI_NO_VERIFY` for each such line, and nothing else\nin `src/` calls the ready check. A repository that is adopted will bring tickets from its own tracker, written\nbefore adoption, with no such clauses, so no brief could be built there. DEC-1083 says a ticket's readiness is\ncomputed by code, and DEC-1130 (2) asks for the fix to land before EXAMIN's copy (W2-27, `DAEO-h4rh`).\n\n",
+      "tokens": 139
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "# .claude/skills/adopt/SKILL.md out of the paths: generated from the kernel skill by the copies ACT (as in W2-88)\n- tests/unit/adopt/test_w2_174*\nreads:\n- src/gov/brief/build.py\n- src/gov/adopt/**\n- template/governance/kernel/templates/ticket.md\n- template/governance/kernel/schemas/ticket.schema.json\n- tests/acceptance/W2-152/**\nneeds:\n- src/gov/brief/build.py       # kpi_rows and the KPI_NO_VERIFY check finished (W2-152)\n- src/gov/adopt/command.py     # W2-88's and W2-23's finished state\n- template/governance/kernel/skills/adopt/SKILL.md\nwaits_on:\n- ref: DAEO-o5x1\n  reason: the tool reads KPI lines with W2-152's kpi_rows, so the list and the check agree\n- ref: DAEO-2bdu\n  reason: it holds the adopt command and skill files this ticket adds a flag and a step to\nest_loc: 180\nkpis:\n  success:\n  - line: \"`gov adopt --verify-list --root <repo>` prints, for each open or in-progress ticket in `<repo>/.tickets/` that has a KPI line with no verify, the ticket id and the labels of those lines (S<n>, F<n>), read with `kpi_rows`; it prints `none` and exits 0 when no ticket lacks one [DEC-1130, DEC-1083]\"\n",
+      "tokens": 278
+    },
+    {
+      "id": "DAEO-xxxx",
+      "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md",
+      "text": "# W2-174 An adopted repository's tickets get their Verify clauses by a checked pass\n\n**Problem.** `gov brief` refuses a ticket whose KPI lines have no `Verify:` (`ready_check`, `src/gov/brief/build.py`\nline 163, `KPI_NO_VERIFY`). A repository adopted by Gov OS brings tickets written before adoption, so no brief can\nbe built there, and W2-27 (EXAMIN's copy) would stop at its first ticket. DEC-1130 (2) asks for a ticket that lands\nfirst. The approach, with the options (c) the acceptance folder, (d) the pass, (e) combinations, and the costs, is\n`.gov-runtime/scratch/orchestrator/drafts/adopt-verify/APPROACH.md`.\n\n**Approach (if known).** Option (d): a pass for the tickets about to launch. The ready check stays unchanged, so\nDEC-1083 holds for every ticket. A product-spec session writes the clauses; the tool lists what is missing, checks\nthe answers and applies them by editing the lines' text only (no YAML dump, which would lose comments), then marks\nthe ticket. (c) was set aside: the acceptance folder is written by the test designer after the first brief, so\nthere is nothing to read for that role, and a folder-level check is coarser than a line-level one.\n\n**Interface.**\n",
+      "tokens": 297
+    },
+    {
+      "id": "3b4c7ee1da95729392f2e684",
+      "path": "governance/project/orchestration/packages/DECIDED-NOT-DONE.md",
+      "text": "| 137 | DEC-1128 (4): set-up B dropped entirely: the sweep of every ticket, row, package and brief that still plans it (DEC-866) | NOT STARTED: with row 135's helper |\n| 138 | DEC-1128 (6): W2-170 to W2-173 and W2-88's lines landing before the first audit on 11-23 | CHECKING 11-11 |\n| 139 | `gov brief` refuses every ticket (KPI_NO_VERIFY) | DECIDED 11-11, DEC-1130 (1): the `Verify:` pass on unreviewed tickets (PREPARING); reviewed ones on hand-built briefs with the refusal recorded; DEC-1130 (2): a ticket for adopted tickets without `Verify:` (approach to the owner) |\n| 140 | W2-94 and W2-93's sets | DECIDED 11-11, DEC-1130 (3): the walled writer route; PREPARING the `evaluation_sets` ACT and the two writer briefs for the owner; **11-11 16:05:** ACT-EXAMIN-SETS-1 review round 1 **READY**, class (a), manifest `97d45565`, F1-F4 rows for the next bundle (`acts/ACT-EXAMIN-SETS-1/review.md`); next: the owner's yes and C1-C8; WAITS: no path-map ACT queued before ~21:17 UTC 11-12 (row 124) |\n",
+      "tokens": 250
+    },
+    {
+      "id": "1073babadc1813be27fca5fa",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md",
+      "text": "  - Read `build.py`, `command.py`, `__init__.py`, `cli/main.py`, `util/frontmatter.py`, the templates, `keys.yaml`, the facts and ticket schemas, and the acceptance README and S5 cases.\n  - Ran the tests. Re-ran the CTO's real run.\n  - Surveyed all open and in-progress tickets. Ran 28 robustness probes on throwaway fixture repos in my scratchpad.\n- **files_changed:** none in any tree (`git status --short` is empty). The only bytecode caches and `.gov-runtime` files in the tree are dated 21:29\u201321:30, before my first command (head committed 21:28:36). My own runs used `PYTHONDONTWRITEBYTECODE=1`.\n- **evidence:**\n  - Tests: 56/56 acceptance and 12/12 unit pass (details under tests).\n  - `gov brief engineer W2-153` refuses with `KPI_NO_VERIFY F1`, `KPI_NO_VERIFY F2` and `SIZE 3976 of 4000`. This matches the CTO's run.\n  - Survey scripts: `/tmp/gov-launch-independent-auditor-p35docyd/claude-1000/-home-usain-gov-os-worktrees-W2-152/e8ca5a80-1b51-4787-8e37-2b8fa176b5e1/scratchpad/survey.py`, `forms.py`, `robust.py`, `deps.py` and `leftover.py` in that same folder.\n  - Scratch use: 4.2M and 1,004 inodes.\n- **tests:**\n",
+      "tokens": 282
+    },
+    {
+      "id": "531adf799b8c636d61b535d6",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md",
+      "text": "- `\"soon\"`, `\"2026-13-45\"` and `20261110` all give `READY_NEW_SINCE_NOT_DATE`.\n- An unquoted YAML date and a timestamp are accepted.\n\n**F4 is closed.** `kpis` missing, a list, or a string, and `success` empty or missing, all give `KPI_NO_VERIFY kpis`. A `{line, verify: ''}` item gives `KPI_NO_VERIFY S1`.\n\n**F6 is closed.** An unclosed block, a quoting slip in the title (by tk id and by W2 id), and front matter that is a list all give `TICKET_UNREADABLE <ref>: front matter unclosed|not_yaml|not_mapping` alone, with no `ALLOWED_PATHS_EMPTY`.\n\n**F5 is closed** for each case round 1 named:\n- A ticket that is not UTF-8 gives `TICKET_UNREADABLE \u2026 not UTF-8`, by tk id and by W2 id.\n- Another such ticket in `.tickets/` no longer breaks a lookup by W2 id (exit 0).\n- facts.yaml with bad YAML or not UTF-8 gives `BRIEF_FACTS_UNREADABLE`.\n- `keys.yaml` with bad YAML, a role template that is not UTF-8, and a `--part` or `--repair` file that is not UTF-8 all give `BRIEF_FILE_UNREADABLE`.\n- None of these prints a traceback, and a refusal prints 0 bytes on stdout.\n- CRLF line endings are read fine.\n- A dependency on an unreadable ticket gives `DEPENDS_NOT_CLOSED`.\n",
+      "tokens": 292
+    },
+    {
+      "id": "573710660f2e2c29ef2f683f",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md",
+      "text": "  2. A directory named `*.md` (or a ticket file that cannot be opened) in `.tickets/` still crashes a lookup by W2 id with a traceback. The cause is `_w2_of_unreadable` at `build.py:81`, which reads outside any `try`. This is F13, a row.\n  3. A ticket that starts with a byte-order mark (BOM) is read as having no front matter. It is refused under the wrong names, `ALLOWED_PATHS_EMPTY` and `KPI_NO_VERIFY kpis`. This is F14, a row.\n  4. A ticket with no `created` field is never held to the dependency fields. The evidence file records this as a choice. This is F15, a row.\n- **risks:** Once W2-56 closes, every `gov brief lead \u2026` refuses with `UNTIL_CLOSED W2-56` until W2-128's `role-lead.md:27` is edited. That is S5 working as intended; whoever closes W2-56 should know it is coming.\n- **lessons:** Revision 2's plant in the lead's common part is what makes F1 testable. My probes confirm the code is general, not fitted to that one spot: plants in front matter, in the end of each worker template, and in three sections outside the run block were all refused.\n- **proposed_decisions:** none. F2 was decided by the CTO as option (a); F7\u2013F12 stay rows.\n- **unresolved:** none.\n",
+      "tokens": 296
+    }
+  ],
+  "supplementary_query": "An adopted repository's tickets get their Verify clauses by a checked pass, so gov brief builds their briefs (a list and an apply tool, the adopt skill's step, a marker)\n{'line': '`gov adopt --verify-list --root <repo>` prints, for each open or in-progress ticket in `<repo>/.tickets/` that has a KPI line with no verify, the ticket id and the labels of those lines (S<n>, F<n>), read with `kpi_rows`; it prints `none` and exits 0 when no ticket lacks one [DEC-1130, DEC-1083]', 'verify': \"tests/unit/adopt/test_w2_174_list.py: a fixture repository with three tickets (all lines verified, two lines missing, a closed ticket with a missing line) gives exactly the second ticket's two labels; the all-verified fixture prints `none`\"}\n{'line': '`gov adopt --verify-apply <answers-file> --root <repo>` appends ` Verify: <clause>` to each named KPI line of each named ticket, the form `gov brief` already reads, and adds one front-matter line `verify_pass: <date> <session>`; every other byte of the ticket file is unchanged, comments and key order included [DEC-1130, DEC-1050]', 'verify': 'tests/unit/adopt/test_w2_174_apply.py: a fixture ticket with YAML comments and a block of five lines; after apply, a byte diff shows only the appended clauses and the one added line'}\n{'line': 'After an apply, `ready_check` of that ticket returns no `KPI_NO_VERIFY` finding, and `gov brief engineer <ticket>` builds its brief on the fixture repository [DEC-1083, DEC-1130]', 'verify': \"tests/unit/adopt/test_w2_174_ready.py: calls `gov.brief.build.ready_check` on the applied fixture and finds none; runs `gov brief engineer` on the fixture and gets exit 0 (the fixture carries its own `governance/project/facts.yaml` with every command filled, as an adopted project's CTO fills it after the defaults; DEC-1148 (2))\"}\n{'line': 'The answers file is checked by code before anything is written: every named ticket exists and is not closed, every named label exists on it, every line still lacking a verify is answered, and each clause is text of its own (not empty, not only TBD, TODO, n/a or none) [DEC-1130, DEC-1083]', 'verify': 'tests/unit/adopt/test_w2_174_checks.py: one case per refusal (unknown ticket, closed ticket, unknown label, an unanswered line, an empty clause, a `TBD` clause), each refused with a named code and nothing written'}\n{'line': \"`gov adopt` writes `governance/project/facts.yaml` when the repository has none: it validates against `template/governance/kernel/schemas/facts.schema.json`, `ready.new_since` is the adoption's UTC date as a quoted ISO string, and every other key holds a product default (gov commands only, nothing of this repository); a command with no product equivalent (`lead_verify`, and `wait_for` until `gov wait` lands) is written as a named placeholder that `gov brief` refuses by name; an existing facts file is left byte for byte [DEC-1148 (2), DEC-1147, DEC-1088 (3)]\", 'verify': \"tests/unit/adopt/test_w2_174_facts.py: a fixture repository without a facts file has, after the adoption step, a file that validates against the kernel schema and carries ready.new_since equal to the step's date, and `gov brief` there no longer answers BRIEF_FACTS_MISSING (it names the placeholder commands instead); a fixture with its own facts file keeps it byte-identical\"}\n{'line': 'The apply never writes anything if one entry is refused (all or nothing), never edits a ticket the answers file does not name, never edits a closed ticket, and never marks a ticket `verify_pass` while one of its lines still has no verify [DEC-1130]', 'verify': 'tests/unit/adopt/test_w2_174_checks.py: a file with nine good entries and one bad one leaves the whole tree byte-identical; a ticket with one line unanswered is refused and unmarked'}\n{'line': 'The pass never changes `gov brief`, the ready check or the ticket template and schema: a ticket is READY by the same code whether adopted or written here [DEC-1083, DEC-1121, DEC-1122]', 'verify': \"the close's diff against the base names no file under `src/gov/brief/`, `template/governance/kernel/templates/` or `template/governance/kernel/schemas/`; `tests/acceptance/W2-152` still passes unchanged\"}\n{'line': 'The tool never reads or writes outside `<repo>/.tickets/` and the answers file it is given, and never calls a model or the network [DEC-1130]', 'verify': 'tests/unit/adopt/test_w2_174_scope.py: a fixture repository with a decoy file outside `.tickets/` is byte-identical after list and apply; the module imports no network or model package'}",
+  "further_batch": [
+    {
+      "id": "b1dc78ca202d108c36f44be6",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+    },
+    {
+      "id": "d13ebc47e53d5a3a25f38e98",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+    },
+    {
+      "id": "d5c21fcdeff8d18a819dcdff",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+    },
+    {
+      "id": "f3cc63e0b7a3fdeb69c9be22",
+      "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+    },
+    {
+      "id": "3a3c75ddcdfd1b169a7cd859",
+      "path": "src/gov/brief/build.py"
+    },
+    {
+      "id": "5bba9afa03b00ea8ec30dd90",
+      "path": "tests/acceptance/W2-152/README.md"
+    },
+    {
+      "id": "e2fa062f7d689f96ae05a292",
+      "path": "tests/acceptance/W2-152/test_w2_152_ready.py"
+    },
+    {
+      "id": "117aea5e5f86428ee3430f25",
+      "path": "tests/acceptance/W2-152/test_w2_152_refusals.py"
+    }
+  ],
+  "supplementary_batches": [
+    {
+      "items": [
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "W2-152-CIT-P",
+          "path": "docs/changes/W2-152-CIT-P.md"
+        },
+        {
+          "id": "a76067335f26477e7ef28876",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "3eed9becf83636613dd9ee44",
+          "path": "src/gov/brief/build.py"
+        },
+        {
+          "id": "4d4cd470d6cbabdb22e72933",
+          "path": "docs/changes/W2-152-evidence.md"
+        },
+        {
+          "id": "191702fb8ce3a7b61519c0f5",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "4149f7942baae7172f3e2bb5",
+          "path": "docs/changes/W2-152-evidence.md"
+        },
+        {
+          "id": "49afbe0183e5a6a144e71743",
+          "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md"
+        },
+        {
+          "id": "c0ff704a047c70e047cda19a",
+          "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md"
+        },
+        {
+          "id": "c188ac688a33bbcbbd7fa1b9",
+          "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md"
+        },
+        {
+          "id": "c5abdfef3816ced3b4c40792",
+          "path": "docs/probes/DAEO-o5x1/PR-DAEO-o5x1.md"
+        },
+        {
+          "id": "24372c7e5f1b82e29567a270",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/APPROACH.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "DAEO-xxxx",
+          "path": "governance/project/orchestration/packages/ADOPT-VERIFY-1/TICKET-DRAFT.md"
+        },
+        {
+          "id": "3b4c7ee1da95729392f2e684",
+          "path": "governance/project/orchestration/packages/DECIDED-NOT-DONE.md"
+        },
+        {
+          "id": "1073babadc1813be27fca5fa",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "531adf799b8c636d61b535d6",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "573710660f2e2c29ef2f683f",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "b1dc78ca202d108c36f44be6",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "d13ebc47e53d5a3a25f38e98",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "d5c21fcdeff8d18a819dcdff",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "f3cc63e0b7a3fdeb69c9be22",
+          "path": "governance/project/orchestration/reviews/w2-152-r1.md"
+        },
+        {
+          "id": "3a3c75ddcdfd1b169a7cd859",
+          "path": "src/gov/brief/build.py"
+        },
+        {
+          "id": "5bba9afa03b00ea8ec30dd90",
+          "path": "tests/acceptance/W2-152/README.md"
+        },
+        {
+          "id": "e2fa062f7d689f96ae05a292",
+          "path": "tests/acceptance/W2-152/test_w2_152_ready.py"
+        },
+        {
+          "id": "117aea5e5f86428ee3430f25",
+          "path": "tests/acceptance/W2-152/test_w2_152_refusals.py"
+        }
+      ],
+      "limit": 10
+    }
+  ],
+  "dropped": [
+    {
+      "id": "117aea5e5f86428ee3430f25",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "3a3c75ddcdfd1b169a7cd859",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "5bba9afa03b00ea8ec30dd90",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "b1dc78ca202d108c36f44be6",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "d13ebc47e53d5a3a25f38e98",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "d5c21fcdeff8d18a819dcdff",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "e2fa062f7d689f96ae05a292",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "f3cc63e0b7a3fdeb69c9be22",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "role_filter",
+      "reason": "withheld from independent-test-designer (ticket DAEO-zmo4): 0 paths, 0 chunks; none matched (DEC-1065 (2))"
+    }
+  ],
+  "tokens": 29773,
+  "budget": {
+    "limit": 30000,
+    "used": 29773
+  },
+  "hash": "e5a2b1ceb100a8cd4ff51f391b05d48bac89817f435ca89c2893e355263feba8"
+}

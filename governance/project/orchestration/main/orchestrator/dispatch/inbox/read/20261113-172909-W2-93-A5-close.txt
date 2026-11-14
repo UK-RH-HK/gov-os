@@ -1,0 +1,8 @@
+log: W2-93-A5-close.json
+W2: W2-93
+status: DONE. The head to land is `206d2b47d7f5ad26d5eb6dab4b69794eb5431c64`. The scoped verification has one red that is not this ticket's: the base already had it, and the fix is on w2/integrate (see risks).
+
+task: DAEO-6y0x (W2-93), build run
+status: DONE. The head to land is `206d2b47d7f5ad26d5eb6dab4b69794eb5431c64`. The scoped verification has one red that is not this ticket's: the base already had it, and the fix is on w2/integrate (see risks).
+work_completed:
+- **The validator.** `fixtures/evaluation/adoption-proving-ground/validate_hidden.py` is new, written by an independent test designer (S5). It takes `--sets-root <root>` and reads `<root>/fixtures/evaluation/adoption-proving-ground/hidden/`. It builds a copy with W2-81's own builder, hidden variants included, in a temporary folder under 

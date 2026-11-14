@@ -1,0 +1,68 @@
+task: DAEO-6n5k (W2-37), a narrow independent check of 7bde87727b0f..9f4878987 against DEC-812 item 6 (P-7 (a))
+status: done. The check passes, with one recorded row that does not block (N1).
+work_completed: Step 0 sandbox check passed: (a) writing `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k` failed with `OSError: [Errno 30] Read-only file system` and no file exists; (b) `git hash-object -w --stdin` returned 1ae28402a…, exit 0, and `git update-index --refresh` exited 0. The `ps` check for ollama or llama-server shows nothing. Identity matches: `independent-auditor` / `DAEO-6n5k`, toplevel `/home/usain/gov-os-worktrees/W2-37`, branch `w2/W2-37`, HEAD `9f4878987af8…`. I ran checks 1 to 5 below.
+files_changed: none. `git status --porcelain` is empty at the end; pytest ran with PYTHONDONTWRITEBYTECODE=1 and `-p no:cacheprovider`.
+evidence: the diffs, trailers and test output are quoted in the narrow check below.
+tests: 454 passed in 181.92s, exit 0. The run covered W1-07 recorded_commands, W1-32, W1-26 recorded_commands, tests/unit/check and tests/unit/optin/test_optin_lifted.py, with `--optin=breadth` through heavy_slot.sh after a slot wait. The `[impact]` cases were collected and ran: W1-07 `…answers_its_help[impact]`, W1-26 `…names_it[impact]` and `…skill_may_name_a_recorded_gov_command[impact]`. The launch brief's real-model exclusion (`-m "not local_only" -k …`) was not added, because the lead's brief gave the exact command; none of these files starts a model.
+discoveries: (1) heavy_slot.sh could not append to `…/orchestrator/log/heavy-slot-waits.jsonl` (read-only in this sandbox). This is harmless: the slot wait and the run still worked. (2) W1-32's `test_the_command_set_is_the_twelve_and_the_three_recorded_ones` has the same kind of stale name. It predates this change and is outside DEC-812 item 6's rename, so I recorded no finding.
+risks: none
+lessons: when a rule renames a test function, the opt-in lists that name the function must be in the same ticket's paths. Otherwise the rename cannot land.
+proposed_decisions: none
+unresolved: the count case is renamed only once `tests/optin-lifted-breadth.txt:42` can change in the same commit (N1).
+recommended_next_action: land on this check. Record N1 as a row, and do the rename together with line 42 of the opt-in list in whatever change holds that list's path (for example a CTO path case under DEC-1156 (7)). It needs no round.
+
+## Narrow check: P-7 (a), DEC-812 item 6
+
+The rule's status: DEC-812 is DONE (owner, DEC-1098 (3)). Nothing in the register supersedes item 6 (searched for `DEC-812 item 6` and `supersed.*DEC-812`).
+
+1. **Sound: the diff.**
+   - Command: `git diff 7bde87727b0f 9f4878987 -- src/gov/check/commands.py tests/conftest.py tests/acceptance/W1-07 tests/acceptance/W1-32`
+   - `commands.py` gains one line, `RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)` with a comment. No other command and no other line changed.
+   - `conftest.py`: `_CBM_SUITES` gains `"W2-37"` only.
+   - `w1_07_support.py` gains a comment and `+ ("impact",)`.
+   - The count case's sorted list gains `"impact"`. Its other changes are comments and a docstring paragraph.
+   - W1-32's first assert gains `"impact"`.
+   - The README adds one revision paragraph.
+   - Nothing is weakened. W1-32's other changes in that range (`RECORDED_HERE`, `- set(RECORDED_HERE)`) came from W2-182 (6e3697785, `Task: DAEO-5y8d`, `Rewrite-Reason: DEC-1163 (6)`) through the integrate merge. They are not part of this change.
+   - The merge f141d6366 has parents 7bde87727 and 730477098. `git diff --stat 730477098 f141d6366 -- <six files>` is empty, and 6e3697785 is an ancestor of 730477098. So the merge holds these files exactly as w2/integrate held them.
+   - `git diff --stat f141d6366 9f4878987` shows only the six files, 23 insertions and 3 deletions.
+
+2. **Sound: trailers and paths.**
+   - 5915e5c9a: `Task: DAEO-6n5k`, `Role: engineer`, `Implements: CAP-33.g, DEC-167`. It touches commands.py and conftest.py.
+   - df75fbd10: `Task: DAEO-6n5k`, `Role: independent-test-designer`, `Implements: CAP-33.g, DEC-167`, `Rewrite-Reason: DEC-812 item 6, P-7 (a)`. It touches the three W1-07 files and the W1-32 file.
+   - 9f4878987, the lead's merge: `Task: DAEO-6n5k`, `Role: orchestrator`.
+   - Every `Implements:` id is in the ticket's `sources:` (CAP-33.b, CAP-33.g, DEC-167, DEC-1083).
+   - All six files are in the ticket's `allowed_paths` (lines 26 to 31 of DAEO-6n5k.md).
+
+3. **Sound: the tests.** Command:
+   ```
+   heavy_slot.sh python3 -m pytest tests/acceptance/W1-07/test_w1_07_recorded_commands.py tests/acceptance/W1-32 tests/acceptance/W1-26/test_w1_26_recorded_commands.py tests/unit/check tests/unit/optin/test_optin_lifted.py -q -p no:cacheprovider -o tmp_path_retention_policy=failed --optin=breadth -rfs
+   ```
+   Output: `454 passed in 181.92s`, exit 0. A collect-only run confirms the three `[impact]` cases and both count cases are selected.
+
+4. **The reason is true; the departure is N1, a row.**
+   - `tests/optin-lifted-breadth.txt:42` names `test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve  # cap`.
+   - `tests/unit/optin/test_optin_lifted.py:178` (`test_every_entry_of_the_real_lists_names_a_test_path_or_function_that_exists`) parses each listed file with `ast` and fails with "(no such function)" on a missing name.
+   - That list is not in the ticket's `allowed_paths`. Renaming the case alone would turn the opt-in test red, so it would fail closed. Leaving the old name is the only green choice inside this ticket's paths.
+
+5. **Sound: anything else.**
+   - Adding `impact` to `GOV_COMMANDS` makes `check()` require `src/gov/impact/command.py`, which exists.
+   - It also lets skills name `gov impact`, which the change skill (SKILL.md:48) already does. That is the intended effect of P-7 (a).
+   - The three `RECORDED_GOV_COMMANDS` lists (commands.py, W1-07's support, W1-32's first assert) agree on `impact`.
+
+**Finding N1: the count case is not renamed.**
+- Setup: DEC-812 item 6 says "its count test renamed".
+- Fault: `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` keeps its name while it now pins ten commands. The comment in the case and the README paragraph both state why.
+- What should happen: rename it in the same change as `tests/optin-lifted-breadth.txt:42`.
+- Scope: in, because it is the text of DEC-812 item 6.
+- Ordinary work: yes, because any reader of the suite sees a name that says "four" over an assertion of ten.
+- Consequence: other. The case still pins the exact ten, so nothing fails open and no work is lost. A rename without the list line would fail closed.
+- What would reverse it: an owner or CTO reading that DEC-812 item 6's rename is satisfied or waived, or the rename landing with the list line.
+
+Classification (DEC-809): N1 is in scope, ordinary work yes, consequence other, so it is a row and not a round.
+
+**Judgement: pass.**
+
+```verdict
+{"kpis": [{"kpi": "w2-37-p7a-dec812-6", "verdict": "pass", "findings": [{"id": "N1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}], "reviewer": "independent-auditor, fresh read-only session; not the author"}
+```

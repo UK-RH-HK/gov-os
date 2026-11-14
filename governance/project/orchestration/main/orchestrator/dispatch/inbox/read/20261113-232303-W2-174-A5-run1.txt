@@ -1,0 +1,9 @@
+log: W2-174-A5-run1.json
+W2: W2-174
+status: DONE. Head to land: `d5922ed34d9cb2aee1b2b7b5893663368f4f5dc4`. The code was verified at `7920da077ac2`; the one commit after it adds only `docs/probes/DAEO-zmo4/PR-DAEO-zmo4.md`.
+
+task: DAEO-zmo4 (W2-174), build run 1
+status: DONE. Head to land: `d5922ed34d9cb2aee1b2b7b5893663368f4f5dc4`. The code was verified at `7920da077ac2`; the one commit after it adds only `docs/probes/DAEO-zmo4/PR-DAEO-zmo4.md`.
+work_completed:
+- A test designer (td-1) and an engineer (en-1) ran in parallel from briefs that each carried the same nine interface decisions (L1–L9, in `briefs/interface.md`). DEC-1157 lets a lead state these rather than stop on them.
+- The test designer wrote 94 acceptance cases under `tests/acceptance/W2-174/`. All were red on the base except the two F2 cases. A plan

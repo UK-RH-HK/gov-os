@@ -1,0 +1,27 @@
+Preparing worktree (detached HEAD 0a693c61a)
+HEAD is now at 0a693c61a Merge w2/W2-93-tests (DAEO-6y0x): W2-93's acceptance tests, form only on planted stand-ins (batch 2: forbidden optional, the README map readable)
+.                                                                        [100%]
+1 passed in 4.35s
+with-fix exit 0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+
+here = (1, [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-98-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-98-CIT-P.md'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/changes/W2-98-CIT-P.md', 'message': "docs/changes/W2-98-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}]
+E       assert [{'code': 'SC...98-CIT-P.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/changes/W2-98-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/changes/W2-98-CIT-P.md'}
+E         Use -v to get more diff
+
+/tmp/w2-93-lead/probe-tree/tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED ../../../../tmp/w2-93-lead/probe-tree/tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+1 failed in 4.49s
+head-as-is exit 1
+done

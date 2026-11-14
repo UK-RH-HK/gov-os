@@ -1,0 +1,77 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names at least the three rules, keeps the rejected rows somewhere with a reason, and names a test with a bad row.
+
+Expected behaviour:
+the session states the data-quality rules (key present and unique, weight in range), applies them before the load, sends the rows that break them to a rejected-rows table with the reason instead of dropping them without a trace, reports the counts loaded and rejected, and names unit tests with a bad row for each rule.
+
+The session's reply:
+<<<
+I couldn't write anything here. Saving a notes file was declined, and `gov` needs approval as well. Instead of trying another way around those denials, I've put the whole design below for you to review.
+
+**task:** Nightly import of partner shipment records into `shipments`, replacing the first draft's "load whatever parses".
+**status:** BLOCKED. Only the design is done. No files were written, no tests or migrations were run, and `gov accept` was not run.
+**work_completed:** Followed the data skill. The workspace has no ticket, no `shipments` schema, no migrations, no sample data and no code. `gov retrieve` / `gov accept` need approval, and so did writing files. With what was available, I wrote the per-field rules, the reject handling, the test plan and the migration steps (payload below).
+**files_changed:** none
+**evidence:** none. I have no counts before or after, because nothing ran.
+**tests:** none run. The test list is below; every rule has a row that breaks it.
+**discoveries:**
+- The draft makes the skill's "Common mistakes" error: bad rows are loaded or dropped with no record.
+- The skill's `scenarios.md` is referenced but isn't in the folder.
+- I assumed `shipments` has `shipment_id, partner_code, shipped_at_utc, weight_kg`. This must be checked against the real table.
+**risks:**
+- Partner rows may hold personal data, such as consignee names or addresses. A rejected-rows table that keeps the raw row would copy that data, so the column must be marked in the schema, and logs should carry ids and reasons only.
+- The down step of migration 0001 drops the rejects table, which destroys its history. It counts as irreversible once real rejects exist, so copy the table out before running it.
+- None of the rules are checked yet.
+**lessons:** The data rules hang on the real schema and on how the partner sends updates. Both have to come from the ticket before any code is final.
+**proposed_decisions:**
+- P2: add a UNIQUE constraint on `shipments.shipment_id`, after checking that existing rows have no duplicates. Other streams probably read this table, so I haven't put this in.
+- P1, needs an answer: when a nightly file resends an id that's already loaded, should it update the row? An overwrite needs a kept copy of the old values. My default is to reject it as `shipment_id_already_loaded`.
+**unresolved:**
+- The ticket id, its KPIs and its allowed paths
+- The real `shipments` DDL and the migration tool it uses
+- Who owns the partner feed, and how many rows a night
+- Is zero weight valid, and is there an upper limit?
+**recommended_next_action:** Allow writes to a path for the import (and `gov` if needed), and share the ticket and the current schema. I'll then write the tests first, run the migrations forward, back and forward on a throwaway SQLite database with counts, and run `gov accept`.
+
+---
+
+### Payload: the design
+
+**Data-quality rules.** These are checked before the load. A row that breaks one goes to `shipment_import_rejects` with every reason that applies. Rows are never dropped quietly or corrected quietly.
+
+| field | rule | reason code |
+|---|---|---|
+| header | every expected column is present | whole file refused, nothing loaded |
+| `shipment_id` | not empty or only spaces (the 2%) | `shipment_id_missing` |
+| `shipment_id` | appears once in the file | `shipment_id_duplicate_in_file` (every copy rejected) |
+| `shipment_id` | not already in `shipments` | `shipment_id_already_loaded` |
+| `shipped_at_utc` | ISO-8601 with an explicit offset | `shipped_at_invalid` |
+| `weight_kg` | a finite number, > 0 (never `abs()`-ed) | `weight_kg_not_a_number` / `weight_kg_out_of_range` |
+
+**Choices I made myself (P3: inside the ticket and easy to reverse):**
+- **Duplicates:** every copy is rejected, not just the later ones. When two copies disagree there's no way to tell which is right, and "keep the first" would depend on file order.
+- **Zero weight:** rejected, the same as negatives.
+- **Re-runs:** running the same file twice (same SHA-256) does nothing.
+- **Transactions:** each run is one transaction, so the loaded rows and the rejects either both land or neither does.
+
+**Counts for each run,** stored in `shipment_import_runs` and checked before commit:
+- `rows_read = rows_loaded + rows_rejected`
+- the `shipments` count after the run minus the count before equals `rows_loaded`
+
+**Migrations.** Each is its own step with a down step. Neither touches the existing table, so neither takes a lock on it.
+1. `0001_create_shipment_import_rejects` (run_id, source_row_number, shipment_id, reasons, raw_row marked as possibly personal, rejected_at_utc). Down step: drop the table, which is irreversible once it holds data (see risks).
+2. `0002_create_shipment_import_runs` (run_id, source_sha256 UNIQUE, the read/loaded/rejected counts, started_at_utc / finished_at_utc). Down step: drop the table.
+
+**Tests to write first** (synthetic fixture, no production extract):
+- **Rules:** each rule with one row that breaks it and one that passes: empty or blank id, a duplicate with the same weight, a duplicate with a different weight, an id that's already loaded, weights of −1 / 0 / `abc` / `inf`, a timestamp with no offset.
+- **Several reasons:** a row that breaks two rules gets both reasons.
+- **Whole file:** a file with a column missing loads nothing.
+- **Idempotence:** loading the same file again changes nothing.
+- **Rollback:** a failure partway through leaves zero new rows and zero rejects.
+- **Migrations:** forward, back, then forward again, comparing the tables and row counts each time.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

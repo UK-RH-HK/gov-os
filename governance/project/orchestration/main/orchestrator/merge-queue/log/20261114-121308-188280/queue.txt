@@ -1,0 +1,9 @@
+2026-11-14 12:13:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-14 12:13:08 merged W2-88b onto c451c21801b0: 92019d882ed6
+2026-11-14 12:28:02 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-14 12:28:08 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-14 12:28:11 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-14 12:28:12 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-14 12:28:12 ADVANCED refs/heads/w2/integrate c451c21801b0 -> 92019d882ed6; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/92019d882ed6.json
+2026-11-14 12:28:12 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-14 12:29:08 integration store promoted: the merged clone's stores at 92019d882ed6 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

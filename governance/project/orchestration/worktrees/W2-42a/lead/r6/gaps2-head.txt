@@ -1,0 +1,21 @@
+allow      "while read -r f; do $f; done <<< 'touch tests/acceptance/X/zz.py'"    
+allow      "while read -r f; do $f; done <<< 'touch src/ok.py'"                   
+allow      "while read -r a b; do $a $b; done <<< 'touch tests/acceptance/X/zz.py'" 
+allow      "while read -r a b; do $a $b; done <<< 'touch src/ok.py'"              
+allow      "read -r a b <<< 'touch tests/acceptance/X/zz.py'; $a $b"              
+allow      "read -r a b <<< 'touch src/ok.py'; $a $b"                             
+allow      'read -r a b <<< "$v"; $a $b'                                          
+allow      'while read -r l; do ${l}; done <<< "$v"'                              
+allow      'while read -r f; do env $f; done <<< "$v"'                            
+deny       'while read -r f; do . "$f"; done <<< "$v"'                            Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'while read -r f; do xargs touch; done <<< "$v"'                       Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+allow      'mapfile -tC \'touch tests/acceptance/X/zz.py\' -c1 L <<< "$v"'        
+allow      'mapfile -tC \'touch src/ok.py\' -c1 L <<< "$v"'                       
+allow      'mapfile -C cb L <<< "$v"'                                             
+allow      'mapfile -t -C "$cb" L <<< "$v"'                                       
+allow      "mapfile -C 'touch tests/acceptance/X/zz.py' L < x.py"                 
+allow      "mapfile -C 'touch src/ok.py' L < x.py"                                
+allow      'read -r a <<< "$v"; $a'                                               
+allow      'while read -r f; do "$f" x; done <<< "$v"'                            
+allow      'while read -r f; do time $f; done <<< "$v"'                           
+allow      'while read -r f; do command $f; done <<< "$v"'                        

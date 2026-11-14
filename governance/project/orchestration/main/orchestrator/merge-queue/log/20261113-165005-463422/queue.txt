@@ -1,0 +1,8 @@
+2026-11-13 16:50:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 16:50:05 merged W2-153 onto dff6e46615b5: 8865f016fea9
+2026-11-13 17:05:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 17:05:30 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 17:05:32 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 17:05:33 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 17:05:33 ADVANCED refs/heads/w2/integrate dff6e46615b5 -> 8865f016fea9; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/8865f016fea9.json
+2026-11-13 17:05:33 integration store not promoted: a refresh holds the integration store's lock; its normal refresh runs apart

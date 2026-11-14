@@ -1,0 +1,8 @@
+manifest sha256: 199dd123fb0edf3ab699c476d6fb2cc2280a1ecfd966ae21e599be7f2328ed26
+validate_manifest: pass
+check_act: pass
+path_rule: pass
+hash mismatches: [] ; unnamed on disk: []
+act_class (the live table): class O; rows ['rulesync-other', 'unknown']; hits []
+act_class (ACT-CLASS-RULES-AGENTS-1's after table): class b; rows ['agent-instructions', 'rulesync-other']; hits []
+register (G2): DEC-1167 ACCEPTED; DEC-1173 ACCEPTED; DEC-953 ACCEPTED; DEC-1128 ACCEPTED; DEC-820 ACCEPTED

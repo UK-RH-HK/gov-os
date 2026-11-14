@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-174
+status: interim result d5922ed34: W2-174 (DAEO-zmo4): the probe record of the narrow independent check (pass at 7920da077ac2, 8/8 lines; 4 rows, none blocking: F1, F2 Wave 3, F3, F4 for W2-27)

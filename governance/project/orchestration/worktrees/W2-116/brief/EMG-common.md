@@ -35,13 +35,21 @@ hold for every one of them.
   at once and you keep going (the owner, DEC-1040 item 3):** an equivalent form (the Edit or Write tool for a file
   change, or a script file run by its path), never a form chosen to pass a true refusal; name it in your return.
   The guard misreads heredocs and `$(…)` loops today (W2-42a fixes it): prefer the Edit/Write tools for file edits.
+- **An engineer never searches into its own ticket's acceptance folder (DEC-1093 (2), until W2-141's guard lands):**
+  every Grep or Glob call that could reach it carries the exclusion `!tests/acceptance/<your ticket's W2 id>/**`, and
+  every recursive Bash search the matching one (`grep -r --exclude-dir=<your W2 id>`: grep matches the folder's BASE
+  NAME only, e.g. `--exclude-dir=W2-141`, never a path, which excludes nothing; `rg -g '!tests/acceptance/<id>/**'`,
+  `find … -path <that folder> -prune -o …`). If a search shows you any line from there anyway, stop reading it and
+  say so in your return.
 - **Under `.gov-runtime/`:** commit hashes written as 12 digits; row W2-L423's rule (write none of the keywords
   `tools/keyword_warn.py` looks for).
 - **Knowledge:** use `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "<question>"` for what you need to
   know about the codebase and the decisions (DEC-836, DEC-1087 (3)). A worktree has no store of its own (a plain
   `gov retrieve` there answers `STORE_MISSING`). The integration store holds integrate's head, so its line numbers are
   integrate's: read the file in your own worktree before relying on a line. Ask code questions by small, targeted
-  searches, never one giant query (DEC-859, DEC-860).
+  searches, never one giant query (DEC-859, DEC-860). **Search again once (DEC-1092 (1)):** if the bundle does not
+  answer, or you can tell your answer may be incomplete, search once more in your own, different words; then answer
+  from both bundles and the files you read, with path and lines, or say "not found". Two searches in all.
 - **Judgement (reviewers):** `governance/project/briefs/JUDGEMENT.md` word for word; each finding with
   `Ordinary work: yes|no, because ...` and `Consequence: fails open|loses work|other`, and the fenced `verdict` block.
 - **Scratch budget:** 20 GB and 1,000,000 files and folders outside the tracked tree; report `du -sh` and
@@ -50,4 +58,4 @@ hold for every one of them.
 - **Return:** the twelve fields first, as labelled lines: task, status, work_completed, files_changed, evidence,
   tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action; then any payload.
   Status DONE, PARTIAL or PACKAGES (a decision only the CTO or the owner can take, with your recommendation and
-  confidence). Refused twice for the same call: stop and say so; no third try.
+  confidence). Refused twice for the same call: stop and say so; no third try. It covers the same effect in another form: a session refused twice for an action does not reach it by another command, form, file or tool (DEC-1142 (9)). A reviewer's read-only probes are allowed at any hour, the quiet hours included (DEC-1144 (7)): write the script into your own `$TMPDIR` with Bash (`cat > "$TMPDIR/probe.py" <<'EOF' ... EOF`), never the Write tool (it asks for a path outside the worktree, and the quiet hours refuse that ask, DEC-991), and only read the repository; nothing under the evaluation sets.

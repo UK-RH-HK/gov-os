@@ -1,0 +1,93 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "head",
+   "before": "6f79e5ae9e72",
+   "after": "23a30c332f80"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W1-07"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W1-32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W2-104"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "head",
+   "before": "349341ab8f03",
+   "after": "894bd4934a49"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/test_w1_07_recorded_commands.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/test_w1_32_command_set.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-104/w2_104_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line added",
+   "line": "?? tests/unit/status/test_w2_116_integration_store.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-116/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "acceptance folder",
+   "folder": "W2-116"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a",
+   "change": "head",
+   "before": "547bf1030e8f",
+   "after": "f3a4461c1ece"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "head",
+   "before": "24dbc45d50eb",
+   "after": "547bf1030e8f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-46/w1_46_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  }
+ ]
+}

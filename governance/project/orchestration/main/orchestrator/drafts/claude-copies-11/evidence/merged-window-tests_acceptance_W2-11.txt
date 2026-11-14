@@ -1,0 +1,82 @@
+...........s............................................................ [ 33%]
+........................................................................ [ 66%]
+............................F.F......F.................................  [100%]
+=================================== FAILURES ===================================
+________ test_the_skill_carries_one_version_in_all_four_places[devops] _________
+
+name = 'devops'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/devops/SKILL.md'
+root = PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50/scratchpad/copies11-run/work/window-merged')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/devops/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[frontend] ________
+
+name = 'frontend'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/frontend/SKILL.md'
+root = PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50/scratchpad/copies11-run/work/window-merged')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/frontend/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+_________ test_the_skill_carries_one_version_in_all_four_places[ui-ux] _________
+
+name = 'ui-ux'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/ui-ux/SKILL.md'
+root = PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50/scratchpad/copies11-run/work/window-merged')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/ui-ux/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[devops]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[frontend]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[ui-ux]
+3 failed, 211 passed, 1 skipped in 5.57s
+heavy_slot: all 3 slots taken; waiting (2026-11-14 04:42:58)

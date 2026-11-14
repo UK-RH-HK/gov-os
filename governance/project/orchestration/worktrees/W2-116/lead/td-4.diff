@@ -1,0 +1,151 @@
+diff --git a/tests/acceptance/W2-131/test_w2_131_unchanged.py b/tests/acceptance/W2-131/test_w2_131_unchanged.py
+index 64ac82618..1dd62e830 100644
+--- a/tests/acceptance/W2-131/test_w2_131_unchanged.py
++++ b/tests/acceptance/W2-131/test_w2_131_unchanged.py
+@@ -25,6 +25,7 @@ FIELDS = ("evidence", "batches", "budget", "gaps", "continuation", "expansions",
+ 
+ 
+ STORE_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
++FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
+ 
+ 
+ def _payload(token):
+@@ -47,7 +48,7 @@ def _without_store(bundle):
+     if not bundle.get("continuation"):
+         return bundle
+     payload = _payload(bundle["continuation"])
+-    return {**bundle, "continuation": {key: value for key, value in payload.items() if key != STORE_KEY}}
++    return {**bundle, "continuation": {key: value for key, value in payload.items() if key not in (STORE_KEY, FOLDER_KEY)}}
+ 
+ 
+ def _account_for_the_store_key(now, before):
+diff --git a/tests/acceptance/W2-133/test_w2_133_unchanged.py b/tests/acceptance/W2-133/test_w2_133_unchanged.py
+index 3bb5c5205..285c025f0 100644
+--- a/tests/acceptance/W2-133/test_w2_133_unchanged.py
++++ b/tests/acceptance/W2-133/test_w2_133_unchanged.py
+@@ -46,6 +46,7 @@ def _evidence(bundle):
+ 
+ 
+ STORE_COMMIT_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
++FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
+ 
+ 
+ def _token(token):
+@@ -58,7 +59,7 @@ def _token(token):
+     except (TypeError, ValueError, binascii.Error) as error:
+         raise AssertionError(f"the continuation token {token!r} is not base64 of JSON: {error}") from error
+     assert isinstance(payload, dict), f"the continuation token decodes to {payload!r}, not an object"
+-    return {key: value for key, value in payload.items() if key != STORE_COMMIT_KEY}
++    return {key: value for key, value in payload.items() if key not in (STORE_COMMIT_KEY, FOLDER_KEY)}
+ 
+ 
+ def _comparable(bundle):
+diff --git a/tests/acceptance/W2-135/test_w2_135_unchanged.py b/tests/acceptance/W2-135/test_w2_135_unchanged.py
+index aadee4c18..abd3b1b20 100644
+--- a/tests/acceptance/W2-135/test_w2_135_unchanged.py
++++ b/tests/acceptance/W2-135/test_w2_135_unchanged.py
+@@ -32,6 +32,7 @@ APART = ("text", "cut")
+ 
+ 
+ STORE_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
++FOLDER_KEY = "f"  # R2-F3 / Q3 (a), DEC-1157 (12): the token also carries `f`, the folder (store half) it was made on
+ 
+ 
+ def _payload(token):
+@@ -45,11 +46,11 @@ def _payload(token):
+ 
+ 
+ def _without_store(bundle):
+-    """The bundle with its token decoded, without ``s`` (a bundle without a token stays as it is)."""
++    """The bundle with its token decoded, without ``s`` and ``f`` (a bundle without a token stays as it is)."""
+     if not bundle.get("continuation"):
+         return bundle
+     return {**bundle, "continuation": {key: value for key, value in _payload(bundle["continuation"]).items()
+-                                       if key != STORE_KEY}}
++                                       if key not in (STORE_KEY, FOLDER_KEY)}}
+ 
+ 
+ def _commit_of(bundle):
+diff --git a/tests/unit/retrieval/test_w2_131_register_ids.py b/tests/unit/retrieval/test_w2_131_register_ids.py
+index f755453ae..588bd0d18 100644
+--- a/tests/unit/retrieval/test_w2_131_register_ids.py
++++ b/tests/unit/retrieval/test_w2_131_register_ids.py
+@@ -164,11 +164,12 @@ def _before(monkeypatch):
+ 
+ 
+ def _without_s(token):
+-    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3)."""
++    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3) and its ``f`` key (the folder, R2-F3)."""
+     if token is None:
+         return None
+     payload = json.loads(base64.urlsafe_b64decode(token))
+     payload.pop("s", None)
++    payload.pop("f", None)  # R2-F3 / Q3 (a), DEC-1157 (12): the folder (store half) the token was made on
+     return payload
+ 
+ 
+diff --git a/tests/unit/retrieval/test_w2_133_gap_label.py b/tests/unit/retrieval/test_w2_133_gap_label.py
+index 24a0960fb..2c47b0d6a 100644
+--- a/tests/unit/retrieval/test_w2_133_gap_label.py
++++ b/tests/unit/retrieval/test_w2_133_gap_label.py
+@@ -145,11 +145,12 @@ def _before(monkeypatch):
+ 
+ 
+ def _without_s(token):
+-    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3)."""
++    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3) and its ``f`` key (the folder, R2-F3)."""
+     if token is None:
+         return None
+     payload = json.loads(base64.urlsafe_b64decode(token))
+     payload.pop("s", None)
++    payload.pop("f", None)  # R2-F3 / Q3 (a), DEC-1157 (12): the folder (store half) the token was made on
+     return payload
+ 
+ 
+diff --git a/tests/unit/retrieval/test_w2_135_item_cap.py b/tests/unit/retrieval/test_w2_135_item_cap.py
+index b932fb6ab..05f6a9b88 100644
+--- a/tests/unit/retrieval/test_w2_135_item_cap.py
++++ b/tests/unit/retrieval/test_w2_135_item_cap.py
+@@ -324,11 +324,12 @@ def _before(monkeypatch, seen):
+ 
+ 
+ def _without_s(token):
+-    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3)."""
++    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3) and its ``f`` key (the folder, R2-F3)."""
+     if token is None:
+         return None
+     payload = json.loads(base64.urlsafe_b64decode(token))
+     payload.pop("s", None)
++    payload.pop("f", None)  # R2-F3 / Q3 (a), DEC-1157 (12): the folder (store half) the token was made on
+     return payload
+ 
+ 
+diff --git a/tests/unit/status/test_status.py b/tests/unit/status/test_status.py
+index 79c177c9e..e66843282 100644
+--- a/tests/unit/status/test_status.py
++++ b/tests/unit/status/test_status.py
+@@ -25,7 +25,8 @@ from gov.status import command  # noqa: E402
+ 
+ ARGS = argparse.Namespace(json=True)
+ PARTS = ("tickets", "decision_packages", "readiness", "governance_share", "pause", "doctor",
+-         "reranker")  # W2-112: the shared reranker's fallbacks and refusals
++         "reranker",  # W2-112: the shared reranker's fallbacks and refusals
++         "integration_store")  # W2-116 S2: the integration store's head and age, after reranker
+ TICKET = "---\nid: {id}\ntype: task\nstatus: {status}\ndeps: []\nwbs_id: W9-01\n---\n# A ticket\n"
+ 
+ 
+@@ -169,10 +170,12 @@ def test_a_status_with_a_part_not_read_names_every_such_place(project, monkeypat
+ 
+     monkeypatch.setattr(doctor, "run", lambda *args: {"healthy": True, "tools": {"status": "unmeasured"}})
+     answer = command.run(project, ARGS, {})
+-    assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == []
++    assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == [
++        # W2-116 S2: a project whose rebuild.yaml names no integration_store has no integration store
++        "integration_store: governance/project/rebuild.yaml names no integration_store: there is no integration store"]
+     assert answer["doctor"]["parts"] == {"tools": "unmeasured"}
+     (project / store.STORE_REL).unlink()
+     answer = command.run(project, ARGS, {})
+     assert [place.split(":")[0] for place in answer["not_read"]] == ["tickets.ready", "tickets.blocked",
+-                                                                    "decision_packages"]
++                                                                    "decision_packages", "integration_store"]
+     assert answer["pause"]["paused"] is False and not (project / ".gov-runtime" / "store.db").exists()

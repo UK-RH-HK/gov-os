@@ -1,0 +1,6 @@
+You have one skill, "data", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+a STANDARD ticket asks for a `region` column that must be NOT NULL on the `accounts` table, which holds 40 million rows and is written to all day. The session's first draft is one migration: `ALTER TABLE accounts ADD COLUMN region text NOT NULL`.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

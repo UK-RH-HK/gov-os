@@ -1,0 +1,320 @@
+# W2-153 — the routed line from W2-33 (the generated role copies' three lines; a hand edit named as drifted), the independent test designer's brief (DAEO-8s85)
+
+You are a fresh independent test designer (class C2) working under **W2-153** (`.tickets/DAEO-8s85.md`, read-only in
+`/home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-8s85.md`). S1 to S5 are built, tested and merged. One KPI
+line is open, routed from W2-33 (its S7 copies and F1 drift, DEC-1156 (3)):
+
+> Routed from W2-33: the generated role copies carry each kernel role file's `Launch default`, `Launch by
+> criticality` and `Skills` lines unchanged, and a hand edit to a generated role copy is named as drifted by the
+> generation check. Verify: after the copies ACT, each generated role copy holds those lines byte-equal to its kernel
+> role file; a planted hand edit in one copy is named as drifted [DEC-315, DEC-957, DEC-1156 (3)]
+
+W2-33 is closed and the copies ACTs are applied (COPIES-6 `36d1a151b`, COPIES-8 `bb9dfca7a`), so these cases are
+expected green on this tree. They are the line's verify, not a build's driver.
+
+## The ground (read it yourself; search again once with Read/Grep if unsure)
+- Kernel role files: `template/governance/kernel/roles/*.md` (nine). Each carries `- **Launch default:** ...` and
+  `- **Skills:** ...`; only some carry `- **Launch by criticality:** ...`. A role file without a line has no case for
+  it (state that in the case's id or skip reason, never a silent pass).
+- Generated role copies: `.claude/agents/<role>.md` (rulesync's output), `.rulesync/subagents/<role>.md` and
+  `template/.rulesync/subagents/<role>.md` (composed sources, `gov.adapters.portability.compose`, S3 amended).
+- The generation check: `python3 -m gov.adapters.portability` run in a project root (`src/gov/adapters/portability.py`,
+  integrate's code, you may read it: DEC-963). A source that differs from `compose()` and a generated file that
+  differs from what rulesync makes from its sources (`GENERATED_DIFFERS`) are each a finding naming the file; exit 1.
+- W2-153's acceptance folder already builds a stand-in portability project (`tests/acceptance/W2-153/w2_153_support.py`,
+  `test_w2_153_portability.py`, a stand-in rulesync). Reuse it; do not duplicate it.
+
+## The cases (one new file, e.g. `tests/acceptance/W2-153/test_w2_153_routed.py`, plus support if needed)
+1. **Lines byte-equal, on this repository.** For each kernel role file and each of the three copy folders: every one
+   of the three lines the role file carries appears in the copy as the same bytes (a whole line). Parametrize so a
+   failure names the copy's file and the line's label.
+2. **A planted hand edit is named as drifted, in a stand-in.** In the stand-in project (a temporary folder, never this
+   repository's files): change one of the three lines in one generated copy (e.g. the `Launch default` line of
+   `.claude/agents/engineer.md`) and run the check; it exits non-zero and a finding names that file. Do the same for
+   a composed source (`.rulesync/subagents/engineer.md`). A control case: the unedited stand-in gives no finding naming
+   either file. Nothing in the repository's tree is written.
+3. **Map them in `tests/acceptance/W2-153/README.md`** (a short "Routed line" section: each case → the line's clause).
+4. Change no other assertion.
+
+## Where you work, rules, return
+- Worktree `/home/usain/gov-os-worktrees/W2-153-tests`, branch `w2/W2-153-tests`, at `9afc9e44d` (integrate merged).
+  Write only `tests/acceptance/W2-153/`.
+- Run the folder with an empty `HOME`, through the heavy slot, TMPDIR your sandbox's `$TMPDIR`:
+  `env HOME=<an empty folder under your $TMPDIR> PYTHONUSERBASE=/home/usain/.local PYTHONPATH=/home/usain/gov-os-worktrees/W2-153-tests/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh python3 -m pytest tests/acceptance/W2-153 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit" --tb=short`
+  (if the slot tool cannot run in your sandbox, run the same pytest without it and say so). rulesync is at
+  `/home/usain/.local/bin/rulesync` (`RULESYNC_BIN` if a case needs it).
+- Show each new case can fail: plant the break in a scratch copy under your `$TMPDIR` (or by a temporary edit you
+  revert before committing) and report what failed.
+- No GPU, model, network or installs. Never open `~/gov-os-eval/`, `~/gov-os-runs/`, or any `hidden`,
+  `memory-verdict` or `memory-verdict-2` folder. One simple command per Bash call. No merge inside the sandbox.
+  Refused twice for the same call: stop and say so; never work around a refusal.
+- **Commit** on `w2/W2-153-tests`, only `tests/acceptance/W2-153/`, with
+  `--trailer "Task: DAEO-8s85" --trailer "Implements: DEC-1050, DEC-1112" --trailer "Role: independent-test-designer" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`.
+  DEC-1156, DEC-315 and DEC-957 are not in the ticket's sources: name them in `discoveries`, never in `Implements:`.
+- **Return** (your final message, in full): the twelve labelled fields of `EMG-common.md` (task, status,
+  work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved,
+  recommended_next_action; sandbox and `ps` checks first), the cases added, the folder's counts, the planted breaks
+  and what failed, the commit and `TESTS-READY <hash12>`.
+
+## The ticket's context packet (gov context DAEO-8s85 --role independent-test-designer)
+The packet below is the store's copy (its ticket text may lag the ticket file; the ticket file wins).
+
+```json
+{
+  "ticket": "DAEO-8s85",
+  "ticket_text": "---\nid: DAEO-8s85\nstatus: in_progress\ndeps: []\nlinks: [DAEO-t8mp]\ncreated: 2026-11-09T20:40:06Z\ntype: task\npriority: 1\nassignee: engineer\nexternal-ref: W2-153\ntags: [wave-2, templates, launch, adapters, standard]\nwbs_id: W2-153\ntitle: 'The role template delivered at launch: gov launch and the dispatcher pass it as the appended system prompt, refusing without it; the subagent bodies and the template copies generated and checked byte for byte (W2-128 TPL-4; the CTO''s split, DEC-1112 (3))'\nclass: tool\nstate_class: AUTHORITATIVE\nrole: engineer\ndepends_on: []\nallowed_paths:\n- src/gov/launch/launcher.py\n- src/gov/adapters/portability.py\n- tests/unit/launch/test_w2_153*\n- tests/unit/adapters/test_w2_153*\n- tests/unit/launch/test_runs.py\n- tests/unit/launch/test_w1_28.py\n- tests/unit/launch/test_w1_32.py\n- tests/unit/launch/test_w2_136_plan_check.py\n- tests/unit/resources/test_w2_20_unit_launch.py  # renamed from test_w2_20_launch.py by `ae489a979` (D-10 collection fix) [changed, path moved]\n- tests/unit/resources/test_w2_20_round3.py\n- tests/unit/launch/test_w2_56.py\n- tests/unit/launch/test_w2_56_r5_lead_store.py\n- governance/project/orchestration/tools/dispatch/launch_now.sh\n- .rulesync/subagents/*.md\n- template/.rulesync/subagents/*.md\n- docs/changes/W2-153-evidence.md\nkpis:\n  success:\n  - 'S1 gov launch <role> <ticket> passes --append-system-prompt-file <root>/.claude/templates/<stem>.md (the role''s template, map below) for every worker role and for a lead, and refuses to start (GovError LAUNCH_NO_TEMPLATE naming the path) when that file is missing. Verify: a launcher unit test on the built argv per role, and the refusal case [DEC-1050] (W2-128 TPL-4 S1)'\n  - 'S2 The dispatcher''s lead launch form (governance/project/orchestration/tools/dispatch/launch_now.sh) passes the same flag with role-lead.md, and refuses when the file is missing. Verify: a test on the built command [DEC-1050] (TPL-4 S2)'\n  - 'S3 Each .rulesync/subagents/<role>.md (and template/.rulesync/subagents/) is its kernel role file''s front matter plus a skills: list (the role''s one or two kernel skills) with the body of its kernel role template; gov.adapters.portability compares the source with that composition (in place of the role file''s whole text) and reports them consistent. Verify: the existing portability tests extended by one case [DEC-1050] (TPL-4 S3)'\n  - 'S4 .claude/templates/<stem>.md are generated byte copies of template/governance/kernel/templates/<stem>.md for brief, role-research, role-product-spec, role-test-designer, role-engineer, role-reviewer, role-lead and role-cto; gov.adapters.portability reports a missing or differing copy as a finding, and python3 -m gov.adapters.portability --write-templates <dir> writes the copies (the ACT''s step). Verify: a test with one copy changed and one missing, and the writer on a temporary folder [DEC-1050] (TPL-4 S4)'\n  - 'S5 It lands at the .claude/ copies ACT: the copies are installed (S4''s writer, and rulesync for S3) in the same ACT that makes S1 and S2 live, so no launch is refused for a missing copy. Verify: the ACT''s record [DEC-1050, CAP-33]'\n  - 'Routed from W2-33 (its S7 copies and F1 drift, DEC-1156 (3)): the generated role copies carry each kernel role file''s `Launch default`, `Launch by criticality` and `Skills` lines unchanged, and a hand edit to a generated role copy is named as drifted by the generation check. Verify: after the copies ACT, each generated role copy holds those lines byte-equal to its kernel role file; a planted hand edit in one copy is named as drifted [DEC-315, DEC-957, DEC-1156 (3)]'\n  failure:\n  - 'A launched session starts without its role template (TPL-4 F1). Verify: S1''s and S2''s refusal cases [marked, DEC-1112 (3): a verify on each line, DEC-1083]'\n  - 'A lead or worker launch changes in any other way than the one added flag. Verify: the built argv otherwise byte-equal to integrate''s on the same fixture [marked, DEC-1112 (3)]'\nprofile: STANDARD\nsources:\n- DEC-1050\n- DEC-1052\n- DEC-1083\n- DEC-1112\n- DEC-1109\n- CAP-33\nest_loc: 250\nacceptance_tests:\n  path: tests/acceptance/W2-153/\n  author: independent-test-designer (MR-3), from these KPI lines and W2-128's interface\ntrack: A\nlist_rows: []\n---\n# W2-153 The role template delivered at launch (W2-128's code half, part 2)\n\n**Why.** R3-1 to R3-3: role files never reached launched sessions. W2-128 (`DAEO-t8mp`) wrote the templates; the CTO\nsplit its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 under DEC-1112 (3);\n`packages/LIFT-1/D5-STATUS.md`). W2-128's S9 is built here; W2-128 closes after both.\n\n**Interface (D5 row 9, stated before the pair starts).**\n- **The role \u2192 template map** (one constant in `launcher.py`, reused by the portability check): engineer\n  `role-engineer`, independent-test-designer `role-test-designer`, independent-auditor `role-reviewer`, product-spec\n  `role-product-spec`, research `role-research`, lead and orchestrator `role-lead`.\n- **The flag** is appended to the CLI arguments the launcher builds (after the caller's), as\n  `--append-system-prompt-file <absolute path>`; `<root>` is the launch's repository root (the worker's worktree).\n- **The skills lists:** engineer `[test-driven-development]`, independent-test-designer `[test-design]`,\n  independent-auditor `[audit]`, product-spec `[change]`, research `[discovery]`, orchestrator `[orchestration]`; the\n  test designer's `test-design` only once W2-128 has reconciled that skill with DEC-963 (review F7): until then it is\n  left out and the case says so.\n- **The copies** are written only by the ACT (DEC-315): this ticket commits no `.claude/` file.\n\n- **Decided after the build (2026-11-10, the CTO, DEC-1112 (3)):**\n  - The source's skills list sits under `claudecode: skills:`, because rulesync 24.0.0 passes `skills` to the\n    generated agent only there. A top-level `skills:` is dropped, so the agents would preload nothing.\n  - The existing launcher unit tests whose fixtures start a session (`test_runs.py`, `test_w1_28.py`, `test_w1_32.py`,\n    `test_w2_136_plan_check.py`) write the role's `.claude/templates/<stem>.md` in their fixture. W2-136's case that\n    the caller's arguments end the argv now allows the one appended flag. Paths added. Refusing only when the folder\n    exists was not taken: it would fail open against F1.\n\n- **The review's R1 (2026-11-09, the CTO, DEC-1112 (3)):**\n  - The CTO scanned the suites the review named, on a clean `w2/W2-153` checkout against its merge base: 58 cases\n    newly red.\n    - Unit, the engineer's (paths added): `tests/unit/resources/test_w2_20_unit_launch.py` (29; named `test_w2_20_launch.py` then) and `test_w2_20_round3.py`\n      (7).\n    - Acceptance support files, a test designer's under DEC-866 (`Rewrite-Reason:`), in the same commit:\n      - W2-20: `test_w2_20_launch.py` (13), `test_w2_20_plan_source.py` (2), `test_w2_20_stale_samples.py` (1);\n      - W2-136: `test_w2_136_launch_check.py` (3);\n      - W1-46: `test_w1_46_held_out.py` (2), `test_w1_46_experiment_folder.py` (1).\n  - 141 cases in W1-28, W1-32, W1-46, W2-58, W1-50 and W2-54 are red on the base too. Their fixtures' machine gate\n    file is missing (W2-20's gate), so the launch stops before the template check. Their launch fixtures plant the\n    copy too, so W2-153 does not turn them red again once the gate files are fixed.\n  - Each fixture plants `.claude/templates/<stem>.md` for the role it launches (any byte content).\n  - After W2-56 merged into integrate, and with it into this branch (`a67fd010`, one conflict resolved by the CTO),\n    two more groups (rescanned 2026-11-10, DEC-1112 (3)):\n    - W2-56's acceptance folder: 136 of 256 newly red; it goes to the test designer.\n    - `tests/unit/launch/test_w2_56.py` (3): the engineer's; path added.\n    - W2-153's own launch cases read the stub's record path from an environment variable (`W2_153_RECORD`), which\n      W2-56's cleaned environment (its S5) now removes. The designer moves that harness to a path W2-56 keeps.\n    - After integrate `e242a66b` merged (W2-56's follow-ups R3/R5): `tests/unit/launch/test_w2_56_r5_lead_store.py`\n      (12), its lead fixtures without the copy; the engineer's, path added (DEC-1112 (3)).\n\n- **S3 amended (2026-11-10, the CTO, DEC-1112 (3)):** after ACT-CLAUDE-COPIES-2, the D-10 helper found the composed\n  agents lack the role file's fields (purpose, allowed paths, tools, network, model tier, authority level, handoff\n  format, permission classes), which W1-33 (MR-5, DEC-066) and W1-38 require: 27 cases.\n  - **Decided:** each composed `.rulesync/subagents/<role>.md` (and the template's copy) is\n    - its rulesync front matter (with `claudecode.skills`),\n    - then the role template's body,\n    - then one blank line,\n    - then the kernel role file's body (`template/governance/kernel/roles/<role>.md` verbatim, its front matter, if\n      any, stripped).\n  - The role templates carry no labelled field, so the agent's labelled fields are exactly the role file's. The\n    approved 1.0.0 templates do not change.\n  - **Interface:** `gov.adapters.portability` exposes `compose(root, role) -> str`, the expected source's full text.\n    Its check compares against that, and the copies ACT's builder writes it, so the two cannot drift.\n  - **W1-38's project builder** (`tests/acceptance/W1-38/w1_38_support.py::build_project_from_template`) also copies\n    the kernel's `templates/` into the generated project, as it copies `roles/` and `skills/`. That is a test\n    designer's revision under DEC-866.\n  - Paths: the test designer revises W1-38's support and W2-153's S3 cases; the engineer changes the portability\n    check and the twelve sources.\n\n**Not here:** the templates' text (W2-128); `gov brief` (W2-152).\n",
+  "authority": [
+    {
+      "id": "DEC-1050",
+      "sha256": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "reason": "declared in sources",
+      "tokens": 948
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "b06a8c0bb8a126b90670963ca424b09adcf354c8d7237f73b6f46b22826c7095",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "b06a8c0bb8a126b90670963ca424b09adcf354c8d7237f73b6f46b22826c7095",
+      "reason": "declared in sources",
+      "tokens": 1862
+    },
+    {
+      "id": "DEC-1083",
+      "sha256": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "reason": "declared in sources",
+      "tokens": 711
+    },
+    {
+      "id": "DEC-1112",
+      "sha256": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "reason": "declared in sources",
+      "tokens": 498
+    },
+    {
+      "id": "DEC-1109",
+      "sha256": "4b36c28f1d8ad543975372c226a3c47b9c1b89204c8aa5f054d770ed8ebfbde5",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "4b36c28f1d8ad543975372c226a3c47b9c1b89204c8aa5f054d770ed8ebfbde5",
+      "reason": "declared in sources",
+      "tokens": 468
+    },
+    {
+      "id": "CAP-33",
+      "sha256": "6a23ae252b2d47f166ff958018bec2c7bbc7f5b8ef69d500fab0d85651539cf1",
+      "authority": "capability",
+      "lifecycle": "ACCEPTED",
+      "constraint": "6a23ae252b2d47f166ff958018bec2c7bbc7f5b8ef69d500fab0d85651539cf1",
+      "reason": "declared in sources",
+      "tokens": 215
+    }
+  ],
+  "mandatory": [
+    {
+      "id": "DEC-1050",
+      "sha256": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "030c1c5a56d759a3b5e9567d1e8e9ec223f1ee733b958a466aefa0fdbdb4d9bf",
+      "reason": "declared in sources",
+      "tokens": 948
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "b06a8c0bb8a126b90670963ca424b09adcf354c8d7237f73b6f46b22826c7095",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "b06a8c0bb8a126b90670963ca424b09adcf354c8d7237f73b6f46b22826c7095",
+      "reason": "declared in sources",
+      "tokens": 1862
+    },
+    {
+      "id": "DEC-1083",
+      "sha256": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "907612978858f8b9d55318cc0e8f313d7f06c317d235cf28af27142240e181be",
+      "reason": "declared in sources",
+      "tokens": 711
+    },
+    {
+      "id": "DEC-1112",
+      "sha256": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "73856ce6d8f2441a1cd8c74538a84c9584c8a978a5045ad9618f6ac98b56dbc2",
+      "reason": "declared in sources",
+      "tokens": 498
+    },
+    {
+      "id": "DEC-1109",
+      "sha256": "4b36c28f1d8ad543975372c226a3c47b9c1b89204c8aa5f054d770ed8ebfbde5",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "4b36c28f1d8ad543975372c226a3c47b9c1b89204c8aa5f054d770ed8ebfbde5",
+      "reason": "declared in sources",
+      "tokens": 468
+    },
+    {
+      "id": "CAP-33",
+      "sha256": "6a23ae252b2d47f166ff958018bec2c7bbc7f5b8ef69d500fab0d85651539cf1",
+      "authority": "capability",
+      "lifecycle": "ACCEPTED",
+      "constraint": "6a23ae252b2d47f166ff958018bec2c7bbc7f5b8ef69d500fab0d85651539cf1",
+      "reason": "declared in sources",
+      "tokens": 215
+    }
+  ],
+  "supplementary": [
+    {
+      "id": "5d0a8132a6a210348d4b08a5",
+      "path": "tests/acceptance/W2-153/README.md",
+      "text": "## The interface as read (the ticket's body)\n\n- **Map:** engineer \u2192 `role-engineer`, independent-test-designer \u2192 `role-test-designer`, independent-auditor \u2192\n  `role-reviewer`, product-spec \u2192 `role-product-spec`, research \u2192 `role-research`, lead and orchestrator \u2192\n  `role-lead`.\n- **Flag:** `--append-system-prompt-file <root>/.claude/templates/<stem>.md`, appended after the caller's arguments,\n  with an absolute path, where `<root>` is the launch's repository root (its real path). A missing file refuses with\n  `GovError` `LAUNCH_NO_TEMPLATE` naming that path, and no session starts.\n- **Skills lists** (under `claudecode: skills:` in each source, DEC-1112 (3): rulesync 24.0.0 drops a top-level\n  `skills` from the generated agent, so a list there would deliver nothing): engineer `[test-driven-development]`, independent-auditor `[audit]`, product-spec `[change]`,\n  research `[discovery]`, orchestrator `[orchestration]`. The test designer gets `[test-design]` only once W2-128 has\n  reconciled that skill with DEC-963, which the case reads as \"the kernel skill names DEC-963\". Until then the list\n",
+      "tokens": 277
+    },
+    {
+      "id": "3ee03b36210074cebfb05c3a",
+      "path": "tests/acceptance/W2-50/w2_50_support.py",
+      "text": "\n\n# --------------------------------------------------------------------------\n# The fixture project, from scratch\n# --------------------------------------------------------------------------\n\nGUARD_COMMAND = f'python3 \"$CLAUDE_PROJECT_DIR\"/{GUARD_REL}'\nPROJECT_FILES = {\n    \"README.md\": \"# W2-50 fixture project\\n\",\n    \".gitignore\": \".gov-runtime/\\n__pycache__/\\n\",\n    \"src/app/main.py\": \"VALUE = 1\\n\",\n    \"src/other/main.py\": \"VALUE = 1\\n\",\n    \"docs/notes.md\": \"notes\\n\",\n    \"docs/spec/feature.md\": \"spec\\n\",\n    \"docs/audit/earlier.md\": \"audit\\n\",\n    \"experiments/spikes/exp-901/README.md\": \"# Experiment 901\\n\",\n}\n# W2-153 (DEC-1050, DEC-1116): ``gov launch`` refuses a session without ``.claude/templates/<stem>.md`` for its role\n# (LAUNCH_NO_TEMPLATE), so the fixture project holds the eight copies, byte for byte the kernel's own\n# ``template/governance/kernel/templates/<stem>.md`` (what the ACT installs, W2-153 S4). The cases that launch a\n# session test what they tested before; none accepts the refusal.\nTEMPLATE_STEMS = (\"brief\", \"role-research\", \"role-product-spec\", \"role-test-designer\", \"role-engineer\",\n                  \"role-reviewer\", \"role-lead\", \"role-cto\")\n",
+      "tokens": 297
+    },
+    {
+      "id": "659b90c7925c0415f76a4cba",
+      "path": "governance/project/orchestration/reviews/w2-153-w1-46.md",
+      "text": "    - True, which is acceptable as explained under F3: any stem (another role's or an unknown name); a relative path with something before `.claude/templates/`; anything inserted before the caller's arguments.\n  - **Rebuilt launches:** all four rows (`accept-edits`, `accept-edits-joined`, `engineer`, `research`) start with exit 0 and exactly one session. Each argv ends with the caller's arguments, then `--append-system-prompt-file <repo>/.claude/templates/role-engineer.md` (`role-research.md` for research). The old assertion is False on all four; the new one is True on all four.\n  - **Launcher:** `src/gov/launch/launcher.py:450` (lead) and `:483` (worker) both build `[*cli_args, *template]`. `template_args` (`:332-339`) always returns the pair or raises `LAUNCH_NO_TEMPLATE`. No launch path skips the pair.\n  - **Scratch:** the probe folder (49 MB) and the retained pytest folders (496 MB) are deleted. The scratch HOME holds 1 inode.\n- **tests:**\n",
+      "tokens": 240
+    },
+    {
+      "id": "0c1c783b25b6d20df763f111",
+      "path": "tests/acceptance/W2-153/w2_153_support.py",
+      "text": "What is never touched: no real Claude session starts. ``gov launch`` runs with ``HOME`` set to a temporary folder whose\n``.local/bin/claude`` is a stand-in that records its arguments and ends; the machine-wide folder, the gate's readings\nand the registry all live in that home. The dispatcher's script runs as a copy whose absolute paths are rewritten into\na temporary folder (its CLI, the orchestrator folder and the worktrees folder), so it can reach no real path.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport datetime\nimport io\nimport json\nimport os\nimport re\nimport subprocess\nimport sys\nimport tarfile\nfrom pathlib import Path\n\nimport yaml\n\nHERE = Path(__file__).resolve().parent\nREPO = HERE.parents[2]\nSRC = REPO / \"src\"\nHARNESS = HERE / \"w2_153_launch_harness.py\"\n\nCOMMAND_TIMEOUT_S = 120.0  # a wait under parallel load, not a time the ticket promises\nSAFE_PATH = \"/usr/local/bin:/usr/bin:/bin\"\nGIB = 1024 ** 3\n\nFLAG = \"--append-system-prompt-file\"\nREFUSAL = \"LAUNCH_NO_TEMPLATE\"\n\n# The ticket's Interface (D5 row 9): the role -> template map, one constant in launcher.py.\nROLE_TEMPLATE = {\n    \"engineer\": \"role-engineer\",\n    \"independent-test-designer\": \"role-test-designer\",\n",
+      "tokens": 298
+    },
+    {
+      "id": "f9c97a91aaa7ecafc5f0a4da",
+      "path": "tests/acceptance/W2-153/w2_153_support.py",
+      "text": "\"\"\"Support code for the W2-153 acceptance tests (standard library and PyYAML only).\n\nW2-153 delivers the role template at launch (W2-128 TPL-4): ``gov launch`` and the dispatcher's lead line pass\n``--append-system-prompt-file <root>/.claude/templates/<stem>.md`` and refuse without the file; the rulesync role\nsources are composed (S3 amended, DEC-1112 (3): the rulesync front matter with ``claudecode.skills``, the kernel role\ntemplate's body, one blank line, the kernel role file's body; ``gov.adapters.portability.compose(root, role)``); the\n``.claude/templates/`` copies are checked byte for byte and written by ``python3 -m gov.adapters.portability\n--write-templates <dir>``.\n\nHow the code under test is chosen (DEC-732): every command runs with ``PYTHONPATH`` set to the ``src/`` folder of the\nworking tree this file is in. The baseline for the failure line F2 is integrate's code at ``BASELINE_COMMIT``, read\nfrom git (``git archive`` / ``git cat-file``) into a temporary folder after checking its blob ids.\n\nWhat is never touched: no real Claude session starts. ``gov launch`` runs with ``HOME`` set to a temporary folder whose\n",
+      "tokens": 284
+    },
+    {
+      "id": "7d88bda43a96dd3f80716a83",
+      "path": "tests/acceptance/W2-153/README.md",
+      "text": "and the rulesync outputs (S3) are installed in the same ACT that makes S1 and S2 live, and no launch is refused for a\nmissing copy (CAP-33, DEC-315). The copies are written only by the ACT. This ticket commits no `.claude/` file, and\nthe ACT's record (`ACT-CLAUDE-COPIES-1` or its successor) is the owner's operator's, outside this ticket's paths. The\nCTO verifies it from that record, as the ticket's Verify line says. Until the ACT runs, the portability check on this\nrepository reports the eight copies as missing. That is expected, and no case here asserts on the repository's own\n`.claude/templates/`.\n\n**A check of the tests themselves** (a throwaway shared clone at `1ef1a7a48c53`, removed afterwards, never\ncommitted): a minimal reference build was written there. It had the map and the refusal in `launcher.py` (flag\nappended after the caller's arguments), the composition, the copies' check and `--write-templates` in\n`portability.py`, the dispatcher's file check with the flag placed *before* `-p` (so F2 does not depend on where the\nflag goes), and the twelve sources composed. It passed all 50 cases. Two wrong builds each failed the cases meant\n",
+      "tokens": 290
+    }
+  ],
+  "supplementary_query": "The role template delivered at launch: gov launch and the dispatcher pass it as the appended system prompt, refusing without it; the subagent bodies and the template copies generated and checked byte for byte (W2-128 TPL-4; the CTO's split, DEC-1112 (3))\nS1 gov launch <role> <ticket> passes --append-system-prompt-file <root>/.claude/templates/<stem>.md (the role's template, map below) for every worker role and for a lead, and refuses to start (GovError LAUNCH_NO_TEMPLATE naming the path) when that file is missing. Verify: a launcher unit test on the built argv per role, and the refusal case [DEC-1050] (W2-128 TPL-4 S1)\nS2 The dispatcher's lead launch form (governance/project/orchestration/tools/dispatch/launch_now.sh) passes the same flag with role-lead.md, and refuses when the file is missing. Verify: a test on the built command [DEC-1050] (TPL-4 S2)\nS3 Each .rulesync/subagents/<role>.md (and template/.rulesync/subagents/) is its kernel role file's front matter plus a skills: list (the role's one or two kernel skills) with the body of its kernel role template; gov.adapters.portability compares the source with that composition (in place of the role file's whole text) and reports them consistent. Verify: the existing portability tests extended by one case [DEC-1050] (TPL-4 S3)\nS4 .claude/templates/<stem>.md are generated byte copies of template/governance/kernel/templates/<stem>.md for brief, role-research, role-product-spec, role-test-designer, role-engineer, role-reviewer, role-lead and role-cto; gov.adapters.portability reports a missing or differing copy as a finding, and python3 -m gov.adapters.portability --write-templates <dir> writes the copies (the ACT's step). Verify: a test with one copy changed and one missing, and the writer on a temporary folder [DEC-1050] (TPL-4 S4)\nS5 It lands at the .claude/ copies ACT: the copies are installed (S4's writer, and rulesync for S3) in the same ACT that makes S1 and S2 live, so no launch is refused for a missing copy. Verify: the ACT's record [DEC-1050, CAP-33]\nRouted from W2-33 (its S7 copies and F1 drift, DEC-1156 (3)): the generated role copies carry each kernel role file's `Launch default`, `Launch by criticality` and `Skills` lines unchanged, and a hand edit to a generated role copy is named as drifted by the generation check. Verify: after the copies ACT, each generated role copy holds those lines byte-equal to its kernel role file; a planted hand edit in one copy is named as drifted [DEC-315, DEC-957, DEC-1156 (3)]\nA launched session starts without its role template (TPL-4 F1). Verify: S1's and S2's refusal cases [marked, DEC-1112 (3): a verify on each line, DEC-1083]\nA lead or worker launch changes in any other way than the one added flag. Verify: the built argv otherwise byte-equal to integrate's on the same fixture [marked, DEC-1112 (3)]",
+  "further_batch": [
+    {
+      "id": "1d6c25e28722740af62784e5",
+      "path": "src/gov/launch/launcher.py"
+    },
+    {
+      "id": "933230beb4da0505bcb0235c",
+      "path": "docs/changes/W2-153-evidence.md"
+    },
+    {
+      "id": "d06c0e178030a1fd89273720",
+      "path": "tests/acceptance/W2-153/README.md"
+    },
+    {
+      "id": "e342d37f409280abeee31b37",
+      "path": "docs/changes/W2-153-evidence.md"
+    }
+  ],
+  "supplementary_batches": [
+    {
+      "items": [
+        {
+          "id": "5d0a8132a6a210348d4b08a5",
+          "path": "tests/acceptance/W2-153/README.md"
+        },
+        {
+          "id": "3ee03b36210074cebfb05c3a",
+          "path": "tests/acceptance/W2-50/w2_50_support.py"
+        },
+        {
+          "id": "659b90c7925c0415f76a4cba",
+          "path": "governance/project/orchestration/reviews/w2-153-w1-46.md"
+        },
+        {
+          "id": "0c1c783b25b6d20df763f111",
+          "path": "tests/acceptance/W2-153/w2_153_support.py"
+        },
+        {
+          "id": "f9c97a91aaa7ecafc5f0a4da",
+          "path": "tests/acceptance/W2-153/w2_153_support.py"
+        },
+        {
+          "id": "7d88bda43a96dd3f80716a83",
+          "path": "tests/acceptance/W2-153/README.md"
+        },
+        {
+          "id": "1d6c25e28722740af62784e5",
+          "path": "src/gov/launch/launcher.py"
+        },
+        {
+          "id": "933230beb4da0505bcb0235c",
+          "path": "docs/changes/W2-153-evidence.md"
+        },
+        {
+          "id": "d06c0e178030a1fd89273720",
+          "path": "tests/acceptance/W2-153/README.md"
+        },
+        {
+          "id": "e342d37f409280abeee31b37",
+          "path": "docs/changes/W2-153-evidence.md"
+        }
+      ],
+      "limit": 10
+    }
+  ],
+  "dropped": [
+    {
+      "id": "1d6c25e28722740af62784e5",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "933230beb4da0505bcb0235c",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "d06c0e178030a1fd89273720",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "e342d37f409280abeee31b37",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "role_filter",
+      "reason": "withheld from independent-test-designer (ticket DAEO-8s85): 0 paths, 0 chunks; none matched (DEC-1065 (2))"
+    }
+  ],
+  "tokens": 8829,
+  "budget": {
+    "limit": 9000,
+    "used": 8829
+  },
+  "left_out": {
+    "count": 3,
+    "superseded": [
+      "DEC-043",
+      "DEC-875",
+      "DEC-876"
+    ],
+    "done": []
+  },
+  "hash": "584dccbbdeb9bcc42027a9b8c14647bccf7700addc43d4e6678ad9eae80e8455"
+}
+```

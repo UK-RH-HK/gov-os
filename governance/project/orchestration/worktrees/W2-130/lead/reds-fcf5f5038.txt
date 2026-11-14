@@ -1,0 +1,22 @@
+tests/acceptance/W2-130/test_w2_130_marks.py:84: in test_s1_the_marks_e12f8a30c_adds_equal_patches_a0_a1_a2_after_the_audits_drops_and_rewrites
+tests/acceptance/W2-130/w2_130_support.py:480: in patch_register_pairs
+E   Failed: a patch block holds no hunk of docs/DECISION_REGISTER.md
+tests/acceptance/W2-130/test_w2_130_marks.py:105: in test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_and_append_only
+E   AssertionError: a register status line of the 87 changed outside a marks commit or not append-only: [('518772b5c272', 'DEC-989', 'other')]
+E   assert not [('518772b5c272', 'DEC-989', 'other')]
+tests/acceptance/W2-130/test_w2_130_marks.py:147: in test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict
+E   AssertionError: DEC-1115: 0 follow-up marks commits append exactly '**Changed by:** DEC-1122 (4)'
+E   assert 0 == 1
+E    +  where 0 = len([])
+tests/acceptance/W2-130/test_w2_130_marks.py:147: in test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict
+E   AssertionError: DEC-026: 0 follow-up marks commits append exactly '**Changed by:** DEC-086'
+E   assert 0 == 1
+E    +  where 0 = len([])
+tests/acceptance/W2-130/test_w2_130_marks.py:170: in test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_the_pair_wrong
+E   AssertionError: 38 census pairs are not on their status line: [('DEC-150', 'DEC-156'), ('DEC-261', 'DEC-798'), ('DEC-466', 'DEC-953'), ('DEC-594', 'DEC-593'), ('DEC-728', 'DEC-723'), ('DEC-742', 'DEC-942')]
+E   assert not [('DEC-150', 'DEC-156'), ('DEC-261', 'DEC-798'), ('DEC-466', 'DEC-953'), ('DEC-594', 'DEC-593'), ('DEC-728', 'DEC-723'), ('DEC-742', 'DEC-942'), ...]
+FAILED tests/acceptance/W2-130/test_w2_130_marks.py::test_s1_the_marks_e12f8a30c_adds_equal_patches_a0_a1_a2_after_the_audits_drops_and_rewrites
+FAILED tests/acceptance/W2-130/test_w2_130_marks.py::test_s1_a_mark_on_one_of_the_87_added_after_e12f8a30c_is_in_a_marks_commit_and_append_only
+FAILED tests/acceptance/W2-130/test_w2_130_marks.py::test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict[dec-1115-dec-1122]
+FAILED tests/acceptance/W2-130/test_w2_130_marks.py::test_s2_the_two_follow_up_marks_are_in_a_marks_commit_after_a_right_verdict[dec-026-dec-086]
+FAILED tests/acceptance/W2-130/test_w2_130_marks.py::test_s2_each_census_id_names_every_stated_changer_unless_the_auditor_judged_the_pair_wrong

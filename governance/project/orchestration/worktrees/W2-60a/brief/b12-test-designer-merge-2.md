@@ -1,0 +1,41 @@
+You are a fresh independent test designer. Ticket: DAEO-cv58 (W2-60a, "The role, its skills and its model and effort loaded at launch; the launch record"), profile FULL. Worktree `/home/usain/gov-os-worktrees/W2-60a`, branch `w2/W2-60a`. Your one job: **resolve the merge conflicts left in four acceptance files**, keeping both sides. Nothing else (DEC-1052: a conflict resolution in `tests/acceptance/` is a test designer's).
+
+## Step 0, before any work: the sandbox check (report it first in your return)
+
+(a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-cv58','w').write('x')"` must FAIL.
+(b) `echo sandbox-trial | git hash-object -w --stdin` must WORK.
+If (a) wrote the file or (b) failed, stop and return. Then `printenv GOV_ROLE GOV_TICKET` (expect `independent-test-designer`, `DAEO-cv58`) and `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-60a`, `w2/W2-60a`). If anything differs, stop and say so.
+
+## Standing rules
+
+- Foreground only; your session ends with your last message.
+- **The merge of `w2/integrate` is committed as 5b7941b66 (WIP) with the four files' markers in it.** You edit the four files (and the second job's folder) only. **No `git merge`, `git checkout`, `git reset`, `git stash`, `git clean`, rebase or push.** When the four files are resolved and the folder runs, commit your files only: `git commit -m "<subject>" --trailer "Task: DAEO-cv58" --trailer "Role: independent-test-designer" --trailer "Implements: DEC-826, DEC-838, DEC-839, DEC-832" --trailer "Rewrite-Reason: <why, one line>" -- <your paths>`. Read-only git (`git show`, `git diff`, `git log`) is fine. The sides: W2-60a's `5b7941b66^1`, integrate's `5b7941b66^2` (in the text below, read `HEAD` as `5b7941b66^1` and `MERGE_HEAD` as `5b7941b66^2`).
+- **Your files: these four, and `tests/acceptance/W2-60a/**` for the second job below; nothing else:** `tests/acceptance/W2-50/w2_50_support.py` (1 hunk), `tests/acceptance/W2-58/README.md` (1), `tests/acceptance/W2-58/test_w2_58_launched_sessions.py` (2), `tests/acceptance/W2-58/w2_58_support.py` (1). If the guard refuses a write to them, that refusal is the answer: stop and report it (refused twice for the same call: stop; never another form).
+- Reads are open (DEC-820) except secrets, the held-out qualification material's contents, the hidden half of an evaluation set. For the four files, the sides are in the files themselves and in `git show HEAD:<file>` / `git show MERGE_HEAD:<file>`.
+- Every pytest through `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh`, with your session's own TMPDIR, `HOME=/home/usain/gov-os-worktrees/W2-60a/.gov-runtime/scratch/empty-home`, `PYTHONUSERBASE=/home/usain/.local`, `PYTHONPATH=/home/usain/gov-os-worktrees/W2-60a/src`, `-p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"`. A resource gate's refusal is a wait.
+- Write with the Write and Edit tools and absolute paths. Commit hashes in 12 digits. Time budget about 60 minutes. You may read the launcher's code for the second job (`src/gov/launch/`), never change it.
+
+## What each side did (keep both)
+
+- **W2-60a (HEAD):** the fixture projects get one role file per worker role, `template/governance/kernel/roles/<role>.md`, with a `- **Version:**` line and a `- **Launch default:** model <id>, effort <e>` line (gov launch refuses a tree without one, DEC-826 Q1, DEC-839); W2-58's live case names Haiku 4.5 at effort low in its role file's default line in place of `--model haiku`, and that file is in the base commit so the tree is clean at the session's start (DEC-951).
+- **Integrate (MERGE_HEAD):** the fixture projects hold the `.claude/templates/<stem>.md` copies (W2-153: gov launch refuses without the role's template, LAUNCH_NO_TEMPLATE); W2-58's live case plants an open resource gate (`env.update(s.plant_open_gate(sandbox))`, W2-20 S19), passes the fixture's live settings (`extra={s.SETTINGS_REL: live_settings_text()}`), and the README's probe text (one call, the hook naming its interpreter, D-10).
+- Resolution: in each support file both blocks stay (role files AND template copies; check how each is wired into the project, e.g. `PROJECT_FILES`, `ROLE_FILES`, `TEMPLATE_FILES` and `make_project`, and that both reach the project). In the live test: one `extra` holding both the role file (Haiku 4.5, effort low) and the live settings; the open gate planted; **no `--model haiku`** on the line (W2-60a refuses a model after `--` that is not the role's, and the role file now names it). In the README: one paragraph saying both (the role file with Haiku at effort low in place of `--model haiku`, and integrate's probe and hook text). Keep the rest of each side's text as written.
+
+## Second job: W2-60a's own acceptance fixtures (your folder, `tests/acceptance/W2-60a/**`)
+
+After the merge, every launch in `tests/acceptance/W2-60a` is refused before it reaches what it tests: (i) `LAUNCH_NO_TEMPLATE` (W2-153: gov launch refuses a session without `<root>/.claude/templates/<stem>.md` for its role, `ROLE_TEMPLATES` in the launcher), and (ii) behind it, W2-20's resource gate ("gate.json is missing": every launch runs the gate, DEC-1088 (5)(b)). Fix the fixtures only (support module and conftest), **never an assertion**: the fixture project holds the eight template copies (any bytes; W2-58's `TEMPLATE_STEMS`/`TEMPLATE_FILES` form, or W2-50's copy of the kernel's own), and each launch's environment plants an open gate (the form of `plant_open_gate` in `tests/acceptance/W2-58/w2_58_support.py:696`, from W2-136's `_plant_open_gate`). Where the folder's README describes the fixture project, add one line for each. Then run the folder. The launcher now hands **one** `--append-system-prompt-file`, `<TMPDIR>/role-<role>.md`, whose bytes are the role file's bytes, then one blank line, then the role template's bytes, placed last after the caller's arguments (the lead's decision for this merge, joining W2-153's template and W2-60a's role text). A case that still fails after the fixtures are fixed: give file:line, the assertion and the message, and say whether it asserts a W2-60a behaviour the code breaks (report it; the lead routes it to the engineer) or a line position that the merge's flag order changed (report it; do not change the assertion).
+
+## Third job: one new case in your folder, a skill copy versioned only under `metadata:`
+
+The kernel's generated skill copies (`.claude/skills/<name>/SKILL.md`) now carry their version only as
+```
+metadata:
+  version: 1.4.0
+```
+in the front matter, with no top-level `version:` (look at this repository's own `.claude/skills/test-design/SKILL.md`). KPI S2 says the record takes each skill's version from the copy the session loads, and F3 says today's copies must not be refused. Add a case (in `tests/acceptance/W2-60a/test_w2_60a_skills.py`, using the support module's fixtures): a role file naming a skill whose loaded copy carries its version only under `metadata: version:` launches (it is not refused), and the launch record lists that skill with that version and the copy's sha256; and a copy with both a top-level `version` and `metadata.version` is recorded with the top-level one. Show it red on today's code (the launcher reads only the top-level `version`, so it refuses "carries no version") and say so in your return; the engineer fixes the code after you.
+
+## Verify, then return
+
+1. No conflict marker left in the four files (`grep -n '^<<<<<<<\|^>>>>>>>\|^=======$'`); `python3 -m py_compile` on the three Python files.
+2. Run `tests/acceptance/W2-50`, `tests/acceptance/W2-58` and `tests/acceptance/W2-60a` (each its own run, the form above; live cases may skip). For each red: file:line, the assertion, and whether it comes from your resolution (fix it in your four files) or from the launcher's behaviour (report it; do not touch code).
+3. Return the twelve fields (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action), each a labelled line: the sandbox check, the counts per folder, every red named, the guard refusals met (count), and your one commit's hash and trailers.

@@ -1,0 +1,8 @@
+W2-61h (DAEO-h2k3): merge td-1, the hidden count case revised to 39 (DEC-1171 (2), h10 retired)
+
+R5's minimum for h10's category waits on that category (a package to the CTO).
+
+Task: DAEO-h2k3
+Role: orchestrator
+Implements: DEC-1069, DEC-954, DEC-957
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

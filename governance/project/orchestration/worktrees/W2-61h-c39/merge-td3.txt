@@ -1,0 +1,9 @@
+W2-61h (DAEO-h2k3): merge td-3, S3's callers floor two short (R5_RETIRED, h10 retired, the owner's (b))
+
+DEC-1171 (2) and the owner's (b) (DEC-1175, to be recorded): h10's category is callers; the callers floor is R5's 4
+less the accepted shortfall and h10's retired place, 2.
+
+Task: DAEO-h2k3
+Role: orchestrator
+Implements: DEC-1069, DEC-954, DEC-957
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

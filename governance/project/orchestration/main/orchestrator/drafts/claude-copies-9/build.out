@@ -1,0 +1,74 @@
+ACT-CLAUDE-COPIES-9 rehearsal; base: integrate 95a55bfcac9b with w2/W2-37 7bde87727b0f merged (one --no-ff commit, clean); rulesync 24.0.0
+the two template sources (template/governance/kernel/skills/change/SKILL.md, template/.rulesync/skills/change/SKILL.md) are at cdf43a49, the bytes of w2/W2-37 7bde87727b0f
+the three adopt sources ['template/governance/kernel/skills/adopt/SKILL.md', '.rulesync/skills/adopt/SKILL.md', 'template/.rulesync/skills/adopt/SKILL.md'] are at 16fd341f, W2-88a's approved bytes
+portability on plain integrate: exit 1; 1 findings: GENERATED_DIFFERS 1; files ['.claude/skills/adopt/SKILL.md']
+portability on the merged tree (no copies): exit 1; 2 findings: GENERATED_DIFFERS 1, SOURCE_DIFFERS 1; of them the change skill's: [('SOURCE_DIFFERS', '.rulesync/skills/change/SKILL.md'), ('GENERATED_DIFFERS', '.claude/skills/adopt/SKILL.md')]
+  no finding outside the change and adopt skills' copies
+rulesync from the merged tree's own root .rulesync (before the copy): differs from the tree in ['.claude/settings.json', '.claude/skills/adopt/SKILL.md']
+rulesync's .claude/skills/change/SKILL.md: dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8; the expected hash dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8; the lead's expected file dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8
+rulesync's .claude/skills/adopt/SKILL.md (from the root .rulesync/ at 16fd341f): 77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6; the tracked copy was b2303bc1615ac8f77332142add5b6a1a34e174569b87413598657b76a01bcc65
+rulesync's other output that differs from the tree (not written, not this ACT's): ['.claude/settings.json']
+portability in the generation clone after the three copies: exit 0; change-skill findings []; the others unchanged: True
+portability on template/ (as an adopted project, no rulesync): 0 change-skill findings; others: RULESYNC_VERSION_UNKNOWN 1, TEMPLATE_COPY_MISSING 8
+generation clone: 3 files changed: .claude/skills/adopt/SKILL.md, .claude/skills/change/SKILL.md, .rulesync/skills/change/SKILL.md
+  .rulesync/skills/change/SKILL.md: byte copy of template/.rulesync/skills/change/SKILL.md; .claude/skills/change/SKILL.md: rulesync's rendering of it (4200 bytes); .claude/skills/adopt/SKILL.md: rulesync's rendering of the adopt source (6176 bytes)
+portability in the generation clone: exit 0, no finding
+the before-bytes are integrate's and equal on the merged tree: .claude/skills/adopt/SKILL.md b2303bc1, .claude/skills/change/SKILL.md e22fd92f, .rulesync/skills/change/SKILL.md 2af36b72
+check 1: the 3 copies; check 2: the 5 sources (the two change-skill template files at cdf43a49, the three adopt sources at 16fd341f); no live HOME path in either
+--- rehearsal on integrate with W2-37 merged (the tree after the hand merge's merge commit); HOME planted
+ok   apply.sh check (every target at its stated before sha256): exit 0
+ok   check 1 before the apply (red, as intended: the copies are at the old bytes): exit 1
+ok   check 2 before the apply (green: the two template sources at the approved bytes): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 3 files): exit 0
+ok   check 2 (sha256sum -c, 5 files): exit 0
+ok   the changed set equals the touched list (3 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   undo: both files byte for byte back, the tree clean
+ok   portability after the undo: exit 1; 2 findings: GENERATED_DIFFERS 1, SOURCE_DIFFERS 1 (the merged tree's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- plain integrate (W2-37 not merged)
+ok   apply.sh check passes on plain integrate (both targets are at the same before bytes there as on the merged tree): exit 0
+ok   check 2 is red on plain integrate (the template sources are the old bytes there: the order is held): exit 1
+ok   check changed nothing
+ok   apply.sh check refuses a moved target (exit 3): exit 3
+--- the gated runs, one folder per run through the heavy-job gate: on the merged tree (W2-37's merge alone, then with this ACT)
+merged window tests/acceptance/W2-37: exit 1; 98 passed, 1 failed, 21 skipped
+merged window tests/unit/impact: exit 0; 42 passed, 0 failed
+merged window tests/unit/adapters: exit 0; 102 passed, 0 failed
+merged window tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+merged window tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+merged window tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+merged window tests/acceptance/W2-11: exit 1; 198 passed, 1 failed, 1 skipped
+merged window tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+merged window tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+merged window tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+ok   merged landed tests/acceptance/W2-37: exit 0; 99 passed, 0 failed, 21 skipped
+ok   merged landed tests/unit/impact: exit 0; 42 passed, 0 failed
+ok   merged landed tests/unit/adapters: exit 0; 102 passed, 0 failed
+ok   merged landed tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+ok   merged landed tests/acceptance/W1-38: exit 0; 42 passed, 0 failed
+ok   merged landed tests/acceptance/W2-153: exit 0; 66 passed, 0 failed
+ok   merged landed tests/acceptance/W2-11: exit 0; 199 passed, 0 failed, 1 skipped
+ok   merged landed tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+ok   merged landed tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+ok   merged landed tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[change]
+     merged: made green by the ACT: tests/acceptance/W2-37/test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[claude-copy]
+merged: red in the window: 2; made green by the ACT: 2; red after: 0; new red brought by the ACT: []
+--- the by-hand steps literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "224deee3dfa544f924e686ebb52e0d6e58586c846c96fa0a6de8a81e1b78dd79", "touched": 3, "failures": 0}

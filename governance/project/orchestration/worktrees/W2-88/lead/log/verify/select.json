@@ -6,9 +6,11 @@
  ],
  "unplaced": [],
  "base": "94132594a02ab39adad785b5f4b46612b5f00560",
- "head": "15ad055adbb5d12abe4ecdf83344c7f504315d01",
+ "head": "ed568a699e4fa82908fc3f8830e16733a8e7a5c4",
  "governance_left_out": [
-  "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md"
+  "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md",
+  "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-2.md",
+  "docs/probes/DAEO-2bdu/PR-DAEO-2bdu.md"
  ],
  "changed": [
   "docs/changes/W2-88-evidence.md",
@@ -32,10 +34,15 @@
   "tests/acceptance/W2-88/standin_b1/sitecustomize.py",
   "tests/acceptance/W2-88/standin_fabric/sitecustomize.py",
   "tests/acceptance/W2-88/standin_ma/sitecustomize.py",
+  "tests/acceptance/W2-88/standin_nc1/sitecustomize.py",
+  "tests/acceptance/W2-88/standin_nc2/sitecustomize.py",
+  "tests/acceptance/W2-88/standin_rv2/sitecustomize.py",
   "tests/acceptance/W2-88/store_hash.py",
   "tests/acceptance/W2-88/test_w2_88_bites.py",
   "tests/acceptance/W2-88/test_w2_88_f5_paths.py",
+  "tests/acceptance/W2-88/test_w2_88_nc1_commit.py",
   "tests/acceptance/W2-88/test_w2_88_practice.py",
+  "tests/acceptance/W2-88/test_w2_88_rv2_undo.py",
   "tests/acceptance/W2-88/test_w2_88_s10_layout.py",
   "tests/acceptance/W2-88/test_w2_88_s12_refresh.py",
   "tests/acceptance/W2-88/test_w2_88_s16_search_again.py",
@@ -53,7 +60,9 @@
   "tests/unit/adopt/test_w2_88_l1.py",
   "tests/unit/adopt/test_w2_88_layout.py",
   "tests/unit/adopt/test_w2_88_memory_sets.py",
+  "tests/unit/adopt/test_w2_88_nc1.py",
   "tests/unit/adopt/test_w2_88_run4.py",
+  "tests/unit/adopt/test_w2_88_rv2.py",
   "tests/unit/adopt/test_w2_88_stages.py",
   "tests/unit/rebuild/test_w2_88_digests.py"
  ],
@@ -84,7 +93,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -102,10 +113,15 @@
       "tests/acceptance/W2-88/standin_b1/sitecustomize.py",
       "tests/acceptance/W2-88/standin_fabric/sitecustomize.py",
       "tests/acceptance/W2-88/standin_ma/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc1/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc2/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_rv2/sitecustomize.py",
       "tests/acceptance/W2-88/store_hash.py",
       "tests/acceptance/W2-88/test_w2_88_bites.py",
       "tests/acceptance/W2-88/test_w2_88_f5_paths.py",
+      "tests/acceptance/W2-88/test_w2_88_nc1_commit.py",
       "tests/acceptance/W2-88/test_w2_88_practice.py",
+      "tests/acceptance/W2-88/test_w2_88_rv2_undo.py",
       "tests/acceptance/W2-88/test_w2_88_s10_layout.py",
       "tests/acceptance/W2-88/test_w2_88_s12_refresh.py",
       "tests/acceptance/W2-88/test_w2_88_s16_search_again.py",
@@ -136,7 +152,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -161,7 +179,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -186,7 +206,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -211,7 +233,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -236,7 +260,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -261,7 +287,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -286,7 +314,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -311,7 +341,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -336,7 +368,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -361,7 +395,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -386,7 +422,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -411,7 +449,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -436,7 +476,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -461,7 +503,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -486,7 +530,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -511,7 +557,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -536,7 +584,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -561,7 +611,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -586,7 +638,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -611,7 +665,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -636,7 +692,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -661,7 +719,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -686,7 +746,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -711,7 +773,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -736,7 +800,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -761,7 +827,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -786,7 +854,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -811,7 +881,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -836,7 +908,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -861,7 +935,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -886,7 +962,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -911,7 +989,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -936,7 +1016,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -961,7 +1043,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -986,7 +1070,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1011,7 +1097,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1036,7 +1124,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1061,7 +1151,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1086,7 +1178,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1111,7 +1205,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1136,7 +1232,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1161,7 +1259,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1186,7 +1286,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1211,7 +1313,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1236,7 +1340,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1261,7 +1367,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1286,7 +1394,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1311,7 +1421,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1336,7 +1448,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1361,7 +1475,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1386,7 +1502,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1411,7 +1529,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1436,7 +1556,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1461,7 +1583,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1486,7 +1610,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1511,7 +1637,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1536,7 +1664,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1561,7 +1691,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1586,7 +1718,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1611,7 +1745,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1636,7 +1772,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1661,7 +1799,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1686,7 +1826,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1711,7 +1853,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1736,7 +1880,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1761,7 +1907,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1786,7 +1934,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1811,7 +1961,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1836,7 +1988,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1861,7 +2015,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1886,7 +2042,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1911,7 +2069,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1936,7 +2096,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1961,7 +2123,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -1986,7 +2150,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2011,7 +2177,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2036,7 +2204,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2061,7 +2231,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2086,7 +2258,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2111,7 +2285,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2136,7 +2312,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2161,7 +2339,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2186,7 +2366,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2211,7 +2393,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2236,7 +2420,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2261,7 +2447,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2286,7 +2474,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2311,7 +2501,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2336,7 +2528,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2361,7 +2555,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2386,7 +2582,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2411,7 +2609,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2436,7 +2636,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2461,7 +2663,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2486,7 +2690,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2511,7 +2717,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2536,7 +2744,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2561,7 +2771,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2586,7 +2798,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2611,7 +2825,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2636,7 +2852,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2858,7 +3076,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py",
       "tests/unit/rebuild/test_w2_88_digests.py"
      ]
@@ -2920,7 +3140,9 @@
       "tests/unit/adopt/test_w2_88_l1.py",
       "tests/unit/adopt/test_w2_88_layout.py",
       "tests/unit/adopt/test_w2_88_memory_sets.py",
+      "tests/unit/adopt/test_w2_88_nc1.py",
       "tests/unit/adopt/test_w2_88_run4.py",
+      "tests/unit/adopt/test_w2_88_rv2.py",
       "tests/unit/adopt/test_w2_88_stages.py"
      ]
     }
@@ -3380,10 +3602,15 @@
       "tests/acceptance/W2-88/standin_b1/sitecustomize.py",
       "tests/acceptance/W2-88/standin_fabric/sitecustomize.py",
       "tests/acceptance/W2-88/standin_ma/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc1/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc2/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_rv2/sitecustomize.py",
       "tests/acceptance/W2-88/store_hash.py",
       "tests/acceptance/W2-88/test_w2_88_bites.py",
       "tests/acceptance/W2-88/test_w2_88_f5_paths.py",
+      "tests/acceptance/W2-88/test_w2_88_nc1_commit.py",
       "tests/acceptance/W2-88/test_w2_88_practice.py",
+      "tests/acceptance/W2-88/test_w2_88_rv2_undo.py",
       "tests/acceptance/W2-88/test_w2_88_s10_layout.py",
       "tests/acceptance/W2-88/test_w2_88_s12_refresh.py",
       "tests/acceptance/W2-88/test_w2_88_s16_search_again.py",
@@ -3416,10 +3643,15 @@
       "tests/acceptance/W2-88/standin_b1/sitecustomize.py",
       "tests/acceptance/W2-88/standin_fabric/sitecustomize.py",
       "tests/acceptance/W2-88/standin_ma/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc1/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc2/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_rv2/sitecustomize.py",
       "tests/acceptance/W2-88/store_hash.py",
       "tests/acceptance/W2-88/test_w2_88_bites.py",
       "tests/acceptance/W2-88/test_w2_88_f5_paths.py",
+      "tests/acceptance/W2-88/test_w2_88_nc1_commit.py",
       "tests/acceptance/W2-88/test_w2_88_practice.py",
+      "tests/acceptance/W2-88/test_w2_88_rv2_undo.py",
       "tests/acceptance/W2-88/test_w2_88_s10_layout.py",
       "tests/acceptance/W2-88/test_w2_88_s12_refresh.py",
       "tests/acceptance/W2-88/test_w2_88_s16_search_again.py",
@@ -3453,10 +3685,15 @@
       "tests/acceptance/W2-88/standin_b1/sitecustomize.py",
       "tests/acceptance/W2-88/standin_fabric/sitecustomize.py",
       "tests/acceptance/W2-88/standin_ma/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc1/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_nc2/sitecustomize.py",
+      "tests/acceptance/W2-88/standin_rv2/sitecustomize.py",
       "tests/acceptance/W2-88/store_hash.py",
       "tests/acceptance/W2-88/test_w2_88_bites.py",
       "tests/acceptance/W2-88/test_w2_88_f5_paths.py",
+      "tests/acceptance/W2-88/test_w2_88_nc1_commit.py",
       "tests/acceptance/W2-88/test_w2_88_practice.py",
+      "tests/acceptance/W2-88/test_w2_88_rv2_undo.py",
       "tests/acceptance/W2-88/test_w2_88_s10_layout.py",
       "tests/acceptance/W2-88/test_w2_88_s12_refresh.py",
       "tests/acceptance/W2-88/test_w2_88_s16_search_again.py",

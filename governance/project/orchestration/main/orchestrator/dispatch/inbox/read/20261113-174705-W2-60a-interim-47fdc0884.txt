@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-60a
+status: interim result 47fdc0884: W2-60a (DAEO-cv58): the narrow independent check's probe record (pass at 97f208456bdb; S2's version reader, P-7 (a), the plan line and P-6 (a), S3/S4/S8 to DEC-839 and the merge; R1-R4 out of scope); 

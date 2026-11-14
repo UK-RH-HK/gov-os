@@ -1,0 +1,17 @@
+gov links: 16 new since 96498443f, 1726 standing (UNMARKED_CHANGE orchestrator 10, UNKNOWN_ID independent-test-designer 8, UNKNOWN_ID orchestrator 47, UNKNOWN_ID owner 1, UNLINKED_ID orchestrator 1409, STATUS_CONFLICT orchestrator 1, NOT_IN_FORCE_AS_RULE orchestrator 19, ENFORCES_SUPERSEDED independent-test-designer 14, CLOSED_TICKET_EDITED orchestrator 121, TICKET_CHANGE_UNMARKED orchestrator 96; records 2163, register 1160 entries, commits 34)
+UNKNOWN_ID tests/acceptance/W2-42a in DAEO-03ub's acceptance_tests.path | .tickets/DAEO-03ub.md:52 | orchestrator | write the tests at tests/acceptance/W2-42a or correct DAEO-03ub's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-182 in DAEO-5y8d's acceptance_tests.path | .tickets/DAEO-5y8d.md:57 | orchestrator | write the tests at tests/acceptance/W2-182 or correct DAEO-5y8d's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-183 in DAEO-href's acceptance_tests.path | .tickets/DAEO-href.md:45 | orchestrator | write the tests at tests/acceptance/W2-183 or correct DAEO-href's acceptance_tests.path
+UNLINKED_ID DEC-1143 in DAEO-6y0x's KPI brackets, not in its sources | .tickets/DAEO-6y0x.md:35 | orchestrator | add DEC-1143 to DAEO-6y0x's sources:
+UNLINKED_ID DEC-1144 in DAEO-6y0x's KPI brackets, not in its sources | .tickets/DAEO-6y0x.md:35 | orchestrator | add DEC-1144 to DAEO-6y0x's sources:
+UNLINKED_ID DEC-1087 in DAEO-lrre's KPI brackets, not in its sources | .tickets/DAEO-lrre.md:50 | orchestrator | add DEC-1087 to DAEO-lrre's sources:
+UNLINKED_ID DEC-1156 in DAEO-lrre's KPI brackets, not in its sources | .tickets/DAEO-lrre.md:50 | orchestrator | add DEC-1156 to DAEO-lrre's sources:
+UNLINKED_ID DEC-971 in DAEO-lrre's KPI brackets, not in its sources | .tickets/DAEO-lrre.md:50 | orchestrator | add DEC-971 to DAEO-lrre's sources:
+UNLINKED_ID W2-113 in DAEO-lrre's KPI brackets, not in its sources | .tickets/DAEO-lrre.md:50 | orchestrator | add W2-113 to DAEO-lrre's sources:
+UNLINKED_ID W2-153 in DAEO-lrre's KPI brackets, not in its sources | .tickets/DAEO-lrre.md:50 | orchestrator | add W2-153 to DAEO-lrre's sources:
+UNLINKED_ID DEC-1071 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1071 to DAEO-pg6i's sources:
+UNLINKED_ID DEC-1072 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1072 to DAEO-pg6i's sources:
+UNLINKED_ID DEC-1074 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1074 to DAEO-pg6i's sources:
+UNLINKED_ID DEC-1083 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1083 to DAEO-pg6i's sources:
+UNLINKED_ID DEC-1099 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1099 to DAEO-pg6i's sources:
+UNLINKED_ID DEC-1116 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1116 to DAEO-pg6i's sources:

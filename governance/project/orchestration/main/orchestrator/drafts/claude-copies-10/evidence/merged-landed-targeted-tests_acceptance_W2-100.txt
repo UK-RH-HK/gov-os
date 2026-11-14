@@ -1,0 +1,12 @@
+........                                                                 [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[backend]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[api]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[data]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[security]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[backend]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[api]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[data]
+PASSED tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[security]
+8 passed in 1.17s

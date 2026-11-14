@@ -1,0 +1,5 @@
+W2-182 (DAEO-5y8d): merge its acceptance folder (cc7867f93 the map; 10213e3bb the redirect only on a folder-alone run)
+
+Task: DAEO-5y8d
+Role: orchestrator
+Implements: DEC-1163, DEC-1156

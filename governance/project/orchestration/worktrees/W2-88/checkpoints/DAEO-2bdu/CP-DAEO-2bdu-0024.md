@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-2bdu-0024
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-2bdu at stop
+task: DAEO-2bdu
+task_status: in_progress
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-13T17:56:52Z'
+inputs:
+- id: DAEO-2bdu
+  version: 94132594a
+  hash: sha256:1c8e22e8c491e549656ab3012e5e403cfd7330244e7f09690afd27b018617465
+head_commit: aa476d394d30703ea879b3681f9ad2df434456b5
+---
+
+# CP-DAEO-2bdu-0024 — DAEO-2bdu at stop
+
+## Next action
+
+Resume after stop

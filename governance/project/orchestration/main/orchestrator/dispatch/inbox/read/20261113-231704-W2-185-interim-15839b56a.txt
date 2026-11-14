@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-185
+status: interim result 15839b56a: W2-185 (DAEO-qyt2): the narrow independent check's probe record on 1180e4ec5 (PASS S1, S2, S3, F1; R1 out of scope: 18 decided-behaviour reds outside the paths for DEC-1156 (7))

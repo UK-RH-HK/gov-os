@@ -1,0 +1,5 @@
+log: dispatch.log
+Slot: heavy slot 1
+status: its holder is IDLE: no CPU time for 15 min (since 2026-11-13 22:52:05); pid 325126; command flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c 
+        rm -f "$0"; m="$1"; w="$2"; l="$3"; shift 3; echo $$ > "$m"; trap "rm -f \"$m\"" EXIT
+        ; tree /home/usain/Dynamic-Agentic-Engineering-OS; not killed: the CTO decides

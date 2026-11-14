@@ -1,0 +1,5 @@
+Merge w2/integrate into w2/W2-116 (DAEO-f58b): pass 2c starts from the integration head 9a467f336 (the ticket widened by the seven test files, DEC-1156 (7))
+
+Task: DAEO-f58b
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

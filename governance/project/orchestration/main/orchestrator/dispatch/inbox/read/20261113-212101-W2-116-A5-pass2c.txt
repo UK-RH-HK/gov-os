@@ -1,0 +1,11 @@
+log: W2-116-A5-pass2c.json
+W2: W2-116
+status: DONE. Land head `f9d473b871f7b7bd45b2884cfd8ea9c6f8390381`.
+
+task: DAEO-f58b (W2-116), pass 2c: revise the 17 cases of other tickets to the decided behaviour before the land
+status: DONE. Land head `f9d473b871f7b7bd45b2884cfd8ea9c6f8390381`.
+work_completed:
+- (1) Merged `w2/integrate` (9a467f336) into the branch with `--no-ff`, as 9e9428942. It merged clean, with no conflicts.
+- (2) A fresh independent test designer (td-4, Sonnet, medium, session d49a06de) made 7 commits, one per file:
+  - The six token files now drop `f` beside `s` in the helper that compares tokens from two folders. The `s`-premise reads are untouched.
+  - `test_status.py`: `PARTS` ga

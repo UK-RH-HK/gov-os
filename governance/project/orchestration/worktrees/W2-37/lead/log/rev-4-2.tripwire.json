@@ -1,0 +1,50 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "head",
+   "before": "23e7c4971503",
+   "after": "cc7867f9303e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-182/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-182"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s1_close_setting.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s2_supplementary_cap.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s3_unchanged.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/w2_183_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "acceptance folder",
+   "folder": "W2-183"
+  }
+ ]
+}

@@ -1,0 +1,320 @@
+{
+ "about": "ACT-GUARD-FIX-5 round 2: unquoted heredocs read by a shell with options or a stdin word (F1 of review round 1), their quoted twins, and controls. An engineer writing under tests/acceptance/ (the case's folder holds tests/acceptance/X/, script.sh). Every case but the controls must be refused after the apply.",
+ "cases": [
+  {
+   "id": "subst-o-pipefail",
+   "command": "bash -o pipefail <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "-o's value; the substitution writes"
+  },
+  {
+   "id": "subst-o-pipefail-quoted",
+   "command": "bash -o pipefail <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "-o's value; the substitution writes (quoted twin)"
+  },
+  {
+   "id": "subst-euo-pipefail",
+   "command": "bash -euo pipefail <<EOF\nx=$(echo y > tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options"
+  },
+  {
+   "id": "subst-euo-pipefail-quoted",
+   "command": "bash -euo pipefail <<'EOF'\nx=$(echo y > tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options (quoted twin)"
+  },
+  {
+   "id": "subst-O-extglob",
+   "command": "bash -O extglob <<EOF\necho `touch tests/acceptance/X/zz.py`\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "-O; backticks"
+  },
+  {
+   "id": "subst-O-extglob-quoted",
+   "command": "bash -O extglob <<'EOF'\necho `touch tests/acceptance/X/zz.py`\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "-O; backticks (quoted twin)"
+  },
+  {
+   "id": "subst-rcfile",
+   "command": "bash --rcfile /dev/null <<EOF\n$(cp /tmp/x tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "--rcfile"
+  },
+  {
+   "id": "subst-rcfile-quoted",
+   "command": "bash --rcfile /dev/null <<'EOF'\n$(cp /tmp/x tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "--rcfile (quoted twin)"
+  },
+  {
+   "id": "subst-init-file",
+   "command": "bash --init-file /dev/null <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "--init-file"
+  },
+  {
+   "id": "subst-init-file-quoted",
+   "command": "bash --init-file /dev/null <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "--init-file (quoted twin)"
+  },
+  {
+   "id": "subst-dev-stdin",
+   "command": "bash /dev/stdin <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "/dev/stdin as the script"
+  },
+  {
+   "id": "subst-dev-stdin-quoted",
+   "command": "bash /dev/stdin <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "/dev/stdin as the script (quoted twin)"
+  },
+  {
+   "id": "subst-dash",
+   "command": "bash - <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "- as the script"
+  },
+  {
+   "id": "subst-dash-quoted",
+   "command": "bash - <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "- as the script (quoted twin)"
+  },
+  {
+   "id": "subst-sh-eu",
+   "command": "sh -eu <<EOF\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "options with no value"
+  },
+  {
+   "id": "subst-sh-eu-quoted",
+   "command": "sh -eu <<'EOF'\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "options with no value (quoted twin)"
+  },
+  {
+   "id": "subst-rm",
+   "command": "bash -o pipefail <<EOF\necho $(rm -rf tests/acceptance/X)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the substitution deletes the folder"
+  },
+  {
+   "id": "subst-rm-quoted",
+   "command": "bash -o pipefail <<'EOF'\necho $(rm -rf tests/acceptance/X)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the substitution deletes the folder (quoted twin)"
+  },
+  {
+   "id": "subst-cat-pipe",
+   "command": "cat <<EOF | bash -o pipefail\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the body reaches the shell through a pipe"
+  },
+  {
+   "id": "subst-cat-pipe-quoted",
+   "command": "cat <<'EOF' | bash -o pipefail\necho $(touch tests/acceptance/X/zz.py)\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the body reaches the shell through a pipe (quoted twin)"
+  },
+  {
+   "id": "file-redirect-run",
+   "command": "bash -o pipefail > s.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the body goes to s.sh (a shell with options), then bash s.sh"
+  },
+  {
+   "id": "file-redirect-run-quoted",
+   "command": "bash -o pipefail > s.sh <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the body goes to s.sh (a shell with options), then bash s.sh (quoted twin)"
+  },
+  {
+   "id": "file-redirect-run-expansion",
+   "command": "bash -o pipefail > s.sh <<EOF\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the same, the body holds an expansion"
+  },
+  {
+   "id": "file-redirect-run-expansion-quoted",
+   "command": "bash -o pipefail > s.sh <<'EOF'\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the same, the body holds an expansion (quoted twin)"
+  },
+  {
+   "id": "file-tee-pipe-run",
+   "command": "tee s.sh <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "tee writes s.sh, a shell with options reads it from the pipe, then bash s.sh"
+  },
+  {
+   "id": "file-tee-pipe-run-quoted",
+   "command": "tee s.sh <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "tee writes s.sh, a shell with options reads it from the pipe, then bash s.sh (quoted twin)"
+  },
+  {
+   "id": "file-tee-pipe-run-expansion",
+   "command": "tee s.sh <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the same, the body holds an expansion"
+  },
+  {
+   "id": "file-tee-pipe-run-expansion-quoted",
+   "command": "tee s.sh <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py $(date +%s)\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "the same, the body holds an expansion (quoted twin)"
+  },
+  {
+   "id": "file-euo-redirect-run",
+   "command": "bash -euo pipefail > s.sh <<EOF\necho x > tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options"
+  },
+  {
+   "id": "file-euo-redirect-run-quoted",
+   "command": "bash -euo pipefail > s.sh <<'EOF'\necho x > tests/acceptance/X/zz.py\nEOF\nbash s.sh",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options (quoted twin)"
+  },
+  {
+   "id": "plain-eu-o-pipefail",
+   "command": "bash -eu -o pipefail <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "W2-42a's bash-eu-o-pipefail-unquoted"
+  },
+  {
+   "id": "plain-eu-o-pipefail-quoted",
+   "command": "bash -eu -o pipefail <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "W2-42a's bash-eu-o-pipefail-unquoted (quoted twin)"
+  },
+  {
+   "id": "plain-euo",
+   "command": "bash -euo pipefail <<EOF\necho x > tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options, no expansion"
+  },
+  {
+   "id": "plain-euo-quoted",
+   "command": "bash -euo pipefail <<'EOF'\necho x > tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "combined options, no expansion (quoted twin)"
+  },
+  {
+   "id": "plain-cat-pipe",
+   "command": "cat <<EOF | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "through a pipe, no expansion"
+  },
+  {
+   "id": "plain-cat-pipe-quoted",
+   "command": "cat <<'EOF' | bash -o pipefail\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "through a pipe, no expansion (quoted twin)"
+  },
+  {
+   "id": "plain-bash",
+   "command": "bash <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "plain bash, unquoted (allowed today under G-1; now judged as the body)"
+  },
+  {
+   "id": "plain-bash-quoted",
+   "command": "bash <<'EOF'\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "deny",
+   "note": "plain bash, unquoted (allowed today under G-1; now judged as the body) (quoted twin)"
+  },
+  {
+   "id": "control-cat-unquoted",
+   "command": "cat <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "data for cat"
+  },
+  {
+   "id": "control-cat-subst-unquoted",
+   "command": "cat <<EOF\necho $(date)\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "cat, a harmless substitution"
+  },
+  {
+   "id": "control-bash-script",
+   "command": "bash script.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "the body is script.sh's input"
+  },
+  {
+   "id": "control-bash-o-script",
+   "command": "bash -o pipefail script.sh <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "-o's value skipped, script.sh is the script"
+  },
+  {
+   "id": "control-bash-c",
+   "command": "bash -c 'echo hi' <<EOF\ntouch tests/acceptance/X/zz.py\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "-c: the program is in the words"
+  },
+  {
+   "id": "control-shell-harmless",
+   "command": "bash -o pipefail <<EOF\necho $(date)\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "a shell with options, a harmless body"
+  },
+  {
+   "id": "control-shell-harmless-quoted",
+   "command": "bash -o pipefail <<'EOF'\necho hi\nEOF",
+   "role": "engineer",
+   "expect_after": "allow",
+   "note": "a shell with options, a harmless quoted body"
+  }
+ ]
+}

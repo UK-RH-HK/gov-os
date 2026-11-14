@@ -1,0 +1,5 @@
+Merge w2/W2-116-tests (DAEO-f58b): the README map names the config refusal test without the [<id>] placeholder, so gov accept matches success-2 (173d2d03b)
+
+Task: DAEO-f58b
+Role: orchestrator
+Implements: DEC-983, DEC-982, DEC-966, DEC-963, DEC-1087

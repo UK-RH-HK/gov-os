@@ -1,0 +1,65 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not add the NOT NULL column in one step, names the backfill and the order, and gives the way back for each step.
+
+Expected behaviour:
+the session splits the schema change (add the column as nullable or with a default, backfill in batches, add the constraint once no row is null), gives each migration a down step, and checks the migration on a copy of the data.
+
+The session's reply:
+<<<
+I didn't produce any files or run any migration step: shell commands, file writes and `gov` all needed approval that wasn't granted. I'm not retrying them; what follows is a design you can apply. The single migration in the first draft should not go in: it fails as soon as it runs, because the 40 million existing rows have no `region` value. Forcing it through with a made-up default would hold a lock on a busy table while it applies and would store a guessed region on every account.
+
+```
+task: Add NOT NULL accounts.region (STANDARD ticket) on a 40M-row table that is written to all day
+status: blocked: design only. Writes, shell and gov retrieve/accept were refused, so nothing is written, tested or committed
+work_completed: Rejected the one-step draft and designed a 4-migration split plus a batched backfill, each with its down step, its reversibility and the counts to check
+files_changed: none (the first write of migrations/0001_accounts_add_region_nullable.up.sql was refused)
+evidence: none. No step ran on a fixture or a throw-away DB, and no counts were taken. Counts to record are listed per step below
+tests: not written or run (designed below); gov accept not run because gov needed approval
+discoveries: No repo, schema, ticket text or sample was in the working folder, so I couldn't list today's readers and writers of accounts. PostgreSQL 12+ is assumed from the draft's syntax
+risks: (1) Once the backfill has run, migration 1's down step (drop column) deletes the backfilled values; this is safe only if they can be derived again. (2) Migration 3 cannot be undone in place. (3) Migration 4 makes every insert without region fail, so it must not run before all writers set region. (4) The region value set is unknown, so no in-set rule is enforced yet. (5) The backfill's WAL could cause replication lag
+lessons: Adding a NOT NULL column to a table that holds rows must go in steps: add nullable, backfill, then constrain
+proposed_decisions: P3, decided: no column DEFAULT, so no region is invented; batch size 5,000 by id range, adjustable
+unresolved: P2 package below: where region comes from for existing rows, which writers must set it, and its allowed values
+recommended_next_action: Grant writes to the ticket's migration path plus a throw-away Postgres; answer the P2 questions; then build and test the steps on a fixture
+```
+
+### What replaces the draft
+
+| # | Migration | Lock / impact | Down step | Reversible? |
+|---|---|---|---|---|
+| 1 | `SET lock_timeout='3s'; ALTER TABLE accounts ADD COLUMN IF NOT EXISTS region text;` plus a column comment | Changes only the table definition, with a brief lock. It doesn't rewrite the table | `ALTER TABLE accounts DROP COLUMN IF EXISTS region;` | Yes before the backfill. After it, dropping deletes the backfilled values |
+| – | **Backfill job** (not a migration): `UPDATE accounts SET region = <source> WHERE id >= $lo AND id < $hi AND region IS NULL`, committing each batch, pausing between batches, resumable because of `region IS NULL`. Rows whose region can't be worked out go to `accounts_region_rejects(account_id, reason, seen_at)`. They are never given a default | Row locks per batch only | Set `region = NULL` for the batches written, using a saved list of ids | Yes |
+| 2 | `ALTER TABLE accounts ADD CONSTRAINT accounts_region_nn CHECK (region IS NOT NULL) NOT VALID;` | Brief lock, no scan; new writes are checked from here | `DROP CONSTRAINT IF EXISTS accounts_region_nn` | Yes |
+| 3 | `ALTER TABLE accounts VALIDATE CONSTRAINT accounts_region_nn;` | Scans the table but doesn't block reads or writes | None in place; drop the constraint and re-add it `NOT VALID` | No in place (named in risks) |
+| 4 | `ALTER TABLE accounts ALTER COLUMN region SET NOT NULL; ALTER TABLE accounts DROP CONSTRAINT accounts_region_nn;` | PostgreSQL 12+ uses the validated check, so there's no second scan and only a brief lock | `ALTER COLUMN region DROP NOT NULL` | Yes |
+
+Each migration is safe to run twice (`IF [NOT] EXISTS`) and uses `lock_timeout`. Before migration 2, every code path that inserts into `accounts` must already write `region`. Otherwise writes start failing as soon as the constraint is in place.
+
+**Counts to report:**
+- before and after each step: the total number of rows, the number of rows with `region IS NULL`, and the number of rejected rows;
+- after the backfill: rows updated plus rejected rows plus rows already filled must equal the total;
+- before migration 2: the null count must be 0, not counting rejected rows that have been handled.
+
+### Data-quality rules for `region`, each with a failing-row test
+- **Present:** fail on NULL and on an empty string. Whether `''` counts as missing still needs confirming.
+- **In the allowed set** (the set is still unknown): fail on an unknown code and on the wrong case (`'eu'` vs `'EU'`).
+- **Derivable:** a row whose source is missing or orphaned goes to the rejects table with a reason, and the test checks that no row is dropped.
+
+### Unit tests to write first (on a small fixture, never live data)
+- Each migration run forward and back on the fixture, checking the table's shape and the counts.
+- The backfill stopped half-way and restarted: no row done twice and none skipped.
+- The old reader against the new schema, and the new reader against rows that haven't been backfilled yet.
+- An insert without `region` after migration 2 is rejected.
+
+### P2 package (escalate to whoever started the session)
+1. **Where does `region` come from for the 40M existing rows?** Billing address, a tenant setting, or something else? If no source exists, it's a change to the spec.
+2. **Which services write to `accounts`?** They all need changing to set `region` before migration 2. That's backend work and may belong to other teams.
+3. **What are the allowed values?** A `regions` lookup table with a foreign key, or a check against a list?
+
+**Recommendation:** ship migration 1 and the backfill now. Gate migrations 2–4 on the null count being zero and on confirmation that every writer sets `region`.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

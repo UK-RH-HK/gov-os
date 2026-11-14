@@ -1,0 +1,75 @@
+allow      'tee <<< "x" tests/acceptance/X/zz.py'                                 
+allow      'tee <<< "x" src/ok.py'                                                
+allow      'tee -a <<< "x" tests/acceptance/X/zz.py'                              
+allow      'tee -a <<< "x" src/ok.py'                                             
+deny       'cat <<< "x" > tests/acceptance/X/zz.py'                               Bash write to '/tmp/w242a-probe/tmp2ni_907l/tests/acceptance/X/zz.py
+allow      'cat <<< "x" > src/ok.py'                                              
+allow      "bash <<< 'touch tests/acceptance/X/zz.py'"                            
+allow      "bash <<< 'touch src/ok.py'"                                           
+allow      "sh <<< 'touch tests/acceptance/X/zz.py'"                              
+allow      "sh <<< 'touch src/ok.py'"                                             
+allow      'xargs touch <<< tests/acceptance/X/zz.py'                             
+allow      'xargs touch <<< src/ok.py'                                            
+allow      'python3 -c "open(\'tests/acceptance/X/zz.py\',\'w\').write(\'x\')"; cat <<EOF' 
+allow      'python3 -c "open(\'src/ok.py\',\'w\').write(\'x\')"; cat <<EOF'       
+allow      'grep -c b <<< "a"'                                                    
+allow      'wc -l <<< "$v"'                                                       
+allow      "tee <<< x tests/acceptance/X/zz.py # it's"                            
+allow      "tee <<< x src/ok.py # it's"                                           
+allow      'cp <<< x x.py tests/acceptance/X/zz.py'                               
+allow      'cp <<< x x.py src/ok.py'                                              
+allow      'tee <<<x tests/acceptance/X/zz.py'                                    
+allow      'tee <<<x src/ok.py'                                                   
+allow      "tee <<<'x' tests/acceptance/X/zz.py"                                  
+allow      "tee <<<'x' src/ok.py"                                                 
+allow      'tee <<<"$v" tests/acceptance/X/zz.py'                                 
+allow      'tee <<<"$v" src/ok.py'                                                
+allow      'tee <<< $(echo x) tests/acceptance/X/zz.py'                           
+allow      'tee <<< $(echo x) src/ok.py'                                          
+deny       'tee 0<<< x tests/acceptance/X/zz.py'                                  Bash write to '/tmp/w242a-probe/tmp2ni_907l/0' denied for role 'engi
+deny       'tee 0<<< x src/ok.py'                                                 Bash write to '/tmp/w242a-probe/tmp2ni_907l/0' denied for role 'engi
+allow      "cat <<< 'touch tests/acceptance/X/zz.py' | sh"                        
+allow      "cat <<< 'touch src/ok.py' | sh"                                       
+allow      "cat <<< 'touch tests/acceptance/X/zz.py' | bash"                      
+allow      "cat <<< 'touch src/ok.py' | bash"                                     
+allow      'xargs -n1 touch <<< tests/acceptance/X/zz.py'                         
+allow      'xargs -n1 touch <<< src/ok.py'                                        
+allow      'xargs rm -f <<< tests/acceptance/X/zz.py'                             
+allow      'xargs rm -f <<< src/ok.py'                                            
+allow      "bash -s <<< 'touch tests/acceptance/X/zz.py'"                         
+allow      "bash -s <<< 'touch src/ok.py'"                                        
+allow      "bash -x <<< 'touch tests/acceptance/X/zz.py'"                         
+allow      "bash -x <<< 'touch src/ok.py'"                                        
+allow      "env bash <<< 'touch tests/acceptance/X/zz.py'"                        
+allow      "env bash <<< 'touch src/ok.py'"                                       
+allow      "timeout 5 sh <<< 'touch tests/acceptance/X/zz.py'"                    
+allow      "timeout 5 sh <<< 'touch src/ok.py'"                                   
+deny       'sort <<< x -o tests/acceptance/X/zz.py'                               Bash write to '/tmp/w242a-probe/tmp2ni_907l/tests/acceptance/X/zz.py
+allow      'sort <<< x -o src/ok.py'                                              
+deny       'dd <<< x of=tests/acceptance/X/zz.py'                                 Bash write to '/tmp/w242a-probe/tmp2ni_907l/tests/acceptance/X/zz.py
+allow      'dd <<< x of=src/ok.py'                                                
+allow      'tee <<< x -a tests/acceptance/X/zz.py'                                
+allow      'tee <<< x -a src/ok.py'                                               
+allow      'tee <<< x /dev/null tests/acceptance/X/zz.py'                         
+allow      'tee <<< x /dev/null src/ok.py'                                        
+allow      'while read l; do echo $l; done <<< x'                                 
+deny       'read -r a <<< x; echo $a > tests/acceptance/X/zz.py'                  Bash write to '/tmp/w242a-probe/tmp2ni_907l/tests/acceptance/X/zz.py
+allow      'read -r a <<< x; echo $a > src/ok.py'                                 
+allow      "bash <<< 'echo hi'"                                                   
+allow      'bash <<< "echo $HOME"'                                                
+allow      'python3 <<< "open(\'tests/acceptance/X/zz.py\',\'w\')"'               
+allow      'python3 <<< "open(\'src/ok.py\',\'w\')"'                              
+allow      "zsh <<< 'touch tests/acceptance/X/zz.py'"                             
+allow      "zsh <<< 'touch src/ok.py'"                                            
+allow      "dash <<< 'touch tests/acceptance/X/zz.py'"                            
+allow      "dash <<< 'touch src/ok.py'"                                           
+allow      "source /dev/stdin <<< 'touch tests/acceptance/X/zz.py'"               
+allow      "source /dev/stdin <<< 'touch src/ok.py'"                              
+allow      ". /dev/stdin <<< 'touch tests/acceptance/X/zz.py'"                    
+allow      ". /dev/stdin <<< 'touch src/ok.py'"                                   
+allow      'eval "$(cat <<< \'touch tests/acceptance/X/zz.py\')"'                 
+allow      'eval "$(cat <<< \'touch src/ok.py\')"'                                
+allow      'xargs -I{} touch {} <<< tests/acceptance/X/zz.py'                     
+allow      'xargs -I{} touch {} <<< src/ok.py'                                    
+allow      'parallel touch <<< tests/acceptance/X/zz.py'                          
+allow      'parallel touch <<< src/ok.py'                                         

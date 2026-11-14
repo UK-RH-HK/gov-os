@@ -1,0 +1,8 @@
+log: W2-100-A5-run2.json
+W2: W2-100
+status: PACKAGES. The branch is verified and passed two narrow independent checks. It needs the owner's yes on the kernel bytes (CIT-P, CAP-33) before it can land. One package for the CTO is out of this ticket's scope.
+
+task: DAEO-uw5h (W2-100), build run 2 (resumed after P-W2-100-IF-1): domain skills A (backend, api, data, security) built, verified and independently checked; the CIT-P goes to the owner
+status: PACKAGES. The branch is verified and passed two narrow independent checks. It needs the owner's yes on the kernel bytes (CIT-P, CAP-33) before it can land. One package for the CTO is out of this ticket's scope.
+work_completed:
+- Merged `w2/integrate` (the CTO's interface `0a706dc4c`) as `627bcaa19`. I wrote the interface reading (I1's list of named points, the output forms, the summaries form) and gave

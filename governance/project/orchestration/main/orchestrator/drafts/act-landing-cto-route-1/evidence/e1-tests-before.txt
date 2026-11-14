@@ -1,0 +1,1178 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.F                                 [100%]
+=================================== FAILURES ===================================
+________________ test_a_commit_with_all_three_conditions_passes ________________
+
+w = <test_landing_cto_route.World object at 0x7354dab9c7d0>
+
+    def test_a_commit_with_all_three_conditions_passes(w):
+        h = w.bundle()
+        c = w.commit([HOOK], route(h))
+>       assert w.flagged() == {}, c
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354dab9c7d0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_________ test_it_passes_without_a_task_trailer_and_with_several_paths _________
+
+w = <test_landing_cto_route.World object at 0x7354daba8ce0>
+
+    def test_it_passes_without_a_task_trailer_and_with_several_paths(w):
+        h = w.bundle(paths=(HOOK, AGENT))
+        w.commit([HOOK, AGENT], ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}"])
+>       assert w.flagged() == {}
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8ce0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+__ test_a_later_rebuild_folder_of_the_same_act_is_found_by_the_manifest_hash ___
+
+w = <test_landing_cto_route.World object at 0x7354daba9a30>
+
+    def test_a_later_rebuild_folder_of_the_same_act_is_found_by_the_manifest_hash(w):
+        h = w.bundle(name=ACT + ".r1-abcdef12")
+        w.commit([HOOK], route(h))
+>       assert w.flagged() == {}
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba9a30>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+___________ test_the_acts_before_the_route_stay_flagged_as_they_were ___________
+
+w = <test_landing_cto_route.World object at 0x7354daba8e60>
+
+    def test_the_acts_before_the_route_stay_flagged_as_they_were(w):
+        """The form of commit 7cc654e49f9b (Role: orchestrator, no Act:), no trailers, Role: operator without Act:, and a wrong role."""
+        h = w.bundle()
+        c1 = w.commit([HOOK], ["Task: DAEO-sdxk", "Role: orchestrator"])
+        c2 = w.commit([HOOK], [])
+        c3 = w.commit([HOOK], ["Role: operator"])
+        c4 = w.commit([HOOK], ["Role: engineer", f"Act: {ACT}", f"Act-sha: {h}"])
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8e60>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_______________ test_the_owner_and_operator_routes_are_unchanged _______________
+
+w = <test_landing_cto_route.World object at 0x7354daba8350>
+
+    def test_the_owner_and_operator_routes_are_unchanged(w):
+        w.commit([HOOK], ["Role: owner"])
+        w.commit([HOOK], ["Role: operator", "Act: ACT-X"])
+        w.commit([HOOK], ["Task: DAEO-abcd", "Role: engineer"])
+>       assert w.flagged() == {}
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8350>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+__________ test_without_condition_1_the_commit_stays_flagged[no log] ___________
+
+w = <test_landing_cto_route.World object at 0x7354daba9a90>, why = 'no log'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba9a90>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_________ test_without_condition_1_the_commit_stays_flagged[empty log] _________
+
+w = <test_landing_cto_route.World object at 0x7354daba9a00>, why = 'empty log'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba9a00>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+________ test_without_condition_1_the_commit_stays_flagged[another act] ________
+
+w = <test_landing_cto_route.World object at 0x7354daba0440>, why = 'another act'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba0440>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_____ test_without_condition_1_the_commit_stays_flagged[another manifest] ______
+
+w = <test_landing_cto_route.World object at 0x7354daba2180>
+why = 'another manifest'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba2180>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_________ test_without_condition_1_the_commit_stays_flagged[no route] __________
+
+w = <test_landing_cto_route.World object at 0x7354daba3e30>, why = 'no route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba3e30>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_without_condition_1_the_commit_stays_flagged[operator route] _______
+
+w = <test_landing_cto_route.World object at 0x7354daba0140>
+why = 'operator route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba0140>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_without_condition_1_the_commit_stays_flagged[route mentions the CTO late] _
+
+w = <test_landing_cto_route.World object at 0x7354daba1fa0>
+why = 'route mentions the CTO late'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba1fa0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+________ test_without_condition_1_the_commit_stays_flagged[other route] ________
+
+w = <test_landing_cto_route.World object at 0x7354daaa6450>, why = 'other route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa6450>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_without_condition_1_the_commit_stays_flagged[route not text] _______
+
+w = <test_landing_cto_route.World object at 0x7354daaa5fd0>
+why = 'route not text'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa5fd0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_a_malformed_line_is_skipped_and_the_good_line_after_it_counts ______
+
+w = <test_landing_cto_route.World object at 0x7354daba0a40>
+
+    def test_a_malformed_line_is_skipped_and_the_good_line_after_it_counts(w):
+        h = w.bundle(approve=None)
+        write(w.approvals, "{not json\n[1]\n\n")
+        w.approve(ACT, h, CTO_ROUTE)
+        w.commit([HOOK], route(h))
+>       assert w.flagged() == {}
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba0a40>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+____________ test_the_operators_own_line_key_names_the_manifest_too ____________
+
+w = <test_landing_cto_route.World object at 0x7354daba0b30>
+
+    def test_the_operators_own_line_key_names_the_manifest_too(w):
+        h = w.bundle(approve=None)
+        w.approve(ACT, h, CTO_ROUTE, key="manifest_sha256")
+        w.commit([HOOK], route(h))
+>       assert w.flagged() == {}
+               ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba0b30>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_a_trailer_that_is_missing_or_wrong_stays_flagged[no Act-sha] _______
+
+w = <test_landing_cto_route.World object at 0x7354daba1df0>, why = 'no Act-sha'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba1df0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+___ test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act-sha not a sha] ___
+
+w = <test_landing_cto_route.World object at 0x7354dab9e0f0>
+why = 'Act-sha not a sha'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354dab9e0f0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+__ test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act-sha of nothing] ___
+
+w = <test_landing_cto_route.World object at 0x7354dabaa9f0>
+why = 'Act-sha of nothing'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354dabaa9f0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_a_trailer_that_is_missing_or_wrong_stays_flagged[two Act-sha] ______
+
+w = <test_landing_cto_route.World object at 0x7354daba8e90>, why = 'two Act-sha'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8e90>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+________ test_a_trailer_that_is_missing_or_wrong_stays_flagged[two Act] ________
+
+w = <test_landing_cto_route.World object at 0x7354daaa6360>, why = 'two Act'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa6360>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_a_trailer_that_is_missing_or_wrong_stays_flagged[bad Act id] _______
+
+w = <test_landing_cto_route.World object at 0x7354daaa4110>, why = 'bad Act id'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa4110>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+___ test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act of another id] ___
+
+w = <test_landing_cto_route.World object at 0x7354daaa44d0>
+why = 'Act of another id'
+
+    @pytest.mark.parametrize("why", ["no Act-sha", "Act-sha not a sha", "Act-sha of nothing", "two Act-sha", "two Act", "bad Act id",
+                                     "Act of another id"])
+    def test_a_trailer_that_is_missing_or_wrong_stays_flagged(w, why):
+        h = w.bundle()
+        t = {"no Act-sha": ["Role: orchestrator", f"Act: {ACT}"],
+             "Act-sha not a sha": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: 12345678"],
+             "Act-sha of nothing": ["Role: orchestrator", f"Act: {ACT}", "Act-sha: " + "a" * 64],
+             "two Act-sha": ["Role: orchestrator", f"Act: {ACT}", f"Act-sha: {h}", f"Act-sha: {h}"],
+             "two Act": ["Role: orchestrator", f"Act: {ACT}", "Act: ACT-Y-1", f"Act-sha: {h}"],
+             "bad Act id": ["Role: orchestrator", "Act: ../x", f"Act-sha: {h}"],
+             "Act of another id": ["Role: orchestrator", "Act: ACT-OTHER-1", f"Act-sha: {h}"]}[why]
+        c = w.commit([HOOK], t)
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa44d0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+___________ test_a_manifest_changed_after_its_approval_stays_flagged ___________
+
+w = <test_landing_cto_route.World object at 0x7354daaa4d40>
+
+    def test_a_manifest_changed_after_its_approval_stays_flagged(w):
+        h = w.bundle()
+        m = w.acts / ACT / "manifest.json"
+        m.write_text(m.read_text() + "\n")
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa4d40>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_____________ test_a_manifest_that_names_another_act_stays_flagged _____________
+
+w = <test_landing_cto_route.World object at 0x7354da945bb0>
+
+    def test_a_manifest_that_names_another_act_stays_flagged(w):
+        h = w.bundle(manifest_act="ACT-OTHER-1")
+        c = w.commit([HOOK], route(h))
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da945bb0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+____________ test_a_manifest_folder_that_is_a_link_is_not_followed _____________
+
+w = <test_landing_cto_route.World object at 0x7354da946bd0>
+
+    def test_a_manifest_folder_that_is_a_link_is_not_followed(w):
+        h = w.bundle(name="elsewhere")
+        (w.acts / ACT).symlink_to(w.acts / "elsewhere")
+        c = w.commit([HOOK], route(h))
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da946bd0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+____________ test_a_manifest_that_does_not_claim_b_stays_flagged[a] ____________
+
+w = <test_landing_cto_route.World object at 0x7354daaa67e0>, claimed = 'a'
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa67e0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+____________ test_a_manifest_that_does_not_claim_b_stays_flagged[O] ____________
+
+w = <test_landing_cto_route.World object at 0x7354daaa6570>, claimed = 'O'
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daaa6570>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+__________ test_a_manifest_that_does_not_claim_b_stays_flagged[None] ___________
+
+w = <test_landing_cto_route.World object at 0x7354daba8e90>, claimed = None
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8e90>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+___________ test_a_bundle_the_classifier_votes_above_b_stays_flagged ___________
+
+w = <test_landing_cto_route.World object at 0x7354daba8fe0>
+
+    def test_a_bundle_the_classifier_votes_above_b_stays_flagged(w):
+        h = w.bundle(apply_sh="#!/bin/bash\nsudo true\n")           # a script hit: sudo raises the class to (O)
+        c = w.commit([HOOK], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba8fe0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+______ test_an_act_on_an_O_control_path_stays_flagged_whatever_it_claims _______
+
+w = <test_landing_cto_route.World object at 0x7354daba3830>
+
+    def test_an_act_on_an_O_control_path_stays_flagged_whatever_it_claims(w):
+        """The operator's own files are (O): the owner's, by hand. A manifest claiming (b) over them does not make it (b)."""
+        h = w.bundle(paths=(OPERATOR,))
+        c = w.commit([OPERATOR], route(h))
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba3830>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening _
+
+w = <test_landing_cto_route.World object at 0x7354daba23c0>
+
+    def test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening(w):
+        """The classifier reads the content: an item added to a refusal list is (a), so the bundle's vote is (b) through the hook
+        file. The path map is the owner's ratchet row (its class by path is (O)), and 'never O' is read on the paths."""
+        h = w.bundle(paths=(HOOK, PATH_MAP), contents={PATH_MAP: (PM_BEFORE, PM_AFTER)})
+        bundle_vote = lc.act_class.classify(str(w.acts / ACT))
+        assert bundle_vote["class"] == "b" and {f["path"]: f["class"] for f in bundle_vote["files"]}[PATH_MAP] == "a"
+        c = w.commit([HOOK, PATH_MAP], route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354daba23c0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_______ test_a_commit_that_adds_an_O_path_beside_a_b_path_stays_flagged ________
+
+w = <test_landing_cto_route.World object at 0x7354da947b30>
+
+    def test_a_commit_that_adds_an_O_path_beside_a_b_path_stays_flagged(w):
+        h = w.bundle(paths=(HOOK, SRC))
+        c = w.commit([HOOK, SRC], route(h))
+>       assert set(w.flagged()) == {c}
+                   ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da947b30>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_the_path_class_is_b_for_b_rows_and_O_for_the_operators_own_and_unknown_paths _
+
+    def test_the_path_class_is_b_for_b_rows_and_O_for_the_operators_own_and_unknown_paths():
+        rules = lc.act_class.load_rules()
+>       assert lc.path_class(rules, HOOK) == "b" and lc.path_class(rules, AGENT) == "b"
+               ^^^^^^^^^^^^^
+E       AttributeError: module 'landing_check_under_test' has no attribute 'path_class'. Did you mean: 'act_class'?
+
+tests/unit/operator/test_landing_cto_route.py:282: AttributeError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[an extra path] _
+
+w = <test_landing_cto_route.World object at 0x7354da8b3020>
+why = 'an extra path'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da8b3020>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a path short] _
+
+w = <test_landing_cto_route.World object at 0x7354da8b3f80>
+why = 'a path short'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da8b3f80>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[another path] _
+
+w = <test_landing_cto_route.World object at 0x7354da8b26f0>
+why = 'another path'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da8b26f0>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a root that is not the repository] _
+
+w = <test_landing_cto_route.World object at 0x7354da8b3710>
+why = 'a root that is not the repository'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+>       got = w.flagged()
+              ^^^^^^^^^^^
+
+tests/unit/operator/test_landing_cto_route.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_landing_cto_route.World object at 0x7354da8b3710>
+
+    def flagged(self):
+        """The commits of base..HEAD the check flags, {commit: item}."""
+>       items = lc.check(str(self.repo), f"{self.base}..HEAD", approvals=str(self.approvals), acts_dir=str(self.acts))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check() got an unexpected keyword argument 'approvals'
+
+tests/unit/operator/test_landing_cto_route.py:101: TypeError
+____________ test_the_fixed_inputs_are_the_ctos_log_and_acts_folder ____________
+
+    def test_the_fixed_inputs_are_the_ctos_log_and_acts_folder():
+>       assert lc.APPROVALS.endswith("/.gov-runtime/scratch/orchestrator/log/act-approvals.jsonl")
+               ^^^^^^^^^^^^
+E       AttributeError: module 'landing_check_under_test' has no attribute 'APPROVALS'
+
+tests/unit/operator/test_landing_cto_route.py:333: AttributeError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_with_all_three_conditions_passes
+FAILED tests/unit/operator/test_landing_cto_route.py::test_it_passes_without_a_task_trailer_and_with_several_paths
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_later_rebuild_folder_of_the_same_act_is_found_by_the_manifest_hash
+FAILED tests/unit/operator/test_landing_cto_route.py::test_the_acts_before_the_route_stay_flagged_as_they_were
+FAILED tests/unit/operator/test_landing_cto_route.py::test_the_owner_and_operator_routes_are_unchanged
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[no log]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[empty log]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[another act]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[another manifest]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[no route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[operator route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[route mentions the CTO late]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[other route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[route not text]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_malformed_line_is_skipped_and_the_good_line_after_it_counts
+FAILED tests/unit/operator/test_landing_cto_route.py::test_the_operators_own_line_key_names_the_manifest_too
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[no Act-sha]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act-sha not a sha]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act-sha of nothing]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[two Act-sha]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[two Act]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[bad Act id]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_trailer_that_is_missing_or_wrong_stays_flagged[Act of another id]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_changed_after_its_approval_stays_flagged
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_names_another_act_stays_flagged
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_folder_that_is_a_link_is_not_followed
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[a]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[O]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[None]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_bundle_the_classifier_votes_above_b_stays_flagged
+FAILED tests/unit/operator/test_landing_cto_route.py::test_an_act_on_an_O_control_path_stays_flagged_whatever_it_claims
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_that_adds_an_O_path_beside_a_b_path_stays_flagged
+FAILED tests/unit/operator/test_landing_cto_route.py::test_the_path_class_is_b_for_b_rows_and_O_for_the_operators_own_and_unknown_paths
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[an extra path]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a path short]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[another path]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a root that is not the repository]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_the_fixed_inputs_are_the_ctos_log_and_acts_folder
+39 failed, 1 passed in 2.59s
+heavy_slot: all 3 slots taken; waiting (2026-11-13 16:08:54)

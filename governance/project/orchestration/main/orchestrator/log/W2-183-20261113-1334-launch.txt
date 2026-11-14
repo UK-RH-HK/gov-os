@@ -1,0 +1,86 @@
+2026-11-13 13:34:07 admitted by the dispatcher; launching W2-183
+disk gate open: 731 GiB free, 57889529 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17176088576,
+  "sessions_live_memory_bytes": 876376064,
+  "load_1m": 10.46,
+  "load_15m": 13.29,
+  "busy_cores_1m": 6.37,
+  "embedding_cpu_p95": {
+    "shared": 0.04,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.01,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 784119373824,
+    "free_inodes": 57889507
+  },
+  "sessions": [
+    {
+      "pid": 1590823,
+      "repository": "/home/usain/gov-os-worktrees/W2-182",
+      "ticket": "DAEO-5y8d",
+      "role": "orchestrator",
+      "live_memory_bytes": 311771136
+    },
+    {
+      "pid": 1641557,
+      "repository": "/home/usain/gov-os-worktrees/W2-182",
+      "ticket": "DAEO-5y8d",
+      "role": "independent-auditor",
+      "live_memory_bytes": 271020032
+    },
+    {
+      "pid": 95691,
+      "repository": "/home/usain/gov-os-worktrees/W2-37",
+      "ticket": "DAEO-6n5k",
+      "role": "orchestrator",
+      "live_memory_bytes": 293584896
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": [
+      {
+        "slot": 1,
+        "kind": "test",
+        "pid": 1601059,
+        "command_pid": 1650800,
+        "tree": "/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw5/test_f3_an_absent_red_not_red_0/project/.gov-runtime/close/clone",
+        "cpus": "6",
+        "threads": 1,
+        "workers": 1,
+        "command": "/usr/bin/python3 -c import subprocess, sys\nwith open(sys.argv[1], 'w') as log:\n    sys.exit(subprocess.run(sys.argv[3:], cwd=sys.argv[2], stdout=log, stderr=subprocess.STDOUT).returncode)\n /tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw5/test_f3_an_absent_red_not_red_0/project/.gov-runtime",
+        "started": "2026-11-13T13:34:07+00:00"
+      }
+    ]
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1650753,
+    "repository": "/home/usain/gov-os-worktrees/W2-183",
+    "ticket": "DAEO-href",
+    "role": "orchestrator",
+    "started": "2026-11-13T13:34:07+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 15863126
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-13 13:34:07 gate open; DAEO-href registered as pid 1650753; starting W2-183

@@ -1,0 +1,6 @@
+closed_missing at 6b62de94e3fd pinned: equal=True problems=[]
+no_record at 6b62de94e3fd pinned: problems=[] unlisted=[]
+cleanup commits: ['e12f8a30ca7d', 'c4420040f9b3', '8d245901b239', '8f8d707f0bd0', 'bce798c3a911', '57cbacfbfc86']
+variant e12f8a30ca7d: branch-tool text=19 own-tool text=19 equal=True only_branch=[] only_own=[]
+variant c4420040f9b3: branch-tool text=8 own-tool text=8 equal=True only_branch=[] only_own=[]
+variant bce798c3a911: branch-tool text=6 own-tool text=6 equal=True only_branch=[] only_own=[]

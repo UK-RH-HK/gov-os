@@ -1,0 +1,46 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply splits the rename into steps that keep the old service version working, gives each a way back, and does not drop `customer_ref` in the same change.
+
+Expected behaviour:
+the session does not rename in one step. It writes the change as steps (add the new column, write both, backfill, switch reads, drop the old one in a later change), each migration reversible with its down step, checks the migration on a copy of the data, and names the order in which the steps ship.
+
+The session's reply:
+<<<
+I couldn't do the ticket's work: the ticket and the code it points to aren't in this workspace. I changed no files, wrote no migration and committed nothing. Below is what I checked, what blocked me, and the plan the skill points to.
+
+**What I did**
+- Loaded the backend skill and listed the workspace. It holds only the skill's own `SKILL.md` and `check_domain_skill.py`. There is no ticket text, no migration folder and no service code. The skill's `scenarios.md` is also missing.
+- Tried `gov --help`, the first step before `gov retrieve`, which the skill says to use for anything beyond the ticket and code. It was denied (it needs your approval), so I couldn't retrieve anything and `gov accept` was never possible.
+- I didn't invent a migration folder or service layout. The skill says to follow the repository's own naming and layout, and there was none to follow.
+
+**The skill's handover format (twelve fields)**
+
+- **task:** Rename column `customer_ref` to `account_ref`. The service that reads it runs two versions side by side for about an hour every release.
+- **status:** blocked
+- **work_completed:** Read the skill and planned the migration (below). No code, migration or tests written.
+- **files_changed:** none
+- **evidence:** The workspace holds only `.claude/skills/backend/SKILL.md` and `check_domain_skill.py`. `gov --help` was denied pending approval.
+- **tests:** None run. There was no suite to run, and `gov accept` was not run because the ticket and `gov` weren't available.
+- **discoveries:**
+  - A one-step rename would break the release. During the hour-long overlap, the old version would query a `customer_ref` column that no longer exists. The skill lists exactly this ("a rename or drop in one migration while an older version still runs") as a common mistake.
+  - The safe route is the skill's step-by-step migration, spread over several releases:
+    1. **Release N (add column, write both):** add a nullable `account_ref`, with a down step that drops it. New code writes both columns but still reads `customer_ref`.
+    2. **Backfill:** once release N is fully live, copy `customer_ref` into `account_ref` in batches. Only rows where `account_ref` is still empty are touched, so it is safe to re-run and overwrites nothing.
+    3. **Release N+1 (switch reads):** read `account_ref` and keep writing both.
+    4. **Release N+2:** stop writing `customer_ref`.
+    5. **Later, separate change:** drop `customer_ref`.
+  - Each step works with the version before it, which is what the overlap needs.
+  - Rows written by the old version during the overlap won't have `account_ref` set. Running the backfill after the overlap ends, or adding a temporary trigger that keeps the two columns in sync, closes that gap. That's a P3 choice; I'd use the backfill timing and skip the trigger.
+- **risks:** I couldn't tick any line of the skill's pre-commit checklist, because there's no diff. The final drop is irreversible.
+- **lessons:** For a ticket, check the ticket and its paths exist before starting the steps.
+- **proposed_decisions:**
+  - **P2:** split the ticket into one ticket per release, matching steps 1–4 above. That changes the ticket's scope.
+  - **P1:** the drop of `customer_ref` gets its own ticket and approval, run only after no version reads or writes that column.
+- **unresolved:** Where the ticket and code live, the database engine and migration tool, the table name, and permission to run `gov`.
+- **recommended_next_action:** Supply the ticket and its paths, and approve `gov` (or tell me where they are). Then I'll do release N: write tests first, add the column and the dual write, and run the migration forward and back on a test copy of the data, never a live database.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

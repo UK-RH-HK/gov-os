@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-101
+status: interim result 4094fe296: W2-101 (DAEO-6icv): the narrow independent check's probe record, round 1 FAIL on 0b0d4cb3053d (F1: the harness would show scenario-summaries.md to the session under test; F2-F6 rows; the lead's L1, W2

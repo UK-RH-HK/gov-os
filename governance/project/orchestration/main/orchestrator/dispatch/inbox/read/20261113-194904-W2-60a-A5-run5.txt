@@ -1,0 +1,11 @@
+log: W2-60a-A5-run5.json
+W2: W2-60a
+status: DONE. Head to land: **a7aa762ab890**. One residual red is waiting on the owner: P-9, the DEC-253 exemption for 5b7941b66, already sent to the owner by the CTO.
+
+task: DAEO-cv58 (W2-60a), run 5, build
+status: DONE. Head to land: **a7aa762ab890**. One residual red is waiting on the owner: P-9, the DEC-253 exemption for 5b7941b66, already sent to the owner by the CTO.
+work_completed:
+- b12 resolved the five conflict markers in the four acceptance files, fixed W2-60a's fixtures (templates, open gate) and added the case for a skill versioned only under `metadata:`.
+- b13 wrote the plan test (`test_w2_60a_plan.py`) and fixed the P-3 older fixtures in 7 files.
+- b14 fixed S2's version reader and built `launcher.plan`.
+- b15 revised 11 assertions to the merge

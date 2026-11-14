@@ -1,0 +1,11 @@
+log: W2-88b-A5-run3.json
+W2: W2-88b
+status: PACKAGES. S4's route for A5 is blocked on both copies, and that stops the lead.
+
+task: DAEO-aks1 (W2-88b), build run 3: the smoke run under DEC-1176
+status: PACKAGES. S4's route for A5 is blocked on both copies, and that stops the lead.
+work_completed:
+- Fresh copies are set up in the layout S1 names: `~/gov-os-runs/W2-88b/redis/` and `~/gov-os-runs/W2-88b/grafana/`.
+  - Each is pinned, with logs in `<name>-logs/` (one `<label>.log` per stage plus `stages.tsv`).
+  - I removed run 2's superseded outputs from the runs folder (F1). These were its `~/workspace` clone, every log or result that named `~/workspace`, and the old stand-in-verdict results.
+  - grafana: run 2's clone

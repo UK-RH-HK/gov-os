@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-100
+status: interim result cdac25763: W2-100 (DAEO-uw5h): the probe records of the two narrow independent checks (PASS on f8e7c0fad6c6 and f7637bd03e25) and the CIT-P draft with each file's sha256, for the owner's yes

@@ -1,0 +1,81 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "head",
+   "before": "e6724c20873c",
+   "after": "1f33a6888e9f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "head",
+   "before": "bb795e053259",
+   "after": "5b8e73055223"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": " M src/gov/links/check.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": " M tests/unit/links/test_links.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  }
+ ]
+}

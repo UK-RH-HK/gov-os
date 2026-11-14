@@ -1,0 +1,37 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not remove or rename `total` in v1, and names a backward-compatibility test for the old shape.
+
+Expected behaviour:
+the session keeps `total` and adds `total_cents` (an additive change), marks `total` as deprecated in the contract, adds a test that an old client's request still gets the old shape, and notes that removing `total` needs a new version.
+
+The session's reply:
+<<<
+Quick update: the `gov` CLI needs approval I don't have, and this folder contains only the skill, with no ticket, contract or code. So I'm writing the change and the handover from the skill's method instead of editing files.
+
+task: Make `GET /v1/orders/{id}` return `total_cents` where it returns `total` today
+status: partial. The additive part is designed but not built; removing `total` is escalated
+work_completed: Read the skill and the folder. Treated the ticket's rename as a breaking change inside the published `v1`, and per Conventions turned it into an additive change: add `total_cents` next to `total`, keep `total` working, mark it deprecated in the contract. Only removing `total` is escalated.
+files_changed: none
+evidence: The folder holds only `.claude/skills/api/SKILL.md` and `check_domain_skill.py`. I found no ticket text, OpenAPI file, handler or tests. `gov retrieve` and `gov accept` were refused because they need approval.
+tests: All planned, none written or run, because there is no code or test suite here:
+- **Old client:** `GET /v1/orders/{id}` still returns `total` with its published type and value. This test stands alone so it covers the mobile apps that can't be forced to update.
+- **New field:** the same call returns `total_cents` as an integer.
+- **Agreement:** `total_cents` and `total` describe the same amount. This test does not stand in for the old-client test.
+- **Schema:** the 200 response matches the contract, and 404 (unknown id) and 400 (malformed id) use the interface's single error shape with stable error codes.
+- **Edges:** a zero total, a very large total, and amounts that don't divide evenly if `total` is a decimal.
+discoveries:
+- The contract doesn't say whether `total` is already in cents or is a decimal in major units such as 12.34. The simplest reading is that it's a decimal, so `total_cents = round(total × 100)`. This is a P3 point to write into the contract.
+- Contract change planned: add `total_cents: integer (minor units)` to the order response, and mark `total` as `deprecated: true` with a description naming `total_cents` as its replacement. The removal date is left open.
+risks:
+- The mobile apps read `total` and can't be forced to update, so removing or renaming it in v1 would break them. I couldn't identify any other callers because the repository wasn't available.
+- None of the pre-commit checklist could be ticked, because there's no diff.
+lessons: A ticket that asks for a rename inside a published version should be read as "add the new field, deprecate the old one" unless it explicitly asks for removal.
+proposed_decisions: Ship `total_cents` additively in v1 and keep `total` until there's a policy for retiring it (for example, a minimum app version or usage telemetry showing no readers left). Any real removal goes into a `v2` or a separate later change.
+unresolved: **P2, to whoever started this session:** the ticket asks for `total_cents` "where it returns `total`" but says nothing about the mobile clients. Removing `total` from v1 would break apps that can't update. My recommendation is the additive change above. Removal would need either a `v2` endpoint or a deprecation window tied to app adoption, and the ticket owner has to choose. The additive work doesn't have to wait for that decision.
+recommended_next_action: Give me the repository path, the ticket's allowed paths and the contract file, and approve `gov`. I'll then change the contract, write the tests above, add the field in the handler, run the suite and `gov accept`, and commit with the ticket's trailers.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

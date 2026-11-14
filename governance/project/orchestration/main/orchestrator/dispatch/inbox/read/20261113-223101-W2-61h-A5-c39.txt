@@ -1,0 +1,9 @@
+log: W2-61h-A5-c39.json
+W2: W2-61h
+status: PACKAGES
+
+task: DAEO-h2k3 (W2-61h): the hidden count case revised to 39 under DEC-1171 (2)
+status: PACKAGES
+work_completed:
+- **Part done.** A fresh independent test designer (td-1) set `HIDDEN_COUNT` to 39 and changed the README's count lines to match. Its commit carries `Rewrite-Reason: DEC-1171 (2), h10 retired, 39 until the replacement`. No test function name changed and no other case changed. I merged it.
+- **Part not done: h10's category minimum and the twelve categories' sum.** No one outside the sets root can know h10's category. The lead searched DEC-1171, `docs/research/memory-measure-audit/HI

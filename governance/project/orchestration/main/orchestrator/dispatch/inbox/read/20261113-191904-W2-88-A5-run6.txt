@@ -1,0 +1,7 @@
+log: W2-88-A5-run6.json
+W2: W2-88
+status: DONE. NC-1 and NC-2 are fixed. The narrow check passed, and `gov accept` passed with 217 passed and 0 failed. The head to land is df9f4910e00edff5f4cf5f7955cb817540f0cc4f.
+
+task: DAEO-2bdu (W2-88), run 6 (build), FULL, class C2. This run is the owner's decision P1-W2-88-NC-1 (a): finish A9's undo on the one path it missed (in `fabric.py`), then a narrow independent check.
+status: DONE. NC-1 and NC-2 are fixed. The narrow check passed, and `gov accept` passed with 217 passed and 0 failed. The head to land is df9f4910e00edff5f4cf5f7955cb817540f0cc4f.
+work_completed: I wrote the run-6 interface (DEC-1052) and the briefs for td-8 and eng-5, and launched them in parallel. eng-5 made A9 commit its record through its own step, `fabric.commit` (no `project.commit`, no re

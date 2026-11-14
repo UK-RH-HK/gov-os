@@ -1,0 +1,34 @@
+.....................................F..                                 [100%]
+=================================== FAILURES ===================================
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a root that is not the repository] _
+
+w = <test_landing_cto_route.World object at 0x7ea7bc1a9c70>
+why = 'a root that is not the repository'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'6384e5f9cdd...d879154c4722'}
+E         
+E         Extra items in the right set:
+E         '6384e5f9cdd7ee394b59afc71fcad879154c4722'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:309: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a root that is not the repository]
+1 failed, 39 passed in 4.01s

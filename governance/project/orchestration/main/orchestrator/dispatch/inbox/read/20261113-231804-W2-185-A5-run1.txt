@@ -1,0 +1,10 @@
+log: W2-185-A5-run1.json
+W2: W2-185
+status: PACKAGES. S1, S2, S3 and F1 are built and all pass, and the narrow check PASSes. The branch can't land yet: the change turns 18 cases red in files outside the ticket's `allowed_paths`. All 18 pin the behaviour from before DEC-1167 (4) and need revising under DEC-1156 (7). One package: P-W2-185-REDS-
+
+task: DAEO-qyt2 (W2-185), build run 1
+status: PACKAGES. S1, S2, S3 and F1 are built and all pass, and the narrow check PASSes. The branch can't land yet: the change turns 18 cases red in files outside the ticket's `allowed_paths`. All 18 pin the behaviour from before DEC-1167 (4) and need revising under DEC-1156 (7). One package: P-W2-185-REDS-1.
+work_completed:
+- **Engineer en-1 (a0558ff7d):**
+  - S1: `context_watch.py` added to the template's `postToolUse` (matcher Bash, timeout 10), the root's line byte for byte with the adopted path.
+  - S2: the lift exemption is now per hook. Only the tem

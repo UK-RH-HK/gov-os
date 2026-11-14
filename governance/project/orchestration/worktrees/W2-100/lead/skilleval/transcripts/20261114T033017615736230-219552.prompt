@@ -1,0 +1,65 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply puts the contract change before the handler in its order of work and says the unit tests follow the contract.
+
+Expected behaviour:
+the session writes the endpoint's contract in the OpenAPI file first (request, responses with their error codes, status codes), derives its unit tests from the contract, and writes the handler last, checking the handler against the contract.
+
+The session's reply:
+<<<
+I stopped before writing anything. The ticket, the OpenAPI file, the handler and its tests are not in this folder, so the skill's first steps (read the ticket and the current contract) could not be done.
+
+## What I did
+- **Looked at the folder:** it holds only `.claude/skills/api/SKILL.md` and `check_domain_skill.py`. There is no ticket, no OpenAPI file, no handler, no tests, and it is not a git repository.
+- **Tried `gov`:** it is installed, but `gov --help` was refused twice. The skill says that when the same call is refused twice, you stop and return. So I could not run `gov retrieve` to find the ticket and contract, or `gov accept` to run the acceptance tests.
+- **Wrote nothing.** The skill's rule is that the contract is written before any code, and the only paths I may change are the ticket's. I didn't create a stand-in OpenAPI file or a handler: one would sit outside the ticket's paths, and the code would come before the contract. The contract draft below is only in this report.
+
+## Return
+- **task:** STANDARD ticket: add `POST /v1/exports`, which starts an export job and returns its id.
+- **status:** blocked before step 1. Nothing written or committed.
+- **work_completed:** looked at the folder; tried `gov` (refused twice); planned the contract change below.
+- **files_changed:** none.
+- **evidence:** the folder listing shows only the skill files; `gov --help` was refused twice.
+- **tests:** none written or run. Planned, from the contract:
+  - valid request → `202` with a body that has a string `id` and `status: "queued"`
+  - missing or wrong-type required field → `400` in the API's existing error shape with a stable code
+  - extra unknown field → ignored, still `202`
+  - empty or at-limit values → handled as the contract says
+  - same `Idempotency-Key` sent twice → the same `id` both times, and only one job
+  - no secret, internal host or personal data in the response
+  - an existing `/v1` endpoint answers as before
+  
+  No test for an old request shape is needed, because nothing is renamed or removed.
+- **discoveries (P3, simplest reading, to go into the contract):**
+  - Starting a job doesn't finish it, so `202 Accepted` rather than `201`.
+  - The body is `{id, status}` only.
+  - An optional `Idempotency-Key` header, because POST isn't safe to retry otherwise.
+  - Errors reuse the existing error schema, not a new one.
+  - Ticket and contract are unread, so the request fields and the API's casing are unknown.
+- **risks:** callers not identified. There may be no `GET /v1/exports/{id}` to poll the job, which would leave the returned id with nothing to use it on.
+- **lessons:** none.
+- **proposed_decisions:** none. The change is additive: a new endpoint in the existing `v1`, so not breaking.
+- **unresolved:** the ticket's KPI lines and request fields, the OpenAPI file's path and error schema, whether a status endpoint exists.
+- **recommended_next_action:** approve `gov` (`retrieve` and `accept`) for this session, or open it in the repository that holds the ticket. Then, in order: edit the OpenAPI file, write the tests, write the handler and check it against the contract, run the suite and the pre-commit checklist, run `gov accept`, and commit with the ticket's trailers.
+
+**Contract draft (only in this report, not written to any file):**
+```yaml
+/v1/exports:
+  post:
+    operationId: createExport
+    parameters:
+      - {in: header, name: Idempotency-Key, required: false, schema: {type: string, maxLength: 255}}
+    requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ExportRequest'}}}}  # fields per ticket
+    responses:
+      '202': {description: Export job accepted, content: {application/json: {schema: {type: object, required: [id, status], properties: {id: {type: string}, status: {type: string, enum: [queued]}}}}}}
+      '400': {$ref: '#/components/responses/Error'}   # existing error shape
+      '401': {$ref: '#/components/responses/Error'}
+      '409': {$ref: '#/components/responses/Error'}   # same Idempotency-Key sent with a different body
+```
+
+To go further I need `gov` approved, or the repository with the ticket in it.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

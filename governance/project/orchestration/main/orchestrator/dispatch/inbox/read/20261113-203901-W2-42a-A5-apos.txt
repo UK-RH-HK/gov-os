@@ -1,0 +1,7 @@
+log: W2-42a-A5-apos.json
+W2: W2-42a
+status: PACKAGES. Two questions for the CTO before the engineer starts. P-03ub-APOS-1: the ordered fix cannot make case (a) pass. P-03ub-APOS-2: a fail-open is live in the product guard and in the live hook.
+
+task: DAEO-03ub (W2-42a), reopened under DEC-1164 (18) and DEC-1174 (1); build run
+status: PACKAGES. Two questions for the CTO before the engineer starts. P-03ub-APOS-1: the ordered fix cannot make case (a) pass. P-03ub-APOS-2: a fail-open is live in the product guard and in the live hook.
+work_completed: (1) Merged `w2/integrate` into `w2/W2-42a` in one command with `--no-ff` (d73bd2756). There were no conflicts and `git diff --check` was empty. (2) A fresh independent test designer (td-4, `Rewrite-Reason: DEC-1174 (1)`) wrote `tests/acceptance/W2-42a/test_w2_42a_apostrophe.py`, with 312 case

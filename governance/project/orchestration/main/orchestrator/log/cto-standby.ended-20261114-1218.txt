@@ -1,0 +1,1 @@
+2026-11-14 12:07:20 HANDOVER: session f3886235 stands by for the owner's operator to start the new CTO session (300k compaction trial, DEC-1171 (6)); state in CHECKPOINT.md's NOW (12:10) block. No land running.

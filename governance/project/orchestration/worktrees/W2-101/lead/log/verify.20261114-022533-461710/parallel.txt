@@ -1,0 +1,338 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 02:09:56)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+......................................s................................. [  3%]
+........................................................................ [  4%]
+................F..F.......F............................................ [  5%]
+.F.F.......F............................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+...................................................FF.F................. [ 11%]
+..................................FFF................................... [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........sss............................................................. [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+.......................................................sss.............. [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+.........................................................F.............. [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+................................................                         [100%]
+=================================== FAILURES ===================================
+________ test_every_write_step_lies_in_the_skills_output_class[devops] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'devops'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+        found = _output_findings(front, s.folder_texts(f"{s.SKILLS}/{name}"))
+>       assert not found, f"{name} tells its role to write outside its output class {front.get('output')!r}: {found}"
+E       AssertionError: devops tells its role to write outside its output class "the ticket's own allowed paths": ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+E       assert not ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+
+tests/acceptance/W2-11/test_w2_11_round2.py:218: AssertionError
+_______ test_every_write_step_lies_in_the_skills_output_class[frontend] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'frontend'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+        found = _output_findings(front, s.folder_texts(f"{s.SKILLS}/{name}"))
+>       assert not found, f"{name} tells its role to write outside its output class {front.get('output')!r}: {found}"
+E       AssertionError: frontend tells its role to write outside its output class "the ticket's own allowed paths": ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+E       assert not ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+
+tests/acceptance/W2-11/test_w2_11_round2.py:218: AssertionError
+_________ test_every_write_step_lies_in_the_skills_output_class[ui-ux] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'ui-ux'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_every_write_step_lies_in_the_skills_output_class(name):
+        front = _front(f"{s.SKILLS}/{name}/SKILL.md")
+        found = _output_findings(front, s.folder_texts(f"{s.SKILLS}/{name}"))
+>       assert not found, f"{name} tells its role to write outside its output class {front.get('output')!r}: {found}"
+E       AssertionError: ui-ux tells its role to write outside its output class "the ticket's own allowed paths": ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+E       assert not ['output is neither none nor a path class: "the ticket\'s own allowed paths"']
+
+tests/acceptance/W2-11/test_w2_11_round2.py:218: AssertionError
+________ test_the_skill_carries_one_version_in_all_four_places[devops] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'devops'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/devops/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-101')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/devops/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[frontend] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'frontend'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/frontend/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-101')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/frontend/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+_________ test_the_skill_carries_one_version_in_all_four_places[ui-ux] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'ui-ux'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/ui-ux/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-101')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/ui-ux/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:38: AssertionError
+___________ test_the_claude_copy_matches_the_kernel_source[frontend] ___________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'frontend'
+
+    @SKILLS
+    def test_the_claude_copy_matches_the_kernel_source(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): .claude/skills/ is generated by it, not by this ticket."""
+        found = differences(_source(skill), s.REPO_ROOT / ".claude/skills" / skill, generated=True)
+>       assert not found, f".claude/skills/{skill} differs from the kernel source: {found}"
+E       AssertionError: .claude/skills/frontend differs from the kernel source: ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/frontend does not exist']
+E       assert not ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/frontend does not exist']
+
+tests/acceptance/W2-101/test_w2_101_copies.py:106: AssertionError
+____________ test_the_claude_copy_matches_the_kernel_source[ui-ux] _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'ui-ux'
+
+    @SKILLS
+    def test_the_claude_copy_matches_the_kernel_source(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): .claude/skills/ is generated by it, not by this ticket."""
+        found = differences(_source(skill), s.REPO_ROOT / ".claude/skills" / skill, generated=True)
+>       assert not found, f".claude/skills/{skill} differs from the kernel source: {found}"
+E       AssertionError: .claude/skills/ui-ux differs from the kernel source: ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/ui-ux does not exist']
+E       assert not ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/ui-ux does not exist']
+
+tests/acceptance/W2-101/test_w2_101_copies.py:106: AssertionError
+____________ test_the_claude_copy_matches_the_kernel_source[devops] ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'devops'
+
+    @SKILLS
+    def test_the_claude_copy_matches_the_kernel_source(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): .claude/skills/ is generated by it, not by this ticket."""
+        found = differences(_source(skill), s.REPO_ROOT / ".claude/skills" / skill, generated=True)
+>       assert not found, f".claude/skills/{skill} differs from the kernel source: {found}"
+E       AssertionError: .claude/skills/devops differs from the kernel source: ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/devops does not exist']
+E       assert not ['/home/usain/gov-os-worktrees/W2-101/.claude/skills/devops does not exist']
+
+tests/acceptance/W2-101/test_w2_101_copies.py:106: AssertionError
+_ test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[frontend] __
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'frontend'
+
+    @SKILLS
+    def test_the_adapter_check_finds_no_generated_drift_in_the_real_skill(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): the .claude/skills/ copy is generated by it."""
+        if shutil.which("rulesync") is None and not os.environ.get("RULESYNC_BIN"):
+            pytest.skip("rulesync is not installed: the adapter check cannot compare the generated copy")
+        _source(skill)
+        drift = [f for f in _naming(_real_findings(), skill) if f["code"].startswith("GENERATED_")]
+>       assert not drift, f"the adapter check names {skill}'s generated copy: {drift}"
+E       AssertionError: the adapter check names frontend's generated copy: [{'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/frontend/SKILL.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/frontend/check_domain_skill.py'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/frontend/scenario-records.yaml'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/frontend/scenario-summaries.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/frontend/scenarios.md'}]
+E       assert not [{'code': 'GENERATED_DIFFERS', 'file': '.claude/skills/frontend/SKILL.md', 'message': 'is not what rulesync generates ...IFFERS', 'file': '.claude/skills/frontend/scenarios.md', 'message': 'is not what rulesync generates from its sources'}]
+
+tests/acceptance/W2-101/test_w2_101_copies.py:140: AssertionError
+___ test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[ui-ux] ___
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'ui-ux'
+
+    @SKILLS
+    def test_the_adapter_check_finds_no_generated_drift_in_the_real_skill(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): the .claude/skills/ copy is generated by it."""
+        if shutil.which("rulesync") is None and not os.environ.get("RULESYNC_BIN"):
+            pytest.skip("rulesync is not installed: the adapter check cannot compare the generated copy")
+        _source(skill)
+        drift = [f for f in _naming(_real_findings(), skill) if f["code"].startswith("GENERATED_")]
+>       assert not drift, f"the adapter check names {skill}'s generated copy: {drift}"
+E       AssertionError: the adapter check names ui-ux's generated copy: [{'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/ui-ux/SKILL.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/ui-ux/check_domain_skill.py'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/ui-ux/scenario-records.yaml'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/ui-ux/scenario-summaries.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/ui-ux/scenarios.md'}]
+E       assert not [{'code': 'GENERATED_DIFFERS', 'file': '.claude/skills/ui-ux/SKILL.md', 'message': 'is not what rulesync generates fro...D_DIFFERS', 'file': '.claude/skills/ui-ux/scenarios.md', 'message': 'is not what rulesync generates from its sources'}]
+
+tests/acceptance/W2-101/test_w2_101_copies.py:140: AssertionError
+__ test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[devops] ___
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+skill = 'devops'
+
+    @SKILLS
+    def test_the_adapter_check_finds_no_generated_drift_in_the_real_skill(skill):
+        """KNOWN RED until the CTO's copies ACT (DEC-1112 (3)): the .claude/skills/ copy is generated by it."""
+        if shutil.which("rulesync") is None and not os.environ.get("RULESYNC_BIN"):
+            pytest.skip("rulesync is not installed: the adapter check cannot compare the generated copy")
+        _source(skill)
+        drift = [f for f in _naming(_real_findings(), skill) if f["code"].startswith("GENERATED_")]
+>       assert not drift, f"the adapter check names {skill}'s generated copy: {drift}"
+E       AssertionError: the adapter check names devops's generated copy: [{'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/devops/SKILL.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/devops/check_domain_skill.py'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/devops/scenario-records.yaml'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/devops/scenario-summaries.md'}, {'code': 'GENERATED_DIFFERS', 'message': 'is not what rulesync generates from its sources', 'file': '.claude/skills/devops/scenarios.md'}]
+E       assert not [{'code': 'GENERATED_DIFFERS', 'file': '.claude/skills/devops/SKILL.md', 'message': 'is not what rulesync generates fr..._DIFFERS', 'file': '.claude/skills/devops/scenarios.md', 'message': 'is not what rulesync generates from its sources'}]
+
+tests/acceptance/W2-101/test_w2_101_copies.py:140: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-lead-W2-101/pytest-of-usain/pytest-0/popen-gw3/h10')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-101/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=3182084) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+13 failed, 6292 passed, 7 skipped, 6 warnings in 847.37s (0:14:07)

@@ -42,6 +42,10 @@
 # /home/usain/gov-os-operator/install/act-in-progress.txt], LANDING_OPCHECK [its install's landing_check.py],
 # LANDING_OPWAIT [3600], LANDING_OPPOLL [30].
 set -u
+# 2026-11-13 (CTO): a landing made by the operator agent (cron, PATH /usr/bin:/bin) started this hook without
+# ~/.local/bin (check-jsonschema, rulesync, gov) or Node 22: run 20261113-140053 went RED on its environment cases.
+# The nightly's fix (8f68e0c7c) in the same form: the tools this run needs come first on PATH whoever starts it.
+export PATH="/home/usain/.local/bin:/home/usain/.nvm/versions/node/v22.23.3/bin:/usr/local/bin:${PATH:-/usr/bin:/bin}"
 # A hook runs with git's own variables (a landing made in a worktree exports GIT_DIR=<main>/.git/worktrees/<name>, which
 # would turn every `git -C <path>` below, the clone's checkout included, onto that worktree): none is kept.
 for v in $(compgen -e | grep '^GIT_'); do unset "$v"; done

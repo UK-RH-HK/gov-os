@@ -1,0 +1,96 @@
+{
+  "ticket": "DAEO-href",
+  "ticket_text": "---\nid: DAEO-href\nwbs_id: W2-183\nexternal-ref: W2-183\ntitle: gov close's context packet at a project setting; gov context's supplementary block capped at 6,000 tokens\ntype: task\nclass: implementation\nrole: engineer\nprofile: STANDARD\nstatus: in_progress\nstate_class: AUTHORITATIVE\npriority: 1\ncreated: 2026-11-13\ndeps: []\nallowed_paths:\n- src/gov/context/__init__.py\n- src/gov/close/command.py\n- governance/project/facts.yaml\n- tests/unit/context/test_w2_183_*.py\n- tests/unit/close/test_w2_183_*.py\n- tests/unit/close/test_context.py  # its :31 case pins build_context(ROOT, \"T-1\"); revised to the decided call with budget= (DEC-1165; CTO, DEC-1156 (7), DEC-1157 (12))\n- docs/probes/DAEO-href/**  # the probe record\nreads:\n- src/gov/context/context_check.py\n- src/gov/context/command.py\n- src/gov/brief/build.py\n- tests/acceptance/W1-24/**\n- tests/acceptance/W2-04/**\n- tests/unit/context/**\nneeds: []\nwaits_on: []\nkpis:\n  success:\n  - 'S1: gov close builds the ticket''s context packet at the project''s setting `budgets.close_context_tokens` in governance/project/facts.yaml (65536 in this repository), not at gov context''s default of 6,000; with no setting, the default applies as today [DEC-1165 (1), DEC-1027 H] Verify: in a stand-in repository, a ticket whose own text and mandatory inputs come to about 10,000 tokens passes the close''s context step with the setting at 65536 and is refused CONTEXT_FAILED (context_error CONTEXT_OVER_CEILING) with the setting at 8000 or absent'\n  - 'S2: gov context''s supplementary block holds at most 6,000 tokens whatever --budget is passed (its room is the smaller of the budget less the mandatory part, and 6,000); the close''s packet is capped the same way [DEC-1165 (2), DEC-860] Verify: in a stand-in with a store large enough to fill it, `gov context <ticket> --budget 60000` gives a supplementary block of at most 6,000 tokens; the same with the close''s setting at 65536'\n  - 'S3: the mandatory part is never shortened, and a packet whose budget leaves under 6,000 tokens of room is unchanged: the same items and the same hash as before the change [DEC-1165 (3), CAP-15.d] Verify: a small stand-in ticket''s packet at the default budget has the hash it had before the change; a ticket whose mandatory part passes its ceiling is still refused CONTEXT_OVER_CEILING, named'\n  failure:\n  - 'A setting that is not a positive whole number refuses by name (never a silent default, never a crash). Verify: `budgets.close_context_tokens: 0`, `-5` and `\"many\"` each make the close''s context step refuse with a named finding'\nnon_goals:\n- 'no trimming of any ticket''s own text or sources (W2-88''s mandatory part, about 61,500 tokens, stays as it is: that needs its text trimmed, which this ticket does not do)'\n- 'no change to gov check''s context-reproducibility (it stays green while some tickets refuse over the ceiling, DEC-1025), to the brief builder (it reads only its own keys of `budgets:`) or to the kernel''s facts schema (`budgets:` already admits any key with a whole number)'\n- 'no change to the default ceiling of 6,000 for gov context and briefs'\ndone_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]\nsources: [DEC-1165, DEC-1027, DEC-860, CAP-15.d]\nacceptance_tests: {path: tests/acceptance/W2-183/}\n---\n\n# W2-183 gov close's context packet at a project setting; the supplementary cap\n\nThe owner's DEC-1165 (2026-11-13, \"add the supplementary cap\"): gov context's ceiling (DEC-1027 H) refuses most tickets\n(W2-88 at 56,284 tokens against 6,000; W2-113 8,440; W2-120 9,476; W2-98 9,828; W2-154 7,401), and every lead works\nround it with `--budget`. Two changes:\n\n- **The close's packet** (`_build_context`, `src/gov/close/command.py`) is built at a project setting,\n  `budgets.close_context_tokens` in `governance/project/facts.yaml` (65536 here), so closes stop refusing on it.\n- **The supplementary cap:** whatever `--budget` a lead passes, a packet carries at most 6,000 tokens of supplementary\n  context above its mandatory part. W2-88's workers today get packets filled toward 60,000; under the cap they get the\n  mandatory part plus at most 6,000. A ticket whose mandatory part is small is unchanged.\n\nThe mandatory part is never shortened (CAP-15.d). The key sits in `budgets:` because the kernel's facts schema (kernel bytes) admits no new top-level key and `budgets:`\nalready admits any key with a whole number; it counts tokens, not the prose characters of the template keys. A test designer writes the cases from these lines; an engineer builds; a STANDARD review; the land.\n",
+  "authority": [
+    {
+      "id": "DEC-1165",
+      "sha256": "de2973001c4c4f8d78f8bfc3080e7fec2ff6ee5439f184dd032d369402fe2614",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "de2973001c4c4f8d78f8bfc3080e7fec2ff6ee5439f184dd032d369402fe2614",
+      "reason": "declared in sources",
+      "tokens": 4688
+    },
+    {
+      "id": "DEC-1027",
+      "sha256": "7f49abe4345bd3ac9327bb90eb36295879e0e7e9432f8bab7f54e2b5ef5d2d48",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "7f49abe4345bd3ac9327bb90eb36295879e0e7e9432f8bab7f54e2b5ef5d2d48",
+      "reason": "declared in sources",
+      "tokens": 560
+    },
+    {
+      "id": "DEC-860",
+      "sha256": "b02ef840a9d231a0f91fbe0abd5dbcdbc318a852fc964291a599945fe8d2ced5",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "b02ef840a9d231a0f91fbe0abd5dbcdbc318a852fc964291a599945fe8d2ced5",
+      "reason": "declared in sources",
+      "tokens": 416
+    },
+    {
+      "id": "CAP-15.d",
+      "sha256": "8ba66b559993972eae97c09eae5408a4a4039dd8189f3ed216d95974087c47c0",
+      "authority": "capability",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8ba66b559993972eae97c09eae5408a4a4039dd8189f3ed216d95974087c47c0",
+      "reason": "declared in sources",
+      "tokens": 169
+    }
+  ],
+  "mandatory": [
+    {
+      "id": "DEC-1165",
+      "sha256": "de2973001c4c4f8d78f8bfc3080e7fec2ff6ee5439f184dd032d369402fe2614",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "de2973001c4c4f8d78f8bfc3080e7fec2ff6ee5439f184dd032d369402fe2614",
+      "reason": "declared in sources",
+      "tokens": 4688
+    },
+    {
+      "id": "DEC-1027",
+      "sha256": "7f49abe4345bd3ac9327bb90eb36295879e0e7e9432f8bab7f54e2b5ef5d2d48",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "7f49abe4345bd3ac9327bb90eb36295879e0e7e9432f8bab7f54e2b5ef5d2d48",
+      "reason": "declared in sources",
+      "tokens": 560
+    },
+    {
+      "id": "DEC-860",
+      "sha256": "b02ef840a9d231a0f91fbe0abd5dbcdbc318a852fc964291a599945fe8d2ced5",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "b02ef840a9d231a0f91fbe0abd5dbcdbc318a852fc964291a599945fe8d2ced5",
+      "reason": "declared in sources",
+      "tokens": 416
+    },
+    {
+      "id": "CAP-15.d",
+      "sha256": "8ba66b559993972eae97c09eae5408a4a4039dd8189f3ed216d95974087c47c0",
+      "authority": "capability",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8ba66b559993972eae97c09eae5408a4a4039dd8189f3ed216d95974087c47c0",
+      "reason": "declared in sources",
+      "tokens": 169
+    }
+  ],
+  "supplementary": [],
+  "supplementary_query": "gov close's context packet at a project setting; gov context's supplementary block capped at 6,000 tokens\nS1: gov close builds the ticket's context packet at the project's setting `budgets.close_context_tokens` in governance/project/facts.yaml (65536 in this repository), not at gov context's default of 6,000; with no setting, the default applies as today [DEC-1165 (1), DEC-1027 H] Verify: in a stand-in repository, a ticket whose own text and mandatory inputs come to about 10,000 tokens passes the close's context step with the setting at 65536 and is refused CONTEXT_FAILED (context_error CONTEXT_OVER_CEILING) with the setting at 8000 or absent\nS2: gov context's supplementary block holds at most 6,000 tokens whatever --budget is passed (its room is the smaller of the budget less the mandatory part, and 6,000); the close's packet is capped the same way [DEC-1165 (2), DEC-860] Verify: in a stand-in with a store large enough to fill it, `gov context <ticket> --budget 60000` gives a supplementary block of at most 6,000 tokens; the same with the close's setting at 65536\nS3: the mandatory part is never shortened, and a packet whose budget leaves under 6,000 tokens of room is unchanged: the same items and the same hash as before the change [DEC-1165 (3), CAP-15.d] Verify: a small stand-in ticket's packet at the default budget has the hash it had before the change; a ticket whose mandatory part passes its ceiling is still refused CONTEXT_OVER_CEILING, named\nA setting that is not a positive whole number refuses by name (never a silent default, never a crash). Verify: `budgets.close_context_tokens: 0`, `-5` and `\"many\"` each make the close's context step refuse with a named finding",
+  "further_batch": [],
+  "supplementary_batches": [],
+  "dropped": [
+    {
+      "id": "supplementary",
+      "reason": "the lexical index is stale"
+    }
+  ],
+  "tokens": 6970,
+  "budget": {
+    "limit": 12000,
+    "used": 6970
+  },
+  "hash": "64161c64709cdf9be3d637a36282c4987cf49b4283321cfa737804065897997c"
+}

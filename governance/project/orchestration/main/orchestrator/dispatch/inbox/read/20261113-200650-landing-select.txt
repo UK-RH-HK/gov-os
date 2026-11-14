@@ -1,0 +1,3 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log
+Landing check (OPERATOR-AGENT-1 §3, S16) after the landing 73569aafdd0a..72c6def8871a on w2/integrate: commit 72c6def8871a (Merge w2/W2-37 (DAEO-6n5k): gov impact and the change skill's impact section at version 1.1.0 (CIT-P a25b02a7, DEC-1166 ) touches template/governance/kernel/skills/change/SKILL.md: a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+status: P1

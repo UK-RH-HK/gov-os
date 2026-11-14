@@ -1,0 +1,9 @@
+log: W2-37-A5-resume-dec1163.json
+W2: W2-37
+status: PACKAGES. Everything the brief asked for is done. F1 (a) is built, tested and passed its narrow independent check. The change skill's impact section is written. Its CIT-P passed independent review. What's left needs others: the owner's approval line on the bytes (and the version number), and the CTO
+
+task: DAEO-6n5k
+status: PACKAGES. Everything the brief asked for is done. F1 (a) is built, tested and passed its narrow independent check. The change skill's impact section is written. Its CIT-P passed independent review. What's left needs others: the owner's approval line on the bytes (and the version number), and the CTO's P-7 and copies ACT at the land. The branch is clean at `31bf5ea0747e`.
+work_completed:
+- Merged `w2/integrate` at `0c266d752`, which carries the widened ticket (df9d442e8). Merged it again at `31bf5ea07` before the check. Neither merge touches the ticket's paths.
+- **F1 pa

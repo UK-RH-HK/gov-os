@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-42a
+status: interim result 62d86f0f8: W2-42a (DAEO-03ub): FULL review round 1 probe record, judgement fail (F1: a shell given an option with a value reads its heredoc as data; F2-F8 rows)

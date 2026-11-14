@@ -1,0 +1,91 @@
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+......................................................................FF [ 87%]
+.........................................                                [100%]
+=================================== FAILURES ===================================
+__ TestKernelAgainstAdapterSource.test_kernel_role_changed_without_its_source __
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e5a343d7200>
+generated_project = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_ker...worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_kernel_role_changed_without_its_source(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_KERNEL)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a kernel role file was changed without its rulesync source")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e5a343d7200>
+project = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_ker...worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = 'a kernel role file was changed without its rulesync source'
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a kernel role file was changed without its rulesync source: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md'} and {'.rulesync/s...-engineer.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         'governance/kernel/templates/role-engineer.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:492: AssertionError
+_ TestKernelAgainstAdapterSource.test_role_source_changed_without_its_kernel_role _
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e5a343d7650>
+generated_project = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_rol...worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_role_source_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_role_source_changed_without_its_kernel_role(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_SOURCE)
+        support.regenerate(generated_project)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a role's rulesync source was changed without its kernel role file")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e5a343d7650>
+project = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_rol...worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-3/test_role_source_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = "a role's rulesync source was changed without its kernel role file"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a role's rulesync source was changed without its kernel role file: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md'} and {'.rulesync/s...-engineer.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         'governance/kernel/templates/role-engineer.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:492: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_kernel_role_changed_without_its_source
+FAILED tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_role_source_changed_without_its_kernel_role
+2 failed, 327 passed, 3 deselected in 317.04s (0:05:17)

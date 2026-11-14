@@ -1,0 +1,95 @@
+..................................FFF...                                 [100%]
+=================================== FAILURES ===================================
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[an extra path] _
+
+w = <test_landing_cto_route.World object at 0x7e66192a1e50>
+why = 'an extra path'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'e21eece3228...a0bcd44ef545'}
+E         
+E         Extra items in the right set:
+E         'e21eece3228f80f449f15c41f4a9a0bcd44ef545'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:309: AssertionError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a path short] _
+
+w = <test_landing_cto_route.World object at 0x7e6619171b80>
+why = 'a path short'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'5f5e5e918dc...79c6c5067806'}
+E         
+E         Extra items in the right set:
+E         '5f5e5e918dc3854dbff6c3c4abc979c6c5067806'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:309: AssertionError
+_ test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[another path] _
+
+w = <test_landing_cto_route.World object at 0x7e66193a5c40>
+why = 'another path'
+
+    @pytest.mark.parametrize("why", ["an extra path", "a path short", "another path", "a root that is not the repository"])
+    def test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged(w, why):
+        if why == "an extra path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [HOOK, AGENT]
+        elif why == "a path short":
+            h = w.bundle(paths=(HOOK, AGENT))
+            paths = [HOOK]
+        elif why == "another path":
+            h = w.bundle(paths=(HOOK,))
+            paths = [AGENT]
+        else:
+            h = w.bundle(paths=(HOOK, AGENT), roots={AGENT: "home"})
+            paths = [HOOK, AGENT]
+        c = w.commit(paths, route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'8ffc7cc83d8...4ca41352ca38'}
+E         
+E         Extra items in the right set:
+E         '8ffc7cc83d838c329bf1771bea9d4ca41352ca38'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:309: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[an extra path]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[a path short]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_commit_whose_paths_are_not_the_touched_list_stays_flagged[another path]
+3 failed, 37 passed in 5.13s
+heavy_slot: all 3 slots taken; waiting (2026-11-13 16:14:49)

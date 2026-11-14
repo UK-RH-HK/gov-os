@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="28" skipped="0" tests="80" time="0.529" timestamp="2026-11-13T21:36:05.032776+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/strip-suffix-of-a-quoted-value]" time="0.017"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  v='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_0/proj'
+template = "v='a # b'; echo ${v%% #*} &gt; {w}", wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "v='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_0/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         v='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/default-value-then-a-later-command]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_1/proj'
+template = 'echo ${x:- #a}; echo x &gt; {w}', wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_1/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/pattern-substitution]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  v='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_2/proj'
+template = "v='a #b'; echo ${v/ #/} &gt; {w}", wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "v='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_2/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         v='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/while-read-loop-redirected]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_3/proj'
+template = 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; {w}'
+wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_3/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/while-read-loop-appending-inside]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_4/proj'
+template = 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; {w}; done &lt; f'
+wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_4/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/allowed-write-then-a-second-write]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_5/proj'
+template = 'echo ${X:- #} &gt; {a}; cp x.py {w}', wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_5/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/double-quoted-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[top-level/nested-expansion]" time="0.003"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_6/proj'
+template = 'echo ${v:-${w%% #*}} &gt; {w}', wrapper = 'top-level'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_6/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/strip-suffix-of-a-quoted-value]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  v='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_7/proj'
+template = "v='a # b'; echo ${v%% #*} &gt; {w}", wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\nv='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_7/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         v='a # b'; echo ${v%% #*} &gt; tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/default-value-then-a-later-command]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_8/proj'
+template = 'echo ${x:- #a}; echo x &gt; {w}', wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\necho ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_8/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/pattern-substitution]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  v='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_9/proj'
+template = "v='a #b'; echo ${v/ #/} &gt; {w}", wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\nv='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_9/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         v='a #b'; echo ${v/ #/} &gt; tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/while-read-loop-redirected]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_10/proj'
+template = 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; {w}'
+wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\nwhile read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_10/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/while-read-loop-appending-inside]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_11/proj'
+template = 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; {w}; done &lt; f'
+wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\nwhile read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_11/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/allowed-write-then-a-second-write]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_12/proj'
+template = 'echo ${X:- #} &gt; {a}; cp x.py {w}', wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\necho ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_12/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/double-quoted-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-heredoc-quoted/nested-expansion]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash &lt;&lt;'EOF'&#10;  echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py&#10;  EOF&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_13/proj'
+template = 'echo ${v:-${w%% #*}} &gt; {w}', wrapper = 'heredoc'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash &lt;&lt;'EOF'\necho ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py\nEOF"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_13/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash &lt;&lt;'EOF'
+E         echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py
+E         EOF
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/strip-suffix-of-a-quoted-value]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'v=&quot;a # b&quot;; echo ${v%% #*} &gt; tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_14/proj'
+template = 'bash -c \'v="a # b"; echo ${v%% #*} &gt; {w}\'', wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'bash -c \'v="a # b"; echo ${v%% #*} &gt; tests/acceptance/X/zz.py\''
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_14/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'v="a # b"; echo ${v%% #*} &gt; tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/default-value-then-a-later-command]" time="0.003"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_15/proj'
+template = "bash -c 'echo ${x:- #a}; echo x &gt; {w}'", wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash -c 'echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py'"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_15/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'echo ${x:- #a}; echo x &gt; tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/pattern-substitution]" time="0.003"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'v=&quot;a #b&quot;; echo ${v/ #/} &gt; tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_16/proj'
+template = 'bash -c \'v="a #b"; echo ${v/ #/} &gt; {w}\'', wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'bash -c \'v="a #b"; echo ${v/ #/} &gt; tests/acceptance/X/zz.py\''
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_16/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'v="a #b"; echo ${v/ #/} &gt; tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/while-read-loop-redirected]" time="0.003"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_17/proj'
+template = "bash -c 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; {w}'"
+wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash -c 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py'"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_17/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'while read -r l; do echo ${l%% #*}; done &lt; f &gt; tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/while-read-loop-appending-inside]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_18/proj'
+template = "bash -c 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; {w}; done &lt; f'"
+wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash -c 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f'"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_18/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'while read -r l; do k=${l%% #*}; echo $k &gt;&gt; tests/acceptance/X/zz.py; done &lt; f'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/allowed-write-then-a-second-write]" time="0.003"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_19/proj'
+template = "bash -c 'echo ${X:- #} &gt; {a}; cp x.py {w}'", wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash -c 'echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py'"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_19/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'echo ${X:- #} &gt; src/ok.py; cp x.py tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/double-quoted-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused[bash-c/nested-expansion]" time="0.004"><failure message="AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: &#10;  --- the command ---&#10;  bash -c 'echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py'&#10;assert 'allow' == 'deny'&#10;  &#10;  - deny&#10;  + allow">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_20/proj'
+template = "bash -c 'echo ${v:-${w%% #*}} &gt; {w}'", wrapper = 'bash-c'
+
+    @pytest.mark.parametrize("template,wrapper", WRAPPED)
+    def test_apos2_f1_a_hash_inside_a_parameter_expansion_starts_no_comment_so_its_write_of_t_is_refused(
+            proj, template, wrapper):
+&gt;       assert_refused_naming_t(build(template, wrapper, T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "bash -c 'echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py'"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f1_a_hash_inside_a_20/proj'
+
+    def assert_refused_naming_t(command, root):
+        """Refused because it writes T: the reason names T (not 'cannot be read', not another reason)."""
+        got, why = decide(command, root)
+&gt;       assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny (bash writes tests/acceptance/X/zz.py), got allow: 
+E         --- the command ---
+E         bash -c 'echo ${v:-${w%% #*}} &gt; tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:164: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/strip-suffix-of-a-quoted-value]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/default-value-then-a-later-command]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/pattern-substitution]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/while-read-loop-redirected]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/while-read-loop-appending-inside]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/allowed-write-then-a-second-write]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/double-quoted-expansion]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[top-level/nested-expansion]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/strip-suffix-of-a-quoted-value]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/default-value-then-a-later-command]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/pattern-substitution]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/while-read-loop-redirected]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/while-read-loop-appending-inside]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/allowed-write-then-a-second-write]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/double-quoted-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/nested-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/strip-suffix-of-a-quoted-value]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/default-value-then-a-later-command]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/pattern-substitution]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/while-read-loop-redirected]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/while-read-loop-appending-inside]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/allowed-write-then-a-second-write]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/double-quoted-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_inside_a_parameter_expansion_with_a_write_of_an_allowed_path_is_allowed[bash-c/nested-expansion]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[top-level/length-expansion]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[top-level/pattern-removal]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[top-level/argument-count]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-heredoc-quoted/length-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-heredoc-quoted/pattern-removal]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-heredoc-quoted/argument-count]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-c/length-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-c/pattern-removal]" time="0.005" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_keeps_its_write_of_t_refused[bash-c/argument-count]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[top-level/length-expansion]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[top-level/pattern-removal]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[top-level/argument-count]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/length-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/pattern-removal]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-heredoc-quoted/argument-count]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-c/length-expansion]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-c/pattern-removal]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_hash_that_never_was_a_comment_with_a_write_of_an_allowed_path_is_allowed[bash-c/argument-count]" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_real_comment_with_an_apostrophe_and_no_write_is_allowed" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f1_a_write_of_t_before_a_real_comment_with_an_apostrophe_is_refused" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed[grep-count]" time="0.003"><failure message="AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  grep -c b &lt;&lt;&lt; &quot;a # b&quot;&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho0/proj'
+command = 'grep -c b &lt;&lt;&lt; "a # b"'
+
+    @pytest.mark.parametrize("command", F4_NO_WRITE)
+    def test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed(proj, command):
+&gt;       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:204: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'grep -c b &lt;&lt;&lt; "a # b"'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho0/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+&gt;       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         grep -c b &lt;&lt;&lt; "a # b"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed[wc-words]" time="0.003"><failure message="AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  wc -w &lt;&lt;&lt; &quot;one # two&quot;&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho1/proj'
+command = 'wc -w &lt;&lt;&lt; "one # two"'
+
+    @pytest.mark.parametrize("command", F4_NO_WRITE)
+    def test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed(proj, command):
+&gt;       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:204: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'wc -w &lt;&lt;&lt; "one # two"'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho1/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+&gt;       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         wc -w &lt;&lt;&lt; "one # two"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed[jq-raw]" time="0.003"><failure message="AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  jq -r '.x' &lt;&lt;&lt; '{&quot;x&quot;: &quot;a # b&quot;}'&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho2/proj'
+command = 'jq -r \'.x\' &lt;&lt;&lt; \'{"x": "a # b"}\''
+
+    @pytest.mark.parametrize("command", F4_NO_WRITE)
+    def test_apos2_f4_a_here_string_holding_a_hash_that_writes_nothing_is_allowed(proj, command):
+&gt;       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:204: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'jq -r \'.x\' &lt;&lt;&lt; \'{"x": "a # b"}\''
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_ho2/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+&gt;       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         jq -r '.x' &lt;&lt;&lt; '{"x": "a # b"}'
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_command_writing_t_is_refused_for_t_not_as_unreadable[grep-count-redirected]" time="0.002"><failure message="AssertionError: want the reason to name tests/acceptance/X/zz.py, not 'cannot be read'; got: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  grep -c b &lt;&lt;&lt; &quot;a # b&quot; &gt; tests/acceptance/X/zz.py&#10;assert ('tests/acceptance/X/zz.py' in 'the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)')">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co0/proj'
+template = 'grep -c b &lt;&lt;&lt; "a # b" &gt; {w}'
+
+    @pytest.mark.parametrize("template", [pytest.param(t, id=i) for i, t in F4_WRITES])
+    def test_apos2_f4_a_here_string_command_writing_t_is_refused_for_t_not_as_unreadable(proj, template):
+        command = fill(template, T)
+        got, why = decide(command, proj)
+        assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+&gt;       assert T in why and UNREADABLE not in why, \
+            f"want the reason to name {T}, not '{UNREADABLE}'; got: {why}\n--- the command ---\n{command}"
+E       AssertionError: want the reason to name tests/acceptance/X/zz.py, not 'cannot be read'; got: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         grep -c b &lt;&lt;&lt; "a # b" &gt; tests/acceptance/X/zz.py
+E       assert ('tests/acceptance/X/zz.py' in 'the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)')
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:212: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_command_writing_t_is_refused_for_t_not_as_unreadable[tr-redirected]" time="0.003"><failure message="AssertionError: want the reason to name tests/acceptance/X/zz.py, not 'cannot be read'; got: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  tr a b &lt;&lt;&lt; 'x # y' &gt; tests/acceptance/X/zz.py&#10;assert ('tests/acceptance/X/zz.py' in 'the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)')">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co1/proj'
+template = "tr a b &lt;&lt;&lt; 'x # y' &gt; {w}"
+
+    @pytest.mark.parametrize("template", [pytest.param(t, id=i) for i, t in F4_WRITES])
+    def test_apos2_f4_a_here_string_command_writing_t_is_refused_for_t_not_as_unreadable(proj, template):
+        command = fill(template, T)
+        got, why = decide(command, proj)
+        assert got == "deny", f"want deny (bash writes {T}), got {got}: {why}\n--- the command ---\n{command}"
+&gt;       assert T in why and UNREADABLE not in why, \
+            f"want the reason to name {T}, not '{UNREADABLE}'; got: {why}\n--- the command ---\n{command}"
+E       AssertionError: want the reason to name tests/acceptance/X/zz.py, not 'cannot be read'; got: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         tr a b &lt;&lt;&lt; 'x # y' &gt; tests/acceptance/X/zz.py
+E       assert ('tests/acceptance/X/zz.py' in 'the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)')
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:212: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_command_writing_an_allowed_path_is_allowed[grep-count-redirected]" time="0.003"><failure message="AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  grep -c b &lt;&lt;&lt; &quot;a # b&quot; &gt; src/ok.py&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co2/proj'
+template = 'grep -c b &lt;&lt;&lt; "a # b" &gt; {w}'
+
+    @pytest.mark.parametrize("template", [pytest.param(t, id=i) for i, t in F4_WRITES])
+    def test_apos2_f4_a_here_string_command_writing_an_allowed_path_is_allowed(proj, template):
+&gt;       assert_allowed(fill(template, A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'grep -c b &lt;&lt;&lt; "a # b" &gt; src/ok.py'
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co2/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+&gt;       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         grep -c b &lt;&lt;&lt; "a # b" &gt; src/ok.py
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_f4_a_here_string_command_writing_an_allowed_path_is_allowed[tr-redirected]" time="0.003"><failure message="AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)&#10;  --- the command ---&#10;  tr a b &lt;&lt;&lt; 'x # y' &gt; src/ok.py&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">proj = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co3/proj'
+template = "tr a b &lt;&lt;&lt; 'x # y' &gt; {w}"
+
+    @pytest.mark.parametrize("template", [pytest.param(t, id=i) for i, t in F4_WRITES])
+    def test_apos2_f4_a_here_string_command_writing_an_allowed_path_is_allowed(proj, template):
+&gt;       assert_allowed(fill(template, A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "tr a b &lt;&lt;&lt; 'x # y' &gt; src/ok.py"
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-4/test_apos2_f4_a_here_string_co3/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+&gt;       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: the command cannot be read, so it is not known to be free of the lift form of gov pause (--off): refused (DEC-409)
+E         --- the command ---
+E         tr a b &lt;&lt;&lt; 'x # y' &gt; src/ok.py
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_dep1_a_python3_c_write_of_t_is_refused" time="0.004" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_dep1_a_python3_c_write_of_an_allowed_path_is_allowed" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_dep1_a_read_only_python3_c_one_liner_is_allowed[json-dumps]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_dep1_a_read_only_python3_c_one_liner_is_allowed[os-listdir]" time="0.003" /><testcase classname="tests.acceptance.W2-42a.test_w2_42a_apostrophe_2" name="test_apos2_dep1_a_read_only_python3_c_one_liner_is_allowed[pathlib-read-text]" time="0.004" /></testsuite></testsuites>

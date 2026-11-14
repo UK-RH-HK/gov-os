@@ -1,0 +1,12 @@
+2026-11-13 16:17:09 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 16:17:09 merged W2-182 onto b97d9604b316: d6e50a0086cb
+2026-11-13 16:41:36 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 16:41:43 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 16:41:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 16:41:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 16:41:48 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-13 16:42:32 the head without the batch: a throwaway worktree head-b97d9604b316-0 at b97d9604b316 with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 16:42:34 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+2026-11-13 16:47:09 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 56ffe611f94e: 79857306c723; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-13 16:47:09 ADVANCED refs/heads/w2/integrate 56ffe611f94e -> 79857306c723; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/79857306c723.json
+2026-11-13 16:47:09 integration store not promoted: a refresh holds the integration store's lock; its normal refresh runs apart

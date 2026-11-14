@@ -1,0 +1,132 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply states an idempotence mechanism that holds for a second delivery, replaces the swallowing `except`, and names the test of a duplicate delivery.
+
+Expected behaviour:
+the session makes the handler safe to run twice (a key taken from the message and a unique constraint or an upsert), separates a failure worth retrying from one that is not, lets the failure be seen (logged and returned or raised) instead of swallowed, and names a unit test that delivers the same message twice and asserts one invoice.
+
+The session's reply:
+<<<
+The permission layer refused every write and command I tried, so I stopped and am returning the design as text, as the skill directs. No file was created and no test was run.
+
+**task:** STANDARD ticket: a queue worker that creates one invoice from each "order paid" message. The queue redelivers any message not acknowledged within 30 seconds.
+
+**status:** blocked. The design is complete but nothing is built. All writes and commands need approval this session doesn't have.
+
+**work_completed:**
+- Read the skill and `scenario-summaries.md`. `scenarios.md` is not in the folder.
+- Went through the operations that change state:
+  - **Inserting the invoice row:**
+    - If it runs twice, the draft makes a second invoice on every redelivery. A slow commit (over 30 seconds) or a crash before the acknowledgement is enough to cause it.
+    - If it fails half-way, the bare `except Exception: pass` swallows the error. The message may then be acknowledged even though no invoice exists, and nothing records it.
+  - **Acknowledging the message:**
+    - If the worker acknowledges before the commit, a crash in between loses the invoice.
+    - If it never acknowledges, the queue redelivers the message forever.
+- Designed the fix and its tests (below).
+- Tried once each to write `invoice_worker/test_worker.py`, run `gov --help`, run `gov retrieve "order paid queue worker invoice idempotence"`, and run `check_domain_skill.py`. All four were refused. I did not retry any of them.
+
+**files_changed:** none.
+
+**evidence:** the refusal messages ("requires approval", "you haven't granted it yet"). There is no test output.
+
+**tests:** written test-first but not saved or run (listed in the payload). Pass/fail: unknown.
+
+**discoveries:**
+- The workspace has no ticket file, no allowed paths, no KPI lines and no repository code, so I couldn't follow existing naming or error style.
+- These interface points were left open; I took the simplest reading of each:
+  - **Idempotency key:** `order_id`, not the message ID. One invoice per order still holds if the publisher re-sends the event with a new message ID.
+  - **Same order, different amount:** the message goes to the dead-letter queue (where unprocessable messages are parked for review). The worker does not overwrite the invoice or create a second one.
+  - **Message fields:** `{order_id, amount_cents, currency}`, with the amount in integer cents.
+  - **Queue features:** the queue client is assumed to give a delivery count, `ack`, `nack` (requeue) and `dead_letter`.
+
+**risks:**
+- **Existing duplicates (P1, not decided):** if the draft already ran against a real table, there may be duplicate rows. Adding the unique index would then fail. The migration is designed to stop and list the duplicate order IDs without deleting anything. Removing duplicates is destructive, could affect invoices already sent, and is not my call.
+- **Checklist items I couldn't tick:**
+  - the suite passing
+  - running the migration forward and back
+  - the diff staying within allowed paths (none were given)
+  - `gov accept`, which was not run because `gov` is refused
+
+**lessons:** a 30-second redelivery window means the database timeout must be well under 30 seconds. Otherwise the commit can succeed after the queue has already redelivered, which is exactly the duplicate this fixes.
+
+**proposed_decisions:** make `order_id` the invoice's unique business key, enforced by the database rather than by worker logic.
+
+**unresolved:** what to do with any duplicates already in the table (P1, above). Also whether a conflicting amount should go to the dead-letter queue (my reading) or be handled by a credit-note flow.
+
+**recommended_next_action:** whoever started the session should grant writes to the ticket's paths and approve `gov`. Then I save the tests, watch them fail, add the code, run the suite and the migration forward and back on a fixture, and run `gov accept`. Separately, someone needs to decide the P1 on existing duplicates.
+
+---
+
+**Payload: the design**
+
+Migration, as one small reversible step:
+```sql
+-- up: before creating the index, check for duplicates; if any exist, stop and list them, delete nothing
+SELECT order_id FROM invoices GROUP BY order_id HAVING COUNT(*) > 1;
+CREATE UNIQUE INDEX ux_invoices_order_id ON invoices(order_id);
+-- down
+DROP INDEX ux_invoices_order_id;
+```
+It adds an index and drops no data. Code that reads the table the old way keeps working.
+
+Handler: parse, then write, then acknowledge only after the commit.
+```python
+def handle(self, d):
+    try:
+        msg = parse(d.body)          # checks order_id, amount_cents is an int >= 0, currency
+    except InvalidMessage as e:      # permanent failure: send to dead-letter, no retry
+        log.error("invalid order-paid message_id=%s: %s", d.message_id, e)
+        d.dead_letter(f"invalid: {e}"); return Outcome.DEAD_LETTERED
+    try:
+        cur = self.db.execute(
+            "INSERT INTO invoices (order_id, amount_cents, currency) VALUES (?,?,?) "
+            "ON CONFLICT(order_id) DO NOTHING", (msg.order_id, msg.amount_cents, msg.currency))
+        self.db.commit()
+    except OperationalError as e:    # retryable: locked or unavailable database
+        self.db.rollback()
+        log.warning("invoice write failed order_id=%s message_id=%s delivery=%d: %s",
+                    msg.order_id, d.message_id, d.delivery_count, e)
+        if d.delivery_count >= self.cfg.max_deliveries:
+            d.dead_letter("retry limit reached"); return Outcome.DEAD_LETTERED
+        d.nack(); return Outcome.RETRY
+    except Exception:                # unexpected: requeue, then re-raise; never swallow it
+        self.db.rollback(); d.nack(); raise
+    if cur.rowcount == 0:            # the order already has an invoice
+        if existing_differs(self.db, msg):
+            d.dead_letter("conflict: amount/currency differs"); return Outcome.DEAD_LETTERED
+        d.ack(); return Outcome.DUPLICATE
+    d.ack(); return Outcome.CREATED
+```
+Configuration comes from the environment and both settings are required: `INVOICE_DB_TIMEOUT_S` and `INVOICE_MAX_DELIVERIES`. The worker refuses to start if the timeout is 30 seconds or more. Logs carry only IDs, never personal data.
+
+Planned unit tests:
+- **Duplicates:**
+  - The same message delivered twice leaves the same state as one delivery.
+  - A re-sent event with a new message ID still gives one invoice.
+  - Several orders, each delivered twice, give one invoice each.
+  - The same order with a different amount goes to the dead-letter queue and is not overwritten.
+- **Bad input:** each of these goes to the dead-letter queue, unacknowledged, with no row written:
+  - an empty body
+  - a body that isn't JSON
+  - a missing `order_id`
+  - a negative amount
+  - a non-integer amount
+
+  An amount of 0 is accepted.
+- **Failed writes:**
+  - A locked database is not acknowledged; the message is requeued and the log includes `order_id`.
+  - At the retry limit, the message goes to the dead-letter queue.
+  - An unexpected error requeues the message and re-raises.
+- **Configuration:**
+  - Settings are read from the environment.
+  - A missing setting fails at start-up.
+  - A timeout of 30 seconds or more is rejected.
+- **Migration:**
+  - Forward, back and forward again on a fixture keeps every row.
+  - Existing duplicates stop the migration and nothing is deleted.
+  - Code that reads the table the old way works on the new shape.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

@@ -101,3 +101,5 @@ b18ebd98028e33aa06c2b3aba634e0a7b012122db304b48436c616aa1c15f310 .rulesync/skill
 9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f template/governance/kernel/skills/spec-writing/spec-form.md DEC-1163 (8) W2-98's CIT-P at 3a86f11c3981
 9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f template/.rulesync/skills/spec-writing/spec-form.md DEC-1163 (8) W2-98's CIT-P at 3a86f11c3981
 9174042b22312e69aac2fe4b02ca16e48216566371cf22e781a3985f3c604e4f .rulesync/skills/spec-writing/spec-form.md DEC-1163 (8) W2-98's CIT-P at 3a86f11c3981
+cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76 template/governance/kernel/skills/change/SKILL.md DEC-1166 (4) W2-37's CIT-P a25b02a7 at version 1.1.0 (7bde87727, narrow check PASS)
+cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76 template/.rulesync/skills/change/SKILL.md DEC-1166 (4) W2-37's CIT-P a25b02a7 at version 1.1.0 (7bde87727, narrow check PASS)

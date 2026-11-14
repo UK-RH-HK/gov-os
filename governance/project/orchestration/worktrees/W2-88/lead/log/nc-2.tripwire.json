@@ -1,0 +1,92 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "head",
+   "before": "6f79e5ae9e72",
+   "after": "39ceaec2a10d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W1-07"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W1-32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "acceptance folder",
+   "folder": "W2-104"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "head",
+   "before": "e51b1fdf6659",
+   "after": "a97503b39f9d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_r2f3_continuation.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_config.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_status.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/test_w2_116_s2_when_due.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-116/w2_116_s2_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-tests",
+   "change": "acceptance folder",
+   "folder": "W2-116"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a",
+   "change": "head",
+   "before": "547bf1030e8f",
+   "after": "a7aa762ab890"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a",
+   "change": "status line gone",
+   "line": " M tests/unit/launch/test_launch_record.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "head",
+   "before": "547bf1030e8f",
+   "after": "f2b751829490"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  }
+ ]
+}

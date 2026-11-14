@@ -1,0 +1,4 @@
+Merge w2/integrate into w2/W2-37: integration since e8c414b0d, bringing the widened ticket (730477098: P-7 (a)'s paths, DEC-812 item 6, and _CBM_SUITES's conftest line) for the short P-7 run before the hand merge
+
+Task: DAEO-6n5k
+Role: orchestrator

@@ -1,0 +1,8 @@
+log: W2-42a-A5-apos3.json
+W2: W2-42a
+status: DONE. The head to land is cd17d270668f. The code was verified at a62cd8c11439, and cd17d270668f adds only the probe record. The tree is clean.
+
+task: DAEO-03ub (W2-42a), FULL, build run: the fix of F1 and F4 after the CTO's answers P-03ub-APOS-3 (1) and P-03ub-APOS-4 (a) (DEC-1164 (18), DEC-1174 (1))
+status: DONE. The head to land is cd17d270668f. The code was verified at a62cd8c11439, and cd17d270668f adds only the probe record. The tree is clean.
+work_completed:
+- td-5, a fresh test designer, wrote 80 cases in tests/acceptance/W2-42a/test_w2_42a_apostrophe_2.py for F1, F4 and departure 1 (merged as c461d79de). My own run on the merge gave 28 failed, 52 passed: 21 are F1 fail-opens and 7 are F4 "cannot be read" refusals. The departur

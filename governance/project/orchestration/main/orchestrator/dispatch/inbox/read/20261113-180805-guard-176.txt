@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 177
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01LUP2UsrGxpZQUfx1xLA1ts", "time": "2026-11-13T13:42:23.666Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-182/3d1a5b33-9322-47bc-9079-77479dfbf12d.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-182", "tool": "Bash", "form": "B=/tmp/gov-launch-ofg67hrc/claude-1000/aud/before; C=/tmp/gov-launch-ofg67hrc/claude-1000/aud/copy; mkdir -p $B && git -C /home/usain/gov-os-worktrees/W2-182 archive 10213e3bb | tar -x -C $B; for t in", "rule": "the call reads files whose names another command gives at run time, from a listing whose start the guard cannot pl

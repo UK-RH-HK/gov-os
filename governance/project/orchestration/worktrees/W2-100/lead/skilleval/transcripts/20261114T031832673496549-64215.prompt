@@ -1,0 +1,56 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names the parameterised query, a narrower database role and the token coming from outside the code, and names a hostile-input test.
+
+Expected behaviour:
+the session checks the input at the boundary and uses a parameterised query, connects with a role that can only read the tables the report needs, takes the token from the environment or the secret store and never from code, and names unit tests with hostile input and with a missing credential.
+
+The session's reply:
+<<<
+I followed the security skill. I didn't write or change any code, because the skill puts security work on hold until a P1 package goes up. Here is what I did and why.
+
+**What I checked first**
+- The workspace holds only the skill (`SKILL.md` and `check_domain_skill.py`). It has no ticket file, no draft source and no allowed paths, so I worked from the situation as you described it. The skill links a `scenarios.md` file, but it isn't there.
+- I tried `gov --help`, as a first step towards `gov retrieve` and `gov accept`, but the command needed approval, so `gov` never ran.
+
+**What I produced: the return the skill asks for, with the security package in `risks` and `unresolved`**
+
+```
+task: GET /reports?customer=<name> (security-flagged STANDARD ticket) — review of the first draft
+status: BLOCKED — P1 escalation, one item at Emergency level; the affected work waits
+work_completed: Read the skill; mapped the trust boundary (input in: `customer` query parameter; access: who may call it is not stated in the ticket; reach: reports database; secret: the service signing token). Checked the draft against the Pre-commit checklist: 3 lines fail. Stopped adding to the draft and wrote the P1 package. No code written.
+files_changed: none
+evidence: Draft as described: (1) SQL built by joining `customer` into the query string; (2) DB connection uses the admin role; (3) signing token held as a constant in a source file. Value deliberately not reproduced.
+tests: none run — no project, test suite or allowed paths in the workspace; `gov accept` not run (no ticket on disk; `gov` needed approval)
+discoveries: The skill's linked scenarios.md is missing from .claude/skills/security/. The ticket doesn't say which callers may read which customer's reports.
+risks: |
+  P1-A SQL injection. Where: the /reports handler's query builder. How it can be reached: any caller of GET /reports, e.g. customer=x' OR '1'='1 or a stacked statement, which can read every customer's reports or, given P1-B, modify or drop data.
+    Options: (a) parameterised query plus an allow-list check on `customer` at the boundary (type string, 1–N chars, a fixed character set, else 400 with no echo of the input); (b) escaping only — rejected, as escaping alone is not enough.
+    Recommendation: (a).
+  P1-B Admin DB role. Where: the handler's DB connection. How it can be reached: through P1-A, or any other bug in this handler, which then has full database rights.
+    Options: (a) a dedicated read-only role with SELECT on the reports table/view only, credentials from the environment or secret store; (b) keep admin and rely on P1-A's fix — rejected.
+    Recommendation: (a). This needs the DB/platform owner to create the role; I won't widen or create it myself.
+  EMERGENCY / P1-C Signing token in source. Where: the draft's source file. How it can be reached: anyone with repo, CI, image or backup access can read it and sign as the service.
+    If the draft was ever committed, pushed, shared or built, treat the token as exposed.
+    Recommendation: rotate the token now (owner of the secret store); load the new one from the environment or secret store at startup and fail closed, with an error that names neither the variable nor the value; tests use a fake. Don't rewrite git history — rotation is what fixes it; any history clean-up is the owner's decision.
+  Pre-commit checklist lines that can't be ticked: input checked at the boundary; no query built by joining input; no secret in the diff; narrowest role; access denied unless allowed (no authorisation rule in the ticket).
+lessons: These are the skill's own "common mistakes" 1, 3 and 4 together; the draft should not go further until all three are fixed.
+proposed_decisions: The /reports service gets its own read-only DB role; its signing token lives only in the secret store.
+unresolved: |
+  1. Token rotation (Emergency) — needs the secret's owner.
+  2. Read-only DB role — needs the DB/platform owner.
+  3. Authorisation rule: may caller X see customer Y's reports? Needs the ticket's author or spec owner; until then the endpoint should deny by default.
+  4. The ticket file and its allowed paths, so the fix can be written within scope.
+recommended_next_action: Session starter: arrange the rotation now, approve the read-only role and answer the authorisation question. Then the engineer writes tests first (hostile `customer`: quotes, `;--`, `..`, oversized, empty, wrong type; no/wrong/insufficient credential; missing token fails closed with no leak in the reply or logs), then the smallest fix: allow-list check, parameterised query, read-only role, token from outside. After that, run the unit suite, the Pre-commit checklist and `gov accept`.
+```
+
+**Summary**
+- Each of the three problems is filed as P1, because the skill counts every security finding as P1.
+- The hardcoded signing token is also an Emergency. It goes up asking for the token to be rotated, and its value appears nowhere in the return.
+- I didn't fix anything quietly. There's no ticket, draft or allowed paths here to work in, and the skill says the affected work waits until the package is answered.
+- Neither the unit suite nor `gov accept` was run.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261114-001603.out
+Structural: after the landing of W2-104, W2-94, W2-174, W2-61h (base e1fce4ed886a)
+status: structural pass at 8a350ee2596c: NOTICE in mutation, authority, links (6 of 9 families ok), 19.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 56 findings: .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/ (+53 more)
+authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since e1fce4ed886a)
+links: NOTICE 6 new since e1fce4ed886a0e968f8daa82eaba39ab4d16ec04 (1764 standing): UNLINKED_ID DEC-1020 in 9fc5bcc3f90d's Implements: (engineer), not in DAEO-drhj's sources | .tickets/DAEO-drhj.md:35 | orchestrator | add DEC-1020 to DAEO-dr... | UNLINKED_ID DEC-747 in 405c3cafa148's Implements: (independent-test-designer), not in DAEO-drhj's sources | .tickets/DAEO-drhj.md:35 | orchestrator | add DEC... | UNLINKED_ID DEC-747 in 9fc5bcc3f90d's Implements: (engineer), not in DAEO-drhj's sources | .tickets/DAEO-drhj.md:35 | orchestrator | add DEC-747 to DAEO-drhj... (+3 more)
+structural pass at 8a350ee2596c: NOTICE in mutation, authority, links (6 of 9 families ok), 19.3 s; a notice, not a refusal

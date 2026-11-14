@@ -1,0 +1,21 @@
+diff --git a/docs/DECISION_REGISTER.md b/docs/DECISION_REGISTER.md
+--- a/docs/DECISION_REGISTER.md
++++ b/docs/DECISION_REGISTER.md
+@@ -64,7 +64,7 @@
+ - **Measurement:** telemetry (DEC-026) tagged by task ID.
+ 
+ ### DEC-005 — Proportionality profiles keyed to impact radius
+-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION
++- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-085 (readiness reduction)
+ - **Decision:** Three ceremony profiles: `LITE` (R0–R1), `STANDARD` (R2), `FULL` (R3+). Profile controls: readiness dimensions required, independent test author/verifier, retrieval budget, human gate.
+ - **Readiness (H2) reduction:** 8 mandatory dimensions always (intent, actor, scenarios, inputs/outputs, data, success+failure criteria, acceptance tests, security); remaining 18 conditional by capability type and profile, with `N/A_WITH_REASON` auto-default.
+ 
+@@ -325,7 +325,7 @@
+ - **Rationale:** The Rust Gov OS was never exercised on real work, including its own orchestration (which ran on Python scripts and an HTML panel). Dogfooding from day one prevents speculative scope.
+ 
+ ### DEC-044 — Hard loop budget per surface
+-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (OD-P2-09 simplification principle) + SUGGESTION (numbers)
++- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED (OD-P2-09 simplification principle) + SUGGESTION (numbers) · **Changed by:** DEC-096
+ - **Decision:** At most two review→repair rounds on any one surface. If the second round still finds a blocking defect, the default disposition is DELETE, NARROW or DEFER; continuing requires an explicit owner decision recorded as an ADR.
+ 
+ ### DEC-045 — Original governance documents preserved unchanged; lean successors authored

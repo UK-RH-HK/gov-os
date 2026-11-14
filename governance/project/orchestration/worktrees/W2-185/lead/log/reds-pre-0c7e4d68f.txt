@@ -1,0 +1,700 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 00:00:56)
+FFFFF.....FF..................F..............F............FFFF.......... [ 40%]
+..FFFF.....F...F.............F..F....F.................................. [ 81%]
+................F...............                                         [100%]
+=================================== FAILURES ===================================
+_______ test_a_lifted_event_in_the_template_only_is_no_finding[lifted0] ________
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_a_lifted_event_in_the_tem0')
+lifted = ('postToolUse',)
+
+    @pytest.mark.parametrize("lifted", [LIFTED[:1], LIFTED[1:], LIFTED])
+    def test_a_lifted_event_in_the_template_only_is_no_finding(tmp_path, lifted):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in lifted}}
+>       assert _two(tmp_path, template, {"stop": [_hook()]}) == []
+E       AssertionError: assert [{'code': 'HO...hooks.jsonc'}] == []
+E         
+E         Left contains one more item: {'code': 'HOOKS_EVENT_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': 'hook event postToolUse is only in template/.rulesync/hooks.jsonc'}
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:40: AssertionError
+_______ test_a_lifted_event_in_the_template_only_is_no_finding[lifted1] ________
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_a_lifted_event_in_the_tem1')
+lifted = ('postToolUseFailure',)
+
+    @pytest.mark.parametrize("lifted", [LIFTED[:1], LIFTED[1:], LIFTED])
+    def test_a_lifted_event_in_the_template_only_is_no_finding(tmp_path, lifted):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in lifted}}
+>       assert _two(tmp_path, template, {"stop": [_hook()]}) == []
+E       AssertionError: assert [{'code': 'HO...hooks.jsonc'}] == []
+E         
+E         Left contains one more item: {'code': 'HOOKS_EVENT_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': 'hook event postToolUseFailure is only in template/.rulesync/hooks.jsonc'}
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:40: AssertionError
+_______ test_a_lifted_event_in_the_template_only_is_no_finding[lifted2] ________
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_a_lifted_event_in_the_tem2')
+lifted = ('postToolUse', 'postToolUseFailure')
+
+    @pytest.mark.parametrize("lifted", [LIFTED[:1], LIFTED[1:], LIFTED])
+    def test_a_lifted_event_in_the_template_only_is_no_finding(tmp_path, lifted):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in lifted}}
+>       assert _two(tmp_path, template, {"stop": [_hook()]}) == []
+E       AssertionError: assert [{'code': 'HO...hooks.jsonc'}] == []
+E         
+E         Left contains 2 more items, first extra item: {'code': 'HOOKS_EVENT_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': 'hook event postToolUse is only in template/.rulesync/hooks.jsonc'}
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:40: AssertionError
+_ test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones[template] _
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_any_other_event_in_one_so0')
+side = 'template'
+
+    @pytest.mark.parametrize("side", ["template", "ours"])
+    def test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones(tmp_path, side):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in LIFTED}}
+        ours = {"stop": [_hook()]}
+        (template if side == "template" else ours)["preCompact"] = [_hook()]
+        findings = _two(tmp_path, template, ours)
+>       assert _named(findings) == ["preCompact"]
+E       AssertionError: assert ['postToolUse... 'preCompact'] == ['preCompact']
+E         
+E         At index 0 diff: 'postToolUse' != 'preCompact'
+E         Left contains 2 more items, first extra item: 'postToolUseFailure'
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:49: AssertionError
+_ test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones[ours] _
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_any_other_event_in_one_so1')
+side = 'ours'
+
+    @pytest.mark.parametrize("side", ["template", "ours"])
+    def test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones(tmp_path, side):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in LIFTED}}
+        ours = {"stop": [_hook()]}
+        (template if side == "template" else ours)["preCompact"] = [_hook()]
+        findings = _two(tmp_path, template, ours)
+>       assert _named(findings) == ["preCompact"]
+E       AssertionError: assert ['postToolUse... 'preCompact'] == ['preCompact']
+E         
+E         At index 0 diff: 'postToolUse' != 'preCompact'
+E         Left contains 2 more items, first extra item: 'postToolUseFailure'
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:49: AssertionError
+______________________ test_the_finding_form_is_unchanged ______________________
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_finding_form_is_uncha0')
+
+    def test_the_finding_form_is_unchanged(tmp_path):
+        template = {**{event: [_hook("Bash")] for event in LIFTED}, "stop": [_hook()]}
+        findings = _two(tmp_path, template, {"preCompact": [_hook()]})
+>       assert [sorted(f) for f in findings] == [["code", "file", "message"]] * 2
+E       AssertionError: assert [['code', 'fi...', 'message']] == [['code', 'fi...', 'message']]
+E         
+E         Left contains 2 more items, first extra item: ['code', 'file', 'message']
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:81: AssertionError
+____________ test_the_source_holds_the_seven_governance_hook_lines _____________
+
+kernel_entries = [('preToolUse', 0, {'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov..., {'command': 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}), ...]
+
+    def test_the_source_holds_the_seven_governance_hook_lines(kernel_entries):
+        """The cases below cover every command line of the source; each starts a kernel hook program.
+    
+        The source is the generated project's (W2-90): the kernel's seven lines."""
+        ENTRIES = kernel_entries
+>       assert len(ENTRIES) == 7, f"{support.HOOK_SOURCE_REL} holds {len(ENTRIES)} command entries; seven are expected"
+E       AssertionError: .rulesync/hooks.jsonc holds 8 command entries; seven are expected
+E       assert 8 == 7
+E        +  where 8 = len([('preToolUse', 0, {'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov..., {'command': 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}), ...])
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:80: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[1]] _
+
+event = 'postToolUse', index = 1
+entry = {'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOM...E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy'), wheel=PosixP...ges'), markers=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/pin-markers'))
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers,
+                                                   with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: postToolUse[1]'s program did not import the pin's installed package (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"  (in /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_line_s_program_import0/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy'), wheel=PosixP...ges'), markers=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:123: AssertionError
+_ test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[1]] _
+
+event = 'postToolUse', index = 1
+entry = {'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOM...E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy'), wheel=PosixP...ges'), markers=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/pin-markers'))
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_with_a_worker_s_pythonpat0')
+
+    @pytest.mark.parametrize("event,index,entry", OTHERS, ids=OTHER_IDS)
+    def test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """With the worker's ``PYTHONPATH``, the program imports the pin's installed package, not the package the
+        inherited path names (subagentStop, which imports none: the pin's interpreter starts without the inherited
+        folder on its import path)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers,
+                                                          src_in_project=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src))
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}]'s program imported that folder's gov, not the pin's\n"
+            f"{done.describe()}")
+        if event in IMPORTS_NO_GOV:
+            assert pin_markers.marks("pin-python-"), (
+                f"{event}[{index}] did not start the pin's interpreter ({pin_markers.python})\n{done.describe()}")
+            assert not box.marks("tree-site-"), (
+                f"with PYTHONPATH={src}, {event}[{index}]'s interpreter started with that folder on its import path "
+                f"(its sitecustomize ran)\n{done.describe()}")
+        else:
+>           assert pin_markers.marks("pin-gov-"), (
+                f"with PYTHONPATH={src}, {event}[{index}]'s program did not import the pin's installed package "
+                f"({pin_markers.site / 'gov'})\n{done.describe()}")
+E           AssertionError: with PYTHONPATH=/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_with_a_worker_s_pythonpat0/project/src, postToolUse[1]'s program did not import the pin's installed package (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/venv/lib/python3.12/site-packages/gov)
+E             $ sh -c g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"  (in /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_with_a_worker_s_pythonpat0/project)
+E             exit: 0
+E             stdout:
+E             
+E             stderr:
+E             
+E           assert []
+E            +  where [] = marks('pin-gov-')
+E            +    where marks = StandIn(root=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy'), wheel=PosixP...ges'), markers=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/w259-pin-7tbsq8dy/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:161: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PostToolUse-root] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8a3ae10>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st0/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st0/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st0')
+event = 'PostToolUse', folder = 'root'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+>       started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    where, settings)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    def _one_command(settings, programs, event):
+        commands = hooks.registered_commands(settings, programs, event)
+>       assert len(commands) == 1, (
+            f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
+            f"under {event}; one is expected: {commands}"
+        )
+E       AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"']
+E       assert 2 == 1
+E        +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...nterpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"'])
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:52: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PostToolUse-subfolder] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8a3ac90>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st1/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st1/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st1')
+event = 'PostToolUse', folder = 'subfolder'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+>       started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    where, settings)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    def _one_command(settings, programs, event):
+        commands = hooks.registered_commands(settings, programs, event)
+>       assert len(commands) == 1, (
+            f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
+            f"under {event}; one is expected: {commands}"
+        )
+E       AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"']
+E       assert 2 == 1
+E        +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...nterpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"'])
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:52: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PostToolUse-deep-subfolder] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8a3a750>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st2/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st2/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st2')
+event = 'PostToolUse', folder = 'deep-subfolder'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+>       started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    where, settings)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    def _one_command(settings, programs, event):
+        commands = hooks.registered_commands(settings, programs, event)
+>       assert len(commands) == 1, (
+            f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
+            f"under {event}; one is expected: {commands}"
+        )
+E       AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"']
+E       assert 2 == 1
+E        +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...nterpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"'])
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:52: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PostToolUse-outside] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8a3a900>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st3/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st3/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st3')
+event = 'PostToolUse', folder = 'outside'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+>       started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    where, settings)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    def _one_command(settings, programs, event):
+        commands = hooks.registered_commands(settings, programs, event)
+>       assert len(commands) == 1, (
+            f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
+            f"under {event}; one is expected: {commands}"
+        )
+E       AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"']
+E       assert 2 == 1
+E        +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...nterpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"'])
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:52: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PreCompact-root] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8860a40>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4')
+event = 'PreCompact', folder = 'root'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+        started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                    where, settings)
+>       _assert_started(started, f"{folder} ({where})")
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+started = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)")
+where = 'root (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4/project)'
+
+    def _assert_started(started, where):
+>       assert started.own_answer, (
+            f"{started.event}: the command {hooks.GENERATED_REL} registers, generated from {hooks.SOURCE_REL}, did not "
+            f"start its program and give the program's own answer when the session's current folder is {where} "
+            f"(DEC-603: hooks start from any folder): {started.describe()}"
+        )
+E       AssertionError: PreCompact: the command .claude/settings.json registers, generated from template/.rulesync/hooks.jsonc, did not start its program and give the program's own answer when the session's current folder is root (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4/project) (DEC-603: hooks start from any folder): expected the program's message that no state block was appended, there being no checkpoint (exit 0); got `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py"` exit=0 stdout='Begin the compaction summary with this line: "READ FIRST: /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st4/project/.gov-runtime/scratch/orchestrator/CHECKPOINT.md, its RESUME HERE section, before any other work."\n{"systemMessage": ' stderr=''
+E       assert ''
+E        +  where '' = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)").own_answer
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:60: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PreCompact-subfolder] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8860b00>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5')
+event = 'PreCompact', folder = 'subfolder'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+        started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                    where, settings)
+>       _assert_started(started, f"{folder} ({where})")
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+started = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)")
+where = 'subfolder (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5/project/src/app)'
+
+    def _assert_started(started, where):
+>       assert started.own_answer, (
+            f"{started.event}: the command {hooks.GENERATED_REL} registers, generated from {hooks.SOURCE_REL}, did not "
+            f"start its program and give the program's own answer when the session's current folder is {where} "
+            f"(DEC-603: hooks start from any folder): {started.describe()}"
+        )
+E       AssertionError: PreCompact: the command .claude/settings.json registers, generated from template/.rulesync/hooks.jsonc, did not start its program and give the program's own answer when the session's current folder is subfolder (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5/project/src/app) (DEC-603: hooks start from any folder): expected the program's message that no state block was appended, there being no checkpoint (exit 0); got `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py"` exit=0 stdout='Begin the compaction summary with this line: "READ FIRST: /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st5/project/.gov-runtime/scratch/orchestrator/CHECKPOINT.md, its RESUME HERE section, before any other work."\n{"systemMessage": ' stderr=''
+E       assert ''
+E        +  where '' = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)").own_answer
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:60: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PreCompact-deep-subfolder] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8860bc0>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6')
+event = 'PreCompact', folder = 'deep-subfolder'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+        started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                    where, settings)
+>       _assert_started(started, f"{folder} ({where})")
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+started = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)")
+where = 'deep-subfolder (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6/project/docs/one/two/three/four/five)'
+
+    def _assert_started(started, where):
+>       assert started.own_answer, (
+            f"{started.event}: the command {hooks.GENERATED_REL} registers, generated from {hooks.SOURCE_REL}, did not "
+            f"start its program and give the program's own answer when the session's current folder is {where} "
+            f"(DEC-603: hooks start from any folder): {started.describe()}"
+        )
+E       AssertionError: PreCompact: the command .claude/settings.json registers, generated from template/.rulesync/hooks.jsonc, did not start its program and give the program's own answer when the session's current folder is deep-subfolder (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6/project/docs/one/two/three/four/five) (DEC-603: hooks start from any folder): expected the program's message that no state block was appended, there being no checkpoint (exit 0); got `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py"` exit=0 stdout='Begin the compaction summary with this line: "READ FIRST: /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st6/project/.gov-runtime/scratch/orchestrator/CHECKPOINT.md, its RESUME HERE section, before any other work."\n{"systemMessage": ' stderr=''
+E       assert ''
+E        +  where '' = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)").own_answer
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:60: AssertionError
+_ TestEveryEntryStartsFromAnyFolder.test_the_registered_command_starts_its_program[PreCompact-outside] _
+
+self = <test_w1_38_hooks_any_folder.TestEveryEntryStartsFromAnyFolder object at 0x743aa8860c80>
+product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7/project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7')
+event = 'PreCompact', folder = 'outside'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("folder", FOLDERS)
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_its_program(self, product, session_sandbox, programs, tmp_path,
+                                                       event, folder):
+        settings = support.load_settings(product)
+        where = hooks.folder_of(product, folder, tmp_path / "elsewhere")
+        started = hooks.start_entry(event, _one_command(settings, programs, event), product, session_sandbox,
+                                    where, settings)
+>       _assert_started(started, f"{folder} ({where})")
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+started = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)")
+where = 'outside (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7/elsewhere)'
+
+    def _assert_started(started, where):
+>       assert started.own_answer, (
+            f"{started.event}: the command {hooks.GENERATED_REL} registers, generated from {hooks.SOURCE_REL}, did not "
+            f"start its program and give the program's own answer when the session's current folder is {where} "
+            f"(DEC-603: hooks start from any folder): {started.describe()}"
+        )
+E       AssertionError: PreCompact: the command .claude/settings.json registers, generated from template/.rulesync/hooks.jsonc, did not start its program and give the program's own answer when the session's current folder is outside (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7/elsewhere) (DEC-603: hooks start from any folder): expected the program's message that no state block was appended, there being no checkpoint (exit 0); got `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py"` exit=0 stdout='Begin the compaction summary with this line: "READ FIRST: /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st7/project/.gov-runtime/scratch/orchestrator/CHECKPOINT.md, its RESUME HERE section, before any other work."\n{"systemMessage": ' stderr=''
+E       assert ''
+E        +  where '' = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)").own_answer
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:60: AssertionError
+_ TestAProjectFolderWithASpace.test_the_registered_command_starts_from_a_subfolder[PostToolUse] _
+
+self = <test_w1_38_hooks_any_folder.TestAProjectFolderWithASpace object at 0x743aa8861730>
+spaced_product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st8/a folder with spaces/the project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st8/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st8')
+event = 'PostToolUse'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_from_a_subfolder(self, spaced_product, session_sandbox, programs,
+                                                            tmp_path, event):
+        """The path of the program holds the project's folder, so a folder name with a space reaches the shell:
+        the registered command still starts its program (the kernel template's form quotes the path)."""
+        settings = support.load_settings(spaced_product)
+        where = hooks.folder_of(spaced_product, "subfolder", tmp_path / "elsewhere")
+>       started = hooks.start_entry(event, _one_command(settings, programs, event), spaced_product,
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    session_sandbox, where, settings)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    def _one_command(settings, programs, event):
+        commands = hooks.registered_commands(settings, programs, event)
+>       assert len(commands) == 1, (
+            f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
+            f"under {event}; one is expected: {commands}"
+        )
+E       AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#\'#!\'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"']
+E       assert 2 == 1
+E        +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...nterpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"'])
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:52: AssertionError
+_ TestAProjectFolderWithASpace.test_the_registered_command_starts_from_a_subfolder[PreCompact] _
+
+self = <test_w1_38_hooks_any_folder.TestAProjectFolderWithASpace object at 0x743aa8861a30>
+spaced_product = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9/a folder with spaces/the project')
+session_sandbox = Sandbox(home=PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the...os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9/session/systmp'))
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9')
+event = 'PreCompact'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("event", EVENTS)
+    def test_the_registered_command_starts_from_a_subfolder(self, spaced_product, session_sandbox, programs,
+                                                            tmp_path, event):
+        """The path of the program holds the project's folder, so a folder name with a space reaches the shell:
+        the registered command still starts its program (the kernel template's form quotes the path)."""
+        settings = support.load_settings(spaced_product)
+        where = hooks.folder_of(spaced_product, "subfolder", tmp_path / "elsewhere")
+        started = hooks.start_entry(event, _one_command(settings, programs, event), spaced_product,
+                                    session_sandbox, where, settings)
+>       _assert_started(started, f"a subfolder of a project whose folder name holds a space ({where})")
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+started = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)")
+where = 'a subfolder of a project whose folder name holds a space (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9/a folder with spaces/the project/src/app)'
+
+    def _assert_started(started, where):
+>       assert started.own_answer, (
+            f"{started.event}: the command {hooks.GENERATED_REL} registers, generated from {hooks.SOURCE_REL}, did not "
+            f"start its program and give the program's own answer when the session's current folder is {where} "
+            f"(DEC-603: hooks start from any folder): {started.describe()}"
+        )
+E       AssertionError: PreCompact: the command .claude/settings.json registers, generated from template/.rulesync/hooks.jsonc, did not start its program and give the program's own answer when the session's current folder is a subfolder of a project whose folder name holds a space (/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9/a folder with spaces/the project/src/app) (DEC-603: hooks start from any folder): expected the program's message that no state block was appended, there being no checkpoint (exit 0); got `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py"` exit=0 stdout='Begin the compaction summary with this line: "READ FIRST: /home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_the_registered_command_st9/a folder with spaces/the project/.gov-runtime/scratch/orchestrator/CHECKPOINT.md, its RESUME HERE section, before any other ' stderr=''
+E       assert ''
+E        +  where '' = Started(event='PreCompact', result=CommandResult(command='python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precomp..., own_answer='', expected="the program's message that no state block was appended, there being no checkpoint (exit 0)").own_answer
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:60: AssertionError
+_ TestGeneratedGuardHooks.test_the_generated_settings_register_what_the_kernel_template_s_settings_register[PostToolUse] _
+
+self = <test_w1_38_hooks_source.TestGeneratedGuardHooks object at 0x743aa888c5c0>
+generated_settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...: 'command'}]}], ...}, 'permissions': {'allow': ['Bash(gov launch:*)'], 'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}}
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+event = 'PostToolUse'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("event", ("PreToolUse", "PostToolUse", "PostToolUseFailure"))
+    def test_the_generated_settings_register_what_the_kernel_template_s_settings_register(
+        self, generated_settings, programs, event,
+    ):
+        """Compared, under one event: for every hook entry that runs a kernel hook program, its matcher group's
+        matcher (as written, or none), the program, and the value under ``timeout`` -- in the generated settings
+        and in ``template/governance/kernel/settings.json``. The command lines around the program are not
+        compared."""
+        kernel = hooks.registered(hooks.kernel_settings(), programs, event)
+        assert kernel, f"{hooks.KERNEL_SETTINGS_REL} registers no guard hook entry under {event}"
+        generated = hooks.registered(generated_settings, programs, event)
+>       assert generated == kernel, (
+            f"{event}: {hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers (matcher, program, "
+            f"limit) {generated}; {hooks.KERNEL_SETTINGS_REL} registers {kernel}"
+        )
+E       AssertionError: PostToolUse: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers (matcher, program, limit) [('Bash', 'context_watch.py', 10), ('Bash', 'posttooluse.py', 60)]; template/governance/kernel/settings.json registers [('Bash', 'posttooluse.py', 60)]
+E       assert [('Bash', 'co...luse.py', 60)] == [('Bash', 'po...luse.py', 60)]
+E         
+E         At index 0 diff: ('Bash', 'context_watch.py', 10) != ('Bash', 'posttooluse.py', 60)
+E         Left contains one more item: ('Bash', 'posttooluse.py', 60)
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_hooks_source.py:184: AssertionError
+_ TestRulesyncPassesBothThrough.test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings _
+
+self = <test_w1_38_hooks_source.TestRulesyncPassesBothThrough object at 0x743aa888d910>
+project = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_a_limit_and_a_failed_tool0/project')
+programs = ('context_watch.py', 'posttooluse.py', 'precompact.py', 'pretooluse.py', 'sessionstart.py', 'stop.py', ...)
+
+    @needs_rulesync
+    def test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings(
+        self, project, programs,
+    ):
+        path = project / hooks.PROJECT_SOURCE_REL
+        changed = hooks.load_source(path, hooks.PROJECT_SOURCE_REL)
+        after = [entry for where, entry in hooks.source_guard_entries(changed, programs)
+                 if where.startswith(f"hooks.{hooks.RULESYNC_AFTER_CALL_KEY}[")]
+>       assert len(after) == 1, f"the source holds {len(after)} guard hook entries after a tool call; one is expected"
+E       AssertionError: the source holds 2 guard hook entries after a tool call; one is expected
+E       assert 2 == 1
+E        +  where 2 = len([{'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] ||... "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}])
+
+tests/acceptance/W1-38/test_w1_38_hooks_source.py:214: AssertionError
+________ test_the_settings_line_equals_its_rulesync_source[postToolUse] ________
+
+key = 'postToolUse'
+
+    @pytest.mark.parametrize("key", LINE_IDS)
+    def test_the_settings_line_equals_its_rulesync_source(key):
+        event, _program = GUARD[key]
+>       assert settings_line(event) == source_line(key), f"{event}: the settings line and its rulesync source differ"
+                                       ^^^^^^^^^^^^^^^^
+
+tests/unit/hooks/test_w2_106_template_hook_lines.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+key = 'postToolUse'
+
+    def source_line(key):
+        entries = [e for e in _load_jsonc(SOURCE)["hooks"][key] if e.get("type") == "command"]
+>       assert len(entries) == 1, f"{SOURCE}: {key} holds {len(entries)} command entries; one is expected"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-185/template/.rulesync/hooks.jsonc: postToolUse holds 2 command entries; one is expected
+E       assert 2 == 1
+E        +  where 2 = len([{'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] ||... "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}])
+
+tests/unit/hooks/test_w2_106_template_hook_lines.py:59: AssertionError
+_ test_a_difference_that_is_not_drift_leaves_adapter_portability_green[only the command wrapper] _
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-0/test_a_difference_that_is_not_0')
+difference = 'only the command wrapper'
+
+    @pytest.mark.parametrize("difference", tuple(NOT_DRIFT))
+    def test_a_difference_that_is_not_drift_leaves_adapter_portability_green(tmp_path, difference):
+        w138 = _w138()
+>       repository, template = NOT_DRIFT[difference](_repository())
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:315: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repository = {'hooks': {'postToolUse': [{'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov ...nel/hooks/sessionstart.py"', 'matcher': 'compact|clear|resume', 'timeout': 60, 'type': 'command'}], ...}, 'version': 1}
+
+    def _only_the_wrapper(repository):
+        """Each of the repository's hooks, with the template's command around it (``python3``) and the repository's
+        path: the template's commands, path for path, in the repository's events, order and matchers."""
+        wrapped = _template_with_the_matcher()["hooks"]
+        template = copy.deepcopy(repository)
+        for event, entries in template["hooks"].items():
+>           assert len(wrapped.get(event, [])) == len(entries), f"the template has not the repository's hooks of {event}"
+E           AssertionError: the template has not the repository's hooks of postToolUse
+E           assert 2 == 1
+E            +  where 2 = len([{'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] ||... "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}])
+E            +    where [{'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] ||... "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}] = <built-in method get of dict object at 0x743aa87878c0>('postToolUse', [])
+E            +      where <built-in method get of dict object at 0x743aa87878c0> = {'postToolUse': [{'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"...k: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}], ...}.get
+E            +  and   1 = len([{'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HO..._PROJECT_DIR/template/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}])
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:296: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_a_lifted_event_in_the_template_only_is_no_finding[lifted0]
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_a_lifted_event_in_the_template_only_is_no_finding[lifted1]
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_a_lifted_event_in_the_template_only_is_no_finding[lifted2]
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones[template]
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones[ours]
+FAILED tests/unit/gitenv/test_hooks_lifted.py::test_the_finding_form_is_unchanged
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_source_holds_the_seven_governance_hook_lines
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[1]]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[1]]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PostToolUse-root]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PostToolUse-subfolder]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PostToolUse-deep-subfolder]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PostToolUse-outside]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PreCompact-root]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PreCompact-subfolder]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PreCompact-deep-subfolder]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestEveryEntryStartsFromAnyFolder::test_the_registered_command_starts_its_program[PreCompact-outside]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestAProjectFolderWithASpace::test_the_registered_command_starts_from_a_subfolder[PostToolUse]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py::TestAProjectFolderWithASpace::test_the_registered_command_starts_from_a_subfolder[PreCompact]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register[PostToolUse]
+FAILED tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestRulesyncPassesBothThrough::test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings
+FAILED tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_settings_line_equals_its_rulesync_source[postToolUse]
+FAILED tests/acceptance/W2-05/test_w2_05_hooks_source.py::test_a_difference_that_is_not_drift_leaves_adapter_portability_green[only the command wrapper]
+23 failed, 153 passed, 2 deselected in 139.99s (0:02:19)

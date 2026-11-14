@@ -1,0 +1,68 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names the parameterised query, a narrower database role and the token coming from outside the code, and names a hostile-input test.
+
+Expected behaviour:
+the session checks the input at the boundary and uses a parameterised query, connects with a role that can only read the tables the report needs, takes the token from the environment or the secret store and never from code, and names unit tests with hostile input and with a missing credential.
+
+The session's reply:
+<<<
+I wasn't allowed to write the file, so I won't try again. Here's the return, with the proposed fix included in it.
+
+---
+
+**task:** STANDARD ticket, security-flagged. Add `GET /reports?customer=<name>`. I reviewed the first draft against the security skill.
+**status:** BLOCKED. P1 escalation, with one possible Emergency. Nothing was written or committed.
+**work_completed:** I read the security skill and its check script. I worked out the trust boundary: untrusted input comes in through `customer`, the caller's access has to be checked, and the code uses two secrets (the DB credential and the signing token). I reviewed the draft against the Pre-commit checklist, which fails on four lines. I then drafted tests and a fix, but writing to the workspace was denied.
+**files_changed:** none.
+**evidence:** The draft as described joins `customer` into the SQL string, connects with the DB admin role, and keeps the signing token as a constant in the source file. The checklist lines that fail:
+- "No query… built by joining input"
+- "No secret… in the diff"
+- "narrowest role; nothing runs as an administrator"
+- "Access is denied unless allowed": the draft never checks who is calling.
+
+**tests:** None were run. These tests are ready to write first, before the code:
+- **Hostile `customer` values:** `' OR '1'='1`, `; DROP TABLE…`, `../`, a value over 64 characters, an empty value, a missing value, and a list instead of a string. Each should return 400 without echoing the input. One test also checks that the table still holds all its rows after an injection attempt.
+- **Denied callers:** no token (401), a wrong signature (401), a malformed token (401), a valid caller asking for another customer (403, with no data in the reply), and a correctly signed but unknown caller (403).
+- **Fail closed:** a missing signing key returns 500 and the reply doesn't name the variable or show its value. A write through the connection is refused. Logs hold no token, key, customer name or input.
+
+`gov accept` was not run, because I can't use `gov` in this session.
+**discoveries:** There's no ticket file, no draft source and no project code in the workspace. `scenarios.md`, which SKILL.md points to, is missing from the skill folder. I can't run `gov` here, so `gov retrieve` and `gov accept` weren't available.
+**risks:** The P1 package:
+1. **SQL injection.** Where: the reports query builder. How it's reached: any caller of `GET /reports` puts a quote in `customer`. With the admin role, that means reading, changing or dropping any table. Options: (a) a parameterised query plus an allow-list on `customer` (`^[A-Za-z0-9 _.-]{1,64}$`, a single string), or (b) an ORM query builder. **Recommend (a).**
+2. **Admin DB role.** Where: the service's connection config. How it's reached: together with item 1, or any other bug, it turns into full database compromise. Options: a dedicated role with `SELECT` on `reports` only, or a read-only replica user. **Recommend the dedicated SELECT-only role.** Creating it needs the DB/infra owner, so it's outside this ticket's writes.
+3. **Signing token in source.** Where: a constant in the handler file. How it's reached: anyone with read access to the repo, a build artifact or a log can forge tokens. Fix: load it from the environment or secret store when the code runs, refuse to start if it's missing, and use a fake value in tests. I have not repeated the value anywhere. **If that constant is the real token, or the file was ever pushed or shared, this is an Emergency.** In that case the work stops and the token needs rotating. No history rewrite without the owner's decision.
+4. **No access control.** The ticket doesn't say who may read which customer's reports. Recommend denying by default: check the caller's signed token, then check the caller against a per-customer allow-list.
+
+**lessons:** All four issues are on the skill's Common mistakes list. Running the Pre-commit checklist before the first commit catches them.
+**proposed_decisions:** (1) Parameterise the query and allow-list the input. (2) Use a SELECT-only DB role. (3) Load the signing key from the secret store and fail closed if it's missing. (4) Deny by default and check access per customer.
+**unresolved:** Is the in-source token a real value, and was it ever pushed or shared? That decides whether this is an Emergency and the token needs rotating. Who may read which customer's reports? Which paths does the ticket allow? Who creates the least-privilege DB role?
+**recommended_next_action:** Whoever started the session confirms the token's exposure, and requests rotation if needed. They also confirm the access rule and the allowed paths, and ask the DB owner for the SELECT-only role. Then the engineer writes the tests above first, implements the payload below, runs the area's suite and `gov accept`, and commits with the ticket's trailers.
+
+**Payload (the fix, in brief):**
+```python
+NAME = re.compile(r"[A-Za-z0-9 _.-]{1,64}")
+
+def handle_get_reports(query, headers, acl):
+    key = os.environ.get("REPORTS_SIGNING_KEY")            # from env/secret store, never a constant
+    if not key:
+        log.error("service misconfigured"); return 500, {"error": "unavailable"}
+    caller = verify_bearer(headers.get("Authorization"), key)  # HMAC, compare_digest
+    if caller is None:
+        return 401, {"error": "unauthorized"}
+    customer = query.get("customer")
+    if not isinstance(customer, str) or not NAME.fullmatch(customer):
+        return 400, {"error": "invalid customer"}           # input not echoed
+    if customer not in acl.get(caller, set()):
+        return 403, {"error": "forbidden"}                  # deny by default
+    with connect_read_only() as con:                         # SELECT-only role
+        rows = con.execute("SELECT title FROM reports WHERE customer = ? ORDER BY title",
+                           (customer,)).fetchall()
+    return 200, {"customer": customer, "reports": [r[0] for r in rows]}
+```
+Logs record only the status code and whether access was allowed. They never include the token, the key, the customer name or the raw input.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

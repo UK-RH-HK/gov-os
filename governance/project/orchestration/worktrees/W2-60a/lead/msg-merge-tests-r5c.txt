@@ -1,0 +1,5 @@
+Merge w2/W2-60a-tests into w2/W2-60a: the older launch suites' fixtures (P-8 (a), b19's 24dbc45d5)
+
+Task: DAEO-cv58
+Role: orchestrator
+Implements: DEC-826, DEC-839, DEC-832

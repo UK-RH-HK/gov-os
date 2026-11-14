@@ -1,0 +1,8 @@
+log: W2-42a-A5-r3b.json
+W2: W2-42a
+status: DONE. The head to land is c24a414f1d49. The verified code head is 9196ce961adf; the one commit after it adds only the probe record. The tree is clean.
+
+task: DAEO-03ub (W2-42a), the R3 F1 follow-up (the CTO's answer (a) under DEC-1164 (18)): read-only here-string forms with an expanded text stay free
+status: DONE. The head to land is c24a414f1d49. The verified code head is 9196ce961adf; the one commit after it adds only the probe record. The tree is clean.
+work_completed:
+- **td-8** (022846a33413, merged as 289432d3a) wrote 53 acceptance cases for the decided rule, with the README map in the same commit and `Rewrite-Reason: DEC-1164 (18), W2-42a R3 F1`. 21 were red on 209ec8464, each for the stated reason: the 13 read-only forms and the 8 wri

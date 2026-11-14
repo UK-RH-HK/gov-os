@@ -1,0 +1,7 @@
+log: W2-116-A5-pass2.json
+W2: W2-116
+status: PACKAGES. The ticket doesn't state S2's interface, and this repository's own refresh times need `governance/project/rebuild.yaml`, which is outside the ticket's paths. I stopped at the interface check, before starting the test designer and engineer.
+
+task: DAEO-f58b
+status: PACKAGES. The ticket doesn't state S2's interface, and this repository's own refresh times need `governance/project/rebuild.yaml`, which is outside the ticket's paths. I stopped at the interface check, before starting the test designer and engineer.
+work_completed: I did the first calls (orchestrator, DAEO-f58b; tree W2-116 on w2/W2-116, clean). I read the ticket, the round-2 review record (`.gov-runtime/scratch/orchestrator/reviews/w2-116.md`), DEC-966 and DEC-983, `nightly.sh` and its verdict lines, the CTO's `store_refresh_daily.sh` and `nightly_end_watch.sh`, `rebui

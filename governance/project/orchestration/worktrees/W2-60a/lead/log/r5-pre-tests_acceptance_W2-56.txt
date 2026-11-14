@@ -1,0 +1,2334 @@
+........................................................................ [ 25%]
+............FFF..........................FF............................. [ 50%]
+........................................FFFFFFFFFFFFFFFF.FFFFFF.FFFFFFFF [ 76%]
+FFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFF.......FFFFF....................     [100%]
+=================================== FAILURES ===================================
+_ test_s4_no_placeholder_is_staged_or_committed_inside_the_session[git-add-A] __
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_stag0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_stag0/pycache'))
+add = ['add', '-A']
+
+    @pytest.mark.parametrize("add", (["add", "-A"], ["add", "."]), ids=("git-add-A", "git-add-dot"))
+    def test_s4_no_placeholder_is_staged_or_committed_inside_the_session(box, add):
+        s.set_plan(box, [
+            {"do": "plant", "names": list(s.PLACEHOLDERS)},
+            *[{"do": "write", "path": rel, "text": "work\n"} for rel in WORK],
+            {"do": "git", "argv": add, "label": "add"},
+            {"do": "git", "argv": ["diff", "--cached", "--name-only"], "label": "staged"},
+            {"do": "git", "argv": ["commit", "-q", "-m", "the worker's commit"], "label": "commit"},
+            {"do": "git", "argv": ["ls-tree", "-r", "--name-only", "HEAD"], "label": "tree"},
+            {"do": "exit", "code": 0},
+        ])
+        launch = s.run_launch(box, s.ENGINEER, s.T.tk)
+>       assert launch.returncode == 0 and launch.started, f"the session did not run\n{launch.describe()}"
+E       AssertionError: the session did not run
+E         launch engineer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_placeholders.py:54: AssertionError
+_ test_s4_no_placeholder_is_staged_or_committed_inside_the_session[git-add-dot] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_stag1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_stag1/pycache'))
+add = ['add', '.']
+
+    @pytest.mark.parametrize("add", (["add", "-A"], ["add", "."]), ids=("git-add-A", "git-add-dot"))
+    def test_s4_no_placeholder_is_staged_or_committed_inside_the_session(box, add):
+        s.set_plan(box, [
+            {"do": "plant", "names": list(s.PLACEHOLDERS)},
+            *[{"do": "write", "path": rel, "text": "work\n"} for rel in WORK],
+            {"do": "git", "argv": add, "label": "add"},
+            {"do": "git", "argv": ["diff", "--cached", "--name-only"], "label": "staged"},
+            {"do": "git", "argv": ["commit", "-q", "-m", "the worker's commit"], "label": "commit"},
+            {"do": "git", "argv": ["ls-tree", "-r", "--name-only", "HEAD"], "label": "tree"},
+            {"do": "exit", "code": 0},
+        ])
+        launch = s.run_launch(box, s.ENGINEER, s.T.tk)
+>       assert launch.returncode == 0 and launch.started, f"the session did not run\n{launch.describe()}"
+E       AssertionError: the session did not run
+E         launch engineer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_placeholders.py:54: AssertionError
+_________ test_s4_no_placeholder_is_committed_beside_a_running_session _________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_comm0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_comm0/pycache'))
+
+    def test_s4_no_placeholder_is_committed_beside_a_running_session(box):
+        planted, release = box.elsewhere / "planted", box.elsewhere / "release"
+        s.set_plan(box, [
+            {"do": "plant", "names": list(s.PLACEHOLDERS)},
+            {"do": "touch", "path": str(planted)},
+            {"do": "wait_for", "paths": [str(release)], "timeout": 45, "fail_code": 7},
+            {"do": "exit", "code": 0},
+        ])
+        process = s.start_launch(box, s.ENGINEER, s.T.tk)
+        try:
+>           assert s.wait_for(planted.exists, 30), "the session did not plant the placeholders"
+E           AssertionError: the session did not plant the placeholders
+E           assert False
+E            +  where False = <function wait_for at 0x7afb0b24a660>(exists, 30)
+E            +    where <function wait_for at 0x7afb0b24a660> = s.wait_for
+E            +    and   exists = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s4_no_placeholder_is_comm0/elsewhere/planted').exists
+
+tests/acceptance/W2-56/test_w2_56_placeholders.py:78: AssertionError
+______ test_r5_guard_a_workers_gov_store_is_still_the_launchers_own[main] ______
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_r5_guard_a_workers_gov_st0')
+tree = 'main'
+
+    @pytest.mark.parametrize("tree", ("main", "worktree"))
+    def test_r5_guard_a_workers_gov_store_is_still_the_launchers_own(tmp_path, tree):
+        box = s.make_box(tmp_path)
+        link = _store_link(box)
+        cwd = None
+        if tree == "main":
+            _project(box, store=_setting(link))
+        else:
+            _project(box, store=NO_LINE)
+            cwd = _worktree_lacking_the_line(box, link)
+>       _assert_the_launchers_store(_launch(box, s.ENGINEER, cwd=cwd), link, f"a worker launched from the {tree} tree")
+
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:89: in _assert_the_launchers_store
+    env, settings_env = _started(launch)
+                        ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def _started(launch) -> tuple[dict, dict]:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+E       AssertionError: the launch did not start one session
+E         launch engineer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:84: AssertionError
+____ test_r5_guard_a_workers_gov_store_is_still_the_launchers_own[worktree] ____
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_r5_guard_a_workers_gov_st1')
+tree = 'worktree'
+
+    @pytest.mark.parametrize("tree", ("main", "worktree"))
+    def test_r5_guard_a_workers_gov_store_is_still_the_launchers_own(tmp_path, tree):
+        box = s.make_box(tmp_path)
+        link = _store_link(box)
+        cwd = None
+        if tree == "main":
+            _project(box, store=_setting(link))
+        else:
+            _project(box, store=NO_LINE)
+            cwd = _worktree_lacking_the_line(box, link)
+>       _assert_the_launchers_store(_launch(box, s.ENGINEER, cwd=cwd), link, f"a worker launched from the {tree} tree")
+
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:89: in _assert_the_launchers_store
+    env, settings_env = _started(launch)
+                        ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def _started(launch) -> tuple[dict, dict]:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+E       AssertionError: the launch did not start one session
+E         launch engineer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_r5_lead_store.py:84: AssertionError
+_ test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[engineer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log(box, role):
+        launch = _launch(box, role)
+>       entries = sb.write_list(sb.started(launch))
+                                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log(box, role):
+        launch = _launch(box, role)
+>       entries = sb.write_list(sb.started(launch))
+                                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[independent-auditor] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log(box, role):
+        launch = _launch(box, role)
+>       entries = sb.write_list(sb.started(launch))
+                                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[product-spec] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log(box, role):
+        launch = _launch(box, role)
+>       entries = sb.write_list(sb.started(launch))
+                                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[research] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_write_list_is_the_4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log(box, role):
+        launch = _launch(box, role)
+>       entries = sb.write_list(sb.started(launch))
+                                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[engineer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay(box, role):
+>       deny = sb.started(_launch(box, role)).get("permissions", {}).get("deny", [])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay(box, role):
+>       deny = sb.started(_launch(box, role)).get("permissions", {}).get("deny", [])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[independent-auditor] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay(box, role):
+>       deny = sb.started(_launch(box, role)).get("permissions", {}).get("deny", [])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[product-spec] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay(box, role):
+>       deny = sb.started(_launch(box, role)).get("permissions", {}).get("deny", [])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[research] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s2_the_literal_deny_rules4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay(box, role):
+>       deny = sb.started(_launch(box, role)).get("permissions", {}).get("deny", [])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____________ test_s3_no_sandbox_entry_is_made_from_any_allowed_path ____________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s3_no_sandbox_entry_is_ma0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s3_no_sandbox_entry_is_ma0/pycache'))
+
+    def test_s3_no_sandbox_entry_is_made_from_any_allowed_path(box):
+>       plain, pattern = (sb.started(s.run_launch(box, s.ENGINEER, ticket.tk)) for ticket in (s.T, sb.PATTERN))
+        ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:95: in <genexpr>
+    plain, pattern = (sb.started(s.run_launch(box, s.ENGINEER, ticket.tk)) for ticket in (s.T, sb.PATTERN))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[engineer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it(box, role):
+        log = sb.reranker_log(box.home)
+        s.set_plan(box, [sb.python_step("log", "import json, os\np = sys.argv[1]\n"
+                                        "print(json.dumps({'file': os.path.isfile(p) and not os.path.islink(p)}))\n",
+                                        args=[log])])
+>       entries = sb.write_list(sb.started(_launch(box, role)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it(box, role):
+        log = sb.reranker_log(box.home)
+        s.set_plan(box, [sb.python_step("log", "import json, os\np = sys.argv[1]\n"
+                                        "print(json.dumps({'file': os.path.isfile(p) and not os.path.islink(p)}))\n",
+                                        args=[log])])
+>       entries = sb.write_list(sb.started(_launch(box, role)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[independent-auditor] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it(box, role):
+        log = sb.reranker_log(box.home)
+        s.set_plan(box, [sb.python_step("log", "import json, os\np = sys.argv[1]\n"
+                                        "print(json.dumps({'file': os.path.isfile(p) and not os.path.islink(p)}))\n",
+                                        args=[log])])
+>       entries = sb.write_list(sb.started(_launch(box, role)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[product-spec] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it(box, role):
+        log = sb.reranker_log(box.home)
+        s.set_plan(box, [sb.python_step("log", "import json, os\np = sys.argv[1]\n"
+                                        "print(json.dumps({'file': os.path.isfile(p) and not os.path.islink(p)}))\n",
+                                        args=[log])])
+>       entries = sb.write_list(sb.started(_launch(box, role)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[research] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_the_reranker_log_is_o4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it(box, role):
+        log = sb.reranker_log(box.home)
+        s.set_plan(box, [sb.python_step("log", "import json, os\np = sys.argv[1]\n"
+                                        "print(json.dumps({'file': os.path.isfile(p) and not os.path.islink(p)}))\n",
+                                        args=[log])])
+>       entries = sb.write_list(sb.started(_launch(box, role)))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[engineer] __
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other(box, role):
+>       sockets = sb.unix_sockets(sb.started(_launch(box, role)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other(box, role):
+>       sockets = sb.unix_sockets(sb.started(_launch(box, role)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[independent-auditor] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other(box, role):
+>       sockets = sb.unix_sockets(sb.started(_launch(box, role)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[product-spec] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other(box, role):
+>       sockets = sb.unix_sockets(sb.started(_launch(box, role)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[research] __
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_sandbox_block_allo4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other(box, role):
+>       sockets = sb.unix_sockets(sb.started(_launch(box, role)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+___ test_s8_the_socket_path_follows_the_services_setting_under_another_home ____
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s8_the_socket_path_follow0')
+
+    def test_s8_the_socket_path_follows_the_services_setting_under_another_home(tmp_path):
+        base = tmp_path.resolve()
+        box = s.Box(base, base / "a home", base / "systmp", base / "elsewhere", base / "pycache")
+        for folder in (box.home, box.tmpdir, box.elsewhere, box.pycache, box.calls, box.results):
+            folder.mkdir(parents=True, exist_ok=True)
+        sb.project(box)
+>       sockets = sb.unix_sockets(sb.started(_launch(box, s.ENGINEER)))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+__________ test_s9_nothing_else_widens_in_the_sandbox_block[engineer] __________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_nothing_else_widens_in_the_sandbox_block(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s9_nothing_else_widens_in_the_sandbox_block[independent-test-designer] __
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_nothing_else_widens_in_the_sandbox_block(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_s9_nothing_else_widens_in_the_sandbox_block[independent-auditor] _____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_nothing_else_widens_in_the_sandbox_block(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+________ test_s9_nothing_else_widens_in_the_sandbox_block[product-spec] ________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_nothing_else_widens_in_the_sandbox_block(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+__________ test_s9_nothing_else_widens_in_the_sandbox_block[research] __________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_nothing_else_widens_in4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_nothing_else_widens_in_the_sandbox_block(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_________ test_s9_sandbox_faults_accepts_the_built_settings[engineer] __________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_sandbox_faults_accepts_the_built_settings(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s9_sandbox_faults_accepts_the_built_settings[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_sandbox_faults_accepts_the_built_settings(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_s9_sandbox_faults_accepts_the_built_settings[independent-auditor] ____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_sandbox_faults_accepts_the_built_settings(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_______ test_s9_sandbox_faults_accepts_the_built_settings[product-spec] ________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_sandbox_faults_accepts_the_built_settings(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_________ test_s9_sandbox_faults_accepts_the_built_settings[research] __________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_accepts4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s9_sandbox_faults_accepts_the_built_settings(box, role):
+>       settings = sb.started(_launch(box, role))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+________ test_s9_sandbox_faults_refuses_any_other_change[enabled-false] ________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses0/pycache'))
+kind = 'enabled-false'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+__ test_s9_sandbox_faults_refuses_any_other_change[fail-if-unavailable-false] __
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses1/pycache'))
+kind = 'fail-if-unavailable-false'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s9_sandbox_faults_refuses_any_other_change[unsandboxed-commands-allowed] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses2/pycache'))
+kind = 'unsandboxed-commands-allowed'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_s9_sandbox_faults_refuses_any_other_change[strict-allowlist-off] _____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses3/pycache'))
+kind = 'strict-allowlist-off'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_s9_sandbox_faults_refuses_any_other_change[excluded-commands] ______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses4/pycache'))
+kind = 'excluded-commands'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_s9_sandbox_faults_refuses_any_other_change[all-unix-sockets] _______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses5'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses5/pycache'))
+kind = 'all-unix-sockets'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_s9_sandbox_faults_refuses_any_other_change[a-second-unix-socket] _____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses6'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses6/pycache'))
+kind = 'a-second-unix-socket'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s9_sandbox_faults_refuses_any_other_change[another-socket-in-its-place] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses7'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses7/pycache'))
+kind = 'another-socket-in-its-place'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_s9_sandbox_faults_refuses_any_other_change[a-socket-pattern] _______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses8'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses8/pycache'))
+kind = 'a-socket-pattern'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_s9_sandbox_faults_refuses_any_other_change[the-socket-folder] ______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses9'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses9/pycache'))
+kind = 'the-socket-folder'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+________ test_s9_sandbox_faults_refuses_any_other_change[local-binding] ________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses10'), home=PosixPath('/t...elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses10/pycache'))
+kind = 'local-binding'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+________ test_s9_sandbox_faults_refuses_any_other_change[a-proxy-port] _________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses11'), home=PosixPath('/t...elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses11/pycache'))
+kind = 'a-proxy-port'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_s9_sandbox_faults_refuses_any_other_change[weaker-nested-sandbox] ____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses12'), home=PosixPath('/t...elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s9_sandbox_faults_refuses12/pycache'))
+kind = 'weaker-nested-sandbox'
+
+    @pytest.mark.parametrize("kind", TODAYS_CHANGES + NEW_CHANGES)
+    def test_s9_sandbox_faults_refuses_any_other_change(box, kind):
+>       changed = _change(_engineer_settings(box), box.home, box.elsewhere, kind)
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:200: in _engineer_settings
+    return sb.started(_launch(box, s.ENGINEER))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_f2_a_sandbox_that_cannot_be_built_stops_the_session[engineer] ______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_0/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_a_sandbox_that_cannot_be_built_stops_the_session(box, role):
+>       sandbox = sb.block(sb.started(_launch(box, role)))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_f2_a_sandbox_that_cannot_be_built_stops_the_session[independent-test-designer] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_1'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_1/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_a_sandbox_that_cannot_be_built_stops_the_session(box, role):
+>       sandbox = sb.block(sb.started(_launch(box, role)))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_f2_a_sandbox_that_cannot_be_built_stops_the_session[independent-auditor] _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_2'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_2/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_a_sandbox_that_cannot_be_built_stops_the_session(box, role):
+>       sandbox = sb.block(sb.started(_launch(box, role)))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+____ test_f2_a_sandbox_that_cannot_be_built_stops_the_session[product-spec] ____
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_3'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_3/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_a_sandbox_that_cannot_be_built_stops_the_session(box, role):
+>       sandbox = sb.block(sb.started(_launch(box, role)))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+______ test_f2_a_sandbox_that_cannot_be_built_stops_the_session[research] ______
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_4'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_a_sandbox_that_cannot_4/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_a_sandbox_that_cannot_be_built_stops_the_session(box, role):
+>       sandbox = sb.block(sb.started(_launch(box, role)))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_sandbox_block.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[engineer] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess0')
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
+>       box, launch, settings, daemons = _daemons(tmp_path, role)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[independent-test-designer] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess1')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
+>       box, launch, settings, daemons = _daemons(tmp_path, role)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[independent-auditor] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess2')
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
+>       box, launch, settings, daemons = _daemons(tmp_path, role)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[product-spec] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess3')
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
+>       box, launch, settings, daemons = _daemons(tmp_path, role)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[research] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess4')
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder(tmp_path, role):
+>       box, launch, settings, daemons = _daemons(tmp_path, role)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[engineer] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess5')
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
+>       box, _, _, daemons = _daemons(tmp_path, role)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[independent-test-designer] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess6')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
+>       box, _, _, daemons = _daemons(tmp_path, role)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[independent-auditor] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess7')
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
+>       box, _, _, daemons = _daemons(tmp_path, role)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[product-spec] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess8')
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
+>       box, _, _, daemons = _daemons(tmp_path, role)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch product-spec DAEO-zw59 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[research] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s1_inside_a_launched_sess9')
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket(tmp_path, role):
+>       box, _, _, daemons = _daemons(tmp_path, role)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-56/test_w2_56_session_daemon.py:44: in _daemons
+    settings = sb.started(launch)
+               ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch research DAEO-zw60 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s8_a_search_in_the_launched_session_reaches_the_planted_service_and_is_ranked _
+
+    def test_s8_a_search_in_the_launched_session_reaches_the_planted_service_and_is_ranked():
+        why = sb.unix_sockets_refused_here()
+        if why:
+            pytest.skip(f"this run's own sandbox refuses Unix sockets ({why}): the CTO runs it outside the sandbox")
+        base = sb.short_base("w56-")
+        if base is None:
+            pytest.skip("no short folder can be made for the planted socket (107 bytes)")
+        service = None
+        try:
+            box = s.make_box(base)
+            if len(sb.reranker_socket(box.home)) > 100:
+                pytest.skip(f"the planted socket path is too long here: {sb.reranker_socket(box.home)}")
+            sb.project(box)
+            sb.plant_interpreter(box.home, "#!/bin/sh\nexit 0\n")
+            service = sb.StandInService(sb.reranker_socket(box.home))
+            s.set_plan(box, [sb.python_step("search", SEARCH)])
+>           sb.started(s.run_launch(box, s.ENGINEER, s.T.tk))
+
+tests/acceptance/W2-56/test_w2_56_session_reranker.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s11_an_unranked_search_in_the_launched_session_is_counted_where_gov_status_counts _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s11_an_unranked_search_in0')
+
+    def test_s11_an_unranked_search_in_the_launched_session_is_counted_where_gov_status_counts(tmp_path):
+        box = s.make_box(tmp_path)
+        sb.project(box)
+        sb.plant_interpreter(box.home)       # no service listens; the one that starts ends at once (exit 78)
+        s.set_plan(box, [sb.python_step("search", SEARCH)])
+>       sb.started(s.run_launch(box, s.ENGINEER, s.T.tk))
+
+tests/acceptance/W2-56/test_w2_56_session_reranker.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+launch = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=())
+
+    def started(launch) -> dict:
+>       assert launch.returncode == 0 and launch.started, f"the launch did not start one session\n{launch.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the launch did not start one session
+E       launch engineer DAEO-zw56 --gate-override DEC-1112
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-56/w2_56_sandbox_support.py:216: AssertionError
+_ test_s7_three_launches_at_once_in_worktrees_sharing_one_git_all_start_run_together_and_commit _
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s7_three_launches_at_once0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s7_three_launches_at_once0/pycache'))
+
+    def test_s7_three_launches_at_once_in_worktrees_sharing_one_git_all_start_run_together_and_commit(box):
+        trees = {name: box.project.parent / name for name in NAMES}
+        processes = {name: s.start_launch(box, s.ENGINEER, TICKET_OF_TREE[name].tk, cwd=trees[name]) for name in NAMES}
+        ended = {name: s.finish(process, timeout=BARRIER_S + 30) for name, process in processes.items()}
+        for name, (code, _, err) in ended.items():
+            assert code != 7, f"the session in {name} never saw all three sessions running at once (a lock held for a " \
+                              f"whole session?): {err[-800:]}"
+>           assert code == 0, f"the launch in {name} ended with {code}: {err[-1200:]}"
+E           AssertionError: the launch in wt-a ended with 1: gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E             
+E           assert 1 == 0
+
+tests/acceptance/W2-56/test_w2_56_start_together.py:54: AssertionError
+______________ test_s7_a_launch_after_three_at_once_still_starts _______________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s7_a_launch_after_three_a0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_s7_a_launch_after_three_a0/pycache'))
+
+    def test_s7_a_launch_after_three_at_once_still_starts(box):
+        trees = {name: box.project.parent / name for name in NAMES}
+        processes = [s.start_launch(box, s.ENGINEER, TICKET_OF_TREE[name].tk, cwd=trees[name]) for name in NAMES]
+        for process in processes:
+            s.finish(process, timeout=BARRIER_S + 30)
+        launch = s.run_launch(box, s.TEST_DESIGNER, s.T.tk, cwd=box.project)
+>       assert launch.returncode == 0 and launch.started, f"a later launch did not start\n{launch.describe()}"
+E       AssertionError: a later launch did not start
+E         launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_start_together.py:70: AssertionError
+___ test_f2_premise_the_unchanged_project_starts_every_worker_role[engineer] ___
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_premise_the_unchanged_0')
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_premise_the_unchanged_project_starts_every_worker_role(tmp_path, role):
+        box = _project(tmp_path, {})
+        launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
+>       assert launch.returncode == 0 and launch.started, f"the fixture project does not launch\n{launch.describe()}"
+E       AssertionError: the fixture project does not launch
+E         launch engineer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_todays_refusals.py:81: AssertionError
+_ test_f2_premise_the_unchanged_project_starts_every_worker_role[independent-test-designer] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_premise_the_unchanged_1')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_premise_the_unchanged_project_starts_every_worker_role(tmp_path, role):
+        box = _project(tmp_path, {})
+        launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
+>       assert launch.returncode == 0 and launch.started, f"the fixture project does not launch\n{launch.describe()}"
+E       AssertionError: the fixture project does not launch
+E         launch independent-test-designer DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n.../roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_todays_refusals.py:81: AssertionError
+_ test_f2_premise_the_unchanged_project_starts_every_worker_role[independent-auditor] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_premise_the_unchanged_2')
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_premise_the_unchanged_project_starts_every_worker_role(tmp_path, role):
+        box = _project(tmp_path, {})
+        launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
+>       assert launch.returncode == 0 and launch.started, f"the fixture project does not launch\n{launch.describe()}"
+E       AssertionError: the fixture project does not launch
+E         launch independent-auditor DAEO-zw56 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_todays_refusals.py:81: AssertionError
+_ test_f2_premise_the_unchanged_project_starts_every_worker_role[product-spec] _
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_premise_the_unchanged_3')
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_premise_the_unchanged_project_starts_every_worker_role(tmp_path, role):
+        box = _project(tmp_path, {})
+        launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
+>       assert launch.returncode == 0 and launch.started, f"the fixture project does not launch\n{launch.describe()}"
+E       AssertionError: the fixture project does not launch
+E         launch product-spec DAEO-zw59 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...rnance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_todays_refusals.py:81: AssertionError
+___ test_f2_premise_the_unchanged_project_starts_every_worker_role[research] ___
+
+tmp_path = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-0/test_f2_premise_the_unchanged_4')
+role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_f2_premise_the_unchanged_project_starts_every_worker_role(tmp_path, role):
+        box = _project(tmp_path, {})
+        launch = s.run_launch(box, role, s.TICKET_OF[role].tk)
+>       assert launch.returncode == 0 and launch.started, f"the fixture project does not launch\n{launch.describe()}"
+E       AssertionError: the fixture project does not launch
+E         launch research DAEO-zw60 --gate-override DEC-1112
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         sessions recorded: 0
+E       assert (1 == 0)
+E        +  where 1 = Launch(argv=('/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\n_t = _m\nfor _n in 'main'.split('.'):\n...governance/kernel/roles/research.md cannot be read: the session would start without its role (DEC-826 Q1)\n', calls=()).returncode
+
+tests/acceptance/W2-56/test_w2_56_todays_refusals.py:81: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-56/test_w2_56_placeholders.py::test_s4_no_placeholder_is_staged_or_committed_inside_the_session[git-add-A]
+FAILED tests/acceptance/W2-56/test_w2_56_placeholders.py::test_s4_no_placeholder_is_staged_or_committed_inside_the_session[git-add-dot]
+FAILED tests/acceptance/W2-56/test_w2_56_placeholders.py::test_s4_no_placeholder_is_committed_beside_a_running_session
+FAILED tests/acceptance/W2-56/test_w2_56_r5_lead_store.py::test_r5_guard_a_workers_gov_store_is_still_the_launchers_own[main]
+FAILED tests/acceptance/W2-56/test_w2_56_r5_lead_store.py::test_r5_guard_a_workers_gov_store_is_still_the_launchers_own[worktree]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s3_no_sandbox_entry_is_made_from_any_allowed_path
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_sandbox_block_allows_the_reranker_socket_and_no_other[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s8_the_socket_path_follows_the_services_setting_under_another_home
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_nothing_else_widens_in_the_sandbox_block[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_accepts_the_built_settings[research]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[enabled-false]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[fail-if-unavailable-false]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[unsandboxed-commands-allowed]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[strict-allowlist-off]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[excluded-commands]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[all-unix-sockets]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[a-second-unix-socket]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[another-socket-in-its-place]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[a-socket-pattern]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[the-socket-folder]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[local-binding]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[a-proxy-port]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_s9_sandbox_faults_refuses_any_other_change[weaker-nested-sandbox]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_sandbox_block.py::test_f2_a_sandbox_that_cannot_be_built_stops_the_session[research]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder[research]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket[research]
+FAILED tests/acceptance/W2-56/test_w2_56_session_reranker.py::test_s8_a_search_in_the_launched_session_reaches_the_planted_service_and_is_ranked
+FAILED tests/acceptance/W2-56/test_w2_56_session_reranker.py::test_s11_an_unranked_search_in_the_launched_session_is_counted_where_gov_status_counts
+FAILED tests/acceptance/W2-56/test_w2_56_start_together.py::test_s7_three_launches_at_once_in_worktrees_sharing_one_git_all_start_run_together_and_commit
+FAILED tests/acceptance/W2-56/test_w2_56_start_together.py::test_s7_a_launch_after_three_at_once_still_starts
+FAILED tests/acceptance/W2-56/test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role[engineer]
+FAILED tests/acceptance/W2-56/test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role[independent-test-designer]
+FAILED tests/acceptance/W2-56/test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role[independent-auditor]
+FAILED tests/acceptance/W2-56/test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role[product-spec]
+FAILED tests/acceptance/W2-56/test_w2_56_todays_refusals.py::test_f2_premise_the_unchanged_project_starts_every_worker_role[research]
+74 failed, 210 passed, 12 deselected in 174.78s (0:02:54)

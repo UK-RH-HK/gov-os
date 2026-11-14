@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-184
+status: interim result 8d7aee0c4: W2-184 (DAEO-6f0s): the FULL review's round-2 record, the probe (judgement fail on F1: a test designer's launch from its tests worktree never sees the probe records; to the owner, DEC-1010)

@@ -1,0 +1,46 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply uses the shared error body, ranks the point P3, and does not stop the work or send the question to the owner.
+
+Expected behaviour:
+the session takes the simplest reading (the same error body as the others), adds it to the contract, tests it, and names the point in `discoveries`; this is a P3 (reversible, inside the ticket, no change to a KPI), decided and logged without stopping the work.
+
+The session's reply:
+<<<
+I treated this as the skill directs, but I couldn't change a contract or any code. This folder contains only the skill (`SKILL.md` and `check_domain_skill.py`). There's no ticket, contract file or source tree, and the `scenarios.md` the skill refers to isn't here either. So I made the decision and wrote the contract change below, but nothing has been edited, tested or run.
+
+**How the skill classes this:** it's a P3. The skill's rubric names "an error body" as its example of a P3: a point the contract leaves open that can be undone, stays inside the ticket and changes no KPI. For a P3 the skill says to take the simplest reading, add it to the contract, log it under `discoveries` and keep going. So I didn't escalate, and I didn't ask the owner.
+
+**The decision:** the 409 uses the same error body as every other error in the contract. That follows the skill's rule of one error body for the whole interface, with a stable code programs can match on and a message meant for people.
+
+---
+
+task: Fill in the response body for the contract's "409 when the name is taken"
+status: partial. The decision and the contract change are written; no files existed to apply them to.
+work_completed: Classed the gap as P3. Chose the contract's existing error body for the 409 and wrote the contract text for it (below).
+files_changed: none. The workspace has no contract or code files.
+evidence: A file listing of the workspace shows only `.claude/skills/api/{SKILL.md, check_domain_skill.py}`.
+tests: planned only, not written or run. (1) Create with a name that's already taken → 409, body matches the error schema, `error.code` = `NAME_TAKEN`. (2) Create with a new name → the success response as the contract publishes it. (3) Repeat the same create → the second call gets 409 `NAME_TAKEN`. (4) Name differing only by case or spacing → whatever the contract decides; this is not yet stated.
+discoveries: The contract gave no body for the 409. I took the simplest reading, `{"error": {"code": "NAME_TAKEN", "message": "..."}}`, and wrote it into the contract text below. The code's casing should match the codes already in the contract.
+risks: I couldn't identify any callers, because there's no repository to look in. The rules for when two names count as the same (case, spacing) aren't stated.
+lessons: none
+proposed_decisions: none. This is a P3 and needs no decision.
+unresolved: Apply the contract change and the tests in the real repository. Settle the case and spacing rule.
+recommended_next_action: Run this again where the ticket, the contract and the code are available. Change the contract first, then write the tests, then the handler, then run `gov accept`.
+
+**Contract text to add (OpenAPI-style):**
+```yaml
+'409':
+  description: The name is already taken.
+  content:
+    application/json:
+      schema: { $ref: '#/components/schemas/Error' }
+      example:
+        error: { code: NAME_TAKEN, message: "A resource with this name already exists." }
+```
+This is an additive change: it gives a body to an error the contract already lists, so it doesn't break anything in the published version.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

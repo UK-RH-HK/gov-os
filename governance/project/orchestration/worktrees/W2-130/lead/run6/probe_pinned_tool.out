@@ -1,0 +1,4 @@
+measured_at 6b62de94e3fd pinned_tool=False: by_code=True by_role=True unl_status=True left={'D-5': True, 'D-6': True, 'D-9': True} | S4 unlisted=[] extra=[] form_problems=[]
+measured_at 6b62de94e3fd pinned_tool=True: by_code=True by_role=True unl_status=True left={'D-5': True, 'D-6': True, 'D-9': True} | S4 unlisted=[] extra=[] form_problems=[]
+START 232efc47d pinned_tool=False: (record, tool) {'UNMARKED_CHANGE': (185, 185), 'UNLINKED_ID': (1877, 1877), 'STATUS_CONFLICT': (116, 116)}
+START 232efc47d pinned_tool=True: (record, tool) {'UNMARKED_CHANGE': (185, 185), 'UNLINKED_ID': (1877, 1877), 'STATUS_CONFLICT': (116, 116)}

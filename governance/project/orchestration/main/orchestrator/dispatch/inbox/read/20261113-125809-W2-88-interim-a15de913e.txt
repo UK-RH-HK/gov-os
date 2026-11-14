@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result a15de913e: W2-88 (DAEO-2bdu): probe record, review round 2 of 2 (the last): FAIL (RV2-1 blocker: A9's undo resets the tree; RV2-2 minor), round 1's findings all fixed; round 1's record gains implementer_session

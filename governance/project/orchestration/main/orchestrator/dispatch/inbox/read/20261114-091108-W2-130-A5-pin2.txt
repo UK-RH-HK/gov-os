@@ -1,0 +1,11 @@
+log: W2-130-A5-pin2.json
+W2: W2-130
+status: DONE
+
+Pin run 2 is done. The branch is ready to land at `aafaf6259d10`. Every test run passed, and a fresh independent check passed the revision with no blocking finding.
+
+task: DAEO-q8cl (W2-130), run 6, build: pin run 2
+status: DONE
+work_completed:
+- I checked the change in advance by running `gov links` at `measured_at` (6b62de94e) with both the current tool and the pinned tree's own tool. Both give the record's after counts and `left`, and S4's three conditions hold there. At the starting head 232efc47d, both tools give the record's before counts (185 / 1877 / 116).
+- A fresh test designer (clau

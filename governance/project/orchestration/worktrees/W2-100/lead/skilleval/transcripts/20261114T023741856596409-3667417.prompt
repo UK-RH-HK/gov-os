@@ -1,0 +1,116 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names at least the three rules, keeps the rejected rows somewhere with a reason, and names a test with a bad row.
+
+Expected behaviour:
+the session states the data-quality rules (key present and unique, weight in range), applies them before the load, sends the rows that break them to a rejected-rows table with the reason instead of dropping them without a trace, reports the counts loaded and rejected, and names unit tests with a bad row for each rule.
+
+The session's reply:
+<<<
+I've stopped here. `gov` was refused (on `gov --help`) and so were all four file writes, so nothing was written, run or committed. The harness says not to retry a declined call as-is, and the skill says not to route around a refusal, so I didn't try writing the files another way. What follows is the import design to apply once writes are allowed.
+
+**task:** Nightly import of partner shipment records into `shipments`, so that rows with an empty `shipment_id`, a repeated `shipment_id` or a negative `weight_kg` are rejected with a reason. The first draft loads whatever parses, and the skill lists that as a common mistake.
+
+**status:** blocked. This is a design and a set of tests, not a finished change.
+
+**work_completed:**
+- Read the skill.
+- Found that the workspace holds only the skill: no ticket file, no schema, no migrations, no sample data. I couldn't read the ticket's KPI lines or allowed paths.
+- Stated the rules for each field and the counts to report.
+- Drafted 26 unit tests, a synthetic fixture, one migration with its down step, and the loader design.
+
+**files_changed:** none (writes refused).
+
+**evidence:** none. Nothing was run, so I have no counts before and after. The counts the tests expect on the fixture: 12 rows in, 3 loaded, 9 rejected, and loaded plus rejected equals rows in.
+
+**tests:**
+- Written but not saved or run: 26 cases across `test_rules.py`, `test_loader.py` and `test_migrations.py`, using only the standard library `unittest`.
+- `gov accept` was not run, because `gov` was refused.
+
+**discoveries:** These are P3 choices: reversible, inside the ticket, no KPI change. I've logged them here and moved on.
+- When a `shipment_id` appears twice, every copy is rejected. Keeping one copy would be a silent fix.
+- `weight_kg` must be greater than 0. Zero is rejected along with negatives.
+- Whitespace around an ID is trimmed only to check for duplicates. Rejected rows keep their raw values unchanged.
+
+**risks:**
+- The real `shipments` schema is unknown, so the tests use a stand-in table (`shipment_id` as primary key, `weight_kg` NOT NULL).
+- `WEIGHT_KG_MAX` (the upper weight limit) is a placeholder. It isn't confirmed.
+- The rule against changing a row already in `shipments` is assumed, not confirmed (see unresolved).
+- The down step drops the rejects table. Once it holds rows, that table is the only record of them, so the down step refuses unless the table is empty. Removing it later needs a kept copy first and goes up as a P1.
+- No checklist line can be ticked yet, because nothing ran.
+
+**lessons:** The skill says to read the ticket first, but the session has neither the ticket nor `gov retrieve`.
+
+**proposed_decisions:** These are P2: they change behaviour that another stream may rely on.
+1. When a `shipment_id` is already in `shipments`, the default is to reject it with `shipment_id_already_loaded` rather than overwrite. Overwriting can't be undone without keeping the old value. The partner may intend these rows as updates, and if so the default needs to change.
+2. Add a unique constraint on `shipments.shipment_id`. This isn't in the draft, because another stream may read that table and existing duplicates would make the constraint fail.
+3. Fail the whole run when more than a set share of rows is rejected (`max_reject_rate`). The ticket needs to say what that share is.
+
+**unresolved:**
+- The ticket's KPIs and allowed paths.
+- The real schema and the migration tool.
+- Who owns `shipments` and what reads it.
+- The `weight_kg` upper limit.
+- Whether repeated IDs in the partner file are updates or errors.
+
+**recommended_next_action:** Grant writes to an allowed path and access to `gov`, and send the ticket and schema. Then: save the files below, run the suite, run the migration forward and back on a throw-away database, and run `gov accept`.
+
+---
+
+**Rules for each field (applied before the load; every reason is kept):**
+
+| field | rule | reason code |
+|---|---|---|
+| `shipment_id` | present: not null, not empty or spaces only | `shipment_id_missing` |
+| `shipment_id` | unique in the batch (every copy rejected) | `shipment_id_duplicate_in_batch` |
+| `shipment_id` | not already in `shipments` (pending P2) | `shipment_id_already_loaded` |
+| `weight_kg` | present | `weight_kg_missing` |
+| `weight_kg` | a finite decimal number (`abc`, `nan`, `inf`, `1,5` rejected) | `weight_kg_not_a_number` |
+| `weight_kg` | greater than 0 and at most `WEIGHT_KG_MAX` | `weight_kg_out_of_range` |
+
+**Counts reported for each run:** rows in, rows loaded, rows rejected, and rejects by reason. The run fails and loads nothing if loaded plus rejected doesn't equal rows in.
+
+**Migration 0001.** It creates new tables only and doesn't touch `shipments`. Running it twice does no harm, and so does running the down step twice.
+```sql
+-- up
+CREATE TABLE IF NOT EXISTS shipment_import_runs (
+  run_id INTEGER PRIMARY KEY, run_key TEXT NOT NULL UNIQUE,  -- e.g. file date; makes re-runs harmless
+  started_at TEXT NOT NULL,  -- UTC ISO-8601
+  status TEXT NOT NULL CHECK (status IN ('committed','failed')),
+  rows_in INTEGER, rows_loaded INTEGER, rows_rejected INTEGER);
+CREATE TABLE IF NOT EXISTS shipment_import_rejects (
+  run_id INTEGER NOT NULL REFERENCES shipment_import_runs(run_id),
+  line_no INTEGER NOT NULL, raw_shipment_id TEXT, raw_weight_kg TEXT,
+  reasons TEXT NOT NULL,  -- comma-separated reason codes
+  PRIMARY KEY (run_id, line_no));
+-- down (refuses if shipment_import_rejects has rows: those are the only record)
+DROP TABLE IF EXISTS shipment_import_rejects;
+DROP TABLE IF EXISTS shipment_import_runs;
+```
+
+**Loader steps.** The whole load runs in one transaction:
+1. If a committed run already has this `run_key`, skip.
+2. Parse the file and run `validate_batch`, which returns the good rows and the rejected rows with their raw values and line numbers.
+3. Check the good rows against IDs already in `shipments`.
+4. Insert the good rows and the rejects.
+5. Check that the counts add up and that the reject share is under `max_reject_rate`.
+6. Write the run's counts and commit. On any error, roll back. A failed run can be retried under the same key.
+
+**Tests drafted:**
+- **Rules:** one failing row and one passing row for each rule, covering null, empty and spaces-only IDs, all copies of a duplicate, and negative, zero, too-large, non-numeric and missing weights, plus the exact upper limit. Also: a row that breaks two rules keeps both reasons, and raw values are kept as received.
+- **Loader, on the fixture:**
+  - The counts add up.
+  - Only `SHP-0001`, `SHP-0002` and `SHP-0009` reach `shipments`.
+  - Each reject is stored with its line number, raw values and reason.
+  - A re-run with the same key is skipped.
+  - An ID already in the table is rejected and the existing row is left unchanged.
+  - A forced failure halfway through leaves no rows behind, and the run can then be retried.
+  - Going over the reject-rate limit loads nothing.
+- **Migration:** up and down each run twice without harm, down restores the previous set of tables, `shipments` is unchanged, and down refuses when rejects are present.
+
+**Fixture:** 12 synthetic rows with no real data. They are: 2 valid, 1 empty ID, 1 spaces-only ID, 1 negative weight, 1 non-numeric weight, 1 missing weight, 1 ID appearing twice, 1 weight over the limit, 1 zero weight, and 1 valid row at the end.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

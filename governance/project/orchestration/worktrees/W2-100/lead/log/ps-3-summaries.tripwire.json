@@ -1,0 +1,41 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "head",
+   "before": "fef53fb21b40",
+   "after": "b266cf8a40f2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/api/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/backend/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/data/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/security/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "head",
+   "before": "9905c9951763",
+   "after": "33484a699983"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "status line gone",
+   "line": " M template/governance/kernel/skills/frontend/SKILL.md"
+  }
+ ]
+}

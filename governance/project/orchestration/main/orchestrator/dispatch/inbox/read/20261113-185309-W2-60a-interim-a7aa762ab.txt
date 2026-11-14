@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-60a
+status: interim result a7aa762ab: W2-60a (DAEO-cv58): the probe record's addendum: f3a4461c1ece (the deny list's order, W2-56 S3) passed a narrow independent check (ad5e193e)

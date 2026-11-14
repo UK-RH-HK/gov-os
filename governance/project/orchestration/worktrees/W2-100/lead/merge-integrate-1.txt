@@ -1,0 +1,6 @@
+W2-100: merge w2/integrate for the interface at claim (P-W2-100-IF-1 (a), 0a706dc4c)
+
+Task: DAEO-uw5h
+Role: orchestrator
+Implements: DEC-959, DEC-957
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,49 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply uses the shared error body, ranks the point P3, and does not stop the work or send the question to the owner.
+
+Expected behaviour:
+the session takes the simplest reading (the same error body as the others), adds it to the contract, tests it, and names the point in `discoveries`; this is a P3 (reversible, inside the ticket, no change to a KPI), decided and logged without stopping the work.
+
+The session's reply:
+<<<
+The skill puts this at **P3**: the contract leaves a point open, but it's reversible, inside the ticket, and doesn't change a KPI. "An error body" is one of the skill's own examples. For a P3 the skill says to take the simplest reading, write it into the contract, log it under `discoveries`, and keep going. It also says not to escalate to the owner directly, so the ticket doesn't need to stop for a day.
+
+**The simplest reading:** the 409 uses the error shape the rest of the contract already uses, with its own stable code. The skill requires one error shape across the interface, so a 409 with no body or a different body would break that rule.
+
+**What I could and couldn't do here:** the workspace has only the skill's `SKILL.md` and `check_domain_skill.py`. There's no ticket, no contract file and no code. The skill also links a `scenarios.md` that isn't there. So I haven't edited any contract or run any tests. I didn't create a contract file either, because the contract has to be the one place the interface is described, and a new file would split that. Below is the return the skill asks for, with the contract fragment to apply.
+
+---
+
+**task:** Specify the body of the "409 when the name is taken" response for the ticket's endpoint.
+**status:** partial. The decision is made and the fragment is written, but it isn't applied because there's no contract file in the workspace.
+**work_completed:** Ranked the gap as P3. Chose the reading: the 409 uses the contract's standard error envelope with a stable code. Wrote the contract fragment (payload below).
+**files_changed:** none
+**evidence:** The workspace holds only `.claude/skills/api/SKILL.md` and `check_domain_skill.py`. Every other error in the contract uses `{"error": {"code": "...", "message": "..."}}`, which you gave me.
+**tests:** None written or run (there's no code or contract). To write when the contract is present: the 409 response checked against the error schema; a create with a taken name returns 409 with `code` = `NAME_TAKEN`; a create with a free name doesn't return 409; names at the edges (casing, surrounding spaces), depending on how uniqueness is defined.
+**discoveries:** The contract gave no body for the 409. I took the simplest reading: the standard error envelope with the code `NAME_TAKEN`. Two smaller open points: (a) the code's casing should match the contract's existing codes (`NAME_TAKEN` assumes SCREAMING_SNAKE); (b) whether "taken" is case-sensitive isn't stated.
+**risks:** I couldn't identify the endpoint's callers because there's no repository. If the endpoint is already published and some callers already get a 409 with a different body, switching to the envelope would be breaking. That would make it P2, and the old body would have to keep working. If the endpoint is new, the change is additive.
+**lessons:** none
+**proposed_decisions:** All 409 conflicts on this interface use the standard error envelope, each with its own stable code.
+**unresolved:** Applying the fragment to the real contract file, and checking the code's casing against the existing codes.
+**recommended_next_action:** Add the fragment to the contract, then write the tests from it, then the handler. Run `gov accept`. Tell the session's starter about the reading in this return, not the owner.
+
+**Payload: contract fragment (OpenAPI)**
+```yaml
+'409':
+  description: The name is already taken.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Error'   # the existing error envelope
+      example:
+        error:
+          code: NAME_TAKEN
+          message: "The name is already in use."
+```
+The example message doesn't include the name that was submitted, so no user data ends up in the example.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

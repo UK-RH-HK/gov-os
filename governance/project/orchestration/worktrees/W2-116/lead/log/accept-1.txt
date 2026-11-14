@@ -1,0 +1,2 @@
+gov accept: ACCEPT_MAP_UNREADABLE: ticket DAEO-f58b: the README of tests/acceptance/W2-116/ has a map row naming no KPI line it can read
+rc=1

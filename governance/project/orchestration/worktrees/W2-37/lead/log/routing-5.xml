@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="0.150" timestamp="2026-11-13T14:05:38.857496+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-37.test_w2_37_skill_routing" name="test_regression_the_skill_says_the_question_triggers_the_impact_assessment[template]" time="0.004" /><testcase classname="tests.acceptance.W2-37.test_w2_37_skill_routing" name="test_regression_the_skill_says_the_question_triggers_the_impact_assessment[claude-copy]" time="0.001" /><testcase classname="tests.acceptance.W2-37.test_w2_37_skill_routing" name="test_the_skill_runs_gov_impact_for_the_question[template]" time="0.000" /><testcase classname="tests.acceptance.W2-37.test_w2_37_skill_routing" name="test_the_skill_runs_gov_impact_for_the_question[claude-copy]" time="0.001"><failure message="AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`&#10;assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form &quot;what is the impact of X?&quot; triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'">path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+&gt;       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,23 @@
+.......................F................                                 [100%]
+=================================== FAILURES ===================================
+___________ test_a_manifest_changed_after_its_approval_stays_flagged ___________
+
+w = <test_landing_cto_route.World object at 0x7b1db5986360>
+
+    def test_a_manifest_changed_after_its_approval_stays_flagged(w):
+        h = w.bundle()
+        m = w.acts / ACT / "manifest.json"
+        m.write_text(m.read_text() + "\n")
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "no manifest of " + ACT in got[c]["reason"]
+E       AssertionError: assert (set() == {'7895a5743ba...a7ab5e0472b8'}
+E         
+E         Extra items in the right set:
+E         '7895a5743baa320bfbca51ba53bfa7ab5e0472b8'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:219: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_changed_after_its_approval_stays_flagged
+1 failed, 39 passed in 4.24s

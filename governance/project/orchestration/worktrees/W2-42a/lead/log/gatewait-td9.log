@@ -1,0 +1,4 @@
+2026-11-14 06:11:53 gate open: OPEN leads=2 load=12.4/8.9 nproc=20 have=18735856kB need=6026944kB
+launch_worker: independent-test-designer DAEO-03ub in /home/usain/gov-os-worktrees/W2-42a-tests: sandbox settings strict; disk gate open; brief /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/brief/td-9.md; projection none; model claude-sonnet-5-5; class C3
+launch_worker: started pid 2079966 (its own process group) for independent-test-designer DAEO-03ub; log /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/lead/log/td-9.json
+launch_worker: wait with: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/lead/log/td-9.exit

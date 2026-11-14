@@ -1,0 +1,10 @@
+log: W2-94-A5-close.json
+W2: W2-94
+status: DONE. Head to land: `cfbcd75ab38678ba1e5ca6284b0a8e59fed289a3`. The full suite is red on 2 tests that this change does not cause (see tests).
+
+task: DAEO-g87r (W2-94), build run: EXAMIN's counts-only gold check and its form-only acceptance cases.
+
+status: DONE. Head to land: `cfbcd75ab38678ba1e5ca6284b0a8e59fed289a3`. The full suite is red on 2 tests that this change does not cause (see tests).
+
+work_completed:
+- The independent test designer wrote `fixtures/evaluation/examin/check_gold.py` with the CTO's interface (`--sets-root <root> --copy <clone> [--set examin]`). For S4 and F3 it checks each gold source at the commit in `COPY-HEAD.txt`, read through git, and whether the source holds the answer. For S1 it refuses a set outside 10

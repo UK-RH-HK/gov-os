@@ -1,0 +1,4237 @@
+{
+ "data": {
+  "commits": {
+   "starting_head": "232efc47dd707dd76038cf8211842d9b4472473c",
+   "first_commit": "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968",
+   "w2_129_landing": "34eed411ac8c1d58dc8279c6d55700a0dcbc2c21",
+   "w2_92_adoption": "3679ca0bad0b44fd772bcf76380dc9081165e3e0",
+   "start_decision": "DEC-1097 (9)",
+   "status_decision": "DEC-1098 (3)",
+   "status_decision_commit": "9546edd61565603981cb2d3148bc4dfb88b26b13",
+   "sitting_commit": "2f9c80b1f80747f26507093551fd4da5e5eccc0f",
+   "cleanup": [
+    "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968",
+    "c4420040f9b31403d05c8a035d385edd1d6fcc76",
+    "8d245901b239f447e78c4b5dd3f32cd9dba94bbb",
+    "8f8d707f0bd0024a981833ccc43caf5e88b0655e",
+    "bce798c3a9113544daca5effee9d602080b64741",
+    "57cbacfbfc861eb982cf08b6aebb3c699171a1de"
+   ],
+   "marks": [
+    "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968",
+    "c4420040f9b31403d05c8a035d385edd1d6fcc76",
+    "bce798c3a9113544daca5effee9d602080b64741"
+   ],
+   "sources": [
+    "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968",
+    "57cbacfbfc861eb982cf08b6aebb3c699171a1de"
+   ],
+   "status": [
+    "c4420040f9b31403d05c8a035d385edd1d6fcc76",
+    "8d245901b239f447e78c4b5dd3f32cd9dba94bbb"
+   ],
+   "r12": "8d245901b239f447e78c4b5dd3f32cd9dba94bbb",
+   "lessons": "8f8d707f0bd0024a981833ccc43caf5e88b0655e"
+  },
+  "ids-87": [
+   "DEC-030",
+   "DEC-039",
+   "DEC-066",
+   "DEC-070",
+   "DEC-082",
+   "DEC-083",
+   "DEC-090",
+   "DEC-093",
+   "DEC-107",
+   "DEC-121",
+   "DEC-153",
+   "DEC-156",
+   "DEC-157",
+   "DEC-176",
+   "DEC-180",
+   "DEC-220",
+   "DEC-235",
+   "DEC-241",
+   "DEC-250",
+   "DEC-258",
+   "DEC-269",
+   "DEC-285",
+   "DEC-290",
+   "DEC-293",
+   "DEC-304",
+   "DEC-318",
+   "DEC-362",
+   "DEC-365",
+   "DEC-367",
+   "DEC-371",
+   "DEC-376",
+   "DEC-378",
+   "DEC-384",
+   "DEC-385",
+   "DEC-386",
+   "DEC-390",
+   "DEC-391",
+   "DEC-394",
+   "DEC-398",
+   "DEC-403",
+   "DEC-407",
+   "DEC-409",
+   "DEC-417",
+   "DEC-421",
+   "DEC-508",
+   "DEC-511",
+   "DEC-513",
+   "DEC-605",
+   "DEC-709",
+   "DEC-721",
+   "DEC-761",
+   "DEC-787",
+   "DEC-832",
+   "DEC-839",
+   "DEC-851",
+   "DEC-853",
+   "DEC-861",
+   "DEC-897",
+   "DEC-914",
+   "DEC-916",
+   "DEC-925",
+   "DEC-943",
+   "DEC-949",
+   "DEC-958",
+   "DEC-961",
+   "DEC-966",
+   "DEC-967",
+   "DEC-968",
+   "DEC-971",
+   "DEC-973",
+   "DEC-974",
+   "DEC-976",
+   "DEC-982",
+   "DEC-989",
+   "DEC-991",
+   "DEC-994",
+   "DEC-1003",
+   "DEC-1012",
+   "DEC-1028",
+   "DEC-1037",
+   "DEC-1038",
+   "DEC-1039",
+   "DEC-1047",
+   "DEC-1048",
+   "DEC-1050",
+   "DEC-1052",
+   "DEC-1066"
+  ],
+  "census": {
+   "DEC-030": [
+    "DEC-080"
+   ],
+   "DEC-039": [
+    "DEC-075"
+   ],
+   "DEC-053": [
+    "DEC-165"
+   ],
+   "DEC-066": [
+    "DEC-094"
+   ],
+   "DEC-070": [
+    "DEC-096"
+   ],
+   "DEC-072": [
+    "DEC-064"
+   ],
+   "DEC-082": [
+    "DEC-096"
+   ],
+   "DEC-083": [
+    "DEC-163"
+   ],
+   "DEC-090": [
+    "DEC-741"
+   ],
+   "DEC-093": [
+    "DEC-220"
+   ],
+   "DEC-096": [
+    "DEC-953",
+    "DEC-1010"
+   ],
+   "DEC-107": [
+    "DEC-117"
+   ],
+   "DEC-120": [
+    "DEC-172",
+    "DEC-173",
+    "DEC-825"
+   ],
+   "DEC-121": [
+    "DEC-127"
+   ],
+   "DEC-140": [
+    "DEC-842"
+   ],
+   "DEC-150": [
+    "DEC-156"
+   ],
+   "DEC-151": [
+    "DEC-172",
+    "DEC-825"
+   ],
+   "DEC-153": [
+    "DEC-209"
+   ],
+   "DEC-156": [
+    "DEC-165",
+    "DEC-176",
+    "DEC-434"
+   ],
+   "DEC-157": [
+    "DEC-209"
+   ],
+   "DEC-162": [
+    "DEC-156"
+   ],
+   "DEC-176": [
+    "DEC-365",
+    "DEC-402"
+   ],
+   "DEC-180": [
+    "DEC-311"
+   ],
+   "DEC-183": [
+    "DEC-205",
+    "DEC-235",
+    "DEC-371"
+   ],
+   "DEC-192": [
+    "DEC-202",
+    "DEC-825"
+   ],
+   "DEC-208": [
+    "DEC-237",
+    "DEC-250",
+    "DEC-838"
+   ],
+   "DEC-220": [
+    "DEC-416",
+    "DEC-974"
+   ],
+   "DEC-235": [
+    "DEC-363"
+   ],
+   "DEC-237": [
+    "DEC-250",
+    "DEC-838"
+   ],
+   "DEC-241": [
+    "DEC-316"
+   ],
+   "DEC-248": [
+    "DEC-838"
+   ],
+   "DEC-250": [
+    "DEC-420"
+   ],
+   "DEC-253": [
+    "DEC-912"
+   ],
+   "DEC-258": [
+    "DEC-264"
+   ],
+   "DEC-261": [
+    "DEC-798",
+    "DEC-1033"
+   ],
+   "DEC-269": [
+    "DEC-394"
+   ],
+   "DEC-281": [
+    "DEC-208",
+    "DEC-237",
+    "DEC-838",
+    "DEC-901"
+   ],
+   "DEC-285": [
+    "DEC-1045"
+   ],
+   "DEC-290": [
+    "DEC-1045"
+   ],
+   "DEC-293": [
+    "DEC-300"
+   ],
+   "DEC-304": [
+    "DEC-310"
+   ],
+   "DEC-318": [
+    "DEC-359"
+   ],
+   "DEC-362": [
+    "DEC-389"
+   ],
+   "DEC-365": [
+    "DEC-402",
+    "DEC-407",
+    "DEC-409"
+   ],
+   "DEC-367": [
+    "DEC-409"
+   ],
+   "DEC-371": [
+    "DEC-386"
+   ],
+   "DEC-376": [
+    "DEC-395"
+   ],
+   "DEC-378": [
+    "DEC-402"
+   ],
+   "DEC-384": [
+    "DEC-397"
+   ],
+   "DEC-385": [
+    "DEC-399"
+   ],
+   "DEC-386": [
+    "DEC-392"
+   ],
+   "DEC-390": [
+    "DEC-394"
+   ],
+   "DEC-391": [
+    "DEC-393",
+    "DEC-396"
+   ],
+   "DEC-394": [
+    "DEC-398",
+    "DEC-403"
+   ],
+   "DEC-398": [
+    "DEC-403"
+   ],
+   "DEC-403": [
+    "DEC-410"
+   ],
+   "DEC-407": [
+    "DEC-409"
+   ],
+   "DEC-409": [
+    "DEC-428"
+   ],
+   "DEC-410": [
+    "DEC-421",
+    "DEC-918"
+   ],
+   "DEC-413": [
+    "DEC-880",
+    "DEC-909",
+    "DEC-912",
+    "DEC-916"
+   ],
+   "DEC-417": [
+    "DEC-421"
+   ],
+   "DEC-421": [
+    "DEC-572"
+   ],
+   "DEC-448": [
+    "DEC-456",
+    "DEC-477"
+   ],
+   "DEC-451": [
+    "DEC-838"
+   ],
+   "DEC-454": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "DEC-455": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "DEC-460": [
+    "DEC-839",
+    "DEC-840"
+   ],
+   "DEC-466": [
+    "DEC-953"
+   ],
+   "DEC-480": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "DEC-490": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "DEC-492": [
+    "DEC-866",
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "DEC-493": [
+    "DEC-896",
+    "DEC-903",
+    "DEC-904"
+   ],
+   "DEC-501": [
+    "DEC-502",
+    "DEC-512",
+    "DEC-825"
+   ],
+   "DEC-502": [
+    "DEC-512",
+    "DEC-825"
+   ],
+   "DEC-508": [
+    "DEC-820"
+   ],
+   "DEC-511": [
+    "DEC-522",
+    "DEC-1057"
+   ],
+   "DEC-513": [
+    "DEC-518",
+    "DEC-536"
+   ],
+   "DEC-518": [
+    "DEC-533",
+    "DEC-536",
+    "DEC-825"
+   ],
+   "DEC-526": [
+    "DEC-541",
+    "DEC-825"
+   ],
+   "DEC-594": [
+    "DEC-593"
+   ],
+   "DEC-605": [
+    "DEC-822"
+   ],
+   "DEC-608": [
+    "DEC-880",
+    "DEC-913",
+    "DEC-917"
+   ],
+   "DEC-624": [
+    "DEC-626",
+    "DEC-825"
+   ],
+   "DEC-665": [
+    "DEC-838"
+   ],
+   "DEC-709": [
+    "DEC-719"
+   ],
+   "DEC-718": [
+    "DEC-900",
+    "DEC-953"
+   ],
+   "DEC-721": [
+    "DEC-953"
+   ],
+   "DEC-723": [
+    "DEC-820",
+    "DEC-953"
+   ],
+   "DEC-724": [
+    "DEC-860",
+    "DEC-861"
+   ],
+   "DEC-726": [
+    "DEC-843",
+    "DEC-852",
+    "DEC-880"
+   ],
+   "DEC-728": [
+    "DEC-723",
+    "DEC-953"
+   ],
+   "DEC-737": [
+    "DEC-847"
+   ],
+   "DEC-742": [
+    "DEC-942"
+   ],
+   "DEC-757": [
+    "DEC-899",
+    "DEC-900",
+    "DEC-953"
+   ],
+   "DEC-761": [
+    "DEC-772"
+   ],
+   "DEC-762": [
+    "DEC-953"
+   ],
+   "DEC-766": [
+    "DEC-953"
+   ],
+   "DEC-769": [
+    "DEC-953"
+   ],
+   "DEC-776": [
+    "DEC-847"
+   ],
+   "DEC-780": [
+    "DEC-775",
+    "DEC-953"
+   ],
+   "DEC-786": [
+    "DEC-847"
+   ],
+   "DEC-787": [
+    "DEC-948"
+   ],
+   "DEC-788": [
+    "DEC-861"
+   ],
+   "DEC-792": [
+    "DEC-837"
+   ],
+   "DEC-804": [
+    "DEC-807"
+   ],
+   "DEC-805": [
+    "DEC-971"
+   ],
+   "DEC-806": [
+    "DEC-953"
+   ],
+   "DEC-813": [
+    "DEC-889",
+    "DEC-899"
+   ],
+   "DEC-819": [
+    "DEC-856",
+    "DEC-887"
+   ],
+   "DEC-820": [
+    "DEC-953"
+   ],
+   "DEC-821": [
+    "DEC-873"
+   ],
+   "DEC-822": [
+    "DEC-953"
+   ],
+   "DEC-823": [
+    "DEC-869"
+   ],
+   "DEC-826": [
+    "DEC-953"
+   ],
+   "DEC-829": [
+    "DEC-831"
+   ],
+   "DEC-830": [
+    "DEC-848"
+   ],
+   "DEC-831": [
+    "DEC-941"
+   ],
+   "DEC-832": [
+    "DEC-957"
+   ],
+   "DEC-839": [
+    "DEC-957"
+   ],
+   "DEC-841": [
+    "DEC-880"
+   ],
+   "DEC-843": [
+    "DEC-852",
+    "DEC-880"
+   ],
+   "DEC-847": [
+    "DEC-880",
+    "DEC-941",
+    "DEC-942",
+    "DEC-953"
+   ],
+   "DEC-849": [
+    "DEC-857",
+    "DEC-953"
+   ],
+   "DEC-850": [
+    "DEC-855"
+   ],
+   "DEC-851": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "DEC-852": [
+    "DEC-880",
+    "DEC-889"
+   ],
+   "DEC-853": [
+    "DEC-884"
+   ],
+   "DEC-855": [
+    "DEC-858",
+    "DEC-936",
+    "DEC-938",
+    "DEC-972"
+   ],
+   "DEC-856": [
+    "DEC-887"
+   ],
+   "DEC-861": [
+    "DEC-1057"
+   ],
+   "DEC-862": [
+    "DEC-906",
+    "DEC-953"
+   ],
+   "DEC-868": [
+    "DEC-892",
+    "DEC-953"
+   ],
+   "DEC-873": [
+    "DEC-953"
+   ],
+   "DEC-879": [
+    "DEC-883",
+    "DEC-884"
+   ],
+   "DEC-880": [
+    "DEC-843",
+    "DEC-882",
+    "DEC-884",
+    "DEC-889",
+    "DEC-904",
+    "DEC-952"
+   ],
+   "DEC-883": [
+    "DEC-889",
+    "DEC-890"
+   ],
+   "DEC-884": [
+    "DEC-889",
+    "DEC-896",
+    "DEC-899",
+    "DEC-918",
+    "DEC-921",
+    "DEC-953"
+   ],
+   "DEC-889": [
+    "DEC-892",
+    "DEC-896",
+    "DEC-899",
+    "DEC-904"
+   ],
+   "DEC-890": [
+    "DEC-896",
+    "DEC-899"
+   ],
+   "DEC-891": [
+    "DEC-906",
+    "DEC-924",
+    "DEC-953"
+   ],
+   "DEC-892": [
+    "DEC-896",
+    "DEC-899"
+   ],
+   "DEC-893": [
+    "DEC-953",
+    "DEC-1045"
+   ],
+   "DEC-895": [
+    "DEC-922",
+    "DEC-953"
+   ],
+   "DEC-896": [
+    "DEC-891",
+    "DEC-923",
+    "DEC-953",
+    "DEC-1057"
+   ],
+   "DEC-897": [
+    "DEC-909"
+   ],
+   "DEC-898": [
+    "DEC-899",
+    "DEC-902",
+    "DEC-904"
+   ],
+   "DEC-899": [
+    "DEC-902",
+    "DEC-912",
+    "DEC-915",
+    "DEC-918",
+    "DEC-924",
+    "DEC-925",
+    "DEC-953"
+   ],
+   "DEC-900": [
+    "DEC-906"
+   ],
+   "DEC-904": [
+    "DEC-905",
+    "DEC-922"
+   ],
+   "DEC-905": [
+    "DEC-906",
+    "DEC-962"
+   ],
+   "DEC-906": [
+    "DEC-953",
+    "DEC-962"
+   ],
+   "DEC-910": [
+    "DEC-911"
+   ],
+   "DEC-911": [
+    "DEC-923",
+    "DEC-953"
+   ],
+   "DEC-914": [
+    "DEC-916"
+   ],
+   "DEC-915": [
+    "DEC-953"
+   ],
+   "DEC-916": [
+    "DEC-987",
+    "DEC-1010"
+   ],
+   "DEC-923": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "DEC-924": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "DEC-925": [
+    "DEC-1057"
+   ],
+   "DEC-926": [
+    "DEC-953"
+   ],
+   "DEC-927": [
+    "DEC-928",
+    "DEC-953",
+    "DEC-1057"
+   ],
+   "DEC-928": [
+    "DEC-953"
+   ],
+   "DEC-929": [
+    "DEC-953"
+   ],
+   "DEC-930": [
+    "DEC-949"
+   ],
+   "DEC-933": [
+    "DEC-953",
+    "DEC-961",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "DEC-934": [
+    "DEC-936",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "DEC-936": [
+    "DEC-938",
+    "DEC-941",
+    "DEC-946",
+    "DEC-953",
+    "DEC-974"
+   ],
+   "DEC-938": [
+    "DEC-941",
+    "DEC-949",
+    "DEC-951",
+    "DEC-953",
+    "DEC-973"
+   ],
+   "DEC-939": [
+    "DEC-945",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1001"
+   ],
+   "DEC-941": [
+    "DEC-942",
+    "DEC-944",
+    "DEC-946",
+    "DEC-953",
+    "DEC-954"
+   ],
+   "DEC-942": [
+    "DEC-946",
+    "DEC-947",
+    "DEC-953",
+    "DEC-961"
+   ],
+   "DEC-943": [
+    "DEC-1052"
+   ],
+   "DEC-946": [
+    "DEC-953"
+   ],
+   "DEC-947": [
+    "DEC-953",
+    "DEC-960",
+    "DEC-961"
+   ],
+   "DEC-949": [
+    "DEC-973",
+    "DEC-1057"
+   ],
+   "DEC-951": [
+    "DEC-953",
+    "DEC-973"
+   ],
+   "DEC-952": [
+    "DEC-953"
+   ],
+   "DEC-953": [
+    "DEC-954",
+    "DEC-959",
+    "DEC-968",
+    "DEC-1045"
+   ],
+   "DEC-954": [
+    "DEC-957",
+    "DEC-962",
+    "DEC-1037"
+   ],
+   "DEC-957": [
+    "DEC-959",
+    "DEC-1052"
+   ],
+   "DEC-958": [
+    "DEC-1050"
+   ],
+   "DEC-959": [
+    "DEC-968"
+   ],
+   "DEC-961": [
+    "DEC-984"
+   ],
+   "DEC-962": [
+    "DEC-963",
+    "DEC-1001"
+   ],
+   "DEC-963": [
+    "DEC-966"
+   ],
+   "DEC-964": [
+    "DEC-970"
+   ],
+   "DEC-966": [
+    "DEC-1045"
+   ],
+   "DEC-967": [
+    "DEC-975"
+   ],
+   "DEC-968": [
+    "DEC-1049"
+   ],
+   "DEC-971": [
+    "DEC-1001"
+   ],
+   "DEC-972": [
+    "DEC-973",
+    "DEC-1021"
+   ],
+   "DEC-973": [
+    "DEC-1049"
+   ],
+   "DEC-974": [
+    "DEC-979"
+   ],
+   "DEC-975": [
+    "DEC-1032"
+   ],
+   "DEC-976": [
+    "DEC-979"
+   ],
+   "DEC-982": [
+    "DEC-1003"
+   ],
+   "DEC-988": [
+    "DEC-989"
+   ],
+   "DEC-989": [
+    "DEC-1045"
+   ],
+   "DEC-991": [
+    "DEC-1050",
+    "DEC-1057"
+   ],
+   "DEC-994": [
+    "DEC-998"
+   ],
+   "DEC-1003": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "DEC-1009": [
+    "DEC-1069"
+   ],
+   "DEC-1012": [
+    "DEC-1057"
+   ],
+   "DEC-1028": [
+    "DEC-1057"
+   ],
+   "DEC-1032": [
+    "DEC-1033"
+   ],
+   "DEC-1037": [
+    "DEC-1039"
+   ],
+   "DEC-1038": [
+    "DEC-1057"
+   ],
+   "DEC-1039": [
+    "DEC-1047",
+    "DEC-1049",
+    "DEC-1052"
+   ],
+   "DEC-1047": [
+    "DEC-1049",
+    "DEC-1051"
+   ],
+   "DEC-1048": [
+    "DEC-1051"
+   ],
+   "DEC-1049": [
+    "DEC-1050"
+   ],
+   "DEC-1050": [
+    "DEC-1057"
+   ],
+   "DEC-1052": [
+    "DEC-1055"
+   ],
+   "DEC-1053": [
+    "DEC-880"
+   ],
+   "DEC-1066": [
+    "DEC-1067"
+   ]
+  },
+  "archive-13": [
+   {
+    "changed": "DEC-454",
+    "changer": "DEC-868"
+   },
+   {
+    "changed": "DEC-454",
+    "changer": "DEC-899"
+   },
+   {
+    "changed": "DEC-454",
+    "changer": "DEC-904"
+   },
+   {
+    "changed": "DEC-455",
+    "changer": "DEC-899"
+   },
+   {
+    "changed": "DEC-455",
+    "changer": "DEC-904"
+   },
+   {
+    "changed": "DEC-480",
+    "changer": "DEC-899"
+   },
+   {
+    "changed": "DEC-480",
+    "changer": "DEC-904"
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-868"
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-899"
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-908"
+   },
+   {
+    "changed": "DEC-492",
+    "changer": "DEC-904"
+   },
+   {
+    "changed": "DEC-492",
+    "changer": "DEC-908"
+   },
+   {
+    "changed": "DEC-501",
+    "changer": "DEC-512"
+   }
+  ],
+  "judged-wrong": [
+   {
+    "changed": "DEC-853",
+    "changer": "DEC-884",
+    "verdict": "wrong: stays unmarked (DEC-884 confirms it)",
+    "finding": "B (aud-marks-1, 2026-11-13); earlier F14 (reviews/w2-130-marks.md part 2)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-1050",
+    "changer": "DEC-1057",
+    "verdict": "wrong: stays unmarked (the subject is DEC-991; DEC-1050 is cited as the one that corrects it)",
+    "finding": "B (aud-marks-1, 2026-11-13); earlier F1 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-120",
+    "changer": "DEC-173",
+    "verdict": "wrong: stays unmarked (the row's subject is DEC-172, already marked)",
+    "finding": "B (aud-marks-1, 2026-11-13); earlier F2 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-724",
+    "changer": "DEC-860",
+    "verdict": "wrong: stays unmarked (the rule is DEC-861's)",
+    "finding": "B (aud-marks-1, 2026-11-13); earlier F3 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-056",
+    "changer": "DEC-017",
+    "verdict": "wrong: stays unmarked (the subject is the code adapter)",
+    "finding": "B (aud-marks-1, 2026-11-13)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-072",
+    "changer": "DEC-064",
+    "verdict": "wrong: stays unmarked (the subject is S0a's Q4; the changer is older)",
+    "finding": "B (aud-marks-1, 2026-11-13)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-162",
+    "changer": "DEC-156",
+    "verdict": "wrong: stays unmarked (the subject is DEC-150; the changer is older)",
+    "finding": "B (aud-marks-1, 2026-11-13)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-1053",
+    "changer": "DEC-880",
+    "verdict": "wrong: stays unmarked (the subject is W2-48's cache; the changer is older)",
+    "finding": "B (aud-marks-1, 2026-11-13)",
+    "in_gov_links": true
+   },
+   {
+    "changed": "DEC-454",
+    "changer": "DEC-904",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-455",
+    "changer": "DEC-904",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-480",
+    "changer": "DEC-899",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-480",
+    "changer": "DEC-904",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-868",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-899",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-490",
+    "changer": "DEC-908",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-492",
+    "changer": "DEC-904",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-492",
+    "changer": "DEC-908",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13); earlier F4 (reviews/w2-130-marks.md part 1)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-780",
+    "changer": "DEC-775",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13)",
+    "in_gov_links": false
+   },
+   {
+    "changed": "DEC-501",
+    "changer": "DEC-512",
+    "verdict": "wrong: stays unmarked",
+    "finding": "C (aud-marks-1, 2026-11-13)",
+    "in_gov_links": false
+   }
+  ],
+  "audits": [
+   {
+    "commit": "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968",
+    "audit_head": "2f9c80b1f80747f26507093551fd4da5e5eccc0f",
+    "audit_date": "2026-11-08T01:35:59+00:00",
+    "audit_source": "the independent auditor's review, part 1 (.gov-runtime/scratch/orchestrator/reviews/w2-130-marks.md; session ad44f5fe, subagent agent-abeeaeb52fe9d7a0a, verdict first written 2026-11-08T01:35:59Z), which checked every free-text mark by hand and every labelled mark by script against the changer's own label",
+    "seed": 1302,
+    "draw": "random.Random(1302).sample(sorted(pool), 20); pool: the 132 labelled marks the auditor checked for a1 and a2, as 'DEC-a<-DEC-b' strings (e12f8a30c's 131 committed labelled marks and DEC-1050<-DEC-1057, dropped by F1); also_judged: the auditor's other rulings on labelled marks (F1, F5) not drawn",
+    "free_text": [
+     {
+      "changed": "DEC-090",
+      "changer": "DEC-741",
+      "mark": "**Changed by:** DEC-741",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-741"
+     },
+     {
+      "changed": "DEC-1066",
+      "changer": "DEC-1067",
+      "mark": "**Changed by:** DEC-1067 (2)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1067 (2)"
+     },
+     {
+      "changed": "DEC-261",
+      "changer": "DEC-1033",
+      "mark": "**Changed by:** DEC-1033",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1033"
+     },
+     {
+      "changed": "DEC-421",
+      "changer": "DEC-572",
+      "mark": "**Changed by:** DEC-572",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-572"
+     },
+     {
+      "changed": "DEC-454",
+      "changer": "DEC-868",
+      "mark": "**Changed by:** DEC-868",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-868 (items 1 (b) and 3), DEC-899 (P-IS-4 (a))"
+     },
+     {
+      "changed": "DEC-454",
+      "changer": "DEC-899",
+      "mark": "**Changed by:** DEC-899",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-868 (items 1 (b) and 3), DEC-899 (P-IS-4 (a))"
+     },
+     {
+      "changed": "DEC-455",
+      "changer": "DEC-899",
+      "mark": "**Changed by:** DEC-899",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-899 (P-IS-4 (a))"
+     },
+     {
+      "changed": "DEC-709",
+      "changer": "DEC-719",
+      "mark": "**Changed by:** DEC-719",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-719"
+     },
+     {
+      "changed": "DEC-120",
+      "changer": "DEC-173",
+      "mark": "**Changed by:** DEC-173",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F2"
+     },
+     {
+      "changed": "DEC-724",
+      "changer": "DEC-860",
+      "mark": "**Changed by:** DEC-860",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F3"
+     },
+     {
+      "changed": "DEC-454",
+      "changer": "DEC-904",
+      "mark": "**Changed by:** DEC-904",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-455",
+      "changer": "DEC-904",
+      "mark": "**Changed by:** DEC-904",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-480",
+      "changer": "DEC-899",
+      "mark": "**Changed by:** DEC-899",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-480",
+      "changer": "DEC-904",
+      "mark": "**Changed by:** DEC-904",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-490",
+      "changer": "DEC-868",
+      "mark": "**Changed by:** DEC-868",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-490",
+      "changer": "DEC-899",
+      "mark": "**Changed by:** DEC-899",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-490",
+      "changer": "DEC-908",
+      "mark": "**Changed by:** DEC-908",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-492",
+      "changer": "DEC-904",
+      "mark": "**Changed by:** DEC-904",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     },
+     {
+      "changed": "DEC-492",
+      "changer": "DEC-908",
+      "mark": "**Changed by:** DEC-908",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F4"
+     }
+    ],
+    "labelled": [
+     {
+      "changed": "DEC-973",
+      "changer": "DEC-1049",
+      "mark": "**Changed by:** DEC-1049 (the nightly at 04:00, its 08:00 check)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1049 (the nightly at 04:00, its 08:00 check)"
+     },
+     {
+      "changed": "DEC-121",
+      "changer": "DEC-127",
+      "mark": "**Changed by:** DEC-127 (its fallback)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-127 (its fallback)"
+     },
+     {
+      "changed": "DEC-991",
+      "changer": "DEC-1057",
+      "mark": "**Changed by:** DEC-1057",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1050, DEC-1057"
+     },
+     {
+      "changed": "DEC-957",
+      "changer": "DEC-1052",
+      "mark": "**Changed by:** DEC-1052",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1052"
+     },
+     {
+      "changed": "DEC-966",
+      "changer": "DEC-1045",
+      "mark": "**Changed by:** DEC-1045 (item 4)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1045 (item 4)"
+     },
+     {
+      "changed": "DEC-365",
+      "changer": "DEC-407",
+      "mark": "**Changed by:** DEC-407 (\"unset `GOV_ROLE` is the owner\")",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-402, DEC-407 (\"unset `GOV_ROLE` is the owner\"), DEC-409"
+     },
+     {
+      "changed": "DEC-1070",
+      "changer": "DEC-1071",
+      "mark": "**Changed by:** DEC-1071",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1071"
+     },
+     {
+      "changed": "DEC-968",
+      "changer": "DEC-1049",
+      "mark": "**Changed by:** DEC-1049 (1)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1049 (1)"
+     },
+     {
+      "changed": "DEC-1069",
+      "changer": "DEC-1070",
+      "mark": "**Changed by:** DEC-1070",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1070"
+     },
+     {
+      "changed": "DEC-304",
+      "changer": "DEC-310",
+      "mark": "**Changed by:** DEC-310",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-310"
+     },
+     {
+      "changed": "DEC-723",
+      "changer": "DEC-820",
+      "mark": "**Changed by:** DEC-820",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-820"
+     },
+     {
+      "changed": "DEC-949",
+      "changer": "DEC-1057",
+      "mark": "**Changed by:** DEC-1057",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1057, DEC-973"
+     },
+     {
+      "changed": "DEC-1049",
+      "changer": "DEC-1050",
+      "mark": "**Changed by:** DEC-1050 (widened)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1050 (widened)"
+     },
+     {
+      "changed": "DEC-933",
+      "changer": "DEC-1049",
+      "mark": "**Changed by:** DEC-1049 (item 2)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1049 (item 2)"
+     },
+     {
+      "changed": "DEC-157",
+      "changer": "DEC-209",
+      "mark": "**Changed by:** DEC-209",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-209"
+     },
+     {
+      "changed": "DEC-093",
+      "changer": "DEC-220",
+      "mark": "**Changed by:** DEC-220 (which packages reach the owner)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-220 (which packages reach the owner)"
+     },
+     {
+      "changed": "DEC-971",
+      "changer": "DEC-1001",
+      "mark": "**Changed by:** DEC-1001 (item 5)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1001 (item 5)"
+     },
+     {
+      "changed": "DEC-107",
+      "changer": "DEC-117",
+      "mark": "**Changed by:** DEC-117",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-117"
+     },
+     {
+      "changed": "DEC-511",
+      "changer": "DEC-522",
+      "mark": "**Changed by:** DEC-522 (its expiry)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1057 (lifted: no committed `gov checkpoint` record per round, R-6), DEC-522 (its expiry)"
+     },
+     {
+      "changed": "DEC-376",
+      "changer": "DEC-395",
+      "mark": "**Changed by:** DEC-395",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-395"
+     }
+    ],
+    "also_judged": [
+     {
+      "changed": "DEC-1050",
+      "changer": "DEC-1057",
+      "mark": "**Changed by:** DEC-1057 (8)",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F1"
+     },
+     {
+      "changed": "DEC-1084",
+      "changer": "DEC-1087",
+      "mark": "**Changed by:** DEC-1087 (W2-33's layer lines moved to Wave 3, W3-P23: reversed by (13)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1087 (13) (W2-33's layer lines back in Wave 2)",
+      "finding": "F5 (part rewritten)"
+     },
+     {
+      "changed": "DEC-941",
+      "changer": "DEC-946",
+      "mark": "**Changed by:** DEC-946 (item 6))",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-946 (blocks A to E: their order)",
+      "finding": "F5 (part rewritten)"
+     },
+     {
+      "changed": "DEC-988",
+      "changer": "DEC-989",
+      "mark": "**Changed by:** DEC-989 (items)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-989 (item 3's baseline)",
+      "finding": "F5 (part rewritten, should)"
+     },
+     {
+      "changed": "DEC-1032",
+      "changer": "DEC-1033",
+      "mark": "**Changed by:** DEC-1033 (items)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1033 (items 2 and 3)",
+      "finding": "F5 (part rewritten, should)"
+     }
+    ],
+    "labelled_all_checked": "every one of the 132 labelled marks checked by script for the changer's own label naming the marked entry (part 1, 'What I checked'); F1 dropped one, F5 rewrote three parts"
+   },
+   {
+    "commit": "c4420040f9b31403d05c8a035d385edd1d6fcc76",
+    "audit_head": "ce7f10eb8a2aead2f345c72879fc072d458ecaaf",
+    "audit_date": "2026-11-09T00:41:51+00:00",
+    "audit_source": "the independent auditor's review, part 2 'Final patches' (.gov-runtime/scratch/orchestrator/reviews/w2-130-marks.md; same session and subagent, verdict first written 2026-11-09T00:41:51Z)",
+    "seed": 1302,
+    "draw": "random.Random(1302).sample(sorted(pool), 20); pool: every labelled mark the auditor judged for c4420040f, as 'DEC-a<-DEC-b' strings (30: f5's 16 labelled, the 13 group B ruling marks less DEC-024<-DEC-074, DEC-786<-DEC-942, DEC-927<-DEC-1057); the other 10 are in also_judged",
+    "free_text": [
+     {
+      "changed": "DEC-024",
+      "changer": "DEC-074",
+      "mark": "**Changed by:** DEC-074",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-074 (Q5)",
+      "basis": "a group B ruling's mark (DEC-1098 (3)), applied as the ruling names it"
+     },
+     {
+      "changed": "DEC-761",
+      "changer": "DEC-772",
+      "mark": "**Changed by:** DEC-772 (item 1)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-772 (item 1)",
+      "basis": "the free-text f5 mark: \"This replaces DEC-761 item 1's line\""
+     }
+    ],
+    "labelled": [
+     {
+      "changed": "DEC-899",
+      "changer": "DEC-924",
+      "mark": "**Changed by:** DEC-924",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-902 (item 10: the proposal decided), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)"
+     },
+     {
+      "changed": "DEC-721",
+      "changer": "DEC-953",
+      "mark": "**Changed by:** DEC-953",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-953"
+     },
+     {
+      "changed": "DEC-017",
+      "changer": "DEC-074",
+      "mark": "**Changed by:** DEC-074 (R1)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-074 (R1)"
+     },
+     {
+      "changed": "DEC-884",
+      "changer": "DEC-918",
+      "mark": "**Changed by:** DEC-918",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-918, DEC-921 (item 3)"
+     },
+     {
+      "changed": "DEC-786",
+      "changer": "DEC-942",
+      "mark": "**Changed by:** DEC-942",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-942"
+     },
+     {
+      "changed": "DEC-044",
+      "changer": "DEC-096",
+      "mark": "**Changed by:** DEC-096",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-096"
+     },
+     {
+      "changed": "DEC-899",
+      "changer": "DEC-912",
+      "mark": "**Changed by:** DEC-912 (item 2)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-902 (item 10: the proposal decided), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)"
+     },
+     {
+      "changed": "DEC-899",
+      "changer": "DEC-918",
+      "mark": "**Changed by:** DEC-918 (item 4)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-902 (item 10: the proposal decided), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)"
+     },
+     {
+      "changed": "DEC-853",
+      "changer": "DEC-884",
+      "mark": "**Changed by:** DEC-884 (item 4)",
+      "verdict": "wrong",
+      "fate": "dropped",
+      "finding": "F14"
+     },
+     {
+      "changed": "DEC-034",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080 \u00b7 **Changed by:** DEC-396",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080 \u00b7 **Changed by:** DEC-396"
+     },
+     {
+      "changed": "DEC-899",
+      "changer": "DEC-925",
+      "mark": "**Changed by:** DEC-925 (item 4)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-902 (item 10: the proposal decided), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)"
+     },
+     {
+      "changed": "DEC-927",
+      "changer": "DEC-1057",
+      "mark": "**Changed by:** DEC-1057 (item 2)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1057 (item 2)"
+     },
+     {
+      "changed": "DEC-914",
+      "changer": "DEC-916",
+      "mark": "**Changed by:** DEC-916 (item 4)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-916 (item 4)"
+     },
+     {
+      "changed": "DEC-884",
+      "changer": "DEC-921",
+      "mark": "**Changed by:** DEC-921 (item 3)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-918, DEC-921 (item 3)"
+     },
+     {
+      "changed": "DEC-033",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080"
+     },
+     {
+      "changed": "DEC-037",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080"
+     },
+     {
+      "changed": "DEC-032",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080"
+     },
+     {
+      "changed": "DEC-896",
+      "changer": "DEC-1057",
+      "mark": "**Changed by:** DEC-1057 (item 2)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1057 (item 2)"
+     },
+     {
+      "changed": "DEC-007",
+      "changer": "DEC-075",
+      "mark": "**Changed by:** DEC-075",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-075"
+     },
+     {
+      "changed": "DEC-040",
+      "changer": "DEC-083",
+      "mark": "**Changed by:** DEC-083 (installs: owner approval per tool)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-083 (installs: owner approval per tool)"
+     }
+    ],
+    "also_judged": [
+     {
+      "changed": "DEC-005",
+      "changer": "DEC-085",
+      "mark": "**Changed by:** DEC-085 (readiness reduction)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-085 (readiness reduction)"
+     },
+     {
+      "changed": "DEC-016",
+      "changer": "DEC-074",
+      "mark": "**Changed by:** DEC-074 (R1)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-074 (R1)"
+     },
+     {
+      "changed": "DEC-031",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080"
+     },
+     {
+      "changed": "DEC-034",
+      "changer": "DEC-396",
+      "mark": "**Changed by:** DEC-396",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080 \u00b7 **Changed by:** DEC-396"
+     },
+     {
+      "changed": "DEC-035",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080 (numbers stay placeholders)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080 (numbers stay placeholders)"
+     },
+     {
+      "changed": "DEC-036",
+      "changer": "DEC-080",
+      "mark": "**Changed by:** DEC-080",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-080"
+     },
+     {
+      "changed": "DEC-042",
+      "changer": "DEC-083",
+      "mark": "**Changed by:** DEC-083 (MR-3 for every task)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-083 (MR-3 for every task)"
+     },
+     {
+      "changed": "DEC-891",
+      "changer": "DEC-924",
+      "mark": "**Changed by:** DEC-924",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-924"
+     },
+     {
+      "changed": "DEC-897",
+      "changer": "DEC-909",
+      "mark": "**Changed by:** DEC-909 (item 1)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-909 (item 1)"
+     },
+     {
+      "changed": "DEC-899",
+      "changer": "DEC-902",
+      "mark": "**Changed by:** DEC-902 (items)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-902 (item 10: the proposal decided), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)"
+     }
+    ]
+   },
+   {
+    "commit": "bce798c3a9113544daca5effee9d602080b64741",
+    "audit_head": "09542040f7c66260cba26e5e62a251cf602da9be",
+    "audit_date": "2026-11-13T22:46:14+00:00",
+    "audit_source": "this run's independent auditor (session d51ff894-0d36-4511-87bf-05ca51f1a74a, aud-marks-1, verdict block dated 2026-11-13T22:46:14+00:00 at 09542040f)",
+    "seed": null,
+    "free_text": [],
+    "labelled": [
+     {
+      "changed": "DEC-026",
+      "changer": "DEC-086",
+      "mark": "**Changed by:** DEC-086",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-086 (for Wave 1)",
+      "finding": "F2 (part named)"
+     },
+     {
+      "changed": "DEC-1115",
+      "changer": "DEC-1122",
+      "mark": "**Changed by:** DEC-1122 (4)",
+      "verdict": "right",
+      "fate": "committed",
+      "committed_mark": "**Changed by:** DEC-1122 (2) (item (4): its 80 % trigger brought forward to now, until the weekly reset)",
+      "finding": "F1 (part corrected)"
+     }
+    ]
+   }
+  ],
+  "comparison": {
+   "e12f8a30ca7dbbf470396f9e2ac9edd68a2aa968": {
+    "unchecked": 0,
+    "wrong": 0,
+    "committed_marks": 139,
+    "free_text_committed": 8
+   },
+   "c4420040f9b31403d05c8a035d385edd1d6fcc76": {
+    "unchecked": 0,
+    "wrong": 0,
+    "committed_marks": 31,
+    "free_text_committed": 2
+   },
+   "bce798c3a9113544daca5effee9d602080b64741": {
+    "unchecked": 0,
+    "wrong": 0,
+    "committed_marks": 2,
+    "free_text_committed": 0
+   }
+  },
+  "trailer-residuals": {
+   "head": "232efc47dd707dd76038cf8211842d9b4472473c",
+   "command": "python3 - 232efc47d < (the w2-130:recount block), cwd the repository",
+   "values": [
+    {
+     "trailer": "Implements",
+     "value": "AR-9",
+     "commits": [
+      "d5d7fac9cb90cfc80a06085a0e11ea7c502f9f74",
+      "340fef31e3adc9e3e4f4cc06d2ae02df109771e1",
+      "1eae249cba33d4ca300c56e05cdad0fc70e75d83",
+      "b252fd7d0e55fa178b3bb9a5f55e95ada60fcb00",
+      "b2520a0c3b2b2a9183f15f761cbd38676265ddda",
+      "9fbaf96958abfc9cd6bc4e0597236926e9074bbe"
+     ],
+     "tickets": [
+      "DAEO-2d6f",
+      "DAEO-2upp",
+      "DAEO-cv6c",
+      "DAEO-pr0y",
+      "DAEO-s1wp",
+      "DAEO-sg6x"
+     ],
+     "should_have_named": [
+      "DEC-900",
+      "DEC-718"
+     ],
+     "unresolved": [
+      "AR-9"
+     ]
+    },
+    {
+     "trailer": "Implements",
+     "value": "CAP-58, CAP-03 (capability level; no covers item names W1-01)",
+     "commits": [
+      "57631ec9462aeb69e07f723bbc21802a3eb68c15"
+     ],
+     "tickets": [
+      "DAEO-dtv3"
+     ],
+     "should_have_named": [
+      "CAP-58",
+      "CAP-03"
+     ],
+     "unresolved": [
+      "(capability",
+      "level;",
+      "no",
+      "covers",
+      "item",
+      "names",
+      "W1-01)"
+     ]
+    },
+    {
+     "trailer": "Implements",
+     "value": "DEC-084, DEC-119 (no covers item names W1-05)",
+     "commits": [
+      "442e9c3c10d1aab77fd5c12600d6acc064ef1713"
+     ],
+     "tickets": [
+      "DAEO-m7u4"
+     ],
+     "should_have_named": [
+      "DEC-084",
+      "DEC-119"
+     ],
+     "unresolved": [
+      "(no",
+      "covers",
+      "item",
+      "names",
+      "W1-05)"
+     ]
+    },
+    {
+     "trailer": "Implements",
+     "value": "engineer",
+     "commits": [
+      "d0bfeb6afd9523b4ee6a4e6e2da5333f54b283bf",
+      "6be837bbbe4158768ca88ae47972308386e008cf",
+      "20d72c1936118e06b86b5eef16c3157e83e6aa94",
+      "04878e23252ad3b32c6308ed2ced6db72a062ab6",
+      "9e2b97758e2474d8c4b61a3ec54aad724c786965",
+      "33401f46ad00189bbab9584138888f44f543c57e",
+      "34e1c59f06e6a158bfd0cf0e00c2d83633d69647",
+      "5634d4305a7c4f9b677bed6a6cea26ea53c96c94",
+      "e00fd14a26be19069aeb904418d2dfa7ac868dcb",
+      "6f2ec438a6fa9b28b703609ff2c96f7855158c5a",
+      "9174e358d77bbb0829a3c6ea9694026018686e9b",
+      "2f03393d848672981c0071ecaa18e08cb3a78977",
+      "09c327d2172662a166fa10dd593b8c74eabdca74",
+      "915a764dd660d1ff2d08944042dd05c6fc02a6a4",
+      "80ec31ab61b844888ddc05470aa12ce3d768e908",
+      "cfea8a26e668c49f60f1fa936b6295d661f47dc5",
+      "f1c743b3ee92b95b31a5c29cde2e756c9ace969b",
+      "614817ec7d6c7a3a9fcf55849c40f414006905b2",
+      "8663196dd9445d990f68faaaa34729ec520889e9",
+      "d2eee219625e620b75b118c109c3778a2aa21a37",
+      "60f71c4298bc38cb01bc37a2e6cd0406de8fdaa4",
+      "3fd2b5a1e664d7c987a2c9a3ffaafd99f4c60a01",
+      "8e9ce18db1c52f1861ce5e579ca4298d0833ea13",
+      "527345b7bf43b8f05d9ccb16e39d0c79c0a02563",
+      "dc05ffe45ee2fccb9f8bf90ec4df6f9e4c033e54",
+      "9d22d9807a440c02ee0a20d4dbf249837183bae3",
+      "0808dbb6e8ffb9dab21e991689adea990323f8a6",
+      "6b1d54fe6cc03ce8899912726799457157a17e01",
+      "ba38ab8d758b3ab9147c951f30aaafbe9b80eaeb",
+      "44062fecf53bdcda83cb3c4bfc668945be5c8709",
+      "e8ad70b51c91b274dfdbb29e57bd15ccdcd9c08c",
+      "e4687ef4cf5631d91b8672d6e139a9a244b6e68f",
+      "6ebc7cf7f74c1c0bbd03a763a7e1d84f7a88fc21",
+      "1475b46c9186bf2201023a4ba658b2ee3f3449a6"
+     ],
+     "tickets": [
+      "DAEO-9nys",
+      "DAEO-c1uz",
+      "DAEO-cy5o",
+      "DAEO-e82f",
+      "DAEO-r9ss",
+      "DAEO-rmbe"
+     ],
+     "should_have_named": "accepted as history, should_implement: DEC-290, DEC-726, DEC-729, DEC-738, DEC-784, DEC-790, DEC-813, DEC-822, DEC-823, DEC-835, DEC-841, DEC-852, DEC-853, DEC-868, DEC-871, DEC-880, DEC-881, DEC-883, DEC-884, DEC-889, DEC-890, DEC-891, DEC-892, DEC-896, DEC-897, DEC-898, DEC-899, DEC-903, DEC-904, DEC-905, DEC-907, DEC-908, DEC-909, DEC-912, DEC-913, DEC-917",
+     "unresolved": [
+      "engineer"
+     ]
+    },
+    {
+     "trailer": "Implements",
+     "value": "independent-test-designer",
+     "commits": [
+      "e052b7b5a8539c1cd9fbd734164e9d28b28d4c1f",
+      "39574e4ee5151dedc5742a89dea75a5a37c37c31",
+      "e04e6ee6effecd971eb7b3021762fd4a8d40769a",
+      "5baafb04661140673a70e246b61d4ab2a064e0b7",
+      "8b318157db948890ede906618e6b31732e915ea6",
+      "78522dea7ce462aca566a7db23565a5c0dc248d9",
+      "f409ad97575a32f6aab96e6ee6bcb4b7bc008691"
+     ],
+     "tickets": [
+      "DAEO-uzme"
+     ],
+     "should_have_named": "accepted as history, should_implement: DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912",
+     "unresolved": [
+      "independent-test-designer"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "W1-01",
+     "commits": [
+      "71100b56c030e4cd4b3fe033eb3fad0f5b1dc996",
+      "b4d7ede4104e8115fa2aa889569a34638bb3a10b"
+     ],
+     "tickets": [
+      "DAEO-dtv3"
+     ],
+     "should_have_named": [
+      "DAEO-dtv3"
+     ],
+     "unresolved": [
+      "W1-01"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "W1-02",
+     "commits": [
+      "a4e66919e0d6250f436570327c03a44378ac34b0",
+      "43fdf41a8dde59c743fc360bc055e2632e9e3d6d",
+      "5d65ba79e4c8cfe985cd793424a3d3e9b03b9d75"
+     ],
+     "tickets": [
+      "DAEO-emkd"
+     ],
+     "should_have_named": [
+      "DAEO-emkd"
+     ],
+     "unresolved": [
+      "W1-02"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "W1-03",
+     "commits": [
+      "95df6c5032cb8f6c50f5bc13cd45bb1c75d29929",
+      "e10a3b3cceda184b3823021d024dc62d7bef472c",
+      "e31e11d4b8ce4ea47328059a9f671ec57ea689aa",
+      "5aeb62a82e346ccb58a7325b361a48089cc3c0cb",
+      "a389ebcf2e7e442da69fa19d3c9043a53c5af9db"
+     ],
+     "tickets": [
+      "DAEO-8qvp"
+     ],
+     "should_have_named": [
+      "DAEO-8qvp"
+     ],
+     "unresolved": [
+      "W1-03"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "W1-04",
+     "commits": [
+      "17ef3ae54988515682a497b716b87690882fac49",
+      "aa649af53606ea1af632f3d2ce114108ea4d5351"
+     ],
+     "tickets": [
+      "DAEO-78bn"
+     ],
+     "should_have_named": [
+      "DAEO-78bn"
+     ],
+     "unresolved": [
+      "W1-04"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "W1-05",
+     "commits": [
+      "2b2944ac6079420caf329f19aca9a3ea97c9e141",
+      "2cdabc99d9b5f49a43e2a6173f34bdffe8f866a6",
+      "7b7d01bf40cd9eccb5965b72b71499694764b561"
+     ],
+     "tickets": [
+      "DAEO-m7u4"
+     ],
+     "should_have_named": [
+      "DAEO-m7u4"
+     ],
+     "unresolved": [
+      "W1-05"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "owner-prompt",
+     "commits": [
+      "27ec34826ae5b80a883353677e7812702b69f696",
+      "6c4ba2f45d3b7b6bbd2b1d1363d5116421a39994",
+      "3ccbf75c869910b8198715b8fa980b9635f5f28e",
+      "e4dc57ce188a6c856b1bdf93db451cfb3baf1e48",
+      "9ea35972573dd6d8e77977a4280dac260459244f",
+      "d07445dfd1ab836696ae0ba7b28ad7a6eb0a2153",
+      "66e09aa1946d15f9e30adad7dc0b5300b79fb9a2",
+      "d73420b1bc7e0a05913bee14fd0864819c9aaaaa",
+      "85e012dbaf6834e12032388962f79ebc6660ecb9"
+     ],
+     "tickets": [
+      null
+     ],
+     "should_have_named": "decision-record if the commit records an owner decision, else W1-45 (DAEO-6cc2), the Wave 1 coordination ticket",
+     "unresolved": [
+      "owner-prompt"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "spec-change-S2",
+     "commits": [
+      "0186bc4986dad602c9a075806c6c4371ad6702ac",
+      "2fcea1ea1432a212faadca8e854593552797e38b"
+     ],
+     "tickets": [
+      null
+     ],
+     "should_have_named": "W1-45 (DAEO-6cc2), the Wave 1 coordination ticket",
+     "unresolved": [
+      "spec-change-S2"
+     ]
+    },
+    {
+     "trailer": "Task",
+     "value": "wave-coordination",
+     "commits": [
+      "7c6bf8040ff1788555f9c74b5bacec56d2d332b9"
+     ],
+     "tickets": [
+      null
+     ],
+     "should_have_named": "W1-45 (DAEO-6cc2), the Wave 1 coordination ticket",
+     "unresolved": [
+      "wave-coordination"
+     ]
+    }
+   ]
+  },
+  "drift-run": {
+   "head": "57cbacfbfc861eb982cf08b6aebb3c699171a1de",
+   "command": "python3 - < (the w2-130:drift block), cwd a clone of the repository at head",
+   "output": {
+    "drift": [
+     {
+      "changed": "DEC-072",
+      "changer": "DEC-064"
+     },
+     {
+      "changed": "DEC-120",
+      "changer": "DEC-173"
+     },
+     {
+      "changed": "DEC-162",
+      "changer": "DEC-156"
+     },
+     {
+      "changed": "DEC-724",
+      "changer": "DEC-860"
+     },
+     {
+      "changed": "DEC-1050",
+      "changer": "DEC-1057"
+     },
+     {
+      "changed": "DEC-1053",
+      "changer": "DEC-880"
+     }
+    ],
+    "count": 6
+   },
+   "set_aside": [
+    {
+     "changed": "DEC-072",
+     "changer": "DEC-064"
+    },
+    {
+     "changed": "DEC-120",
+     "changer": "DEC-173"
+    },
+    {
+     "changed": "DEC-162",
+     "changer": "DEC-156"
+    },
+    {
+     "changed": "DEC-724",
+     "changer": "DEC-860"
+    },
+    {
+     "changed": "DEC-1050",
+     "changer": "DEC-1057"
+    },
+    {
+     "changed": "DEC-1053",
+     "changer": "DEC-880"
+    }
+   ],
+   "count_after_set_aside": 0
+  },
+  "counts-before": {
+   "head": "232efc47dd707dd76038cf8211842d9b4472473c",
+   "command": "gov links --all --json --root <a git clone --shared of this repository checked out at 232efc47dd70> (the tool of 6b62de94e3fd, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at the clean-up's starting head",
+   "by_code": {
+    "CLOSED_TICKET_EDITED": 117,
+    "ENFORCES_SUPERSEDED": 43,
+    "NOT_IN_FORCE_AS_RULE": 141,
+    "STATUS_CONFLICT": 116,
+    "TICKET_CHANGE_UNMARKED": 93,
+    "UNKNOWN_ID": 101,
+    "UNLINKED_ID": 1877,
+    "UNMARKED_CHANGE": 185
+   },
+   "by_code_role": {
+    "CLOSED_TICKET_EDITED": {
+     "orchestrator": 117
+    },
+    "ENFORCES_SUPERSEDED": {
+     "independent-test-designer": 43
+    },
+    "NOT_IN_FORCE_AS_RULE": {
+     "orchestrator": 35,
+     "product-spec": 106
+    },
+    "STATUS_CONFLICT": {
+     "orchestrator": 110,
+     "product-spec": 6
+    },
+    "TICKET_CHANGE_UNMARKED": {
+     "orchestrator": 93
+    },
+    "UNKNOWN_ID": {
+     "independent-test-designer": 44,
+     "orchestrator": 53,
+     "owner": 1,
+     "product-spec": 3
+    },
+    "UNLINKED_ID": {
+     "orchestrator": 1877
+    },
+    "UNMARKED_CHANGE": {
+     "orchestrator": 185
+    }
+   },
+   "unlinked_by_status": {
+    "closed": 1097,
+    "in_progress": 405,
+    "open": 375
+   }
+  },
+  "counts-after": {
+   "head": "57cbacfbfc861eb982cf08b6aebb3c699171a1de",
+   "measured_at": "6b62de94e3fd67505998c69d3de68b937d60406b",
+   "command": "gov links --all --json --root <a git clone --shared of this repository checked out at 6b62de94e3fd> (the tool of 6b62de94e3fd, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at 6b62de94e3fd, the merged head after the last clean-up commit 57cbacfbfc86 (the sources follow-up; the merges of w2/integrate since change no clean-up line, only other tickets' files, so 'head' names the last clean-up commit and 'measured_at' the tree counted)",
+   "by_code": {
+    "CLOSED_TICKET_EDITED": 122,
+    "ENFORCES_SUPERSEDED": 14,
+    "NOT_IN_FORCE_AS_RULE": 19,
+    "TICKET_CHANGE_UNMARKED": 96,
+    "UNKNOWN_ID": 56,
+    "UNLINKED_ID": 1420,
+    "UNMARKED_CHANGE": 8
+   },
+   "by_code_role": {
+    "CLOSED_TICKET_EDITED": {
+     "orchestrator": 122
+    },
+    "ENFORCES_SUPERSEDED": {
+     "independent-test-designer": 14
+    },
+    "NOT_IN_FORCE_AS_RULE": {
+     "orchestrator": 19
+    },
+    "TICKET_CHANGE_UNMARKED": {
+     "orchestrator": 96
+    },
+    "UNKNOWN_ID": {
+     "independent-test-designer": 8,
+     "orchestrator": 47,
+     "owner": 1
+    },
+    "UNLINKED_ID": {
+     "orchestrator": 1420
+    },
+    "UNMARKED_CHANGE": {
+     "orchestrator": 8
+    }
+   },
+   "unlinked_by_status": {
+    "closed": 1355,
+    "in_progress": 2,
+    "open": 63
+   }
+  },
+  "closed-missing": {
+   "DAEO-03dg": [
+    "DEC-780",
+    "DEC-862",
+    "DEC-889",
+    "DEC-906",
+    "DEC-922"
+   ],
+   "DAEO-03pw": [
+    "CAP-59.a",
+    "CAP-59.b"
+   ],
+   "DAEO-0i6h": [
+    "CAP-24.a",
+    "CAP-24.b",
+    "CAP-24.c",
+    "CAP-28.a",
+    "CAP-30.b",
+    "CAP-30.f",
+    "CAP-32.c",
+    "CAP-33.a",
+    "CAP-33.d",
+    "CAP-33.e",
+    "CAP-33.f",
+    "CAP-34.c",
+    "CAP-38.b",
+    "CAP-38.e",
+    "CAP-47.d"
+   ],
+   "DAEO-0pyc": [
+    "DEC-105",
+    "DEC-1126",
+    "DEC-1169",
+    "W2-L065",
+    "W2-M073",
+    "W2-M103",
+    "W2-M104",
+    "W2-M191"
+   ],
+   "DAEO-0qs5": [
+    "CAP-25.d",
+    "CAP-61.e"
+   ],
+   "DAEO-0rfi": [
+    "DEC-1033",
+    "DEC-1042",
+    "DEC-773",
+    "DEC-866",
+    "W2-30",
+    "W2-32",
+    "W2-34",
+    "W2-40"
+   ],
+   "DAEO-0uhh": [
+    "DEC-954"
+   ],
+   "DAEO-0z8c": [
+    "DEC-1074",
+    "DEC-1109",
+    "DEC-1125",
+    "W2-L160",
+    "W2-M105",
+    "W2-M113",
+    "W2-M161"
+   ],
+   "DAEO-1ahb": [
+    "W2-H001",
+    "W2-H012",
+    "W2-H046",
+    "W2-L105",
+    "W2-M094",
+    "W2-M095",
+    "W2-M097",
+    "W2-M152",
+    "W2-M181",
+    "W2-M187",
+    "W2-M245",
+    "W2-M247",
+    "W2-M275",
+    "W2-M291",
+    "W2-M405"
+   ],
+   "DAEO-1vka": [
+    "DEC-1010",
+    "W2-112"
+   ],
+   "DAEO-2bdu": [
+    "DEC-1132",
+    "W2-124",
+    "W2-26"
+   ],
+   "DAEO-2ds6": [
+    "W2-I041"
+   ],
+   "DAEO-2gc7": [
+    "DEC-906"
+   ],
+   "DAEO-2lwj": [
+    "CAP-07.a",
+    "CAP-13.a",
+    "CAP-20.a",
+    "CAP-24.a",
+    "CAP-31.b",
+    "CAP-38.a",
+    "CAP-38.b",
+    "CAP-38.c",
+    "CAP-38.d",
+    "CAP-38.f",
+    "CAP-46.a",
+    "CAP-50.c",
+    "CAP-59.a",
+    "CAP-59.b",
+    "CAP-59.c"
+   ],
+   "DAEO-32n6": [
+    "CAP-37.g"
+   ],
+   "DAEO-3ef2": [
+    "CAP-38.b",
+    "CAP-52.a",
+    "CAP-52.b"
+   ],
+   "DAEO-49o5": [
+    "DEC-767",
+    "DEC-772",
+    "W2-H029",
+    "W2-L002",
+    "W2-L014",
+    "W2-L227",
+    "W2-M174",
+    "W2-M175"
+   ],
+   "DAEO-4eux": [
+    "DEC-986"
+   ],
+   "DAEO-4yyl": [
+    "CAP-08.a",
+    "CAP-09.a",
+    "CAP-09.b",
+    "CAP-13.a"
+   ],
+   "DAEO-57hm": [
+    "DEC-970",
+    "W2-H064"
+   ],
+   "DAEO-5j8b": [
+    "DEC-826"
+   ],
+   "DAEO-5x4l": [
+    "CAP-04.c",
+    "CAP-14.a",
+    "CAP-16.a",
+    "CAP-16.b",
+    "CAP-16.c",
+    "CAP-18.a",
+    "CAP-18.b",
+    "CAP-38.b",
+    "CAP-51.b",
+    "CAP-55.a"
+   ],
+   "DAEO-5ylr": [
+    "CAP-02.a",
+    "CAP-43.a",
+    "CAP-44.a"
+   ],
+   "DAEO-6cc2": [
+    "CAP-58.e"
+   ],
+   "DAEO-6mk8": [
+    "CAP-04.b",
+    "CAP-40.a",
+    "CAP-40.c",
+    "CAP-40.d",
+    "CAP-53.c"
+   ],
+   "DAEO-6n5k": [
+    "DEC-1157",
+    "DEC-1163",
+    "W2-L319",
+    "W2-M285"
+   ],
+   "DAEO-6ox0": [
+    "W2-H052",
+    "W2-L316",
+    "W2-L328",
+    "W2-M334",
+    "W2-M335",
+    "W2-M336",
+    "W2-M337",
+    "W2-M338",
+    "W2-M344",
+    "W2-M347",
+    "W2-M350"
+   ],
+   "DAEO-6y0x": [
+    "DEC-1143",
+    "DEC-1144"
+   ],
+   "DAEO-78bn": [
+    "CAP-25.a",
+    "CAP-25.b"
+   ],
+   "DAEO-7nne": [
+    "CAP-03.a",
+    "CAP-03.b",
+    "CAP-03.e",
+    "CAP-38.b",
+    "CAP-52.a"
+   ],
+   "DAEO-7r5e": [
+    "DEC-1014",
+    "DEC-803",
+    "W2-H020",
+    "W2-L017",
+    "W2-L106",
+    "W2-L335",
+    "W2-M013",
+    "W2-M142"
+   ],
+   "DAEO-7rr2": [
+    "W2-H047",
+    "W2-M202"
+   ],
+   "DAEO-7y6v": [
+    "W2-H053",
+    "W2-L018",
+    "W2-L324",
+    "W2-L341"
+   ],
+   "DAEO-8goq": [
+    "CAP-27.a",
+    "CAP-28.a"
+   ],
+   "DAEO-8lmb": [
+    "MR-3"
+   ],
+   "DAEO-8nue": [
+    "CAP-17.c",
+    "CAP-55.a",
+    "CAP-57.a"
+   ],
+   "DAEO-8qvp": [
+    "CAP-58.a"
+   ],
+   "DAEO-8s85": [
+    "DEC-1116",
+    "DEC-1122",
+    "DEC-1156",
+    "DEC-315",
+    "DEC-957"
+   ],
+   "DAEO-9279": [
+    "CAP-05.a",
+    "CAP-05.b",
+    "CAP-05.c",
+    "CAP-05.d",
+    "DEC-386"
+   ],
+   "DAEO-9i8e": [
+    "CAP-15.f"
+   ],
+   "DAEO-9nys": [
+    "DEC-914",
+    "DEC-954",
+    "DEC-970"
+   ],
+   "DAEO-a3m2": [
+    "W2-I015",
+    "W2-M016",
+    "W2-M236"
+   ],
+   "DAEO-av72": [
+    "DEC-849",
+    "DEC-899",
+    "DEC-906"
+   ],
+   "DAEO-b6hm": [
+    "DEC-866",
+    "W2-68",
+    "W2-M406"
+   ],
+   "DAEO-be7u": [
+    "CAP-01.b",
+    "CAP-21.a",
+    "CAP-34.d",
+    "CAP-51.a",
+    "DEC-360",
+    "DEC-387",
+    "DEC-418"
+   ],
+   "DAEO-c1uz": [
+    "DEC-868",
+    "DEC-904"
+   ],
+   "DAEO-cb2b": [
+    "W2-118"
+   ],
+   "DAEO-cdoi": [
+    "CAP-06.b",
+    "CAP-06.c",
+    "CAP-06.d",
+    "CAP-15.c",
+    "CAP-42.a",
+    "CAP-42.b",
+    "CAP-42.c",
+    "CAP-44.b",
+    "CAP-44.c",
+    "CAP-44.d",
+    "CAP-44.e",
+    "CAP-44.j"
+   ],
+   "DAEO-clon": [
+    "DEC-1122"
+   ],
+   "DAEO-cuao": [
+    "W2-M049",
+    "W2-M280"
+   ],
+   "DAEO-cv58": [
+    "DEC-105",
+    "DEC-1156",
+    "DEC-1157",
+    "DEC-1167",
+    "DEC-233",
+    "DEC-313",
+    "DEC-951",
+    "DEC-954",
+    "DEC-957",
+    "W2-184"
+   ],
+   "DAEO-cy5o": [
+    "DEC-766",
+    "DEC-886",
+    "DEC-899",
+    "DEC-925"
+   ],
+   "DAEO-drhj": [
+    "DEC-1020",
+    "DEC-747"
+   ],
+   "DAEO-drvn": [
+    "CAP-27.a",
+    "CAP-28.b",
+    "DEC-185",
+    "DEC-186",
+    "DEC-187"
+   ],
+   "DAEO-dy7j": [
+    "CAP-24.c",
+    "CAP-50.a",
+    "DEC-239",
+    "DEC-968",
+    "DEC-982"
+   ],
+   "DAEO-e82f": [
+    "W2-59"
+   ],
+   "DAEO-ebmh": [
+    "W2-L429"
+   ],
+   "DAEO-egm9": [
+    "CAP-34.a",
+    "CAP-34.b",
+    "CAP-34.c",
+    "CAP-34.d"
+   ],
+   "DAEO-egsy": [
+    "DEC-729",
+    "DEC-730"
+   ],
+   "DAEO-emkd": [
+    "CAP-38.c",
+    "CAP-39.a",
+    "CAP-58.a",
+    "CAP-58.c"
+   ],
+   "DAEO-f58b": [
+    "DEC-1157",
+    "W2-06",
+    "W2-M088"
+   ],
+   "DAEO-fdkq": [
+    "CAP-39.a"
+   ],
+   "DAEO-fygv": [
+    "CAP-01.c",
+    "CAP-24.c",
+    "CAP-30.b",
+    "CAP-30.e",
+    "CAP-38.b",
+    "CAP-39.d",
+    "CAP-58.a",
+    "DEC-438",
+    "DEC-439",
+    "DEC-441"
+   ],
+   "DAEO-g0ip": [
+    "W2-H047",
+    "W2-L111",
+    "W2-L235",
+    "W2-M147",
+    "W2-M165",
+    "W2-M202",
+    "W2-M209",
+    "W2-M238",
+    "W2-M250",
+    "W2-M251",
+    "W2-M266"
+   ],
+   "DAEO-g23i": [
+    "DEC-968",
+    "DEC-982",
+    "W2-H043",
+    "W2-M163",
+    "W2-M240",
+    "W2-M241"
+   ],
+   "DAEO-g29a": [
+    "DEC-1156",
+    "DEC-995",
+    "DEC-996",
+    "W2-33"
+   ],
+   "DAEO-gdzh": [
+    "DEC-889"
+   ],
+   "DAEO-gjjf": [
+    "CAP-23.c",
+    "CAP-28.b",
+    "CAP-38.b",
+    "CAP-40.c"
+   ],
+   "DAEO-ha8z": [
+    "CAP-45.a",
+    "DEC-614",
+    "DEC-750"
+   ],
+   "DAEO-i89t": [
+    "DEC-1156",
+    "W2-L097"
+   ],
+   "DAEO-ifgf": [
+    "DEC-1149"
+   ],
+   "DAEO-ipqy": [
+    "CAP-25.a"
+   ],
+   "DAEO-iw1f": [
+    "DEC-954"
+   ],
+   "DAEO-j8gn": [
+    "DEC-968",
+    "DEC-982",
+    "W2-H037",
+    "W2-H048",
+    "W2-H049",
+    "W2-L010",
+    "W2-M107",
+    "W2-M108",
+    "W2-M227",
+    "W2-M257",
+    "W2-M258"
+   ],
+   "DAEO-jdqr": [
+    "CAP-22.d",
+    "CAP-25.e",
+    "CAP-27",
+    "CAP-28",
+    "CAP-49.b",
+    "CAP-58.d",
+    "CAP-61.a",
+    "CAP-61.b",
+    "CAP-61.c",
+    "CAP-61.d"
+   ],
+   "DAEO-jfm3": [
+    "W2-04"
+   ],
+   "DAEO-jozo": [
+    "CAP-57.a"
+   ],
+   "DAEO-jpr0": [
+    "W2-123"
+   ],
+   "DAEO-juee": [
+    "W2-M372",
+    "W2-M373"
+   ],
+   "DAEO-k7hz": [
+    "CAP-24",
+    "CAP-37",
+    "CAP-38",
+    "DEC-103",
+    "DEC-371",
+    "DEC-534",
+    "DEC-536",
+    "DEC-537",
+    "DEC-539",
+    "DEC-541",
+    "DEC-729",
+    "DEC-732",
+    "DEC-791",
+    "DEC-801",
+    "DEC-802",
+    "DEC-808",
+    "DEC-832",
+    "DEC-837",
+    "DEC-838",
+    "DEC-862",
+    "DEC-963",
+    "DEC-968",
+    "DEC-981",
+    "DEC-992",
+    "W2-L256",
+    "W2-L268"
+   ],
+   "DAEO-kh9l": [
+    "CAP-33",
+    "DEC-864",
+    "DEC-877"
+   ],
+   "DAEO-kia7": [
+    "W2-H039",
+    "W2-H040",
+    "W2-H041",
+    "W2-M011",
+    "W2-M088",
+    "W2-M143",
+    "W2-M210",
+    "W2-M243",
+    "W2-M282",
+    "W2-M293",
+    "W2-M295"
+   ],
+   "DAEO-kiar": [
+    "DEC-967",
+    "DEC-970",
+    "DEC-975",
+    "DEC-978"
+   ],
+   "DAEO-kl5e": [
+    "W2-M355"
+   ],
+   "DAEO-kmcr": [
+    "W2-H035",
+    "W2-H036",
+    "W2-H050",
+    "W2-M216",
+    "W2-M217",
+    "W2-M218",
+    "W2-M219",
+    "W2-M220",
+    "W2-M224",
+    "W2-M225",
+    "W2-M229",
+    "W2-M232",
+    "W2-M307",
+    "W2-M312"
+   ],
+   "DAEO-ktiw": [
+    "DEC-1065"
+   ],
+   "DAEO-l4gf": [
+    "MR-3",
+    "W2-13"
+   ],
+   "DAEO-l78m": [
+    "CAP-10",
+    "CAP-44.c",
+    "CAP-44.d",
+    "CAP-44.f",
+    "DEC-802",
+    "DEC-860",
+    "DEC-968",
+    "DEC-993"
+   ],
+   "DAEO-lc4q": [
+    "CAP-30.a",
+    "CAP-30.e"
+   ],
+   "DAEO-lkeb": [
+    "CAP-03.e",
+    "CAP-12.a",
+    "CAP-12.b"
+   ],
+   "DAEO-lrre": [
+    "DEC-1087",
+    "DEC-1156",
+    "DEC-971",
+    "W2-113",
+    "W2-153"
+   ],
+   "DAEO-m7u4": [
+    "CAP-22.a"
+   ],
+   "DAEO-mb2t": [
+    "W2-26",
+    "W2-88"
+   ],
+   "DAEO-n0wb": [
+    "DEC-1112",
+    "DEC-1125"
+   ],
+   "DAEO-neam": [
+    "W2-H018",
+    "W2-M129",
+    "W2-M130",
+    "W2-M151",
+    "W2-M211",
+    "W2-M212",
+    "W2-M259",
+    "W2-M265"
+   ],
+   "DAEO-nqa2": [
+    "DEC-1065",
+    "W2-106"
+   ],
+   "DAEO-o4fg": [
+    "CAP-25.f",
+    "CAP-25.g",
+    "CAP-49.c",
+    "CAP-58.f",
+    "CAP-62.a"
+   ],
+   "DAEO-o5x1": [
+    "DEC-1052"
+   ],
+   "DAEO-p3ln": [
+    "DEC-1157"
+   ],
+   "DAEO-pg6i": [
+    "DEC-1071",
+    "DEC-1072",
+    "DEC-1074",
+    "DEC-1083",
+    "DEC-1099",
+    "DEC-1116"
+   ],
+   "DAEO-qty6": [
+    "W2-72",
+    "W2-L441"
+   ],
+   "DAEO-qzca": [
+    "W2-129"
+   ],
+   "DAEO-r30l": [
+    "DEC-1105",
+    "DEC-1122",
+    "W2-M188",
+    "W2-M244",
+    "W2-M262"
+   ],
+   "DAEO-r9ss": [
+    "DEC-663",
+    "DEC-906",
+    "DEC-923",
+    "DEC-924",
+    "W2-H038",
+    "W2-H045",
+    "W2-L209",
+    "W2-L236",
+    "W2-M158",
+    "W2-M166",
+    "W2-M249",
+    "W2-M252",
+    "W2-M286",
+    "W2-M371"
+   ],
+   "DAEO-rmbe": [
+    "W2-L373",
+    "W2-M404"
+   ],
+   "DAEO-rrxp": [
+    "CAP-13.b",
+    "CAP-20.a",
+    "CAP-37.a",
+    "CAP-37.b",
+    "CAP-37.c",
+    "CAP-37.f",
+    "CAP-38.b"
+   ],
+   "DAEO-rxln": [
+    "CAP-03.d",
+    "CAP-11.a",
+    "CAP-17.a",
+    "CAP-18.b",
+    "CAP-38.b"
+   ],
+   "DAEO-s694": [
+    "W2-H022",
+    "W2-H023",
+    "W2-H024",
+    "W2-H025",
+    "W2-H033",
+    "W2-M015",
+    "W2-M115",
+    "W2-M164",
+    "W2-M203",
+    "W2-M204",
+    "W2-M254",
+    "W2-M255",
+    "W2-M256"
+   ],
+   "DAEO-siiz": [
+    "DEC-1033",
+    "DEC-1065"
+   ],
+   "DAEO-skiy": [
+    "CAP-16.b",
+    "CAP-24.b",
+    "CAP-38.b",
+    "CAP-47.b",
+    "CAP-47.d",
+    "CAP-56.a",
+    "DEC-425",
+    "DEC-439",
+    "DEC-441"
+   ],
+   "DAEO-t6hf": [
+    "CAP-10.a",
+    "CAP-18.a",
+    "DEC-1039",
+    "DEC-1046"
+   ],
+   "DAEO-t8mp": [
+    "DEC-1116",
+    "DEC-1121",
+    "W2-11b"
+   ],
+   "DAEO-tgk2": [
+    "DEC-956",
+    "DEC-964",
+    "W2-L451",
+    "W2-M408"
+   ],
+   "DAEO-topz": [
+    "CAP-23.a",
+    "CAP-31.c",
+    "CAP-31.d",
+    "CAP-34.e"
+   ],
+   "DAEO-ts4y": [
+    "DEC-1003",
+    "DEC-1009",
+    "DEC-1014"
+   ],
+   "DAEO-u4oz": [
+    "W2-H034",
+    "W2-M126",
+    "W2-M215",
+    "W2-M239",
+    "W2-M294",
+    "W2-M330"
+   ],
+   "DAEO-u5g6": [
+    "W2-H002",
+    "W2-H008",
+    "W2-H014",
+    "W2-H027",
+    "W2-H028",
+    "W2-M003",
+    "W2-M018",
+    "W2-M271"
+   ],
+   "DAEO-uudf": [
+    "CAP-03.a",
+    "CAP-03.b",
+    "CAP-03.c",
+    "CAP-06.a",
+    "CAP-06.e",
+    "CAP-07.b",
+    "CAP-31.a",
+    "CAP-41.a",
+    "CAP-41.c",
+    "CAP-41.f",
+    "CAP-50.a",
+    "CAP-53.a",
+    "CAP-54.b"
+   ],
+   "DAEO-uzme": [
+    "DEC-750",
+    "DEC-754",
+    "DEC-900"
+   ],
+   "DAEO-v4is": [
+    "DEC-866"
+   ],
+   "DAEO-w616": [
+    "CAP-30.a",
+    "CAP-30.b",
+    "CAP-47.d",
+    "CAP-53.a"
+   ],
+   "DAEO-w9l3": [
+    "CAP-31.a"
+   ],
+   "DAEO-wi46": [
+    "DEC-1156"
+   ],
+   "DAEO-wk2v": [
+    "CAP-01.a",
+    "CAP-01.d",
+    "CAP-15.a",
+    "CAP-15.b",
+    "CAP-15.c",
+    "CAP-15.d",
+    "CAP-15.e",
+    "CAP-15.g",
+    "CAP-38.b",
+    "DEC-425"
+   ],
+   "DAEO-wnnz": [
+    "DEC-1122",
+    "W2-112",
+    "W2-127",
+    "W2-145",
+    "W2-21",
+    "W2-I012",
+    "W2-L105",
+    "W2-M094",
+    "W2-M095",
+    "W2-M097",
+    "W2-M181",
+    "W2-M187",
+    "W2-M275",
+    "W2-M393",
+    "W2-M405",
+    "W3-P28"
+   ],
+   "DAEO-wq2b": [
+    "DEC-962",
+    "DEC-968",
+    "DEC-979",
+    "DEC-982",
+    "DEC-985"
+   ],
+   "DAEO-wqd6": [
+    "CAP-41.b",
+    "CAP-41.d",
+    "CAP-59.c"
+   ],
+   "DAEO-xafn": [
+    "DEC-1107",
+    "DEC-1122"
+   ],
+   "DAEO-xm6l": [
+    "W2-L101",
+    "W2-L206",
+    "W2-L215",
+    "W2-L336",
+    "W2-M139",
+    "W2-M201",
+    "W2-M264",
+    "W2-M287",
+    "W2-M288",
+    "W2-M289",
+    "W2-M290"
+   ],
+   "DAEO-xnbx": [
+    "CAP-58.h",
+    "DEC-378",
+    "DEC-402",
+    "DEC-404",
+    "DEC-407",
+    "DEC-409",
+    "DEC-421"
+   ],
+   "DAEO-xog0": [
+    "CAP-22.a",
+    "CAP-58.b"
+   ],
+   "DAEO-xw3k": [
+    "CAP-02.a",
+    "CAP-06.a",
+    "CAP-06.d",
+    "CAP-07.a",
+    "CAP-20.a",
+    "CAP-25.a",
+    "CAP-38.b",
+    "CAP-46.a",
+    "CAP-54.a",
+    "DEC-416",
+    "DEC-425"
+   ],
+   "DAEO-xwro": [
+    "DEC-1097"
+   ],
+   "DAEO-xxgp": [
+    "W2-H044",
+    "W2-M153"
+   ],
+   "DAEO-ye2a": [
+    "DEC-866"
+   ],
+   "DAEO-ym8a": [
+    "W2-L069",
+    "W2-L221",
+    "W2-M106",
+    "W2-M145",
+    "W2-M267"
+   ],
+   "DAEO-yvzh": [
+    "DEC-244",
+    "DEC-245",
+    "DEC-246",
+    "DEC-247"
+   ],
+   "DAEO-zflj": [
+    "W2-L177",
+    "W2-L243",
+    "W2-M138",
+    "W2-M260",
+    "W2-M301",
+    "W2-M309",
+    "W2-M310",
+    "W2-M316",
+    "W2-M317"
+   ],
+   "DAEO-zkr9": [
+    "DEC-1001",
+    "DEC-1003",
+    "DEC-1010",
+    "DEC-1014",
+    "DEC-1015",
+    "DEC-989"
+   ],
+   "DAEO-zndm": [
+    "W2-H019",
+    "W2-L078",
+    "W2-L135",
+    "W2-M037",
+    "W2-M038",
+    "W2-M156",
+    "W2-M222"
+   ],
+   "DAEO-zoex": [
+    "DEC-385",
+    "DEC-977"
+   ],
+   "DAEO-zqvn": [
+    "DEC-1112",
+    "W2-L233",
+    "W2-M071",
+    "W2-M072",
+    "W2-M100",
+    "W2-M102",
+    "W2-M292",
+    "W2-M296"
+   ],
+   "DAEO-zsvl": [
+    "CAP-15.g",
+    "CAP-37.b",
+    "CAP-37.c",
+    "CAP-37.d",
+    "DEC-413"
+   ]
+  },
+  "no-record": {},
+  "dec-1123-linked": {
+   "DAEO-057v": [
+    {
+     "form": "list_rows",
+     "id": "W2-H021",
+     "via": "W2-H021"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H032",
+     "via": "W2-H032"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L172",
+     "via": "W2-L172"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L173",
+     "via": "W2-L173"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L174",
+     "via": "W2-L174"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L230",
+     "via": "W2-L230"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M123",
+     "via": "W2-M123"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M279",
+     "via": "W2-M279"
+    }
+   ],
+   "DAEO-4k3l": [
+    {
+     "form": "wbs",
+     "id": "W2-128",
+     "via": "DAEO-t8mp"
+    }
+   ],
+   "DAEO-6w5n": [
+    {
+     "form": "wbs",
+     "id": "W2-118",
+     "via": "DAEO-ts4y"
+    },
+    {
+     "form": "wbs",
+     "id": "W2-21",
+     "via": "DAEO-1ahb"
+    }
+   ],
+   "DAEO-ar89": [
+    {
+     "form": "wbs",
+     "id": "W1-19",
+     "via": "DAEO-t6hf"
+    }
+   ],
+   "DAEO-ecac": [
+    {
+     "form": "list_rows",
+     "id": "W3-P09",
+     "via": "W3-P09"
+    }
+   ],
+   "DAEO-fau3": [
+    {
+     "form": "list_rows",
+     "id": "W2-H006",
+     "via": "W2-H006"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H007",
+     "via": "W2-H007"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H009",
+     "via": "W2-H009"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H010",
+     "via": "W2-H010"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H011",
+     "via": "W2-H011"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H013",
+     "via": "W2-H013"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H031",
+     "via": "W2-H031"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L216",
+     "via": "W2-L216"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M019",
+     "via": "W2-M019"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M031",
+     "via": "W2-M031"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M047",
+     "via": "W2-M047"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M061",
+     "via": "W2-M061"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M067",
+     "via": "W2-M067"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M173",
+     "via": "W2-M173"
+    }
+   ],
+   "DAEO-j9z6": [
+    {
+     "form": "wbs",
+     "id": "W2-117",
+     "via": "DAEO-zkr9"
+    }
+   ],
+   "DAEO-jip3": [
+    {
+     "form": "wbs",
+     "id": "W2-25",
+     "via": "DAEO-btt7"
+    }
+   ],
+   "DAEO-jzvg": [
+    {
+     "form": "list_rows",
+     "id": "W2-H026",
+     "via": "W2-H026"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H042",
+     "via": "W2-H042"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L119",
+     "via": "W2-L119"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M159",
+     "via": "W2-M159"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M160",
+     "via": "W2-M160"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M162",
+     "via": "W2-M162"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M253",
+     "via": "W2-M253"
+    }
+   ],
+   "DAEO-m4rq": [
+    {
+     "form": "wbs",
+     "id": "W2-61h",
+     "via": "DAEO-h2k3"
+    }
+   ],
+   "DAEO-nn1s": [
+    {
+     "form": "wbs",
+     "id": "W2-24",
+     "via": "DAEO-0mab"
+    }
+   ],
+   "DAEO-rd0g": [
+    {
+     "form": "wbs",
+     "id": "W2-15b",
+     "via": "DAEO-swdu"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L102",
+     "via": "W2-L102"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L321",
+     "via": "W2-L321"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L322",
+     "via": "W2-L322"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L329",
+     "via": "W2-L329"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M340",
+     "via": "W2-M340"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M342",
+     "via": "W2-M342"
+    }
+   ],
+   "DAEO-sdhj": [
+    {
+     "form": "list_rows",
+     "id": "W2-M176",
+     "via": "W2-M176"
+    }
+   ],
+   "DAEO-swdu": [
+    {
+     "form": "dec-798",
+     "id": "DEC-798",
+     "via": "DEC-1033"
+    },
+    {
+     "form": "wbs",
+     "id": "W2-15a",
+     "via": "DAEO-rd0g"
+    },
+    {
+     "form": "wbs",
+     "id": "W2-61",
+     "via": "DAEO-iw1f"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L102",
+     "via": "W2-L102"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L317",
+     "via": "W2-L317"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L320",
+     "via": "W2-L320"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L321",
+     "via": "W2-L321"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-L322",
+     "via": "W2-L322"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M017",
+     "via": "W2-M017"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M089",
+     "via": "W2-M089"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M340",
+     "via": "W2-M340"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M342",
+     "via": "W2-M342"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M351",
+     "via": "W2-M351"
+    }
+   ],
+   "DAEO-w19l": [
+    {
+     "form": "list_rows",
+     "id": "W2-M284",
+     "via": "W2-M284"
+    }
+   ],
+   "DAEO-yadm": [
+    {
+     "form": "list_rows",
+     "id": "W2-H015",
+     "via": "W2-H015"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-H051",
+     "via": "W2-H051"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M082",
+     "via": "W2-M082"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M274",
+     "via": "W2-M274"
+    },
+    {
+     "form": "list_rows",
+     "id": "W2-M283",
+     "via": "W2-M283"
+    }
+   ]
+  },
+  "lessons": {
+   "L-0074": {
+    "sources": [
+     "DEC-041",
+     "DEC-046"
+    ],
+    "came_from": "DEC-041 (DECISION_REGISTER.md) \u2014 \"L-0074: a universal negative implemented as a positive enumeration fails silently as soon as the product grows a path the author did not list, and tests derived from the same list cannot notice.\" Carried as a principle by DEC-046.",
+    "agree": true
+   },
+   "L-0075": {
+    "sources": [
+     "OWNER-DECISION-P2-0008"
+    ],
+    "came_from": "OWNER-DECISION-P2-0008 (OD-P2-08) \u00a79, \"Anti-stall rule \u2014 active for the remainder of Phase 2.\"",
+    "agree": true
+   },
+   "L-0076": {
+    "sources": [
+     "OWNER-DIRECTION-BR-0004"
+    ],
+    "came_from": "OWNER-DIRECTION-BR-0004 (OD-BR-04) \u00a72D, \"Do not manufacture historical evidence.\"",
+    "agree": true
+   },
+   "L-0077": {
+    "sources": [
+     "OWNER-AMENDMENT-P2-0010"
+    ],
+    "came_from": "OWNER-AMENDMENT-P2-0010 (OD-P2-10) \u00a77, \"Resuming Phase 2 with the bridge \u2014 the anti-snowball rule.\"",
+    "agree": true
+   },
+   "L-0078": {
+    "sources": [
+     "DEC-044",
+     "DEC-046",
+     "OWNER-AMENDMENT-P2-0010"
+    ],
+    "came_from": "DEC-044 and DEC-046 (DECISION_REGISTER.md); OWNER-AMENDMENT-P2-0010 (OD-P2-10) \u00a77.",
+    "agree": true
+   }
+  },
+  "left": {
+   "D-5": {},
+   "D-6": {
+    "tests/acceptance/W2-121/test_s10_plan_ready_list.py": {
+     "independent-test-designer": 3
+    },
+    "tests/acceptance/W2-121b/test_b_s1_landing_batch.py": {
+     "independent-test-designer": 1
+    },
+    "tests/acceptance/W2-121b/test_b_s2_closes.py": {
+     "independent-test-designer": 3
+    },
+    "tests/acceptance/W2-37/README.md": {
+     "independent-test-designer": 4
+    },
+    "tests/acceptance/W2-37/test_w2_37_proposal.py": {
+     "independent-test-designer": 1
+    },
+    "tests/acceptance/W2-37/test_w2_37_resume_findings.py": {
+     "independent-test-designer": 4
+    },
+    "tests/unit/dispatch/test_status.py": {
+     "independent-test-designer": 1
+    },
+    "tests/unit/impact/test_impact.py": {
+     "independent-test-designer": 2
+    },
+    "tests/unit/retrieval/test_semantic_query_vector.py": {
+     "independent-test-designer": 2
+    },
+    "tests/unit/semantic/test_semantic.py": {
+     "independent-test-designer": 1
+    }
+   },
+   "D-9": {
+    ".tickets/DAEO-03dg.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-03pw.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-03ub.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-057v.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-0i6h.md": {
+     "orchestrator": 38
+    },
+    ".tickets/DAEO-0pyc.md": {
+     "orchestrator": 9
+    },
+    ".tickets/DAEO-0qs5.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-0rfi.md": {
+     "orchestrator": 26
+    },
+    ".tickets/DAEO-0uhh.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-0z8c.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-168f.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-1ahb.md": {
+     "orchestrator": 17
+    },
+    ".tickets/DAEO-1k7y.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-1ve2.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-1vka.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-2bdu.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-2d6f.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-2ds6.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-2gc7.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-2lwj.md": {
+     "orchestrator": 179
+    },
+    ".tickets/DAEO-2upp.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-32n6.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-3ef2.md": {
+     "orchestrator": 24
+    },
+    ".tickets/DAEO-49o5.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-4eux.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-4k3l.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-4yyl.md": {
+     "orchestrator": 10
+    },
+    ".tickets/DAEO-57hm.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-5j8b.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-5x4l.md": {
+     "orchestrator": 14
+    },
+    ".tickets/DAEO-5ylr.md": {
+     "orchestrator": 29
+    },
+    ".tickets/DAEO-6b2q.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-6cc2.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-6f0s.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-6icv.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-6mk8.md": {
+     "orchestrator": 51
+    },
+    ".tickets/DAEO-6n5k.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-6ox0.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-6w5n.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-6y0x.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-78bn.md": {
+     "orchestrator": 12
+    },
+    ".tickets/DAEO-7nne.md": {
+     "orchestrator": 27
+    },
+    ".tickets/DAEO-7r5e.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-7rr2.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-7y6v.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-8goq.md": {
+     "orchestrator": 13
+    },
+    ".tickets/DAEO-8lmb.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-8nue.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-8qvp.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-8s85.md": {
+     "orchestrator": 5
+    },
+    ".tickets/DAEO-9279.md": {
+     "orchestrator": 15
+    },
+    ".tickets/DAEO-9bc0.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-9i8e.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-9nys.md": {
+     "orchestrator": 20
+    },
+    ".tickets/DAEO-a3m2.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-ar89.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-av72.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-b6hm.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-be7u.md": {
+     "orchestrator": 27
+    },
+    ".tickets/DAEO-c1uz.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-cb2b.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-cdoi.md": {
+     "orchestrator": 55
+    },
+    ".tickets/DAEO-clon.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-cuao.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-cv58.md": {
+     "orchestrator": 22
+    },
+    ".tickets/DAEO-cv6c.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-cy5o.md": {
+     "orchestrator": 10
+    },
+    ".tickets/DAEO-drhj.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-drvn.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-dtv3.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-dy7j.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-e82f.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-e8f0.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-ebmh.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-ecac.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-egm9.md": {
+     "orchestrator": 10
+    },
+    ".tickets/DAEO-egsy.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-emkd.md": {
+     "orchestrator": 40
+    },
+    ".tickets/DAEO-f58b.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-fau3.md": {
+     "orchestrator": 14
+    },
+    ".tickets/DAEO-fdkq.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-fu3n.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-fygv.md": {
+     "orchestrator": 20
+    },
+    ".tickets/DAEO-g0ip.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-g23i.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-g29a.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-gdzh.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-gjjf.md": {
+     "orchestrator": 10
+    },
+    ".tickets/DAEO-ha8z.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-hgv3.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-i89t.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-ifgf.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-ipqy.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-iw1f.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-j8gn.md": {
+     "orchestrator": 12
+    },
+    ".tickets/DAEO-j9z6.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-jdqr.md": {
+     "orchestrator": 33
+    },
+    ".tickets/DAEO-jfm3.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-jip3.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-jozo.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-jpr0.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-juee.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-jzvg.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-k7hz.md": {
+     "orchestrator": 60
+    },
+    ".tickets/DAEO-kh9l.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-kia7.md": {
+     "orchestrator": 12
+    },
+    ".tickets/DAEO-kiar.md": {
+     "orchestrator": 15
+    },
+    ".tickets/DAEO-kl5e.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-kmcr.md": {
+     "orchestrator": 15
+    },
+    ".tickets/DAEO-ktiw.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-l4gf.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-l78m.md": {
+     "orchestrator": 20
+    },
+    ".tickets/DAEO-lc4q.md": {
+     "orchestrator": 9
+    },
+    ".tickets/DAEO-lkeb.md": {
+     "orchestrator": 17
+    },
+    ".tickets/DAEO-lrre.md": {
+     "orchestrator": 5
+    },
+    ".tickets/DAEO-lxzn.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-m4rq.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-m7u4.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-mb2t.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-mc6n.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-n0wb.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-neam.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-nn1s.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-nqa2.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-o4fg.md": {
+     "orchestrator": 13
+    },
+    ".tickets/DAEO-o5x1.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-ozyt.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-p3ln.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-pg6i.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-pr0y.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-qty6.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-qyt2.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-qz4p.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-qzca.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-r30l.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-r9ss.md": {
+     "orchestrator": 17
+    },
+    ".tickets/DAEO-rd0g.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-rmbe.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-rpfv.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-rrxp.md": {
+     "orchestrator": 20
+    },
+    ".tickets/DAEO-rxln.md": {
+     "orchestrator": 13
+    },
+    ".tickets/DAEO-s1wp.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-s694.md": {
+     "orchestrator": 14
+    },
+    ".tickets/DAEO-s9qc.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-sdhj.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-sdxk.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-sg6x.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-siiz.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-skiy.md": {
+     "orchestrator": 19
+    },
+    ".tickets/DAEO-swdu.md": {
+     "orchestrator": 14
+    },
+    ".tickets/DAEO-t6hf.md": {
+     "orchestrator": 13
+    },
+    ".tickets/DAEO-t8mp.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-tgk2.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-topz.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-ts4y.md": {
+     "orchestrator": 5
+    },
+    ".tickets/DAEO-u4oz.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-u5g6.md": {
+     "orchestrator": 9
+    },
+    ".tickets/DAEO-uudf.md": {
+     "orchestrator": 39
+    },
+    ".tickets/DAEO-uw5h.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-uzme.md": {
+     "orchestrator": 3
+    },
+    ".tickets/DAEO-v4is.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-w19l.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-w616.md": {
+     "orchestrator": 11
+    },
+    ".tickets/DAEO-w9l3.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-wahn.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-wbdh.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-wi46.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-wk2v.md": {
+     "orchestrator": 16
+    },
+    ".tickets/DAEO-wnnz.md": {
+     "orchestrator": 16
+    },
+    ".tickets/DAEO-wq2b.md": {
+     "orchestrator": 18
+    },
+    ".tickets/DAEO-wqd6.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-wudw.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-xafn.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-xm6l.md": {
+     "orchestrator": 12
+    },
+    ".tickets/DAEO-xnbx.md": {
+     "orchestrator": 25
+    },
+    ".tickets/DAEO-xog0.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-xw3k.md": {
+     "orchestrator": 32
+    },
+    ".tickets/DAEO-xwro.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-xxgp.md": {
+     "orchestrator": 4
+    },
+    ".tickets/DAEO-yadm.md": {
+     "orchestrator": 5
+    },
+    ".tickets/DAEO-ye2a.md": {
+     "orchestrator": 1
+    },
+    ".tickets/DAEO-ym8a.md": {
+     "orchestrator": 5
+    },
+    ".tickets/DAEO-yvzh.md": {
+     "orchestrator": 6
+    },
+    ".tickets/DAEO-zflj.md": {
+     "orchestrator": 9
+    },
+    ".tickets/DAEO-zkr9.md": {
+     "orchestrator": 7
+    },
+    ".tickets/DAEO-zndm.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-zoex.md": {
+     "orchestrator": 2
+    },
+    ".tickets/DAEO-zqvn.md": {
+     "orchestrator": 8
+    },
+    ".tickets/DAEO-zsvl.md": {
+     "orchestrator": 13
+    }
+   }
+  }
+ },
+ "left_by_code": {
+  "D-5": {},
+  "D-6": {
+   "UNKNOWN_ID": 8,
+   "ENFORCES_SUPERSEDED": 14
+  },
+  "D-9": {
+   "UNKNOWN_ID": 35,
+   "UNLINKED_ID": 1420,
+   "NOT_IN_FORCE_AS_RULE": 1,
+   "CLOSED_TICKET_EDITED": 122,
+   "TICKET_CHANGE_UNMARKED": 96
+  }
+ },
+ "measured": "6b62de94e3fd67505998c69d3de68b937d60406b",
+ "recount": "\"\"\"W2-130 S5: every Task: and Implements: trailer value in `git log <rev>`'s history that names no record.\n\nRun from the repository's root as `python3 - <rev>` (this script on stdin); standard library and git only; reads\ngit, writes nothing. A value is read from git's own trailer block (`%(trailers:key=Task,key=Implements,unfold)`),\nsplit on commas and white space. `Task:` names no record when a token is neither `decision-record` (valid under\nDEC-861) nor a ticket file `.tickets/<token>.md` at <rev>; `Implements:` names no record when a token is none of: a\nregister entry (`### DEC-n` in docs/DECISION_REGISTER.md at <rev>), a ticket id, a W2 id (a ticket's `wbs_id` or\n`external-ref`), or a capability or master-rule id of docs/contract/contract.yaml at <rev>.\nPrints one JSON list of {\"trailer\", \"value\", \"tokens\", \"commits\"} ((trailer, value) once; tokens: the unresolved\nelements; commits: every commit carrying it, newest first).\n\"\"\"\nimport json\nimport re\nimport subprocess\nimport sys\nfrom pathlib import Path\n\n\ndef git(*args):\n    return subprocess.run([\"git\", *args], capture_output=True, text=True, encoding=\"utf-8\", errors=\"replace\",\n                          check=False).stdout\n\n\nrev = git(\"rev-parse\", \"--verify\", sys.argv[1] + \"^{commit}\").strip()\nlog = git(\"log\", \"--format=%x1e%H%x1f%(trailers:key=Task,key=Implements,unfold)\", rev)\ntickets = {Path(name).stem for name in git(\"ls-tree\", \"--name-only\", rev, \".tickets/\").split()}\naliases = set(re.findall(r\"(?m)^(?:wbs_id|external-ref): *(\\S+)\",\n                         git(\"grep\", \"-h\", \"-E\", \"^(wbs_id|external-ref):\", rev, \"--\", \".tickets\")))\nregister = set(re.findall(r\"(?m)^### (DEC-\\d+)\\b\", git(\"show\", f\"{rev}:docs/DECISION_REGISTER.md\")))\ncontract = git(\"show\", f\"{rev}:docs/contract/contract.yaml\")\ncapabilities = set(re.findall(r\"\\b(?:CAP-\\d+(?:\\.[a-z])?|MR-\\d+)\\b\", contract))\nknown = register | tickets | aliases | capabilities\nfound = {}\nfor item in log.split(\"\\x1e\")[1:]:\n    sha, block = item.split(\"\\x1f\", 1)\n    for line in block.splitlines():\n        key, _, value = line.partition(\":\")\n        key, value = key.strip(), value.strip()\n        tokens = [t for t in re.split(r\"[,\\s]+\", value) if t]\n        if key == \"Task\":\n            bad = [t for t in tokens if t != \"decision-record\" and t not in tickets]\n        elif key == \"Implements\":\n            bad = [t for t in tokens if t not in known]\n        else:\n            continue\n        if bad:\n            entry = found.setdefault((key, value), {\"trailer\": key, \"value\": value, \"tokens\": bad, \"commits\": []})\n            if sha not in entry[\"commits\"]:\n                entry[\"commits\"].append(sha)\nprint(json.dumps([found[k] for k in sorted(found)]))\n"
+}

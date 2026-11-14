@@ -1,0 +1,5 @@
+Merge w2/W2-42a-tests (56e0e02074d9): td-6's here-string cases (31; red 12 on d3ba8e50b: 5 R3 write arguments after a here-string, 7 fallback fail-opens) and td-7's README map rows (DEC-1164 (18), W2-42a R3)
+
+Task: DAEO-03ub
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

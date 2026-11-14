@@ -1,0 +1,81 @@
+2026-11-14 00:00:04 admitted by the dispatcher; launching W2-185
+disk gate open: 694 GiB free, 55444670 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 16752074752,
+  "sessions_live_memory_bytes": 1194004480,
+  "load_1m": 9.64,
+  "load_15m": 12.13,
+  "busy_cores_1m": 7.14,
+  "embedding_cpu_p95": {
+    "shared": 0.06,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.08,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 745161822208,
+    "free_inodes": 55444597
+  },
+  "sessions": [
+    {
+      "pid": 1200924,
+      "repository": "/home/usain/gov-os-worktrees/W2-130",
+      "ticket": "DAEO-q8cl",
+      "role": "orchestrator",
+      "live_memory_bytes": 302968832
+    },
+    {
+      "pid": 257856,
+      "repository": "/home/usain/gov-os-worktrees/W2-184",
+      "ticket": "DAEO-6f0s",
+      "role": "engineer",
+      "live_memory_bytes": 613965824
+    },
+    {
+      "pid": 3725459,
+      "repository": "/home/usain/gov-os-worktrees/W2-184",
+      "ticket": "DAEO-6f0s",
+      "role": "orchestrator",
+      "live_memory_bytes": 277069824
+    }
+  ],
+  "cleared": [
+    {
+      "pid": 927993,
+      "repository": "/home/usain/gov-os-worktrees/W2-61h-c39",
+      "ticket": "DAEO-h2k3",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    }
+  ],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 1247676,
+    "repository": "/home/usain/gov-os-worktrees/W2-185",
+    "ticket": "DAEO-qyt2",
+    "role": "orchestrator",
+    "started": "2026-11-14T00:00:04+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 19369496
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-14 00:00:04 gate open; DAEO-qyt2 registered as pid 1247676; starting W2-185

@@ -1,0 +1,9 @@
+log: W2-60a-A5-run4e.json
+W2: W2-60a
+status: LAUNCH_BLOCKED
+
+I've stopped this run as **LAUNCH_BLOCKED**: no worker can start from this tree, so I made no commits.
+
+`model-check.py` calls the launcher's own role check without starting a session, and it refuses all five worker roles. Each role file names skills, and the skill copies in `.claude/skills/` (which came in with integrate) carry their version only under `metadata: version:`. `role.py:212` reads only a top-level `version`, so every launch is refused with "carries no version in its front matter".
+
+This also means that if W2-60a landed as it is, it would refuse every worker launch on integrate. S

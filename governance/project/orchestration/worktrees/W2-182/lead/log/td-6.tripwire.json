@@ -1,0 +1,41 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "head",
+   "before": "0564b50a8c71",
+   "after": "b826e2007a74"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-182"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a",
+   "change": "status line added",
+   "line": " M tests/unit/launch/test_role.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "head",
+   "before": "a15de913e8c4",
+   "after": "af046b331e27"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M src/gov/adopt/fabric.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": " M src/gov/adopt/refactor_plan.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line gone",
+   "line": "?? tests/unit/adopt/test_w2_88_rv2.py"
+  }
+ ]
+}

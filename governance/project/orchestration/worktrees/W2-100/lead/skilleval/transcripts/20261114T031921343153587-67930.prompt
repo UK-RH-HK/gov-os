@@ -1,0 +1,74 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not add the NOT NULL column in one step, names the backfill and the order, and gives the way back for each step.
+
+Expected behaviour:
+the session splits the schema change (add the column as nullable or with a default, backfill in batches, add the constraint once no row is null), gives each migration a down step, and checks the migration on a copy of the data.
+
+The session's reply:
+<<<
+I wrote nothing to disk and ran nothing: the workspace refused every write and every command beyond reading the skill. I didn't try to get around that. Below is the handover the skill asks for, with the corrected migration plan attached for review.
+
+**task:** STANDARD ticket: add a NOT NULL `region` column to `accounts` (40M rows, written to all day). Replace the first draft, a single `ALTER TABLE accounts ADD COLUMN region text NOT NULL`.
+
+**status:** Blocked. The plan is designed but not written to disk, not run and not accepted.
+
+**work_completed:**
+- Loaded the `data` skill and read its check script.
+- Found no ticket, schema, migrations, data sample or database in the workspace. `scenarios.md`, which the skill refers to, is also missing.
+- Rejected the first draft. It breaks the skill's first listed common mistake. Worse, it can't work as written: PostgreSQL won't add a NOT NULL column with no default to a table that already has rows. If you add a default to get past that, all 40M rows get a made-up region.
+- Designed a 5-step replacement (payload below).
+
+**files_changed:** None. All five migration file writes were refused.
+
+**evidence:** No row counts yet. Step 2 is written to log the number of rows with no region, the number rejected and the total, before and after.
+
+**tests:** None written or run. These are still owed, using a throw-away PostgreSQL database and never live data:
+- a row with no region, and a row whose region can't be worked out, which must land in the rejects table;
+- each step run forward and back, comparing the table's shape and row counts;
+- the backfill stopped halfway and restarted, with no row done twice and none skipped;
+- the old reader against the new schema, and the new reader against old rows;
+- inserts after step 3 that leave out region, which must be refused.
+
+**discoveries:**
+- **Low-risk choices I made (P3, logged here):** a batch size of 10,000; a 3-second lock timeout; a constraint named `accounts_region_not_null`; a rejects table named `accounts_region_rejects`.
+
+**risks:**
+- **Value for existing rows:** the ticket doesn't say what region the existing 40M rows should get. The backfill can't run until someone decides. Rows where no region can be worked out go to the rejects table; they never silently get a default.
+- **Application code:** the app has to write region on every insert before step 3. That's backend work outside this skill.
+- **PostgreSQL version:** step 5 is only cheap on version 12 or later. On older versions it scans the whole table while locking out all writes.
+- **Data loss on rollback:** step 1's way back drops the column. Once step 2 has run, that throws away the backfilled values unless they're exported first. Every other step can be undone.
+- **Allowed paths:** I don't know the ticket's allowed paths or the project's migration tool, so file names are tool-neutral.
+
+**lessons:** On a large table that's written to all day, a NOT NULL column is always: add it nullable, backfill in batches, add an unchecked constraint, validate it, then set NOT NULL.
+
+**proposed_decisions:**
+- How to work out region for existing accounts.
+- What values region may take: a fixed list, or a link to a regions table.
+- Whether the rollback of step 1 may drop backfilled data, or must export it first.
+
+**unresolved:**
+- Permission to write files and run commands, including `gov`.
+- The ticket text, the current schema and the migration tool.
+- A throw-away PostgreSQL database to test against.
+- `gov accept` wasn't run because I had no permission to run commands.
+
+**recommended_next_action:** Grant writes to `migrations/` and `tests/` plus a throw-away PostgreSQL database, and supply the ticket and the region derivation. Then write the tests first, run each step forward and back with counts, and run `gov accept`.
+
+**Payload: the replacement plan.** Each step is its own migration and can safely be run twice.
+
+| # | Up | Lock / effect on running code | Down |
+|---|----|------------------------------|------|
+| 1 | `SET lock_timeout='3s'; ALTER TABLE accounts ADD COLUMN IF NOT EXISTS region text;` plus a column comment | Changes table metadata only, so the lock lasts milliseconds. The timeout stops it waiting behind a long transaction while writers queue up behind it. | `DROP COLUMN IF EXISTS region`. Throws away backfilled data, so export first. |
+| — | *Deploy the app change that writes region on every insert* | — | — |
+| 2 | A procedure that backfills in id ranges of 10,000 and commits after each batch. It only touches rows where region is still empty and not already rejected, so it can be stopped and restarted. Rows with no derivable region go to `accounts_region_rejects(account_id, reason)`. It logs counts before and after. The derivation function deliberately raises an error until the decision is made. | Short row locks, one batch at a time | Set region back to NULL in batches. Keep the rejects table. |
+| 3 | `ADD CONSTRAINT accounts_region_not_null CHECK (region IS NOT NULL) NOT VALID` | Brief lock. New writes are checked straight away; existing rows aren't scanned. | `DROP CONSTRAINT` |
+| 4 | `VALIDATE CONSTRAINT accounts_region_not_null` | Scans all rows but doesn't block reads or writes. Fails harmlessly if any empty region is left. | Drop the constraint, then add it back unchecked (`NOT VALID`) |
+| 5 | `ALTER COLUMN region SET NOT NULL; DROP CONSTRAINT accounts_region_not_null` | Brief on PostgreSQL 12+, which uses the validated check instead of scanning. On older versions, stop and escalate. | `DROP NOT NULL`, then add the check back unchecked (`NOT VALID`) |
+
+I have the full SQL for all five files ready and can write it out as soon as the writes are allowed.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

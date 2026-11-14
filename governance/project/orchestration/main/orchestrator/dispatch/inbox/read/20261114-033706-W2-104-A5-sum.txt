@@ -1,0 +1,10 @@
+log: W2-104-A5-sum.json
+W2: W2-104
+status: DONE. The head to land is `c9f07ef3782b` (full: c9f07ef3782b2cd3fac9fff00aa94ccc7c2d9656). It is verified at `ac18ac2ab7c8`; the probe record is added on top of that.
+
+task: DAEO-drhj (W2-104), run 5 (build; the CTO reopened the ticket under DEC-1164 (18))
+status: DONE. The head to land is `c9f07ef3782b` (full: c9f07ef3782b2cd3fac9fff00aa94ccc7c2d9656). It is verified at `ac18ac2ab7c8`; the probe record is added on top of that.
+work_completed:
+- Merged `w2/integrate` at `c82335a401df` in one command (`--no-ff`) as `3ef7c62c4`. It had no conflicts, and its tree is exactly integrate's tree.
+- Engineer eng-6 (Sonnet 5.5, medium) made commit `ac18ac2ab`:
+  - `SUMMARIES = "scenario-summaries.md"` sits beside `SCENARIOS` and `RECORD` in `harness.py`, and is passed

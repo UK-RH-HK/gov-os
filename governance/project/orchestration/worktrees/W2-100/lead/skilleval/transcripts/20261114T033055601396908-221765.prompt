@@ -1,0 +1,46 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not remove or rename `total` in v1, and names a backward-compatibility test for the old shape.
+
+Expected behaviour:
+the session keeps `total` and adds `total_cents` (an additive change), marks `total` as deprecated in the contract, adds a test that an old client's request still gets the old shape, and notes that removing `total` needs a new version.
+
+The session's reply:
+<<<
+I followed the skill, but I couldn't make the change itself. This folder holds only the skill (`SKILL.md` and `check_domain_skill.py`). There's no ticket file, no OpenAPI or contract file, no handler and no tests. My one attempt at `gov retrieve` was held for approval, so I didn't run it again. I didn't build a stand-in codebase, because guessed paths would be outside the ticket's allowed paths.
+
+**The decision the skill requires:** swapping `total` for `total_cents` in place would rename a field inside the published `/v1/`. That's a breaking change, and it would break the mobile apps that read `total` and can't be forced to update. Following the skill, I'd make it additive instead:
+- **Keep** `total` in the v1 response, unchanged, and mark it `deprecated: true` in the contract, naming `total_cents` as its replacement.
+- **Add** `total_cents` as a new integer field beside it.
+- **Remove** `total` only in a later, separate change, and only once the mobile apps no longer read it. In practice that probably means a v2.
+
+This gives the ticket what it asks for and breaks no caller, so nothing needs escalating now.
+
+---
+
+task: `GET /v1/orders/{id}` should return `total_cents` where it returns `total` today
+status: blocked. The approach is settled; no files could be changed.
+work_completed: Read the skill. Searched the folder for the ticket, contract, callers and code and found none. Tried `gov retrieve` once; it was held for approval. Decided the change should be additive (above). Planned the contract change and tests.
+files_changed: none
+evidence: The folder contains only `.claude/skills/api/SKILL.md` and `check_domain_skill.py`. The `scenarios.md` the skill links to is also missing. The `gov retrieve` call was held for approval.
+tests: planned only, not written or run, because there's no code.
+  - **Old client** (backward-compatibility test): `GET /v1/orders/{id}` on an existing order still returns `total` with its current type and value.
+  - **New field:** the same call returns `total_cents` as an integer.
+  - **Agreement:** `total_cents == total × 100` for typical amounts, a zero amount and a large amount. This doesn't replace the old-client test.
+  - **Schema checks:** the 200 response matches the contract with both fields present. The 404 and invalid-id errors use the interface's one error shape and stable error code.
+discoveries:
+  - The contract doesn't say what type or unit `total` is (a decimal in major currency units, or a float), so the conversion rule isn't known. Simplest reading: `total_cents` is an integer equal to `total` × 100, using the currency's smallest unit.
+  - The ticket doesn't say whether `total` should be removed or kept alongside `total_cents`. I took it as keep alongside.
+risks:
+  - I couldn't identify the callers. The mobile apps are known to read `total`; there may be others I can't see.
+  - If floats are used today, rounding could make `total_cents` disagree slightly with `total`.
+  - No Pre-commit checklist item could be ticked, because there's no diff.
+lessons: In this folder, a "replace X with Y" ticket on a published interface becomes "add Y, deprecate X".
+proposed_decisions: Removing `total` from v1 should be its own later ticket: either a v2 without it, or a removal date tied to the mobile apps' oldest supported version. If the ticket owner really needs `total` gone from v1 now, that is a P1 (it changes published v1 and breaks the mobile apps) and needs options and a decision before any work.
+unresolved: Where the ticket is, its allowed paths and KPI lines, where the contract file is, and the current type of `total`.
+recommended_next_action: Re-run this session in the repository that has the orders service and its contract, with `gov retrieve` and `gov accept` allowed. Then do steps 2–8: change the contract first, write the tests above, add `total_cents` in the handler, run the area's tests and `gov accept`. Separately, confirm with the ticket owner that keeping `total` is acceptable.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

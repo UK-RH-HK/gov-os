@@ -1,0 +1,5 @@
+Merge w2/W2-42a-tests (1eab590aee88): td-9's cases for a here-string read as data that feeds a command (23; red 17 on 885b0d0f6: 13 command words from a read-bound variable, 4 mapfile/readarray callbacks) and their README map rows (DEC-1164 (18), W2-42a R3 F1)
+
+Task: DAEO-03ub
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,1 @@
+launch_worker product-spec DAEO-uw5h: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-100/.gov-runtime/scratch/lead/log/ps-6-fix.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-100/.gov-runtime/scratch/lead/log/ps-6-fix.json; spend recorded (projection none)

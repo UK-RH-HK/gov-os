@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 195
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01FNihngqiwqytXKb4oTQHxg", "time": "2026-11-13T17:24:56.707Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/f3886235-4854-4c91-9cf3-1a1dd009cb50.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator", "tool": "Bash", "form": "sed -i 's|^W2-94 DAEO-g87r W2-94-A5-close.md W2-94-A5-close.json$|# W2-94 DAEO-g87r W2-94-A5-close.md W2-94-A5-close.json # DONE 17:24 at cfbcd75ab386; check_gold by the owner'\"'\"'s operator, then lan", "rule": "the call reads files whose names another command gives at run ti

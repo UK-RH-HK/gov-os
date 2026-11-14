@@ -1,0 +1,93 @@
+diff --git a/docs/DECISION_REGISTER.md b/docs/DECISION_REGISTER.md
+--- a/docs/DECISION_REGISTER.md
++++ b/docs/DECISION_REGISTER.md
+@@ -219,7 +219,7 @@
+ - **Gates:** A3, E1, N2, N3, O5 (G0–G3 local, G4–G5 CI)
+ 
+ ### DEC-026 — Telemetry
+-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED
++- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-086
+ - **Decision:** Start with Claude Code OpenTelemetry → local collector → Prometheus → Grafana (no cloud, light). [E-OTEL] Add Langfuse (plugin, self-host or cloud) when per-turn traces are needed. [E-LANGFUSE]
+ - **Primary metric:** governance tokens per completed task (DEC-004).
+ - **Gates:** P1, P2 (partial), U
+@@ -393,7 +393,7 @@
+ - **Decision:** Neutralise the hook script (renamed, reversible), remove its wiring from the repo's untracked `.claude/settings.local.json` (backup kept), install gitleaks to `~/.local/bin` with checksum verification, and take a `git bundle --all` backup before any ref surgery. Old per-project Claude Code auto-memory for this repository path, if present, is moved aside only with explicit owner approval.
+ 
+ ### DEC-056 — Restructure executed (record of facts, 2026-09-29)
+-- **Status:** DONE · **Basis:** session report
++- **Status:** DONE · **Basis:** session report · **Changed by:** DEC-017
+ - Base `1ab6782fa4e8f490c8b97ac6959cdd77a29350f9`; annotated tag `archive/gov-os-v4-final` (tag object `6e4ae20`).
+ - Bundle `~/gov-os-inventory/restructure/pre-restructure.bundle`, verified, sha256 `efafe460af693d4159ba4549067309c20c5a2def2aabc0284527aacfc0532434`.
+ - 168 branches moved to `refs/archive/heads/*` with matching shas; `main` is the only branch; tags, `refs/safe-hold/*` and `refs/codex/*` unchanged. 72 linked worktrees removed; the read-only `br-frozen-3c880d8` was moved to `~/gov-os-inventory/restructure/`.
+@@ -478,7 +478,7 @@
+ - The matrix still shows S0a's CORE/LATER labels; Contract v4 relabels them by wave (DEC-064).
+ 
+ ### DEC-072 — S0b2 scope and guardrails
+-- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION
++- **Status:** ACCEPTED (owner, by running it) · **Basis:** SUGGESTION · **Changed by:** DEC-064
+ - **Decision:** S0b2 installs the stack user-level (owner approves each install; versions pinned; uninstall commands recorded), runs twelve integration checks (I-01…I-12) on sandbox clones of the dev tiers, decides the four open choices by BAKEOFF_PLAN's fixed rules (retrieval tie-break now "shared store", since Node ≥ 20.19 is needed for OpenSpec anyway), compiles the dev tiers' Rust and TypeScript for the first time, and measures resources. The scale probe indexes an owner-generated qual tier of Programme B in `s0b2/probe/`; the session may not read its contents or the oracle. beads_rust excluded (Q2). Running S0b2 accepts S0a Q2, Q6 (probe on the qual tier) and Q7 (user-level, approved installs); Q1, Q3, Q5, Q8, Q9 settle in S1; Q4 is superseded by DEC-064.
+ 
+ ### DEC-073 — Operating model until the Gov OS lands
+@@ -1097,7 +1097,7 @@
+ The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change under DEC-120 only.
+ 
+ ### DEC-120 — W1-04 KD-1: the install rule reaches the harness through the PreToolUse guard
+-- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-1 · **Implements:** DEC-083 · **Changed by:** its settings "second line" withdrawn by DEC-172 (shown by DEC-825, 2026-10-19)
++- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-1 · **Implements:** DEC-083 · **Changed by:** its settings "second line" withdrawn by DEC-172 (shown by DEC-825, 2026-10-19) · **Changed by:** DEC-173
+ - **Decision:** The install rule reaches the harness through the PreToolUse guard. For a Bash call it classifies as an
+   install, the guard returns the permission decision `ask` when the acting role is orchestrator, and `deny` for every
+   other role, and for no role. The classifier only ever escalates: a match never allows something the harness would
+@@ -1472,7 +1472,7 @@
+   - that its `GOV_ROLE` and `GOV_TICKET` reach the guard.
+ 
+ ### DEC-162 — The qualification oracle is hidden from every session started in the repository root
+-- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to the S2 open point on DEC-161 · **Refines:** DEC-152 (oracle hiding), DEC-161
++- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to the S2 open point on DEC-161 · **Refines:** DEC-152 (oracle hiding), DEC-161 · **Changed by:** DEC-156
+ - **Decision:** The qualification oracle is hidden from every session started in the repository root, the unsandboxed
+   orchestrator included, by two layers:
+   - a `Read` deny rule with the oracle's absolute path in the repository's committed `.claude/settings.json`;
+@@ -7700,7 +7700,7 @@
+   4. **Agents never list, glob or search `~/gov-os-workbench`.** They name a file there explicitly, or ask the owner.
+ 
+ ### DEC-724 — Owner acceptances are owner git facts: `Role: owner`, batched, and a `gov approve` command (P-W2-5 (a), refined)
+-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Changed by:** its owner commits replaced by DEC-861: the orchestrator commits the records with `Decided-by: owner`, the owner pushes (2026-10-20) · **Under:** DEC-409, DEC-718 (AR-7, F-M6) · **Basis:** F-M6 found register entries set ACCEPTED in commits the orchestrator made, with no git fact of the owner's approval.
++- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Changed by:** its owner commits replaced by DEC-861: the orchestrator commits the records with `Decided-by: owner`, the owner pushes (2026-10-20) · **Under:** DEC-409, DEC-718 (AR-7, F-M6) · **Basis:** F-M6 found register entries set ACCEPTED in commits the orchestrator made, with no git fact of the owner's approval. · **Changed by:** DEC-860
+ - **Decision:**
+   1. From now on, the owner commits every owner register entry with `Role: owner`. The orchestrator drafts and stages; it never commits an owner entry.
+   2. **Owner decisions are staged in batches:** at most one owner commit per session break.
+@@ -9274,7 +9274,7 @@
+ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two packages of that report, the notification test and the rebuild's cost. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
+ 
+ ### DEC-853 — P-W2-49 (a): the secrets scan's time limit and pool are fixed in W2-50's resume; a store unchanged since its last clean scan is not re-scanned
+-- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the change to a hard-block check's mechanics is approved here, CAP-33) · **Under:** DEC-802, DEC-780, CAP-38.b · **Basis:** P-W2-49 (`governance/project/orchestration/packages/P-W2-49.md`): `secrets-indexing` timed out (60 s per gitleaks run, about 24 at a time) on `store.db` (250 MB) and `code.db` (210 MB), so every close would be refused.
++- **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the change to a hard-block check's mechanics is approved here, CAP-33) · **Under:** DEC-802, DEC-780, CAP-38.b · **Basis:** P-W2-49 (`governance/project/orchestration/packages/P-W2-49.md`): `secrets-indexing` timed out (60 s per gitleaks run, about 24 at a time) on `store.db` (250 MB) and `code.db` (210 MB), so every close would be refused. · **Changed by:** DEC-884 (item 4)
+ - **Decision:**
+   1. **(a):** the fix rides in W2-50's resume, which already rewrites `stores_with_secrets` in `src/gov/secrets/__init__.py`: the time limit grows with the content's size (or a large store is scanned in bounded chunks, each within the limit), and the pool is bounded so that large files are not starved. Every file is still scanned with every rule set, and a scan that cannot finish still fails closed.
+   2. **Added by the owner:** a store whose hash has not changed since its last clean scan is not re-scanned; the clean result is reused, keyed on the store's hash. A changed store is always scanned in full. **A finding is never reused.**
+@@ -13005,7 +13005,7 @@
+ | 0.432 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1049. Next free id: DEC-1050. |
+ 
+ ### DEC-1050 — P1-LIFT-1's twelve decide-first rows decided; the refactoring's parallel work: brief templates, the plan, the remaining 63 rows
+-- **Status:** ACCEPTED (owner, 2026-11-02 ~22:46, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-1047, DEC-1049, DEC-1010, DEC-953 item 2 · **Changes:** DEC-958 (the harvest), DEC-991's `rm` ask, DEC-1049 (widened) · **Superseded by:** DEC-1158 (1) (item (5))
++- **Status:** ACCEPTED (owner, 2026-11-02 ~22:46, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-1047, DEC-1049, DEC-1010, DEC-953 item 2 · **Changes:** DEC-958 (the harvest), DEC-991's `rm` ask, DEC-1049 (widened) · **Superseded by:** DEC-1158 (1) (item (5)) · **Changed by:** DEC-1057 (8)
+ - **Decision (the owner's words, in short):** the emergency is at its highest. (1)-(4) **T-5, T-4, T-1, Q-1 approved**; further: if the merge queue and the close already run what `gov check` protects, the full `gov check` leaves leads' verification altogether (the CTO checks and reports). (5) **T-12, O-10 approved, and wider: nothing scheduled runs until the refactoring is finished**; the full suite runs next only on the refactored repository, on the owner's word; the old regime's acceptance of reds and the checks built around it do not carry over. (6) **The guard harvest stops** (done: `guard_harvest_s` 10^9 in the dispatcher's config, backup `.pre-dec1050`); the five guard rules stay, but during the refactoring they are fixed into good, smart practice: they must not refuse honest work again and again. (7) **R-1 to R-5 refused as written:** cutting the brief is not the fix; find out why leads read only about 3 % of it (who wrote it, how it is built, what they skip and why); a lead in a repository of 170,000 lines needs better guidance, not less: the right paths, commands and how to report; the fix is better brief templates that agents actually read and follow. (8) **O-7 approved, and wider:** agents may delete freely (`rm`) without asking; protect only against the catastrophic: deleting the repository, its `.git`, the main tree's tracked files, or anything outside the project and its scratch. (9) **R-8, R-11 approved:** pings only when work waits on the owner, two digests a day; not a priority. (10) **O-1, O-2, O-4 refused:** no cut to the CTO's prompt without evidence that it improves delivery; the measure is productivity, delivered work and less drift, not tokens or cost. (11) **G-12 refused:** review effort stays as it is. (12) **G-1, G-2 approved now:** rules 1 and 5 stop guessing at shell commands, the landing check on who wrote any acceptance test going in first; the root fix is agents briefed so well (commands, paths, how to report) that they do not trip the guard, with the templates. **Keep this repository: approved.** **Templates (new, in parallel):** investigate how good software companies brief and record work (ticket and task templates, specs and acceptance criteria, definitions of ready and done, design notes, pull-request and review templates, hand-overs); design templates for every role (research and discovery, product-spec, test designer, engineer, QA and reviewer, lead, CTO) and for tickets and briefs, so every session uses the same ones and agents read and follow them, alongside the roles and skills; bring them as spec and KPIs for tasks in the refactoring. **The 63 remaining rows and the plan:** the owner reviews the remaining rows now; in parallel the CTO drafts the refactoring plan (every row's change, the ticket fates, the approved test refactor P1-INVENTORY-1, the code tidy-up, the templates, the WBS refactor DEC-1039 step 3b; for each step who does it, the order, how it is verified, the time, and the new estimate for EXAMIN's copy), updated after the owner's decisions on the rows. Nothing else is lifted before the owner decides.
+ 
+ | Version | Date | Change |
+@@ -13039,7 +13039,7 @@
+ | 0.436 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1052 gains the basis as a standing practice. Next free id: DEC-1053. |
+ 
+ ### DEC-1053 — D-0's clean-up list decided: what is merged, what is deleted, what waits for D-9
+-- **Status:** ACCEPTED (owner, 2026-11-03 ~11:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 (D-0, O-8, O-13) · **Source:** `governance/project/orchestration/packages/LIFT-1/D0-CLEANUP-LIST.md` (`ad3d1529`) · **Changed by:** DEC-1164 (12) (item (6): the CTO disposes of the branches now)
++- **Status:** ACCEPTED (owner, 2026-11-03 ~11:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 (D-0, O-8, O-13) · **Source:** `governance/project/orchestration/packages/LIFT-1/D0-CLEANUP-LIST.md` (`ad3d1529`) · **Changed by:** DEC-1164 (12) (item (6): the CTO disposes of the branches now) · **Changed by:** DEC-880
+ - **Decision:** every ASK line as recommended. (1) `emg/w1-19-helper` (`a0d1d3a0`, the W1-19 test helper, DEC-1046 item 3) is merged into `w2/integrate` in D-1, then its branch and worktree deleted. (2) `w2/W2-48` (the cache withdrawn by DEC-880) is deleted. (3) W2-67's stray planted file `tests/acceptance/W1-27/w2_67_td4_plant.py` (untracked, in the W2-67 worktree) is deleted. (4) The 42 worktrees and branches with nothing unmerged are removed, after each worktree's ignored `.gov-runtime/scratch/` is archived to `.gov-runtime/scratch/orchestrator/archive/worktree-scratch/<name>/`. (5) The run folders as listed: the 56 near-empty folders; the base and head clones of W2-55, W2-86, W2-87 and W2-61's `repo/`, keeping `measure/`, `records/`, `register/` and `logs/` (the measures' evidence); in `W2-00/`, `close/`, `precheck-w254-20261030-2146/`, `w103-before-w272/` and `tooltrials/`. (6) `w2/W2-78` and the in-flight tickets' branches with unmerged work wait for D-9's fates.
+ - **Basis:** question 4 (less to search and keep; nothing that holds work is lost) and question 2 (no work lost: unmerged work listed first).
+ 
+@@ -14178,7 +14178,7 @@
+ 
+ 
+ ### DEC-1115 — Yes to ACT-SETS-GLOBS-1 (by hand) and ACT-CLAUDE-COPIES-1 (by the operator agent, its first live run); TPL-6's Appendix A applied now; before the lift, past 80 % of the week's usage only the lift's critical path runs
+-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5 · **Changed:** item (4) changed by DEC-1149 (3) (usage never stops a lead; report only); item (4) spent at the lift, DEC-1164 (7)
++- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5 · **Changed:** item (4) changed by DEC-1149 (3) (usage never stops a lead; report only); item (4) spent at the lift, DEC-1164 (7) · **Changed by:** DEC-1122 (4)
+ - **Decision:**
+   - (1) **ACT-SETS-GLOBS-1: yes** (`yes ACT-SETS-GLOBS-1 1f93d6ef`, class (b)); the owner's operator applies it by
+     hand now (the package's §5).

@@ -1,0 +1,5 @@
+Merge w2/W2-42a-tests (b7112b6cad38): td-4's apostrophe cases (DEC-1174 (1)); 312 cases, red 120 on d73bd2756 (70 (a) unreadable by the lift check, 50 fail-opens)
+
+Task: DAEO-03ub
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

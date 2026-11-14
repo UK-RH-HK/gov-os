@@ -1,0 +1,5 @@
+Merge w2/W2-60a into w2/W2-60a-tests: b12's resolution and fixtures and b14's batches, before b15
+
+Task: DAEO-cv58
+Role: orchestrator
+Implements: DEC-826, DEC-839, DEC-832

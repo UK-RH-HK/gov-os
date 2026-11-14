@@ -1,0 +1,5 @@
+Merge w2/W2-60a-tests into w2/W2-60a: the README's plan row relabelled S10 (the old S10 moved to W2-184), for gov accept
+
+Task: DAEO-cv58
+Role: orchestrator
+Implements: DEC-826, DEC-839

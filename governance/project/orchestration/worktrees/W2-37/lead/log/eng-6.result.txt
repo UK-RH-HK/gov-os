@@ -1,0 +1,73 @@
+task: DAEO-6n5k (W2-37, "gov impact"), P-7 (a) of DEC-812 item 6 plus the DEC-1156 (7) conftest line
+
+status: done. The commit is `5915e5c9a7f92da4e44d6d95c833e8bbd71db326` and the tree is clean.
+
+**Step 0, the sandbox check (reported first):**
+- (a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k','w')..."` failed with `OSError: [Errno 30] Read-only file system`. The file was not written.
+- (b) `echo sandbox-trial | git hash-object -w --stdin` worked and returned `1ae28402a109c3397a44b19239a00adfa9472eb0`. `git update-index --refresh` exited 0.
+- `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` showed nothing.
+
+**Start checks:**
+- `GOV_ROLE` was `engineer` and `GOV_TICKET` was `DAEO-6n5k`.
+- The toplevel was `/home/usain/gov-os-worktrees/W2-37` on `w2/W2-37`.
+- `HEAD` was `f141d6366…`, and `git status --short` was empty.
+
+work_completed:
+- `src/gov/check/commands.py`: added one line after the `wait` line: `RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)`, with a trailing comment naming W2-37 and DEC-812 item 6. The line is 120 columns, so the comment stayed on the same line. `VERSION` and every other line are unchanged.
+- `tests/conftest.py`: `_CBM_SUITES` gains `"W2-37"` after `"W2-92"`, with the existing members and order kept.
+
+files_changed: `src/gov/check/commands.py` (+1) and `tests/conftest.py` (+1, −1).
+
+evidence: the diff, verbatim from `git show HEAD`:
+```
+diff --git a/src/gov/check/commands.py b/src/gov/check/commands.py
+index 7274c78a1..53c5be870 100644
+--- a/src/gov/check/commands.py
++++ b/src/gov/check/commands.py
+@@ -18,6 +18,7 @@ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
+ # ``gov`` imports); check() accepts that folder or a folder of the command's own name, as it is.
+ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("session-watch",)
+ RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("wait",)  # wait (W2-160, DEC-1079): a bounded wait on a job's exit file
++RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("impact",)  # impact (W2-37, DEC-812 item 6, P-7 (a)): the impact query
+ # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
+ RECORDED_MODULE_COMMANDS = ("lock",)
+ 
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 5a1591be0..410e5484f 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -321,7 +321,7 @@ _CBM_TOOL = "codebase-memory-mcp"
+ _CBM_MARK = ".gov-cbm-base"  # gov.codeintel.MARK
+ # The suites (and the one file) that run the real code-graph tool (T-8); every other case runs without it, so none starts
+ # a daemon outside the run's own folder. W1-41's adopt stage A3, W2-52's adopt stages, W2-69's rebuild, W2-92's code-graph route and W1-06's digest check need it (D-10).
+-_CBM_SUITES = frozenset({"W1-16", "W1-20", "W1-41", "W2-52", "W2-69", "W2-92", "test_w1_06_digests.py"})
++_CBM_SUITES = frozenset({"W1-16", "W1-20", "W1-41", "W2-52", "W2-69", "W2-92", "W2-37", "test_w1_06_digests.py"})
+ _cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
+ _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
+```
+- Commit message and trailers: `Task: DAEO-6n5k`, `Role: engineer`, `Implements: CAP-33.g, DEC-167`, plus `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
+- `git diff --stat` before the commit showed 2 files changed, 2 insertions, 1 deletion.
+- `git status --short` after the commit is empty.
+
+tests:
+- I ran the brief's pytest command through `heavy_slot.sh` on `tests/unit/check`, `tests/unit/accept/test_w2_96_run2.py`, `tests/unit/session_watch/test_route.py` and `tests/acceptance/W1-26/test_w1_26_recorded_commands.py`. Result: **208 passed, 164 deselected**, none red, in 39.5 s.
+- I added `-m "not local_only" -k "not real and not green_here and not time_limit"` from the common-rules file, so the 164 deselected cases are the real-model and slow cases it names.
+- I set `HOME` to an empty scratch folder and `TMPDIR` to a folder under the sandbox's own TMPDIR, because `/tmp/gov-os-w237-eng6` could not be created (`/tmp` is read-only).
+- I skipped the comparison run on the clean tree because nothing was red.
+- `PYTHONPATH=…/W2-37/src python3 -m gov.check.commands` (the module's own entry) exited 0 with no findings. `GOV_COMMANDS[-3:]` is `('session-watch', 'wait', 'impact')`, and `src/gov/impact/command.py` exists, so `check()` finds `impact`'s module.
+
+discoveries: `/tmp` is read-only in this sandbox, so the example's TMPDIR path cannot be made. The sandbox TMPDIR (`/tmp/gov-launch-pmiracti/claude-1000`) works with the heavy slot.
+
+risks:
+- The comment line before `_CBM_SUITES` (:323) still names only W2-92's code-graph route among the W2 suites. I left it alone because the brief said nothing else in the file.
+- `gov.check.commands` now lists `impact` in `GOV_COMMANDS`. A branch without `src/gov/impact/command.py` would report `COMMAND_NO_MODULE`. This branch has the file.
+
+lessons: none.
+
+proposed_decisions: none.
+
+unresolved: W1-26's `tests/acceptance/W1-26/test_w1_26_recorded_commands.py` has no `impact` case on this branch, as expected. It passed here, and W1-07's lists are being changed by a test designer on another branch.
+
+recommended_next_action: the CTO merges the commit into `w2/integrate`, or carries on with the short P-7 run. The CTO also merges the test designer's W1-07 and W1-32 changes, so those lists agree that `impact` is recorded.
+
+guard_refusals: none. The only restriction I hit was `/tmp` being read-only, from the sandbox; that is a limit, not a refusal, and I switched TMPDIR without working around it.

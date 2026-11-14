@@ -1,0 +1,5 @@
+Merge w2/W2-116-tests (DAEO-f58b): pass 2b's acceptance cases for S2 (when-due, config refusals, gov status's integration_store) and R2-F3 (the token carries the half); red on e51b1fdf6, 38 of 40 (2 guards)
+
+Task: DAEO-f58b
+Role: orchestrator
+Implements: DEC-983, DEC-982, DEC-966, DEC-963, DEC-1087

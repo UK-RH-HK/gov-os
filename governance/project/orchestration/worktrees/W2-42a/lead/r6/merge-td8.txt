@@ -1,0 +1,5 @@
+Merge w2/W2-42a-tests (022846a33413): td-8's read-only here-string cases with an expanded text (53; red 21 on 209ec8464: 13 read-only forms, 8 writes of an allowed path) and their README map rows (DEC-1164 (18), W2-42a R3 F1)
+
+Task: DAEO-03ub
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

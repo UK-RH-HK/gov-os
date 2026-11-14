@@ -1,0 +1,40 @@
+..F.F..                                                                  [100%]
+=================================== FAILURES ===================================
+________________ test_the_twelve_sources_are_the_composition[] _________________
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: orchestrator
+E           assert '---\nname: o... mechanism.\n' == '---\nname: o... mechanism.\n'
+E             
+E             Skipping 1693 identical leading characters in diff, use -v to show
+E               -1052].
+E             + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E               - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E               - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E               ...
+E             
+E             ...Full output truncated (78 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...estrator.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/orchestrator.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2 failed, 5 passed in 5.52s

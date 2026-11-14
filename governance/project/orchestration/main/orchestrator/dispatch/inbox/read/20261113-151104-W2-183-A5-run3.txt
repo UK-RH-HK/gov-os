@@ -1,0 +1,10 @@
+log: W2-183-A5-run3.json
+W2: W2-183
+status: DONE. The head to land is 6a82ec67a5f4 (code and tests last verified at 8b0056d78370; 6a82ec67a adds only the probe record). `git status --short` is empty.
+
+task: DAEO-href (W2-183), run 3 (build), STANDARD, class C2
+status: DONE. The head to land is 6a82ec67a5f4 (code and tests last verified at 8b0056d78370; 6a82ec67a adds only the probe record). `git status --short` is empty.
+work_completed:
+- Merged w2/integrate as da3edd181. It was one command with `--no-ff` and no conflicts. It brought in aa4d460ff, COPIES-8 and W2-98.
+- A fresh independent test designer (td-3) revised the W2-54 case `test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing` (old :172, now :188) to the decided cap. The commit is b2b0c4ed94b9, merged as 8b0056d78.
+- Ra

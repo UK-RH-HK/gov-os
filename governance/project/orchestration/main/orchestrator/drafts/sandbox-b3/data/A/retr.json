@@ -1,0 +1,40 @@
+{
+ "exit": 0,
+ "stderr": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.\nEMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.\n",
+ "ok": true,
+ "facets": {
+  "lexical": {
+   "available": true,
+   "reason": null
+  },
+  "semantic": {
+   "available": false,
+   "reason": "EMBEDDER_UNAVAILABLE: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."
+  }
+ },
+ "merge": {
+  "candidates": 20,
+  "duplicates": 0,
+  "dropped": [],
+  "reranked": false
+ },
+ "n_evidence": 18,
+ "keys": [
+  "batches",
+  "budget",
+  "continuation",
+  "evidence",
+  "expansions",
+  "facets",
+  "gaps",
+  "merge",
+  "pool",
+  "repeats",
+  "rerank",
+  "routing",
+  "stopping_reason",
+  "store"
+ ],
+ "warnings": null,
+ "stopping_reason": "FACET_UNAVAILABLE"
+}

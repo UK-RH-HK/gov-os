@@ -1,0 +1,6 @@
+You have one skill, "security", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+a security-flagged STANDARD ticket asks for `GET /reports?customer=<name>`. The first draft builds the SQL by joining the `customer` parameter into the query string, connects with the database's admin role, and holds the service's signing token as a constant in the source file.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

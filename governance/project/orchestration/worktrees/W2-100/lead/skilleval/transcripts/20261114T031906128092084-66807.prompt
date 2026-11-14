@@ -1,0 +1,6 @@
+You have one skill, "api", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+the contract for the ticket's endpoint says "409 when the name is taken" but gives no body for it. Every other error in the contract uses the body `{"error": {"code": "...", "message": "..."}}`. Asking the owner would stop the ticket for a day.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

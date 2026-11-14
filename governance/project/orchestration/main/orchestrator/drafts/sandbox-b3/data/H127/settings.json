@@ -1,0 +1,36 @@
+{
+ "env": {
+  "PROBE_OUT": "/tmp/claude-1000/b3-probe/out-H127",
+  "PROBE_P1": "47311",
+  "PROBE_P2": "47312",
+  "GOV_STORE": "/home/usain/gov-os-worktrees/W2-00-store"
+ },
+ "permissions": {
+  "allow": [
+   "Bash(python3 -I /tmp/claude-1000/b3-probe/probe.py)",
+   "Bash(python3 -I /tmp/claude-1000/b3-probe/retr.py)",
+   "Bash(python3 -I /tmp/claude-1000/b3-probe/health.py)",
+   "Bash(python3 -I /tmp/claude-1000/b3-probe/alias.py)"
+  ]
+ },
+ "sandbox": {
+  "enabled": true,
+  "failIfUnavailable": true,
+  "allowUnsandboxedCommands": false,
+  "network": {
+   "strictAllowlist": true,
+   "allowedDomains": [
+    "127.0.0.1"
+   ],
+   "allowUnixSockets": [
+    "/home/usain/.cache/gov-os/rerank.sock"
+   ]
+  },
+  "filesystem": {
+   "allowWrite": [
+    "//tmp/claude-1000/b3-probe/out-H127",
+    "//home/usain/.cache/gov-os/rerank.log"
+   ]
+  }
+ }
+}

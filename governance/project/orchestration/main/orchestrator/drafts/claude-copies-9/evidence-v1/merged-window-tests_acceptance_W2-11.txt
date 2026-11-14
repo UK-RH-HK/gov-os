@@ -1,0 +1,28 @@
+...........s............................................................ [ 36%]
+........................................................................ [ 72%]
+..............F.........................................                 [100%]
+=================================== FAILURES ===================================
+________ test_the_skill_carries_one_version_in_all_four_places[change] _________
+
+name = 'change'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: change: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
+
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[change]
+1 failed, 198 passed, 1 skipped in 4.63s

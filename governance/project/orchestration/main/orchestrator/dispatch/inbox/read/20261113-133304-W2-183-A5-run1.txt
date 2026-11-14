@@ -1,0 +1,9 @@
+log: W2-183-A5-run1.json
+W2: W2-183
+status: DONE. The acceptance tests are written, merged and fail as expected on the current code; TESTS-READY names merge 8a62f6c60. The engineer, review, probe record and land are not done: they belong to the build and review runs.
+
+task: DAEO-href (W2-183), run kind tests
+status: DONE. The acceptance tests are written, merged and fail as expected on the current code; TESTS-READY names merge 8a62f6c60. The engineer, review, probe record and land are not done: they belong to the build and review runs.
+work_completed:
+- Merged w2/integrate into w2/W2-183 first, as the brief asked (00c6b1101, the setting name corrected). The merge is d36c268c1, carrying `Task: DAEO-href` and `Role: orchestrator`.
+- Made the tests worktree and built the test designer's brief, td-1.md. The context packet came from `gov context DAEO-href --role

@@ -1,0 +1,21 @@
+.............................F..........                                 [100%]
+=================================== FAILURES ===================================
+___________ test_a_bundle_the_classifier_votes_above_b_stays_flagged ___________
+
+w = <test_landing_cto_route.World object at 0x74faa2b689e0>
+
+    def test_a_bundle_the_classifier_votes_above_b_stays_flagged(w):
+        h = w.bundle(apply_sh="#!/bin/bash\nsudo true\n")           # a script hit: sudo raises the class to (O)
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "classifier's vote" in got[c]["reason"]
+E       AssertionError: assert (set() == {'388b36bf4db...45d0114ad948'}
+E         
+E         Extra items in the right set:
+E         '388b36bf4dbb9a025dbe7e62346e45d0114ad948'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:248: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_bundle_the_classifier_votes_above_b_stays_flagged
+1 failed, 39 passed in 5.00s

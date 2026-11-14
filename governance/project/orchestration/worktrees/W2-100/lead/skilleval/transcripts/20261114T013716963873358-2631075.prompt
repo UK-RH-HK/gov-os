@@ -1,0 +1,39 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply puts the contract change before the handler in its order of work and says the unit tests follow the contract.
+
+Expected behaviour:
+the session writes the endpoint's contract in the OpenAPI file first (request, responses with their error codes, status codes), derives its unit tests from the contract, and writes the handler last, checking the handler against the contract.
+
+The session's reply:
+<<<
+I ran the api skill, but I couldn't do the ticket's work: the files the situation describes aren't in this workspace. The folder holds only the skill (`SKILL.md` and `check_domain_skill.py`). There's no ticket, no OpenAPI file, no handler and no tests. The `scenarios.md` the skill links to is also missing. The skill's first step is to read the ticket and the existing contract before writing anything, so I wrote nothing. I didn't check whether the `gov` CLI is installed, because that command needed approval.
+
+Here is the return in the skill's format:
+
+**task:** STANDARD ticket: add `POST /v1/exports`, which starts an export job and returns its id.
+**status:** blocked. The inputs are missing, so nothing was written.
+**work_completed:** Loaded the api skill and started its checklist. Step 1 (read the ticket, its allowed paths, the current contract and who calls it) failed because none of those files are here. Steps 2–8 weren't started.
+**files_changed:** none
+**evidence:** The workspace listing shows only `.claude/skills/api/SKILL.md` and `.claude/skills/api/check_domain_skill.py`.
+**tests:** none written or run. `gov accept` was not run because there is no ticket or code to check.
+**discoveries:** These are the points I expect the contract to leave open. Each is low-risk and inside the ticket, so I'd take the simplest reading and log it here:
+- **Success response:** probably `202 Accepted` with body `{ "id": "<string>" }`, since the job runs asynchronously. I wouldn't add a `Location` header or a `GET /v1/exports/{id}` endpoint, because the ticket doesn't ask for one.
+- **Request body:** the ticket doesn't specify one. I'd match the existing file's naming and casing and add no required fields beyond what the ticket states.
+- **Repeated calls:** POST isn't idempotent. I'd only add an `Idempotency-Key` header if the existing contract already uses one.
+**risks:** Who calls the endpoint is unknown, because the repository isn't available. It's a new endpoint, so there are no existing callers to break.
+**lessons:** none yet.
+**proposed_decisions:** none. Adding a new endpoint inside the published `v1` doesn't change existing behaviour, so it doesn't need escalating.
+**unresolved:** Where the repository is, the ticket text with its allowed paths and success criteria, the existing OpenAPI file and its error schema, and whether `gov` is installed.
+**recommended_next_action:** Put the repository and ticket in this workspace and rerun. The skill then sets the order:
+1. Add `POST /v1/exports` to the existing OpenAPI file first, with its request, the 202 response and every error. The errors would point to the file's existing error schema and codes.
+2. Write the unit tests from the contract: the 202 response checked against its schema, each error, and inputs at the edges (a missing field, an extra field that gets ignored, a wrong type).
+3. Write the handler and check it against the contract.
+4. Run the area's test suite and the pre-commit checklist.
+5. Run the acceptance tests only through `gov accept`, without reading them.
+6. Commit the contract and the code together, with the ticket's trailers.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

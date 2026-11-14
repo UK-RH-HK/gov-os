@@ -1,0 +1,58 @@
+..........................FFF...........                                 [100%]
+=================================== FAILURES ===================================
+____________ test_a_manifest_that_does_not_claim_b_stays_flagged[a] ____________
+
+w = <test_landing_cto_route.World object at 0x755639871f70>, claimed = 'a'
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "claims class" in got[c]["reason"]
+E       AssertionError: assert (set() == {'65ebf8b5a85...13b150e3e241'}
+E         
+E         Extra items in the right set:
+E         '65ebf8b5a85bc3527d562542d32a13b150e3e241'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:241: AssertionError
+____________ test_a_manifest_that_does_not_claim_b_stays_flagged[O] ____________
+
+w = <test_landing_cto_route.World object at 0x755639a80650>, claimed = 'O'
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "claims class" in got[c]["reason"]
+E       AssertionError: assert (set() == {'6ddff418a39...d28ac5c31a1d'}
+E         
+E         Extra items in the right set:
+E         '6ddff418a3974555b70b087191eed28ac5c31a1d'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:241: AssertionError
+__________ test_a_manifest_that_does_not_claim_b_stays_flagged[None] ___________
+
+w = <test_landing_cto_route.World object at 0x755639782570>, claimed = None
+
+    @pytest.mark.parametrize("claimed", ["a", "O", None])
+    def test_a_manifest_that_does_not_claim_b_stays_flagged(w, claimed):
+        h = w.bundle(claimed=claimed)
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "claims class" in got[c]["reason"]
+E       AssertionError: assert (set() == {'5a6616c1765...91eb837127e2'}
+E         
+E         Extra items in the right set:
+E         '5a6616c176556071f3a8146c009291eb837127e2'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:241: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[a]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[O]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_manifest_that_does_not_claim_b_stays_flagged[None]
+3 failed, 37 passed in 4.35s

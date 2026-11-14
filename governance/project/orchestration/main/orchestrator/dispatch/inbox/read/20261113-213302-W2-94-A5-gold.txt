@@ -1,0 +1,11 @@
+log: W2-94-A5-gold.json
+W2: W2-94
+status: PACKAGES
+
+task: DAEO-g87r (W2-94), build run for the owner's W2-94 GOLD change (2026-11-13), which changes `check_gold.py` in three ways: (i) hyphenated id tokens, (ii) path tokens by segments, (iii) the literal `SEED+k=` draw line
+status: PACKAGES
+work_completed:
+- Steps 1 to 2 of the order are done. Steps 3 to 5 are not.
+- The script change is blocked. The guard refused the test designer's read of `check_gold.py` twice, and the launcher refused an engineer on this ticket.
+- Merged `w2/integrate` into `w2/W2-94` in one command: bf9ec3e3f, `--no-ff`, no conflicts.
+- Launched a fresh independent test des

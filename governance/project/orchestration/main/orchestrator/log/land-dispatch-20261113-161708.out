@@ -1,0 +1,31 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-182 (DAEO-5y8d, LITE) at 04914c869ed3: pre-check passed
+W2-182: kernel gate at 04914c869ed3: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-13 16:17:09 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 16:17:09 merged W2-182 onto b97d9604b316: d6e50a0086cb
+2026-11-13 16:41:36 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 16:41:43 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 16:41:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 16:41:47 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 16:41:48 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-13 16:42:32 the head without the batch: a throwaway worktree head-b97d9604b316-0 at b97d9604b316 with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 16:42:34 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+2026-11-13 16:47:09 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 56ffe611f94e: 79857306c723; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-13 16:47:09 ADVANCED refs/heads/w2/integrate 56ffe611f94e -> 79857306c723; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/79857306c723.json
+2026-11-13 16:47:09 integration store not promoted: a refresh holds the integration store's lock; its normal refresh runs apart
+queue run exit 0
+CLOSED W2-182: aa976b8f3 W2-182 (DAEO-5y8d): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 33 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+30 more)
+structural pass: authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since b97d9604b316)
+structural pass: links: NOTICE 1 new since b97d9604b316493e0922fde6da324032d63cfa3f (1740 standing): NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in a brief or prompt line | governance/project/prompts/w2-orchestrator.md:1 | orchestrator | decide DEC-869 or name...
+structural pass: structural pass at aa976b8f33f5 (the work tree differs from it at 3 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 25.2 s; a notice, not a refusal
+structural pass: notice -> inbox/20261113-164739-structural-notice.txt

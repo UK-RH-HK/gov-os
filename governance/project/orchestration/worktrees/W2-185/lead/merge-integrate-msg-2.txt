@@ -1,0 +1,6 @@
+W2-185 (DAEO-qyt2): merge w2/integrate (e2a0d6191) to bring the widened ticket (P-W2-185-REDS-2 (a), DEC-1156 (7))
+
+Task: DAEO-qyt2
+Role: orchestrator
+Implements: DEC-1167, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

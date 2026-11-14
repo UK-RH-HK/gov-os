@@ -1,0 +1,6 @@
+Merge w2/W2-94-tests (DAEO-g87r): check_gold.py (S4, F3, S1's form; counts and ids only) and the form-only acceptance cases on planted stand-ins (83beeb8f6311)
+
+Task: DAEO-g87r
+Role: orchestrator
+Implements: DEC-957, DEC-954, DEC-828, DEC-820, DEC-845
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

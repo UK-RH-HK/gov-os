@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-151808.out
+Structural: after the landing of W2-183 (base 79159cd44c5b)
+status: structural pass at aea1e11b17a9 (the work tree differs from it at 13 tracked path(s): the working files were read): NOTICE in schema, mutation, authority (6 of 9 families ok), 15.5 s; a notice, not a refusal
+
+schema: NOTICE 1 finding: docs/changes/W2-98-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured
+graph: ok
+claims: ok
+mutation: NOTICE 33 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+30 more)
+authority: NOTICE 4 findings: docs/changes/W2-98-CIT-P.md: the frontmatter is not valid YAML: mapping values are not allowed here in "<unicode string>", line 10, column 179: ... -F3); the... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... (+1 more)
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 79159cd44c5b)
+links: ok (0 new since 79159cd44c5b9982bcb1f7405d9078cfdee25868, 1736 standing)
+structural pass at aea1e11b17a9 (the work tree differs from it at 13 tracked path(s): the working files were read): NOTICE in schema, mutation, authority (6 of 9 families ok), 15.5 s; a notice, not a refusal

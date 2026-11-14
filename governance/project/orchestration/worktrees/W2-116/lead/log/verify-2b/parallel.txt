@@ -1,0 +1,660 @@
+bringing up nodes...
+bringing up nodes...
+
+.......F................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+...................................s...............x.................... [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+..............................................sss....................... [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+.sss.................................................................... [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+.....................................F......F.F......................... [ 71%]
+.....................FFFFF.............................................. [ 72%]
+..................................................FFF................... [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+.................................................F.F.................... [ 83%]
+...................................F.......F............................ [ 84%]
+..............................................................F...F..... [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+..............................................................F......... [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+_ test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[register-every-chunk-batched-gov-retrieve] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x706fd2662660>
+today = <module 'w2_135_today_retrieve'>
+name = 'register-every-chunk-batched-gov-retrieve', query = 'quay'
+kwargs = {'batch_size': 1, 'pipeline': True, 'repo': 'register'}
+
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
+        olds, news, *_ = _both(ask, today, query, kwargs)
+        assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
+        assert len({_commit_of(page) for page in news if page.get("continuation")}) <= 1, \
+            f"{name}: the pages of one question name more than one store commit"
+        for number, (old, new) in enumerate(zip(olds, news), 1):
+>           _same(old, new, f"{name}, page {number}")
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+old = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 2180}, 'rounds': {'limit': 1, 'us..., ...}, 'evidence': [{'batch': 2, 'changed_by': [], 'chunk_id': 'd42bb65901bd4140b839f50a', 'end_line': 30, ...}], ...}
+new = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 2180}, 'rounds': {'limit': 1, 'us..., ...}, 'evidence': [{'batch': 2, 'changed_by': [], 'chunk_id': 'd42bb65901bd4140b839f50a', 'end_line': 30, ...}], ...}
+where = 'register-every-chunk-batched-gov-retrieve, page 1'
+
+    def _same(old, new, where):
+        _account_for_the_store_key(old, new, where)
+        old, new = _without_store(old), _without_store(new)
+        assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
+        for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
+                    "stopping_reason", "rerank", "left_out"):
+>           assert new.get(key) == old.get(key), f"{where}: the bundle's {key!r} changed"
+E           AssertionError: register-every-chunk-batched-gov-retrieve, page 1: the bundle's 'continuation' changed
+E           assert {'bb': None, ...r0/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw4/w2-135-register0/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:90: AssertionError
+________________ test_a_conflict_is_ejected_and_the_rest_go_on _________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+w = namespace(tmp=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_conflict_is_ejected_and0'),... sel=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_conflict_is_ejected_and0/select.py'))
+
+    def test_a_conflict_is_ejected_and_the_rest_go_on(w):
+        enter(w, "A", ticket(w, "A", {"src/lib.py": "def value():\n    return 1  # A\n"}))
+        enter(w, "B", ticket(w, "B", {"src/lib.py": "def value():\n    return 1  # B\n"}))
+>       assert run(w).returncode == 3
+E       assert 4 == 3
+E        +  where 4 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-116/governance/project/orchestration/tools...in/gov-os-operator/install/act-in-progress.txt); nothing advanced, the landing waits for the next run; entries kept\n").returncode
+E        +    where CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-116/governance/project/orchestration/tools...in/gov-os-operator/install/act-in-progress.txt); nothing advanced, the landing waits for the next run; entries kept\n") = run(namespace(tmp=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_conflict_is_ejected_and0'),... sel=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_conflict_is_ejected_and0/select.py')))
+
+tests/unit/orchestration/test_w2_97_merge_queue.py:439: AssertionError
+_ test_s3_the_bundle_is_todays_but_for_the_ids_of_register_items[a-ticket-batched] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+today = <module 'w2_131_today_retrieve'>
+ask = <function ask.<locals>.asked at 0x79eb36596de0>, name = 'a-ticket-batched'
+query = 'lantern', kwargs = {'batch_size': 2, 'ticket': 'DAEO-t131'}
+
+    @pytest.mark.parametrize("name, query, kwargs", [pytest.param(*case, id=case[0]) for case in support.SCENARIOS])
+    def test_s3_the_bundle_is_todays_but_for_the_ids_of_register_items(today, ask, name, query, kwargs):
+        now, before = ask(query, **kwargs), ask(query, module=today, **kwargs)
+        assert _place(now) == _place(before), "the evidence set or its order changed"
+        _account_for_the_store_key(now, before)
+        now_bare = _without_store(support.without_register_ids(now))
+        before_bare = _without_store(support.without_register_ids(before))
+        changed = [field for field in FIELDS if now_bare.get(field) != before_bare.get(field)]
+>       assert not changed, f"fields that changed beside the register items' ids: {changed}"
+E       AssertionError: fields that changed beside the register items' ids: ['continuation']
+E       assert not ['continuation']
+
+tests/acceptance/W2-131/test_w2_131_unchanged.py:81: AssertionError
+___ test_s3_the_continued_pages_are_todays_but_for_the_ids_of_register_items ___
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+today = <module 'w2_131_today_retrieve'>
+ask = <function ask.<locals>.asked at 0x79eb36588360>
+
+    def test_s3_the_continued_pages_are_todays_but_for_the_ids_of_register_items(today, ask):
+        kwargs = {"ticket": support.TICKET, "batch_size": 2}
+        now = support.pages(ask, "lantern", kwargs)
+        before = support.pages(lambda query, **kw: ask(query, module=today, **kw), "lantern", kwargs)
+        assert len(before) > 1, "premise: today's answer continues over more than one page"
+        for page, was in zip(now, before):
+            _account_for_the_store_key(page, was)
+        assert len({_commit_of(page) for page in now if page["continuation"]}) == 1, \
+            "the pages of one question name more than one store commit"
+>       assert [_without_store(support.without_register_ids(page)) for page in now] == \
+            [_without_store(support.without_register_ids(page)) for page in before]
+E       AssertionError: assert [{'batches': ..., ...}], ...}] == [{'batches': ..., ...}], ...}]
+E         
+E         At index 0 diff: {'stopping_reason': 'BUDGET_EXHAUSTED_WITH_GAPS', 'evidence': [{'id': 'FAIL-131', 'sha256': '4af0947858072f5b119f1138e5c12a9716299e7a6a80ceed098f8d5aecdce87f', 'path': 'docs/failures/FAIL-131.md', 'start_line': 6, 'end_line': 8, 'text': '# A failure\n\nThe lantern went dark in the squall.\n', 'chunk_id': 'cb14870f655ae5cad7bf621a', 'routes': ['lexical', 'closure'], 'batch': 1}, {'id': 'LES-131', 'sha256': 'd565aa365c547e8fa20b5386bfb24acd2fec8799d3f17414c3eee3ba4c1fae94', 'path': 'docs/lessons/LES-131.md', 'start_line': 6, 'end_line': 8, 'text': '# A le...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-131/test_w2_131_unchanged.py:94: AssertionError
+_ test_s3_the_bundle_is_today_s_but_for_the_register_items_ids_and_status[every-chunk-batched-gov-retrieve] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36cdce00>
+raw = <function raw.<locals>.asked at 0x79eb36cdc720>
+today = (<module 'w2_133_today_retrieve'>, <module 'w2_133_today_register'>)
+pipeline = 'gov-retrieve', name = 'every-chunk-batched', query = 'orchard'
+kwargs = {'batch_size': 1}
+
+    @pytest.mark.parametrize("pipeline", ["gov-retrieve", "retrieve-alone"])
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundle_is_today_s_but_for_the_register_items_ids_and_status(ask, raw, today, pipeline, name, query,
+                                                                                 kwargs):
+        asked = ask if pipeline == "gov-retrieve" else raw
+>       _same(asked(query, modules=today, **kwargs), asked(query, **kwargs))
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...ce': [{'batch': 1, 'chunk_id': 'c9bdbfc37434c7da9e417689', 'end_line': 3, 'id': 'c9bdbfc37434c7da9e417689', ...}], ...}
+after = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...ce': [{'batch': 1, 'chunk_id': 'c9bdbfc37434c7da9e417689', 'end_line': 3, 'id': 'c9bdbfc37434c7da9e417689', ...}], ...}
+
+    def _same(before, after):
+        assert _evidence(after) == _evidence(before), "the evidence set or its order changed"
+        old, new = _comparable(before), _comparable(after)
+        for field in FIELDS:
+>           assert new.get(field) == old.get(field), f"the bundle's {field!r} changed"
+E           AssertionError: the bundle's 'continuation' changed
+E           assert {'bb': None, ...30/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1330/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:76: AssertionError
+_ test_s3_the_bundle_is_today_s_but_for_the_register_items_ids_and_status[every-chunk-batched-retrieve-alone] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36cdd6c0>
+raw = <function raw.<locals>.asked at 0x79eb36cdd800>
+today = (<module 'w2_133_today_retrieve'>, <module 'w2_133_today_register'>)
+pipeline = 'retrieve-alone', name = 'every-chunk-batched', query = 'orchard'
+kwargs = {'batch_size': 1}
+
+    @pytest.mark.parametrize("pipeline", ["gov-retrieve", "retrieve-alone"])
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundle_is_today_s_but_for_the_register_items_ids_and_status(ask, raw, today, pipeline, name, query,
+                                                                                 kwargs):
+        asked = ask if pipeline == "gov-retrieve" else raw
+>       _same(asked(query, modules=today, **kwargs), asked(query, **kwargs))
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...force': True, 'status': 'ACCEPTED'}], 'batch': 2, 'changed_by': [], 'chunk_id': 'd986dc264f61a592a7b484c5', ...}], ...}
+after = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...n_force': True, 'status': 'ACCEPTED'}], 'batch': 2, 'chunk_id': 'd986dc264f61a592a7b484c5', 'end_line': 77, ...}], ...}
+
+    def _same(before, after):
+        assert _evidence(after) == _evidence(before), "the evidence set or its order changed"
+        old, new = _comparable(before), _comparable(after)
+        for field in FIELDS:
+>           assert new.get(field) == old.get(field), f"the bundle's {field!r} changed"
+E           AssertionError: the bundle's 'continuation' changed
+E           assert {'bb': None, ...30/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1330/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:76: AssertionError
+_ test_s3_the_continued_pages_are_today_s_but_for_the_register_items_ids_and_status[gov-retrieve] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36cddc60>
+raw = <function raw.<locals>.asked at 0x79eb36cddee0>
+today = (<module 'w2_133_today_retrieve'>, <module 'w2_133_today_register'>)
+pipeline = 'gov-retrieve'
+
+    @pytest.mark.parametrize("pipeline", ["gov-retrieve", "retrieve-alone"])
+    def test_s3_the_continued_pages_are_today_s_but_for_the_register_items_ids_and_status(ask, raw, today, pipeline):
+        asked = ask if pipeline == "gov-retrieve" else raw
+        kwargs = {"batch_size": 1}
+        before = support.pages(lambda query, **more: asked(query, modules=today, **more), "orchard", kwargs)
+        after = support.pages(asked, "orchard", kwargs)
+        assert len(before) > 1, "premise: the batched question has more than one page"
+        assert len(after) == len(before), f"{len(after)} pages, where today gives {len(before)}"
+        for old, new in zip(before, after):
+>           _same(old, new)
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...ce': [{'batch': 1, 'chunk_id': 'c9bdbfc37434c7da9e417689', 'end_line': 3, 'id': 'c9bdbfc37434c7da9e417689', ...}], ...}
+after = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...ce': [{'batch': 1, 'chunk_id': 'c9bdbfc37434c7da9e417689', 'end_line': 3, 'id': 'c9bdbfc37434c7da9e417689', ...}], ...}
+
+    def _same(before, after):
+        assert _evidence(after) == _evidence(before), "the evidence set or its order changed"
+        old, new = _comparable(before), _comparable(after)
+        for field in FIELDS:
+>           assert new.get(field) == old.get(field), f"the bundle's {field!r} changed"
+E           AssertionError: the bundle's 'continuation' changed
+E           assert {'bb': None, ...30/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1330/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:76: AssertionError
+_______ test_a_head_that_moves_under_test_gets_a_new_merge_and_a_new_run _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+w = namespace(tmp=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_head_that_moves_under_t0'),... sel=PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw0/test_a_head_that_moves_under_t0/select.py'))
+
+    def test_a_head_that_moves_under_test_gets_a_new_merge_and_a_new_run(w):
+        mover = w.tmp / "mover.py"
+        mover.write_text(MOVER)
+        c = ticket(w, "A", {"tests/test_a.py": "def test_a():\n    pass\n"})
+        enter(w, "A", c)
+        old = head(w)
+        r = run(w, test_cmd=f"{sys.executable} {mover} {w.tmp / 'moved'} {w.repo}")
+>       assert r.returncode == 0, r.stderr
+E       AssertionError: merge queue: stopped: the operator agent's commit freeze holds (/home/usain/gov-os-operator/install/act-in-progress.txt); nothing advanced, the landing waits for the next run; entries kept
+E         
+E       assert 4 == 0
+E        +  where 4 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-116/governance/project/orchestration/tools...in/gov-os-operator/install/act-in-progress.txt); nothing advanced, the landing waits for the next run; entries kept\n").returncode
+
+tests/unit/orchestration/test_w2_97_merge_queue.py:462: AssertionError
+_ test_s3_the_continued_pages_are_today_s_but_for_the_register_items_ids_and_status[retrieve-alone] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36cde5c0>
+raw = <function raw.<locals>.asked at 0x79eb36cde700>
+today = (<module 'w2_133_today_retrieve'>, <module 'w2_133_today_register'>)
+pipeline = 'retrieve-alone'
+
+    @pytest.mark.parametrize("pipeline", ["gov-retrieve", "retrieve-alone"])
+    def test_s3_the_continued_pages_are_today_s_but_for_the_register_items_ids_and_status(ask, raw, today, pipeline):
+        asked = ask if pipeline == "gov-retrieve" else raw
+        kwargs = {"batch_size": 1}
+        before = support.pages(lambda query, **more: asked(query, modules=today, **more), "orchard", kwargs)
+        after = support.pages(asked, "orchard", kwargs)
+        assert len(before) > 1, "premise: the batched question has more than one page"
+        assert len(after) == len(before), f"{len(after)} pages, where today gives {len(before)}"
+        for old, new in zip(before, after):
+>           _same(old, new)
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...force': True, 'status': 'ACCEPTED'}], 'batch': 2, 'changed_by': [], 'chunk_id': 'd986dc264f61a592a7b484c5', ...}], ...}
+after = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1341}, 'rounds': {'limit': 1, 'us...n_force': True, 'status': 'ACCEPTED'}], 'batch': 2, 'chunk_id': 'd986dc264f61a592a7b484c5', 'end_line': 77, ...}], ...}
+
+    def _same(before, after):
+        assert _evidence(after) == _evidence(before), "the evidence set or its order changed"
+        old, new = _comparable(before), _comparable(after)
+        for field in FIELDS:
+>           assert new.get(field) == old.get(field), f"the bundle's {field!r} changed"
+E           AssertionError: the bundle's 'continuation' changed
+E           assert {'bb': None, ...30/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1330/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-133/test_w2_133_unchanged.py:76: AssertionError
+_ test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[almanac-batched] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36d449a0>
+today = <module 'w2_135_today_retrieve'>, name = 'almanac-batched'
+query = 'tide almanac', kwargs = {'batch_size': 1}
+
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
+        olds, news, *_ = _both(ask, today, query, kwargs)
+        assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
+        assert len({_commit_of(page) for page in news if page.get("continuation")}) <= 1, \
+            f"{name}: the pages of one question name more than one store commit"
+        for number, (old, new) in enumerate(zip(olds, news), 1):
+>           _same(old, new, f"{name}, page {number}")
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+old = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1143}, 'rounds': {'limit': 1, 'us.....}, {'batch': 1, 'chunk_id': '9fb88e4b01d51aa4f4fe8b28', 'end_line': 44, 'id': '9fb88e4b01d51aa4f4fe8b28', ...}], ...}
+new = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 1143}, 'rounds': {'limit': 1, 'us.....}, {'batch': 1, 'chunk_id': '9fb88e4b01d51aa4f4fe8b28', 'end_line': 44, 'id': '9fb88e4b01d51aa4f4fe8b28', ...}], ...}
+where = 'almanac-batched, page 1'
+
+    def _same(old, new, where):
+        _account_for_the_store_key(old, new, where)
+        old, new = _without_store(old), _without_store(new)
+        assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
+        for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
+                    "stopping_reason", "rerank", "left_out"):
+>           assert new.get(key) == old.get(key), f"{where}: the bundle's {key!r} changed"
+E           AssertionError: almanac-batched, page 1: the bundle's 'continuation' changed
+E           assert {'bb': None, ...50/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1350/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:90: AssertionError
+_ test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[every-file-batched] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36d468e0>
+today = <module 'w2_135_today_retrieve'>, name = 'every-file-batched'
+query = 'harbour', kwargs = {'batch_size': 1}
+
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
+        olds, news, *_ = _both(ask, today, query, kwargs)
+        assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
+        assert len({_commit_of(page) for page in news if page.get("continuation")}) <= 1, \
+            f"{name}: the pages of one question name more than one store commit"
+        for number, (old, new) in enumerate(zip(olds, news), 1):
+>           _same(old, new, f"{name}, page {number}")
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+old = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 873}, 'rounds': {'limit': 1, 'use.....}, {'batch': 2, 'chunk_id': '58dc06e6436339bff7da6d3e', 'end_line': 60, 'id': '58dc06e6436339bff7da6d3e', ...}], ...}
+new = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 6000, 'used': 873}, 'rounds': {'limit': 1, 'use.....}, {'batch': 2, 'chunk_id': '58dc06e6436339bff7da6d3e', 'end_line': 60, 'id': '58dc06e6436339bff7da6d3e', ...}], ...}
+where = 'every-file-batched, page 1'
+
+    def _same(old, new, where):
+        _account_for_the_store_key(old, new, where)
+        old, new = _without_store(old), _without_store(new)
+        assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
+        for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
+                    "stopping_reason", "rerank", "left_out"):
+>           assert new.get(key) == old.get(key), f"{where}: the bundle's {key!r} changed"
+E           AssertionError: every-file-batched, page 1: the bundle's 'continuation' changed
+E           assert {'bb': None, ...50/repo', ...} == {'bb': None, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1350/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:90: AssertionError
+_ test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[almanac-batched-budget-1000] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+ask = <function ask.<locals>.asked at 0x79eb36d46e80>
+today = <module 'w2_135_today_retrieve'>, name = 'almanac-batched-budget-1000'
+query = 'tide almanac', kwargs = {'batch_size': 1, 'bundle_budget': 1000}
+
+    @pytest.mark.parametrize("name, query, kwargs", CASES)
+    def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
+        olds, news, *_ = _both(ask, today, query, kwargs)
+        assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
+        assert len({_commit_of(page) for page in news if page.get("continuation")}) <= 1, \
+            f"{name}: the pages of one question name more than one store commit"
+        for number, (old, new) in enumerate(zip(olds, news), 1):
+>           _same(old, new, f"{name}, page {number}")
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+old = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 1000, 'used': 578}, 'rounds': {'limit': 1, 'use.....}, {'batch': 1, 'chunk_id': '9fb88e4b01d51aa4f4fe8b28', 'end_line': 44, 'id': '9fb88e4b01d51aa4f4fe8b28', ...}], ...}
+new = {'batches': [{'size': 1}, {'size': 1}], 'budget': {'bundle': {'limit': 1000, 'used': 578}, 'rounds': {'limit': 1, 'use.....}, {'batch': 1, 'chunk_id': '9fb88e4b01d51aa4f4fe8b28', 'end_line': 44, 'id': '9fb88e4b01d51aa4f4fe8b28', ...}], ...}
+where = 'almanac-batched-budget-1000, page 1'
+
+    def _same(old, new, where):
+        _account_for_the_store_key(old, new, where)
+        old, new = _without_store(old), _without_store(new)
+        assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
+        for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
+                    "stopping_reason", "rerank", "left_out"):
+>           assert new.get(key) == old.get(key), f"{where}: the bundle's {key!r} changed"
+E           AssertionError: almanac-batched-budget-1000, page 1: the bundle's 'continuation' changed
+E           assert {'bb': 1000, ...50/repo', ...} == {'bb': 1000, ... 'i': [], ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw3/w2-1350/repo'}
+E             Use -v to get more diff
+
+tests/acceptance/W2-135/test_w2_135_unchanged.py:90: AssertionError
+__ test_the_bundle_is_the_same_before_and_after_but_for_a_gap_starter_s_label __
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_bundle_is_the_same_be0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc1e3c3bc0>
+
+    def test_the_bundle_is_the_same_before_and_after_but_for_a_gap_starter_s_label(project, monkeypatch):
+        # one test over every call, not parametrised: the opt-in lists keep only a parametrised test's first row
+        before, gap_starters, inside = _before(monkeypatch), 0, 0
+        for query, kwargs in CALLS:
+            old = before.retrieve(project, query, **kwargs)
+            new = retrieve.retrieve(project, query, **kwargs)
+            assert set(old) == set(new), (query, kwargs)
+            for key in set(new) - {"evidence"}:  # the batches, budget, gaps, continuation, expansions, drops, facets
+                if key == "continuation":  # DEC-1090 (3): the token compared decoded, without its s key
+>                   assert _without_s(old[key]) == _without_s(new[key]), (query, kwargs, key)
+E                   AssertionError: ('pool rule worker', {'batch_size': 1}, 'continuation')
+E                   assert {'bb': None, ... 'i': [], ...} == {'bb': None, ...ame_be0', ...}
+E                     
+E                     Omitting 9 identical items, use -vv to show
+E                     Right contains 1 more item:
+E                     {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_bundle_is_the_same_be0'}
+E                     Use -v to get more diff
+
+tests/unit/retrieval/test_w2_133_gap_label.py:170: AssertionError
+__________ test_the_continuation_carries_on_the_same_before_and_after __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_continuation_carries_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc1d7cb770>
+
+    def test_the_continuation_carries_on_the_same_before_and_after(project, monkeypatch):
+        before = _before(monkeypatch)
+        old = before.retrieve(project, "lotus marigold juniper", batch_size=1)
+        new = retrieve.retrieve(project, "lotus marigold juniper", batch_size=1)
+        # DEC-1090 (3): the tokens compared decoded, without their s key
+>       assert new["continuation"] is not None and _without_s(old["continuation"]) == _without_s(new["continuation"])
+E       AssertionError: assert ('eyJiYiI6bnVsbCwiYnMiOjEsImMiOltbImRlY2lzaW9ucy9SRUdJU1RFUi5tZCIsNTQsNTYsImNkMmZlNmUxMDc3OTcwMzFlNTM4MTFhNCJdXSwiZiI6I...MiOiIwNzNkMTg4MDdkNTA4MmY0YTQ2Mjk1OGI1OTgwY2YxYjFkYzUxYjFlIiwidCI6bnVsbCwieCI6WyI5MDU0MjU3MGZkZmY0NzNkNDBjYTkxMGEiXX0=' is not None and {'bb': None, ... 'i': [], ...} == {'bb': None, ...rries_0', ...}
+E         
+E         Omitting 9 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_continuation_carries_0'}
+E         Use -v to get more diff)
+
+tests/unit/retrieval/test_w2_133_gap_label.py:191: AssertionError
+__ test_the_bundle_is_the_same_before_and_after_but_for_the_cut_lines_and_key __
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_bundle_is_the_same_be1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc1d7cb8f0>
+
+    def test_the_bundle_is_the_same_before_and_after_but_for_the_cut_lines_and_key(project, monkeypatch):
+        # one test over every call, not parametrised: the opt-in lists keep only a parametrised test's first row
+        old_seen, new_seen = [], []
+        before = _before(monkeypatch, old_seen)
+        _stand_ins(monkeypatch, retrieve, new_seen)
+        cut, whole, long_whole = 0, 0, 0
+        for query, kwargs in CALLS:
+            old = before.retrieve(project, query, **kwargs)
+            new = retrieve.retrieve(project, query, **kwargs)
+            assert set(old) == set(new), (query, kwargs)
+            for key in set(new) - {"evidence"}:  # the batches, budget (its used), gaps, continuation, expansions, repeats
+                if key == "continuation":  # DEC-1090 (3): the token compared decoded, without its s key
+>                   assert _without_s(old[key]) == _without_s(new[key]), (query, kwargs, key)
+E                   AssertionError: ('worker queue task', {'batch_size': 2}, 'continuation')
+E                   assert {'bb': None, ... 'i': [], ...} == {'bb': None, ...ame_be1', ...}
+E                     
+E                     Omitting 9 identical items, use -vv to show
+E                     Right contains 1 more item:
+E                     {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_bundle_is_the_same_be1'}
+E                     Use -v to get more diff
+
+tests/unit/retrieval/test_w2_135_item_cap.py:358: AssertionError
+__________ test_the_continuation_carries_on_the_same_before_and_after __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_continuation_carries_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc1e30e210>
+
+    def test_the_continuation_carries_on_the_same_before_and_after(project, monkeypatch):
+        before = _before(monkeypatch, None)
+        query = "zephyrine quokkaline marmoset kumquat"
+        old = before.retrieve(project, query, batch_size=1)
+        new = retrieve.retrieve(project, query, batch_size=1)
+        # DEC-1090 (3): the tokens compared decoded, without their s key
+>       assert new["continuation"] is not None and _without_s(old["continuation"]) == _without_s(new["continuation"])
+E       AssertionError: assert ('eyJiYiI6bnVsbCwiYnMiOjEsImMiOltbImRvY3Mvc21hbGwubWQiLDEsMywiY2FjNzAwMjQ3YjFkZjlkYWNlZTY3NTUxIl1dLCJmIjoiL3RtcC9nb3Ytb...I6IjQwZTljNzM5M2YzOGM0MWEzZmRiZDk4OGNhYmVhNmYzM2VjNDk4MWUiLCJ0IjpudWxsLCJ4IjpbIjBkZThiNTZmZGU0NzRkNjQxZjMwYmVjNCJdfQ==' is not None and {'bb': None, ... 'i': [], ...} == {'bb': None, ...rries_1', ...}
+E         
+E         Omitting 9 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw5/test_the_continuation_carries_1'}
+E         Use -v to get more diff)
+
+tests/unit/retrieval/test_w2_135_item_cap.py:390: AssertionError
+______ test_the_bundle_is_the_same_before_and_after_but_for_register_ids _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw1/test_the_bundle_is_the_same_be0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71b5f9586840>
+
+    def test_the_bundle_is_the_same_before_and_after_but_for_register_ids(project, monkeypatch):
+        # one test over every call, not parametrised: the opt-in lists keep only a parametrised test's first row
+        before, register_items = _before(monkeypatch), 0
+        for query, kwargs in CALLS:
+            old = before.retrieve(project, query, **kwargs)
+            new = retrieve.retrieve(project, query, **kwargs)
+            assert set(old) == set(new), (query, kwargs)
+            for key in set(new) - {"evidence"}:  # the batches, budget, gaps, continuation, expansions, drops, facets
+                if key == "continuation":  # DEC-1090 (3): the token compared decoded, without its s key
+>                   assert _without_s(old[key]) == _without_s(new[key]), (query, kwargs, key)
+E                   AssertionError: ('label rule', {'batch_size': 1}, 'continuation')
+E                   assert {'bb': None, ... 'i': [], ...} == {'bb': None, ...ame_be0', ...}
+E                     
+E                     Omitting 9 identical items, use -vv to show
+E                     Right contains 1 more item:
+E                     {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw1/test_the_bundle_is_the_same_be0'}
+E                     Use -v to get more diff
+
+tests/unit/retrieval/test_w2_131_register_ids.py:189: AssertionError
+__________ test_the_continuation_carries_on_the_same_before_and_after __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw1/test_the_continuation_carries_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71b5f95848c0>
+
+    def test_the_continuation_carries_on_the_same_before_and_after(project, monkeypatch):
+        before = _before(monkeypatch)
+        old = before.retrieve(project, "label rule", batch_size=1)
+        new = retrieve.retrieve(project, "label rule", batch_size=1)
+        # DEC-1090 (3): the tokens compared decoded, without their s key
+>       assert new["continuation"] is not None and _without_s(old["continuation"]) == _without_s(new["continuation"])
+E       AssertionError: assert ('eyJiYiI6bnVsbCwiYnMiOjEsImMiOltbImRlY2lzaW9ucy9SRUdJU1RFUi5tZCIsMzEsNDQsImM1MGE1NzRhYWVjOTBmMzZjNjcxZTk3MyJdXSwiZiI6I...MiOiI0YzY2MWRhZGE2MjFmOGYzMzhlYWE5OTJkZDIyYWU2ZjhmYWYxY2UyIiwidCI6bnVsbCwieCI6WyIyYTJmYmE5MzFjNWE4MzljZWI5YTI5YmQiXX0=' is not None and {'bb': None, ... 'i': [], ...} == {'bb': None, ...rries_0', ...}
+E         
+E         Omitting 9 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'f': '/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw1/test_the_continuation_carries_0'}
+E         Use -v to get more diff)
+
+tests/unit/retrieval/test_w2_131_register_ids.py:209: AssertionError
+__________ test_a_status_with_a_part_not_read_names_every_such_place ___________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-116/pytest-of-usain/pytest-0/popen-gw4/test_a_status_with_a_part_not_0/project')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x706fd36a7ef0>
+
+    def test_a_status_with_a_part_not_read_names_every_such_place(project, monkeypatch):
+        from gov.doctor import command as doctor
+    
+        monkeypatch.setattr(doctor, "run", lambda *args: {"healthy": True, "tools": {"status": "unmeasured"}})
+        answer = command.run(project, ARGS, {})
+>       assert tuple(answer) == ("root", "config_files", *PARTS, "not_read") and answer["not_read"] == []
+E       AssertionError: assert (('root', 'con...e_share', ...) == ('root', 'con...e_share', ...)
+E         
+E         At index 9 diff: 'integration_store' != 'not_read'
+E         Left contains one more item: 'not_read'
+E         Use -v to get more diff)
+
+tests/unit/status/test_status.py:172: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-116/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=172768) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-32/test_w2_32_s5_fusion_limit.py:91: this build refuses a limit above its cap; the order of a honoured limit does not arise
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+19 failed, 6713 passed, 7 skipped, 1 xfailed, 6 warnings in 1580.79s (0:26:20)

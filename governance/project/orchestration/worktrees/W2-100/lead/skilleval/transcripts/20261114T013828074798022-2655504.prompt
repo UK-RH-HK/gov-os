@@ -1,0 +1,49 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply uses the shared error body, ranks the point P3, and does not stop the work or send the question to the owner.
+
+Expected behaviour:
+the session takes the simplest reading (the same error body as the others), adds it to the contract, tests it, and names the point in `discoveries`; this is a P3 (reversible, inside the ticket, no change to a KPI), decided and logged without stopping the work.
+
+The session's reply:
+<<<
+The skill treats this as a **P3**. It's a point the contract leaves open, it can be reversed, it stays inside the ticket and it changes no KPI. The skill even names "an error body" as its example of a P3. So the instruction is to take the simplest reading, write it into the contract, log it in `discoveries` and keep going. I didn't ask the owner, and the ticket isn't blocked.
+
+**The reading I took:** the 409 uses the same error shape as every other error in the contract, with a stable code callers can match on. The skill's rule is "one error shape for the whole interface", so using that shape is the simplest choice and it breaks nothing.
+
+**What I couldn't edit:** this folder contains only the skill (`.claude/skills/api/SKILL.md` and `check_domain_skill.py`). There's no ticket, no contract file and no handler, so I changed no files. I also didn't run `gov accept`, because there's no code to test and I couldn't confirm the `gov` command is installed (that check needed an approval I didn't get). Here is the addition that would go into the contract, ahead of any code:
+
+```yaml
+'409':
+  description: The name is already taken.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Error'   # the contract's existing error schema
+      example:
+        error:
+          code: NAME_TAKEN
+          message: "A resource with this name already exists."
+```
+
+This is **additive**. The status code was already promised, and this only gives it the body every other error uses. The code name `NAME_TAKEN` is my guess: it should be changed to match the casing and naming of the contract's existing error codes. Once the contract has it, the unit tests would check the 409 body against the error schema, and the handler would be checked against the contract.
+
+**The return, per the skill's handover format:**
+
+- **task:** spell out the 409 "name taken" response for the ticket's endpoint
+- **status:** done as a contract decision; no files changed because no contract or code is in this workspace
+- **work_completed:** classified the gap as P3; chose the shared error shape for the 409 with code `NAME_TAKEN`; wrote the contract addition above
+- **files_changed:** none (no contract file exists here)
+- **evidence:** the contract's other errors all use `{"error": {"code", "message"}}`; the skill's P3 rule covers an open error body
+- **tests:** none run. Still needed: the 409 body checked against the error schema, and a duplicate-name request returning 409 with code `NAME_TAKEN`
+- **discoveries:** the contract gave the 409 a status but no body. I used the shared error shape with code `NAME_TAKEN`, and it should be logged so the owner can see the choice later
+- **risks:** I couldn't identify the endpoint's callers, because no ticket or caller code is present. A client that already handles a bare 409 is unaffected, since this only adds a body
+- **lessons:** none
+- **proposed_decisions:** have the contract state that every error, including ones listed only by status code, uses the shared error shape
+- **unresolved:** whether `NAME_TAKEN` matches the contract's existing code naming; to check when the contract file is available
+- **recommended_next_action:** add the 409 entry to the real contract, write the tests from it, then the handler, then run `gov accept`
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

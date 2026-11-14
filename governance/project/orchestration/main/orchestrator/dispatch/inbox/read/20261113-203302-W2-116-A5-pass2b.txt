@@ -1,0 +1,8 @@
+log: W2-116-A5-pass2b.json
+W2: W2-116
+status: DONE. Head to land: **37669f026300e68ff6062677d97c2bffa60cb5fa**. It can't land green until the CTO fixes 17 cases of other tickets that this branch turns red (DEC-1156 (7)). They are listed under unresolved.
+
+task: DAEO-f58b (W2-116) pass 2b: S2 (the two daily refresh times and `gov status`) and R2-F3 (the continuation token carries the half it was made on)
+status: DONE. Head to land: **37669f026300e68ff6062677d97c2bffa60cb5fa**. It can't land green until the CTO fixes 17 cases of other tickets that this branch turns red (DEC-1156 (7)). They are listed under unresolved.
+work_completed:
+- Merged `w2/integrate` into `w2/W2-116` (e51b1fdf6), `--no-ff`, with `Task: DAEO-f58b` and `Role: orchestrator`. Pass 1's leftover `w2/W2-116-tests` was fully merged (`git branch --no-merged` did not list it) and it

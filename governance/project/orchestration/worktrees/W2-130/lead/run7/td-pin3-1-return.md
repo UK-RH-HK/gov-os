@@ -1,0 +1,48 @@
+td-pin3-1 (session 996a5e96-496b-487c-ae07-48ef600dfe94, claude-sonnet-5-5, high, C2): DONE 83285c3c52c32b7f96936b815e2656604a6d97cb; twelve fields recovered from the session transcript (its final message was a note on a polling helper).
+The two S4 cases that read HEAD are now pinned at `counts-after.measured_at`, and `variant_findings` runs the commit's own `gov links`. It is one commit, `83285c3c52c32b7f96936b815e2656604a6d97cb` on `w2/W2-130-tests`, with the trailers in one final paragraph. Both folders are green and every README-mapped node id collects.
+
+- **task:** DAEO-q8cl (W2-130), pin run 3.
+- **status:** DONE.
+- **Step 0 (first, as asked):** passed. The write to `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-q8cl` failed with `Read-only file system` and no such file exists. `git hash-object -w` gave `1ae28402a109c3397a44b19239a00adfa9472eb0`, and `git update-index --refresh` exited 0. `GOV_TICKET=DAEO-q8cl`, `GOV_ROLE=independent-test-designer`. The `ps` check for ollama and llama-server shows nothing.
+- **work_completed:**
+  - `test_s4_closed_missing_lists_per_closed_ticket_the_ids_its_sources_lack` and `test_s4_no_record_lists_per_ticket_ids_that_name_no_record` now go through `_pinned(record, pinned_findings)`. They read the findings, the ticket statuses and files, the register headings and the ticket stems from the same `measured_at` clone (6b62de94e3fd), using that tree's own `gov links`. They no longer take `head_findings` or `head_tree`. Names are kept, with docstrings saying which tree and tool they read. `_ticket_at_head` became `_ticket_in(tree, ticket)`.
+  - `variant_findings` now runs `links_json(tree, home, src=support.pinned_src(tree))`. Its docstring, the `test_w2_130_audit.py` module docstring and README's "Derived from free text" line (near line 61) now say "the commit's own tool (its tree's `src`)".
+  - Beyond the brief, README now says S4's "at HEAD" is re-baselined to `measured_at` and that S8's `left` and `counts-before` read the pinned tree's tool. It also has a "Pin run 3" bullet listing the cases left on the branch's tool.
+- **files_changed:** `tests/acceptance/W2-130/test_w2_130_sources.py`, `conftest.py`, `test_w2_130_audit.py` (docstring only) and `README.md` (prose only; no map row or node id edited). `w2_130_support.py` is untouched.
+- **evidence:**
+  - Commit: `83285c3c52c32b7f96936b815e2656604a6d97cb`.
+  - Changed files (sources and audit): 25 passed.
+  - `tests/acceptance/W2-130`: 81 passed.
+  - `tests/acceptance/W2-175`: 51 passed.
+  - Every run used `heavy_slot.sh`, an empty `HOME`, and `-m "not local_only" -k "not real and not green_here and not time_limit"`. I did not run without the exclusion. The auditor found the exclusion left nothing out of W2-130, but I did not re-check that or W2-175.
+  - `--collect-only` on W2-130 collects 81, and all 81 README-mapped ids collect (none missing). The `def test_*` names of the three changed `.py` files are identical to `aafaf6259d10`.
+  - Planted values, in a `git clone --shared` scratch copy with the change committed (records edited in the copy only, restored after each):
+    - **`closed-missing`:**
+      - DEC-780 dropped from DAEO-03dg: fails ("differs from gov links' UNLINKED_ID on closed tickets at measured_at").
+      - DAEO-q8cl (in progress at `measured_at`) listed: fails ("is not a closed ticket at measured_at").
+    - **`no-record`:**
+      - **Drop test not possible:** the record's `no-record` block is `{}`, so there is no listed (ticket, id) pair to drop.
+      - DEC-1088 (a register heading) listed on DAEO-057v: fails ("names a record").
+      - DEC-99998 listed on DAEO-057v: fails ("is in neither its brackets nor its sources").
+      - **Unlisted side, by a scratch route:** a scratch commit on `measured_at` added DEC-88888 to DAEO-057v's sources, was merged into the copy with `-s ours`, and `measured_at` was set to it. The case failed ("gov links reports unknown ids at measured_at the record does not list per ticket: [('DAEO-057v', 'DEC-88888')]"). With the pair listed it passes.
+    - **Pin holds:** a commit at the copy's HEAD reopened DAEO-03dg and put DEC-99999 on DAEO-057v's `sources:`. Both S4 cases, the three other S4 cases and S8's two stayed green (7 passed).
+    - **Tool pinned:** I put a modified `src` first on PYTHONPATH. It dropped DAEO-03dg's first UNLINKED_ID and one UNKNOWN_ID on a ticket, and cleared the first `text: true` flag. It also added an UNMARKED_CHANGE (DEC-1, DEC-2), an UNKNOWN_ID on DAEO-057v and an UNKNOWN_ID on `docs/lessons/x.md`. The two S4 cases, the S3/F3 cases and S8's two stayed green (13 passed). S2's HEAD-wide case failed ("extra: [('DEC-1', 'DEC-2')]") and S7's failed ("[(['DEC-77778'], 'docs/lessons/x.md')]"), so they read the branch's tool.
+  - Scratch `$TMPDIR` is 272M and 23,012 inodes.
+- **tests:** 81 cases in W2-130 and 51 in W2-175, all green. No case added, removed or renamed.
+- **discoveries:**
+  - **Still on the branch's tool:** S2's "no UNMARKED_CHANGE but the 8 pairs" (`test_w2_130_marks.py`), S6's no STATUS_CONFLICT (`test_w2_130_status.py`) and S7's no UNKNOWN_ID on a lesson (`test_w2_130_lessons.py`). Each judges HEAD itself. A search of `links_json` and `run_links` found no other case running `gov links` at a fixed commit on the branch's tool, so I pinned nothing else.
+  - **The lead's `variant_findings` measurement held:** it stayed green with the commit's own `src`.
+  - **Wrong guess in the brief:** it expected the S2 case to be turned red by a planted UNKNOWN_ID or UNLINKED_ID, but S2 reads only UNMARKED_CHANGE. Pin run 2's demonstration (a planted UNMARKED_CHANGE) was the one that works.
+- **risks:** Cases that still read a value a later event or approved change can move (listed from my reading and a grep; I did not read every W2-175 case line by line):
+  - **S2/S6/S7 HEAD-wide `gov links` cases:** these move with any register, status or lesson edit or a change to the tool. That is their point.
+  - **Cases on `head_tree`:**
+    - Register status lines at HEAD: S1 "still on its status line at head" and the S2 changer checks.
+    - Lessons at HEAD: S7's `sources:` keys and listing.
+    - `LINK-RECONCILIATION.md` at HEAD: S6.
+    - The drift script on `head_tree`: S2's drift case and F2's drift case. A new register entry with a changer could turn these red; I judge that the closest to a ticket event, but none reads a ticket's status.
+  - **W2-175:** the templates and the record `docs/changes/W2-175-CIT-P.md` are read at HEAD, and the sha256 case is pinned at its landing `61cae50dc`. They move only on an approved change to the templates or the record, which is meant to turn them red.
+  - Nothing else I found reads ticket status, a ticket's `sources:`, or a `gov links` count at HEAD.
+- **lessons:** none new. The one correction is that a "drop a listed pair" demonstration needs a non-empty record block, so for an empty `no-record` a scratch commit is the way to show the unlisted side.
+- **proposed_decisions:** none.
+- **unresolved:** none.
+- **recommended_next_action:** The lead merges `w2/W2-130-tests` at `83285c3c52c3` and runs `gov accept W2-130` and `gov accept W2-175`. After that, land W2-130 once, per the brief.

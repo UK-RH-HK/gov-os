@@ -5,3 +5,29 @@ ok template/governance/kernel/skills/adopt/SKILL.md 16fd341f267b DEC-1163
 reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
 2026-11-13 12:52:10 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
 2026-11-13 12:52:10 merged W2-88a onto 36fc597ca74f: 5d535ee621ba
+2026-11-13 13:11:09 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 13:11:16 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 13:11:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 13:11:20 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 13:11:53 the head without the batch: a throwaway worktree head-36fc597ca74f-0 at 36fc597ca74f with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 13:11:54 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+2026-11-13 13:11:54 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+2026-11-13 13:11:55 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead]
+2026-11-13 13:11:56 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]
+2026-11-13 13:11:56 ADVANCED refs/heads/w2/integrate 36fc597ca74f -> 5d535ee621ba; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/5d535ee621ba.json
+2026-11-13 13:11:56 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 13:12:42 integration store promoted: the merged clone's stores at 5d535ee621ba into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-88a: 655421b3d W2-88a (DAEO-pg6i): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 31 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+28 more)
+structural pass: authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: NOTICE 4 findings: differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md | is not a byte copy of template/governance/kernel/templates/role-lead.md | is not a byte copy of template/governance/kernel/templates/role-cto.md (+1 more) [2 kernel role, skill, hook or .rulesync path(s) changed since 36fc597ca74f]
+structural pass: links: NOTICE 6 new since 36fc597ca74fe6b6e51ad56ff3b70f8a94dcf5cf (1726 standing): UNLINKED_ID DEC-1071 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1071 to DAEO-pg6i's sources: | UNLINKED_ID DEC-1072 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1072 to DAEO-pg6i's sources: | UNLINKED_ID DEC-1074 in DAEO-pg6i's KPI brackets, not in its sources | .tickets/DAEO-pg6i.md:45 | orchestrator | add DEC-1074 to DAEO-pg6i's sources: (+3 more)
+structural pass: structural pass at 655421b3d2d1 (the work tree differs from it at 1 tracked path(s): the working files were read): NOTICE in mutation, authority, portability, links (6 of 10 families ok), 14.7 s; a notice, not a refusal
+structural pass: notice -> inbox/20261113-131301-structural-notice.txt

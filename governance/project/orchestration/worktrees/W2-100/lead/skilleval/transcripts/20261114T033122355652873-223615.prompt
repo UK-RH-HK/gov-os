@@ -1,0 +1,54 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not add the NOT NULL column in one step, names the backfill and the order, and gives the way back for each step.
+
+Expected behaviour:
+the session splits the schema change (add the column as nullable or with a default, backfill in batches, add the constraint once no row is null), gives each migration a down step, and checks the migration on a copy of the data.
+
+The session's reply:
+<<<
+task: Add a NOT NULL `region` column to `accounts` (40M rows, written to all day). STANDARD ticket.
+status: blocked. Nothing was written, run or committed, and I stopped here as the skill says to.
+work_completed: I loaded the `data` skill and followed its steps. I replaced the draft `ALTER TABLE accounts ADD COLUMN region text NOT NULL` with four separate migrations, each with a down step (below). The skill lists the draft as its first common mistake: one step that adds a NOT NULL column to a table that has rows. On a table this size it either fails because existing rows have no value, or (with a default) silently fills a made-up value into 40M rows. All the migration files exist only in this return.
+files_changed: none. All seven file writes were refused.
+evidence: none. I couldn't run `gov retrieve`, check whether Postgres or SQLite is installed, or write files. No step was run forward or back, so I have no row counts before or after. The workspace has no repo, schema, migrations, sample data or ticket file; the only files are the skill and `check_domain_skill.py`. The skill's `scenarios.md` is also missing.
+tests: all planned, none written or run (writes and runs were refused). Planned fixture: SQLite with made-up rows, no personal data:
+  - `test_region_underivable`: a row with no source for region is rejected as `region_underivable`, stays NULL and is kept in `accounts_region_rejects`.
+  - `test_region_blank`: a derived value of `"  "` is rejected as `region_blank` and kept.
+  - `test_region_not_in_set`: the value `"mars"` is rejected as `region_not_in_set` and kept.
+  - `test_region_valid`: an allowed value is written; the counts of filled, NULL and rejected rows add up to the total.
+  - `test_backfill_restart`: stopped after 2 of 5 batches, then restarted: no row done twice, none skipped, checkpoint `last_id` correct.
+  - `test_backfill_never_overwrites`: a row that already has a region keeps it.
+  - `test_migrations_up_down`: each step forward then back; same columns, counts and sampled values.
+  - `test_old_reader_new_schema` / `test_new_reader_old_rows`: old code reading the new schema, and new code reading NULL regions before step 3.
+discoveries: P3 choices I made and logged: file names `000N_*.up/down.sql` (the project's migration tool is unknown), the rejected-rows table layout, a batch size of 5000, `lock_timeout = 3s`. I assumed Postgres because of the `text` type.
+risks:
+  - The step 1 down step drops a column. Once the backfill has run it destroys data, so it copies the values to `accounts_region_backup` before the drop.
+  - The step 2 down step also wipes values the app has written since its deploy. Only run it together with rolling the app back.
+  - Step 4 needs Postgres 12 or later to avoid scanning all 40M rows while blocking every read and write. On an older version, stop after step 3.
+  - The app must write `region` on every insert and update before step 3, or writes start failing.
+  - No pre-commit checklist item is ticked, because nothing ran.
+lessons: Don't assume a constant default is harmless. `ADD COLUMN ... NOT NULL DEFAULT 'x'` is fast on Postgres 11+, but it invents a value for 40M existing rows.
+proposed_decisions: Use the 4-step plan below. Rows whose region can't be derived are rejected and recorded, never defaulted.
+unresolved (P2, to whoever started this session):
+  1. The ticket doesn't say where `region` comes from for the 40M existing rows, or which values are allowed. The backfill can't run until that's decided. Until then it rejects every row and changes nothing.
+  2. `accounts` is probably read by other teams' code, so they should be told about the new column.
+  3. The service code that writes `region` belongs to the backend skill, not this one.
+recommended_next_action: Get the region source and allowed values added to the ticket's spec. Then allow writes to `migrations/` and `tests/`, plus a throwaway Postgres 12+ or SQLite to run on. After that I'll write the tests first, run each step forward and back with counts, and run `gov accept`.
+
+**Payload: the migration plan**
+
+| # | Step | Lock | Down step | Reversible |
+|---|---|---|---|---|
+| 1 | `ADD COLUMN IF NOT EXISTS region text` (nullable, no default); create `accounts_region_rejects` and a checkpoint table | Brief, no table rewrite | Copy values to `accounts_region_backup`, then `DROP COLUMN` | Yes, with the copy kept |
+| — | Deploy app code that writes `region` | — | Roll back the app | Yes |
+| 2 | Batched backfill: batches by id, only `WHERE region IS NULL`, one commit per batch with the checkpoint saved, short pause between batches; bad rows go to the rejects table with a reason | Row locks per batch only | Set the backfilled values back to NULL (nothing was overwritten) | Yes |
+| 3 | `ADD CONSTRAINT accounts_region_not_null CHECK (region IS NOT NULL) NOT VALID`, then `VALIDATE CONSTRAINT` as a separate transaction. Only run with 0 NULLs left. | Brief, then a scan that doesn't block reads or writes | `DROP CONSTRAINT` | Yes |
+| 4 | `ALTER COLUMN region SET NOT NULL` (skips the scan on Postgres 12+ thanks to step 3's check), then drop the check | Brief | `DROP NOT NULL` and put back step 3's check | Yes |
+
+Every step uses `IF NOT EXISTS` or `ON CONFLICT` so it can run twice without harm, and sets `lock_timeout` so a waiting migration can't stall writes to `accounts`.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

@@ -1,0 +1,135 @@
+64d3d4eb-f24c-4f3a-9c76-4f942d1c0066
+## Sandbox check (Step 0, launch_worker.sh)
+- (a) Writing `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k` **failed** (`OSError: [Errno 30] Read-only file system`), and no file exists. That is the expected result.
+- (b) `echo sandbox-trial | git hash-object -w --stdin` worked (it printed `1ae28402a…`, exit 0) and `git update-index --refresh` worked (exit 0). Running (b) as prescribed wrote one unreferenced loose blob into the shared `.git`. It is not in any tree.
+- `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` showed nothing, at the start and at the end.
+- Identity: `GOV_ROLE=independent-auditor`, `GOV_TICKET=DAEO-6n5k`. Top level `/home/usain/gov-os-worktrees/W2-37`, branch `w2/W2-37`, HEAD `31bf5ea0747e…`. `PYTHONPATH=/home/usain/gov-os-worktrees/W2-37/src python3 -c "import gov; print(gov.__file__)"` printed `/home/usain/gov-os-worktrees/W2-37/src/gov/__init__.py`. `git status --porcelain` was empty at the start and is empty at the end.
+
+task: DAEO-6n5k
+status: done. CIT-P review: pass (3 rows, no blocker). Narrow check: pass (1 row, no blocker).
+work_completed:
+- Independent review of `.gov-runtime/scratch/lead/changes/W2-37-CIT-P.md` against `68d9a917b`.
+- Narrow check of F1 (a) (`000fd9a52`) on my own temporary repository under TMPDIR:
+  - the store was built with the worktree's loader;
+  - for the old-store case I dropped the real `stated_links` table instead of patching code;
+  - I ran the same probe store under the old code (`65e8c076`, from `git archive` into TMPDIR) and the new code.
+- Checked the trailers and paths of every commit since `65e8c076`.
+files_changed: none. Nothing was written in any repository; all probes ran in `$TMPDIR/probe` and `$TMPDIR/old`.
+evidence:
+- **Diff:** the CIT-P's fenced diff equals `git show 68d9a917b -- template/governance/kernel/skills/change/SKILL.md` from the `@@` line on (`diff` empty). The `.rulesync` template's diff differs only in its path lines.
+- **Hashes:**
+  - Both templates before (`96498443f`): `2af36b72…dc982`.
+  - Both after and now: `a25b02a7…932536`.
+  - `cmp` says the two files are byte-equal.
+  - Root `.rulesync` is unchanged (`2af36b72…`); `.claude` is unchanged (`e22fd92f…`).
+  - I recomputed the expected `.claude` hash (its own frontmatter plus the new template body; today its body equals the old template body). It is exactly `017328ec…6658d`, as the record says.
+- **No other paths:** `git diff 68d9a917b 31bf5ea07 --` over the ticket's paths is empty (0 bytes).
+- **Cited ids:**
+  - DEC-167: ACCEPTED (owner, 2026-10-03).
+  - DEC-816: ACCEPTED.
+  - DEC-1163: ACCEPTED, and its item (7) says what the record says.
+  - DEC-105: ACCEPTED.
+  - CAP-33.a, .d, .f and .g: present in `docs/contract/contract.yaml` and `CONTRACT_v4.md`.
+  - No `Supersedes:` or `Changes:` line names DEC-167 or DEC-816.
+- **The command matches the section:** `gov impact --help` offers `--out <path>`, `--compare <CIT-E path>` and `<change>...` ("a record id, a symbol name, or one question").
+- **S1 through the CLI** (`gov.cli.main`, this worktree's code): `gov impact "What is the impact of DEC-510?"` printed `change` (with `deletable`), `radius`, `depth`, `affected` (the five kinds), `graphs`, `complete`, `gaps` and `proposal`. "what is…", "What's…", "what’s…" and a missing `?` all resolve to the id.
+- **F1 (a) probe** (record graph `ok`, store loaded at HEAD):
+  - Not deletable, radius R1:
+    - DEC-510 (named only by `sources:`);
+    - DEC-511 (`closes:`);
+    - DEC-512 (`sources: [DEC-512 (3)]`);
+    - DEC-501 (`**Under:**`);
+    - DEC-503 (`**Changes:**`);
+    - DEC-507 (a `**Supersedes:**` with words, stored as AMENDS).
+  - Still deletable at R0, because nothing names them: DEC-504, and the namers T-1, DEC-500, DEC-502 and DEC-506.
+  - Old store with the table dropped: the record graph reads `stale: the store holds no stated links…`, and DEC-504, DEC-514 and T-1 are all `deletable: false`, R1, `complete: false`.
+  - Refusals unchanged: `IMPACT_CHANGE_MALFORMED`, `IMPACT_NO_CHANGE`, `IMPACT_CHANGE_UNKNOWN`.
+  - No writes: the tree hash and `git status` were identical before and after the assessments.
+- **Old code vs new code** on the same store: only DEC-510 and DEC-501 changed (True/R0 → False/R1). The edge cases DEC-513/DEC-514, and T-1, DEC-500, DEC-502 and DEC-504, are identical.
+- **Commits since `65e8c076`:**
+  - `000fd9a52`: `Task: DAEO-6n5k`, `Role: engineer`; files `src/gov/impact/__init__.py`, `src/gov/impact/readings.py`, `tests/unit/impact/test_impact.py`.
+  - `202fbf723`: `Role: independent-test-designer`; files in `tests/acceptance/W2-37/` only.
+  - `68d9a917b`: `Role: engineer`; the two template skill files only.
+  - All are inside `allowed_paths` (the designer writes its own acceptance folder). `0c266d752`, `96498443f` and `31bf5ea07` are merges.
+tests:
+- To reproduce C3 only: `heavy_slot.sh python3 -m pytest tests/acceptance/W1-32/test_w1_32_command_set.py tests/acceptance/W1-07/test_w1_07_recorded_commands.py -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"` with `HOME=$TMPDIR/h`. Result: 1 failed, 2 passed, 10 deselected. The failure is `test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones`: "gov has commands the command list does not record: ['adapters', 'dispatch', 'impact', 'session-watch', 'wait']".
+- The 10 deselected are the `local_only`/real/green_here/time_limit cases of those two files.
+- Nothing else re-run; the lead ran the ticket's suites.
+discoveries:
+- W1-32's exact command-set case is red at this head, with `impact` among the unrecorded commands. It does not appear in the lead's 17-failure list for `68d9a917b`. Either that list misses it, or lead_verify selects differently; the lead should check its `31bf5ea07` run for it.
+- DEC-812 (6) had put `commands.py` and W1-07's and W1-32's lists in W2-37's resume. The ticket's current `allowed_paths` no longer hold `commands.py`, and the CIT-P calls P-7 "the CTO's file".
+risks: if P-7 does not land with the bytes, W1-35 (x2) and W1-32 stay red. That fails closed: red checks, nothing lost.
+lessons: none
+proposed_decisions:
+- At approval, the owner settles the version line (C2): keep `1.0.0`, or bump. A bump touches two lines per template file (`version:` and `metadata.version:`) and changes every after-hash in §2.
+- The P-7 landing names W1-07's pinned list and W1-32's command-set assertion together with `commands.py`, as DEC-812 (6) did.
+unresolved: none
+recommended_next_action: put the CIT-P before the owner with C1–C3 as rows. Correct §4/§5's P-7 cost to name W1-32 and drop the "if" for W1-07, and keep the version question visible. Check the `31bf5ea07` lead_verify for W1-32.
+
+## CIT-P review
+
+Classification (DEC-809): C1 is in scope, ordinary work yes, other. C2 is in scope, ordinary work yes, other. C3 is out of scope, ordinary work yes, other. None fails open or loses work, so none blocks.
+
+**Checks:**
+- **Verbatim lines:** sound.
+- **sha256 before and after, both files:** sound.
+- **Expected copies' hashes:** sound (recomputed).
+- **Byte-equal:** sound.
+- **Cited ids exist and are ACCEPTED:** sound.
+- **The section matches `gov impact`:** sound. Run form, question form, the reported fields, `--out` and `--compare` are all as the command does them.
+- **DEC-105 options:** sound in form, but the cost of option 1 is incomplete (C3).
+- **The W1-35 lines `:991` and `:845`:** sound. They are the named cases.
+- **Nit, not a finding:** the record says `skill_validator.py` reads `RECORDED_GOV_COMMANDS`. It reads `GOV_COMMANDS`, which is built from that list; the effect is the same.
+
+**C1: one sentence outside the impact section changed, and it is disclosed.**
+- Setup and fault: DEC-816 names "the impact-assessment section", but the commit also rewrites the `## Tools` sentence (`gov closure` → `gov impact`, CAP-33.f → CAP-33.g). The record states this in its introduction and shows it in the diff. DEC-1163 (7) puts both whole files in the paths, and the step-3 `gov closure` mention under "CIT-P and CIT-E" is left alone and stated as such.
+- Should have been: what the owner approves is exactly what is shown, and it is.
+- Scope: in (the bytes). Ordinary work: yes, because widening a fix to the matching sentence is ordinary. Consequence: other.
+- Would reverse it: an owner reading that DEC-816 limits the bytes to the section's own lines.
+
+**C2: the version-line reasoning misreads the skill's own rule.**
+- Setup and fault: the record says "no rule fixes the number for a content change, so the bytes keep `1.0.0`". But this skill's lifecycle step 5 (CAP-24.c) says "on approval, the skill's frontmatter version is incremented". The rule fixes that the version increments, if not to what.
+- The record also says a bump is "one line in both files". The template frontmatter holds two version lines (`version: "1.0.0"` and `metadata.version: "1.0.0"`).
+- The record does offer the bump, so the owner is not misled about the choice.
+- Scope: in. Ordinary work: yes. Consequence: other (a version that was not incremented; no work lost).
+- Would reverse it: a decision that promotion, not the approved bytes, carries the increment.
+
+**C3: the P-7 cost is understated.**
+- Setup: the `impact` command is offered by `gov --help` on this branch.
+- Fault: W1-32's exact command-set case fails here with `impact` unrecorded, alongside four other tickets' commands. DEC-812 (6) names W1-07's lists and W1-32's assertion. The record names `commands.py`, W1-35, and "W1-07's/W1-26's lists, if their tests name the set". W1-07's do name it, and W1-32 is not mentioned.
+- Should have been: option 1's cost names W1-07's pinned list and W1-32's assertion outright.
+- Scope: out. It comes from the command (code), not the skill bytes, and P-7 is outside the ticket's paths. Ordinary work: yes. Consequence: other (fails closed: a red test).
+- Would reverse it: W1-32 green at `31bf5ea07` in the lead's run with `impact` recorded somewhere I did not find.
+
+Judgement: **pass**. The bytes are what the record says and the section describes the command truly. The rows are corrections to the record's text, not to the bytes.
+
+```verdict
+{"kpis": [{"kpi": "w2-37-cit-p", "verdict": "pass", "findings": [{"id": "C1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "C2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "C3", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}], "reviewer": "independent-auditor, fresh read-only session; not the author"}
+```
+
+## Narrow check
+
+Classification (DEC-809): N1 is out of scope, ordinary work yes, other. No blocker.
+
+**Probed and sound:**
+- **Named by a stated link:** a decision named only by a ticket's `sources:` (including a sub-item form `DEC-512 (3)`), by `closes:`, by a register `**Under:**` line, by a `**Changes:**` line, or by a worded `**Supersedes:**` is `deletable: false` and not R0, on a current graph.
+- **Named by nothing:** such a decision stays deletable at R0.
+- **What the item names itself:** does not count. The ticket and the register entries that do the naming stay deletable.
+- **Older store:** a real store without the table reads `stale` and makes nothing deletable. It fails closed.
+- **Nothing green before changed:** the refusals and the no-writes behaviour are unchanged. The edge-based baseline radii are identical under the old and new code; only the stated-link-named items moved, from open to closed.
+- **S1:** the plain-language question runs `gov impact` on the id through the CLI and prints its result.
+- **Commits:** in paths, with `Task: DAEO-6n5k` and the right role trailers.
+
+**N1: a decision named only by stated links lists nothing affected.**
+- Setup: decision DEC-510, named only by ticket T-1's `sources:`.
+- What happened: `gov impact DEC-510` says it is not deletable (R1), but `affected` lists nothing: T-1 is not shown as a ticket that depends on it. The walk still follows edges only.
+- This is the same as before F1 (a), which decided G-24's join only (DEC-1163 (7)).
+- Should have been, if wanted: the namer listed under `tickets`.
+- Scope: out (F1 (a) is the deletable join). Ordinary work: yes. Consequence: other (the deletable flag fails closed; the list under-reports).
+- Would reverse it: an owner reading that S1/CAP-33.b's affected list must include stated-link namers.
+
+Judgement: **pass**.
+
+```verdict
+{"kpis": [{"kpi": "S1", "verdict": "pass", "findings": []}, {"kpi": "S2", "verdict": "pass", "findings": [{"id": "N1", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}]}
+```

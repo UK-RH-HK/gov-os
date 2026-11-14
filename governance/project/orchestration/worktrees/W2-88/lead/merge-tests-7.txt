@@ -1,0 +1,7 @@
+W2-88 (DAEO-2bdu): merge td-7's run-5 acceptance cases (3923bf8469f7): RV2-1 (A9's undo touches only what A9 did, HEAD_MOVED) and RV2-2 (PLAN.md's unscanned list)
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-44.g, DEC-1098
+Rewrite-Reason: P1-W2-88-RV2-1 (a)
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

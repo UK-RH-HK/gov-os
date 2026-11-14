@@ -1,0 +1,8 @@
+log: W2-37-A5-v110.json
+W2: W2-37
+status: DONE. Verified head `7bde87727b0f`, `git status --short` is empty. lead_verify is RED with 8 failures. None of them is in the ticket's paths, and none is listed in skip_known.json. Four will only pass once the CTO's P-7 and copies ACT land; the other four belong to other tickets (see `tests`).
+
+task: DAEO-6n5k (W2-37, gov impact): short resume after the owner approved "yes W2-37 CIT-P a25b02a7, version 1.1.0" (DEC-1166 (4))
+status: DONE. Verified head `7bde87727b0f`, `git status --short` is empty. lead_verify is RED with 8 failures. None of them is in the ticket's paths, and none is listed in skip_known.json. Four will only pass once the CTO's P-7 and copies ACT land; the other four belong to other tickets (see `tests`).
+work_completed:
+- (1) Merged `w2/integrate` into the branch: `e8c414b0d`, one command, `--no-ff`, `Task: DAEO-6n5k`, `Role: orchestrator`. It touches none of the tic

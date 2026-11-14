@@ -1,0 +1,72 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 19:09:45)
+231: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+......F.F......F...........................................              [100%]
+=================================== FAILURES ===================================
+_______ test_gov_now_with_an_offset_is_that_instant_and_that_wall_clock ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7cde6f6ae300>
+
+    def test_gov_now_with_an_offset_is_that_instant_and_that_wall_clock(monkeypatch):
+        monkeypatch.setenv("GOV_NOW", "2026-11-13T23:30:00-05:00")
+        now = integration.now()
+        assert now == datetime.fromisoformat("2026-11-14T04:30:00+00:00")
+>       assert integration.at_time(now, (18, 0)).isoformat() == "2026-11-13T18:00:00-05:00"  # that offset's date
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert '2026-11-14T18:00:00+00:00' == '2026-11-13T18:00:00-05:00'
+E         
+E         - 2026-11-13T18:00:00-05:00
+E         ?          ^         ^ ^
+E         + 2026-11-14T18:00:00+00:00
+E         ?          ^         ^ ^
+
+tests/unit/rebuild/test_w2_116_when_due.py:211: AssertionError
+__________________ test_without_gov_now_it_is_the_real_clock ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7cde6fb07e60>
+
+    def test_without_gov_now_it_is_the_real_clock(monkeypatch):
+>       monkeypatch.delenv("GOV_NOW")
+
+tests/unit/rebuild/test_w2_116_when_due.py:221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/lib/python3.12/site-packages/_pytest/monkeypatch.py:340: in delenv
+    self.delitem(environ, name, raising=raising)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_pytest.monkeypatch.MonkeyPatch object at 0x7cde6fb07e60>
+dic = environ({'SHELL': '/bin/bash', 'CLAUDE_CODE_SUBAGENT_MODEL': 'claude-opus-5-5', 'COREPACK_ENABLE_AUTO_PIN': '0', 'CLAU...'GOV_VECTOR_CACHE_DIR': '/tmp/gov-launch-43mabuy1/claude-1000/pytest-of-usain/pytest-2/vector-cache/2652fba1e6c3baaf'})
+name = 'GOV_NOW', raising = True
+
+    def delitem(self, dic: Mapping[K, V], name: K, raising: bool = True) -> None:
+        """Delete ``name`` from dict.
+    
+        Raises ``KeyError`` if it doesn't exist, unless ``raising`` is set to
+        False.
+        """
+        if name not in dic:
+            if raising:
+>               raise KeyError(name)
+E               KeyError: 'GOV_NOW'
+
+../../.local/lib/python3.12/site-packages/_pytest/monkeypatch.py:307: KeyError
+____ test_due_runs_the_refresh_names_its_reason_and_writes_the_record_whole ____
+
+project = (PosixPath('/tmp/gov-launch-43mabuy1/claude-1000/pytest-of-usain/pytest-2/test_due_runs_the_refresh_name0/project'), P...00/pytest-of-usain/pytest-2/test_due_runs_the_refresh_name0/stores/store'), [], {'fails': False, 'status': 'switched'})
+
+    def test_due_runs_the_refresh_names_its_reason_and_writes_the_record_whole(project):
+        root, link, calls, state = project
+        _now(f"{DAY}T10:00:00+01:00")
+        result = _run(root)
+>       assert calls == [(root, "integrate")]
+E       AssertionError: assert [] == [(PosixPath('... 'integrate')]
+E         
+E         Right contains one more item: (PosixPath('/tmp/gov-launch-43mabuy1/claude-1000/pytest-of-usain/pytest-2/test_due_runs_the_refresh_name0/project'), 'integrate')
+E         Use -v to get more diff
+
+tests/unit/rebuild/test_w2_116_when_due.py:335: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/rebuild/test_w2_116_when_due.py::test_gov_now_with_an_offset_is_that_instant_and_that_wall_clock
+FAILED tests/unit/rebuild/test_w2_116_when_due.py::test_without_gov_now_it_is_the_real_clock
+FAILED tests/unit/rebuild/test_w2_116_when_due.py::test_due_runs_the_refresh_names_its_reason_and_writes_the_record_whole
+3 failed, 56 passed, 76 deselected in 3.35s
+exit=1

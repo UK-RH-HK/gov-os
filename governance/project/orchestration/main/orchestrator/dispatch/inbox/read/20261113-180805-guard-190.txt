@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 191
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_013Z83nAGLndZTL5CF12jrLn", "time": "2026-11-13T16:20:10.098Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-88/fa647d9d-1cf1-4be9-adfc-2a44e4261318.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-88", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-88/tests/acceptance/W2-88; git diff a15de913e8c4 HEAD -- README.md | grep \"^+\" | grep -o \"test_[a-z0-9_]*\\.py::test_[a-z0-9_]*\" | sort -u > \"$TMPDIR/probe/mapped.txt", "rule": "the call reads files whose names another command gives at run time, from a listing whose start the guard canno

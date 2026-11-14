@@ -1,0 +1,5 @@
+Merge w2/W2-116-tests (DAEO-f58b): pass 2c: the seven other tickets' test files revised to R2-F3's f token key and S2's integration_store status part (6666cec2c, DEC-1156 (7))
+
+Task: DAEO-f58b
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

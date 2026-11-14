@@ -1,0 +1,32 @@
+== 2026-11-14 04:04:22 nightly_cron: start
+code: governance/project/orchestration/nightly at 8f68e0c7c, tree 7f71884f3913
+rotate: done
+2026-11-14 04:04:22 nightly night: estimate {"estimate_s": 3093, "parallel_s": 1442, "serial_s": 1327, "setup_s": 43, "effective_workers": 11.6, "margin": 1.1, "runs": ["history", "history", "history"]}
+latest start 07:08
+head f3d3438fcb45
+seed: seeded (copy): vectors only, 30255 vectors from /home/usain/gov-os-worktrees/W2-00-store-a at f3d3438fcb45 in 4.7 s
+secrets full scan: off by configuration (DEC-1045)
+clone rebuilt
+gate: OPEN full-run leads=2 load=12.2/6.6 nproc=20 have=17351308kB need=12123084kB
+heavy-job slots held: 1 of 3 (waited 1893 s)
+the suites' thread budget and CPU sets: the gate's, for the slots held (1)
+heavy-job slots released after the suites
+parallel exit 1 in 3329 s: 7 failed, 17369 passed, 89 skipped, 3 xfailed, 6 warnings in 3093.66s (0:51:33)
+serial exit 1 in 1798 s: 4 failed, 138 passed, 48 deselected, 1 warning in 1650.09s (0:27:30)
+serial: 142 cases run
+red-alone tests/acceptance/W2-175/test_w2_175_record.py::test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-cto]: 1 failed in 0.16s
+red-alone tests/acceptance/W2-175/test_w2_175_record.py::test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-lead]: 1 failed in 0.18s
+passes-alone tests/acceptance/W2-45/test_s1_decision_checker_merges.py::test_s1_merges_decision_checker_runs_within_the_gov_check_budget_on_a_history_with_merges
+passes-alone tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung]
+passes-alone tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500]
+red-alone tests/acceptance/W2-130/test_w2_130_record.py::test_s8_gov_links_at_head_gives_the_after_counts: 1 failed in 6.21s
+red-alone tests/acceptance/W2-130/test_w2_130_record.py::test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head: 1 failed in 5.62s
+accepted-red tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+red-alone tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit: 1 failed in 206.70s (0:03:26)
+red-alone tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here: 1 failed in 337.53s (0:05:37)
+accepted-red tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget
+verdict: red 6
+duration: estimate 3093 s, actual 7731 s (setup 78 s, lock wait 1893 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261114-0404
+2026-11-14 06:13:13 done
+== 2026-11-14 06:13:13 nightly_cron: end, exit 0

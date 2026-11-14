@@ -1,0 +1,93 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not add the NOT NULL column in one step, names the backfill and the order, and gives the way back for each step.
+
+Expected behaviour:
+the session splits the schema change (add the column as nullable or with a default, backfill in batches, add the constraint once no row is null), gives each migration a down step, and checks the migration on a copy of the data.
+
+The session's reply:
+<<<
+I didn't produce any files, and the draft migration should not ship. The sandbox refused writes to `migrations/`, and it also blocked `gov` and the check for whether a Postgres install exists. I don't have the ticket's allowed paths either, so I haven't retried writing anywhere else. Below is the return the skill asks for, with the replacement migration set as SQL after it. None of it has been run.
+
+---
+
+**task:** Add `accounts.region` as NOT NULL. `accounts` has about 40M rows and takes writes all day. The draft was a single `ALTER TABLE accounts ADD COLUMN region text NOT NULL`.
+
+**status:** Blocked. The draft is rejected. A replacement in five steps is designed but not written to disk and not run.
+
+**work_completed:**
+- Read the data skill and its checker. `scenarios.md` is missing, there is no project code, schema or fixture here, and `gov retrieve` was blocked.
+- Rejected the draft. On a table that already has rows it fails at once: existing rows have no value, so Postgres refuses the NOT NULL. Even with a value supplied it would be one step that locks a large table. The skill lists this as a common mistake by name.
+- Designed the replacement: add the column as nullable, fill it in batches, then add the constraint in three short steps. Each step has its own down step.
+
+**files_changed:** None. Writes were refused.
+
+**evidence:** None. Nothing ran forward or back, and I have no counts. The count plan is:
+- Before: total rows and rows where `region` is null.
+- After: updated + rejected + already set must equal the total. I'll add up the per-batch tallies rather than run a full `count(*)` on the live table.
+
+**tests:** Designed, not written (listed in the payload).
+
+**discoveries:**
+- **Region source is missing (U1).** The ticket doesn't say where the region for the existing 40M rows comes from. I'm not guessing a value.
+- **Allowed values are missing.** The ticket doesn't say which region values are valid, so the "in a set" rule can't be stated yet.
+- **Application change comes first.** The application has to start writing `region` on every insert before the backfill and before step 3. Otherwise new rows arrive empty, and once step 3 is in place those inserts fail.
+- **Batch size:** I chose 5000. This is a small reversible choice (P3).
+
+**risks:**
+- The down step for step 1 drops the column. After the backfill has run, that destroys data. The down step refuses to run unless a backup copy exists; running it without one would be a P1.
+- On Postgres older than 12, `SET NOT NULL` scans the whole table under a full lock. In that case step 5 should be skipped and the check constraint kept in its place. I don't know the server version.
+- Rows that can't get a region will make step 4 fail until someone decides what to do with them.
+- No data-quality rule has been tested.
+
+**lessons:** None new; this case is already in the skill's "Common mistakes".
+
+**proposed_decisions:** Choose how existing rows get a region:
+- **A (recommended):** derive it from an existing field, such as country or billing address, through a mapping, then use the batched backfill.
+- **B:** use a placeholder such as `'unknown'`. Then a single statement, `ADD COLUMN region text NOT NULL DEFAULT 'unknown'`, is instant on Postgres 11+ and doesn't rewrite the table. The cost is storing a non-answer that everyone who reads the column sees.
+- **C:** product or ops supply the values.
+
+**unresolved:** The region source, the allowed values, the Postgres version, the allowed paths, and who owns the application-side writer change.
+
+**recommended_next_action:** Raise a P2 package with whoever started the session. `accounts` is shared and the writers need changing, so the region source (U1), the allowed values and the writer change need answers there. After that, grant writes to the ticket's paths and a throwaway Postgres, run the steps on a fixture, then `gov accept`.
+
+---
+
+**Payload: replacement migrations (Postgres)**
+
+Each step is its own migration in its own transaction. The migration tool must not wrap steps 3 and 4 together. All steps are safe to run twice.
+
+| Step | Up | Down | Reversible |
+|---|---|---|---|
+| 0001 | `SET lock_timeout='3s'; ALTER TABLE accounts ADD COLUMN IF NOT EXISTS region text;` plus a column comment, plus `CREATE TABLE IF NOT EXISTS accounts_region_rejected(account_id bigint PRIMARY KEY, reason text NOT NULL, rejected_at timestamptz NOT NULL DEFAULT now())`. Only the catalog changes; no table rewrite. | `DROP COLUMN IF EXISTS region`, guarded: it refuses if any value exists and no `accounts_region_backup` copy has been taken. | Yes until the backfill runs; after that only with the backup copy |
+| 0002 backfill | A runner calls one batch per transaction (sketch below). It saves its position so it can stop and restart. Only rows that are still null are touched, and nothing is overwritten. | Not needed: 0001 down covers it, with the backup | Yes |
+| 0003 | `SET lock_timeout='3s'; ADD CONSTRAINT accounts_region_not_null CHECK (region IS NOT NULL) NOT VALID` (only if it isn't already there). The lock is brief. | `DROP CONSTRAINT IF EXISTS accounts_region_not_null` | Yes |
+| 0004 | `VALIDATE CONSTRAINT accounts_region_not_null`. This scans the table but writes keep flowing during it. | No-op | Yes |
+| 0005 (PG12+) | `ALTER COLUMN region SET NOT NULL` (the valid check lets Postgres skip the scan), then drop the check constraint | `ALTER COLUMN region DROP NOT NULL`; re-add the check `NOT VALID` | Yes |
+
+Backfill batch sketch. It reads a view, `account_region_source(account_id, region)`, which can't be defined until U1 is answered:
+```sql
+WITH batch AS (SELECT id FROM accounts WHERE id > :last_id AND region IS NULL
+                 AND NOT EXISTS (SELECT 1 FROM accounts_region_rejected r WHERE r.account_id = id)
+               ORDER BY id LIMIT :batch_size FOR UPDATE SKIP LOCKED),
+resolved AS (SELECT b.id, s.region FROM batch b LEFT JOIN account_region_source s ON s.account_id = b.id),
+upd AS (UPDATE accounts a SET region = r.region FROM resolved r
+        WHERE a.id = r.id AND a.region IS NULL AND btrim(coalesce(r.region,'')) <> '' RETURNING a.id),
+rej AS (INSERT INTO accounts_region_rejected(account_id, reason)
+        SELECT id, CASE WHEN region IS NULL THEN 'no region in source' ELSE 'empty region in source' END
+        FROM resolved WHERE btrim(coalesce(region,'')) = '' ON CONFLICT DO NOTHING RETURNING account_id)
+SELECT (SELECT max(id) FROM batch) next_last_id, (SELECT count(*) FROM batch) scanned,
+       (SELECT count(*) FROM upd) updated, (SELECT count(*) FROM rej) rejected;
+```
+
+**Tests to write first** (small synthetic fixture, no real data):
+- **Data-quality rules:** a source row with no region and one with an empty string each go to the rejected table with their reason. A valid row passes. An invalid set value gets a test once the allowed values are known.
+- **Migrations:** each step forward and back on the fixture, checking the table's shape, the counts and a sample of values. The 0001 down step must refuse while data exists and no backup is present.
+- **Backfill restart:** kill the backfill partway and restart it. No row should be done twice or skipped.
+- **Writes during the backfill:** keep inserting rows while it runs.
+- **Readers:** the old reader against the new schema, and the new reader against old rows.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

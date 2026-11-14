@@ -1,0 +1,5083 @@
+{
+ "store": {
+  "head": "3d1c459ed3d17b75150a97e2f622ad1b48569158",
+  "records": 1975,
+  "records_by_type": {
+   "evidence": 8,
+   "decision": 1075,
+   "specification": 9,
+   "research": 6,
+   "capability": 276,
+   "close": 18,
+   "checkpoint": 364,
+   "task": 194,
+   "decision-package": 1,
+   "failure": 1,
+   "lesson": 6,
+   "change-execution-record": 7,
+   "change-impact-proposal": 5,
+   "plan": 5
+  },
+  "edges": 757,
+  "edges_by_type": {
+   "CONSTRAINS": 9,
+   "DEPENDS_ON": 743,
+   "IMPLEMENTS": 2,
+   "SUPERSEDES": 3
+  },
+  "edge_pairs_by_kind": {
+   "CONSTRAINS:decision->decision": 1,
+   "CONSTRAINS:decision->specification": 2,
+   "CONSTRAINS:lesson->task": 6,
+   "DEPENDS_ON:decision->decision": 1,
+   "DEPENDS_ON:capability->specification": 62,
+   "DEPENDS_ON:capability->capability": 214,
+   "DEPENDS_ON:specification->decision": 2,
+   "DEPENDS_ON:specification->specification": 7,
+   "DEPENDS_ON:task->task": 440,
+   "DEPENDS_ON:plan->decision": 1,
+   "DEPENDS_ON:plan->specification": 8,
+   "DEPENDS_ON:plan->plan": 8,
+   "IMPLEMENTS:decision->specification": 2,
+   "SUPERSEDES:decision->decision": 3
+  },
+  "commits": 4575,
+  "indexed_files": 0
+ },
+ "register_dec_mentions_total": 9137,
+ "register_dec_mentions_in_spans_incl_self": 8857,
+ "register": {
+  "entries": 1068,
+  "status_words": {
+   "PROPOSED": 40,
+   "CONDITIONAL": 1,
+   "REJECTED": 1,
+   "ACCEPTED": 1013,
+   "SUPERSEDED": 8,
+   "DONE": 5
+  },
+  "fields_with_ids": {
+   "Under": 2469,
+   "Decision": 2266,
+   "Status": 331,
+   "Basis": 248,
+   "Changed by": 206,
+   "Changes": 179,
+   "Amends": 64,
+   "Refines": 59,
+   "Next": 50,
+   "Decision and record": 25,
+   "Extends": 24,
+   "Accepted as written": 21,
+   "Granularity": 21,
+   "Ratifies": 19,
+   "Residual": 15,
+   "Lifted by": 15,
+   "Accepted as realised by later decisions": 12,
+   "The order from here": 12,
+   "Target": 12,
+   "Principle": 10,
+   "Superseded": 9,
+   "Corrects": 9,
+   "Order from here": 9,
+   "How it is applied": 9,
+   "Implements": 8,
+   "Confirms": 8,
+   "The deviation": 8,
+   "Paths added for the second run": 8,
+   "Replaces": 8,
+   "The old entry is marked at once": 8,
+   "The probe is a pass": 7,
+   "Why": 7,
+   "The cause": 7,
+   "Supersedes": 6,
+   "Unchanged": 6,
+   "Daily spellings": 6,
+   "Noted": 6,
+   "Agents read freely": 6,
+   "Settles": 5,
+   "Tests": 5,
+   "Stale evidence": 5,
+   "A check command that succeeds": 5,
+   "What the reviewer held": 5,
+   "Refused for": 5,
+   "With the owner": 5,
+   "The adapter output applied": 5,
+   "Applied by the orchestrator": 5,
+   "Compact the decisions": 5,
+   "Record": 4,
+   "Verification": 4,
+   "Note": 4,
+   "Withdraws": 4,
+   "Red checks": 4,
+   "Deviation for the exit auditor": 4,
+   "Removed by the owner": 4,
+   "Done": 4,
+   "Ticket change": 3,
+   "Built": 3,
+   "Retry": 3,
+   "Named deviation for the exit auditor": 3,
+   "List rows": 3,
+   "In this batch": 3,
+   "Rows": 3,
+   "Worksteal": 3,
+   "Found before the queue": 3,
+   "The registry line": 3,
+   "Until it lands": 3,
+   "The roles spec before building": 3,
+   "Decisions": 3,
+   "Amended": 3,
+   "No install for the hit": 3,
+   "Consequence": 2,
+   "Outcome of": 2,
+   "Scopes": 2,
+   "Context": 2,
+   "Store freshness": 2,
+   "Named residual": 2,
+   "Checked first": 2,
+   "Why now": 2,
+   "Side effect": 2,
+   "The test": 2,
+   "The list shrinks": 2,
+   "The change record is corrected": 2,
+   "Never committed": 2,
+   "One canonical judgement text": 2,
+   "Added by the owner": 2,
+   "What agents need to search stays memory": 2,
+   "Pushing": 2,
+   "The installs": 2,
+   "How": 2,
+   "Priority": 2,
+   "Later packages": 2,
+   "Everything else stays red": 2,
+   "The early warning": 2,
+   "Who and where": 2,
+   "If the smoke test passes": 2,
+   "ACT commands in a file": 2,
+   "Where it goes": 2,
+   "Leads": 2,
+   "The mapping": 2,
+   "The nightly": 2,
+   "The same remedy": 2,
+   "Standing for the emergency": 2,
+   "The templates": 2,
+   "No private embedder in the launch sandbox": 2,
+   "Measurement": 1,
+   "Alternatives considered": 1,
+   "Default until triggered": 1,
+   "Primary metric": 1,
+   "Open": 1,
+   "Deferred": 1,
+   "Closed": 1,
+   "Consistent with": 1,
+   "For": 1,
+   "Amended by": 1,
+   "Decision as given in the brief": 1,
+   "Scoped by": 1,
+   "Reverses": 1,
+   "Clarifies": 1,
+   "Narrows": 1,
+   "Closes": 1,
+   "Restores": 1,
+   "Measured": 1,
+   "Ratification": 1,
+   "Indexing": 1,
+   "Owner decisions are staged in batches": 1,
+   "The plan is approved": 1,
+   "Measured first": 1,
+   "The rows are accepted as sorted": 1,
+   "Under review by": 1,
+   "A checkpoint is written at every handover": 1,
+   "Model": 1,
+   "Measured before and after": 1,
+   "The backstop": 1,
+   "Delegated decisions accepted by the owner": 1,
+   "Verified byte for byte": 1,
+   "How a session keeps to it": 1,
+   "Then": 1,
+   "The requirements live on": 1,
+   "What": 1,
+   "Its only entry": 1,
+   "Its tests": 1,
+   "No hook behaviour changes": 1,
+   "Part B": 1,
+   "What follows": 1,
+   "Every standing practice settled": 1,
+   "The schedule": 1,
+   "Drift": 1,
+   "Launch order": 1,
+   "The reserve": 1,
+   "Release the closes now": 1,
+   "Watch": 1,
+   "Escalate if it keeps happening": 1,
+   "The work order in parallel": 1,
+   "Withdrawn": 1,
+   "Filed as recommended": 1,
+   "The baseline": 1,
+   "The homes": 1,
+   "The hidden half never chooses": 1,
+   "Rationale": 0,
+   "Revisit trigger": 0,
+   "Gates": 0,
+   "Evidence": 0,
+   "Pin": 0,
+   "Extension point": 0,
+   "CI": 0,
+   "Explicitly not used": 0,
+   "Why changed": 0,
+   "Known limitation": 0,
+   "Risk": 0,
+   "Alternatives": 0,
+   "Install note": 0,
+   "Upgrade path": 0,
+   "Licence rule": 0,
+   "Constraint": 0,
+   "Verdict by use": 0,
+   "Hosting options": 0,
+   "BMAD": 0,
+   "Rule": 0,
+   "Lock": 0,
+   "Gates extended": 0,
+   "Motivation": 0,
+   "Carry as archived reference only": 0,
+   "Leave behind": 0,
+   "Archive": 0,
+   "Diagnosis recorded": 0,
+   "Control panel": 0,
+   "Owner answers": 0,
+   "Correction": 0,
+   "Addition": 0,
+   "Known limit": 0,
+   "First use": 0,
+   "Accepted residual": 0,
+   "Still in force": 0,
+   "Exception to": 0,
+   "Iterations": 0,
+   "The ratification": 0,
+   "Scope": 0,
+   "Hook events": 0,
+   "Timeouts": 0,
+   "Matchers": 0,
+   "Deny rules": 0,
+   "No Read deny rule survives": 0,
+   "Env block": 0,
+   "Other keys": 0,
+   "Cause": 0,
+   "What happened": 0,
+   "The exit clones": 0,
+   "Corpora": 0,
+   "Retrieval": 0,
+   "Accuracy": 0,
+   "Stacking": 0,
+   "Not decided here": 0,
+   "The rule": 0,
+   "Briefs": 0,
+   "Then leads run sandboxed": 0,
+   "The condition": 0,
+   "The behaviour": 0,
+   "No further early start now": 0,
+   "One option reader": 0,
+   "Where": 0,
+   "A commit is needed sooner only": 0,
+   "No push": 0,
+   "KPIs": 0,
+   "What the orchestrator commits": 0,
+   "How it signs": 0,
+   "Size": 0,
+   "Adds to": 0,
+   "Tickets": 0,
+   "Keystones": 0,
+   "Classification": 0,
+   "Lens H stays held": 0,
+   "One list of owner acts": 0,
+   "Now": 0,
+   "Pants is not adopted now": 0,
+   "The auditors": 0,
+   "A short synthesis across the areas": 0,
+   "How the orchestrator applies it": 0,
+   "Its tests decide": 0,
+   "When": 0,
+   "How it is recorded": 0,
+   "The budgets": 0,
+   "The live gaps": 0,
+   "The interim guard is approved now": 0,
+   "Starts": 0,
+   "What it may remove": 0,
+   "Its conditions": 0,
+   "What it never touches": 0,
+   "How it runs": 0,
+   "Two rows": 0,
+   "Not now": 0,
+   "The order": 0,
+   "Peak": 0,
+   "The results": 0,
+   "Time": 0,
+   "The list": 0,
+   "The fix": 0,
+   "The last round": 0,
+   "Origin": 0,
+   "Backup ref": 0,
+   "Reset and merge": 0,
+   "Containment": 0,
+   "Trailer gate": 0,
+   "Part A": 0,
+   "Rollback": 0,
+   "The pin": 0,
+   "The pinned judge": 0,
+   "The early warnings": 0,
+   "Settings changes": 0,
+   "The window": 0,
+   "Start conditions": 0,
+   "The locks": 0,
+   "For every adopted product": 0,
+   "The declared checks": 0,
+   "Both branches pushed": 0,
+   "Mutation testing as a standing practice": 0,
+   "Until the owner chooses": 0,
+   "What it could let through": 0,
+   "One package": 0,
+   "Hold only what an item blocks": 0,
+   "A morning with nothing to report": 0,
+   "One condition": 0,
+   "The packages": 0,
+   "The rest as proposed": 0,
+   "Leads started that day": 0,
+   "The tools": 0,
+   "Closes take priority": 0,
+   "The locks and windows stay": 0,
+   "The daily document reports": 0,
+   "The register of gaps": 0,
+   "Fixing": 0,
+   "Removed": 0,
+   "Nothing was installed": 0,
+   "Speed": 0,
+   "The nightly is frozen as it is": 0,
+   "Filed tickets that wait": 0,
+   "The parking list": 0,
+   "Progress": 0,
+   "A and B": 0,
+   "The guard keeps four rules": 0,
+   "Also approved": 0,
+   "A research session now": 0,
+   "Effort": 0,
+   "Emergency": 0,
+   "Record each false positive": 0,
+   "Report": 0,
+   "Tests run no more than this": 0,
+   "What was found": 0,
+   "Effect": 0,
+   "The amendment": 0,
+   "Applied now": 0,
+   "The fallback": 0,
+   "What is timed around it moves": 0,
+   "The lesson": 0,
+   "No bigger machine now": 0,
+   "The stores": 0,
+   "The shared reranker": 0,
+   "The order of closes and work": 0,
+   "Then the critical chain": 0,
+   "The batch of eight": 0,
+   "No ticket sits merged but not closed": 0,
+   "A safety net for the quiet hours": 0,
+   "Into the Gov OS": 0,
+   "Apply it": 0,
+   "The four gaps": 0,
+   "Close in batches": 0,
+   "Standing": 0,
+   "The dispatcher is versioned": 0,
+   "The peaks and slots plan approved": 0,
+   "Option A": 0,
+   "The test suite": 0,
+   "Tonight": 0,
+   "Source": 0,
+   "The cut": 0,
+   "Quiet hours": 0,
+   "The reranker trial": 0,
+   "The embedder": 0,
+   "The writers": 0,
+   "A standing model bench": 0,
+   "A new measurement set": 0,
+   "The finer choice measure": 0,
+   "A standing rule": 0,
+   "The order stands": 0,
+   "The rule for structural fixes": 0,
+   "The proof of the structure is consistency": 0,
+   "Only then the reranker trial": 0,
+   "First a census": 0
+  },
+  "cites_instances": 7310,
+  "cites_pairs": 5002,
+  "cites_resolvable_pairs": 5001,
+  "cites_in_graph_pairs": 6,
+  "statements_by_class": {
+   "settle": 17,
+   "amend": 447,
+   "supersede": 71,
+   "mark": 18,
+   "refine": 62,
+   "implement": 8,
+   "extend": 24,
+   "under": 2468,
+   "confirm": 8,
+   "ratify": 19
+  },
+  "statements_by_class_whole": {
+   "settle": 1,
+   "amend": 32,
+   "supersede": 12,
+   "mark": 0,
+   "refine": 56,
+   "implement": 7,
+   "extend": 24,
+   "under": 1405,
+   "confirm": 8,
+   "ratify": 18
+  },
+  "statements_pairs_by_class": {
+   "settle": 12,
+   "amend": 343,
+   "supersede": 55,
+   "mark": 17,
+   "refine": 62,
+   "implement": 8,
+   "extend": 24,
+   "under": 2468,
+   "confirm": 8,
+   "ratify": 19
+  },
+  "own_status_line_marks": 153,
+  "preamble_statements": 4,
+  "supersedes_edges_from_register": [
+   "DEC-048->DEC-038",
+   "DEC-051->DEC-048",
+   "DEC-961->DEC-960"
+  ]
+ },
+ "drift": {
+  "supersede": {
+   "targets_stated": 57,
+   "targets_current": 43,
+   "current_whole": 1,
+   "current_no_hint_in_span": 8,
+   "current_no_hint_status_line": 9,
+   "chunks_of_current": 0,
+   "chunks_without_hint": 0,
+   "not_current_already": [
+    "DEC-002",
+    "DEC-038",
+    "DEC-043",
+    "DEC-045",
+    "DEC-047",
+    "DEC-048",
+    "DEC-056",
+    "DEC-062",
+    "DEC-636",
+    "DEC-798",
+    "DEC-869",
+    "DEC-875",
+    "DEC-876",
+    "DEC-960"
+   ]
+  },
+  "amend": {
+   "targets_stated": 208,
+   "targets_current": 199,
+   "current_whole": 27,
+   "current_no_hint_in_span": 88,
+   "current_no_hint_status_line": 89,
+   "chunks_of_current": 0,
+   "chunks_without_hint": 0,
+   "not_current_already": [
+    "DEC-005",
+    "DEC-007",
+    "DEC-024",
+    "DEC-034",
+    "DEC-037",
+    "DEC-040",
+    "DEC-044",
+    "DEC-045",
+    "DEC-798"
+   ]
+  },
+  "either": {
+   "current": 218,
+   "no_hint_in_span": 88
+  },
+  "spent_per_archive": {
+   "ids": 111,
+   "current": 110
+  },
+  "archive_A_statements": 83,
+  "archive_A_targets_current": 55,
+  "archive_A_targets_not_found_in_register_text": [
+   "DEC-004",
+   "DEC-289",
+   "DEC-361",
+   "DEC-828"
+  ],
+  "proposed_or_done_current_but_stated": [
+   "DEC-002",
+   "DEC-005",
+   "DEC-007",
+   "DEC-024",
+   "DEC-034",
+   "DEC-037",
+   "DEC-040",
+   "DEC-043",
+   "DEC-044",
+   "DEC-045",
+   "DEC-047",
+   "DEC-056",
+   "DEC-062"
+  ]
+ },
+ "drift_examples": {
+  "supersede": [
+   {
+    "id": "DEC-053",
+    "by": [
+     "DEC-165"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** reversed by",
+     "**Reverses:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: reverses"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-072",
+    "by": [
+     "DEC-064"
+    ],
+    "whole": false,
+    "forms": [
+     "text: superseded by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-120",
+    "by": [
+     "DEC-172",
+     "DEC-173",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** withdrawn by",
+     "**Withdraws:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: withdraws"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-140",
+    "by": [
+     "DEC-842"
+    ],
+    "whole": true,
+    "forms": [
+     "**Changed by:** withdrawn by",
+     "**Withdraws:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-150",
+    "by": [
+     "DEC-156"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-151",
+    "by": [
+     "DEC-172",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** withdrawn by",
+     "**Withdraws:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-183",
+    "by": [
+     "DEC-371"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "**Supersedes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-208",
+    "by": [
+     "DEC-838"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-237",
+    "by": [
+     "DEC-838"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-248",
+    "by": [
+     "DEC-838"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-365",
+    "by": [
+     "DEC-409"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-407",
+    "by": [
+     "DEC-409"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-448",
+    "by": [
+     "DEC-477"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "**Supersedes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: replaces"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-451",
+    "by": [
+     "DEC-838"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-460",
+    "by": [
+     "DEC-839"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: replaced by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-508",
+    "by": [
+     "DEC-820"
+    ],
+    "whole": false,
+    "forms": [
+     "**Replaces:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-526",
+    "by": [
+     "DEC-541",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "**Supersedes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-605",
+    "by": [
+     "DEC-822"
+    ],
+    "whole": false,
+    "forms": [
+     "**Replaces:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-665",
+    "by": [
+     "DEC-838"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-709",
+    "by": [
+     "DEC-719"
+    ],
+    "whole": false,
+    "forms": [
+     "text: replaces"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-723",
+    "by": [
+     "DEC-820"
+    ],
+    "whole": false,
+    "forms": [
+     "**Replaces:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-724",
+    "by": [
+     "DEC-860",
+     "DEC-861"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "change log: replaces"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-726",
+    "by": [
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-737",
+    "by": [
+     "DEC-847"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "**Replaces:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-742",
+    "by": [
+     "DEC-942"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-761",
+    "by": [
+     "DEC-772"
+    ],
+    "whole": false,
+    "forms": [
+     "text: replaces"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-776",
+    "by": [
+     "DEC-847"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "**Replaces:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-786",
+    "by": [
+     "DEC-847"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "**Replaces:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-788",
+    "by": [
+     "DEC-861"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-813",
+    "by": [
+     "DEC-889"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-821",
+    "by": [
+     "DEC-873"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-829",
+    "by": [
+     "DEC-831"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** ended by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-831",
+    "by": [
+     "DEC-941"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-843",
+    "by": [
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-847",
+    "by": [
+     "DEC-942"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-850",
+    "by": [
+     "DEC-855"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** replaced by",
+     "**Replaces:**",
+     "text: replaces"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-852",
+    "by": [
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** superseded by",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-904",
+    "by": [
+     "DEC-905"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-936",
+    "by": [
+     "DEC-938",
+     "DEC-946"
+    ],
+    "whole": false,
+    "forms": [
+     "text: replaced by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-939",
+    "by": [
+     "DEC-945"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: reversed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-952",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "text: superseded by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1053",
+    "by": [
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "text: withdrawn by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1066",
+    "by": [
+     "DEC-1067"
+    ],
+    "whole": false,
+    "forms": [
+     "text: replaces"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   }
+  ],
+  "amend": [
+   {
+    "id": "DEC-030",
+    "by": [
+     "DEC-080"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-039",
+    "by": [
+     "DEC-075"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-066",
+    "by": [
+     "DEC-094"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-070",
+    "by": [
+     "DEC-096"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-082",
+    "by": [
+     "DEC-096"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-083",
+    "by": [
+     "DEC-163"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-090",
+    "by": [
+     "DEC-741"
+    ],
+    "whole": false,
+    "forms": [
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-093",
+    "by": [
+     "DEC-220"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-096",
+    "by": [
+     "DEC-953",
+     "DEC-1010"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-107",
+    "by": [
+     "DEC-117"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-121",
+    "by": [
+     "DEC-127"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-150",
+    "by": [
+     "DEC-156"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amended by:**",
+     "**Amends:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-153",
+    "by": [
+     "DEC-209"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-156",
+    "by": [
+     "DEC-165",
+     "DEC-176",
+     "DEC-434"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-157",
+    "by": [
+     "DEC-209"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-162",
+    "by": [
+     "DEC-156"
+    ],
+    "whole": false,
+    "forms": [
+     "text: amended by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-176",
+    "by": [
+     "DEC-365",
+     "DEC-402"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-180",
+    "by": [
+     "DEC-311"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-183",
+    "by": [
+     "DEC-205",
+     "DEC-235"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-192",
+    "by": [
+     "DEC-202",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-208",
+    "by": [
+     "DEC-237",
+     "DEC-250"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-220",
+    "by": [
+     "DEC-416",
+     "DEC-974"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-235",
+    "by": [
+     "DEC-363"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-237",
+    "by": [
+     "DEC-250"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-241",
+    "by": [
+     "DEC-316"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-250",
+    "by": [
+     "DEC-420"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-253",
+    "by": [
+     "DEC-912"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-258",
+    "by": [
+     "DEC-264"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-261",
+    "by": [
+     "DEC-798",
+     "DEC-1033"
+    ],
+    "whole": false,
+    "forms": [
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: amended by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-269",
+    "by": [
+     "DEC-394"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-281",
+    "by": [
+     "DEC-208",
+     "DEC-237",
+     "DEC-838",
+     "DEC-901"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-285",
+    "by": [
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-290",
+    "by": [
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-293",
+    "by": [
+     "DEC-300"
+    ],
+    "whole": true,
+    "forms": [
+     "**Narrows:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-304",
+    "by": [
+     "DEC-310"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-318",
+    "by": [
+     "DEC-359"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-362",
+    "by": [
+     "DEC-389"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-365",
+    "by": [
+     "DEC-402",
+     "DEC-407",
+     "DEC-409"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-367",
+    "by": [
+     "DEC-409"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-371",
+    "by": [
+     "DEC-386"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-376",
+    "by": [
+     "DEC-395"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-378",
+    "by": [
+     "DEC-402"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-384",
+    "by": [
+     "DEC-397"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-385",
+    "by": [
+     "DEC-399"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-386",
+    "by": [
+     "DEC-392"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-390",
+    "by": [
+     "DEC-394"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-391",
+    "by": [
+     "DEC-393",
+     "DEC-396"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-394",
+    "by": [
+     "DEC-398",
+     "DEC-403"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-398",
+    "by": [
+     "DEC-403"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-403",
+    "by": [
+     "DEC-410"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-407",
+    "by": [
+     "DEC-409"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-409",
+    "by": [
+     "DEC-428"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-410",
+    "by": [
+     "DEC-421",
+     "DEC-918"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**",
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-413",
+    "by": [
+     "DEC-880",
+     "DEC-909",
+     "DEC-912",
+     "DEC-916"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-417",
+    "by": [
+     "DEC-421"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-421",
+    "by": [
+     "DEC-572"
+    ],
+    "whole": false,
+    "forms": [
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-448",
+    "by": [
+     "DEC-456"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-454",
+    "by": [
+     "DEC-868",
+     "DEC-899",
+     "DEC-904",
+     "DEC-908"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-455",
+    "by": [
+     "DEC-868",
+     "DEC-899",
+     "DEC-904",
+     "DEC-908"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-460",
+    "by": [
+     "DEC-840"
+    ],
+    "whole": true,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-466",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-480",
+    "by": [
+     "DEC-868",
+     "DEC-899",
+     "DEC-904",
+     "DEC-908"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-490",
+    "by": [
+     "DEC-868",
+     "DEC-899",
+     "DEC-904",
+     "DEC-908"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-492",
+    "by": [
+     "DEC-866",
+     "DEC-868",
+     "DEC-899",
+     "DEC-904",
+     "DEC-908"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-493",
+    "by": [
+     "DEC-896",
+     "DEC-903",
+     "DEC-904"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-501",
+    "by": [
+     "DEC-502",
+     "DEC-512",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-502",
+    "by": [
+     "DEC-512",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-511",
+    "by": [
+     "DEC-522",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Amends:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-513",
+    "by": [
+     "DEC-518",
+     "DEC-536"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "**Restores:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-518",
+    "by": [
+     "DEC-533",
+     "DEC-536",
+     "DEC-825"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-594",
+    "by": [
+     "DEC-593"
+    ],
+    "whole": false,
+    "forms": [
+     "text: lifted by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-608",
+    "by": [
+     "DEC-880",
+     "DEC-913",
+     "DEC-917"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-624",
+    "by": [
+     "DEC-626",
+     "DEC-825"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A",
+     "text: corrects"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-718",
+    "by": [
+     "DEC-900",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-721",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-723",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-724",
+    "by": [
+     "DEC-861"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-726",
+    "by": [
+     "DEC-843",
+     "DEC-852",
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-728",
+    "by": [
+     "DEC-723",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-742",
+    "by": [
+     "DEC-942"
+    ],
+    "whole": false,
+    "forms": [
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-757",
+    "by": [
+     "DEC-899",
+     "DEC-900",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-762",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-766",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-769",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-780",
+    "by": [
+     "DEC-775",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-787",
+    "by": [
+     "DEC-948"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-788",
+    "by": [
+     "DEC-861"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-792",
+    "by": [
+     "DEC-837"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** lifted by",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-804",
+    "by": [
+     "DEC-807"
+    ],
+    "whole": false,
+    "forms": [
+     "text: amended by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-805",
+    "by": [
+     "DEC-971"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-806",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-813",
+    "by": [
+     "DEC-899"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-819",
+    "by": [
+     "DEC-856",
+     "DEC-887"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changed by:** corrected by",
+     "**Changes:**",
+     "**Corrects:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-820",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-821",
+    "by": [
+     "DEC-873"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-822",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-823",
+    "by": [
+     "DEC-869"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-826",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-829",
+    "by": [
+     "DEC-831"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-830",
+    "by": [
+     "DEC-848"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:** corrected by",
+     "**Corrects:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-831",
+    "by": [
+     "DEC-941"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-832",
+    "by": [
+     "DEC-957"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-839",
+    "by": [
+     "DEC-957"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-841",
+    "by": [
+     "DEC-880"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-843",
+    "by": [
+     "DEC-852"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-847",
+    "by": [
+     "DEC-880",
+     "DEC-941",
+     "DEC-942",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-849",
+    "by": [
+     "DEC-857",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-851",
+    "by": [
+     "DEC-1052",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-852",
+    "by": [
+     "DEC-889"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-853",
+    "by": [
+     "DEC-884"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-855",
+    "by": [
+     "DEC-858",
+     "DEC-936",
+     "DEC-938",
+     "DEC-972"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changed by:** corrected by",
+     "**Changes:**",
+     "**Corrects:**",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-856",
+    "by": [
+     "DEC-887"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "ARCHIVE-SUPERSEDED \u00a7A"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-861",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-862",
+    "by": [
+     "DEC-906",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-868",
+    "by": [
+     "DEC-892",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-873",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-879",
+    "by": [
+     "DEC-883",
+     "DEC-884"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-880",
+    "by": [
+     "DEC-843",
+     "DEC-882",
+     "DEC-884",
+     "DEC-889",
+     "DEC-904",
+     "DEC-952"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-883",
+    "by": [
+     "DEC-889",
+     "DEC-890"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-884",
+    "by": [
+     "DEC-889",
+     "DEC-896",
+     "DEC-899",
+     "DEC-918",
+     "DEC-921",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-889",
+    "by": [
+     "DEC-892",
+     "DEC-896",
+     "DEC-899",
+     "DEC-904"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "text: amends"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-890",
+    "by": [
+     "DEC-896",
+     "DEC-899"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-891",
+    "by": [
+     "DEC-906",
+     "DEC-924",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-892",
+    "by": [
+     "DEC-896",
+     "DEC-899"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-893",
+    "by": [
+     "DEC-953",
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-895",
+    "by": [
+     "DEC-922",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-896",
+    "by": [
+     "DEC-891",
+     "DEC-923",
+     "DEC-953",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-897",
+    "by": [
+     "DEC-909"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-898",
+    "by": [
+     "DEC-899",
+     "DEC-902",
+     "DEC-904"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-899",
+    "by": [
+     "DEC-902",
+     "DEC-912",
+     "DEC-915",
+     "DEC-918",
+     "DEC-924",
+     "DEC-925",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-900",
+    "by": [
+     "DEC-906"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-904",
+    "by": [
+     "DEC-905",
+     "DEC-922"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-905",
+    "by": [
+     "DEC-906",
+     "DEC-962"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-906",
+    "by": [
+     "DEC-953",
+     "DEC-962"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-910",
+    "by": [
+     "DEC-911"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-911",
+    "by": [
+     "DEC-923",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-914",
+    "by": [
+     "DEC-916"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-915",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-916",
+    "by": [
+     "DEC-987",
+     "DEC-1010"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-923",
+    "by": [
+     "DEC-925",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-924",
+    "by": [
+     "DEC-925",
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-925",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-926",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-927",
+    "by": [
+     "DEC-928",
+     "DEC-953",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-928",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-929",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Lifted by:**",
+     "text: lifted by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-930",
+    "by": [
+     "DEC-949"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-933",
+    "by": [
+     "DEC-953",
+     "DEC-961",
+     "DEC-973",
+     "DEC-1049"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-934",
+    "by": [
+     "DEC-936",
+     "DEC-973",
+     "DEC-1049"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-936",
+    "by": [
+     "DEC-938",
+     "DEC-941",
+     "DEC-946",
+     "DEC-953",
+     "DEC-974"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-938",
+    "by": [
+     "DEC-941",
+     "DEC-949",
+     "DEC-951",
+     "DEC-953",
+     "DEC-973"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-939",
+    "by": [
+     "DEC-945",
+     "DEC-953",
+     "DEC-961",
+     "DEC-1001"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-941",
+    "by": [
+     "DEC-942",
+     "DEC-944",
+     "DEC-946",
+     "DEC-953",
+     "DEC-954"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-942",
+    "by": [
+     "DEC-946",
+     "DEC-947",
+     "DEC-953",
+     "DEC-961"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changed by:** lifted by",
+     "**Changes:**",
+     "text: changed by"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-943",
+    "by": [
+     "DEC-1052"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-946",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-947",
+    "by": [
+     "DEC-953",
+     "DEC-960",
+     "DEC-961"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**",
+     "**Lifted by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-949",
+    "by": [
+     "DEC-973",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-951",
+    "by": [
+     "DEC-953",
+     "DEC-973"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-952",
+    "by": [
+     "DEC-953"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-953",
+    "by": [
+     "DEC-954",
+     "DEC-959",
+     "DEC-968",
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-954",
+    "by": [
+     "DEC-957",
+     "DEC-962",
+     "DEC-1037"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-957",
+    "by": [
+     "DEC-959",
+     "DEC-1052"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-958",
+    "by": [
+     "DEC-1050"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-959",
+    "by": [
+     "DEC-968"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-961",
+    "by": [
+     "DEC-984"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-962",
+    "by": [
+     "DEC-963",
+     "DEC-1001"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-963",
+    "by": [
+     "DEC-966"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-964",
+    "by": [
+     "DEC-970"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-966",
+    "by": [
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-967",
+    "by": [
+     "DEC-975"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-968",
+    "by": [
+     "DEC-1049"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-971",
+    "by": [
+     "DEC-1001"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-972",
+    "by": [
+     "DEC-973",
+     "DEC-1021"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-973",
+    "by": [
+     "DEC-1049"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-974",
+    "by": [
+     "DEC-979"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-975",
+    "by": [
+     "DEC-1032"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changed by:**",
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-976",
+    "by": [
+     "DEC-979"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-982",
+    "by": [
+     "DEC-1003"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-988",
+    "by": [
+     "DEC-989"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-989",
+    "by": [
+     "DEC-1045"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-991",
+    "by": [
+     "DEC-1050",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": true,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-994",
+    "by": [
+     "DEC-998"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1003",
+    "by": [
+     "DEC-1052",
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1009",
+    "by": [
+     "DEC-1069"
+    ],
+    "whole": false,
+    "forms": [
+     "(amended here)",
+     "**Amended:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1012",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1028",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1032",
+    "by": [
+     "DEC-1033"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1037",
+    "by": [
+     "DEC-1039"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1038",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1039",
+    "by": [
+     "DEC-1047",
+     "DEC-1049",
+     "DEC-1052"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1047",
+    "by": [
+     "DEC-1049",
+     "DEC-1051"
+    ],
+    "whole": true,
+    "forms": [
+     "**Amends:**",
+     "**Changes:**",
+     "text: amends"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1048",
+    "by": [
+     "DEC-1051"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1049",
+    "by": [
+     "DEC-1050"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1050",
+    "by": [
+     "DEC-1057"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1052",
+    "by": [
+     "DEC-1055"
+    ],
+    "whole": false,
+    "forms": [
+     "**Changes:**"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1067",
+    "by": [
+     "DEC-1071"
+    ],
+    "whole": false,
+    "forms": [
+     "(amended here)"
+    ],
+    "hint_in_span": false,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1069",
+    "by": [
+     "DEC-1070"
+    ],
+    "whole": false,
+    "forms": [
+     "(amended here)",
+     "**Amended:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   },
+   {
+    "id": "DEC-1070",
+    "by": [
+     "DEC-1071"
+    ],
+    "whole": false,
+    "forms": [
+     "(amended here)",
+     "**Amended:**"
+    ],
+    "hint_in_span": true,
+    "status_line_marks": false,
+    "chunks": 0,
+    "chunks_with_hint": 0
+   }
+  ]
+ },
+ "trailers": {
+  "Task": {
+   "instances": 3573,
+   "commits": 3573,
+   "distinct_values": 193,
+   "resolvable_values": 189,
+   "store_instances": 3582
+  },
+  "Implements": {
+   "instances": 4257,
+   "commits": 2658,
+   "distinct_values": 514,
+   "resolvable_values": 502,
+   "store_instances": 4257
+  },
+  "Role": {
+   "instances": 3514,
+   "commits": 3514,
+   "distinct_values": 11,
+   "resolvable_values": 0,
+   "store_instances": 0
+  },
+  "Decided-by": {
+   "instances": 184,
+   "commits": 184,
+   "distinct_values": 21,
+   "resolvable_values": 0,
+   "store_instances": 0
+  }
+ },
+ "rows": [
+  {
+   "kind": "decision supersede decision",
+   "where": "register entries",
+   "form": "**Changed by:** superseded by 16; **Changed by:** replaced by 8; **Replaces:** 8; **Supersedes:** 6; **Changed by:** withdrawn by 6; **Superseded:** X (by Y) 5",
+   "instances": 71,
+   "pairs": 55,
+   "resolvable": 55,
+   "in_graph": 3,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 12; labelled 56, free text 15"
+  },
+  {
+   "kind": "decision amend decision",
+   "where": "register entries",
+   "form": "**Changes:** 172; **Changed by:** 130; **Amends:** 64; **Lifted by:** 15; **Changed by:** corrected by 14; text: amends 12",
+   "instances": 447,
+   "pairs": 343,
+   "resolvable": 343,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 32; labelled 416, free text 31"
+  },
+  {
+   "kind": "decision refine decision",
+   "where": "register entries",
+   "form": "**Refines:** 59; text: refined 2; **Clarifies:** 1",
+   "instances": 62,
+   "pairs": 62,
+   "resolvable": 62,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 56; labelled 60, free text 2"
+  },
+  {
+   "kind": "decision extend decision",
+   "where": "register entries",
+   "form": "**Extends:** 24",
+   "instances": 24,
+   "pairs": 24,
+   "resolvable": 24,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 24; labelled 24, free text 0"
+  },
+  {
+   "kind": "decision settle decision",
+   "where": "register entries",
+   "form": "**Changed by:** settled by 8; **Settles:** 5; text: settled 4",
+   "instances": 17,
+   "pairs": 12,
+   "resolvable": 12,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 1; labelled 13, free text 4"
+  },
+  {
+   "kind": "decision ratify decision",
+   "where": "register entries",
+   "form": "**Ratifies:** 19",
+   "instances": 19,
+   "pairs": 19,
+   "resolvable": 19,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 18; labelled 19, free text 0"
+  },
+  {
+   "kind": "decision confirm decision",
+   "where": "register entries",
+   "form": "**Confirms:** 8",
+   "instances": 8,
+   "pairs": 8,
+   "resolvable": 8,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 8; labelled 8, free text 0"
+  },
+  {
+   "kind": "decision implement decision",
+   "where": "register entries",
+   "form": "**Implements:** 8",
+   "instances": 8,
+   "pairs": 8,
+   "resolvable": 8,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 7; labelled 8, free text 0"
+  },
+  {
+   "kind": "decision under decision",
+   "where": "register entries",
+   "form": "**Under:** 2468",
+   "instances": 2468,
+   "pairs": 2468,
+   "resolvable": 2468,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 1405; labelled 2468, free text 0"
+  },
+  {
+   "kind": "decision mark decision",
+   "where": "register entries",
+   "form": "**Changed by:** marked by 6; text: marked 6; **Changed by:** shown by 4; text: kept 2",
+   "instances": 18,
+   "pairs": 17,
+   "resolvable": 17,
+   "in_graph": 1,
+   "followable": "keyword only",
+   "note": "whole (ids alone) 0; labelled 10, free text 8"
+  },
+  {
+   "kind": "decision cites decision (any DEC id in an entry but its own)",
+   "where": "register entries",
+   "form": "DEC-n anywhere in the span",
+   "instances": 7310,
+   "pairs": 5002,
+   "resolvable": 5001,
+   "in_graph": 6,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "decision under / implements capability, MR, ADR, ticket",
+   "where": "register entries",
+   "form": "**Under:** CAP-n, MR-n",
+   "instances": 294,
+   "pairs": 294,
+   "resolvable": 293,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "register change log: X supersedes/amends Y",
+   "where": "register preamble table",
+   "form": "'(...; amends DEC-n)'",
+   "instances": 4,
+   "pairs": 4,
+   "resolvable": 4,
+   "in_graph": 2,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket sources -> decision",
+   "where": ".tickets/*.md front matter",
+   "form": "sources: [DEC-n]",
+   "instances": 807,
+   "pairs": 807,
+   "resolvable": 807,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket sources -> capability / MR / ADR",
+   "where": ".tickets/*.md front matter",
+   "form": "sources: [CAP-n, MR-n]",
+   "instances": 304,
+   "pairs": 304,
+   "resolvable": 264,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket closes -> decision / capability / row",
+   "where": ".tickets/*.md front matter",
+   "form": "closes: [...]",
+   "instances": 129,
+   "pairs": 129,
+   "resolvable": 37,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "W2-H/M/L list rows are rows of docs/plan lists, no records"
+  },
+  {
+   "kind": "ticket depends_on -> ticket",
+   "where": ".tickets/*.md front matter",
+   "form": "depends_on: [DAEO-x]",
+   "instances": 440,
+   "pairs": 440,
+   "resolvable": 440,
+   "in_graph": 440,
+   "followable": "graph",
+   "note": ""
+  },
+  {
+   "kind": "ticket deps -> ticket (tk's copy)",
+   "where": ".tickets/*.md front matter",
+   "form": "deps: [DAEO-x]",
+   "instances": 436,
+   "pairs": 436,
+   "resolvable": 436,
+   "in_graph": 430,
+   "followable": "graph",
+   "note": "duplicates depends_on where both are present"
+  },
+  {
+   "kind": "ticket links -> ticket",
+   "where": ".tickets/*.md front matter",
+   "form": "links: [DAEO-x]",
+   "instances": 28,
+   "pairs": 28,
+   "resolvable": 28,
+   "in_graph": 10,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket parent -> ticket",
+   "where": ".tickets/*.md front matter",
+   "form": "parent: DAEO-x",
+   "instances": 6,
+   "pairs": 6,
+   "resolvable": 6,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket list_rows -> list row",
+   "where": ".tickets/*.md front matter",
+   "form": "list_rows: [W2-H001]",
+   "instances": 566,
+   "pairs": 566,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "rows of the plan's lists; no record holds them"
+  },
+  {
+   "kind": "ticket KPI names decision",
+   "where": ".tickets/*.md kpis",
+   "form": "[DEC-n] in a KPI line",
+   "instances": 1311,
+   "pairs": 764,
+   "resolvable": 764,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket body names decision",
+   "where": ".tickets/*.md body",
+   "form": "DEC-n in the text",
+   "instances": 911,
+   "pairs": 699,
+   "resolvable": 699,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket names ticket (W-id in KPIs/body)",
+   "where": ".tickets/*.md body and kpis",
+   "form": "W2-n",
+   "instances": 1844,
+   "pairs": 725,
+   "resolvable": 720,
+   "in_graph": 157,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "commit trailer Task:",
+   "where": "git log (final trailer block)",
+   "form": "Task: <id>",
+   "instances": 3573,
+   "pairs": 3573,
+   "resolvable": 3065,
+   "in_graph": 0,
+   "followable": "no (store table, not an edge; git log)",
+   "note": "3573 commits, 193 distinct values; the store keeps Task/Implements in its trailers table (3582 rows), never as edges"
+  },
+  {
+   "kind": "commit trailer Implements:",
+   "where": "git log (final trailer block)",
+   "form": "Implements: <id>",
+   "instances": 4257,
+   "pairs": 4257,
+   "resolvable": 4198,
+   "in_graph": 0,
+   "followable": "no (store table, not an edge; git log)",
+   "note": "2658 commits, 514 distinct values; the store keeps Task/Implements in its trailers table (4257 rows), never as edges"
+  },
+  {
+   "kind": "commit trailer Role:",
+   "where": "git log (final trailer block)",
+   "form": "Role: <id>",
+   "instances": 3514,
+   "pairs": 3514,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "no (git log only)",
+   "note": "3514 commits, 11 distinct values; the store keeps Task/Implements in its trailers table (0 rows), never as edges"
+  },
+  {
+   "kind": "commit trailer Decided-by:",
+   "where": "git log (final trailer block)",
+   "form": "Decided-by: <id>",
+   "instances": 184,
+   "pairs": 184,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "no (git log only)",
+   "note": "184 commits, 21 distinct values; the store keeps Task/Implements in its trailers table (0 rows), never as edges"
+  },
+  {
+   "kind": "ticket implements decision, via one commit's Task+Implements",
+   "where": "git log trailers",
+   "form": "Task: T + Implements: D",
+   "instances": 4257,
+   "pairs": 1182,
+   "resolvable": 1157,
+   "in_graph": 0,
+   "followable": "no",
+   "note": ""
+  },
+  {
+   "kind": "commit message names decision",
+   "where": "git log (subject and body)",
+   "form": "DEC-n in the message",
+   "instances": 3625,
+   "pairs": 3504,
+   "resolvable": 3502,
+   "in_graph": 0,
+   "followable": "no (git log only)",
+   "note": "commit messages are not indexed"
+  },
+  {
+   "kind": "capability -> provider ticket",
+   "where": "docs/contract/contract.yaml capabilities[].provider",
+   "form": "provider: [W1-10]",
+   "instances": 159,
+   "pairs": 159,
+   "resolvable": 159,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "57 more providers are tools, not tickets"
+  },
+  {
+   "kind": "capability item -> provider ticket",
+   "where": "contract.yaml capabilities[].covers[].provider",
+   "form": "provider: [W1-24]",
+   "instances": 203,
+   "pairs": 203,
+   "resolvable": 203,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "0 more are tools"
+  },
+  {
+   "kind": "capability -> decision (sources)",
+   "where": "contract.yaml capabilities[].sources and covers[].source",
+   "form": "DEC-n",
+   "instances": 331,
+   "pairs": 331,
+   "resolvable": 331,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "master rule -> provider ticket",
+   "where": "contract.yaml master_rules[].provider",
+   "form": "provider: [W1-12]",
+   "instances": 32,
+   "pairs": 32,
+   "resolvable": 32,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "master rule -> decision",
+   "where": "contract.yaml master_rules[].sources",
+   "form": "DEC-n",
+   "instances": 18,
+   "pairs": 18,
+   "resolvable": 18,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "capability item -> its capability; capability -> Contract",
+   "where": "docs/contract/capabilities/*.md front matter",
+   "form": "depends_on: [CAP-01]",
+   "instances": 276,
+   "pairs": 276,
+   "resolvable": 276,
+   "in_graph": 276,
+   "followable": "graph",
+   "note": ""
+  },
+  {
+   "kind": "Contract text cites decision",
+   "where": "docs/contract/CONTRACT_v4.md",
+   "form": "DEC-n",
+   "instances": 506,
+   "pairs": 108,
+   "resolvable": 108,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "ticket -> its acceptance tests",
+   "where": ".tickets/*.md acceptance_tests.path",
+   "form": "path: tests/acceptance/W2-21/",
+   "instances": 173,
+   "pairs": 173,
+   "resolvable": 104,
+   "in_graph": 0,
+   "followable": "keyword only (the path, not the files)",
+   "note": "resolvable = the path exists; 95 folders under tests/acceptance"
+  },
+  {
+   "kind": "test folder -> ticket (by folder name)",
+   "where": "tests/acceptance/<W-id>/",
+   "form": "folder named by the WBS id",
+   "instances": 95,
+   "pairs": 95,
+   "resolvable": 95,
+   "in_graph": 0,
+   "followable": "no edge; keyword on the path",
+   "note": ""
+  },
+  {
+   "kind": "test file names decision",
+   "where": "tests/**/*.py",
+   "form": "DEC-n in docstrings/comments",
+   "instances": 7615,
+   "pairs": 3847,
+   "resolvable": 3801,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "tests/** are indexed today; DEC-1052 M-4 plans to stop embedding them"
+  },
+  {
+   "kind": "test file names ticket",
+   "where": "tests/**/*.py",
+   "form": "W2-n",
+   "instances": 4131,
+   "pairs": 2087,
+   "resolvable": 1904,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "test map coupling: path -> suite",
+   "where": "governance/project/test-map.yaml couplings",
+   "form": "paths: [...] suites: [...]",
+   "instances": 81,
+   "pairs": 81,
+   "resolvable": 81,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "resolvable = the suite path exists"
+  },
+  {
+   "kind": "test map cites decision",
+   "where": "test-map.yaml comments",
+   "form": "# DEC-n",
+   "instances": 20,
+   "pairs": 11,
+   "resolvable": 11,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "role -> skill",
+   "where": "template/governance/kernel/roles/*.md",
+   "form": "a skill named in the role file",
+   "instances": 0,
+   "pairs": 0,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "no",
+   "note": "6 roles, 12 skills; no role file names a skill"
+  },
+  {
+   "kind": "skill -> role",
+   "where": "kernel skills SKILL.md",
+   "form": "the role named in the text",
+   "instances": 13,
+   "pairs": 13,
+   "resolvable": 13,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "role file cites decision / capability / MR",
+   "where": "kernel roles",
+   "form": "DEC-n, CAP-n, MR-n",
+   "instances": 107,
+   "pairs": 87,
+   "resolvable": 87,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "skill cites decision / capability / MR",
+   "where": "kernel skills",
+   "form": "DEC-n, CAP-n",
+   "instances": 271,
+   "pairs": 95,
+   "resolvable": 95,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "lesson constrains ticket",
+   "where": "docs/lessons/*.md front matter",
+   "form": "constrains: [DAEO-x]",
+   "instances": 6,
+   "pairs": 6,
+   "resolvable": 6,
+   "in_graph": 6,
+   "followable": "graph",
+   "note": ""
+  },
+  {
+   "kind": "lesson -> the decision it came from",
+   "where": "docs/lessons/*.md body",
+   "form": "**Source:** DEC-n",
+   "instances": 6,
+   "pairs": 4,
+   "resolvable": 4,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "failure record -> its source",
+   "where": "failure records",
+   "form": "(none exist beyond the template)",
+   "instances": 0,
+   "pairs": 0,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "-",
+   "note": "0 failure records outside the template"
+  },
+  {
+   "kind": "plan -> decisions (front matter)",
+   "where": "docs/plan/*.md front matter",
+   "form": "decisions: [DEC-n]",
+   "instances": 168,
+   "pairs": 168,
+   "resolvable": 168,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "'decisions' is no edge type of the loader"
+  },
+  {
+   "kind": "plan card -> ticket",
+   "where": "docs/plan/*.md '#### W2-n' cards",
+   "form": "card heading",
+   "instances": 94,
+   "pairs": 93,
+   "resolvable": 92,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "plan card (ticket) -> decision",
+   "where": "docs/plan/*.md card text",
+   "form": "DEC-n under a card",
+   "instances": 510,
+   "pairs": 380,
+   "resolvable": 380,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "path map entry -> decision",
+   "where": "governance/project/path-map.yaml comments",
+   "form": "# DEC-n",
+   "instances": 70,
+   "pairs": 34,
+   "resolvable": 34,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "checkpoint task -> ticket",
+   "where": "checkpoint records front matter",
+   "form": "task:",
+   "instances": 364,
+   "pairs": 364,
+   "resolvable": 363,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "close decisions_applied -> decision",
+   "where": "close records front matter",
+   "form": "decisions_applied:",
+   "instances": 113,
+   "pairs": 113,
+   "resolvable": 113,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "close requirements_implemented -> decision",
+   "where": "close records front matter",
+   "form": "requirements_implemented:",
+   "instances": 95,
+   "pairs": 95,
+   "resolvable": 90,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "specification decisions -> decision",
+   "where": "specification records front matter",
+   "form": "decisions:",
+   "instances": 71,
+   "pairs": 71,
+   "resolvable": 71,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "decision decisions -> decision",
+   "where": "decision records front matter",
+   "form": "decisions:",
+   "instances": 58,
+   "pairs": 58,
+   "resolvable": 58,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "change-execution-record decisions_carried -> decision",
+   "where": "change-execution-record records front matter",
+   "form": "decisions_carried:",
+   "instances": 46,
+   "pairs": 46,
+   "resolvable": 46,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "change-execution-record decisions_recorded -> decision",
+   "where": "change-execution-record records front matter",
+   "form": "decisions_recorded:",
+   "instances": 32,
+   "pairs": 32,
+   "resolvable": 32,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "change-impact-proposal decisions_carried -> decision",
+   "where": "change-impact-proposal records front matter",
+   "form": "decisions_carried:",
+   "instances": 29,
+   "pairs": 29,
+   "resolvable": 29,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "change-impact-proposal decisions_read -> decision",
+   "where": "change-impact-proposal records front matter",
+   "form": "decisions_read:",
+   "instances": 18,
+   "pairs": 18,
+   "resolvable": 18,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "close task -> ticket",
+   "where": "close records front matter",
+   "form": "task:",
+   "instances": 18,
+   "pairs": 18,
+   "resolvable": 18,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "change-impact-proposal decisions_recorded -> decision",
+   "where": "change-impact-proposal records front matter",
+   "form": "decisions_recorded:",
+   "instances": 13,
+   "pairs": 13,
+   "resolvable": 13,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "no edge type of the loader"
+  },
+  {
+   "kind": "review package -> ticket (W-id in name or opening)",
+   "where": "governance/project/orchestration/packages/**",
+   "form": "W2-n",
+   "instances": 630,
+   "pairs": 630,
+   "resolvable": 627,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "approximate: any W-id in the file name or first 2,000 characters"
+  },
+  {
+   "kind": "review package cites decision",
+   "where": "packages/**",
+   "form": "DEC-n",
+   "instances": 3222,
+   "pairs": 1407,
+   "resolvable": 1407,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "any other indexed file cites decision",
+   "where": "the rest of the index (checkpoints, research, briefs, src, \u2026)",
+   "form": "DEC-n",
+   "instances": 0,
+   "pairs": 0,
+   "resolvable": 0,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "0 files"
+  },
+  {
+   "kind": "in-force list names decision",
+   "where": "orchestration/DECISIONS-IN-FORCE.md",
+   "form": "DEC-n",
+   "instances": 85,
+   "pairs": 62,
+   "resolvable": 62,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "archive: X superseded/changed by Y",
+   "where": "orchestration/ARCHIVE-SUPERSEDED.md \u00a7A",
+   "form": "- DEC-x: ... by DEC-y",
+   "instances": 83,
+   "pairs": 82,
+   "resolvable": 82,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": ""
+  },
+  {
+   "kind": "archive: decision spent",
+   "where": "ARCHIVE-SUPERSEDED.md \u00a7B",
+   "form": "- DEC-x: ... Spent.",
+   "instances": 111,
+   "pairs": 111,
+   "resolvable": 111,
+   "in_graph": 0,
+   "followable": "keyword only",
+   "note": "a state, not a pair"
+  }
+ ],
+ "cites_by_field": {
+  "Under": 2469,
+  "Decision": 2266,
+  "Status": 331,
+  "Basis": 248,
+  "Changed by": 206,
+  "Changes": 179,
+  "Amends": 64,
+  "Refines": 59,
+  "Next": 50,
+  "Decision and record": 25,
+  "Extends": 24,
+  "Accepted as written": 21,
+  "Granularity": 21,
+  "Ratifies": 19,
+  "Residual": 15,
+  "Lifted by": 15,
+  "Accepted as realised by later decisions": 12,
+  "The order from here": 12,
+  "Target": 12,
+  "Principle": 10,
+  "Superseded": 9,
+  "Corrects": 9,
+  "Order from here": 9,
+  "How it is applied": 9,
+  "Implements": 8
+ }
+}

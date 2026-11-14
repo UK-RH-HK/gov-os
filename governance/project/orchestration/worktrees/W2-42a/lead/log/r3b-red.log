@@ -1,0 +1,592 @@
+FFFFFFFFFFFFF..............FFFFF.FFF.................                    [100%]
+=================================== FAILURES ===================================
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o0/proj'
+command = 'read -r a <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o0/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         read -r a <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-with-ifs-prefix] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o1/proj'
+command = 'IFS=: read -r a b <<< "$line"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'IFS=: read -r a b <<< "$line"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o1/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         IFS=: read -r a b <<< "$line"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-of-a-substitution] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o2/proj'
+command = 'read -r a b <<< "$(git rev-parse HEAD HEAD)"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a b <<< "$(git rev-parse HEAD HEAD)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o2/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         read -r a b <<< "$(git rev-parse HEAD HEAD)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-of-a-variable-set-by-substitution] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o3/proj'
+command = 'v=$(git log -1); read -r a <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'v=$(git log -1); read -r a <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o3/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         v=$(git log -1); read -r a <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[mapfile] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o4/proj'
+command = 'mapfile -t L <<< "$(ls)"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'mapfile -t L <<< "$(ls)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o4/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         mapfile -t L <<< "$(ls)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[readarray] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o5/proj'
+command = 'readarray -t L <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'readarray -t L <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o5/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         readarray -t L <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[while-read-loop] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o6/proj'
+command = 'while read -r f; do echo "$f"; done <<< "$(git status --porcelain)"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do echo "$f"; done <<< "$(git status --porcelain)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o6/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         while read -r f; do echo "$f"; done <<< "$(git status --porcelain)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[sed-substitution-script] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o7/proj'
+command = 'sed \'s/a/b/\' <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'sed \'s/a/b/\' <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o7/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         sed 's/a/b/' <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[awk-print-script] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o8/proj'
+command = 'awk \'{print $1}\' <<< "$line"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'awk \'{print $1}\' <<< "$line"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o8/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         awk '{print $1}' <<< "$line"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[bc] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o9/proj'
+command = 'bc <<< "$x + 1"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'bc <<< "$x + 1"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o9/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         bc <<< "$x + 1"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-into-an-array] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o10/proj'
+command = 'read -ra arr <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -ra arr <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o10/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         read -ra arr <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[until-read-loop] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o11/proj'
+command = 'until read -r l; do echo "$l"; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'until read -r l; do echo "$l"; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o11/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         until read -r l; do echo "$l"; done <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[while-ifs-read-loop] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o12/proj'
+command = 'while IFS= read -r l; do printf \'%s\\n\' "$l"; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", RO_FORMS)
+    def test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed(proj, command):
+>       assert_allowed(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while IFS= read -r l; do printf \'%s\\n\' "$l"; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_read_only_a_reader_o12/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         while IFS= read -r l; do printf '%s\n' "$l"; done <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[read-redirect] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo0/proj'
+template = 'read -r a <<< "$v" > {w}'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a <<< "$v" > src/ok.py'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo0/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         read -r a <<< "$v" > src/ok.py
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[mapfile-then-touch] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo1/proj'
+template = 'mapfile -t L <<< "$v"; touch {w}'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'mapfile -t L <<< "$v"; touch src/ok.py'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo1/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         mapfile -t L <<< "$v"; touch src/ok.py
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-body-touch] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo2/proj'
+template = 'while read -r f; do touch {w}; done <<< "$(ls)"'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do touch src/ok.py; done <<< "$(ls)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo2/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         while read -r f; do touch src/ok.py; done <<< "$(ls)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-body-cp] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo3/proj'
+template = 'while read -r f; do cp "$f" {w}; done <<< "$v"'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do cp "$f" src/ok.py; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo3/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         while read -r f; do cp "$f" src/ok.py; done <<< "$v"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[sed-redirect] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo4/proj'
+template = 'sed \'s/a/b/\' <<< "$v" > {w}'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'sed \'s/a/b/\' <<< "$v" > src/ok.py'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo4/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         sed 's/a/b/' <<< "$v" > src/ok.py
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[read-text-substitution-writes] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo5/proj'
+template = 'read -r a <<< "$(touch {w})"'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a <<< "$(touch src/ok.py)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo5/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         read -r a <<< "$(touch src/ok.py)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-text-substitution-writes] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo6/proj'
+template = 'while read -r f; do echo "$f"; done <<< "$(touch {w})"'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do echo "$f"; done <<< "$(touch src/ok.py)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo6/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         while read -r f; do echo "$f"; done <<< "$(touch src/ok.py)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+_ test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[sed-text-substitution-writes] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo7/proj'
+template = 'sed \'s/a/b/\' <<< "$(touch {w})"'
+
+    @pytest.mark.parametrize("template", RW_FORMS)
+    def test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed(proj, template):
+>       assert_allowed(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'sed \'s/a/b/\' <<< "$(touch src/ok.py)"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-0/test_hsro_write_a_read_only_fo7/proj'
+
+    def assert_allowed(command, root):
+        got, why = decide(command, root)
+>       assert got == "allow", f"want allow, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want allow, got deny: Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+E         --- the command ---
+E         sed 's/a/b/' <<< "$(touch src/ok.py)"
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py:139: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-with-ifs-prefix]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-of-a-substitution]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-of-a-variable-set-by-substitution]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[mapfile]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[readarray]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[while-read-loop]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[sed-substitution-script]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[awk-print-script]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[bc]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[read-into-an-array]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[until-read-loop]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_read_only_a_reader_of_an_expanded_here_string_that_writes_nothing_is_allowed[while-ifs-read-loop]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[read-redirect]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[mapfile-then-touch]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-body-touch]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-body-cp]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[sed-redirect]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[read-text-substitution-writes]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[loop-text-substitution-writes]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro.py::test_hsro_write_a_read_only_form_that_writes_an_allowed_path_is_allowed[sed-text-substitution-writes]
+21 failed, 32 passed in 0.59s

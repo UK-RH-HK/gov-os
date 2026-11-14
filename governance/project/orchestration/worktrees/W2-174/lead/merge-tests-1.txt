@@ -1,0 +1,6 @@
+W2-174: merge the acceptance cases (tests/acceptance/W2-174, td-1, 638f5be5f) into the build branch
+
+Task: DAEO-zmo4
+Role: orchestrator
+Implements: DEC-1130, DEC-1083, DEC-1050, DEC-1088, DEC-1121, DEC-1122
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

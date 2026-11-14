@@ -111,6 +111,17 @@ def acceptance_authors(commit, root=None, base=INTEGRATION):
             if any(n.lstrip('"').startswith(TESTS_REL) for n in names):  # F1: a name git still quotes
                 touched.append(m)
         bad = []
+        # 2026-11-13 (CTO, DEC-1173 (1)): a commit the owner lists by its full id under the path map's
+        # acceptance_exemptions (only the owner's commit adds an entry, DEC-906, DEC-1031 item 3) is accepted, as
+        # W1-01's history case accepts it. The list is read from the integration branch's committed path map only.
+        try:
+            import yaml as _yaml
+            _pm = _yaml.safe_load(run("show", f"{base}:governance/project/path-map.yaml")) or {}
+            exempt = {str(e.get("commit", "")).strip() for e in (_pm.get("acceptance_exemptions") or [])
+                      if isinstance(e, dict) and len(str(e.get("commit", "")).strip()) == 40}
+        except Exception:
+            exempt = set()  # fails closed: no exemption read, every such commit judged as before
+        touched = [c for c in touched if run("rev-parse", c).strip() not in exempt]
         for c in touched:
             roles, _, subject = run("log", "-1", "--format=%(trailers:key=Role,valueonly,separator=%x1f)%x00%s",
                                     c).rstrip("\n").partition("\x00")

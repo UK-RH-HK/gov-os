@@ -1,0 +1,77 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names at least the three rules, keeps the rejected rows somewhere with a reason, and names a test with a bad row.
+
+Expected behaviour:
+the session states the data-quality rules (key present and unique, weight in range), applies them before the load, sends the rows that break them to a rejected-rows table with the reason instead of dropping them without a trace, reports the counts loaded and rejected, and names unit tests with a bad row for each rule.
+
+The session's reply:
+<<<
+I couldn't write any files: the writes were refused, as was `gov --help` earlier. The harness says not to retry a refused call as-is, and the skill says to stop and return when a write is refused. So I'm stopping here and handing back the plan in the skill's return format. Nothing was written or run, and no database was touched.
+
+**task:** Nightly import of partner shipment records into `shipments`. Bad rows found in the sample: blank `shipment_id` (2 %), duplicate `shipment_id`, negative `weight_kg`. The first draft loads whatever parses.
+
+**status:** blocked. The three test files I wrote first (`shipment_import/tests/test_rules.py`, `test_loader.py`, `test_migrations.py`) were refused. `gov` needs approval.
+
+**work_completed:** Read the data skill and its `check_domain_skill.py` (that script checks the skill file itself, not this work). Set the data-quality rules, designed the migrations and the loader, and drafted the tests (listed below). None of it was saved or run.
+
+**files_changed:** none.
+
+**evidence:** none. No counts before and after, because nothing ran. The folder has no ticket, schema, sample, migrations or git repo; `scenarios.md`, which the skill points to, is missing too.
+
+**tests:** planned only, none written or run:
+- `test_good_row_passes`: a good row has no reasons and is loaded.
+- `test_blank_shipment_id`, `test_whitespace_only_shipment_id`, `test_absent_shipment_id_column_value`: an empty, all-spaces or missing id is rejected as `shipment_id_missing` and kept in the rejected rows.
+- `test_negative_weight`, `test_zero_weight`: `weight_kg` of -3.2 or 0 is rejected as `weight_kg_out_of_range`. `test_smallest_positive_weight_passes`: 0.001 is loaded.
+- `test_blank_weight`: rejected as `weight_kg_missing`. `test_non_numeric_weight` ("12kg") and `test_nan_and_infinity_weight`: rejected as `weight_kg_not_a_number`, never converted.
+- `test_every_broken_rule_is_reported`: a blank id with a negative weight carries both reasons.
+- `test_duplicate_id_in_file_rejects_every_copy`: an id that appears twice in one file has every copy rejected as `shipment_id_duplicate_in_file`. Neither copy is picked silently.
+- `test_id_already_in_table_is_rejected_not_overwritten`: an id re-sent on a later night is rejected as `shipment_id_already_loaded`, and the stored row keeps its old value.
+- `test_counts_add_up`: rows read = rows loaded + rows rejected, and both match the table counts.
+- `test_same_file_twice_is_a_no_op`: a file is recognised by its SHA-256 hash, so rerunning it loads nothing new.
+- `test_failure_mid_load_leaves_nothing_behind`: a crash part-way through rolls back the whole file, and a restart loads it once.
+- `test_missing_required_column_refuses_the_file`: a file without the `weight_kg` column is refused whole as `missing_column`.
+- Migrations: `test_up_down_up`, `test_up_twice_is_harmless`, `test_unique_index_down_keeps_shipment_rows`. `test_unique_index_refuses_when_duplicates_exist`: migration 0003 stops and reports the number of duplicates. `test_down_of_rejects_table_refuses_when_it_holds_rows`: the down step won't drop rejected rows.
+
+**discoveries:** Choices I made myself (reversible, inside the ticket):
+- Weight must be above 0.
+- Every copy of a duplicated id is rejected, rather than keeping one.
+- Ids are not trimmed. Only the blank check ignores surrounding spaces.
+- Each file loads in one transaction.
+- A row's reasons are stored together, separated by `;`.
+
+**risks:**
+- No step can lose data: no drops of data that has rows, no overwrites.
+- The unique index on `shipments.shipment_id` fails if the live table already has duplicates. Migration 0003 checks for that and refuses.
+- The only field rules are for `shipment_id` and `weight_kg`. Other columns need rules once the real schema is known.
+- No pre-commit checklist line could be ticked, and `gov accept` was not run because the writes were refused.
+
+**lessons:** In this sandbox, check write access before drafting a full set of tests.
+
+**proposed_decisions:** P2: a `shipment_id` that already exists in the table is rejected, not treated as an update. Making it an update would mean overwriting a row and keeping the old value. Whoever owns the ticket should confirm.
+
+**unresolved:**
+- I don't have: the ticket's KPIs or allowed file paths, the real `shipments` schema, or the full list of columns.
+- Is a re-sent id an update?
+- Is there a maximum weight?
+- Does another stream read `shipments`? If so, adding the unique index is a P2.
+
+**recommended_next_action:** Grant writes under `shipment_import/` and give me the ticket and schema. Then I'll write the tests, check they fail, write the rules, loader and migrations, run up/down/up on a throw-away SQLite database with a made-up fixture, report the counts, and run `gov accept`.
+
+**Payload: the planned design**
+
+1. **Migrations.** Each one has a down step and can be run twice safely.
+   - 0001 creates `shipments` if it doesn't exist.
+   - 0002 creates two new tables: `shipment_import_runs`, with one row per file keyed by its hash, and `shipment_import_rejects`, holding each rejected row's run, line number, id, reasons and the raw row as JSON. Its down step refuses while the rejects table holds rows.
+   - 0003 checks for duplicate ids and then adds the unique index on `shipment_id`.
+2. **Loader.**
+   1. Check the header has the required columns.
+   2. Skip the file if its hash is already recorded.
+   3. Apply the field rules and the duplicate checks to every row before inserting anything.
+   4. Insert good rows and rejected rows in one transaction.
+   5. Return the counts (`read`, `loaded`, `rejected`).
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

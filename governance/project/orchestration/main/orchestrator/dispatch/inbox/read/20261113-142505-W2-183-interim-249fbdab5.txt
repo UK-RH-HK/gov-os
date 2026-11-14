@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-183
+status: interim result 249fbdab5: W2-183: the STANDARD review's probe record (pass at e0c076514c9d; F1-F4 rows; the W2-54 case to the CTO)

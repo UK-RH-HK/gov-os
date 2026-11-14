@@ -1,0 +1,60 @@
+E       AssertionError: no write for a shell's body (the auditor's example: no target on the review head; the base parser gave 3)
+E       assert set()
+E       AssertionError: no write for a shell's body (combined short options with an option value (pipefail))
+E       assert set()
+E       AssertionError: no write for a shell's body (separate short options; -o's value is not a script name)
+E       assert set()
+E       AssertionError: no write for a shell's body (unquoted delimiter; the body holds no expansion)
+E       assert set()
+E       AssertionError: no write for a shell's body (sh with a long-named -o option)
+E       assert set()
+E       AssertionError: no write for a shell's body (-O takes a shopt name as its value)
+E       assert set()
+E       AssertionError: no write for a shell's body (a + option (unset) with a value)
+E       assert set()
+E       AssertionError: no write for a shell's body (a long option with a separate value (f is not a script name))
+E       assert set()
+E       AssertionError: no write for a shell's body (the body reaches the shell through a pipe from cat)
+E       assert set()
+E       AssertionError: no write for a shell's body (through a pipe, combined options with a value)
+E       assert set()
+E       AssertionError: no write for a shell's body (F4 ride-along: /dev/stdin as the script is standard input)
+E       assert set()
+E       AssertionError: no write for a shell's body (F4 ride-along: /dev/fd/0 as the script is standard input)
+E       assert set()
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)

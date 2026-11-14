@@ -1,0 +1,9 @@
+log: W2-130-A5-pin3.json
+W2: W2-130
+status: DONE. The head to land is `6f8158a0eed50c38479f4f372bf55a8db3d55801`. `git status --short` is empty.
+
+task: DAEO-q8cl (W2-130), build run 7 (pin run 3)
+status: DONE. The head to land is `6f8158a0eed50c38479f4f372bf55a8db3d55801`. `git status --short` is empty.
+work_completed:
+- A fresh independent test designer (claude-sonnet-5-5, high, C2) made one commit, `83285c3c5`. It pins the two S4 cases that still read HEAD (`closed_missing`, `no_record`) at `counts-after.measured_at` (6b62de94e3fd), using that tree's own `gov links`. It also makes `variant_findings` (the S3/F3 cases) run each marks commit's own `gov links` from its own `src`.
+- I merged it as `17487b470` and ran the two changed files,

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 179
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_013WBGzULsxV9mMS6qoUE7tZ", "time": "2026-11-13T14:50:14.850Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-42a/b4ed5672-cd89-4b89-a968-87b10525f0bf.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-42a", "tool": "Bash", "form": "mkdir -p $TMPDIR/basesrc && cd /home/usain/gov-os-worktrees/W2-42a && git archive 7c6a7427 src | tar -x -C $TMPDIR/basesrc && ls $TMPDIR/basesrc/src/gov/guard | head; cat > $TMPDIR/aud/rj.py <<'ZZQEND", "rule": "the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d

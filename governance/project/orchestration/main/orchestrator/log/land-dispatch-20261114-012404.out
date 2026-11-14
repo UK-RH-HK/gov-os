@@ -1,0 +1,9 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-130 (DAEO-q8cl, STANDARD) at 798278be519d: pre-check passed
+W2-130: kernel gate at 798278be519d: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-14 01:24:05 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-14 01:24:05 EJECTED W2-130: conflict
+queue run exit 3
+W2-130: not landed (ejected: conflict)

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88
+status: interim result 01ec6d2a7: W2-88 (DAEO-2bdu): probe record, narrow independent check of the RV2-1/RV2-2 fix: FAIL (NC-1 blocker: a refused A9 record commit still resets through project.commit; NC-2 a row); RV2-2 fixed, RV2-1 fi

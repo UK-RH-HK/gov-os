@@ -1,0 +1,2 @@
+tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[change]
+tests/acceptance/W2-37/test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[claude-copy]

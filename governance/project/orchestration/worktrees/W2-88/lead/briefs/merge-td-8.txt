@@ -1,0 +1,7 @@
+W2-88 (DAEO-2bdu): merge td-8's run-6 acceptance cases (9990563fc8d9): NC-1 (A9's refused record commit resets nothing, Case C) and NC-2 (an interrupt as A9's git add returns, Case D)
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-44.g, DEC-1098
+Rewrite-Reason: P1-W2-88-NC-1 (a)
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

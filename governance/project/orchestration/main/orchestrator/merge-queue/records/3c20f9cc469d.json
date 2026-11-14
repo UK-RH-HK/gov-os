@@ -1,0 +1,28 @@
+{
+ "head": "3c20f9cc469db401ed6c3f454be2af694ce72fd9",
+ "base": "1d5af6d75e41f26df518e85c7ea59e4a43f0283e",
+ "skipped": "the merged code is identical to 6f8158a0eed50c38479f4f372bf55a8db3d55801, W2-130's approved commit, which its lead tested; governance paths left out of the comparison: governance/project/orchestration/packages/P1-MORNING-20261114.md (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)",
+ "tickets": [
+  {
+   "ticket": "W2-130",
+   "task": "DAEO-q8cl",
+   "commit": "6f8158a0eed50c38479f4f372bf55a8db3d55801",
+   "merge": "3c20f9cc469db401ed6c3f454be2af694ce72fd9"
+  }
+ ],
+ "selection": {
+  "targets": [],
+  "core_changed": [],
+  "unplaced": []
+ },
+ "counts": null,
+ "flaky": [],
+ "unowned": [],
+ "ejected": [],
+ "trace_base": null,
+ "record_rerun": null,
+ "cleared_by_results": [],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261114-095405-544072",
+ "started": "2026-11-14 09:54:05",
+ "finished": "2026-11-14 09:54:05"
+}

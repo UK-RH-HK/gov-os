@@ -1,8 +1,8 @@
-Status at 2026-11-13 09:33:46 (the last report's block)
-- Progress: 131 closed / 10 merged-not-closed / 4 built-and-held / 11 in flight / 29 not started, of 185.
-- Leads: 1 running (W2-88); queued next: W2-88; the gate: open.
-- Closes: none running; next: close each as its check finds it ready (the owner, 01:55); open: W2-61h (hidden-form run, walled route), W2-32 (fresh probe; closes with W2-15a), W2-134 (after W2-61h), W2-137 (after W2-32), W2-138 (after W2-116), W2-145 (after W2-32/W2-137), W2-136 (S10: the nightly's group D, the owner), W2-147 (after W2-136), W2-148 (S15 ACT after HOURS-3 B), W2-116 (pass 2 after W2-60b/W2-33); CLOSED overnight: 17 (W2-124 to W2-56); refused since the last report: none.
-- Memory chain: W2-61 closed; W2-61h MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
-- Toward EXAMIN's copy: EXAMIN's copy about 11-20 (11-20 to 11-25): critical path W2-88 (run 4, the last review round), W2-174 (1 d), W2-27 (3 d); W2-172 closed.
-- Emergency plan: none; the memory gate's paper reservation fixed by ACT-P95-1 (16:53).
-- OWNER_ACTION: yes NIGHTLY-NODE22 bdfdc24b; P-W2-111-MEASURE-1; go W2-33; yes ACT-OPERATOR-HOURS-3 716da9dc; yes ACT-W2-148-S15-1 a3df8ff6; yes ACT-LEADS-ADD-DIR-1 1781a708
+Status at 2026-11-14 09:04:17 (the last report's block)
+- Progress: 158 closed / 4 merged-not-closed / 3 built-and-held / 2 in flight / 23 not started, of 190.
+- Leads: 2 running (W2-130, W2-88b); queued next: W2-88b, W2-130; the gate: open.
+- Closes: none running; next: W2-130 pin run 2 (nightly reds) -> land; W2-100 and W2-101 after your CIT-P yeses (hand merge, then COPIES-10/-11); W2-134 after the hidden-form result; W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-37, W2-42a (x2), W2-60a, W2-88, W2-93, W2-94, W2-104 (x2), W2-116, W2-128, W2-136, W2-147, W2-174, W2-61h, W2-130, W2-185; refused since the last report: none.
+- Memory chain: W2-61 closed; W2-61h closed; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
+- Toward EXAMIN's copy: EXAMIN's copy: W2-88 and W2-60a merged; W2-27 waits on the first numbered release (P-RELEASE-1: your seven lines), then the re-pin, the clone and the EXAMIN CTO (DEC-1174 (2)); about one day from your yeses to its start.
+- Emergency plan: none (lifted, DEC-1158).
+- OWNER_ACTION: yes W2-100-CIT-P 7bb4f1ac + yes ACT-CLAUDE-COPIES-10 f535215e; yes W2-101-CIT-P 42c1cc38 + yes ACT-CLAUDE-COPIES-11 3b4e462f; P-RELEASE-1 (7 lines); P-W2-184-1; approve q02 variant 0703aebf; MEMORY-AUDIT-P1; W2-61h hidden-form result (closes W2-134)

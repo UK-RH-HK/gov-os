@@ -1,0 +1,102 @@
+ACT-CLAUDE-COPIES-10 rehearsal; base: integrate f3d3438fcb45 with w2/W2-100 cdac25763613 merged (one --no-ff commit, clean: no conflict, merge base 0a706dc4c2f1, 72 files brought); rulesync 24.0.0
+the commits after the verified product head f7637bd03e25 touch only ['docs/changes/W2-100-CIT-P.md', 'docs/probes/DAEO-uw5h/PR-DAEO-uw5h-check1.md', 'docs/probes/DAEO-uw5h/PR-DAEO-uw5h-check2.md']; the CIT-P at the branch head is 7bb4f1ac
+the 60 sources (the five files of each of ['backend', 'api', 'data', 'security'] in ['template/governance/kernel/skills', '.rulesync/skills', 'template/.rulesync/skills']) are at W2-100's CIT-P section 3 hashes, on the merged tree and in w2/W2-100 cdac25763613; none is on plain integrate
+portability on plain integrate: exit 0; 0 findings: none; files []
+portability on the merged tree (no copies): exit 1; 20 findings: GENERATED_DIFFERS 20; of them the four skills': 20 (GENERATED_DIFFERS 20)
+  the four skills' findings are GENERATED_DIFFERS for exactly the 20 absent .claude copies; no SOURCE_ finding; the others (0) are integrate's own
+rulesync from plain integrate's root .rulesync: differs from the tree in ['.claude/settings.json']
+rulesync renders .claude/skills/backend/: ['SKILL.md', 'check_domain_skill.py', 'scenario-records.yaml', 'scenario-summaries.md', 'scenarios.md']
+rulesync renders .claude/skills/api/: ['SKILL.md', 'check_domain_skill.py', 'scenario-records.yaml', 'scenario-summaries.md', 'scenarios.md']
+rulesync renders .claude/skills/data/: ['SKILL.md', 'check_domain_skill.py', 'scenario-records.yaml', 'scenario-summaries.md', 'scenarios.md']
+rulesync renders .claude/skills/security/: ['SKILL.md', 'check_domain_skill.py', 'scenario-records.yaml', 'scenario-summaries.md', 'scenarios.md']
+  rulesync renders all five files of each skill folder (SKILL.md re-rendered, the other four copied)
+rulesync's other output that differs from the tree (not written, not this ACT's, the same on plain integrate): ['.claude/settings.json']
+  every non-SKILL.md copy is byte-equal to its kernel file; each SKILL.md is rulesync's rendering: backend e6f8cd8d (8192 bytes), api 9c3fa501 (9362 bytes), data d5b626f0 (9048 bytes), security 973c40f5 (9172 bytes)
+portability in the generation clone after the 20 copies: exit 0; the four skills' findings []; the others unchanged: True
+portability on template/ (as an adopted project, no rulesync): 0 findings for the four skills; others: RULESYNC_VERSION_UNKNOWN 1, TEMPLATE_COPY_MISSING 8
+generation clone: 20 files new: .claude/skills/api/SKILL.md, .claude/skills/api/check_domain_skill.py, .claude/skills/api/scenario-records.yaml, .claude/skills/api/scenario-summaries.md, .claude/skills/api/scenarios.md, .claude/skills/backend/SKILL.md, .claude/skills/backend/check_domain_skill.py, .claude/skills/backend/scenario-records.yaml, .claude/skills/backend/scenario-summaries.md, .claude/skills/backend/scenarios.md, .claude/skills/data/SKILL.md, .claude/skills/data/check_domain_skill.py, .claude/skills/data/scenario-records.yaml, .claude/skills/data/scenario-summaries.md, .claude/skills/data/scenarios.md, .claude/skills/security/SKILL.md, .claude/skills/security/check_domain_skill.py, .claude/skills/security/scenario-records.yaml, .claude/skills/security/scenario-summaries.md, .claude/skills/security/scenarios.md
+the before-state is absent for all 20 targets, on integrate and on the merged tree (no before/ file, as COPIES-7)
+check 1: the 20 copies; check 2: the 60 sources (W2-100's CIT-P section 3, kernel, root .rulesync and template/.rulesync); no live HOME path in either
+--- rehearsal on integrate with W2-100 merged (the tree after the hand merge's merge commit); HOME planted
+ok   apply.sh check (every target at its stated before state: absent): exit 0
+ok   check 1 before the apply (red, as intended: the copies are absent): exit 1
+ok   check 2 before the apply (green: W2-100's sixty sources at the approved bytes): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1 (sha256sum -c, 20 files): exit 0
+ok   check 2 (sha256sum -c, 60 files): exit 0
+ok   the changed set equals the touched list (20 files)
+ok   every target is at its stated after sha256
+ok   portability after the apply: exit 0; the four skills' findings []; the 0 others (integrate's own) unchanged
+ok   apply.sh undo: exit 0
+ok   undo: every file removed again, the tree clean
+ok   portability after the undo: exit 1; 20 findings: GENERATED_DIFFERS 20 (the merged tree's own reading)
+ok   apply.sh check after the undo: exit 0
+ok   apply.sh apply (re-apply): exit 0
+ok   the re-apply gives the same bytes and the same changed set as the first apply
+--- plain integrate (W2-100 not merged)
+ok   apply.sh check passes on plain integrate (the twenty copies are absent there as on the merged tree): exit 0
+ok   check 2 is red on plain integrate (W2-100's sources are absent: the order is held): exit 1
+ok   check changed nothing
+ok   apply.sh check refuses a moved target (a file planted at .claude/skills/api/SKILL.md; exit 3): exit 3
+--- the gated runs, one folder per run through the heavy-job gate: on the merged tree (W2-100's merge alone, then with this ACT)
+merged window tests/acceptance/W2-100: exit 1; 222 passed, 8 failed
+merged window tests/acceptance/W2-11: exit 1; 215 passed, 4 failed, 1 skipped
+merged window tests/unit/adapters: exit 0; 110 passed, 0 failed
+merged window tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+merged window tests/acceptance/W1-38: exit 0; 46 passed, 0 failed
+merged window tests/acceptance/W2-153: exit 0; 137 passed, 0 failed, 18 skipped
+merged window tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+merged window tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+merged window tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+merged window tests/acceptance/W2-37: exit 0; 120 passed, 0 failed
+ok   merged landed tests/acceptance/W2-100: exit 0; 230 passed, 0 failed
+ok   merged landed tests/acceptance/W2-11: exit 0; 223 passed, 0 failed, 1 skipped
+ok   merged landed tests/unit/adapters: exit 0; 110 passed, 0 failed
+ok   merged landed tests/acceptance/W1-33: exit 0; 112 passed, 0 failed
+ok   merged landed tests/acceptance/W1-38: exit 0; 46 passed, 0 failed
+ok   merged landed tests/acceptance/W2-153: exit 0; 137 passed, 0 failed, 18 skipped
+ok   merged landed tests/acceptance/W2-98: exit 0; 502 passed, 0 failed
+ok   merged landed tests/acceptance/W2-88a: exit 0; 35 passed, 0 failed
+ok   merged landed tests/acceptance/W2-52: exit 0; 65 passed, 0 failed
+ok   merged landed tests/acceptance/W2-37: exit 0; 120 passed, 0 failed
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[api]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[backend]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[data]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[security]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[api]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[backend]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[data]
+     merged: made green by the ACT: tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[security]
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[api]
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[backend]
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[data]
+     merged: made green by the ACT: tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[security]
+merged: red in the window: 12; made green by the ACT: 12; red after: 0; new red brought by the ACT: []
+--- the three named acceptance cases (W2-100's claude-copy and generated-drift cases, W2-11's four-places case)
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[api]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[backend]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[data]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_adapter_check_finds_no_generated_drift_in_the_real_skill[security]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[api]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[backend]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[data]: window FAILED, landed PASSED
+     tests/acceptance/W2-100/test_w2_100_copies.py::test_the_claude_copy_matches_the_kernel_source[security]: window FAILED, landed PASSED
+     tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[api]: window FAILED, landed PASSED
+     tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[backend]: window FAILED, landed PASSED
+     tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[data]: window FAILED, landed PASSED
+     tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[security]: window FAILED, landed PASSED
+ok   the twelve named cases for the four skills PASSED after the ACT (12 of 12); in the window 12 FAILED
+ok   the four-places case for the other 10 kernel skills PASSED after the ACT
+--- the by-hand steps literally on the merged tree
+ok   git add the touched paths: exit 0
+ok   staged count equals the touched list: exit 0
+ok   commit: exit 0
+ok   portability after the commit: exit 0; findings []
+ok   apply.sh undo: exit 0
+ok   git add the touched paths (undo): exit 0
+ok   commit the undo: exit 0
+ok   the undo commit returns the tree to the start (empty diff over the touched paths): exit 0
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "f535215e5ba08a366fda4c0e4580e95c0d1cd1cd9150af0329372f107814c6bd", "touched": 20, "failures": 0}
+exit 0

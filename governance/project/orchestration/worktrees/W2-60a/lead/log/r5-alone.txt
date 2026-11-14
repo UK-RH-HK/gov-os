@@ -1,0 +1,87 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_s4_no_placeholder_is_committed_beside_a_running_session _________
+
+box = Box(base=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-1/test_s4_no_placeholder_is_comm0'), home=PosixPath('/tm.../elsewhere'), pycache=PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-1/test_s4_no_placeholder_is_comm0/pycache'))
+
+    def test_s4_no_placeholder_is_committed_beside_a_running_session(box):
+        planted, release = box.elsewhere / "planted", box.elsewhere / "release"
+        s.set_plan(box, [
+            {"do": "plant", "names": list(s.PLACEHOLDERS)},
+            {"do": "touch", "path": str(planted)},
+            {"do": "wait_for", "paths": [str(release)], "timeout": 45, "fail_code": 7},
+            {"do": "exit", "code": 0},
+        ])
+        process = s.start_launch(box, s.ENGINEER, s.T.tk)
+        try:
+>           assert s.wait_for(planted.exists, 30), "the session did not plant the placeholders"
+E           AssertionError: the session did not plant the placeholders
+E           assert False
+E            +  where False = <function wait_for at 0x71f1d7d582c0>(exists, 30)
+E            +    where <function wait_for at 0x71f1d7d582c0> = s.wait_for
+E            +    and   exists = PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-1/test_s4_no_placeholder_is_comm0/elsewhere/planted').exists
+
+tests/acceptance/W2-56/test_w2_56_placeholders.py:78: AssertionError
+__ test_f1_launches_started_together_admit_only_those_the_memory_rule_admits ___
+
+planted = <conftest.Machine object at 0x71f1d79b7680>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x71f1d79b7a40>
+
+    def test_f1_launches_started_together_admit_only_those_the_memory_rule_admits(planted, monkeypatch):
+        """Six launches at once against room for three (floor 3 GiB, working size 2 GiB, 9 GiB available): only three
+        sessions start, and the other three are refused on memory. Each check is slowed after its reading, so without
+        the lock all six would read no session and start."""
+        monkeypatch.setenv("GOV_RESOURCES_PROC", "/proc")  # real sessions: their pids are alive
+        project = _quiet_launch_checks(planted, monkeypatch)
+        planted.config(memory_floor_bytes=3 * GIB, working_size_bytes=2 * GIB)
+        planted.memory(available=9 * GIB)  # 9 + the stand-ins' few MiB: n=2 needs 9 (opens), n=3 needs 11 (shuts)
+        marks = planted.root / "marks"
+        marks.mkdir()
+        cli = planted.home / launcher.CLI_REL
+        cli.parent.mkdir(parents=True)
+        # The folder is written into the stand-in: the launcher passes the CLI a cleaned environment (W2-56 S5), so a
+        # variable of this process's would not reach it.
+        cli.write_text(STAND_IN_CLI.replace("#!/bin/sh\n", f"#!/bin/sh\nMARKS={shlex.quote(str(marks))}\n", 1))
+        cli.chmod(0o755)
+        real_check = launch_gate.check_start
+    
+        def slow_check(**kw):
+            reading = real_check(**kw)
+            time.sleep(0.3)  # the window between the reading and the registration, widened
+            return reading
+    
+        monkeypatch.setattr(launch_gate, "check_start", slow_check)
+        children = []
+        try:
+            for i in range(6):
+                pid = os.fork()
+                if pid == 0:  # pragma: no cover - the child
+                    code = 4
+                    try:
+                        launcher.launch(project, "engineer", f"T-{i}", [])
+                        code = 0
+                    except GovError as error:
+                        (marks / f"refused-{i}").write_text(error.message)
+                        code = 3
+                    except BaseException as error:  # noqa: BLE001
+                        (marks / f"error-{i}").write_text(repr(error))
+                    finally:
+                        os._exit(code)
+                children.append(pid)
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline:
+                settled = _count(marks, "started-") + _count(marks, "refused-") + _count(marks, "error-")
+                entries = len(list((planted.dir / "sessions").glob("*.json"))) if (planted.dir / "sessions").exists() else 0
+                if settled == 6 and entries == _count(marks, "started-"):
+                    break
+                time.sleep(0.05)
+            assert _count(marks, "error-") == 0, [p.read_text() for p in marks.glob("error-*")]
+>           assert _count(marks, "started-") == 3 and _count(marks, "refused-") == 3
+E           AssertionError: assert (0 == 3)
+E            +  where 0 = _count(PosixPath('/tmp/w260a-lead-r5/pytest-of-usain/pytest-1/test_f1_launches_started_toget0/marks'), 'started-')
+
+tests/unit/resources/test_w2_20_round3.py:129: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-56/test_w2_56_placeholders.py::test_s4_no_placeholder_is_committed_beside_a_running_session
+FAILED tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+2 failed in 30.31s

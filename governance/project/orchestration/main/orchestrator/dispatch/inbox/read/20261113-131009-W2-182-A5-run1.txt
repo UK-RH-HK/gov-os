@@ -1,0 +1,10 @@
+log: W2-182-A5-run1.json
+W2: W2-182
+status: DONE (tests run). The revised cases are merged into w2/W2-182 at **1315039e6613**. 7 of the 8 revised cases pass. W2-23 S6 is red until the product-spec worker wires `context_watch.py` into `template/.rulesync/hooks.jsonc` (E (a)), which is the next run's work.
+
+task: DAEO-5y8d (W2-182), run 1: tests
+status: DONE (tests run). The revised cases are merged into w2/W2-182 at **1315039e6613**. 7 of the 8 revised cases pass. W2-23 S6 is red until the product-spec worker wires `context_watch.py` into `template/.rulesync/hooks.jsonc` (E (a)), which is the next run's work.
+work_completed:
+- I made the tests worktree, briefed a fresh independent test designer and ran two batches (Sonnet 5.5, high, class C1). Then I merged with `--no-ff` and removed the tests worktree and its branch.
+- **Batch 1** (6e3697785) covers lines B, C, R, D and E:
+  - B: the four appro

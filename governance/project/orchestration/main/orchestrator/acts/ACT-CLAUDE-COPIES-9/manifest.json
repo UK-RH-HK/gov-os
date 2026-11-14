@@ -1,0 +1,54 @@
+{
+ "act": "ACT-CLAUDE-COPIES-9",
+ "dec": "DEC-315, DEC-1112 (3), DEC-1156 (3), DEC-1166 (4), CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/adopt/SKILL.md",
+   "before": "b2303bc1615ac8f77332142add5b6a1a34e174569b87413598657b76a01bcc65",
+   "after": "77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/change/SKILL.md",
+   "before": "e22fd92ff3a6f88d15850ba01046f4f66bf0399e1865ca1bfd51258e0569a352",
+   "after": "dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/skills/change/SKILL.md",
+   "before": "2af36b728573e930ff4c5ea689f3a66faff11d342aced19a6a1babbfe16dc982",
+   "after": "cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/skills/adopt/SKILL.md": "b2303bc1615ac8f77332142add5b6a1a34e174569b87413598657b76a01bcc65",
+  "after/repo/.claude/skills/adopt/SKILL.md": "77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6",
+  "before/repo/.claude/skills/change/SKILL.md": "e22fd92ff3a6f88d15850ba01046f4f66bf0399e1865ca1bfd51258e0569a352",
+  "after/repo/.claude/skills/change/SKILL.md": "dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8",
+  "before/repo/.rulesync/skills/change/SKILL.md": "2af36b728573e930ff4c5ea689f3a66faff11d342aced19a6a1babbfe16dc982",
+  "after/repo/.rulesync/skills/change/SKILL.md": "cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76",
+  "list.txt": "b8ebe0997aa50ab64e2a32cf6f24656ab9a1a6f205ef62a13197a734de496c92",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "807027f82ae23b80e935f962f6ced88720ab678e706492390f3f4bc870fd1be1"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "807027f82ae23b80e935f962f6ced88720ab678e706492390f3f4bc870fd1be1"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n77faaa130301446a92e8eb92ddae872daf9555a1cc9d1baa0366ab82efd3b2c6  .claude/skills/adopt/SKILL.md\ndc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8  .claude/skills/change/SKILL.md\ncdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76  .rulesync/skills/change/SKILL.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0  .rulesync/skills/adopt/SKILL.md\n16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0  template/.rulesync/skills/adopt/SKILL.md\ncdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76  template/.rulesync/skills/change/SKILL.md\n16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0  template/governance/kernel/skills/adopt/SKILL.md\ncdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76  template/governance/kernel/skills/change/SKILL.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

@@ -1,0 +1,41 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "head",
+   "before": "b266cf8a40f2",
+   "after": "121c99a44bf6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "head",
+   "before": "0b0d4cb3053d",
+   "after": "4094fe296400"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "head",
+   "before": "bec7757d4dd1",
+   "after": "fb4144730048"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "status line gone",
+   "line": " M governance/project/criticality.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "status line gone",
+   "line": " M src/gov/launch/launcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184",
+   "change": "status line gone",
+   "line": " M tests/unit/launch/test_w2_184_criticality.py"
+  }
+ ]
+}

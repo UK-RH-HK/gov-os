@@ -1,0 +1,8 @@
+log: W2-104-A5-r4.json
+W2: W2-104
+status: DONE. Head to land: `050a3e9a1725`. The verified code is at `97b06de4eba1`, and the only commit after it adds the probe record. One residual red remains: W1-01's case on run 3's WIP merge `349341ab8f03`. It turns green when the owner's exemption reaches integrate, which has not happened yet (see unr
+
+task: DAEO-drhj (W2-104), run 4 (build, class C2)
+status: DONE. Head to land: `050a3e9a1725`. The verified code is at `97b06de4eba1`, and the only commit after it adds the probe record. One residual red remains: W1-01's case on run 3's WIP merge `349341ab8f03`. It turns green when the owner's exemption reaches integrate, which has not happened yet (see unresolved).
+work_completed:
+- Merged `w2/integrate` at `72c6def8871a` as `0e469cc37`, in the form DEC-1173 (1) sets. All 5 conflicted files were taken from integrate's side: `src/gov/check/commands.py`, W1-07's `README.md`, `test_w1_07_recorded

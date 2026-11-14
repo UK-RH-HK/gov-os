@@ -1,0 +1,5 @@
+Merge w2/W2-60a-tests into w2/W2-60a: run 5's tests (S12 plan test, P-3 older fixtures, the merge-order and lead-launch revisions, P-6 (a) exit 1, P-7 (a) manifest cases, README)
+
+Task: DAEO-cv58
+Role: orchestrator
+Implements: DEC-826, DEC-839, DEC-832

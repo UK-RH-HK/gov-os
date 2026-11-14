@@ -1,0 +1,40 @@
+deny       'mapfile -t L <<< \'touch tests/acceptance/X/zz.py\'; "${L[@]}"'       Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'mapfile -t L <<< \'touch src/ok.py\'; "${L[@]}"'                      
+deny       "readarray -t L <<< 'touch tests/acceptance/X/zz.py'; ${L[0]}"         Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "readarray -t L <<< 'touch src/ok.py'; ${L[0]}"                        
+deny       'read -ra arr <<< \'touch tests/acceptance/X/zz.py\'; "${arr[@]}"'     Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'read -ra arr <<< \'touch src/ok.py\'; "${arr[@]}"'                    
+deny       "read -ra arr <<< 'touch tests/acceptance/X/zz.py'; ${arr[*]}"         Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "read -ra arr <<< 'touch src/ok.py'; ${arr[*]}"                        
+deny       "f=$(read -r x <<< 'touch tests/acceptance/X/zz.py'; echo $x); $f"     Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "f=$(read -r x <<< 'touch src/ok.py'; echo $x); $f"                    
+deny       "while read -r f; do sudo $f; done <<< 'touch tests/acceptance/X/zz.py'" Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "while read -r f; do sudo $f; done <<< 'touch src/ok.py'"              
+deny       "read -r a <<< 'touch tests/acceptance/X/zz.py'; b=$a; $b"             Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "read -r a <<< 'touch src/ok.py'; b=$a; $b"                            
+deny       'read -r a <<< \'touch tests/acceptance/X/zz.py\'; export a; bash -c "$a"' Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch src/ok.py\'; export a; bash -c "$a"'            Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch tests/acceptance/X/zz.py\'; bash -c "$a"'       Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch src/ok.py\'; bash -c "$a"'                      Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch tests/acceptance/X/zz.py\'; sh -c "$a"'         Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch src/ok.py\'; sh -c "$a"'                        Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch tests/acceptance/X/zz.py\' && eval "$a"'        Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< \'touch src/ok.py\' && eval "$a"'                       Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       "{ read -r a; $a; } <<< 'touch tests/acceptance/X/zz.py'"              Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "{ read -r a; $a; } <<< 'touch src/ok.py'"                             
+deny       "while read -r a; do declare -f x; $a; done <<< 'touch tests/acceptance/X/zz.py'" Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      "while read -r a; do declare -f x; $a; done <<< 'touch src/ok.py'"     
+deny       'read -r a b <<< \'touch tests/acceptance/X/zz.py\'; "$a" "$b"'        Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'read -r a b <<< \'touch src/ok.py\'; "$a" "$b"'                       
+allow      'while read -r f; do ("$f" tests/acceptance/X/zz.py); done <<< touch'  
+allow      'while read -r f; do ("$f" src/ok.py); done <<< touch'                 
+allow      'while read -r c; do $c tests/acceptance/X/zz.py; done <<< touch'      
+allow      'while read -r c; do $c src/ok.py; done <<< touch'                     
+allow      'read -r c <<< touch; $c tests/acceptance/X/zz.py'                     
+allow      'read -r c <<< touch; $c src/ok.py'                                    
+deny       'read -r a <<< \'touch tests/acceptance/X/zz.py\'; echo "$a" | sh'     Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'read -r a <<< \'touch src/ok.py\'; echo "$a" | sh'                    
+deny       'mapfile -t L <<< \'touch tests/acceptance/X/zz.py\'; printf \'%s\\n\' "${L[@]}" | bash' Bash write to '/tmp/w242a-lead/tmp/tmpioj_ulkr/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'mapfile -t L <<< \'touch src/ok.py\'; printf \'%s\\n\' "${L[@]}" | bash' 
+deny       'read -r a <<< "$v"; ${a:-touch} tests/acceptance/X/zz.py'             Bash write to '/<guard-unresolvable>' denied for role 'engineer'
+deny       'read -r a <<< "$v"; ${a:-touch} src/ok.py'                            Bash write to '/<guard-unresolvable>' denied for role 'engineer'

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-130
+status: interim result 35b6ac6ba: W2-130 (DAEO-q8cl) tests: pin run: S8's two cases at the record's measured tree; W2-175 S7 at its landing 61cae50dc

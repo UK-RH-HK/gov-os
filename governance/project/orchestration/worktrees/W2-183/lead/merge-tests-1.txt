@@ -1,0 +1,6 @@
+Merge w2/W2-183-tests: W2-183's acceptance tests (49 cases; S1, S2, S3, F1; red on the base as mapped in the README)
+
+Task: DAEO-href
+Role: orchestrator
+Implements: DEC-1165, DEC-1027, DEC-860, CAP-15.d
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

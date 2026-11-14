@@ -1,0 +1,9 @@
+log: W2-130-A5-pin.json
+W2: W2-130
+status: PACKAGES. Both revisions are done and passed the narrow check at 36d4539db. A third red of the same kind, S4, blocks DONE: `gov accept W2-130` passes 11 of 12 lines and fails success-4 (S4). The head ready to land once S4 is decided: `67364dbea2fb30a9b5ddd6ac4c489c6c4dabc3d4`.
+
+task: DAEO-q8cl (W2-130), the pin run: two decided-behaviour test revisions under DEC-1164 (18) and DEC-1156 (7)
+status: PACKAGES. Both revisions are done and passed the narrow check at 36d4539db. A third red of the same kind, S4, blocks DONE: `gov accept W2-130` passes 11 of 12 lines and fails success-4 (S4). The head ready to land once S4 is decided: `67364dbea2fb30a9b5ddd6ac4c489c6c4dabc3d4`.
+work_completed:
+- Merged w2/integrate into w2/W2-130 with `--no-ff`, no conflicts (f4511c723).
+- Before writing the brief I measured the decided pin and found it would stay red: the record's `counts-af

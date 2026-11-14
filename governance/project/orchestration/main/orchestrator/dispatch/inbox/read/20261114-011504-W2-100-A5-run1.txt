@@ -1,0 +1,8 @@
+log: W2-100-A5-run1.json
+W2: W2-100
+status: PACKAGES
+
+task: DAEO-uw5h (W2-100)
+status: PACKAGES
+work_completed: I stopped this build run before the test designer and the implementer started, so no worker was launched. The ticket has no `## Interface` section. The claim (e09607093) and the brief do not say how six code-bound KPI clauses are met inside the ticket's paths, which are only the four skill folders and their `.rulesync` copies. Under DEC-1157 (3) a gap left at claim comes back as an interface package. I wrote package P-W2-100-IF-1, which recommends an interface on the pattern of W2-98's P-W2-98-IF-1, and a checkpoint.
+files_changed: none

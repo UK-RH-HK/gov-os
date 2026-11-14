@@ -1,0 +1,9 @@
+log: W2-94-A5-gold2.json
+W2: W2-94
+status: LAUNCH_BLOCKED
+
+I couldn't start the engineer: the launcher refused it, so `check_gold.py` is unchanged and nothing was built, tested or reviewed this run. The integrate merge is done; the blocker is a comment on the ticket's `role:` line that only the CTO can remove.
+
+task: DAEO-g87r
+status: LAUNCH_BLOCKED
+work_completed: Step 1 is done: I merged `w2/integrate` into `w2/W2-94` in one `--no-ff` command (7a19bcf2a, clean, with `Task: DAEO-g87r` and `Role: orchestrator`), which brought in the ticket's role change from db09788ff. Step 2 is blocked. The launcher's dry run refused the engineer for `briefs/en-1.md`

@@ -1,0 +1,15 @@
+2026-11-14 00:16:04 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-14 00:16:04 merged W2-104, W2-94, W2-174, W2-61h onto e1fce4ed886a: 98bc0f937d2b
+2026-11-14 00:48:16 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-14 00:48:25 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-14 00:48:30 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-14 00:48:31 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-14 00:56:16 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35.py
+2026-11-14 00:56:17 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-11-14 00:57:12 the head without the batch: a throwaway worktree head-e1fce4ed886a-0 at e1fce4ed886a with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-14 00:57:14 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+2026-11-14 00:57:17 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]
+2026-11-14 00:57:19 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]
+2026-11-14 00:57:21 ADVANCED refs/heads/w2/integrate e1fce4ed886a -> 98bc0f937d2b; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/98bc0f937d2b.json
+2026-11-14 00:57:21 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-14 01:05:24 integration store promoted: the merged clone's stores at 98bc0f937d2b into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

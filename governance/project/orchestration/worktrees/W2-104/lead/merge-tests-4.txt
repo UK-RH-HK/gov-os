@@ -1,0 +1,9 @@
+W2-104: merge the tests branch for run 4 (skilleval back in W1-07's and W1-32's lists, beside W2-37's impact)
+
+The test designer's commit 5ded8afe73ee adds skilleval beside impact in W1-07's support, count case, help case
+docstring and README, and in W1-32's command-set assertion (DEC-747, DEC-1020); nothing else changes.
+
+Task: DAEO-drhj
+Role: orchestrator
+Implements: DEC-959, DEC-820
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

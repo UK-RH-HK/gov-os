@@ -1,0 +1,25 @@
+...............................F........                                 [100%]
+=================================== FAILURES ===================================
+_ test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening _
+
+w = <test_landing_cto_route.World object at 0x79a77bc92780>
+
+    def test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening(w):
+        """The classifier reads the content: an item added to a refusal list is (a), so the bundle's vote is (b) through the hook
+        file. The path map is the owner's ratchet row (its class by path is (O)), and 'never O' is read on the paths."""
+        h = w.bundle(paths=(HOOK, PATH_MAP), contents={PATH_MAP: (PM_BEFORE, PM_AFTER)})
+        bundle_vote = lc.act_class.classify(str(w.acts / ACT))
+        assert bundle_vote["class"] == "b" and {f["path"]: f["class"] for f in bundle_vote["files"]}[PATH_MAP] == "a"
+        c = w.commit([HOOK, PATH_MAP], route(h))
+        got = w.flagged()
+>       assert set(got) == {c} and "class of the commit's paths" in got[c]["reason"]
+E       AssertionError: assert (set() == {'ca4f256e3f1...5cba01c80554'}
+E         
+E         Extra items in the right set:
+E         'ca4f256e3f19350efd6e53b28ae45cba01c80554'
+E         Use -v to get more diff)
+
+tests/unit/operator/test_landing_cto_route.py:271: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_a_path_map_change_beside_a_b_path_stays_flagged_though_the_classifier_reads_it_as_a_tightening
+1 failed, 39 passed in 4.49s

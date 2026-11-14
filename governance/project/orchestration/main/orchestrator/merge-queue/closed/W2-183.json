@@ -1,0 +1,12 @@
+{
+ "ticket": "W2-183",
+ "task": "DAEO-href",
+ "branch": "w2/W2-183",
+ "commit": "6a82ec67a5f4a6e120ee98b122122d83032ee812",
+ "requested_at": "2026-11-13 15:18:08",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-13T15:18:08.297111",
+ "merge": "8c10b3745aff3970148a62496673ac0340e3abf1",
+ "record": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/8c10b3745aff.json",
+ "landed_at": "2026-11-13 16:02:07"
+}

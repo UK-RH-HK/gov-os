@@ -1,0 +1,11 @@
+Auto-merging src/gov/check/commands.py
+CONFLICT (content): Merge conflict in src/gov/check/commands.py
+Auto-merging tests/acceptance/W1-07/README.md
+CONFLICT (content): Merge conflict in tests/acceptance/W1-07/README.md
+Auto-merging tests/acceptance/W1-07/test_w1_07_recorded_commands.py
+CONFLICT (content): Merge conflict in tests/acceptance/W1-07/test_w1_07_recorded_commands.py
+Auto-merging tests/acceptance/W1-07/w1_07_support.py
+CONFLICT (content): Merge conflict in tests/acceptance/W1-07/w1_07_support.py
+Auto-merging tests/acceptance/W1-32/test_w1_32_command_set.py
+CONFLICT (content): Merge conflict in tests/acceptance/W1-32/test_w1_32_command_set.py
+Automatic merge failed; fix conflicts and then commit the result.

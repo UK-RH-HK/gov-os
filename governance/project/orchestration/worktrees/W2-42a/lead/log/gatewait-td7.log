@@ -1,0 +1,9 @@
+2026-11-14 05:21:01 SHUT leads=2 load=26.8/30.9 nproc=20 have=12118460kB need=5505024kB: load 26.8/30.9 >= nproc 20
+2026-11-14 05:22:06 SHUT leads=2 load=26.8/30.7 nproc=20 have=12108040kB need=5505024kB: load 26.8/30.7 >= nproc 20
+2026-11-14 05:23:11 SHUT leads=2 load=24.3/30.2 nproc=20 have=11997448kB need=5505024kB: load 24.3/30.2 >= nproc 20
+2026-11-14 05:24:17 SHUT leads=2 load=22.4/29.7 nproc=20 have=11986396kB need=5505024kB: load 22.4/29.7 >= nproc 20
+2026-11-14 05:25:19 SHUT leads=2 load=23.5/29.4 nproc=20 have=12360768kB need=5505024kB: load 23.5/29.4 >= nproc 20
+2026-11-14 05:26:24 gate open: OPEN leads=2 load=17.7/28.4 nproc=20 have=12005176kB need=5505024kB
+launch_worker: independent-test-designer DAEO-03ub in /home/usain/gov-os-worktrees/W2-42a-tests: sandbox settings strict; disk gate open; brief /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/brief/td-7-2.md; projection none; model claude-sonnet-5-5; class C3
+launch_worker: started pid 1616037 (its own process group) for independent-test-designer DAEO-03ub; log /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/lead/log/td-7-2.json
+launch_worker: wait with: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-42a-tests/.gov-runtime/scratch/lead/log/td-7-2.exit

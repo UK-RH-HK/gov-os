@@ -1,0 +1,178 @@
+--- A. the bundle
+ok   A1 list.txt names the one file, root repo
+ok   A2 the before copy hashes as listed
+ok   A3 the after copy hashes as listed
+ok   A4 the main tree's bash_writes.py is the frozen before
+ok   A5 apply.sh parses
+ok   A6 seven lines removed (_kind's five-line shell branch, body()'s one elif, the held-body loop's one if), the rest added
+     60 lines added
+changed blocks (old line ranges): [(1082, 1086), (1088, 1087), (1232, 1232), (1497, 1497), (1500, 1499)]
+ok   A7 every changed block lies in one of three places (_kind's shell branch, body()'s shell elif, the held-body loop's registration line), all three are touched; every other line is identical
+ok   A9 W2-42a's F1 fixture read from refs/heads/w2/W2-42a
+ok   A8 the before copy is the committed blob (HEAD)
+ok   A10 the frozen copies are the two listed files, no __pycache__ or bytecode in the bundle (review F2)
+ok   A11 the bundle holds no other file (apply.sh, the follow-up diff, list.txt, manifest.json, the rehearsal log; review.md is the operator's, added later)
+--- B. a fresh clone of w2/integrate
+     state before (sha256 bb246a21735e)
+ok   B1 check: state before (exit 0)
+ok   B2 the checks before the apply: 1 passes (it parses), 2, 3 and 4 refuse (exits 0,1,1,1)
+     state applied (sha256 e55c48a3bec6)
+ok   B3 apply (exit 0)
+ok   B4 the file is the after, byte for byte
+ok   B5 its mode kept (644)
+ok   B6 verify (exit 0)
+     state applied (sha256 e55c48a3bec6); nothing to do
+ok   B7 apply again: nothing to do
+ok   B8 only bash_writes.py changed in the clone
+     bash_writes: a shell's option values are not its script; standard input and unknown options read as shell; -c is data; never less strict
+     the hook, as an engineer writing under tests/acceptance/: every shell spelling, quoted or not, a substitution in an unquoted body, and a body written to a file and run are refused; the controls pass
+ok   B9 the manifest's four checks after the apply (exits 0,0,0,0)
+--- C. the live hook, as Claude Code runs it, on the bundle's before and after copies
+ok   C1 both hook copies hold the clone's own pretooluse.py (the hook is not part of the change)
+     before: F1 bash -euo pipefail|allow
+     before: F1 bash -o pipefail|allow
+     before: F1 bash -O extglob|allow
+     before: F1 bash --rcfile|allow
+     before: F1 bash --init-file|allow
+     before: F1 cat | bash -o pipefail|allow
+     before: F1 bash /dev/stdin|allow
+     before: plain bash|deny
+     before: bash -c|allow
+     before: bash script.sh|allow
+     before: bash -o pipefail script.sh|allow
+     before: cat data|allow
+     before: designer, bash -euo pipefail|allow
+ok   C2 before: each F1 spelling is allowed (the defect reproduced); plain bash refused; the others as expected
+     after:  F1 bash -euo pipefail|deny
+     after:  F1 bash -o pipefail|deny
+     after:  F1 bash -O extglob|deny
+     after:  F1 bash --rcfile|deny
+     after:  F1 bash --init-file|deny
+     after:  F1 cat | bash -o pipefail|deny
+     after:  F1 bash /dev/stdin|deny
+     after:  plain bash|deny
+     after:  bash -c|allow
+     after:  bash script.sh|allow
+     after:  bash -o pipefail script.sh|allow
+     after:  cat data|allow
+     after:  designer, bash -euo pipefail|allow
+ok   C3 after: each F1 spelling is refused; plain bash, bash -c, bash script.sh, cat and the test designer as before
+ok   C4 every case that is not an F1 spelling answers the same before and after
+     id                                   expect  before   round 1  after
+     subst-o-pipefail                     deny    deny     allow    deny
+     subst-o-pipefail-quoted              deny    allow    deny     deny
+     subst-euo-pipefail                   deny    deny     allow    deny
+     subst-euo-pipefail-quoted            deny    allow    deny     deny
+     subst-O-extglob                      deny    deny     allow    deny
+     subst-O-extglob-quoted               deny    allow    deny     deny
+     subst-rcfile                         deny    deny     allow    deny
+     subst-rcfile-quoted                  deny    allow    deny     deny
+     subst-init-file                      deny    deny     allow    deny
+     subst-init-file-quoted               deny    allow    deny     deny
+     subst-dev-stdin                      deny    deny     allow    deny
+     subst-dev-stdin-quoted               deny    allow    deny     deny
+     subst-dash                           deny    allow    allow    deny
+     subst-dash-quoted                    deny    deny     deny     deny
+     subst-sh-eu                          deny    allow    allow    deny
+     subst-sh-eu-quoted                   deny    deny     deny     deny
+     subst-rm                             deny    deny     allow    deny
+     subst-rm-quoted                      deny    allow    deny     deny
+     subst-cat-pipe                       deny    deny     allow    deny
+     subst-cat-pipe-quoted                deny    allow    deny     deny
+     file-redirect-run                    deny    deny     allow    deny
+     file-redirect-run-quoted             deny    deny     deny     deny
+     file-redirect-run-expansion          deny    deny     allow    deny
+     file-redirect-run-expansion-quoted   deny    deny     deny     deny
+     file-tee-pipe-run                    deny    deny     allow    deny
+     file-tee-pipe-run-quoted             deny    deny     deny     deny
+     file-tee-pipe-run-expansion          deny    deny     allow    deny
+     file-tee-pipe-run-expansion-quoted   deny    deny     deny     deny
+     file-euo-redirect-run                deny    deny     allow    deny
+     file-euo-redirect-run-quoted         deny    deny     deny     deny
+     plain-eu-o-pipefail                  deny    allow    allow    deny
+     plain-eu-o-pipefail-quoted           deny    allow    deny     deny
+     plain-euo                            deny    allow    allow    deny
+     plain-euo-quoted                     deny    allow    deny     deny
+     plain-cat-pipe                       deny    allow    allow    deny
+     plain-cat-pipe-quoted                deny    allow    deny     deny
+     plain-bash                           deny    allow    allow    deny
+     plain-bash-quoted                    deny    deny     deny     deny
+     control-cat-unquoted                 allow   allow    allow    allow
+     control-cat-subst-unquoted           allow   allow    allow    allow
+     control-bash-script                  allow   allow    allow    allow
+     control-bash-o-script                allow   allow    allow    allow
+     control-bash-c                       allow   allow    allow    allow
+     control-shell-harmless               allow   allow    allow    allow
+     control-shell-harmless-quoted        allow   allow    allow    allow
+ok   C5 round 2's 38 cases (19 unquoted-and-file cases and their quoted twins): every one is refused after
+ok   C6 the 7 controls are allowed before and after
+ok   C7 no case refused before is allowed after (stricter only)
+     refused before and allowed by the round 1 file (review F1): 13; newly refused after: 17
+ok   C8 the round 1 file is looser than before on at least ten of these cases (review F1 reproduced), the after file on none
+     1280 calls (20 heads x 8 bodies x quoted or not x 2 tails x engineer and auditor): refused before 308, after 700; refused before and allowed after: 0 (the round 1 file: 63); newly refused: 392, by body: {'touch tests/acceptance/X/zz.py': 82, 'echo x > tests/acceptance/X/zz.py': 82, 'echo $(touch tests/acceptance/X/zz.py)': 53, 'echo `touch tests/acceptance/X/zz.py`': 53, 'rm -rf tests/acceptance/X': 82, 'echo x > src/gov/zz.py': 40}
+ok   C9 the differential matrix through the whole hook: 1,280 calls, none refused before is allowed after, and no harmless body (echo hi, echo $(date)) is newly refused
+--- D. the follow-up tests (through heavy_slot.sh, TMPDIR in the bed)
+ok   D1 the follow-up tests apply to the clone
+ok   D1b the follow-up's fixture copy is W2-42a's file, byte for byte
+ok   D1c the follow-up's round 2 case file is the one the rehearsal ran in C
+ok   D2 the clone's changes are the hook, the one test file and its fixture copy
+     before: 31 failed, 36 passed, 63 deselected in 12.64s
+ok   D3 before: of the 67 new tests, 31 are red: the F1 case group, the _kind table, 12 of W2-42a's 19 cases (the 12 spellings allowed before) and 17 of round 2's 45 (the cases refused after and allowed before); the other 36 green
+     F1 spellings red before: 12
+ok   D4 before: the F1 case group has 12 red cases (the ten spellings, and the two unquoted bodies with nothing to expand: 'want deny, got allow')
+     after: 67 passed, 63 deselected in 10.22s
+ok   D5 after: the 67 new tests green (3, W2-42a's 19 and round 2's 45)
+     the hook's own suites after: 561 passed, 1 skipped, 36 deselected in 50.76s
+ok   D6 after: tests/unit/hooks (the live hook's cases and the logged-refusals replay), test_w2_141_search.py and test_w2_141_hook.py green
+ok   D7 after: test_the_logged_refusals_replay_as_decided ran (the corpus is here) and passed
+--- E. undo and refusals
+     state before (sha256 bb246a21735e)
+ok   E1 undo (exit 0)
+ok   E2 undone byte for byte
+ok   E3 check: state before (exit 0)
+     refused: .claude/hooks/bash_writes.py is neither the frozen before nor the frozen after (sha256 1ac107a8fe56)
+ok   E4 apply refuses a bash_writes.py changed since the freeze (exit 3)
+     refused: .claude/hooks/bash_writes.py is not as this ACT left it (sha256 40d11b9af71c); a later change is not overwritten
+ok   E5 undo refuses it too (exit 3)
+ok   E6 verify refuses it (exit 3)
+ok   E7 a link in the file's place is refused
+--- H. W2-42a's F1 fixture, every id through the hook before and after (an engineer writing under tests/acceptance/)
+     bash-euo-pipefail-auditor          write     before=allow  after=deny
+     bash-euo-pipefail                  write     before=allow  after=deny
+     bash-e-u-o-pipefail                write     before=allow  after=deny
+     bash-eu-o-pipefail-unquoted        write     before=allow  after=deny
+     sh-o-errexit                       write     before=allow  after=deny
+     bash-O-extglob                     write     before=allow  after=deny
+     bash-plus-o-posix                  write     before=allow  after=deny
+     bash-noprofile-norc                write     before=deny   after=deny
+     bash-rcfile-f                      write     before=allow  after=deny
+     cat-pipe-bash-o-pipefail           write     before=allow  after=deny
+     cat-pipe-bash-euo-pipefail         write     before=allow  after=deny
+     bash-s                             write     before=deny   after=deny
+     bash-dev-stdin                     write     before=allow  after=deny
+     sh-dev-fd-0                        write     before=allow  after=deny
+     bash-unknown-flag-fails-closed     write     before=deny   after=deny
+     data-cat                           no-write  before=allow  after=allow
+     data-tee-f                         no-write  before=allow  after=allow
+     data-grep-e                        no-write  before=allow  after=allow
+     data-bash-script-sh                no-write  before=allow  after=allow
+     shell spellings 15: allowed before 12, refused after 15; allowed after: []
+     data controls 4: same before and after 4, allowed 4
+     fixture: as stated
+ok   H1 the 15 shell spellings: 12 allowed before, all 15 refused after (the unquoted-delimiter case too, round 2); the 4 data controls keep their verdict (allowed); nothing refused before is allowed after
+--- F. the main tree
+ok   F1 the main tree's bash_writes.py is unchanged
+ok   F2 the main tree's pretooluse.py is unchanged
+ok   F3 the main tree's tracked .claude/governance/tests/src status unchanged
+--- G. the guard replay (every refused call is still refused)
+     calls: 720 (corpus 87, shell heredoc calls of the call set 633)
+     refused before: 25; refused after: 25
+     refused before, allowed after: 0 
+     allowed before, refused after (replay_refused): 0 
+     hook errors: 0 
+     replay: every refused call is still refused
+ok   G1 no call refused before is allowed after, no hook error
+ok   G2 newly refused calls (the review's replay_refused list), each with its hook reason above: 0
+ok   G3 after the whole rehearsal the bundle still holds no __pycache__ or bytecode (nothing imported the frozen copies in place)
+=== 52 ok, 0 failed
+failures: 0

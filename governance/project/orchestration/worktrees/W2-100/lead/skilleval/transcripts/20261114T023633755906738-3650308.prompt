@@ -1,0 +1,57 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply uses the shared error body, ranks the point P3, and does not stop the work or send the question to the owner.
+
+Expected behaviour:
+the session takes the simplest reading (the same error body as the others), adds it to the contract, tests it, and names the point in `discoveries`; this is a P3 (reversible, inside the ticket, no change to a KPI), decided and logged without stopping the work.
+
+The session's reply:
+<<<
+Per the skill, this is a **P3**: the point the contract leaves open (an error body) can be undone, sits inside the ticket and changes no KPI. So I took the simplest reading, put it in the contract, logged it, and kept going without asking the owner.
+
+I found no ticket, contract file, handler or tests in the workspace. The only files are the skill's own. So I didn't write a file. The contract addition is below as text, ready to go in the contract file in the same commit as the code.
+
+---
+
+**task:** Settle the body of the "409 when the name is taken" response, which the contract doesn't give, and continue the ticket.
+**status:** partial. The open point is settled at the contract level. No contract file, code or tests exist in the workspace to change or run.
+**work_completed:** Ranked the gap as P3. Took the simplest reading: the 409 uses the contract's one shared error shape `{"error": {"code": "...", "message": "..."}}` with a stable code callers can match on. Wrote the contract addition below. Did not ask the owner.
+**files_changed:** none, because there is no contract file or ticket path in the workspace.
+**evidence:** The contract gives every other error the body `{"error": {"code", "message"}}`. The skill requires one error shape for the whole interface and lists "an error body" as a P3 example.
+**tests:** none run (nothing to run against). Tests to write from the contract, before the handler:
+- creating with a name that is already taken returns 409, and the body validates against the shared `Error` schema with `error.code == "name_taken"`;
+- the same request with an unused name still returns the success response;
+- a name that differs only in case or surrounding spaces follows whatever uniqueness rule the contract states (if it states none, that's another open point to log);
+- repeating a create that already succeeded gives 409 `name_taken`, not 500.
+**discoveries:** The contract said "409 when the name is taken" with no body. Reading taken: the shared error shape with code `name_taken`. The casing is assumed snake_case, so match the codes the contract already uses (e.g. `NAME_TAKEN` if they're upper case). The message is for people only and says nothing about the other resource beyond the name the caller sent.
+**risks:** I couldn't identify any callers because no repo is present. The change is additive (it documents a body where none was given), so no published shape breaks. The message must not leak the other resource's id or owner.
+**lessons:** none new.
+**proposed_decisions:** none. Within the skill's P3 rule.
+**unresolved:** Where the contract file lives and the endpoint's exact path and version are unknown in this workspace.
+**recommended_next_action:** Add the fragment below to the contract file, then write the tests above (TDD), then the handler. Run the suite and the pre-commit checklist, then `gov accept`.
+
+**Contract addition (OpenAPI fragment):**
+
+```yaml
+# under the endpoint's responses:
+'409':
+  description: The name is already taken.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Error'   # the contract's shared error shape
+      example:
+        error:
+          code: name_taken
+          message: "A resource with this name already exists."
+```
+
+## What I did
+- Ranked the missing 409 body as a P3 and didn't ask the owner, so the ticket isn't held up for a day.
+- Used the same error body as every other error, with a fixed code (`name_taken`) that callers can match on. Change the casing if the contract's other codes use a different style.
+- I changed no files and ran no tests, because the workspace has no ticket, contract, code or tests. What I produced is the contract addition above and a list of tests to write first.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

@@ -1,0 +1,115 @@
+2026-11-13 16:07:05 admitted by the dispatcher; launching W2-116
+disk gate open: 718 GiB free, 57324880 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 15665598464,
+  "sessions_live_memory_bytes": 2807222272,
+  "load_1m": 14.61,
+  "load_15m": 13.83,
+  "busy_cores_1m": 8.08,
+  "embedding_cpu_p95": {
+    "shared": 0.05,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.1,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 770126700544,
+    "free_inodes": 57324881
+  },
+  "sessions": [
+    {
+      "pid": 174525,
+      "repository": "/home/usain/gov-os-worktrees/W2-153-tests",
+      "ticket": "DAEO-8s85",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 317943808
+    },
+    {
+      "pid": 2060041,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a",
+      "ticket": "DAEO-03ub",
+      "role": "orchestrator",
+      "live_memory_bytes": 272080896
+    },
+    {
+      "pid": 2855458,
+      "repository": "/home/usain/gov-os-worktrees/W2-88",
+      "ticket": "DAEO-2bdu",
+      "role": "orchestrator",
+      "live_memory_bytes": 375349248
+    },
+    {
+      "pid": 2907548,
+      "repository": "/home/usain/gov-os-worktrees/W2-60a",
+      "ticket": "DAEO-cv58",
+      "role": "orchestrator",
+      "live_memory_bytes": 266665984
+    },
+    {
+      "pid": 2961821,
+      "repository": "/home/usain/gov-os-worktrees/W2-182",
+      "ticket": "DAEO-5y8d",
+      "role": "orchestrator",
+      "live_memory_bytes": 287571968
+    },
+    {
+      "pid": 2981713,
+      "repository": "/home/usain/gov-os-worktrees/W2-60a-tests",
+      "ticket": "DAEO-cv58",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 323710976
+    },
+    {
+      "pid": 3544109,
+      "repository": "/home/usain/gov-os-worktrees/W2-153",
+      "ticket": "DAEO-8s85",
+      "role": "orchestrator",
+      "live_memory_bytes": 298901504
+    },
+    {
+      "pid": 3774354,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a",
+      "ticket": "DAEO-03ub",
+      "role": "engineer",
+      "live_memory_bytes": 357142528
+    },
+    {
+      "pid": 3931713,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a-tests",
+      "ticket": "DAEO-03ub",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 307855360
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 207433,
+    "repository": "/home/usain/gov-os-worktrees/W2-116",
+    "ticket": "DAEO-f58b",
+    "role": "orchestrator",
+    "started": "2026-11-13T16:07:05+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 16695341
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-13 16:07:05 gate open; DAEO-f58b registered as pid 207433; starting W2-116

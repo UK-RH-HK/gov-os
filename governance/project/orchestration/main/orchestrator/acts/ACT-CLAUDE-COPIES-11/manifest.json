@@ -1,0 +1,135 @@
+{
+ "act": "ACT-CLAUDE-COPIES-11",
+ "dec": "DEC-315, DEC-1112 (3), CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/devops/SKILL.md",
+   "before": null,
+   "after": "a41243e1e6745fee8aa7c9cd6ce9cabd7f12d7c48531daf6df7362cae985720f"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/devops/check_domain_skill.py",
+   "before": null,
+   "after": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/devops/scenario-records.yaml",
+   "before": null,
+   "after": "87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/devops/scenario-summaries.md",
+   "before": null,
+   "after": "6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/devops/scenarios.md",
+   "before": null,
+   "after": "a6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/frontend/SKILL.md",
+   "before": null,
+   "after": "7b8f57f29bfda69ac792a645e9008b44235f008280e6a6c8e59c5ae8661e9931"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/frontend/check_domain_skill.py",
+   "before": null,
+   "after": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/frontend/scenario-records.yaml",
+   "before": null,
+   "after": "44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/frontend/scenario-summaries.md",
+   "before": null,
+   "after": "a3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/frontend/scenarios.md",
+   "before": null,
+   "after": "d572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/ui-ux/SKILL.md",
+   "before": null,
+   "after": "775ff4da6694a81e318108c46d08a0f42879b12de48b4ec7e7ee13c1ced28c54"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/ui-ux/check_domain_skill.py",
+   "before": null,
+   "after": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/ui-ux/scenario-records.yaml",
+   "before": null,
+   "after": "9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/ui-ux/scenario-summaries.md",
+   "before": null,
+   "after": "665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/ui-ux/scenarios.md",
+   "before": null,
+   "after": "714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9"
+  }
+ ],
+ "files": {
+  "after/repo/.claude/skills/devops/SKILL.md": "a41243e1e6745fee8aa7c9cd6ce9cabd7f12d7c48531daf6df7362cae985720f",
+  "after/repo/.claude/skills/devops/check_domain_skill.py": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a",
+  "after/repo/.claude/skills/devops/scenario-records.yaml": "87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28",
+  "after/repo/.claude/skills/devops/scenario-summaries.md": "6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0",
+  "after/repo/.claude/skills/devops/scenarios.md": "a6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9",
+  "after/repo/.claude/skills/frontend/SKILL.md": "7b8f57f29bfda69ac792a645e9008b44235f008280e6a6c8e59c5ae8661e9931",
+  "after/repo/.claude/skills/frontend/check_domain_skill.py": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a",
+  "after/repo/.claude/skills/frontend/scenario-records.yaml": "44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd",
+  "after/repo/.claude/skills/frontend/scenario-summaries.md": "a3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d",
+  "after/repo/.claude/skills/frontend/scenarios.md": "d572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a",
+  "after/repo/.claude/skills/ui-ux/SKILL.md": "775ff4da6694a81e318108c46d08a0f42879b12de48b4ec7e7ee13c1ced28c54",
+  "after/repo/.claude/skills/ui-ux/check_domain_skill.py": "3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a",
+  "after/repo/.claude/skills/ui-ux/scenario-records.yaml": "9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e",
+  "after/repo/.claude/skills/ui-ux/scenario-summaries.md": "665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b",
+  "after/repo/.claude/skills/ui-ux/scenarios.md": "714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9",
+  "list.txt": "3a6e6e316d33508486226771c07c7d230782a650f7f94dc251fcaa83dc63f48b",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "6f69867116da490a0d75638256ed6bc0e8a6086d522051755ae7a51d7fe26fa3"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "6f69867116da490a0d75638256ed6bc0e8a6086d522051755ae7a51d7fe26fa3"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\na41243e1e6745fee8aa7c9cd6ce9cabd7f12d7c48531daf6df7362cae985720f  .claude/skills/devops/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .claude/skills/devops/check_domain_skill.py\n87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28  .claude/skills/devops/scenario-records.yaml\n6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0  .claude/skills/devops/scenario-summaries.md\na6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9  .claude/skills/devops/scenarios.md\n7b8f57f29bfda69ac792a645e9008b44235f008280e6a6c8e59c5ae8661e9931  .claude/skills/frontend/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .claude/skills/frontend/check_domain_skill.py\n44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd  .claude/skills/frontend/scenario-records.yaml\na3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d  .claude/skills/frontend/scenario-summaries.md\nd572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a  .claude/skills/frontend/scenarios.md\n775ff4da6694a81e318108c46d08a0f42879b12de48b4ec7e7ee13c1ced28c54  .claude/skills/ui-ux/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .claude/skills/ui-ux/check_domain_skill.py\n9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e  .claude/skills/ui-ux/scenario-records.yaml\n665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b  .claude/skills/ui-ux/scenario-summaries.md\n714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9  .claude/skills/ui-ux/scenarios.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n468257eb1ee4ee66b1c36cf388ae05b4808ef807533b7655f9c54cf4684b6fd3  .rulesync/skills/devops/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .rulesync/skills/devops/check_domain_skill.py\n87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28  .rulesync/skills/devops/scenario-records.yaml\n6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0  .rulesync/skills/devops/scenario-summaries.md\na6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9  .rulesync/skills/devops/scenarios.md\nac86c6384f58c1dcf1f94efe93a5490f88d92ea06bc90aae062da96c11805edc  .rulesync/skills/frontend/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .rulesync/skills/frontend/check_domain_skill.py\n44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd  .rulesync/skills/frontend/scenario-records.yaml\na3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d  .rulesync/skills/frontend/scenario-summaries.md\nd572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a  .rulesync/skills/frontend/scenarios.md\n9a50b6f26539936f50775b65eea717a5906c841aa5cf033f04da39c400f8be54  .rulesync/skills/ui-ux/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  .rulesync/skills/ui-ux/check_domain_skill.py\n9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e  .rulesync/skills/ui-ux/scenario-records.yaml\n665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b  .rulesync/skills/ui-ux/scenario-summaries.md\n714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9  .rulesync/skills/ui-ux/scenarios.md\n468257eb1ee4ee66b1c36cf388ae05b4808ef807533b7655f9c54cf4684b6fd3  template/.rulesync/skills/devops/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/.rulesync/skills/devops/check_domain_skill.py\n87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28  template/.rulesync/skills/devops/scenario-records.yaml\n6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0  template/.rulesync/skills/devops/scenario-summaries.md\na6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9  template/.rulesync/skills/devops/scenarios.md\nac86c6384f58c1dcf1f94efe93a5490f88d92ea06bc90aae062da96c11805edc  template/.rulesync/skills/frontend/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/.rulesync/skills/frontend/check_domain_skill.py\n44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd  template/.rulesync/skills/frontend/scenario-records.yaml\na3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d  template/.rulesync/skills/frontend/scenario-summaries.md\nd572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a  template/.rulesync/skills/frontend/scenarios.md\n9a50b6f26539936f50775b65eea717a5906c841aa5cf033f04da39c400f8be54  template/.rulesync/skills/ui-ux/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/.rulesync/skills/ui-ux/check_domain_skill.py\n9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e  template/.rulesync/skills/ui-ux/scenario-records.yaml\n665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b  template/.rulesync/skills/ui-ux/scenario-summaries.md\n714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9  template/.rulesync/skills/ui-ux/scenarios.md\n468257eb1ee4ee66b1c36cf388ae05b4808ef807533b7655f9c54cf4684b6fd3  template/governance/kernel/skills/devops/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/governance/kernel/skills/devops/check_domain_skill.py\n87f6c71296571252c7bd82b4f0062c03be7f8396a1bf8c13c4d7a5f7edd25b28  template/governance/kernel/skills/devops/scenario-records.yaml\n6b5c340edba9fbee9d2a4664749fe34de99eeae8d4c7d4fbbbd125c0681575f0  template/governance/kernel/skills/devops/scenario-summaries.md\na6a737c6c2db84d0b905f38c3532337b9387b4d0ab70b87f2c9fe963a19dd5d9  template/governance/kernel/skills/devops/scenarios.md\nac86c6384f58c1dcf1f94efe93a5490f88d92ea06bc90aae062da96c11805edc  template/governance/kernel/skills/frontend/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/governance/kernel/skills/frontend/check_domain_skill.py\n44f6d05d0f56d526cec2d7c0f2c8e945b5088180ceabbf16d532a495a07cdcfd  template/governance/kernel/skills/frontend/scenario-records.yaml\na3f597664ece8d9e9e690b8db9cca99360b4988df3d38619d329cfed7fc1a11d  template/governance/kernel/skills/frontend/scenario-summaries.md\nd572be6bb9143e2a70e4499771e554ba2bba16a259c2601417c84f2dac60640a  template/governance/kernel/skills/frontend/scenarios.md\n9a50b6f26539936f50775b65eea717a5906c841aa5cf033f04da39c400f8be54  template/governance/kernel/skills/ui-ux/SKILL.md\n3532f93de84972ded38ef7725dac323f45bab78e5c4735dc90d8ed84ddc9d62a  template/governance/kernel/skills/ui-ux/check_domain_skill.py\n9b038c094435183aa0866866222f8f5931f69e9dc0285bd28fa290514eaf146e  template/governance/kernel/skills/ui-ux/scenario-records.yaml\n665707193be00eb7f888a623b55327e043bd95617a1a9279be177363c202895b  template/governance/kernel/skills/ui-ux/scenario-summaries.md\n714ecf9e1d15b597c3dd938fc2427218b52ba403cbd79e4f12cb5d5bf9caabc9  template/governance/kernel/skills/ui-ux/scenarios.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

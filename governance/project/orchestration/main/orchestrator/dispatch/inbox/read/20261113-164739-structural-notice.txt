@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-161708.out
+Structural: after the landing of W2-182 (base b97d9604b316)
+status: structural pass at aa976b8f33f5 (the work tree differs from it at 3 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 25.2 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 33 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+30 more)
+authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since b97d9604b316)
+links: NOTICE 1 new since b97d9604b316493e0922fde6da324032d63cfa3f (1740 standing): NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in a brief or prompt line | governance/project/prompts/w2-orchestrator.md:1 | orchestrator | decide DEC-869 or name...
+structural pass at aa976b8f33f5 (the work tree differs from it at 3 tracked path(s): the working files were read): NOTICE in mutation, authority, links (6 of 9 families ok), 25.2 s; a notice, not a refusal

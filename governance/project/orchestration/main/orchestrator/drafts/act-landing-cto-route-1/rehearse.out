@@ -1,0 +1,84 @@
+ACT-LANDING-CTO-ROUTE-1 rehearsal; bundle /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-LANDING-CTO-ROUTE-1; base: a fresh clone of w2/integrate
+--- A. the bundle
+ok   A1 every file the manifest names hashes as it says
+ok   A2 list.txt equals the manifest's touched list
+ok   A3 the live install's landing_check.py and the source copy are the frozen before
+ok   A4 the live APPROVED is the frozen before
+ok   A5 apply.sh parses
+ok   A6 no __pycache__ in the bundle
+--- B. a fresh clone of w2/integrate, a planted HOME (the live install is never touched)
+     clone at 8ba025e8fa26; HOME planted at /tmp/claude-1000/acts-landing-rules/lr/home
+ok   B0 the planted install is a copy of the live one
+ok   B1 apply.sh check: ready (exit 0): check: ready to apply (every listed file is the before; the install's other files as built; the operator holds nothing)
+ok   B2 the manifest's checks before the apply: the install, APPROVED, tests and behaviour checks refuse ([False, False, True, False, True, False])
+     apply: repo/governance/project/operator/landing_check.py | apply: repo/tests/unit/operator/test_landing_cto_route.py | apply: home/gov-os-operator/install/landing_check.py | apply: home/gov-os-operator/install/APPROVED | the install's own APPROVED check: ok | APPROVED ef5afbac78f3fce16ab7551ef88987a6898acd8f9a7a18439bf83aeb9216c157 | state applied
+ok   B3 apply (exit 0; the install's own APPROVED check ok)
+ok   B4 every listed file is the frozen after, byte for byte
+ok   B5 modes: the install's two files 0444, the repository's 0644: {'landing_check.py': '0o444', 'test_landing_cto_route.py': '0o644', 'APPROVED': '0o444'}
+ok   B6 verify (exit 0)
+ok   B7 the manifest's six checks after the apply ([True, True, True, True, True, True])
+ok   B8 the clone's changed set is the two repository paths: governance/project/operator/landing_check.py, tests/unit/operator/test_landing_cto_route.py
+ok   B9 in the planted install only landing_check.py and APPROVED changed
+ok   B10 apply again: nothing to do
+ok   B11 check after the apply refuses (already applied, exit 3)
+ok   B12 undo: byte for byte the before (install back to the live copy)
+ok   B13 the clone is clean after the undo
+ok   B14 undo again: nothing to do (exit 0)
+ok   B15 apply again gives the same bytes
+--- C. refusals (each on its own clone and planted HOME; nothing is touched when one fires)
+ok   C1 a changed install file: check refuses (exit 3)
+ok   C2 apply refuses and touches nothing (exit 3)
+ok   C3 another install file changed: refused (exit 3)
+ok   C4 a stray file in install/: refused, nothing applied
+ok   C5 a request waiting in queue/: busy (exit 6), nothing applied
+ok   C6 the operator's commit freeze present: busy (exit 6)
+ok   C7 a source copy that is not the before: refused (exit 3)
+ok   C8 the new test file already there: refused (exit 3)
+ok   C9 a half-applied state (the source copy already the after): check refuses (exit 3)
+ok   C10 a launch holding log/launch.lock: busy (exit 6), nothing changed
+--- D. the owner's steps literally on the applied clone (apply.sh, the two paths staged, the commit, the undo)
+ok   D1 the two repository paths staged, and only them
+ok   D2 the commit with Role: owner
+ok   D3 the planted (new) landing check does not flag that commit (Role: owner)
+ok   D4 apply.sh undo (install and repository paths back)
+ok   D5 the undo commit
+ok   D6 an empty diff over the paths against the start
+ok   D7 and the apply goes through again
+--- E. the unit tests (each through heavy_slot.sh, TMPDIR outside the repository)
+ok   E1 the new tests on the before code: red (39 failed, 1 passed in 2.59s): 33 failed
+ok   E2 the new tests on the after code: green (40 passed in 2.91s)
+ok   E3 tests/unit/operator after: green (509 passed in 68.64s (0:01:08))
+ok   E4 tests/acceptance/W2-148 after (the landing check's own acceptance test among them): green (185 passed in 47.94s)
+ok   E5.1 without condition 1 (the approvals line): the new tests go red (9 failed, 31 passed in 4.75s)
+ok   E5.2 without condition 1 (the route names the CTO): the new tests go red (2 failed, 38 passed in 4.04s)
+ok   E5.3 without the manifest is found by its hash: the new tests go red (1 failed, 39 passed in 4.24s)
+ok   E5.4 without condition 2 (the manifest claims b): the new tests go red (3 failed, 37 passed in 4.35s)
+ok   E5.5 without condition 2 (the classifier's vote on the bundle): the new tests go red (1 failed, 39 passed in 5.00s)
+ok   E5.6 without condition 2 (the class of the commit's paths): the new tests go red (1 failed, 39 passed in 4.49s)
+ok   E5.7 without condition 3 (the paths are the touched list): the new tests go red (3 failed, 37 passed in 5.13s)
+ok   E5.8 without condition 3 (every touched root is repo): the new tests go red (1 failed, 39 passed in 4.01s)
+--- F. the live example and the history (the planted install's landing check, run as landing_select.sh runs it)
+ok   F1 7cc654e49f9b (no Act: trailer) is flagged by the new check, as by the old: a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+ok   F2 and by the old check
+     ACT-DISPATCH-NIGHTLY-SLOT-1: manifest 9ff4f275, in the live approvals log with the route: the CTO (class (b), a watchers path), th
+ok   F3 the same commit with Role: orchestrator, Act: and Act-sha: passes the new check (ACT-DISPATCH-NIGHTLY-SLOT-1, the live approvals line and the live bundle, read only)
+ok   F4 and is a P1 for the old check
+ok   F5 with a wrong Act-sha: a P1 that says why: s route refuses: no line of the CTO's approvals log names ACT-DISPATCH-NIGHTLY-SLOT-1 with that manifest and a CTO route
+ok   F6 the same ACT with one more path in the commit: a P1 (the paths are not the touched list)
+ok   F7 on the last 300 first-parent commits of w2/integrate the old and the new check print the same 2 items
+--- G. the operator's read-only gates, and the classifier
+ok   G1 validate_manifest (the operator's own): pass
+ok   G2 check_act: pass
+ok   G3 path_rule: pass
+ok   G4 act_class: class O; rows ['operator-own', 'unknown']; hits []
+     repo|governance/project/operator/landing_check.py: O (operator-own)
+     repo|tests/unit/operator/test_landing_cto_route.py: O (unknown)
+     home|gov-os-operator/install/landing_check.py: O (operator-own)
+     home|gov-os-operator/install/APPROVED: O (operator-own)
+ok   G5 no unlisted file and no __pycache__ in the bundle: []
+--- H. the live files
+ok   H1 the live install is byte for byte as before
+ok   H2 the main tree's tracked status and the source copy are unchanged
+ok   H3 the live approvals log and the dispatch ACT's manifest were only read
+=== 66 ok, 0 failed
+failures: 0

@@ -1,0 +1,24 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-104 (DAEO-drhj, STANDARD) at c9f07ef3782b: pre-check passed
+W2-104: kernel gate at c9f07ef3782b: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-14 03:38:06 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-14 03:38:06 merged W2-104 onto c82335a401df: e133afea4eee
+2026-11-14 03:38:06 run skipped: the merged code is identical to c9f07ef3782b2cd3fac9fff00aa94ccc7c2d9656, W2-104's approved commit, which its lead tested; governance paths left out of the comparison: none differ (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)
+2026-11-14 03:38:06 ADVANCED refs/heads/w2/integrate c82335a401df -> e133afea4eee; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/e133afea4eee.json
+2026-11-14 03:38:06 integration store not promoted: the merged clone's stores were not rebuilt at the landed commit e133afea4eee (the run was skipped, or its last rebuild was at None); its normal refresh runs apart
+queue run exit 0
+CLOSED W2-104: aeee743e9 W2-104 (DAEO-drhj): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 57 findings: .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/ (+54 more)
+structural pass: authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since c82335a401df)
+structural pass: links: ok (0 new since c82335a401dfefa068030ae3006272840eb9e95f, 1735 standing)
+structural pass: structural pass at aeee743e9e41: NOTICE in mutation, authority (7 of 9 families ok), 15.3 s; a notice, not a refusal
+structural pass: notice -> inbox/20261114-033822-structural-notice.txt

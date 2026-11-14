@@ -1,1 +1,2 @@
-W2-37 (DAEO-6n5k) F1 (a) batch: tests merged at 96498443f (w2/W2-37-tests 202fbf723, tests/acceptance/W2-37/test_w2_37_stated_links.py, 5 cases: 4 red on 0c266d752, 1 green guard).
+W2-37 (DAEO-6n5k) P-7 (a) batch (DEC-812 item 6): tests merged at 9f4878987 (w2/W2-37-tests df75fbd10: W1-07 w1_07_support.py, test_w1_07_recorded_commands.py, README.md; W1-32 test_w1_32_command_set.py). Red on f141d6366 code: W1-26 test_a_recorded_command_without_its_module_is_a_finding_that_names_it[impact], test_a_skill_may_name_a_recorded_gov_command[impact] (commands.py did not record impact).
+Earlier: F1 (a) batch merged at 96498443f (w2/W2-37-tests 202fbf723, tests/acceptance/W2-37/test_w2_37_stated_links.py, 5 cases: 4 red on 0c266d752, 1 green guard).

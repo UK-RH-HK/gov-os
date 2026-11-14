@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+"""Stand-in for the Claude Code CLI (W1-46 acceptance tests). Starts nothing; records how it was called."""
+import json, os, sys
+
+args = sys.argv[1:]
+kind = 'session'
+if kind == "session" and ("--version" in args or "-v" in args):
+    kind = "version"
+    print('2.1.292' + " (Claude Code)")
+settings = []
+i = 0
+while i < len(args):
+    value = None
+    if args[i] == "--settings" and i + 1 < len(args):
+        value = args[i + 1]
+        i += 1
+    elif args[i].startswith("--settings="):
+        value = args[i].split("=", 1)[1]
+    if value is not None:
+        entry = {"value": value, "inline": value.lstrip().startswith("{")}
+        if entry["inline"]:
+            entry["text"] = value
+        else:
+            entry["realpath"] = os.path.realpath(value)
+            entry["is_symlink"] = os.path.islink(value)
+            try:
+                with open(value, encoding="utf-8") as handle:
+                    entry["text"] = handle.read()
+            except OSError as exc:
+                entry["text"] = None
+                entry["error"] = str(exc)
+        settings.append(entry)
+    i += 1
+named = dict(os.environ)
+for entry in settings:
+    try:
+        block = json.loads(entry["text"]).get("env")
+    except Exception:
+        block = None
+    if isinstance(block, dict):
+        named.update({k: v for k, v in block.items() if isinstance(v, str)})
+directories = {v: os.path.isdir(v) for k, v in named.items() if "TMP" in k.upper() and v.startswith("/")}
+record = {"kind": kind, "argv0": sys.argv[0], "args": args, "cwd": os.getcwd(), "env": dict(os.environ),
+          "settings": settings, "directories": directories}
+with open('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-5/test_the_launchers_settings_le0/sandbox/elsewhere/claude-calls.jsonl', "a", encoding="utf-8") as handle:
+    handle.write(json.dumps(record) + "\n")
+if kind == "session" and os.path.isfile('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-5/test_the_launchers_settings_le0/sandbox/elsewhere/claude-calls.jsonl.exit-code'):
+    with open('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-5/test_the_launchers_settings_le0/sandbox/elsewhere/claude-calls.jsonl.exit-code', encoding="utf-8") as handle:
+        sys.exit(int(handle.read().strip()))

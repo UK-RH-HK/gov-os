@@ -1,0 +1,5 @@
+Merge w2/W2-42a-tests (c2d87a1210d1): td-5's cases for F1, F4 and departure 1 (DEC-1174 (1), APOS-3/APOS-4); 80 cases, red 28 on 692bc41bd (21 fail-opens, 7 refused as unreadable)
+
+Task: DAEO-03ub
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

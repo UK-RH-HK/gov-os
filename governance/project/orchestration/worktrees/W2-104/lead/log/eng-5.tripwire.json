@@ -1,0 +1,46 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "72c6def8871a",
+   "after": "e437c799c931"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104",
+   "change": "head",
+   "before": "0e469cc379cd",
+   "after": "4999dd9ecf6c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-07/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-07/test_w1_07_recorded_commands.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-32/test_w1_32_command_set.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "acceptance folder",
+   "folder": "W1-07"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "acceptance folder",
+   "folder": "W1-32"
+  }
+ ]
+}

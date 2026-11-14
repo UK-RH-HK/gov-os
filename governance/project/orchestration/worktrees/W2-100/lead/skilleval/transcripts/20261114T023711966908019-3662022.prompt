@@ -1,0 +1,73 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply splits the rename into steps that keep the old service version working, gives each a way back, and does not drop `customer_ref` in the same change.
+
+Expected behaviour:
+the session does not rename in one step. It writes the change as steps (add the new column, write both, backfill, switch reads, drop the old one in a later change), each migration reversible with its down step, checks the migration on a copy of the data, and names the order in which the steps ship.
+
+The session's reply:
+<<<
+I'm stopping here: there's nothing in the workspace to change, and the `gov` calls were refused twice. My report follows.
+
+**task:** Rename column `customer_ref` to `account_ref`. During every release, the service that reads it runs in two versions side by side for an hour.
+
+**status:** Blocked. No files were written. I'm returning a plan instead.
+
+**work_completed:**
+- I listed the workspace. It holds only `.claude/skills/backend/`. There is no ticket file, no migration folder and no service code, even though the ticket says its paths hold both.
+- The skill says to get missing context through `gov retrieve`. Both `gov` calls I tried (`gov --help`, with and without output redirection) were refused for approval. The skill says to stop after two refusals of the same call, so I did not run `gov retrieve` or `gov accept`.
+- With no ticket paths to write in, writing files anywhere would break "the diff touches only the ticket's allowed paths". So the work is the plan below.
+
+**files_changed:** none
+
+**evidence:** a file listing showing only the skill folder. Two refusals: "This Bash command contains multiple operations… requires approval: gov --help" and "This command requires approval".
+
+**tests:** None were run, because there is no code or fixture. The planned tests are in the payload.
+
+**discoveries:**
+- The ticket's ticket file and code are missing from the workspace.
+- A plain `ALTER TABLE … RENAME COLUMN` would break the old version during the one-hour overlap, so a one-step rename is not safe.
+- Still unknown: the database engine; whether `customer_ref` is NOT NULL, indexed, unique or a foreign key; and whether anything else reads it (reports, ETL, other services).
+
+**risks:**
+- Two pre-commit lines can't be ticked yet: "migration run forward and back" and "suite passes".
+- During the overlap, the old version writes only `customer_ref`. Unless something keeps the columns in sync, rows written in that hour will have no `account_ref`.
+
+**lessons:** A rename is really an expand/contract that spans at least three releases. The ticket's wording hides that.
+
+**proposed_decisions:** Treat the rename as add → write both → backfill → switch reads → stop the old write → drop later, with one step per release.
+
+**unresolved:**
+- **P2, a change to the ticket's scope:** one ticket can't safely ship the rename. The work needs splitting across releases.
+- **P1:** the final drop of `customer_ref` destroys data. It needs a separate approval and a separate ticket, and it waits.
+
+**recommended_next_action:** Whoever started the session should provide the ticket and code (or approve `gov`) and agree to split the work across releases. Then I'll do steps 1–3 below test-first and run `gov accept`.
+
+---
+
+### Payload: the rename plan
+
+Each step must work alongside the version released just before it.
+
+| # | Release | Change | Old version still running | Way back |
+|---|---|---|---|---|
+| 1 | Migration M1 | Add `account_ref`, nullable. Build its index without locking (concurrently) and copy any unique or foreign-key constraint. Add a trigger that copies `customer_ref` into `account_ref` on insert or update when `account_ref` is null, to cover writes from the old version. | Old version doesn't know about the new column, so nothing breaks. | Drop the trigger, index and `account_ref`. No data is lost because `customer_ref` still holds all of it. |
+| 2 | Code v+1 | Write both columns; keep reading `customer_ref`. | v0 writes only `customer_ref`; the trigger fills `account_ref`. | Redeploy v0. |
+| 3 | Migration M2, the backfill | `UPDATE … SET account_ref = customer_ref WHERE account_ref IS NULL`, in batches with a set batch size, until no rows change. It only fills nulls and never overwrites, so a second run changes nothing and an interrupted run can resume. | No effect on readers. | Nothing to undo; the source column is untouched. |
+| 4 | Code v+2 | Read `account_ref`; still write both. | v+1 reads `customer_ref`, which is still written. | Redeploy v+1. |
+| 5 | Code v+3, plus M3 if needed | Stop writing `customer_ref`. Make it nullable first if it is NOT NULL. Drop the trigger in a later migration. | v+2 reads `account_ref`, so nothing breaks. | Redeploy v+2, then backfill `customer_ref` from `account_ref` for rows written since. |
+| 6 | Later, separate ticket, **P1** | Drop `customer_ref`. | Every version reads `account_ref`. | Only partial: re-add the column and fill it from `account_ref`. Needs approval. |
+
+**Planned tests**, run on a fixture or a throw-away database, never a live one:
+- Run M1 and M2 forward and back on a small fixture.
+- The v0 reader and writer still work after M1.
+- A v0-style insert gets `account_ref` filled by the trigger.
+- Running the backfill twice leaves the same state as running it once.
+- A backfill killed halfway resumes and finishes correctly.
+- The batch cases: empty, one row, many rows, and exactly the batch size.
+- v+2 reads correctly when `account_ref` was filled by the trigger and when it was filled by the backfill.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

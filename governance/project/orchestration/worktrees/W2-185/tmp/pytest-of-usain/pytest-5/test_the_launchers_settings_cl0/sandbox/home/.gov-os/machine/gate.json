@@ -1,0 +1,74 @@
+{
+ "memory_floor_bytes": {
+  "value": 3221225472,
+  "date": "2026-11-14",
+  "source": "DEC-942 item 2 (planted)"
+ },
+ "verification_peak_bytes": {
+  "value": 4294967296,
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "working_size_bytes": {
+  "value": 1073741824,
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "rebuild_peak_bytes": {
+  "value": 2147483648,
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "disk_floor_bytes": {
+  "value": 107374182400,
+  "date": "2026-11-14",
+  "source": "DEC-898 item 1 (planted)"
+ },
+ "inode_floor": {
+  "value": 10000000,
+  "date": "2026-11-14",
+  "source": "DEC-898 item 1 (planted)"
+ },
+ "verification_lock": {
+  "value": "/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-5/test_the_launchers_settings_cl0/sandbox/elsewhere/open-gate/verification.lock",
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "gpu_margin": {
+  "value": 0.1,
+  "date": "2026-11-14",
+  "source": "DEC-950 item 2 (planted)"
+ },
+ "oom_floor_bytes": {
+  "value": 1073741824,
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "heavy_slots": {
+  "value": 2,
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "gpu_shares": {
+  "value": {
+   "embedder_mib": 0,
+   "reranker_mib": 0
+  },
+  "date": "2026-11-14",
+  "source": "planted for the W1-46 launcher cases (W2-20 README)"
+ },
+ "embedding_servers": {
+  "shared": {
+   "cpus": "5",
+   "nice": 10,
+   "date": "2026-11-14",
+   "source": "planted"
+  },
+  "query": {
+   "cpus": "5",
+   "nice": 10,
+   "date": "2026-11-14",
+   "source": "planted"
+  }
+ }
+}

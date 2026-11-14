@@ -1,0 +1,6 @@
+W2-100: merge the acceptance tests (w2/W2-100-tests, d9379baaa, td-1) into the ticket branch
+
+Task: DAEO-uw5h
+Role: orchestrator
+Implements: DEC-959, DEC-957, DEC-832, DEC-616, DEC-645, CAP-24.b, DEC-315, DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

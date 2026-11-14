@@ -1,0 +1,99 @@
+--- drafts/act-guard-fix-5/bash_writes.py.before	2026-11-03 12:53:36.890565622 +0000
++++ drafts/act-guard-fix-5/bash_writes.py	2026-11-13 16:11:51.753507529 +0000
+@@ -1079,14 +1079,60 @@
+             i += 2 if args[i] in ("-W", "-X") else 1
+         return "python" if i >= len(args) or args[i] == "-" else "data"
+     if name in _SHELLS:
+-        opts = [a for a in args if a.startswith("-")]
+-        operands = [a for a in args if not a.startswith("-")]
+-        if any("c" in o.lstrip("-") for o in opts if not o.startswith("--")):
+-            return "data"
+-        return "shell" if not operands or "-s" in opts else "data"
++        return _shell_kind(args)
+     return "data" if name in _DATA else "code"
+ 
+ 
++# How a shell's own options are read (ACT-GUARD-FIX-5, P1-GUARD-HEREDOC-OPTS-1: ``bash -euo pipefail <<EOF`` took the
++# option's value, pipefail, for a script file). Short letters of bash, dash and ksh that take no value, long options of
++# bash that take none, and the words that mean standard input as a script file. -o and -O (any place in a cluster)
++# and --rcfile and --init-file take the next word; any other option is unknown and reads the heredoc as shell.
++_SHELL_FLAGS = frozenset("abefhiklmnprstuvxBCDEHIPTV")
++_SHELL_LONG = frozenset(("--debugger", "--dump-po-strings", "--dump-strings", "--help", "--login", "--noediting",
++                         "--noprofile", "--norc", "--posix", "--pretty-print", "--restricted", "--verbose",
++                         "--version"))
++_SHELL_STDIN = frozenset(("-", "/dev/stdin", "/dev/fd/0", "/proc/self/fd/0"))
++
++
++def _shell_kind(args):
++    """How a shell reads a heredoc on its standard input, by its words: data when the program is in the words (-c) or
++    in a script file it is given; shell when it reads its program from the input (no script, -s, or a script named
++    ``-``, /dev/stdin or /dev/fd/0) or when an option is not one this knows (fail closed)."""
++    i, unknown, stdin, program = 0, False, False, False
++    while i < len(args):
++        a = args[i]
++        if a == "--":
++            i += 1
++            break
++        if a == "-":
++            break
++        if not a.startswith(("-", "+")):
++            break
++        if a.startswith("--"):
++            if a in ("--rcfile", "--init-file"):
++                i += 2
++                continue
++            unknown = unknown or a not in _SHELL_LONG
++            i += 1
++            continue
++        letters = a[1:]
++        if a[0] == "-" and "c" in letters:
++            program = True
++        elif any(x not in _SHELL_FLAGS and x not in "oO" for x in letters):
++            unknown = True
++        if a[0] == "-" and "s" in letters:
++            stdin = True
++        i += 1 + sum(letters.count(x) for x in "oO")
++    if program:
++        return "data"
++    # The last two tests are the earlier reading kept as a floor, so this never reads a heredoc as data that was read
++    # as shell before: -s anywhere in the words, and words that all start with -.
++    if unknown or stdin or i >= len(args) or args[i] in _SHELL_STDIN or "-s" in args or \
++            all(a.startswith("-") for a in args):
++        return "shell"
++    return "data"
++
++
+ _PARAM = re.compile(r"\$\{([A-Za-z_]\w*)([^}]*)\}|\$([A-Za-z_]\w*)|\$[0-9@*#?$!-]")
+ 
+ 
+@@ -1229,7 +1275,9 @@
+                         reader = lead(full)
+                         self.prefix = _prefix(full, reader)
+                         self.body(self.bodies[k], kind, part_, where, whole, depth, argv=self.py_argv(reader))
+-                        if kind == "data":
++                        if kind in ("data", "shell"):
++                            # a body written to a file the command then runs: judged as that file's code (a shell
++                            # with options was data before, so this held for it: ACT-GUARD-FIX-5, round 2)
+                             targets = _written(staged[at:], raw=True)
+                             if targets:
+                                 scripts.append(({self.basename(t) for t in targets}, self.bodies[k]))
+@@ -1494,9 +1542,18 @@
+                     self.sub(text[s:e], ecwd, whole, depth)
+         elif kind == "python":
+             self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"], argv=argv)
+-        elif kind == "shell" and body["quoted"]:
++        elif kind == "shell" and (body["quoted"] or not (_EXPANSION.search(body["text"]) or "\\" in body["text"])):
++            # a shell reads it as it stands: a quoted body, or an unquoted one with nothing in it for the shell to
++            # expand or join (no $, backtick or backslash: ACT-GUARD-FIX-5, round 2), is judged as the commands it holds
+             self.sub(body["text"], ecwd, whole, depth)
+         else:
++            if kind == "shell":
++                # an unquoted body with expansions that a shell reads: its command substitutions are judged as
++                # commands, as the data path judges them for cat (ACT-GUARD-FIX-5, round 2: a shell with options
++                # was data before, so its substitutions were judged; they still are)
++                text = re.sub(r"\\[\\$`]", "  ", body["text"])
++                for _, _, s, e in spans(text):
++                    self.sub(text[s:e], ecwd, whole, depth)
+             # code the guard does not read (an unknown reader, or a shell body the shell rewrites first)
+             self.findings.append(([(SENT, None)], part + "\n" + body["text"],
+                                   bool(re.search(r"\b(perl|node|ruby|php)\b", part))))

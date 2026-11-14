@@ -1,0 +1,10 @@
+log: W2-182-A5-run2.json
+W2: W2-182
+status: LAUNCH_BLOCKED. Line E (a) can't start: the launcher refuses a product-spec worker on this ticket. Everything else in the build run is done up to the final-head checks.
+
+task: DAEO-5y8d (W2-182)
+status: LAUNCH_BLOCKED. Line E (a) can't start: the launcher refuses a product-spec worker on this ticket. Everything else in the build run is done up to the final-head checks.
+work_completed:
+- Merged `w2/integrate` into the branch: 23e7c4971, `--no-ff`, with Task and Role trailers.
+- **Acceptance folder:** a fresh test designer (td-3, Sonnet, high) wrote `tests/acceptance/W2-182/`. It holds a README map from B, C, R, D, E, F and F1 to the full node ids of the 9 revised cases, a conftest that points a run at those ids, and one no-lowering case for F1.
+  - I found a fa

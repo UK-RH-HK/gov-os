@@ -1,0 +1,282 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+................s..s..s............s..s..s..s..s..s...........s..s..s..s [  6%]
+..s..s..s..s..s......................................................... [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+.....FF...F............................................................. [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+..............................................sss....................... [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+.................................................sss.................... [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+...........................................F............................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+...............................................................F........ [ 98%]
+........F..............F................................................ [ 99%]
+.............................                                            [100%]
+=================================== FAILURES ===================================
+_______ test_a_lifted_event_in_the_template_only_is_no_finding[lifted0] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw2/test_a_lifted_event_in_the_tem0')
+lifted = ('postToolUse',)
+
+    @pytest.mark.parametrize("lifted", [LIFTED[:1], LIFTED[1:], LIFTED])
+    def test_a_lifted_event_in_the_template_only_is_no_finding(tmp_path, lifted):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in lifted}}
+>       assert _two(tmp_path, template, {"stop": [_hook()]}) == []
+E       AssertionError: assert [{'code': 'HO...hooks.jsonc'}] == []
+E         
+E         Left contains one more item: {'code': 'HOOKS_EVENT_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': 'hook event postToolUse is only in template/.rulesync/hooks.jsonc'}
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:40: AssertionError
+_ test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones[template] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw2/test_any_other_event_in_one_so0')
+side = 'template'
+
+    @pytest.mark.parametrize("side", ["template", "ours"])
+    def test_any_other_event_in_one_source_only_is_still_a_finding_beside_the_lifted_ones(tmp_path, side):
+        template = {"stop": [_hook()], **{event: [_hook("Bash")] for event in LIFTED}}
+        ours = {"stop": [_hook()]}
+        (template if side == "template" else ours)["preCompact"] = [_hook()]
+        findings = _two(tmp_path, template, ours)
+>       assert _named(findings) == ["preCompact"]
+E       AssertionError: assert ['postToolUse... 'preCompact'] == ['preCompact']
+E         
+E         At index 0 diff: 'postToolUse' != 'preCompact'
+E         Left contains 2 more items, first extra item: 'postToolUseFailure'
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:49: AssertionError
+______________________ test_the_finding_form_is_unchanged ______________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw2/test_the_finding_form_is_uncha0')
+
+    def test_the_finding_form_is_unchanged(tmp_path):
+        template = {**{event: [_hook("Bash")] for event in LIFTED}, "stop": [_hook()]}
+        findings = _two(tmp_path, template, {"preCompact": [_hook()]})
+>       assert [sorted(f) for f in findings] == [["code", "file", "message"]] * 2
+E       AssertionError: assert [['code', 'fi...', 'message']] == [['code', 'fi...', 'message']]
+E         
+E         Left contains 2 more items, first extra item: ['code', 'file', 'message']
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_hooks_lifted.py:81: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw2/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+____________ test_the_source_holds_the_seven_governance_hook_lines _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_entries = [('preToolUse', 0, {'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov..., {'command': 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}), ...]
+
+    def test_the_source_holds_the_seven_governance_hook_lines(kernel_entries):
+        """The cases below cover every command line of the source; each starts a kernel hook program.
+    
+        The source is the generated project's (W2-90): the kernel's seven lines."""
+        ENTRIES = kernel_entries
+>       assert len(ENTRIES) == 7, f"{support.HOOK_SOURCE_REL} holds {len(ENTRIES)} command entries; seven are expected"
+E       AssertionError: .rulesync/hooks.jsonc holds 8 command entries; seven are expected
+E       assert 8 == 7
+E        +  where 8 = len([('preToolUse', 0, {'command': 'h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov..., {'command': 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}), ...])
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:80: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[1]] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'postToolUse', index = 1
+entry = {'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOM...E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw'), wheel=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin...zjftpw/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw5/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers,
+                                                   with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: postToolUse[1]'s program did not import the pin's installed package (/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"  (in /tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw5/test_the_line_s_program_import0/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw'), wheel=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin...zjftpw/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:123: AssertionError
+_ test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[1]] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'postToolUse', index = 1
+entry = {'command': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOM...E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"', 'matcher': 'Bash', 'timeout': 10, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw'), wheel=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin...zjftpw/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw5/test_with_a_worker_s_pythonpat0')
+
+    @pytest.mark.parametrize("event,index,entry", OTHERS, ids=OTHER_IDS)
+    def test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """With the worker's ``PYTHONPATH``, the program imports the pin's installed package, not the package the
+        inherited path names (subagentStop, which imports none: the pin's interpreter starts without the inherited
+        folder on its import path)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers,
+                                                          src_in_project=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src))
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}]'s program imported that folder's gov, not the pin's\n"
+            f"{done.describe()}")
+        if event in IMPORTS_NO_GOV:
+            assert pin_markers.marks("pin-python-"), (
+                f"{event}[{index}] did not start the pin's interpreter ({pin_markers.python})\n{done.describe()}")
+            assert not box.marks("tree-site-"), (
+                f"with PYTHONPATH={src}, {event}[{index}]'s interpreter started with that folder on its import path "
+                f"(its sitecustomize ran)\n{done.describe()}")
+        else:
+>           assert pin_markers.marks("pin-gov-"), (
+                f"with PYTHONPATH={src}, {event}[{index}]'s program did not import the pin's installed package "
+                f"({pin_markers.site / 'gov'})\n{done.describe()}")
+E           AssertionError: with PYTHONPATH=/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw5/test_with_a_worker_s_pythonpat0/project/src, postToolUse[1]'s program did not import the pin's installed package (/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/venv/lib/python3.12/site-packages/gov)
+E             $ sh -c g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"  (in /tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-0/popen-gw5/test_with_a_worker_s_pythonpat0/project)
+E             exit: 0
+E             stdout:
+E             
+E             stderr:
+E             
+E           assert []
+E            +  where [] = marks('pin-gov-')
+E            +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw'), wheel=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin...zjftpw/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-185/w259-pin-odzjftpw/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:161: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-185/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2916956) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file independent-auditor.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file orchestrator.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file product-spec.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file research.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file senior-engineer.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file ticket-lead.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+7 failed, 6622 passed, 24 skipped, 6 warnings in 1460.37s (0:24:20)

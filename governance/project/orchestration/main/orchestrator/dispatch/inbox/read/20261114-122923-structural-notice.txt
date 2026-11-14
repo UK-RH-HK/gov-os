@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261114-121307.out
+Structural: after the landing of W2-88b (base c451c21801b0)
+status: structural pass at 7ccc0bb618c3: NOTICE in mutation, authority, links (6 of 9 families ok), 14.9 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 57 findings: .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/ (+54 more)
+authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since c451c21801b0)
+links: NOTICE 3 new since c451c21801b029d23e33aadba69c611008e7b4a5 (1740 standing): UNLINKED_ID DEC-078 in bbbfc379a175's Implements: (research), not in DAEO-aks1's sources | .tickets/DAEO-aks1.md:49 | orchestrator | add DEC-078 to DAEO-aks1... | UNLINKED_ID DEC-718 in bbbfc379a175's Implements: (research), not in DAEO-aks1's sources | .tickets/DAEO-aks1.md:49 | orchestrator | add DEC-718 to DAEO-aks1... | UNLINKED_ID DEC-723 in bbbfc379a175's Implements: (research), not in DAEO-aks1's sources | .tickets/DAEO-aks1.md:49 | orchestrator | add DEC-723 to DAEO-aks1...
+structural pass at 7ccc0bb618c3: NOTICE in mutation, authority, links (6 of 9 families ok), 14.9 s; a notice, not a refusal

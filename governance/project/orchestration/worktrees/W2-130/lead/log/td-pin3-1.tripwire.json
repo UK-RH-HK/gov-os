@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-130-tests",
+   "change": "head",
+   "before": "aafaf6259d10",
+   "after": "83285c3c52c3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-130-tests",
+   "change": "acceptance folder",
+   "folder": ".claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-130-tests",
+   "change": "acceptance folder",
+   "folder": "W2-130"
+  }
+ ]
+}

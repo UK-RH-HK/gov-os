@@ -1,0 +1,455 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  1%]
+....................................................s................... [  2%]
+........................................................................ [  2%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+.................................................s...................... [  6%]
+........................................................................ [  7%]
+........................................................................ [  7%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [  9%]
+........................................................................ [  9%]
+......................................................................s. [ 10%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 11%]
+..............s......................................................... [ 11%]
+........................................................................ [ 12%]
+...............s..s..s............s...s..s..s..s..s...........s..s..s..s [ 12%]
+..s..s..s..s..s......................................................... [ 13%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 14%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 15%]
+..............s......................................................... [ 16%]
+........................................................................ [ 16%]
+.....................s.................................................. [ 16%]
+........................................................................ [ 17%]
+..................................................................s..... [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 19%]
+........................s............................................... [ 20%]
+....s................................................................... [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 21%]
+...............................s........................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 23%]
+........................................................................ [ 23%]
+.................................................................s...... [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+.....................................................F..F............... [ 26%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 27%]
+.......ss............................................................... [ 28%]
+........................................................................ [ 28%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+.....................................sss................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 30%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+..............................................................x..x...... [ 32%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+s....................................................................... [ 35%]
+........................................................................ [ 35%]
+..............................................ssss...................... [ 36%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+....................F................................................... [ 37%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 39%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 42%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+..........................................................F............. [ 43%]
+........................................................................ [ 44%]
+.........sssssss........................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 45%]
+....F................................................................... [ 46%]
+........................................................................ [ 46%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+..................................................................s..... [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 51%]
+......................................................s................. [ 51%]
+........................................................................ [ 52%]
+..........................sss...........................s............... [ 52%]
+.s...................................................................... [ 53%]
+sssssssssssssssss....................................................... [ 53%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................sssssssss....................... [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+......s................................................................. [ 56%]
+........................................................................ [ 56%]
+.........x.............................................................. [ 57%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 61%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 63%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+..........................s............................................. [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+.......................................................................F [ 79%]
+........................................................................ [ 79%]
+.....F.................................................................. [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+......................................................sss............... [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+......................................................sss............... [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+.............................................s.......................... [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+..........s............................................................. [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+__ test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-cto] __
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+        _, body = t.record()
+        rows = [row for row in t.table_rows(body) if f"{stem}.md" in row]
+        assert rows, f"docs/changes/W2-175-CIT-P.md has no table row naming {stem}.md"
+        head = t.sha256(t.path_of(stem).read_bytes())
+>       assert any(head in t.HEX64.findall(row.lower()) for row in rows), \
+            f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at the head ({head}): {rows}"
+E       AssertionError: docs/changes/W2-175-CIT-P.md: no row naming role-cto.md holds its sha256 at the head (dbcc9d8ccc925acd4f783cb1d359943eb564297cd7685433d98892956979d789): ["| E3 | At the base, `role-engineer.md` and four others state none of Policy 2's refusals; `role-test-designer.md` holds only the counterpart half in one line (its item 4); only `role-cto.md` states DEC-861's record rule (its line 29); the stop after two refusals is in `brief.md`'s return section and in no role template | `governance/project/orchestration/packages/P1-W2-11-BRIEFS.md`; the seven files at the base |", '| `template/governance/kernel/templates/role-cto.md` | `1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8` | `013d4d85bc5d55b2d858f6f07f10f949bccdc85e20458c2c45e4c3d6cfd67abd` | P2, STOP (2) |']
+E       assert False
+E        +  where False = any(<generator object test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head.<locals>.<genexpr> at 0x70a003fc05e0>)
+
+tests/acceptance/W2-175/test_w2_175_record.py:53: AssertionError
+_ test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-lead] __
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", t.SEVEN)
+    def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+        _, body = t.record()
+        rows = [row for row in t.table_rows(body) if f"{stem}.md" in row]
+        assert rows, f"docs/changes/W2-175-CIT-P.md has no table row naming {stem}.md"
+        head = t.sha256(t.path_of(stem).read_bytes())
+>       assert any(head in t.HEX64.findall(row.lower()) for row in rows), \
+            f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at the head ({head}): {rows}"
+E       AssertionError: docs/changes/W2-175-CIT-P.md: no row naming role-lead.md holds its sha256 at the head (c731503e7f643dc0b4377358dd09876d7dedaf688ec79ffb6e021776bf86e799): ['| `template/governance/kernel/templates/role-lead.md` | `8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e` | `4e8e46b097797d13f70c8828f41562b768bfb19f06160dac87ee7e308aa590a9` | P2, REC, STOP (3) |']
+E       assert False
+E        +  where False = any(<generator object test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head.<locals>.<genexpr> at 0x709fffa36020>)
+
+tests/acceptance/W2-175/test_w2_175_record.py:53: AssertionError
+_ test_s1_merges_decision_checker_runs_within_the_gov_check_budget_on_a_history_with_merges _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+merge_scale_run = (<w2_45_support.Project object at 0x7b2d53a97e00>, <w2_45_support.Run object at 0x7b2d565f3c20>)
+
+    def test_s1_merges_decision_checker_runs_within_the_gov_check_budget_on_a_history_with_merges(merge_scale_run):
+        _, run = merge_scale_run
+        entry = run.entry(support.CORE_AUTHORITY)
+        elapsed, limit = entry.get("elapsed_s"), entry.get("time_limit_s")
+        print(f"core-authority: elapsed_s={elapsed} time_limit_s={limit} (gov check ran {run.seconds:.1f} s)")
+        codes = support.finding_codes(entry)
+        for refused in ("CHECK_TIMED_OUT", "CHECK_FAILED", "DECISION_CHECKER_ERROR", "DECISIONS_GIT_FAILED"):
+>           assert refused not in codes, \
+                f"core-authority has {refused}: elapsed_s={elapsed} time_limit_s={limit}\n{run.describe()}"
+E           AssertionError: core-authority has CHECK_TIMED_OUT: elapsed_s=60.065 time_limit_s=60
+E             gov check --json --root /tmp/pytest-of-usain/pytest-1401/popen-gw5/s1-merges0/project -> exit 3 in 61.5 s
+E             stdout:
+E             , "authority/role limits": {"status": "RED", "family": "authority/role limits", "check_count": 1}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "core-authority", "family": "authority/role limits", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_TIMED_OUT", "time_limit_s": 60, "message": "core-authority did not end within its time limit of 60 seconds"}], "elapsed_s": 60.065, "time_limit_s": 60, "provenance": {"commit": "f8995ab9b0fc2f0e8e7fceb610f16e71992da87f", "check_version": "1.0.0", "inputs_hash": "79a8c99fbad10583"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "f8995ab9b0fc2f0e8e7fceb610f16e71992da87f", "check_version": "1.0.0", "inputs_hash": "d523718b6308405c"}, "elapsed_s": 1.049, "time_limit_s": 60}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f8995ab9b0fc2f0e8e7fceb610f16e71992da87f", "check_version": "1.0.0", "inputs_hash": "817a22f26d5d27fb"}, "elapsed_s": 0.0, "time_limit_s": 60}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f8995ab9b0fc2f0e8e7fceb610f16e71992da87f", "check_version": "1.0.0", "inputs_hash": "6e5a3af6a2bc5230"}, "elapsed_s": 0.014, "time_limit_s": 60}], "time_limit_s": 60}}}
+E             
+E             stderr:
+E             families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E               adapter/model portability: YELLOW (no registered check)
+E               audit reproducibility: YELLOW (no registered check)
+E               authority/role limits: RED
+E               command-contract consistency: YELLOW (no registered check)
+E               concurrency/claims: YELLOW (no registered check)
+E               context reproducibility: YELLOW (no registered check)
+E               fresh-agent reconstruction: YELLOW (no registered check)
+E               graph integrity: YELLOW (no registered check)
+E               index freshness: YELLOW (no registered check)
+E               mutation scope: YELLOW (no registered check)
+E               path-map compliance: YELLOW (no registered check)
+E               product traceability: YELLOW
+E               recovery/rebuild: YELLOW (no registered check)
+E               retrieval regression: YELLOW (no registered check)
+E               schema/invariants: YELLOW (no registered check)
+E               secrets indexing: YELLOW (no registered check)
+E               skill regression: GREEN
+E             
+E           assert 'CHECK_TIMED_OUT' not in ['CHECK_TIMED_OUT']
+
+tests/acceptance/W2-45/test_s1_decision_checker_merges.py:81: AssertionError
+----------------------------- Captured stdout call -----------------------------
+core-authority: elapsed_s=60.065 time_limit_s=60 (gov check ran 61.5 s)
+_ test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung] _
+[gw13] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/pytest-of-usain/pytest-1401/popen-gw13/test_s1_hung_or_transient_fail0/box'), home=PosixPath(..., lock=PosixPath('/tmp/pytest-of-usain/pytest-1401/popen-gw13/test_s1_hung_or_transient_fail0/box/locks/rebuild.lock'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x751adddbb980>
+mode = 'hung'
+
+    @pytest.mark.parametrize("mode", ["hung", "part-way-500"])
+    def test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic(box, monkeypatch, mode):
+        stand_in = support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: hung: the rebuild took 84 s: it waited out a real endpoint timeout
+E       assert 83.6541816490062 < 60
+
+/home/usain/gov-os-runs/W2-00/nightly/20261114-0404/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+_ test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500] _
+[gw13] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/pytest-of-usain/pytest-1401/popen-gw13/test_s1_hung_or_transient_fail1/box'), home=PosixPath(..., lock=PosixPath('/tmp/pytest-of-usain/pytest-1401/popen-gw13/test_s1_hung_or_transient_fail1/box/locks/rebuild.lock'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x751adddb96a0>
+mode = 'part-way-500'
+
+    @pytest.mark.parametrize("mode", ["hung", "part-way-500"])
+    def test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic(box, monkeypatch, mode):
+        stand_in = support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: part-way-500: the rebuild took 84 s: it waited out a real endpoint timeout
+E       assert 84.30375722801546 < 60
+
+/home/usain/gov-os-runs/W2-00/nightly/20261114-0404/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+_______________ test_s8_gov_links_at_head_gives_the_after_counts _______________
+[gw15] linux -- Python 3.12.3 /usr/bin/python3
+
+record = <w2_130_support.Record object at 0x7f0794a56a20>
+head_findings = [{'code': 'UNMARKED_CHANGE', 'fix': 'add "**Changed by:** DEC-017" to DEC-056\'s status line', 'form': 'text: replaced...d by:** DEC-884 (item 4)" to DEC-853\'s status line', 'form': '**Changes:**', 'ids': ['DEC-853', 'DEC-884'], ...}, ...]
+head_tree = PosixPath('/tmp/pytest-of-usain/pytest-1401/popen-gw15/w2-130-clone0/repo')
+
+    def test_s8_gov_links_at_head_gives_the_after_counts(record, head_findings, head_tree):
+        after = record.data("counts-after")
+        _shape(after, "counts-after")
+        mine = _counts(head_findings, head_tree)
+>       assert {k: v for k, v in after["by_code"].items() if v} == mine["by_code"]
+E       AssertionError: assert {'CLOSED_TICK...KED': 96, ...} == {'CLOSED_TICK...KED': 96, ...}
+E         
+E         Omitting 5 identical items, use -vv to show
+E         Differing items:
+E         {'CLOSED_TICKET_EDITED': 122} != {'CLOSED_TICKET_EDITED': 123}
+E         {'UNKNOWN_ID': 56} != {'UNKNOWN_ID': 55}
+E         Use -v to get more diff
+
+tests/acceptance/W2-130/test_w2_130_record.py:78: AssertionError
+_ test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head _
+[gw15] linux -- Python 3.12.3 /usr/bin/python3
+
+record = <w2_130_support.Record object at 0x7f0794a56a20>
+head_findings = [{'code': 'UNMARKED_CHANGE', 'fix': 'add "**Changed by:** DEC-017" to DEC-056\'s status line', 'form': 'text: replaced...d by:** DEC-884 (item 4)" to DEC-853\'s status line', 'form': '**Changes:**', 'ids': ['DEC-853', 'DEC-884'], ...}, ...]
+
+    def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, head_findings):
+        left = record.data("left")
+        assert isinstance(left, dict) and {"D-5", "D-6", "D-9"} <= set(left), "left lacks D-5, D-6 or D-9"
+        for area, prefixes in AREAS.items():
+            mine = collections.defaultdict(dict)
+            for f in head_findings:
+                if f["path"].startswith(prefixes):
+                    mine[f["path"]][f["role"]] = mine[f["path"]].get(f["role"], 0) + 1
+            assert isinstance(left[area], dict), f"left.{area} is not a mapping path -> role -> n"
+>           assert {p: dict(r) for p, r in left[area].items()} == dict(mine), f"left.{area} differs from the findings at HEAD"
+E           AssertionError: left.D-9 differs from the findings at HEAD
+E           assert {'.tickets/DA...tor': 8}, ...} == {'.tickets/DA...tor': 8}, ...}
+E             
+E             Omitting 187 identical items, use -vv to show
+E             Differing items:
+E             {'.tickets/DAEO-drhj.md': {'orchestrator': 3}} != {'.tickets/DAEO-drhj.md': {'orchestrator': 4}}
+E             Left contains 1 more item:
+E             {'.tickets/DAEO-qyt2.md': {'orchestrator': 1}}
+E             Use -v to get more diff
+
+tests/acceptance/W2-130/test_w2_130_record.py:101: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/nightly/20261114-0404/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=748027) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-175/test_w2_175_record.py::test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-cto]
+FAILED tests/acceptance/W2-175/test_w2_175_record.py::test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head[role-lead]
+FAILED tests/acceptance/W2-45/test_s1_decision_checker_merges.py::test_s1_merges_decision_checker_runs_within_the_gov_check_budget_on_a_history_with_merges
+FAILED tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung]
+FAILED tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py::test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[part-way-500]
+FAILED tests/acceptance/W2-130/test_w2_130_record.py::test_s8_gov_links_at_head_gives_the_after_counts
+FAILED tests/acceptance/W2-130/test_w2_130_record.py::test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head
+7 failed, 17369 passed, 89 skipped, 3 xfailed, 6 warnings in 3093.66s (0:51:33)

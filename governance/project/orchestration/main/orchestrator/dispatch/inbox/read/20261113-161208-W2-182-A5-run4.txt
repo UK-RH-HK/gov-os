@@ -1,0 +1,7 @@
+log: W2-182-A5-run4.json
+W2: W2-182
+status: DONE. Head to land: **04914c869ed3164c8515c8851488bd1637b76f7b**. It is the verified head 5110578c8 plus one commit that adds only the probe record. Tracked `git status --short` is empty. **One condition of the order is not met:** two reds remain, but the order allowed only W2-23 S6 and the three `t
+
+task: DAEO-5y8d (W2-182), run 4 (build, the final run after P-W2-182-E-1 (1), DEC-1167 (4))
+status: DONE. Head to land: **04914c869ed3164c8515c8851488bd1637b76f7b**. It is the verified head 5110578c8 plus one commit that adds only the probe record. Tracked `git status --short` is empty. **One condition of the order is not met:** two reds remain, but the order allowed only W2-23 S6 and the three `test_cto_safety_nets.py` cases. The extra red is W2-02's core-schema case, and its cause is a W2-98 record that came in from `w2/integrate` (see risks). The land on that red is the CTO's call.
+work_com

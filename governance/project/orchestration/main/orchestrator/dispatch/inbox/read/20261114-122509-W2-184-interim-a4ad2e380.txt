@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-184
+status: interim result a4ad2e380: W2-184 (DAEO-6f0s) tests: review round 2's F1: a test designer launched from the tests worktree sees the ticket's probe records (P-W2-184-1 (a))

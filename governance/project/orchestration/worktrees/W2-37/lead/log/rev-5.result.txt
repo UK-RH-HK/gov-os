@@ -1,0 +1,73 @@
+The version change to 1.1.0 passes: commit `7bde87727` changed only the four version lines, and every hash in the record matches what I computed. I wrote nothing in the worktree (`git status --porcelain` is empty at the end).
+
+**Sandbox check (step 0, `EMG-d4b-launched.md`):**
+- (a) Writing `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k` failed with `OSError: [Errno 30] Read-only file system`, and no file was created. Sound.
+- (b) `echo sandbox-trial | git hash-object -w --stdin` returned `1ae28402a109c3397a44b19239a00adfa9472eb0` (exit 0), and `git update-index --refresh` exited 0. Sound.
+
+**Process check:** `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` showed nothing.
+
+**Identity:** `GOV_ROLE=independent-auditor`, `GOV_TICKET=DAEO-6n5k`, top level `/home/usain/gov-os-worktrees/W2-37`, branch `w2/W2-37`, HEAD `7bde87727b0f292448b1c04b11807b2f34d14d05`. All as expected.
+
+task: DAEO-6n5k
+status: complete. Narrow check of the version 1.1.0 change: pass, no findings.
+work_completed: Ran checks 1 to 7, read-only. Rebuilt the expected `.claude` copy with my own script instead of reusing the lead's.
+files_changed: none (my scratch script `$TMPDIR/chk4.py` is in the sandbox TMPDIR only)
+evidence: The commands and outputs are in the section below. Key hashes: `a25b02a7…` (both files at `68d9a917b`), `cdf43a49…` (both files at HEAD), `dc4d01de…` (the expected `.claude` copy, matched by my own rebuild).
+tests: `tests/acceptance/W2-37/test_w2_37_skill_routing.py` through the heavy slot: 3 passed, 1 failed. `[template]` and both regression cases pass. `[claude-copy]` fails, which the brief already expects until the CTO's copies ACT. No `-m`/`-k` exclusion was needed for one file with no model cases. I set `HOME` to an empty scratch folder.
+discoveries: (1) From the launch sandbox, `heavy_slot.sh` cannot write its wait log (`.../orchestrator/log/heavy-slot-waits.jsonl: Read-only file system`). It went on waiting and then ran the test, so this is harmless; only the waits stop being logged. (2) DEC-1166 is in the main tree's register but not yet in this worktree's copy, which is expected before integration.
+risks: none
+lessons: none
+proposed_decisions: none
+unresolved: none
+recommended_next_action: The lead writes the narrow-check record (`../probes/PR-DAEO-6n5k-narrow-version-1.1.0.md`) with the verdict block below. After that comes the CTO's hand merge with P-7, then the copies ACT, which should produce `.rulesync` = `cdf43a49…` and `.claude` = `dc4d01de…`.
+
+## Narrow check: version 1.1.0
+
+1. **Sound. Only the version lines changed; the approved body is untouched.**
+   - `git diff 68d9a917b 7bde87727 -- <both files>` shows, in each file, line 4 `version: "1.0.0"` → `"1.1.0"` and line 6 `  version: "1.0.0"` → `"1.1.0"`. Nothing else: 2 files, 4 insertions, 4 deletions.
+   - `git show 68d9a917b:<path> | sha256sum` gives `a25b02a7c5c8090c2251b945e48b60779ce7c2de7c254ae661a1cb0715932536` for both.
+   - `git log 68d9a917b..HEAD -- <both files>` lists only `7bde87727`. The two merges in between (`31bf5ea07`, `e8c414b0d`) do not touch either file.
+
+2. **Sound. The record's after-hash matches.**
+   - `sha256sum` of both files, in the worktree and via `git show HEAD:`, gives `cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76`.
+   - `cmp` reports the two files byte-equal.
+
+3. **Sound. Every version line in the front matter was changed.**
+   - The front matter is `name`, `description`, `version: "1.1.0"`, `metadata:` / `  version: "1.1.0"`.
+   - `grep -n '1\.0\.0\|1\.1\.0\|version'` finds version values only on lines 4 and 6 of each file. No `1.0.0` is left anywhere in either file. Lines 21, 32, 44 and 57 contain the word "version" only in prose.
+   - These are exactly the two lines the CIT-P names (section 2's version paragraph, review row C2).
+
+4. **Sound. The expected copies are right, and the method fits how rulesync generates copies.**
+   - **`.rulesync` copy:** the expected value is a byte copy of the template, `cdf43a49…`. That is consistent with check 2. Today it is `2af36b72…`, the template's pre-change bytes.
+   - **Expected `.claude` file hash:** its `sha256sum` is `dc4d01de95fb22703f3ef2db79ce5ca516990d641bb6f425af1732cce99f7cd8`.
+   - **Independent rebuild:** I took the current `.claude` front matter, changed `  version: 1.0.0` to `1.1.0`, and appended the HEAD template body without its leading blank line. My rebuild hashes to `dc4d01de…`. The current front matter has exactly one `1.0.0`.
+   - **Front matter diff:** `diff` of the current against the expected front matter shows only `7c7 <   version: 1.0.0 / >   version: 1.1.0`.
+   - **Body:** the expected body equals the template body after its front matter (less the one blank line rulesync drops).
+   - **Whole-file diff:** current `.claude` against expected shows only the version line plus the approved impact-section and Tools hunks, exactly the section 3 lines.
+   - **Why the method is sound:**
+     - The current `.claude` body equals the template body at `96498443f` exactly. So the "template body without its leading blank line" rule reproduces today's generated copy.
+     - The `description` is unchanged, so rulesync's line folding cannot change.
+     - The other generated skills already at 1.1.0 (checkpoint, retrieval, discovery) show `  version: 1.1.0` unquoted with the top-level `version:` dropped. That is the same form as the expected file.
+   - **Caveat:** if the rulesync version in use changed its output format before the ACT, the expected hash would differ. The record already labels its figures "expected … if the generation is plain". The ACT measures the real result in any case.
+
+5. **Sound. The approval is recorded verbatim in both places.**
+   - The record's front matter `owner_approval` and its section 7 both quote "yes W2-37 CIT-P a25b02a7, version 1.1.0" verbatim. Both say the approved body is `a25b02a7`'s (`68d9a917b`) with the version lines at 1.1.0 (`7bde87727`), hash `cdf43a49…`.
+   - The register (`grep -n '^### DEC-1166'`, line 14948) has the heading "… W2-37's CIT-P approved at version 1.1.0 …". Item (4) reads: "**`yes W2-37 CIT-P a25b02a7, version 1.1.0`:** the change skill's impact section approved, the version lines set to 1.1.0 by a short resume with a narrow check; then the CTO's hand merge with P-7 and a copies ACT." This matches the record.
+
+6. **Sound. Trailers and paths are in order.**
+   - `git show -s 7bde87727` has the trailers `Task: DAEO-6n5k`, `Role: engineer`, `Implements: CAP-33.g, DEC-167`. Both ids are in the ticket's `sources` (CAP-33.b, CAP-33.g, DEC-167, DEC-1083).
+   - There is no `Role: owner` or `Decided-by:` trailer.
+   - The commit touches only the two files (`M` each), and both are listed in `.tickets/DAEO-6n5k.md`'s `allowed_paths`.
+   - Its parent is `e8c414b0d`.
+
+7. **Sound. The routing test results match what the brief expects.**
+   - `[template]` passes. `[claude-copy]` fails because the `.claude` copy still carries Wave 1's text, which is the known red until the copies ACT. Both regression cases pass.
+   - Output: `1 failed, 3 passed in 0.14s`.
+
+**Findings:** none. I also checked and found sound: the record's `head:` line ("only merges of w2/integrate (31bf5ea07, e8c414b0d), touching neither file") and the "superseded" note on the pre-bump expected hashes.
+
+**Judgement: pass.**
+
+```verdict
+{"kpis": [{"kpi": "w2-37-cit-p-version", "verdict": "pass", "findings": []}], "reviewer": "independent-auditor, fresh read-only session; not the author"}
+```

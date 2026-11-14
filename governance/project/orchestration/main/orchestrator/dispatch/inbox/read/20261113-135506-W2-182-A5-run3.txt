@@ -1,0 +1,13 @@
+log: W2-182-A5-run3.json
+W2: W2-182
+status: PACKAGES
+
+I'm returning PACKAGES. The check cannot land: E's template line turns 4 other cases red, and none of them is in this ticket's paths.
+
+task: DAEO-5y8d (W2-182), run 3 (build: the final checks)
+status: PACKAGES
+work_completed:
+- Ran the rebuild (rc 0, complete).
+- `gov accept W2-182` on f0cb5284d: pass, 9 of 9, every line.
+- The scoped run once (DEC-968): RED, 5604 tests, 6 failed. I ran each red alone on the head and on its parent 80b19dc16, in clean copies.
+- The narrow independent check: a read-only auditor (Opus high) with JUDGEMENT.md word for word. It returned PASS on all 7 lines with 5 f

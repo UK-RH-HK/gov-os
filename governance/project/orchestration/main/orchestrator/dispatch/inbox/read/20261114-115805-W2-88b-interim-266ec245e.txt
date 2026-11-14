@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-88b
+status: interim result 266ec245e: W2-88b (DAEO-aks1): the probe record's schema keys (reviewer_session to probed_commit) and the lead's judgement: pass, R1 and R2 rows; the reviewer's text and verdict unchanged

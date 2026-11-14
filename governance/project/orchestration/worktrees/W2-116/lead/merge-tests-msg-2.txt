@@ -1,0 +1,5 @@
+Merge w2/W2-116-tests (DAEO-f58b): the README map lists the ride-along token cases in their own table, so gov accept reads the map (bc1ccc048)
+
+Task: DAEO-f58b
+Role: orchestrator
+Implements: DEC-983, DEC-982, DEC-966, DEC-963, DEC-1087

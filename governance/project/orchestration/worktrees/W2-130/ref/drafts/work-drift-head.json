@@ -1,0 +1,4858 @@
+{
+ "summary": {
+  "store": "HEAD by the loader (--from-head)",
+  "links_by_type": {
+   "CITES": 1771,
+   "UNDER": 2595,
+   "AMENDS": 402,
+   "OF_TASK": 381,
+   "SUPERSEDES": 7
+  },
+  "census_drifted_current_with_spent": 226,
+  "drifted_current": 195,
+  "drifted_no_hint": 82,
+  "spent_for_status_reconciliation": {
+   "count": 110,
+   "ids": [
+    "DEC-063",
+    "DEC-721",
+    "DEC-729",
+    "DEC-738",
+    "DEC-739",
+    "DEC-743",
+    "DEC-746",
+    "DEC-747",
+    "DEC-748",
+    "DEC-749",
+    "DEC-750",
+    "DEC-751",
+    "DEC-752",
+    "DEC-753",
+    "DEC-754",
+    "DEC-755",
+    "DEC-756",
+    "DEC-757",
+    "DEC-758",
+    "DEC-761",
+    "DEC-763",
+    "DEC-764",
+    "DEC-765",
+    "DEC-767",
+    "DEC-768",
+    "DEC-771",
+    "DEC-773",
+    "DEC-774",
+    "DEC-775",
+    "DEC-776",
+    "DEC-777",
+    "DEC-779",
+    "DEC-781",
+    "DEC-783",
+    "DEC-784",
+    "DEC-785",
+    "DEC-786",
+    "DEC-790",
+    "DEC-794",
+    "DEC-800",
+    "DEC-804",
+    "DEC-805",
+    "DEC-807",
+    "DEC-811",
+    "DEC-812",
+    "DEC-813",
+    "DEC-814",
+    "DEC-817",
+    "DEC-821",
+    "DEC-823",
+    "DEC-824",
+    "DEC-834",
+    "DEC-835",
+    "DEC-840",
+    "DEC-842",
+    "DEC-853",
+    "DEC-854",
+    "DEC-856",
+    "DEC-857",
+    "DEC-858",
+    "DEC-863",
+    "DEC-864",
+    "DEC-865",
+    "DEC-867",
+    "DEC-870",
+    "DEC-871",
+    "DEC-872",
+    "DEC-874",
+    "DEC-877",
+    "DEC-879",
+    "DEC-882",
+    "DEC-884",
+    "DEC-885",
+    "DEC-886",
+    "DEC-888",
+    "DEC-890",
+    "DEC-891",
+    "DEC-892",
+    "DEC-894",
+    "DEC-895",
+    "DEC-896",
+    "DEC-897",
+    "DEC-899",
+    "DEC-900",
+    "DEC-903",
+    "DEC-904",
+    "DEC-907",
+    "DEC-908",
+    "DEC-909",
+    "DEC-910",
+    "DEC-912",
+    "DEC-913",
+    "DEC-914",
+    "DEC-915",
+    "DEC-917",
+    "DEC-918",
+    "DEC-919",
+    "DEC-920",
+    "DEC-921",
+    "DEC-922",
+    "DEC-923",
+    "DEC-924",
+    "DEC-926",
+    "DEC-927",
+    "DEC-928",
+    "DEC-931",
+    "DEC-932",
+    "DEC-935",
+    "DEC-937",
+    "DEC-940"
+   ],
+   "of_them_stated_changed": 31
+  },
+  "stated_changed_not_accepted": {
+   "DONE": {
+    "count": 1,
+    "ids": [
+     "DEC-056"
+    ]
+   },
+   "PROPOSED": {
+    "count": 12,
+    "ids": [
+     "DEC-002",
+     "DEC-005",
+     "DEC-007",
+     "DEC-024",
+     "DEC-034",
+     "DEC-037",
+     "DEC-040",
+     "DEC-043",
+     "DEC-044",
+     "DEC-045",
+     "DEC-047",
+     "DEC-062"
+    ]
+   },
+   "SUPERSEDED": {
+    "count": 7,
+    "ids": [
+     "DEC-038",
+     "DEC-048",
+     "DEC-636",
+     "DEC-798",
+     "DEC-869",
+     "DEC-875",
+     "DEC-876"
+    ]
+   }
+  },
+  "proposed_decisions_in_all": 42,
+  "superseded_in_part_current": 37,
+  "before": {
+   "one_hop_edge_to_a_changer": 0
+  },
+  "after": {
+   "one_hop_edge_to_a_changer": 195,
+   "one_hop_edge_to_every_changer": 189,
+   "of_the_no_hint": 82,
+   "reached_by_follow_a_changer": 195,
+   "reached_by_follow_every_changer": 189,
+   "named_in_changed_by": 195
+  },
+  "not_joined": [],
+  "changer_pairs": 339,
+  "changer_pairs_joined_after": 326
+ },
+ "rows": [
+  {
+   "id": "DEC-030",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-039",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-075"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-075"
+   ],
+   "reached_by_follow": [
+    "DEC-075"
+   ],
+   "named_in_changed_by": [
+    "DEC-075"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-053",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-165"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-165"
+   ],
+   "reached_by_follow": [
+    "DEC-165"
+   ],
+   "named_in_changed_by": [
+    "DEC-165"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-066",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-094"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-094"
+   ],
+   "reached_by_follow": [
+    "DEC-094"
+   ],
+   "named_in_changed_by": [
+    "DEC-094"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-070",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-096"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-096"
+   ],
+   "reached_by_follow": [
+    "DEC-096"
+   ],
+   "named_in_changed_by": [
+    "DEC-096"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-072",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-064"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-064"
+   ],
+   "reached_by_follow": [
+    "DEC-064"
+   ],
+   "named_in_changed_by": [
+    "DEC-064"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-082",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-096"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-096"
+   ],
+   "reached_by_follow": [
+    "DEC-096"
+   ],
+   "named_in_changed_by": [
+    "DEC-096"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-083",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-163"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-163"
+   ],
+   "reached_by_follow": [
+    "DEC-163"
+   ],
+   "named_in_changed_by": [
+    "DEC-163"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-090",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-741"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-741"
+   ],
+   "reached_by_follow": [
+    "DEC-741"
+   ],
+   "named_in_changed_by": [
+    "DEC-741"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-093",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-220"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-220"
+   ],
+   "reached_by_follow": [
+    "DEC-220"
+   ],
+   "named_in_changed_by": [
+    "DEC-220"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-096",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-1010"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-1010"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-1010"
+   ],
+   "named_in_changed_by": [
+    "DEC-1010",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-107",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-117"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-117"
+   ],
+   "reached_by_follow": [
+    "DEC-117"
+   ],
+   "named_in_changed_by": [
+    "DEC-117"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-120",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-172",
+    "DEC-173",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-172",
+    "DEC-173",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-172",
+    "DEC-173",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-172",
+    "DEC-173",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-121",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-127"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-127"
+   ],
+   "reached_by_follow": [
+    "DEC-127"
+   ],
+   "named_in_changed_by": [
+    "DEC-127"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-140",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-842"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-842"
+   ],
+   "reached_by_follow": [
+    "DEC-842"
+   ],
+   "named_in_changed_by": [
+    "DEC-842"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-150",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-156"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-156"
+   ],
+   "reached_by_follow": [
+    "DEC-156"
+   ],
+   "named_in_changed_by": [
+    "DEC-156"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-151",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-172",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-172",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-172",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-172",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-153",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-209"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-209"
+   ],
+   "reached_by_follow": [
+    "DEC-209"
+   ],
+   "named_in_changed_by": [
+    "DEC-209"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-156",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-165",
+    "DEC-176",
+    "DEC-434"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-165",
+    "DEC-176",
+    "DEC-434"
+   ],
+   "reached_by_follow": [
+    "DEC-165",
+    "DEC-176",
+    "DEC-434"
+   ],
+   "named_in_changed_by": [
+    "DEC-165",
+    "DEC-176",
+    "DEC-434"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-157",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-209"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-209"
+   ],
+   "reached_by_follow": [
+    "DEC-209"
+   ],
+   "named_in_changed_by": [
+    "DEC-209"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-162",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-156"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-156"
+   ],
+   "reached_by_follow": [
+    "DEC-156"
+   ],
+   "named_in_changed_by": [
+    "DEC-156"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-176",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-365",
+    "DEC-402"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-365",
+    "DEC-402"
+   ],
+   "reached_by_follow": [
+    "DEC-365",
+    "DEC-402"
+   ],
+   "named_in_changed_by": [
+    "DEC-365",
+    "DEC-402"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-180",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-311"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-311"
+   ],
+   "reached_by_follow": [
+    "DEC-311"
+   ],
+   "named_in_changed_by": [
+    "DEC-311"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-183",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-205",
+    "DEC-235",
+    "DEC-371"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-205",
+    "DEC-235",
+    "DEC-371"
+   ],
+   "reached_by_follow": [
+    "DEC-205",
+    "DEC-235",
+    "DEC-371"
+   ],
+   "named_in_changed_by": [
+    "DEC-205",
+    "DEC-235",
+    "DEC-371"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-192",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-202",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-202",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-202",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-202",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-208",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-237",
+    "DEC-250",
+    "DEC-838"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-237",
+    "DEC-250",
+    "DEC-838"
+   ],
+   "reached_by_follow": [
+    "DEC-237",
+    "DEC-250",
+    "DEC-838"
+   ],
+   "named_in_changed_by": [
+    "DEC-237",
+    "DEC-250",
+    "DEC-838"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-220",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-416",
+    "DEC-974"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-416",
+    "DEC-974"
+   ],
+   "reached_by_follow": [
+    "DEC-416",
+    "DEC-974"
+   ],
+   "named_in_changed_by": [
+    "DEC-416",
+    "DEC-974"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-235",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-363"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-363"
+   ],
+   "reached_by_follow": [
+    "DEC-363"
+   ],
+   "named_in_changed_by": [
+    "DEC-363"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-237",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-250",
+    "DEC-838"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-250",
+    "DEC-838"
+   ],
+   "reached_by_follow": [
+    "DEC-250",
+    "DEC-838"
+   ],
+   "named_in_changed_by": [
+    "DEC-250",
+    "DEC-838"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-241",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-316"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-316"
+   ],
+   "reached_by_follow": [
+    "DEC-316"
+   ],
+   "named_in_changed_by": [
+    "DEC-316"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-248",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-838"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-838"
+   ],
+   "reached_by_follow": [
+    "DEC-838"
+   ],
+   "named_in_changed_by": [
+    "DEC-838"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-250",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-420"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-420"
+   ],
+   "reached_by_follow": [
+    "DEC-420"
+   ],
+   "named_in_changed_by": [
+    "DEC-420"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-253",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-912"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-912"
+   ],
+   "reached_by_follow": [
+    "DEC-912"
+   ],
+   "named_in_changed_by": [
+    "DEC-912"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-258",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-264"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-264"
+   ],
+   "reached_by_follow": [
+    "DEC-264"
+   ],
+   "named_in_changed_by": [
+    "DEC-264"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-261",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-798",
+    "DEC-1033"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-798",
+    "DEC-1033"
+   ],
+   "reached_by_follow": [
+    "DEC-798",
+    "DEC-1033"
+   ],
+   "named_in_changed_by": [
+    "DEC-1033",
+    "DEC-798"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-269",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-394"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-394"
+   ],
+   "reached_by_follow": [
+    "DEC-394"
+   ],
+   "named_in_changed_by": [
+    "DEC-394"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-281",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-208",
+    "DEC-237",
+    "DEC-838",
+    "DEC-901"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-208",
+    "DEC-237",
+    "DEC-838",
+    "DEC-901"
+   ],
+   "reached_by_follow": [
+    "DEC-208",
+    "DEC-237",
+    "DEC-838",
+    "DEC-901"
+   ],
+   "named_in_changed_by": [
+    "DEC-208",
+    "DEC-237",
+    "DEC-838",
+    "DEC-901"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-285",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1045"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1045"
+   ],
+   "reached_by_follow": [
+    "DEC-1045"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-290",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1045"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1045"
+   ],
+   "reached_by_follow": [
+    "DEC-1045"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-293",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-300"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-300"
+   ],
+   "reached_by_follow": [
+    "DEC-300"
+   ],
+   "named_in_changed_by": [
+    "DEC-300"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-304",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-310"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-310"
+   ],
+   "reached_by_follow": [
+    "DEC-310"
+   ],
+   "named_in_changed_by": [
+    "DEC-310"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-318",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-359"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-359"
+   ],
+   "reached_by_follow": [
+    "DEC-359"
+   ],
+   "named_in_changed_by": [
+    "DEC-359"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-362",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-389"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-389"
+   ],
+   "reached_by_follow": [
+    "DEC-389"
+   ],
+   "named_in_changed_by": [
+    "DEC-389"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-365",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-402",
+    "DEC-407",
+    "DEC-409"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-402",
+    "DEC-407",
+    "DEC-409"
+   ],
+   "reached_by_follow": [
+    "DEC-402",
+    "DEC-407",
+    "DEC-409"
+   ],
+   "named_in_changed_by": [
+    "DEC-402",
+    "DEC-407",
+    "DEC-409"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-367",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-409"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-409"
+   ],
+   "reached_by_follow": [
+    "DEC-409"
+   ],
+   "named_in_changed_by": [
+    "DEC-409"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-371",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-386"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-386"
+   ],
+   "reached_by_follow": [
+    "DEC-386"
+   ],
+   "named_in_changed_by": [
+    "DEC-386"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-376",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-395"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-395"
+   ],
+   "reached_by_follow": [
+    "DEC-395"
+   ],
+   "named_in_changed_by": [
+    "DEC-395"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-378",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-402"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-402"
+   ],
+   "reached_by_follow": [
+    "DEC-402"
+   ],
+   "named_in_changed_by": [
+    "DEC-402"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-384",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-397"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-397"
+   ],
+   "reached_by_follow": [
+    "DEC-397"
+   ],
+   "named_in_changed_by": [
+    "DEC-397"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-385",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-399"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-399"
+   ],
+   "reached_by_follow": [
+    "DEC-399"
+   ],
+   "named_in_changed_by": [
+    "DEC-399"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-386",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-392"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-392"
+   ],
+   "reached_by_follow": [
+    "DEC-392"
+   ],
+   "named_in_changed_by": [
+    "DEC-392"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-390",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-394"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-394"
+   ],
+   "reached_by_follow": [
+    "DEC-394"
+   ],
+   "named_in_changed_by": [
+    "DEC-394"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-391",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-393",
+    "DEC-396"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-393",
+    "DEC-396"
+   ],
+   "reached_by_follow": [
+    "DEC-393",
+    "DEC-396"
+   ],
+   "named_in_changed_by": [
+    "DEC-393",
+    "DEC-396"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-394",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-398",
+    "DEC-403"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-398",
+    "DEC-403"
+   ],
+   "reached_by_follow": [
+    "DEC-398",
+    "DEC-403"
+   ],
+   "named_in_changed_by": [
+    "DEC-398",
+    "DEC-403"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-398",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-403"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-403"
+   ],
+   "reached_by_follow": [
+    "DEC-403"
+   ],
+   "named_in_changed_by": [
+    "DEC-403"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-403",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-410"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-410"
+   ],
+   "reached_by_follow": [
+    "DEC-410"
+   ],
+   "named_in_changed_by": [
+    "DEC-410"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-407",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-409"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-409"
+   ],
+   "reached_by_follow": [
+    "DEC-409"
+   ],
+   "named_in_changed_by": [
+    "DEC-409"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-409",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-428"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-428"
+   ],
+   "reached_by_follow": [
+    "DEC-428"
+   ],
+   "named_in_changed_by": [
+    "DEC-428"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-410",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-421",
+    "DEC-918"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-421",
+    "DEC-918"
+   ],
+   "reached_by_follow": [
+    "DEC-421",
+    "DEC-918"
+   ],
+   "named_in_changed_by": [
+    "DEC-421",
+    "DEC-918"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-413",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-880",
+    "DEC-909",
+    "DEC-912",
+    "DEC-916"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880",
+    "DEC-909",
+    "DEC-912",
+    "DEC-916"
+   ],
+   "reached_by_follow": [
+    "DEC-880",
+    "DEC-909",
+    "DEC-912",
+    "DEC-916"
+   ],
+   "named_in_changed_by": [
+    "DEC-880",
+    "DEC-909",
+    "DEC-912",
+    "DEC-916"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-417",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-421"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-421"
+   ],
+   "reached_by_follow": [
+    "DEC-421"
+   ],
+   "named_in_changed_by": [
+    "DEC-421"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-421",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-572"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-572"
+   ],
+   "reached_by_follow": [
+    "DEC-572"
+   ],
+   "named_in_changed_by": [
+    "DEC-572"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-448",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-456",
+    "DEC-477"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-456",
+    "DEC-477"
+   ],
+   "reached_by_follow": [
+    "DEC-456",
+    "DEC-477"
+   ],
+   "named_in_changed_by": [
+    "DEC-456",
+    "DEC-477"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-451",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-838"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-838"
+   ],
+   "reached_by_follow": [
+    "DEC-838"
+   ],
+   "named_in_changed_by": [
+    "DEC-838"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-454",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-908"
+   ],
+   "reached_by_follow": [
+    "DEC-908"
+   ],
+   "named_in_changed_by": [
+    "DEC-908"
+   ],
+   "only_in_archive": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904"
+   ]
+  },
+  {
+   "id": "DEC-455",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "reached_by_follow": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "named_in_changed_by": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "only_in_archive": [
+    "DEC-899",
+    "DEC-904"
+   ]
+  },
+  {
+   "id": "DEC-460",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-839",
+    "DEC-840"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-839",
+    "DEC-840"
+   ],
+   "reached_by_follow": [
+    "DEC-839",
+    "DEC-840"
+   ],
+   "named_in_changed_by": [
+    "DEC-839",
+    "DEC-840"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-466",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-480",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "reached_by_follow": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "named_in_changed_by": [
+    "DEC-868",
+    "DEC-908"
+   ],
+   "only_in_archive": [
+    "DEC-899",
+    "DEC-904"
+   ]
+  },
+  {
+   "id": "DEC-490",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-904"
+   ],
+   "reached_by_follow": [
+    "DEC-904"
+   ],
+   "named_in_changed_by": [
+    "DEC-904"
+   ],
+   "only_in_archive": [
+    "DEC-868",
+    "DEC-899",
+    "DEC-908"
+   ]
+  },
+  {
+   "id": "DEC-492",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-866",
+    "DEC-868",
+    "DEC-899",
+    "DEC-904",
+    "DEC-908"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-866",
+    "DEC-868",
+    "DEC-899"
+   ],
+   "reached_by_follow": [
+    "DEC-866",
+    "DEC-868",
+    "DEC-899"
+   ],
+   "named_in_changed_by": [
+    "DEC-866",
+    "DEC-868",
+    "DEC-899"
+   ],
+   "only_in_archive": [
+    "DEC-904",
+    "DEC-908"
+   ]
+  },
+  {
+   "id": "DEC-493",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-896",
+    "DEC-903",
+    "DEC-904"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-896",
+    "DEC-903",
+    "DEC-904"
+   ],
+   "reached_by_follow": [
+    "DEC-896",
+    "DEC-903",
+    "DEC-904"
+   ],
+   "named_in_changed_by": [
+    "DEC-896",
+    "DEC-903",
+    "DEC-904"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-501",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-502",
+    "DEC-512",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-502",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-502",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-502",
+    "DEC-825"
+   ],
+   "only_in_archive": [
+    "DEC-512"
+   ]
+  },
+  {
+   "id": "DEC-502",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-512",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-512",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-512",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-512",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-508",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-820"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-820"
+   ],
+   "reached_by_follow": [
+    "DEC-820"
+   ],
+   "named_in_changed_by": [
+    "DEC-820"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-511",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-522",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-522",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-522",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057",
+    "DEC-522"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-513",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-518",
+    "DEC-536"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-518",
+    "DEC-536"
+   ],
+   "reached_by_follow": [
+    "DEC-518",
+    "DEC-536"
+   ],
+   "named_in_changed_by": [
+    "DEC-518",
+    "DEC-536"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-518",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-533",
+    "DEC-536",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-533",
+    "DEC-536",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-533",
+    "DEC-536",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-533",
+    "DEC-536",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-526",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-541",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-541",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-541",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-541",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-594",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-593"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-593"
+   ],
+   "reached_by_follow": [
+    "DEC-593"
+   ],
+   "named_in_changed_by": [
+    "DEC-593"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-605",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-822"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-822"
+   ],
+   "reached_by_follow": [
+    "DEC-822"
+   ],
+   "named_in_changed_by": [
+    "DEC-822"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-608",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-880",
+    "DEC-913",
+    "DEC-917"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880",
+    "DEC-913",
+    "DEC-917"
+   ],
+   "reached_by_follow": [
+    "DEC-880",
+    "DEC-913",
+    "DEC-917"
+   ],
+   "named_in_changed_by": [
+    "DEC-880",
+    "DEC-913",
+    "DEC-917"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-624",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-626",
+    "DEC-825"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-626",
+    "DEC-825"
+   ],
+   "reached_by_follow": [
+    "DEC-626",
+    "DEC-825"
+   ],
+   "named_in_changed_by": [
+    "DEC-626",
+    "DEC-825"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-665",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-838"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-838"
+   ],
+   "reached_by_follow": [
+    "DEC-838"
+   ],
+   "named_in_changed_by": [
+    "DEC-838"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-709",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-719"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-719"
+   ],
+   "reached_by_follow": [
+    "DEC-719"
+   ],
+   "named_in_changed_by": [
+    "DEC-719"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-718",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-900",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-900",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-900",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-900",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-723",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-820",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-820",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-820",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-820",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-724",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-860",
+    "DEC-861"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-860",
+    "DEC-861"
+   ],
+   "reached_by_follow": [
+    "DEC-860",
+    "DEC-861"
+   ],
+   "named_in_changed_by": [
+    "DEC-860",
+    "DEC-861"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-726",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-843",
+    "DEC-852",
+    "DEC-880"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-843",
+    "DEC-852",
+    "DEC-880"
+   ],
+   "reached_by_follow": [
+    "DEC-843",
+    "DEC-852",
+    "DEC-880"
+   ],
+   "named_in_changed_by": [
+    "DEC-843",
+    "DEC-852",
+    "DEC-880"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-728",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-723",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-723",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-723",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-723",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-737",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-847"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-847"
+   ],
+   "reached_by_follow": [
+    "DEC-847"
+   ],
+   "named_in_changed_by": [
+    "DEC-847"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-742",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-942"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-942"
+   ],
+   "reached_by_follow": [
+    "DEC-942"
+   ],
+   "named_in_changed_by": [
+    "DEC-942"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-762",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-766",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-769",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-780",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-775",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-775",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-775",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-775",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-787",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-948"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-948"
+   ],
+   "reached_by_follow": [
+    "DEC-948"
+   ],
+   "named_in_changed_by": [
+    "DEC-948"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-788",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-861"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-861"
+   ],
+   "reached_by_follow": [
+    "DEC-861"
+   ],
+   "named_in_changed_by": [
+    "DEC-861"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-792",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-837"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-837"
+   ],
+   "reached_by_follow": [
+    "DEC-837"
+   ],
+   "named_in_changed_by": [
+    "DEC-837"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-806",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-819",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-856",
+    "DEC-887"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-856",
+    "DEC-887"
+   ],
+   "reached_by_follow": [
+    "DEC-856",
+    "DEC-887"
+   ],
+   "named_in_changed_by": [
+    "DEC-856",
+    "DEC-887"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-820",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-822",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-826",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-829",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-831"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-831"
+   ],
+   "reached_by_follow": [
+    "DEC-831"
+   ],
+   "named_in_changed_by": [
+    "DEC-831"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-830",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-848"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-848"
+   ],
+   "reached_by_follow": [
+    "DEC-848"
+   ],
+   "named_in_changed_by": [
+    "DEC-848"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-831",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-941"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-941"
+   ],
+   "reached_by_follow": [
+    "DEC-941"
+   ],
+   "named_in_changed_by": [
+    "DEC-941"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-832",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-957"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-957"
+   ],
+   "reached_by_follow": [
+    "DEC-957"
+   ],
+   "named_in_changed_by": [
+    "DEC-957"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-839",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-957"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-957"
+   ],
+   "reached_by_follow": [
+    "DEC-957"
+   ],
+   "named_in_changed_by": [
+    "DEC-957"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-841",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-880"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880"
+   ],
+   "reached_by_follow": [
+    "DEC-880"
+   ],
+   "named_in_changed_by": [
+    "DEC-880"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-843",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-852",
+    "DEC-880"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-852",
+    "DEC-880"
+   ],
+   "reached_by_follow": [
+    "DEC-852",
+    "DEC-880"
+   ],
+   "named_in_changed_by": [
+    "DEC-852",
+    "DEC-880"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-847",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-880",
+    "DEC-941",
+    "DEC-942",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880",
+    "DEC-941",
+    "DEC-942",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-880",
+    "DEC-941",
+    "DEC-942",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-880",
+    "DEC-941",
+    "DEC-942",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-849",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-857",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-857",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-857",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-857",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-850",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-855"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-855"
+   ],
+   "reached_by_follow": [
+    "DEC-855"
+   ],
+   "named_in_changed_by": [
+    "DEC-855"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-851",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-852",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-880",
+    "DEC-889"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880",
+    "DEC-889"
+   ],
+   "reached_by_follow": [
+    "DEC-880",
+    "DEC-889"
+   ],
+   "named_in_changed_by": [
+    "DEC-880",
+    "DEC-889"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-855",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-858",
+    "DEC-936",
+    "DEC-938",
+    "DEC-972"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-858",
+    "DEC-936",
+    "DEC-938",
+    "DEC-972"
+   ],
+   "reached_by_follow": [
+    "DEC-858",
+    "DEC-936",
+    "DEC-938",
+    "DEC-972"
+   ],
+   "named_in_changed_by": [
+    "DEC-858",
+    "DEC-936",
+    "DEC-938",
+    "DEC-972"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-861",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-862",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-906",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-906",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-906",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-906",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-868",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-892",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-892",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-892",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-892",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-873",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-880",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-843",
+    "DEC-882",
+    "DEC-884",
+    "DEC-889",
+    "DEC-904",
+    "DEC-952"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-843",
+    "DEC-882",
+    "DEC-884",
+    "DEC-889",
+    "DEC-904",
+    "DEC-952"
+   ],
+   "reached_by_follow": [
+    "DEC-843",
+    "DEC-882",
+    "DEC-884",
+    "DEC-889",
+    "DEC-904",
+    "DEC-952"
+   ],
+   "named_in_changed_by": [
+    "DEC-843",
+    "DEC-882",
+    "DEC-884",
+    "DEC-889",
+    "DEC-904",
+    "DEC-952"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-883",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-889",
+    "DEC-890"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-889",
+    "DEC-890"
+   ],
+   "reached_by_follow": [
+    "DEC-889",
+    "DEC-890"
+   ],
+   "named_in_changed_by": [
+    "DEC-889",
+    "DEC-890"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-889",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-892",
+    "DEC-896",
+    "DEC-899",
+    "DEC-904"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-892",
+    "DEC-896",
+    "DEC-899",
+    "DEC-904"
+   ],
+   "reached_by_follow": [
+    "DEC-892",
+    "DEC-896",
+    "DEC-899",
+    "DEC-904"
+   ],
+   "named_in_changed_by": [
+    "DEC-892",
+    "DEC-896",
+    "DEC-899",
+    "DEC-904"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-893",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-1045"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-1045"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-1045"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-898",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-899",
+    "DEC-902",
+    "DEC-904"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-899",
+    "DEC-902",
+    "DEC-904"
+   ],
+   "reached_by_follow": [
+    "DEC-899",
+    "DEC-902",
+    "DEC-904"
+   ],
+   "named_in_changed_by": [
+    "DEC-899",
+    "DEC-902",
+    "DEC-904"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-905",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-906",
+    "DEC-962"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-906",
+    "DEC-962"
+   ],
+   "reached_by_follow": [
+    "DEC-906",
+    "DEC-962"
+   ],
+   "named_in_changed_by": [
+    "DEC-906",
+    "DEC-962"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-906",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-962"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-962"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-962"
+   ],
+   "named_in_changed_by": [
+    "DEC-953",
+    "DEC-962"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-911",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-923",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-923",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-923",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-923",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-916",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-987",
+    "DEC-1010"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-987",
+    "DEC-1010"
+   ],
+   "reached_by_follow": [
+    "DEC-987",
+    "DEC-1010"
+   ],
+   "named_in_changed_by": [
+    "DEC-1010",
+    "DEC-987"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-925",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-929",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-930",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-949"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-949"
+   ],
+   "reached_by_follow": [
+    "DEC-949"
+   ],
+   "named_in_changed_by": [
+    "DEC-949"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-933",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-961",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-961",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-961",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "named_in_changed_by": [
+    "DEC-1049",
+    "DEC-953",
+    "DEC-961",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-934",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-936",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-936",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "reached_by_follow": [
+    "DEC-936",
+    "DEC-973",
+    "DEC-1049"
+   ],
+   "named_in_changed_by": [
+    "DEC-1049",
+    "DEC-936",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-936",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-938",
+    "DEC-941",
+    "DEC-946",
+    "DEC-953",
+    "DEC-974",
+    "DEC-1088"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-938",
+    "DEC-941",
+    "DEC-946",
+    "DEC-953",
+    "DEC-974",
+    "DEC-1088"
+   ],
+   "reached_by_follow": [
+    "DEC-938",
+    "DEC-941",
+    "DEC-946",
+    "DEC-953",
+    "DEC-974",
+    "DEC-1088"
+   ],
+   "named_in_changed_by": [
+    "DEC-1088",
+    "DEC-938",
+    "DEC-941",
+    "DEC-946",
+    "DEC-953",
+    "DEC-974"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-938",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-941",
+    "DEC-949",
+    "DEC-951",
+    "DEC-953",
+    "DEC-973"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-941",
+    "DEC-949",
+    "DEC-951",
+    "DEC-953",
+    "DEC-973"
+   ],
+   "reached_by_follow": [
+    "DEC-941",
+    "DEC-949",
+    "DEC-951",
+    "DEC-953",
+    "DEC-973"
+   ],
+   "named_in_changed_by": [
+    "DEC-941",
+    "DEC-949",
+    "DEC-951",
+    "DEC-953",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-939",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-945",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1001"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-945",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1001"
+   ],
+   "reached_by_follow": [
+    "DEC-945",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1001"
+   ],
+   "named_in_changed_by": [
+    "DEC-1001",
+    "DEC-945",
+    "DEC-953",
+    "DEC-961"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-941",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-942",
+    "DEC-944",
+    "DEC-946",
+    "DEC-953",
+    "DEC-954",
+    "DEC-1089"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-942",
+    "DEC-944",
+    "DEC-946",
+    "DEC-953",
+    "DEC-954",
+    "DEC-1089"
+   ],
+   "reached_by_follow": [
+    "DEC-942",
+    "DEC-944",
+    "DEC-946",
+    "DEC-953",
+    "DEC-954",
+    "DEC-1089"
+   ],
+   "named_in_changed_by": [
+    "DEC-1089",
+    "DEC-942",
+    "DEC-944",
+    "DEC-946",
+    "DEC-953",
+    "DEC-954"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-942",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-946",
+    "DEC-947",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1089"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-946",
+    "DEC-947",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1089"
+   ],
+   "reached_by_follow": [
+    "DEC-946",
+    "DEC-947",
+    "DEC-953",
+    "DEC-961",
+    "DEC-1089"
+   ],
+   "named_in_changed_by": [
+    "DEC-1089",
+    "DEC-946",
+    "DEC-947",
+    "DEC-953",
+    "DEC-961"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-943",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1052"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1052"
+   ],
+   "reached_by_follow": [
+    "DEC-1052"
+   ],
+   "named_in_changed_by": [
+    "DEC-1052"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-946",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-947",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-960",
+    "DEC-961"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-960",
+    "DEC-961"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-960",
+    "DEC-961"
+   ],
+   "named_in_changed_by": [
+    "DEC-953",
+    "DEC-960",
+    "DEC-961"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-949",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-973",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-973",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-973",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-951",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953",
+    "DEC-973"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953",
+    "DEC-973"
+   ],
+   "reached_by_follow": [
+    "DEC-953",
+    "DEC-973"
+   ],
+   "named_in_changed_by": [
+    "DEC-953",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-952",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-953",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-954",
+    "DEC-959",
+    "DEC-968",
+    "DEC-1045"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-954",
+    "DEC-959",
+    "DEC-968",
+    "DEC-1045"
+   ],
+   "reached_by_follow": [
+    "DEC-954",
+    "DEC-959",
+    "DEC-968",
+    "DEC-1045"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045",
+    "DEC-954",
+    "DEC-959",
+    "DEC-968"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-954",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-957",
+    "DEC-962",
+    "DEC-1037"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-957",
+    "DEC-962",
+    "DEC-1037"
+   ],
+   "reached_by_follow": [
+    "DEC-957",
+    "DEC-962",
+    "DEC-1037"
+   ],
+   "named_in_changed_by": [
+    "DEC-1037",
+    "DEC-957",
+    "DEC-962"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-957",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-959",
+    "DEC-1052"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-959",
+    "DEC-1052"
+   ],
+   "reached_by_follow": [
+    "DEC-959",
+    "DEC-1052"
+   ],
+   "named_in_changed_by": [
+    "DEC-1052",
+    "DEC-959"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-958",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1050"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1050"
+   ],
+   "reached_by_follow": [
+    "DEC-1050"
+   ],
+   "named_in_changed_by": [
+    "DEC-1050"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-959",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-968"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-968"
+   ],
+   "reached_by_follow": [
+    "DEC-968"
+   ],
+   "named_in_changed_by": [
+    "DEC-968"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-961",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-984"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-984"
+   ],
+   "reached_by_follow": [
+    "DEC-984"
+   ],
+   "named_in_changed_by": [
+    "DEC-984"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-962",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-963",
+    "DEC-1001"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-963",
+    "DEC-1001"
+   ],
+   "reached_by_follow": [
+    "DEC-963",
+    "DEC-1001"
+   ],
+   "named_in_changed_by": [
+    "DEC-1001",
+    "DEC-963"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-963",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-966"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-966"
+   ],
+   "reached_by_follow": [
+    "DEC-966"
+   ],
+   "named_in_changed_by": [
+    "DEC-966"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-964",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-970"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-970"
+   ],
+   "reached_by_follow": [
+    "DEC-970"
+   ],
+   "named_in_changed_by": [
+    "DEC-970"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-966",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1045",
+    "DEC-1087"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1045",
+    "DEC-1087"
+   ],
+   "reached_by_follow": [
+    "DEC-1045",
+    "DEC-1087"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045",
+    "DEC-1087"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-967",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-975"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-975"
+   ],
+   "reached_by_follow": [
+    "DEC-975"
+   ],
+   "named_in_changed_by": [
+    "DEC-975"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-968",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1049"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1049"
+   ],
+   "reached_by_follow": [
+    "DEC-1049"
+   ],
+   "named_in_changed_by": [
+    "DEC-1049"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-971",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1001"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1001"
+   ],
+   "reached_by_follow": [
+    "DEC-1001"
+   ],
+   "named_in_changed_by": [
+    "DEC-1001"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-972",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-973",
+    "DEC-1021"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-973",
+    "DEC-1021"
+   ],
+   "reached_by_follow": [
+    "DEC-973",
+    "DEC-1021"
+   ],
+   "named_in_changed_by": [
+    "DEC-1021",
+    "DEC-973"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-973",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1049"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1049"
+   ],
+   "reached_by_follow": [
+    "DEC-1049"
+   ],
+   "named_in_changed_by": [
+    "DEC-1049"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-974",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-979"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-979"
+   ],
+   "reached_by_follow": [
+    "DEC-979"
+   ],
+   "named_in_changed_by": [
+    "DEC-979"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-975",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1032"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1032"
+   ],
+   "reached_by_follow": [
+    "DEC-1032"
+   ],
+   "named_in_changed_by": [
+    "DEC-1032"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-976",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-979"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-979"
+   ],
+   "reached_by_follow": [
+    "DEC-979"
+   ],
+   "named_in_changed_by": [
+    "DEC-979"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-982",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1003"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1003"
+   ],
+   "reached_by_follow": [
+    "DEC-1003"
+   ],
+   "named_in_changed_by": [
+    "DEC-1003"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-988",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-989"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-989"
+   ],
+   "reached_by_follow": [
+    "DEC-989"
+   ],
+   "named_in_changed_by": [
+    "DEC-989"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-989",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1045"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1045"
+   ],
+   "reached_by_follow": [
+    "DEC-1045"
+   ],
+   "named_in_changed_by": [
+    "DEC-1045"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-991",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1050",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1050",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1050",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1050",
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-994",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-998"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-998"
+   ],
+   "reached_by_follow": [
+    "DEC-998"
+   ],
+   "named_in_changed_by": [
+    "DEC-998"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1003",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1052",
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1009",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1069"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1069"
+   ],
+   "reached_by_follow": [
+    "DEC-1069"
+   ],
+   "named_in_changed_by": [
+    "DEC-1069"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1012",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1028",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1032",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1033"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1033"
+   ],
+   "reached_by_follow": [
+    "DEC-1033"
+   ],
+   "named_in_changed_by": [
+    "DEC-1033"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1037",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1039"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1039"
+   ],
+   "reached_by_follow": [
+    "DEC-1039"
+   ],
+   "named_in_changed_by": [
+    "DEC-1039"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1038",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1039",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1047",
+    "DEC-1049",
+    "DEC-1052"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1047",
+    "DEC-1049",
+    "DEC-1052"
+   ],
+   "reached_by_follow": [
+    "DEC-1047",
+    "DEC-1049",
+    "DEC-1052"
+   ],
+   "named_in_changed_by": [
+    "DEC-1047",
+    "DEC-1049",
+    "DEC-1052"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1047",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1049",
+    "DEC-1051"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1049",
+    "DEC-1051"
+   ],
+   "reached_by_follow": [
+    "DEC-1049",
+    "DEC-1051"
+   ],
+   "named_in_changed_by": [
+    "DEC-1049",
+    "DEC-1051"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1048",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1051"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1051"
+   ],
+   "reached_by_follow": [
+    "DEC-1051"
+   ],
+   "named_in_changed_by": [
+    "DEC-1051"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1049",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1050"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1050"
+   ],
+   "reached_by_follow": [
+    "DEC-1050"
+   ],
+   "named_in_changed_by": [
+    "DEC-1050"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1050",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1052",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1055"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1055"
+   ],
+   "reached_by_follow": [
+    "DEC-1055"
+   ],
+   "named_in_changed_by": [
+    "DEC-1055"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1053",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-880"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-880"
+   ],
+   "reached_by_follow": [
+    "DEC-880"
+   ],
+   "named_in_changed_by": [
+    "DEC-880"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1066",
+   "classes": [
+    "supersede"
+   ],
+   "changers": [
+    "DEC-1067"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1067"
+   ],
+   "reached_by_follow": [
+    "DEC-1067"
+   ],
+   "named_in_changed_by": [
+    "DEC-1067"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1067",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1071",
+    "DEC-1090"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1071",
+    "DEC-1090"
+   ],
+   "reached_by_follow": [
+    "DEC-1071",
+    "DEC-1090"
+   ],
+   "named_in_changed_by": [
+    "DEC-1071",
+    "DEC-1090"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1069",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1070",
+    "DEC-1076"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1070",
+    "DEC-1076"
+   ],
+   "reached_by_follow": [
+    "DEC-1070",
+    "DEC-1076"
+   ],
+   "named_in_changed_by": [
+    "DEC-1070",
+    "DEC-1076"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1070",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1071",
+    "DEC-1074"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1071",
+    "DEC-1074"
+   ],
+   "reached_by_follow": [
+    "DEC-1071",
+    "DEC-1074"
+   ],
+   "named_in_changed_by": [
+    "DEC-1071",
+    "DEC-1074"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1071",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1074"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1074"
+   ],
+   "reached_by_follow": [
+    "DEC-1074"
+   ],
+   "named_in_changed_by": [
+    "DEC-1074"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1074",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1076",
+    "DEC-1087"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1076",
+    "DEC-1087"
+   ],
+   "reached_by_follow": [
+    "DEC-1076",
+    "DEC-1087"
+   ],
+   "named_in_changed_by": [
+    "DEC-1076",
+    "DEC-1087"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1075",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1076"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1076"
+   ],
+   "reached_by_follow": [
+    "DEC-1076"
+   ],
+   "named_in_changed_by": [
+    "DEC-1076"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1079",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1081"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1081"
+   ],
+   "reached_by_follow": [
+    "DEC-1081"
+   ],
+   "named_in_changed_by": [
+    "DEC-1081"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1080",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1081",
+    "DEC-1082"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1081",
+    "DEC-1082"
+   ],
+   "reached_by_follow": [
+    "DEC-1081",
+    "DEC-1082"
+   ],
+   "named_in_changed_by": [
+    "DEC-1081",
+    "DEC-1082"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1083",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1084",
+    "DEC-1087",
+    "DEC-1097"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1084",
+    "DEC-1087",
+    "DEC-1097"
+   ],
+   "reached_by_follow": [
+    "DEC-1084",
+    "DEC-1087",
+    "DEC-1097"
+   ],
+   "named_in_changed_by": [
+    "DEC-1084",
+    "DEC-1087",
+    "DEC-1097"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1084",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1087"
+   ],
+   "hint_in_own_entry": false,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1087"
+   ],
+   "reached_by_follow": [
+    "DEC-1087"
+   ],
+   "named_in_changed_by": [
+    "DEC-1087"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-1086",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-1091"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-1091"
+   ],
+   "reached_by_follow": [
+    "DEC-1091"
+   ],
+   "named_in_changed_by": [
+    "DEC-1091"
+   ],
+   "only_in_archive": []
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+# Record of the three Superpowers skills copied here from
+# template/governance/kernel/vendor/superpowers/skills/ (DEC-244, DEC-245, DEC-246).
+# source_sha256: DEC-199 digest of the vendor folder (all its files, the licence included).
+# sha256: DEC-199 digest of this folder, vendored.yaml left out.
+# token_sizes: floor(characters / 4) of each SKILL.md (DEC-247).
+version: "v6.4.2"
+source_sha256: "f2a95244bc977742ee2cf6e5228fd1c24c276d63e7c1e732b3fcf9b2e8c0b90a"
+sha256: "8d9c12efefd8ce57185c123b4b55f79f73843cfc1e3c78a3e48855496893fbcd"
+token_sizes:
+  test-driven-development: 2389
+  systematic-debugging: 2360
+  verification-before-completion: 899

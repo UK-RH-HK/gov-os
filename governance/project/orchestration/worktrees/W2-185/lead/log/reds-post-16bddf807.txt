@@ -1,0 +1,50 @@
+== the eight files, opt-in lifted,breadth
+heavy_slot: all 3 slots taken; waiting (2026-11-14 00:37:13)
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+....                                                                     [100%]
+220 passed, 2 deselected in 210.92s (0:03:30)
+== the time_limit cases of the eight files
+..                                                                       [100%]
+2 passed, 192 deselected in 2.27s
+== W2-23 S6 and W1-38 rulesync
+..F....................                                                  [100%]
+=================================== FAILURES ===================================
+____ test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir _____
+
+tmp_path = PosixPath('/home/usain/gov-os-worktrees/W2-185/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-1/test_s6_every_kernel_hook_exit0')
+
+    def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_path):
+        """Revised for DEC-1163 (6) E (a) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; routed
+        by DEC-1156 (7)). Reason: W2-176 added the seventh kernel hook, ``context_watch.py`` (13fd1dd34, hand merge
+        3430341c4), so the case, which pinned six, failed in the nightly of 2026-11-13; ACT-CONTEXT-WATCH-1 wired it into
+        the repository's own settings only. Decided behaviour: adopted projects get the context watch, so the template's
+        hooks source (``template/.rulesync/hooks.jsonc``) wires ``context_watch.py`` and the case expects seven hooks,
+        each reached by a settings command line and each run with a space in the project dir. What the case still catches:
+        any hook script of the kernel folder that no settings line reaches (named in the failure), a count other than
+        seven, and any exit code or path error that differs with a space. Until the template wires ``context_watch.py``
+        the case is red, and the message names it as unreached."""
+        pair = _pair(tmp_path)
+        events = support.kernel_hook_events()
+        scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
+        reached = {name for name in scripts if any(name in command for _, command in events)}
+        assert reached == scripts and len(scripts) == 7, \
+            f"the settings' hook command lines do not reach the seven kernel hooks: {sorted(scripts - reached)}"
+        runs = {f"the {event} hook": tuple(support.run_hook(root, box, command, event) for root, box in pair)
+                for event, command in events}
+        problems = _compare(runs, pair[0][0])
+>       assert not problems, "\n\n".join(problems)
+E       AssertionError: the SessionStart hook: a fragment of the split path: "ts\\nDAEO-g87r [P1][in_progress] - W2-94 EXAMIN's question set\\nDAEO-h2k3 [P1][in_progr"
+E         $ gov SessionStart
+E         exit 0
+E         --- stdout
+E         {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "DAEO-03ub [P1][in_progress] - W2-42a The product's guard reads what a Bash command writes\nDAEO-2tfd [P1][in_progress] - W2-145 No private reranker beside the shared service\nDAEO-5rgj [P1][open] - W2-121c gov dispatch, part c\nDAEO-6f0s [P1][in_progress] - W2-184 RUBRIC-2 at launch (from W2-60a)\nDAEO-6w5n [P1][open] - W2-121d gov dispatch, part d\nDAEO-drhj [P1][in_progress] - W2-104 The skill evaluation harness\nDAEO-ecac [P1][open] - W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents\nDAEO-g87r [P1][in_progress] - W2-94 EXAMIN's question set\nDAEO-h2k3 [P1][in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources\nDAEO-j9z6 [P1][open] - W2-115b gov queue, the product's merge queue\nDAEO-q8cl [P1][in_progress] - W2-130 The link clean-up (DEC-1073 (5)(a))\nDAEO-rmhj [P1][in_progress] - W2-138 The store's commit in every search result, and the line-hash check\nDAEO-sdxk [P1][open] - W2-00 Wave 2 coordination: the main session's records\nDAEO-zmo4 [P1][in_progress] - W2-174 An adopted repository's tickets get their Verify clauses by a checked pass\nDAEO-aks1 [P2][in_progress] - W2-88b W2-88's proofs on real repositories (a child of W2-88)\nDAEO-qyt2 [P2][in_progress] - W2-185 Adopted projects get the context watch (W2-182's E gap)\nDAEO-sq3a [P2][open] - W2-186 Sandboxed workers' searches ranked again (SANDBOX-1 B4)\nDAEO-057v [P4][open] - W2-18 Pinned install: a product repository runs a fixed release, never the development copy\nDAEO-ar89 [P4][in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget\nDAEO-fau3 [P4][open] - W2-42 Guard: missing role, links, late paths, atomic saves\nDAEO-jzvg [P4][open] - W2-19 Language-agnostic test commands\nDAEO-sdhj [P4][open] - W2-17 gov update\nDAEO-yadm [P4][open] - W2-34 gov readiness --generate"}}
+E         --- stderr
+E         
+E       assert not ['the SessionStart hook: a fragment of the split path: "ts\\\\nDAEO-g87r [P1][in_progress] - W2-94 EXAMIN\'s question ...ds\\nDAEO-sdhj [P4][open] - W2-17 gov update\\nDAEO-yadm [P4][open] - W2-34 gov readiness --generate"}}\n--- stderr\n']
+
+tests/acceptance/W2-23/test_w2_23_space.py:113: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+1 failed, 22 passed, 68 deselected in 43.63s

@@ -1,0 +1,167 @@
+gov_close_serial_only: not in this run: tests/acceptance/W1-16/test_w1_16_ui_off.py
+........................................................................ [ 50%]
+...........................................................F.......FFF   [100%]
+=================================== FAILURES ===================================
+____________ test_a_warm_query_answers_within_half_a_second_at_p95 _____________
+
+measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...4431, 0.2667378009937238, 0.27040484998724423, 0.2689175779814832, 0.4877168279781472, 0.22567296397755854, ...], ...}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        # The timed pass's times: no memory sampler ran in that process (W2-M332).
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 0.531 s over 52 queries (limit 0.5 s; the three slowest: [0.531, 0.555, 0.743])
+E       assert 0.531364117981866 <= 0.5
+E        +  where 0.531364117981866 = <function p95 at 0x79a5b265eb60>([0.25699937500758097, 0.23204537300625816, 0.3030335759976879, 0.26246942701982334, 0.22533228501561098, 0.2797510579985101, ...])
+E        +    where <function p95 at 0x79a5b265eb60> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:273: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/nightly/20261114-0404/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds < limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+>       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (190.7 s)
+E         stdout:
+E          text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-m4rq: 11223 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-mb2t: 20795 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-mc6n: 18234 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-n0wb: 15640 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-nn1s: 66648 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-nqa2: 7537 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-ouet: 10413 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-ozyt: 10297 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-p3ln: 16700 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-p8tv: 17326 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-q7lk: 18708 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-q8cl: 21034 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-qz4p: 7506 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-qzca: 8183 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-qzrq: 7327 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-r30l: 29976 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-r9ss: 13491 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-rd0g: 17923 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-rmbe: 8171 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-s9qc: 12786 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-sdxk: 20231 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-sq3a: mandatory input 'W2-56' not found in the store
+E         REFUSED: DAEO-swdu: 19687 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-t8mp: 32848 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-tgk2: 7486 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-ts4y: 7987 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-uw5h: 8013 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-uzme: 9961 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-v4is: 10041 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wahn: 22211 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wi46: 9827 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wnnz: 28662 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wq2b: 7164 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wqd6: 8340 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-xafn: 12699 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-xwro: 10010 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-ylsh: 13508 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-zflj: 6749 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-zkr9: 9013 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-zmo4: 25095 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-zqvn: 13205 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         context-reproducibility: 0 ticket(s) failed, 3 error(s)
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x79a5b21d6cc0>.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x79a5b2360260>, {'adapter-portability': {'elapsed_s': 0.835, 'family': 'adapter/model p...which is no accepted gate of its CIT', 'paths': ['docs/changes/W2-176-CIT-P.md']}], 'id': 'core-authority', ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "REFUSED: DAEO-03dg: 16469 tokens of its own text and mandatory inputs, over the ceiling of 6000\nREFUSED: DAEO-03ub: 8126 tokens of its own text and mandatory inputs, over the ceiling of 6000\nREFUSED: "}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError
+_____ test_a_warm_retrieval_with_the_real_models_answers_within_the_budget _____
+
+box = <w2_13_support.Box object at 0x79a5b21d6c90>
+real_tiers = {'A': PosixPath('/tmp/pytest-of-usain/pytest-1427/w2-13-real-a-dev0/a-dev'), 'B': PosixPath('/tmp/pytest-of-usain/pytest-1427/w2-13-real-b-dev0/b-dev')}
+
+    @pytest.mark.needs("ollama", "reranker")
+    def test_a_warm_retrieval_with_the_real_models_answers_within_the_budget(box, real_tiers):
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        roots = {programme: (root, [query["query"] for query in queries if query.get("programme") == programme])
+                 for programme, root in real_tiers.items()}
+        env = box.real_env()
+>       _within_budget(_timed(box, roots, support.FUSION, "search", [None], {"refresh": False}, env=env))
+
+tests/acceptance/W2-13/test_w2_13_latency.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seconds = [0.37986134699895047, 0.4114531670056749, 0.4848490029980894, 0.4493009789730422, 0.3365217329992447, 0.4962067129963543, ...]
+
+    def _within_budget(seconds):
+        assert len(seconds) >= 20, f"only {len(seconds)} questions were timed"
+        slowest = [round(value, 3) for value in sorted(seconds)[-3:]]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} questions (limit " \
+            f"{support.WARM_P95_LIMIT_S} s; the three slowest: {slowest})"
+E       AssertionError: warm p95 is 0.710 s over 52 questions (limit 0.5 s; the three slowest: [0.71, 0.729, 1.005])
+E       assert 0.7100455449835863 <= 0.5
+E        +  where 0.7100455449835863 = <function p95 at 0x79a5b2896980>([0.37986134699895047, 0.4114531670056749, 0.4848490029980894, 0.4493009789730422, 0.3365217329992447, 0.4962067129963543, ...])
+E        +    where <function p95 at 0x79a5b2896980> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W2-13/test_w2_13_latency.py:62: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:243: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 85.00
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: at or above the S0b2 R1 baseline of 85 (+0.00); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=100.0, why=80.0
+W1-19 hit@5: missed (8): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+FAILED tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget
+4 failed, 138 passed, 48 deselected, 1 warning in 1650.09s (0:27:30)

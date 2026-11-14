@@ -1,0 +1,5 @@
+Merge w2/integrate into w2/W2-60a: the ticket's run 5 edits (S10 to W2-184; P-6 (a), P-7 (a)) before the verification and the narrow check
+
+Task: DAEO-cv58
+Role: orchestrator
+Implements: DEC-826, DEC-839, DEC-832

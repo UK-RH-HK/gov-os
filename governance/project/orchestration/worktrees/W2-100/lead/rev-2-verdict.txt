@@ -1,0 +1,3 @@
+```verdict
+{"kpis": [{"kpi": "w2-100-narrow-2", "verdict": "pass", "findings": [{"id": "N1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "N2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "N3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "N4", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
+```

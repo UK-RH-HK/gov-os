@@ -1,0 +1,20 @@
+--- a/docs/DECISION_REGISTER.md
++++ b/docs/DECISION_REGISTER.md
+@@ -14847,7 +14847,7 @@
+ - **Basis:** the owner's message of 2026-11-12 ~21:35.
+ 
+ ### DEC-1156 — Five lead packages decided at night (ROUTE-1 (a), P-W2-120-1 (b), W2-33 A, W2-113 PKG-1 (a) and PKG-2 (b), P-W2-98-IF-1 (a)); W2-157's and W2-159's F4 fixed now; two standing rules (the CTO fixes decided-behaviour test revisions and own-branch path cases; any lead-stopping decision brought at night)
+-- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~22:55; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (7), (8) standing · **Under:** DEC-1052, DEC-1154, DEC-1155, DEC-1153 (2), DEC-1087 (13), DEC-996 (1), DEC-995, DEC-974, DEC-1142 (8), DEC-1083, DEC-105 · **Changed by:** DEC-1157 (1) (item (8) superseded)
++- **Status:** ACCEPTED (owner, 2026-11-12, in the chat ~22:55; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-12)`); (7), (8) standing · **Under:** DEC-1052, DEC-1154, DEC-1155, DEC-1153 (2), DEC-1087 (13), DEC-996 (1), DEC-995, DEC-974, DEC-1142 (8), DEC-1083, DEC-105 · **Changed by:** DEC-1157 (1) (item (8) superseded), DEC-1164 (23) (item (8) restored: the owner's asleep clause for a decision that stops a lead)
+ - **Decision:**
+   - (1) **W2-160 ROUTE-1 (a):** W2-160's paths gain `tests/unit/session_watch/test_route.py` for its `ACT_PATHS` assertion only (the two-path tuple of DEC-1153 (2)).
+   - (2) **P-W2-120-1 (b):** W2-120's Interface stated (findings with code, file, key, message; exit 1/0); the closed key list lands on every copy, the validator finding the copies itself; vendored skills named without changing the exit; the "no output class" half deferred (lifted on the ticket) until a product-spec follow-up adds `output` to the kernel skills.
+@@ -14938,7 +14938,7 @@
+ - **Basis:** the owner's message of 2026-11-13 (~10:30) and "W2-56 UNTIL deletion approved: role-lead c731503e, role-cto dbcc9d8c, orchestrator source 5db8f0cb" (~11:05).
+ 
+ ### DEC-1165 — gov context's ceiling: the close's packet at a project setting, and the supplementary cap; W2-183 filed
+-- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 is held: drafted, PROPOSED, waiting for the owner's reading
++- **Status:** ACCEPTED (owner, 2026-11-13, in the chat ~12:40; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-13)`) · **Under:** DEC-1027 H, DEC-1163 (9), DEC-860, DEC-974 · DEC-1164 was held until the owner accepted it (2026-11-13, ~16:00)
+ - **Decision:** of the two scopes brought for gov context's ceiling (DEC-1027 H refuses most tickets: W2-88 at 56,284 tokens against 6,000; every lead works round it with `--budget`), the owner chose **"add the supplementary cap"**, and a ticket filed for it (W2-183, `DAEO-href`):
+   - (1) `gov close` builds its context packet at a project setting, `budgets.close_context_tokens` in `governance/project/facts.yaml` (65536 here; corrected 13:25 from `context.close_tokens`: the kernel's facts schema admits no new top-level key, `budgets:` admits it), so closes stop refusing on the ceiling; with no setting, the default of 6,000 applies.
+   - (2) Every packet carries at most 6,000 tokens of supplementary context above its mandatory part, whatever `--budget` a lead passes.

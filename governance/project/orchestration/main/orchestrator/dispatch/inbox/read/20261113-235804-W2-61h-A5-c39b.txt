@@ -1,0 +1,11 @@
+log: W2-61h-A5-c39b.json
+W2: W2-61h
+status: DONE
+
+task: DAEO-h2k3 (W2-61h). Build run that resumed after P-W2-61H-H10-CAT, on the owner's answer (b): h10's category is callers.
+status: DONE
+work_completed:
+- A fresh independent test designer (td-3, session 2bf08375-225d-4dee-bc01-fb7e566dbcbe) made the floor change in commit 5cd76ee9d:
+  - added `R5_RETIRED = {"callers": 1}` beside `R5_SHORT`;
+  - changed S3's floors to `R5_QUOTAS - R5_SHORT - R5_RETIRED`, which gives callers 2, decision 5, code-paraphrase 2 and every other category at its full minimum;
+  - made the comments say the twelve minimums sum to 40, or 39 without h10's place (matchi

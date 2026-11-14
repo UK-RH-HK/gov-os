@@ -1,0 +1,8 @@
+log: W2-130-A5-run4.json
+W2: W2-130
+status: DONE. Head to land: 0fe423d8f8c8a0bc7bdd6ce7447c3fcfc8e98d8f. `git status --short` is empty.
+
+task: DAEO-q8cl (W2-130), run 4 (build: a short refresh before the land)
+status: DONE. Head to land: 0fe423d8f8c8a0bc7bdd6ce7447c3fcfc8e98d8f. `git status --short` is empty.
+work_completed:
+1. Refreshed `docs/research/W2-130-link-cleanup.md` at the merged head 6b62de94e, using the record's own commands (run 3's builder, adjusted to measure at HEAD). The refreshed parts are the after counts, the closed tickets' missing ids, the ids that name no record, and what is left for D-5, D-6 and D-9. After counts: UNLINKED_ID 1417→1420, UNKNOWN_ID 57→56, closed tickets 142→143 (DAEO-drhj added). Committe

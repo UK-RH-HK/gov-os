@@ -1,0 +1,6 @@
+W2-100: merge the tests' revision (w2/W2-100-tests, 26a1a98ce, td-2: the front-matter case reads version as the template does)
+
+Task: DAEO-uw5h
+Role: orchestrator
+Implements: DEC-959, DEC-832
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

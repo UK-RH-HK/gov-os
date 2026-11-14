@@ -1,0 +1,7 @@
+log: W2-42a-A5-apos2.json
+W2: W2-42a
+status: PACKAGES. The narrow independent check failed on fail-closed (FC). One finding, F1, is in scope, comes up in ordinary work and fails open. Under DEC-1010 that blocks landing, and I do not decide a FAIL away.
+
+task: DAEO-03ub (W2-42a), the apostrophe fix (DEC-1164 (18), DEC-1174 (1)), build run
+status: PACKAGES. The narrow independent check failed on fail-closed (FC). One finding, F1, is in scope, comes up in ordinary work and fails open. Under DEC-1010 that blocks landing, and I do not decide a FAIL away.
+work_completed: I launched a fresh engineer (eng-2, opus, high; the launcher raised the class to C3) with the failing output of `lead/log/apos-red.log`, the CTO's scope (A) and the gov context (`--budget 12000`). It made 3 commits. All 312 apostrophe cases are now green and nothing that was green 

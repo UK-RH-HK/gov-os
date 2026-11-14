@@ -1,0 +1,6 @@
+---
+task: DAEO-2bdu
+decisions_applied: [DEC-1052, DEC-1112, DEC-1150, DEC-957, DEC-1099, DEC-1157, DEC-1156, DEC-1010, DEC-136]
+---
+STATE: run 4: review round 2 (the last) FAIL: round 1's findings all fixed; new RV2-1 blocker (A9's undo = git reset --hard) + RV2-2 minor; probe record committed a15de913e8c4 (round 1's record gains implementer_session); returned PACKAGES P-W2-88-RV2-1 to the CTO | HEAD: a15de913e8c4 | NEXT: on the owner's answer: (a) td-7 batch (RV2-1 cases A, B + RV2-2 as described behaviours, packages/P-W2-88-RV2-1.md) and eng-4 in parallel, merge, accept, lead_verify, narrow independent check of that change only, DONE; (b)/(c) as decided | WAITING ON: the owner's answer to P-W2-88-RV2-1 (via the CTO)
+Workers: rv-2 (done, session c56e1745, FAIL) · td-6 (done, session 70729993, merged 15ad055adbb5) · eng-3 (exit 1 API 403 after both commits, session 18a2ad97) · earlier all done · Rounds: round 1 FAIL; round 2 FAIL (the last; no third) · Decisions taken: no eng-3b (its work committed); no real-embedder re-run of legacy-docs (named residual) · Open packages: P-W2-88-RV2-1 · Paths: packages/P-W2-88-RV2-1.md; log/rv-2.review.md, accept-4.txt, verify/ (RED 9: 4 probe-schema, fixed a15de913e; W2-124 hung load, passes alone; 3 cto_safety_nets live inbox, pass alone; W2-23 :94 integrate's)

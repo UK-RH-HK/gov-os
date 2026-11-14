@@ -1,0 +1,7 @@
+log: W2-101-A5-run3.json
+W2: W2-101
+status: PACKAGES
+
+task: DAEO-6icv (W2-101), build run 3, resumed after P-W2-101-R1 and P-W2-101-CTX-1
+status: PACKAGES
+work_completed: All six steps of the CTO's order are done. (1) I merged `w2/integrate` into `w2/W2-101` with `--no-ff`, in one command, at 57ea2d40bb9f. A dry run first showed no conflict, so no test designer was needed. The merge brought W2-104's harness fix: `harness.py:35,169` now leaves `scenario-summaries.md` out of the session's copy. (2) A product-spec worker (ps-4) fixed L1 at 3cd17b73e3ee: each skill's `output:` is now the path class `"<allowed_path>/** (one entry of the ticket's allow

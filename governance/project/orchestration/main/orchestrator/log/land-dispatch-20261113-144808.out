@@ -1,0 +1,31 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-111 (DAEO-qvff, LITE) at 3da7242f4461: pre-check passed
+W2-111: kernel gate at 3da7242f4461: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-13 14:48:11 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 14:48:11 merged W2-111 onto 95a55bfcac9b: 9c91d4f80208
+2026-11-13 15:08:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 15:08:26 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 15:08:29 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 15:08:30 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 15:08:31 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-13 15:09:04 the head without the batch: a throwaway worktree head-95a55bfcac9b-0 at 95a55bfcac9b with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 15:09:09 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-13 15:09:10 ADVANCED refs/heads/w2/integrate 95a55bfcac9b -> 9c91d4f80208; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/9c91d4f80208.json
+2026-11-13 15:09:10 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 15:10:30 integration store promoted: the merged clone's stores at 9c91d4f80208 into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-111: ce4bdfdfb W2-111 (DAEO-qvff): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: NOTICE 1 finding: docs/changes/W2-98-CIT-P.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 33 findings: .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-50/w2_50_support.py' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/README.md' covers tests/acceptance/ | .tickets/DAEO-cv58.md: implementer allowed_paths pattern 'tests/acceptance/W2-58/test_w2_58_launched_sessions.py' covers tests/acceptance/ (+30 more)
+structural pass: authority: NOTICE 4 findings: docs/changes/W2-98-CIT-P.md: the frontmatter is not valid YAML: mapping values are not allowed here in "<unicode string>", line 10, column 179: ... -F3); the... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... (+1 more)
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 95a55bfcac9b)
+structural pass: links: ok (0 new since 95a55bfcac9bccb0d5e58ae3ddea6d7d8941a17c, 1737 standing)
+structural pass: structural pass at ce4bdfdfb74d (the work tree differs from it at 1 tracked path(s): the working files were read): NOTICE in schema, mutation, authority (6 of 9 families ok), 16.0 s; a notice, not a refusal
+structural pass: notice -> inbox/20261113-151050-structural-notice.txt

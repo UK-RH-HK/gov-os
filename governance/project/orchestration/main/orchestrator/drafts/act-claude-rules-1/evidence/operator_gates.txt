@@ -1,0 +1,6 @@
+manifest sha256: 83c5faf6c4ac2ff3267d7c58fdb830afb8ce44494b061a877c683c72620e074f
+validate_manifest: pass
+check_act: pass
+path_rule: pass
+hash mismatches: [] ; unnamed on disk: []
+act_class: class O; rows ['rulesync-other', 'unknown']; hits []

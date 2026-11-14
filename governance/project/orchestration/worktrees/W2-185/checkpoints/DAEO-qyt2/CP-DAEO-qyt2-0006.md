@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-qyt2-0006
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-qyt2 at stop
+task: DAEO-qyt2
+task_status: in_progress
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-13T23:17:18Z'
+inputs:
+- id: DAEO-qyt2
+  version: 31eab2103
+  hash: sha256:94af97275a1b42cb0f6c510250ecfdf8e0e051d70b1121904d492bb053847405
+head_commit: 15839b56abb270286b76a1cbd5324da8b4a22485
+---
+
+# CP-DAEO-qyt2-0006 — DAEO-qyt2 at stop
+
+## Next action
+
+Resume after stop

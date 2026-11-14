@@ -1,0 +1,14 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "head",
+   "before": "57ea2d40bb9f",
+   "after": "3cd17b73e3ee"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

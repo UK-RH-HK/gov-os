@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.237" timestamp="2026-11-14T03:34:35.677691+00:00" hostname="Usain"><testcase classname="tests.unit.retrieval.test_w2_112_shared_reranker" name="test_the_running_service_writes_one_memory_line_per_request" time="0.044"><failure message="AssertionError: assert 'unavailable' == 'service'&#10;  &#10;  - service&#10;  + unavailable">home = PosixPath('/home/usain/gov-os-worktrees/W2-104/.gov-runtime/scratch/tmp-unit5/pytest-of-usain/pytest-0/h0')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+&gt;           assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+E           AssertionError: assert 'unavailable' == 'service'
+E             
+E             - service
+E             + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:563: AssertionError</failure></testcase></testsuite></testsuites>

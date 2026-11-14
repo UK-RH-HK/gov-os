@@ -1,0 +1,63 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "head",
+   "before": "20d6a21f5353",
+   "after": "d4f05d6577a1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": " M governance/project/rebuild.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": " M src/gov/rebuild/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": " M src/gov/rebuild/integration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": " M src/gov/status/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": "?? src/gov/status/integration_store.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": "?? tests/unit/rebuild/test_w2_116_when_due.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "status line gone",
+   "line": "?? tests/unit/status/test_w2_116_integration_store.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-60a-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "head",
+   "before": "ed568a699e4f",
+   "after": "df9f4910e00e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

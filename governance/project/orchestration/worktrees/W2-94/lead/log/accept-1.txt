@@ -1,0 +1,1 @@
+gov accept: ACCEPT_MAP_UNREADABLE: ticket DAEO-g87r: the README of tests/acceptance/W2-94/ has a map cell listing a KPI line it cannot read (README line 36: "S5 (W2-61's close record names KPI 6 as moved to W2-94)")

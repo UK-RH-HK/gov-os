@@ -1,0 +1,58 @@
+ACT-CLAUDE-RULES-1 rehearsal; bundle /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-RULES-1; rulesync 24.0.0
+--- A. the bundle
+ok   A1 every file the manifest names hashes as it says
+ok   A2 list.txt equals the manifest's touched list
+ok   A3 the main tree's three files are at their before hashes
+ok   A4 apply.sh is the copies ACTs' apply.sh and parses
+ok   A5 no __pycache__ in the bundle
+--- B. a fresh clone of w2/integrate (HOME planted at an empty folder)
+     clone at 79159cd44c5b
+ok   B1 each of the three is at its before hash (CLAUDE.md, AGENTS.md, .rulesync/rules/governance.md)
+ok   B2 the template's rule source is unchanged and is not in the bundle
+     portability before: exit 1; findings [('GENERATED_DIFFERS', '.claude/skills/adopt/SKILL.md')]
+ok   B3 apply.sh check: exit 0, prints nothing
+ok   B4 the manifest's checks before the apply: the after hashes, the gone sentence and the new sentence refuse ([False, True, False, False])
+ok   B5 apply (exit 0): the three files are the frozen after, byte for byte
+ok   B6 the manifest's four checks after the apply ([True, True, True, True])
+ok   B7 the clone's changed set is the three files: .rulesync/rules/governance.md, AGENTS.md, CLAUDE.md
+ok   B8 .claude/settings.json and the template's rule source are not written
+ok   B9 a fresh rulesync generation from the applied source gives CLAUDE.md and AGENTS.md byte for byte
+ok   B10 and the held-out step gives .claude/settings.json byte for byte the tree's: the ACT has nothing to write there
+ok   B11 portability after: the same findings as before (1), none on the three files: [('GENERATED_DIFFERS', '.claude/skills/adopt/SKILL.md')]
+ok   B12 check after the apply refuses (a file has moved: exit 3)
+ok   B13 undo: byte for byte the before, the tree clean
+ok   B14 apply again gives the same bytes
+--- C. why the three go together, and refusals
+ok   C1 the source alone (copies not yet written): portability reads GENERATED_DIFFERS for CLAUDE.md and AGENTS.md: [('GENERATED_DIFFERS', 'AGENTS.md'), ('GENERATED_DIFFERS', 'CLAUDE.md')]
+ok   C2 CLAUDE.md changed: check refuses naming it (exit 3)
+ok   C3 AGENTS.md changed: check refuses naming it (exit 3)
+ok   C4 .rulesync/rules/governance.md changed: check refuses naming it (exit 3)
+ok   C5 no test names the replaced sentences (grep over tests/: no file)
+--- D. the owner's steps literally (the three staged, the commit, the undo)
+ok   D1 the three paths staged, and only them
+ok   D2 the commit with Role: owner
+ok   D3 the operator's landing check (Role: owner) raises nothing for the commit
+ok   D4 apply.sh undo
+ok   D5 the undo commit
+ok   D6 an empty diff over the three paths against the start
+ok   D7 and the apply and commit go through again
+--- E. the tests (each folder one run through heavy_slot.sh, TMPDIR outside the repository; the clone after the apply)
+ok   E tests/unit/adapters: before exit 0 (102 passed, 40 deselected in 5.18s); after exit 0 (102 passed, 40 deselected in 4.96s); no new red
+ok   E tests/acceptance/W1-38: before exit 0 (42 passed, 159 deselected in 62.53s (0:01:02)); after exit 0 (42 passed, 159 deselected in 58.97s); no new red
+ok   E tests/acceptance/W2-23: before exit 1 (1 failed, 32 passed in 173.36s (0:02:53)); after exit 1 (1 failed, 32 passed in 204.79s (0:03:24)); no new red: reds after 1, before 1
+ok   E tests/acceptance/W2-153: before exit 0 (66 passed in 7.65s); after exit 0 (66 passed in 7.49s); no new red
+ok   E tests/acceptance/W2-98: before exit 0 (502 passed in 34.25s); after exit 0 (502 passed in 36.29s); no new red
+ok   E tests/acceptance/W2-106: before exit 0 (26 passed, 62 deselected in 10.16s); after exit 0 (26 passed, 62 deselected in 10.28s); no new red
+ok   E tests/acceptance/W1-33: before exit 0 (112 passed, 2 deselected in 15.41s); after exit 0 (112 passed, 2 deselected in 16.12s); no new red
+ok   E-all new red brought by the ACT: none: {}
+--- F. the operator's read-only gates, and the classifier
+ok   F1 validate_manifest (the operator's own): pass
+ok   F2 check_act: pass
+ok   F3 path_rule: pass
+ok   F4 act_class: class O (the manifest claims O); rows {'.rulesync/rules/governance.md': 'rulesync-other', 'CLAUDE.md': 'unknown', 'AGENTS.md': 'unknown'}; hits []
+ok   F5 no unlisted file and no __pycache__ in the bundle: []
+--- G. the live files
+ok   G1 the main tree's three files, the template's source and the settings are byte for byte as before
+ok   G2 nothing was written to the planted HOME
+=== 46 ok, 0 failed
+failures: 0

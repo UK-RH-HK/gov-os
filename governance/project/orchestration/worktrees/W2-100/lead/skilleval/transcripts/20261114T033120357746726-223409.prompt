@@ -1,0 +1,44 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply uses the shared error body, ranks the point P3, and does not stop the work or send the question to the owner.
+
+Expected behaviour:
+the session takes the simplest reading (the same error body as the others), adds it to the contract, tests it, and names the point in `discoveries`; this is a P3 (reversible, inside the ticket, no change to a KPI), decided and logged without stopping the work.
+
+The session's reply:
+<<<
+Per the api skill, this is a **P3**, not something to escalate. The contract leaves an error body open; the choice can be undone, stays inside the ticket and changes no KPI. The skill's rule for P3 is to take the simplest reading, write it into the contract, log it in `discoveries`, and keep going. So I'm not waiting on the owner.
+
+**The choice:** the 409 uses the same error body as every other error in the contract, with a stable code:
+
+```yaml
+# in the endpoint's responses (OpenAPI)
+'409':
+  description: The name is taken.
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/Error'   # the contract's existing {"error": {"code", "message"}} schema
+      example:
+        error:
+          code: NAME_TAKEN
+          message: "The name is already in use."
+```
+
+This is the simplest reading because the contract has one error shape everywhere and the skill requires one. It's an additive change: it fills a gap and changes nothing that's published. I'd write the code in the same casing as the contract's other codes; `NAME_TAKEN` assumes upper snake case. The example message has no personal data in it, so it doesn't echo the name the caller sent.
+
+**Tests this adds** (written from the contract, before the handler):
+- Create with a name that's already taken → 409, and the body matches the `Error` schema with `error.code == "NAME_TAKEN"`.
+- Create with a new name → the success response, not 409.
+- Test the code, not the message: callers match on the code, and the message is for people.
+
+**For the return:**
+- `discoveries`: "The contract said 409 when the name is taken but gave no body. I used the interface's one error shape with code `NAME_TAKEN` and added it to the contract. Ranked P3 and logged here, not escalated."
+- `proposed_decisions`: that `NAME_TAKEN` becomes the stable code for this conflict. The owner can rename it before release, which is cheap.
+
+**I haven't edited any files or run any tests.** This folder holds only the skill itself (`SKILL.md`, `check_domain_skill.py`). There's no ticket, no contract file and no code, and `scenarios.md`, which the skill points to, is missing. I didn't want to invent a contract file. The fragment and tests above are what to apply to the real contract file before the handler is written. If you point me at the ticket's repository, I'll make the change there, contract first, and continue the ticket.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

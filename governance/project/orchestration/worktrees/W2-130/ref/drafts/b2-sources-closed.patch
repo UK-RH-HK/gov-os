@@ -1,0 +1,1521 @@
+diff --git a/.tickets/DAEO-03dg.md b/.tickets/DAEO-03dg.md
+--- a/.tickets/DAEO-03dg.md
++++ b/.tickets/DAEO-03dg.md
+@@ -45,6 +45,11 @@
+ - DEC-892
+ - DEC-898
+ - DEC-911
++- DEC-780
++- DEC-862
++- DEC-889
++- DEC-906
++- DEC-922
+ est_loc: 450
+ acceptance_tests:
+   path: tests/acceptance/W2-80/
+diff --git a/.tickets/DAEO-03pw.md b/.tickets/DAEO-03pw.md
+--- a/.tickets/DAEO-03pw.md
++++ b/.tickets/DAEO-03pw.md
+@@ -37,6 +37,8 @@
+ - MR-4
+ - CAP-47
+ - CAP-59
++- CAP-59.a
++- CAP-59.b
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W1-43/
+diff --git a/.tickets/DAEO-0i6h.md b/.tickets/DAEO-0i6h.md
+--- a/.tickets/DAEO-0i6h.md
++++ b/.tickets/DAEO-0i6h.md
+@@ -85,6 +85,21 @@
+ - DEC-136
+ - CAP-32
+ - DEC-167
++- CAP-24.a
++- CAP-24.b
++- CAP-24.c
++- CAP-28.a
++- CAP-30.b
++- CAP-30.f
++- CAP-32.c
++- CAP-33.a
++- CAP-33.d
++- CAP-33.e
++- CAP-33.f
++- CAP-34.c
++- CAP-38.b
++- CAP-38.e
++- CAP-47.d
+ est_loc: 480
+ acceptance_tests:
+   path: tests/acceptance/W1-35/
+diff --git a/.tickets/DAEO-0qs5.md b/.tickets/DAEO-0qs5.md
+--- a/.tickets/DAEO-0qs5.md
++++ b/.tickets/DAEO-0qs5.md
+@@ -37,6 +37,8 @@
+ - DEC-083
+ - CAP-25
+ - CAP-61
++- CAP-25.d
++- CAP-61.e
+ est_loc: 10
+ acceptance_tests:
+   path: tests/acceptance/W1-48/
+diff --git a/.tickets/DAEO-0rfi.md b/.tickets/DAEO-0rfi.md
+--- a/.tickets/DAEO-0rfi.md
++++ b/.tickets/DAEO-0rfi.md
+@@ -50,6 +50,14 @@
+ - DEC-441
+ - DEC-565
+ - CAP-33
++- DEC-1033
++- DEC-1042
++- DEC-773
++- DEC-866
++- W2-30
++- W2-32
++- W2-34
++- W2-40
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-54/
+diff --git a/.tickets/DAEO-0uhh.md b/.tickets/DAEO-0uhh.md
+--- a/.tickets/DAEO-0uhh.md
++++ b/.tickets/DAEO-0uhh.md
+@@ -39,6 +39,7 @@
+ - DEC-890
+ - DEC-833
+ - DEC-941
++- DEC-954
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-64/
+diff --git a/.tickets/DAEO-1ahb.md b/.tickets/DAEO-1ahb.md
+--- a/.tickets/DAEO-1ahb.md
++++ b/.tickets/DAEO-1ahb.md
+@@ -40,6 +40,21 @@
+ - DEC-715
+ - DEC-434
+ - DEC-743
++- W2-H001
++- W2-H012
++- W2-H046
++- W2-L105
++- W2-M094
++- W2-M095
++- W2-M097
++- W2-M152
++- W2-M181
++- W2-M187
++- W2-M245
++- W2-M247
++- W2-M275
++- W2-M291
++- W2-M405
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W2-21/
+diff --git a/.tickets/DAEO-1vka.md b/.tickets/DAEO-1vka.md
+--- a/.tickets/DAEO-1vka.md
++++ b/.tickets/DAEO-1vka.md
+@@ -35,6 +35,8 @@
+ - DEC-1034
+ - DEC-1033
+ - DEC-799
++- DEC-1010
++- W2-112
+ est_loc: 40
+ acceptance_tests:
+   path: tests/acceptance/W2-127/
+diff --git a/.tickets/DAEO-2ds6.md b/.tickets/DAEO-2ds6.md
+--- a/.tickets/DAEO-2ds6.md
++++ b/.tickets/DAEO-2ds6.md
+@@ -28,6 +28,7 @@
+ - DEC-728
+ - DEC-078
+ - DEC-727
++- W2-I041
+ est_loc: 60
+ acceptance_tests:
+   evidence:
+diff --git a/.tickets/DAEO-2gc7.md b/.tickets/DAEO-2gc7.md
+--- a/.tickets/DAEO-2gc7.md
++++ b/.tickets/DAEO-2gc7.md
+@@ -45,6 +45,7 @@
+ - DEC-880
+ - DEC-899
+ - DEC-936
++- DEC-906
+ est_loc: 300
+ acceptance_tests:
+   path: tests/acceptance/W2-68/
+diff --git a/.tickets/DAEO-2lwj.md b/.tickets/DAEO-2lwj.md
+--- a/.tickets/DAEO-2lwj.md
++++ b/.tickets/DAEO-2lwj.md
+@@ -86,6 +86,21 @@
+ - CAP-50
+ - MR-3
+ - DEC-137
++- CAP-07.a
++- CAP-13.a
++- CAP-20.a
++- CAP-24.a
++- CAP-31.b
++- CAP-38.a
++- CAP-38.b
++- CAP-38.c
++- CAP-38.d
++- CAP-38.f
++- CAP-46.a
++- CAP-50.c
++- CAP-59.a
++- CAP-59.b
++- CAP-59.c
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W1-30/
+diff --git a/.tickets/DAEO-32n6.md b/.tickets/DAEO-32n6.md
+--- a/.tickets/DAEO-32n6.md
++++ b/.tickets/DAEO-32n6.md
+@@ -41,6 +41,7 @@
+ - DEC-237
+ - DEC-025
+ - CAP-37
++- CAP-37.g
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W1-49/
+diff --git a/.tickets/DAEO-3ef2.md b/.tickets/DAEO-3ef2.md
+--- a/.tickets/DAEO-3ef2.md
++++ b/.tickets/DAEO-3ef2.md
+@@ -44,6 +44,9 @@
+ - CAP-52
+ - CAP-38
+ - MR-5
++- CAP-38.b
++- CAP-52.a
++- CAP-52.b
+ est_loc: 50
+ acceptance_tests:
+   path: tests/acceptance/W1-38/
+diff --git a/.tickets/DAEO-49o5.md b/.tickets/DAEO-49o5.md
+--- a/.tickets/DAEO-49o5.md
++++ b/.tickets/DAEO-49o5.md
+@@ -46,6 +46,14 @@
+ - DEC-752
+ - DEC-753
+ - DEC-954
++- DEC-767
++- DEC-772
++- W2-H029
++- W2-L002
++- W2-L014
++- W2-L227
++- W2-M174
++- W2-M175
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-16/
+diff --git a/.tickets/DAEO-4eux.md b/.tickets/DAEO-4eux.md
+--- a/.tickets/DAEO-4eux.md
++++ b/.tickets/DAEO-4eux.md
+@@ -33,6 +33,7 @@
+ - DEC-385
+ - DEC-906
+ - DEC-977
++- DEC-986
+ est_loc: 40
+ acceptance_tests:
+   path: tests/acceptance/W2-114/
+diff --git a/.tickets/DAEO-4yyl.md b/.tickets/DAEO-4yyl.md
+--- a/.tickets/DAEO-4yyl.md
++++ b/.tickets/DAEO-4yyl.md
+@@ -41,6 +41,10 @@
+ - CAP-13
+ - CAP-29
+ - CAP-50
++- CAP-08.a
++- CAP-09.a
++- CAP-09.b
++- CAP-13.a
+ est_loc: 260
+ acceptance_tests:
+   path: tests/acceptance/W1-10/
+diff --git a/.tickets/DAEO-57hm.md b/.tickets/DAEO-57hm.md
+--- a/.tickets/DAEO-57hm.md
++++ b/.tickets/DAEO-57hm.md
+@@ -35,6 +35,8 @@
+ - DEC-954
+ - DEC-694
+ - DEC-381
++- DEC-970
++- W2-H064
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W2-95/
+diff --git a/.tickets/DAEO-5j8b.md b/.tickets/DAEO-5j8b.md
+--- a/.tickets/DAEO-5j8b.md
++++ b/.tickets/DAEO-5j8b.md
+@@ -46,6 +46,7 @@
+ - DEC-857
+ - DEC-873
+ - DEC-880
++- DEC-826
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-58/
+diff --git a/.tickets/DAEO-5x4l.md b/.tickets/DAEO-5x4l.md
+--- a/.tickets/DAEO-5x4l.md
++++ b/.tickets/DAEO-5x4l.md
+@@ -50,6 +50,16 @@
+ - CAP-04
+ - CAP-38
+ - CAP-51
++- CAP-04.c
++- CAP-14.a
++- CAP-16.a
++- CAP-16.b
++- CAP-16.c
++- CAP-18.a
++- CAP-18.b
++- CAP-38.b
++- CAP-51.b
++- CAP-55.a
+ est_loc: 300
+ acceptance_tests:
+   path: tests/acceptance/W1-21/
+diff --git a/.tickets/DAEO-5ylr.md b/.tickets/DAEO-5ylr.md
+--- a/.tickets/DAEO-5ylr.md
++++ b/.tickets/DAEO-5ylr.md
+@@ -45,6 +45,9 @@
+ - CAP-43
+ - CAP-44
+ - CAP-54
++- CAP-02.a
++- CAP-43.a
++- CAP-44.a
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-39/
+diff --git a/.tickets/DAEO-6cc2.md b/.tickets/DAEO-6cc2.md
+--- a/.tickets/DAEO-6cc2.md
++++ b/.tickets/DAEO-6cc2.md
+@@ -46,6 +46,7 @@
+ - DEC-171
+ - MR-3
+ - CAP-58
++- CAP-58.e
+ est_loc: 40
+ acceptance_tests:
+   path: tests/acceptance/W1-45/
+diff --git a/.tickets/DAEO-6mk8.md b/.tickets/DAEO-6mk8.md
+--- a/.tickets/DAEO-6mk8.md
++++ b/.tickets/DAEO-6mk8.md
+@@ -45,6 +45,11 @@
+ - DEC-106
+ - DEC-138
+ - DEC-170
++- CAP-04.b
++- CAP-40.a
++- CAP-40.c
++- CAP-40.d
++- CAP-53.c
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W1-31/
+diff --git a/.tickets/DAEO-78bn.md b/.tickets/DAEO-78bn.md
+--- a/.tickets/DAEO-78bn.md
++++ b/.tickets/DAEO-78bn.md
+@@ -35,6 +35,8 @@
+ - DEC-083
+ - DEC-040
+ - CAP-25
++- CAP-25.a
++- CAP-25.b
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W1-04/
+diff --git a/.tickets/DAEO-7nne.md b/.tickets/DAEO-7nne.md
+--- a/.tickets/DAEO-7nne.md
++++ b/.tickets/DAEO-7nne.md
+@@ -46,6 +46,11 @@
+ - DEC-074
+ - CAP-03
+ - CAP-38
++- CAP-03.a
++- CAP-03.b
++- CAP-03.e
++- CAP-38.b
++- CAP-52.a
+ est_loc: 70
+ acceptance_tests:
+   path: tests/acceptance/W1-15/
+diff --git a/.tickets/DAEO-7r5e.md b/.tickets/DAEO-7r5e.md
+--- a/.tickets/DAEO-7r5e.md
++++ b/.tickets/DAEO-7r5e.md
+@@ -40,6 +40,14 @@
+ - DEC-709
+ - DEC-719
+ - DEC-971
++- DEC-1014
++- DEC-803
++- W2-H020
++- W2-L017
++- W2-L106
++- W2-L335
++- W2-M013
++- W2-M142
+ est_loc: 0
+ acceptance_tests:
+   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
+diff --git a/.tickets/DAEO-7rr2.md b/.tickets/DAEO-7rr2.md
+--- a/.tickets/DAEO-7rr2.md
++++ b/.tickets/DAEO-7rr2.md
+@@ -35,6 +35,8 @@
+ - DEC-757
+ - DEC-704
+ - DEC-498
++- W2-H047
++- W2-M202
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-53/
+diff --git a/.tickets/DAEO-7y6v.md b/.tickets/DAEO-7y6v.md
+--- a/.tickets/DAEO-7y6v.md
++++ b/.tickets/DAEO-7y6v.md
+@@ -36,6 +36,10 @@
+ sources:
+ - DEC-723
+ - DEC-900
++- W2-H053
++- W2-L018
++- W2-L324
++- W2-L341
+ est_loc: 0
+ acceptance_tests:
+   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
+diff --git a/.tickets/DAEO-8goq.md b/.tickets/DAEO-8goq.md
+--- a/.tickets/DAEO-8goq.md
++++ b/.tickets/DAEO-8goq.md
+@@ -38,6 +38,8 @@
+ - S0a-G-01
+ - CAP-28
+ - CAP-27
++- CAP-27.a
++- CAP-28.a
+ est_loc: 80
+ acceptance_tests:
+   path: tests/acceptance/W1-32/
+diff --git a/.tickets/DAEO-8lmb.md b/.tickets/DAEO-8lmb.md
+--- a/.tickets/DAEO-8lmb.md
++++ b/.tickets/DAEO-8lmb.md
+@@ -55,6 +55,7 @@
+ - DEC-954
+ - DEC-955
+ - DEC-906
++- MR-3
+ est_loc: 400
+ acceptance_tests:
+   path: tests/acceptance/W2-90/
+diff --git a/.tickets/DAEO-8nue.md b/.tickets/DAEO-8nue.md
+--- a/.tickets/DAEO-8nue.md
++++ b/.tickets/DAEO-8nue.md
+@@ -36,6 +36,9 @@
+ - CAP-17
+ - CAP-55
+ - CAP-57
++- CAP-17.c
++- CAP-55.a
++- CAP-57.a
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W1-22/
+diff --git a/.tickets/DAEO-8qvp.md b/.tickets/DAEO-8qvp.md
+--- a/.tickets/DAEO-8qvp.md
++++ b/.tickets/DAEO-8qvp.md
+@@ -35,6 +35,7 @@
+ - DEC-076
+ - CAP-58
+ - MR-3
++- CAP-58.a
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-03/
+diff --git a/.tickets/DAEO-9279.md b/.tickets/DAEO-9279.md
+--- a/.tickets/DAEO-9279.md
++++ b/.tickets/DAEO-9279.md
+@@ -39,6 +39,11 @@
+ sources:
+ - S0a-G-10
+ - CAP-05
++- CAP-05.a
++- CAP-05.b
++- CAP-05.c
++- CAP-05.d
++- DEC-386
+ est_loc: 80
+ acceptance_tests:
+   path: tests/acceptance/W1-28/
+diff --git a/.tickets/DAEO-9i8e.md b/.tickets/DAEO-9i8e.md
+--- a/.tickets/DAEO-9i8e.md
++++ b/.tickets/DAEO-9i8e.md
+@@ -32,6 +32,7 @@
+ - DEC-030
+ - DEC-036
+ - CAP-15
++- CAP-15.f
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-23/
+diff --git a/.tickets/DAEO-9nys.md b/.tickets/DAEO-9nys.md
+--- a/.tickets/DAEO-9nys.md
++++ b/.tickets/DAEO-9nys.md
+@@ -37,6 +37,9 @@
+ - DEC-899
+ - DEC-904
+ - DEC-907
++- DEC-914
++- DEC-954
++- DEC-970
+ est_loc: 750
+ acceptance_tests:
+   path: tests/acceptance/W1-27/
+diff --git a/.tickets/DAEO-a3m2.md b/.tickets/DAEO-a3m2.md
+--- a/.tickets/DAEO-a3m2.md
++++ b/.tickets/DAEO-a3m2.md
+@@ -34,6 +34,9 @@
+ - CAP-33
+ - DEC-685
+ - DEC-743
++- W2-I015
++- W2-M016
++- W2-M236
+ est_loc: 90
+ acceptance_tests:
+   path: tests/acceptance/W2-09/
+diff --git a/.tickets/DAEO-av72.md b/.tickets/DAEO-av72.md
+--- a/.tickets/DAEO-av72.md
++++ b/.tickets/DAEO-av72.md
+@@ -42,6 +42,9 @@
+ - DEC-824
+ - DEC-820
+ - DEC-893
++- DEC-849
++- DEC-899
++- DEC-906
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W2-79/
+diff --git a/.tickets/DAEO-b6hm.md b/.tickets/DAEO-b6hm.md
+--- a/.tickets/DAEO-b6hm.md
++++ b/.tickets/DAEO-b6hm.md
+@@ -32,6 +32,9 @@
+ - DEC-915
+ - DEC-890
+ - DEC-803
++- DEC-866
++- W2-68
++- W2-M406
+ est_loc: 20
+ acceptance_tests:
+   path: tests/acceptance/W2-77/
+diff --git a/.tickets/DAEO-be7u.md b/.tickets/DAEO-be7u.md
+--- a/.tickets/DAEO-be7u.md
++++ b/.tickets/DAEO-be7u.md
+@@ -40,6 +40,13 @@
+ - CAP-51
+ - CAP-01
+ - CAP-34
++- CAP-01.b
++- CAP-21.a
++- CAP-34.d
++- CAP-51.a
++- DEC-360
++- DEC-387
++- DEC-418
+ est_loc: 310
+ acceptance_tests:
+   path: tests/acceptance/W1-11/
+diff --git a/.tickets/DAEO-c1uz.md b/.tickets/DAEO-c1uz.md
+--- a/.tickets/DAEO-c1uz.md
++++ b/.tickets/DAEO-c1uz.md
+@@ -68,6 +68,8 @@
+ - DEC-899
+ - DEC-903
+ - DEC-905
++- DEC-868
++- DEC-904
+ est_loc: 400
+ acceptance_tests:
+   path: tests/acceptance/W2-66/
+diff --git a/.tickets/DAEO-cdoi.md b/.tickets/DAEO-cdoi.md
+--- a/.tickets/DAEO-cdoi.md
++++ b/.tickets/DAEO-cdoi.md
+@@ -59,6 +59,18 @@
+ - CAP-42
+ - CAP-44
+ - CAP-54
++- CAP-06.b
++- CAP-06.c
++- CAP-06.d
++- CAP-15.c
++- CAP-42.a
++- CAP-42.b
++- CAP-42.c
++- CAP-44.b
++- CAP-44.c
++- CAP-44.d
++- CAP-44.e
++- CAP-44.j
+ est_loc: 440
+ acceptance_tests:
+   path: tests/acceptance/W1-41/
+diff --git a/.tickets/DAEO-cuao.md b/.tickets/DAEO-cuao.md
+--- a/.tickets/DAEO-cuao.md
++++ b/.tickets/DAEO-cuao.md
+@@ -36,6 +36,8 @@
+ profile: FULL
+ sources:
+ - DEC-729
++- W2-M049
++- W2-M280
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-10/
+diff --git a/.tickets/DAEO-cy5o.md b/.tickets/DAEO-cy5o.md
+--- a/.tickets/DAEO-cy5o.md
++++ b/.tickets/DAEO-cy5o.md
+@@ -46,6 +46,10 @@
+ - DEC-890
+ - DEC-892
+ - DEC-784
++- DEC-766
++- DEC-886
++- DEC-899
++- DEC-925
+ est_loc: 250
+ acceptance_tests:
+   path: tests/acceptance/W2-57/
+diff --git a/.tickets/DAEO-drvn.md b/.tickets/DAEO-drvn.md
+--- a/.tickets/DAEO-drvn.md
++++ b/.tickets/DAEO-drvn.md
+@@ -41,6 +41,11 @@
+ - DEC-046
+ - CAP-27
+ - CAP-28
++- CAP-27.a
++- CAP-28.b
++- DEC-185
++- DEC-186
++- DEC-187
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W1-07/
+diff --git a/.tickets/DAEO-dy7j.md b/.tickets/DAEO-dy7j.md
+--- a/.tickets/DAEO-dy7j.md
++++ b/.tickets/DAEO-dy7j.md
+@@ -51,6 +51,11 @@
+ - DEC-954
+ - DEC-957
+ - DEC-983
++- CAP-24.c
++- CAP-50.a
++- DEC-239
++- DEC-968
++- DEC-982
+ est_loc: 350
+ acceptance_tests:
+   path: tests/acceptance/W2-83a/
+diff --git a/.tickets/DAEO-e82f.md b/.tickets/DAEO-e82f.md
+--- a/.tickets/DAEO-e82f.md
++++ b/.tickets/DAEO-e82f.md
+@@ -41,6 +41,7 @@
+ - DEC-884
+ - DEC-889
+ - DEC-899
++- W2-59
+ est_loc: 30
+ acceptance_tests:
+   path: tests/acceptance/W2-65/
+diff --git a/.tickets/DAEO-ebmh.md b/.tickets/DAEO-ebmh.md
+--- a/.tickets/DAEO-ebmh.md
++++ b/.tickets/DAEO-ebmh.md
+@@ -36,6 +36,7 @@
+ - DEC-889
+ - DEC-906
+ - DEC-866
++- W2-L429
+ est_loc: 30
+ acceptance_tests:
+   path: tests/acceptance/W2-54/
+diff --git a/.tickets/DAEO-egm9.md b/.tickets/DAEO-egm9.md
+--- a/.tickets/DAEO-egm9.md
++++ b/.tickets/DAEO-egm9.md
+@@ -36,6 +36,10 @@
+ - DEC-093
+ - MR-6
+ - CAP-34
++- CAP-34.a
++- CAP-34.b
++- CAP-34.c
++- CAP-34.d
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W1-34/
+diff --git a/.tickets/DAEO-egsy.md b/.tickets/DAEO-egsy.md
+--- a/.tickets/DAEO-egsy.md
++++ b/.tickets/DAEO-egsy.md
+@@ -33,6 +33,8 @@
+ - DEC-744
+ - DEC-723
+ - DEC-741
++- DEC-729
++- DEC-730
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-51/
+diff --git a/.tickets/DAEO-emkd.md b/.tickets/DAEO-emkd.md
+--- a/.tickets/DAEO-emkd.md
++++ b/.tickets/DAEO-emkd.md
+@@ -42,6 +42,10 @@
+ - CAP-38
+ - CAP-39
+ - MR-3
++- CAP-38.c
++- CAP-39.a
++- CAP-58.a
++- CAP-58.c
+ est_loc: 200
+ acceptance_tests:
+   path: tests/acceptance/W1-02/
+diff --git a/.tickets/DAEO-fdkq.md b/.tickets/DAEO-fdkq.md
+--- a/.tickets/DAEO-fdkq.md
++++ b/.tickets/DAEO-fdkq.md
+@@ -39,6 +39,7 @@
+ - DEC-075
+ - DEC-087
+ - CAP-39
++- CAP-39.a
+ est_loc: 80
+ acceptance_tests:
+   path: tests/acceptance/W1-40/
+diff --git a/.tickets/DAEO-fygv.md b/.tickets/DAEO-fygv.md
+--- a/.tickets/DAEO-fygv.md
++++ b/.tickets/DAEO-fygv.md
+@@ -55,6 +55,16 @@
+ - CAP-30
+ - CAP-39
+ - CAP-58
++- CAP-01.c
++- CAP-24.c
++- CAP-30.b
++- CAP-30.e
++- CAP-38.b
++- CAP-39.d
++- CAP-58.a
++- DEC-438
++- DEC-439
++- DEC-441
+ est_loc: 290
+ acceptance_tests:
+   path: tests/acceptance/W1-26/
+diff --git a/.tickets/DAEO-g0ip.md b/.tickets/DAEO-g0ip.md
+--- a/.tickets/DAEO-g0ip.md
++++ b/.tickets/DAEO-g0ip.md
+@@ -41,6 +41,17 @@
+ - DEC-739
+ - DEC-750
+ - DEC-754
++- W2-H047
++- W2-L111
++- W2-L235
++- W2-M147
++- W2-M165
++- W2-M202
++- W2-M209
++- W2-M238
++- W2-M250
++- W2-M251
++- W2-M266
+ est_loc: 180
+ acceptance_tests:
+   path: tests/acceptance/W2-01/
+diff --git a/.tickets/DAEO-g23i.md b/.tickets/DAEO-g23i.md
+--- a/.tickets/DAEO-g23i.md
++++ b/.tickets/DAEO-g23i.md
+@@ -34,6 +34,12 @@
+ sources:
+ - CAP-53.b
+ - DEC-983
++- DEC-968
++- DEC-982
++- W2-H043
++- W2-M163
++- W2-M240
++- W2-M241
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-38/
+diff --git a/.tickets/DAEO-gdzh.md b/.tickets/DAEO-gdzh.md
+--- a/.tickets/DAEO-gdzh.md
++++ b/.tickets/DAEO-gdzh.md
+@@ -32,6 +32,7 @@
+ - DEC-915
+ - DEC-906
+ - DEC-757
++- DEC-889
+ est_loc: 10
+ acceptance_tests:
+   path: tests/acceptance/W2-54/
+diff --git a/.tickets/DAEO-gjjf.md b/.tickets/DAEO-gjjf.md
+--- a/.tickets/DAEO-gjjf.md
++++ b/.tickets/DAEO-gjjf.md
+@@ -65,6 +65,10 @@
+ - CAP-40
+ - CAP-23
+ - DEC-235
++- CAP-23.c
++- CAP-28.b
++- CAP-38.b
++- CAP-40.c
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W1-42/
+diff --git a/.tickets/DAEO-ha8z.md b/.tickets/DAEO-ha8z.md
+--- a/.tickets/DAEO-ha8z.md
++++ b/.tickets/DAEO-ha8z.md
+@@ -44,6 +44,9 @@
+ - DEC-741
+ - DEC-744
+ - DEC-745
++- CAP-45.a
++- DEC-614
++- DEC-750
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W2-49/
+diff --git a/.tickets/DAEO-ipqy.md b/.tickets/DAEO-ipqy.md
+--- a/.tickets/DAEO-ipqy.md
++++ b/.tickets/DAEO-ipqy.md
+@@ -33,6 +33,7 @@
+ - DEC-074
+ - CAP-25
+ - CAP-40
++- CAP-25.a
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W1-06/
+diff --git a/.tickets/DAEO-iw1f.md b/.tickets/DAEO-iw1f.md
+--- a/.tickets/DAEO-iw1f.md
++++ b/.tickets/DAEO-iw1f.md
+@@ -44,6 +44,7 @@
+ - DEC-825
+ - DEC-941
+ - DEC-957
++- DEC-954
+ est_loc: 180
+ acceptance_tests:
+   path: tests/acceptance/W2-61/
+diff --git a/.tickets/DAEO-j8gn.md b/.tickets/DAEO-j8gn.md
+--- a/.tickets/DAEO-j8gn.md
++++ b/.tickets/DAEO-j8gn.md
+@@ -55,6 +55,17 @@
+ - DEC-862
+ - DEC-891
+ - DEC-983
++- DEC-968
++- DEC-982
++- W2-H037
++- W2-H048
++- W2-H049
++- W2-L010
++- W2-M107
++- W2-M108
++- W2-M227
++- W2-M257
++- W2-M258
+ est_loc: 340
+ acceptance_tests:
+   path: tests/acceptance/W2-12/
+diff --git a/.tickets/DAEO-jdqr.md b/.tickets/DAEO-jdqr.md
+--- a/.tickets/DAEO-jdqr.md
++++ b/.tickets/DAEO-jdqr.md
+@@ -75,6 +75,16 @@
+ - CAP-61
+ - CAP-22
+ - CAP-25
++- CAP-22.d
++- CAP-25.e
++- CAP-27
++- CAP-28
++- CAP-49.b
++- CAP-58.d
++- CAP-61.a
++- CAP-61.b
++- CAP-61.c
++- CAP-61.d
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W1-46/
+diff --git a/.tickets/DAEO-jfm3.md b/.tickets/DAEO-jfm3.md
+--- a/.tickets/DAEO-jfm3.md
++++ b/.tickets/DAEO-jfm3.md
+@@ -34,6 +34,7 @@
+ - DEC-1027
+ - DEC-1025
+ - DEC-860
++- W2-04
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W2-125/
+diff --git a/.tickets/DAEO-jozo.md b/.tickets/DAEO-jozo.md
+--- a/.tickets/DAEO-jozo.md
++++ b/.tickets/DAEO-jozo.md
+@@ -36,6 +36,7 @@
+ - S0a-G-03
+ - CAP-09
+ - CAP-57
++- CAP-57.a
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-20/
+diff --git a/.tickets/DAEO-juee.md b/.tickets/DAEO-juee.md
+--- a/.tickets/DAEO-juee.md
++++ b/.tickets/DAEO-juee.md
+@@ -39,6 +39,8 @@
+ - DEC-792
+ - DEC-838
+ - DEC-851
++- W2-M372
++- W2-M373
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W2-62/
+diff --git a/.tickets/DAEO-kh9l.md b/.tickets/DAEO-kh9l.md
+--- a/.tickets/DAEO-kh9l.md
++++ b/.tickets/DAEO-kh9l.md
+@@ -43,6 +43,9 @@
+ - DEC-835
+ - DEC-854
+ - DEC-831
++- CAP-33
++- DEC-864
++- DEC-877
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-59/
+diff --git a/.tickets/DAEO-kia7.md b/.tickets/DAEO-kia7.md
+--- a/.tickets/DAEO-kia7.md
++++ b/.tickets/DAEO-kia7.md
+@@ -41,6 +41,17 @@
+ sources:
+ - DEC-719
+ - CAP-17.b
++- W2-H039
++- W2-H040
++- W2-H041
++- W2-M011
++- W2-M088
++- W2-M143
++- W2-M210
++- W2-M243
++- W2-M282
++- W2-M293
++- W2-M295
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W2-06/
+diff --git a/.tickets/DAEO-kiar.md b/.tickets/DAEO-kiar.md
+--- a/.tickets/DAEO-kiar.md
++++ b/.tickets/DAEO-kiar.md
+@@ -43,6 +43,10 @@
+ - DEC-911
+ - DEC-285
+ - DEC-898
++- DEC-967
++- DEC-970
++- DEC-975
++- DEC-978
+ est_loc: 180
+ acceptance_tests:
+   path: tests/acceptance/W2-107/
+diff --git a/.tickets/DAEO-kl5e.md b/.tickets/DAEO-kl5e.md
+--- a/.tickets/DAEO-kl5e.md
++++ b/.tickets/DAEO-kl5e.md
+@@ -59,6 +59,7 @@
+ - DEC-738
+ - DEC-743
+ - DEC-853
++- W2-M355
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-50/
+diff --git a/.tickets/DAEO-lc4q.md b/.tickets/DAEO-lc4q.md
+--- a/.tickets/DAEO-lc4q.md
++++ b/.tickets/DAEO-lc4q.md
+@@ -34,6 +34,8 @@
+ - DEC-085
+ - CAP-30
+ - MR-1
++- CAP-30.a
++- CAP-30.e
+ est_loc: 110
+ acceptance_tests:
+   path: tests/acceptance/W1-12/
+diff --git a/.tickets/DAEO-lkeb.md b/.tickets/DAEO-lkeb.md
+--- a/.tickets/DAEO-lkeb.md
++++ b/.tickets/DAEO-lkeb.md
+@@ -40,6 +40,9 @@
+ - DEC-076
+ - CAP-12
+ - CAP-03
++- CAP-03.e
++- CAP-12.a
++- CAP-12.b
+ est_loc: 50
+ acceptance_tests:
+   path: tests/acceptance/W1-16/
+diff --git a/.tickets/DAEO-m7u4.md b/.tickets/DAEO-m7u4.md
+--- a/.tickets/DAEO-m7u4.md
++++ b/.tickets/DAEO-m7u4.md
+@@ -41,6 +41,7 @@
+ - MR-3
+ - CAP-22
+ - DEC-119
++- CAP-22.a
+ est_loc: 20
+ acceptance_tests:
+   path: tests/acceptance/W1-05/
+diff --git a/.tickets/DAEO-o4fg.md b/.tickets/DAEO-o4fg.md
+--- a/.tickets/DAEO-o4fg.md
++++ b/.tickets/DAEO-o4fg.md
+@@ -55,6 +55,11 @@
+ - CAP-49
+ - CAP-58
+ - CAP-62
++- CAP-25.f
++- CAP-25.g
++- CAP-49.c
++- CAP-58.f
++- CAP-62.a
+ est_loc: 60
+ acceptance_tests:
+   path: tests/acceptance/W1-47/
+diff --git a/.tickets/DAEO-qty6.md b/.tickets/DAEO-qty6.md
+--- a/.tickets/DAEO-qty6.md
++++ b/.tickets/DAEO-qty6.md
+@@ -30,6 +30,8 @@
+ - DEC-921
+ - DEC-906
+ - DEC-866
++- W2-72
++- W2-L441
+ est_loc: 15
+ acceptance_tests:
+   path: tests/acceptance/W1-03/
+diff --git a/.tickets/DAEO-r9ss.md b/.tickets/DAEO-r9ss.md
+--- a/.tickets/DAEO-r9ss.md
++++ b/.tickets/DAEO-r9ss.md
+@@ -56,6 +56,20 @@
+ - DEC-903
+ - DEC-904
+ - DEC-908
++- DEC-663
++- DEC-906
++- DEC-923
++- DEC-924
++- W2-H038
++- W2-H045
++- W2-L209
++- W2-L236
++- W2-M158
++- W2-M166
++- W2-M249
++- W2-M252
++- W2-M286
++- W2-M371
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W2-07/
+diff --git a/.tickets/DAEO-rmbe.md b/.tickets/DAEO-rmbe.md
+--- a/.tickets/DAEO-rmbe.md
++++ b/.tickets/DAEO-rmbe.md
+@@ -47,6 +47,8 @@
+ - DEC-909
+ - DEC-868
+ - DEC-896
++- W2-L373
++- W2-M404
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-69/
+diff --git a/.tickets/DAEO-rrxp.md b/.tickets/DAEO-rrxp.md
+--- a/.tickets/DAEO-rrxp.md
++++ b/.tickets/DAEO-rrxp.md
+@@ -40,6 +40,13 @@
+ - CAP-37
+ - CAP-20
+ - CAP-38
++- CAP-13.b
++- CAP-20.a
++- CAP-37.a
++- CAP-37.b
++- CAP-37.c
++- CAP-37.f
++- CAP-38.b
+ est_loc: 180
+ acceptance_tests:
+   path: tests/acceptance/W1-25/
+diff --git a/.tickets/DAEO-rxln.md b/.tickets/DAEO-rxln.md
+--- a/.tickets/DAEO-rxln.md
++++ b/.tickets/DAEO-rxln.md
+@@ -46,6 +46,11 @@
+ - CAP-18
+ - CAP-03
+ - CAP-38
++- CAP-03.d
++- CAP-11.a
++- CAP-17.a
++- CAP-18.b
++- CAP-38.b
+ est_loc: 240
+ acceptance_tests:
+   path: tests/acceptance/W1-17/
+diff --git a/.tickets/DAEO-s694.md b/.tickets/DAEO-s694.md
+--- a/.tickets/DAEO-s694.md
++++ b/.tickets/DAEO-s694.md
+@@ -37,6 +37,19 @@
+ profile: FULL
+ sources:
+ - DEC-729
++- W2-H022
++- W2-H023
++- W2-H024
++- W2-H025
++- W2-H033
++- W2-M015
++- W2-M115
++- W2-M164
++- W2-M203
++- W2-M204
++- W2-M254
++- W2-M255
++- W2-M256
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-41/
+diff --git a/.tickets/DAEO-skiy.md b/.tickets/DAEO-skiy.md
+--- a/.tickets/DAEO-skiy.md
++++ b/.tickets/DAEO-skiy.md
+@@ -54,6 +54,15 @@
+ - MR-4
+ - CAP-38
+ - CAP-47
++- CAP-16.b
++- CAP-24.b
++- CAP-38.b
++- CAP-47.b
++- CAP-47.d
++- CAP-56.a
++- DEC-425
++- DEC-439
++- DEC-441
+ est_loc: 480
+ acceptance_tests:
+   path: tests/acceptance/W1-36/
+diff --git a/.tickets/DAEO-t6hf.md b/.tickets/DAEO-t6hf.md
+--- a/.tickets/DAEO-t6hf.md
++++ b/.tickets/DAEO-t6hf.md
+@@ -37,6 +37,10 @@
+ - DEC-080
+ - CAP-10
+ - CAP-18
++- CAP-10.a
++- CAP-18.a
++- DEC-1039
++- DEC-1046
+ est_loc: 280
+ acceptance_tests:
+   path: tests/acceptance/W1-19/
+diff --git a/.tickets/DAEO-tgk2.md b/.tickets/DAEO-tgk2.md
+--- a/.tickets/DAEO-tgk2.md
++++ b/.tickets/DAEO-tgk2.md
+@@ -34,6 +34,10 @@
+ - DEC-889
+ - DEC-866
+ - DEC-898
++- DEC-956
++- DEC-964
++- W2-L451
++- W2-M408
+ est_loc: 80
+ acceptance_tests:
+   path: tests/acceptance/W2-76/
+diff --git a/.tickets/DAEO-topz.md b/.tickets/DAEO-topz.md
+--- a/.tickets/DAEO-topz.md
++++ b/.tickets/DAEO-topz.md
+@@ -44,6 +44,10 @@
+ - MR-2
+ - MR-3
+ - CAP-34
++- CAP-23.a
++- CAP-31.c
++- CAP-31.d
++- CAP-34.e
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-09/
+diff --git a/.tickets/DAEO-ts4y.md b/.tickets/DAEO-ts4y.md
+--- a/.tickets/DAEO-ts4y.md
++++ b/.tickets/DAEO-ts4y.md
+@@ -40,6 +40,9 @@
+ - DEC-982
+ - DEC-952
+ - DEC-943
++- DEC-1003
++- DEC-1009
++- DEC-1014
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-118/
+diff --git a/.tickets/DAEO-u5g6.md b/.tickets/DAEO-u5g6.md
+--- a/.tickets/DAEO-u5g6.md
++++ b/.tickets/DAEO-u5g6.md
+@@ -35,6 +35,14 @@
+ profile: STANDARD
+ sources:
+ - DEC-729
++- W2-H002
++- W2-H008
++- W2-H014
++- W2-H027
++- W2-H028
++- W2-M003
++- W2-M018
++- W2-M271
+ est_loc: 140
+ acceptance_tests:
+   path: tests/acceptance/W2-43/
+diff --git a/.tickets/DAEO-uudf.md b/.tickets/DAEO-uudf.md
+--- a/.tickets/DAEO-uudf.md
++++ b/.tickets/DAEO-uudf.md
+@@ -52,6 +52,19 @@
+ - CAP-53
+ - CAP-54
+ - DEC-168
++- CAP-03.a
++- CAP-03.b
++- CAP-03.c
++- CAP-06.a
++- CAP-06.e
++- CAP-07.b
++- CAP-31.a
++- CAP-41.a
++- CAP-41.c
++- CAP-41.f
++- CAP-50.a
++- CAP-53.a
++- CAP-54.b
+ est_loc: 200
+ acceptance_tests:
+   path: tests/acceptance/W1-08/
+diff --git a/.tickets/DAEO-uzme.md b/.tickets/DAEO-uzme.md
+--- a/.tickets/DAEO-uzme.md
++++ b/.tickets/DAEO-uzme.md
+@@ -42,6 +42,9 @@
+ - DEC-906
+ - DEC-908
+ - DEC-912
++- DEC-750
++- DEC-754
++- DEC-900
+ est_loc: 20
+ acceptance_tests:
+   path: tests/acceptance/W1-05/
+diff --git a/.tickets/DAEO-v4is.md b/.tickets/DAEO-v4is.md
+--- a/.tickets/DAEO-v4is.md
++++ b/.tickets/DAEO-v4is.md
+@@ -43,6 +43,7 @@
+ - DEC-757
+ - DEC-766
+ - DEC-862
++- DEC-866
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-78/
+diff --git a/.tickets/DAEO-w616.md b/.tickets/DAEO-w616.md
+--- a/.tickets/DAEO-w616.md
++++ b/.tickets/DAEO-w616.md
+@@ -43,6 +43,10 @@
+ - MR-4
+ - CAP-47
+ - CAP-53
++- CAP-30.a
++- CAP-30.b
++- CAP-47.d
++- CAP-53.a
+ est_loc: 170
+ acceptance_tests:
+   path: tests/acceptance/W1-13/
+diff --git a/.tickets/DAEO-w9l3.md b/.tickets/DAEO-w9l3.md
+--- a/.tickets/DAEO-w9l3.md
++++ b/.tickets/DAEO-w9l3.md
+@@ -32,6 +32,7 @@
+ - G-05
+ - CAP-31
+ - MR-2
++- CAP-31.a
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W1-14/
+diff --git a/.tickets/DAEO-wk2v.md b/.tickets/DAEO-wk2v.md
+--- a/.tickets/DAEO-wk2v.md
++++ b/.tickets/DAEO-wk2v.md
+@@ -46,6 +46,16 @@
+ - CAP-01
+ - CAP-15
+ - CAP-38
++- CAP-01.a
++- CAP-01.d
++- CAP-15.a
++- CAP-15.b
++- CAP-15.c
++- CAP-15.d
++- CAP-15.e
++- CAP-15.g
++- CAP-38.b
++- DEC-425
+ est_loc: 350
+ acceptance_tests:
+   path: tests/acceptance/W1-24/
+diff --git a/.tickets/DAEO-wq2b.md b/.tickets/DAEO-wq2b.md
+--- a/.tickets/DAEO-wq2b.md
++++ b/.tickets/DAEO-wq2b.md
+@@ -39,6 +39,11 @@
+ - DEC-848
+ - DEC-954
+ - DEC-983
++- DEC-962
++- DEC-968
++- DEC-979
++- DEC-982
++- DEC-985
+ est_loc: 250
+ acceptance_tests:
+   path: tests/acceptance/W2-97/
+diff --git a/.tickets/DAEO-wqd6.md b/.tickets/DAEO-wqd6.md
+--- a/.tickets/DAEO-wqd6.md
++++ b/.tickets/DAEO-wqd6.md
+@@ -39,6 +39,9 @@
+ - CAP-41
+ - CAP-59
+ - DEC-168
++- CAP-41.b
++- CAP-41.d
++- CAP-59.c
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W1-44/
+diff --git a/.tickets/DAEO-xm6l.md b/.tickets/DAEO-xm6l.md
+--- a/.tickets/DAEO-xm6l.md
++++ b/.tickets/DAEO-xm6l.md
+@@ -35,6 +35,17 @@
+ profile: STANDARD
+ sources:
+ - DEC-729
++- W2-L101
++- W2-L206
++- W2-L215
++- W2-L336
++- W2-M139
++- W2-M201
++- W2-M264
++- W2-M287
++- W2-M288
++- W2-M289
++- W2-M290
+ est_loc: 120
+ acceptance_tests:
+   path: tests/acceptance/W2-22/
+diff --git a/.tickets/DAEO-xnbx.md b/.tickets/DAEO-xnbx.md
+--- a/.tickets/DAEO-xnbx.md
++++ b/.tickets/DAEO-xnbx.md
+@@ -60,6 +60,13 @@
+ - DEC-235
+ - DEC-076
+ - CAP-58
++- CAP-58.h
++- DEC-378
++- DEC-402
++- DEC-404
++- DEC-407
++- DEC-409
++- DEC-421
+ est_loc: 100
+ acceptance_tests:
+   path: tests/acceptance/W1-50/
+diff --git a/.tickets/DAEO-xog0.md b/.tickets/DAEO-xog0.md
+--- a/.tickets/DAEO-xog0.md
++++ b/.tickets/DAEO-xog0.md
+@@ -47,6 +47,8 @@
+ - DEC-156
+ - DEC-163
+ - DEC-158
++- CAP-22.a
++- CAP-58.b
+ est_loc: 300
+ acceptance_tests:
+   path: tests/acceptance/W1-33/
+diff --git a/.tickets/DAEO-xw3k.md b/.tickets/DAEO-xw3k.md
+--- a/.tickets/DAEO-xw3k.md
++++ b/.tickets/DAEO-xw3k.md
+@@ -55,6 +55,17 @@
+ - CAP-54
+ - CAP-38
+ - MR-4
++- CAP-02.a
++- CAP-06.a
++- CAP-06.d
++- CAP-07.a
++- CAP-20.a
++- CAP-25.a
++- CAP-38.b
++- CAP-46.a
++- CAP-54.a
++- DEC-416
++- DEC-425
+ est_loc: 230
+ acceptance_tests:
+   path: tests/acceptance/W1-27/
+diff --git a/.tickets/DAEO-xxgp.md b/.tickets/DAEO-xxgp.md
+--- a/.tickets/DAEO-xxgp.md
++++ b/.tickets/DAEO-xxgp.md
+@@ -51,6 +51,8 @@
+ - DEC-083
+ - DEC-843
+ - DEC-852
++- W2-H044
++- W2-M153
+ est_loc: 220
+ acceptance_tests:
+   path: tests/acceptance/W2-48/
+diff --git a/.tickets/DAEO-ye2a.md b/.tickets/DAEO-ye2a.md
+--- a/.tickets/DAEO-ye2a.md
++++ b/.tickets/DAEO-ye2a.md
+@@ -38,6 +38,7 @@
+ - DEC-421
+ - DEC-572
+ - DEC-453
++- DEC-866
+ est_loc: 50
+ acceptance_tests:
+   path: tests/acceptance/W2-72/
+diff --git a/.tickets/DAEO-ym8a.md b/.tickets/DAEO-ym8a.md
+--- a/.tickets/DAEO-ym8a.md
++++ b/.tickets/DAEO-ym8a.md
+@@ -39,6 +39,11 @@
+ - DEC-729
+ - DEC-752
+ - DEC-755
++- W2-L069
++- W2-L221
++- W2-M106
++- W2-M145
++- W2-M267
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-03/
+diff --git a/.tickets/DAEO-yvzh.md b/.tickets/DAEO-yvzh.md
+--- a/.tickets/DAEO-yvzh.md
++++ b/.tickets/DAEO-yvzh.md
+@@ -32,6 +32,10 @@
+ - DEC-076
+ - CAP-24
+ - CAP-38
++- DEC-244
++- DEC-245
++- DEC-246
++- DEC-247
+ est_loc: 20
+ acceptance_tests:
+   path: tests/acceptance/W1-37/
+diff --git a/.tickets/DAEO-zflj.md b/.tickets/DAEO-zflj.md
+--- a/.tickets/DAEO-zflj.md
++++ b/.tickets/DAEO-zflj.md
+@@ -40,6 +40,15 @@
+ - DEC-741
+ - DEC-746
+ - DEC-749
++- W2-L177
++- W2-L243
++- W2-M138
++- W2-M260
++- W2-M301
++- W2-M309
++- W2-M310
++- W2-M316
++- W2-M317
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-02/
+diff --git a/.tickets/DAEO-zkr9.md b/.tickets/DAEO-zkr9.md
+--- a/.tickets/DAEO-zkr9.md
++++ b/.tickets/DAEO-zkr9.md
+@@ -39,6 +39,12 @@
+ - DEC-983
+ - DEC-982
+ - DEC-959
++- DEC-1001
++- DEC-1003
++- DEC-1010
++- DEC-1014
++- DEC-1015
++- DEC-989
+ est_loc: 250
+ acceptance_tests:
+   path: tests/acceptance/W2-117/
+diff --git a/.tickets/DAEO-zndm.md b/.tickets/DAEO-zndm.md
+--- a/.tickets/DAEO-zndm.md
++++ b/.tickets/DAEO-zndm.md
+@@ -30,6 +30,13 @@
+ profile: FULL
+ sources:
+ - DEC-729
++- W2-H019
++- W2-L078
++- W2-L135
++- W2-M037
++- W2-M038
++- W2-M156
++- W2-M222
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-44/
+diff --git a/.tickets/DAEO-zoex.md b/.tickets/DAEO-zoex.md
+--- a/.tickets/DAEO-zoex.md
++++ b/.tickets/DAEO-zoex.md
+@@ -38,6 +38,8 @@
+ - DEC-966
+ - DEC-860
+ - DEC-424
++- DEC-385
++- DEC-977
+ est_loc: 80
+ acceptance_tests:
+   path: tests/acceptance/W2-108/
+diff --git a/.tickets/DAEO-zsvl.md b/.tickets/DAEO-zsvl.md
+--- a/.tickets/DAEO-zsvl.md
++++ b/.tickets/DAEO-zsvl.md
+@@ -40,6 +40,11 @@
+ - S0a-G-09
+ - CAP-15
+ - CAP-37
++- CAP-15.g
++- CAP-37.b
++- CAP-37.c
++- CAP-37.d
++- DEC-413
+ est_loc: 180
+ acceptance_tests:
+   path: tests/acceptance/W1-29/

@@ -1,0 +1,313 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 11:50:54)
+bringing up nodes...
+bringing up nodes...
+
+......................................................F................. [  1%]
+........................................................................ [  2%]
+...................s......................................x............. [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+...................................................................F.... [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+...............................................................F........ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+...............................F........................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+...........F....F....................................................... [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+.....................................F.F................................ [ 56%]
+..............................................F......................... [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................sss............. [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................sss............................................. [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.............................................                            [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-2bdu/PR-...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 1 findings on this repository: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]
+E       assert [{'at': '$', ...perty)', ...}] == []
+E         
+E         Left contains one more item: {'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-2bdu/PR-DAEO-...sing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+____ test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw2/test_s6_every_kernel_hook_exit0')
+
+    def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_path):
+        pair = _pair(tmp_path)
+        events = support.kernel_hook_events()
+        scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
+        reached = {name for name in scripts if any(name in command for _, command in events)}
+>       assert reached == scripts and len(scripts) == 6, \
+            f"the settings' hook command lines do not reach the six kernel hooks: {sorted(scripts - reached)}"
+E       AssertionError: the settings' hook command lines do not reach the six kernel hooks: ['context_watch.py']
+E       assert ({'posttooluse...agentstop.py'} == {'context_wat...stop.py', ...}
+E         
+E         Extra items in the right set:
+E         'context_watch.py'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-23/test_w2_23_space.py:99: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x710225792d20>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x710225792d20>
+schema = PosixPath('/home/usain/gov-os-worktrees/W2-88/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-0mtg-PR-DAEO-0mtg': {'commissioned_by': 'orchestrator', 'implementer_session': "unknown (the engineer's log was...lementer_session': '8f696f48-3724-45bd-8ef2-dcc024b3ff5f', 'judged_by': 'orchestrator', 'judgement': 'pass', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw1/test_the_probe_schema_accepts_0/instances-0/DAEO-2bdu-PR-DAEO-2bdu-round-1.json::$: 'implementer_session' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_ test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic[hung] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw4/test_s1_hung_or_transient_fail0/box'), ...h('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw4/test_s1_hung_or_transient_fail0/box/locks/rebuild.lock'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ab866b881d0>
+mode = 'hung'
+
+    @pytest.mark.parametrize("mode", ["hung", "part-way-500"])
+    def test_s1_hung_or_transient_failing_embedder_raises_rebuild_failed_semantic(box, monkeypatch, mode):
+        stand_in = support.Embedder(mode, good=1)
+        try:
+            project = support.plant(box, "project", **PLANT)
+            done, error, seconds = _in_process_rebuild(box, project, stand_in.host, monkeypatch)
+        finally:
+            stand_in.close()
+        assert error is not None, \
+            f"{mode}: the rebuild returned instead of failing; semantic = {((done or {}).get('stores') or {}).get('semantic')}"
+        assert getattr(error, "code", None) == "REBUILD_FAILED", f"{mode}: expected GovError REBUILD_FAILED, got {error!r}"
+        details = getattr(error, "details", {}) or {}
+        assert details.get("store") == "semantic", f"{mode}: details.store is {details.get('store')!r}"
+        assert isinstance(details.get("reason"), str) and details["reason"].strip(), f"{mode}: details.reason is empty"
+        assert isinstance(details.get("stores"), dict) and "lexical" in details["stores"], \
+            f"{mode}: details.stores is {details.get('stores')!r}"
+        assert getattr(error, "exit_code", 1) == 1
+        assert "store: semantic" in str(error), f"{mode}: the message does not hold 'store: semantic': {error!s}"
+>       assert seconds < 60, f"{mode}: the rebuild took {seconds:.0f} s: it waited out a real endpoint timeout"
+E       AssertionError: hung: the rebuild took 62 s: it waited out a real endpoint timeout
+E       assert 61.76282880900544 < 60
+
+/home/usain/gov-os-worktrees/W2-88/tests/acceptance/W2-124/test_w2_124_s1_semantic_fails_named.py:94: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x710224c7ba40>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md': [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}]}
+E       assert not {'docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md': [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_s...ng required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 1 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md', 'field': 'implementer_session', 'schema': 'probe.schema.json', 'at': '$', 'message': "docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md: missing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)"}])
+E       assert not [{'at': '$', 'code': 'SCHEMA_MISSING_FIELD', 'field': 'implementer_session', 'message': "docs/probes/DAEO-2bdu/PR-DAEO...ing required field 'implementer_session' (probe.schema.json at $: 'implementer_session' is a required property)", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+_ test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw2/test_the_watch_exits_10_with_t0')
+
+    def test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise(tmp_path):
+        from datetime import datetime, timezone
+        p = tmp_path / "proj"
+        p.mkdir()
+        transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
+                                    "message": {"content": [{"type": "tool_use", "name": "Bash"}]}}])
+        r = watch(p, tmp_path, "--session-file", str(tmp_path / "none"))
+>       assert r.returncode == 10 and r.stdout.startswith("ALERT P1 DEADMAN | the CTO session is waiting on a tool")
+E       assert (10 == 10 and False)
+E        +  where 10 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-88/governance/project/orchestration/tools/...box: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n", stderr='').returncode
+E        +  and   False = <built-in method startswith of str object at 0x72c9147676f0>('ALERT P1 DEADMAN | the CTO session is waiting on a tool')
+E        +    where <built-in method startswith of str object at 0x72c9147676f0> = "ALERT P1 INBOX | the dispatcher's inbox: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n".startswith
+E        +      where "ALERT P1 INBOX | the dispatcher's inbox: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n" = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-88/governance/project/orchestration/tools/...box: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n", stderr='').stdout
+
+tests/unit/orchestration/test_cto_safety_nets.py:112: AssertionError
+__________________ test_a_standby_file_keeps_the_switch_quiet __________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw2/test_a_standby_file_keeps_the_0')
+
+    def test_a_standby_file_keeps_the_switch_quiet(tmp_path):
+        p = tmp_path / "proj"
+        p.mkdir()
+        transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
+                                    "message": {"content": [{"type": "tool_use", "name": "Bash"}]}}])
+        sb = tmp_path / "standby.txt"
+        sb.write_text("handover: the fresh session starts at 01:30\n")
+        r = watch(p, tmp_path, "--session-file", str(tmp_path / "none"), "--standby", str(sb))
+>       assert r.returncode == 0 and r.stdout.startswith("HEARTBEAT standby: handover")
+E       assert (10 == 0)
+E        +  where 10 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-88/governance/project/orchestration/tools/...box: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n", stderr='').returncode
+
+tests/unit/orchestration/test_cto_safety_nets.py:143: AssertionError
+_ test_the_watch_alerts_on_an_expired_note_and_the_inbox_exemptions_follow_the_note _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-88/pytest-of-usain/pytest-14/popen-gw2/test_the_watch_alerts_on_an_ex0')
+
+    def test_the_watch_alerts_on_an_expired_note_and_the_inbox_exemptions_follow_the_note(tmp_path):
+        from datetime import datetime, timedelta, timezone
+        p = tmp_path / "proj"
+        p.mkdir()
+        now = datetime.now(timezone.utc)
+        transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                    "message": {"content": [{"type": "text"}]}}])
+        sb = tmp_path / "standby.txt"
+        sb.write_text((now - timedelta(hours=3)).strftime("%F %T") + " CTO waits on the owner\n")
+        # a stalled session: the expired note no longer holds the ALERT back
+        stalled = tmp_path / "stalled"
+        stalled.mkdir()
+        transcript(stalled / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-10T15:49:00Z",
+                                          "message": {"content": [{"type": "text"}]}}])
+        r = watch(stalled, tmp_path, "--session-file", str(tmp_path / "none"), "--standby", str(sb))
+>       assert r.returncode == 10 and "its stand-by note had expired (written " in r.stdout
+E       assert (10 == 10 and 'its stand-by note had expired (written ' in "ALERT P1 INBOX | the dispatcher's inbox: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n")
+E        +  where 10 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-88/governance/project/orchestration/tools/...box: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n", stderr='').returncode
+E        +  and   "ALERT P1 INBOX | the dispatcher's inbox: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n" = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-worktrees/W2-88/governance/project/orchestration/tools/...box: inbox: 2 item(s) unread; the oldest 20261113-120127-landing-select.txt | read it or restart the CTO\n", stderr='').stdout
+
+tests/unit/orchestration/test_cto_safety_nets.py:250: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-88/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=557003) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-32/test_w2_32_s5_fusion_limit.py:91: this build refuses a limit above its cap; the order of a honoured limit does not arise
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+9 failed, 6220 passed, 7 skipped, 1 xfailed, 6 warnings in 2554.51s (0:42:34)

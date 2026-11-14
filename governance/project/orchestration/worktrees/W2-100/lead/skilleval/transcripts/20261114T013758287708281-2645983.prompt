@@ -1,0 +1,53 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply does not remove or rename `total` in v1, and names a backward-compatibility test for the old shape.
+
+Expected behaviour:
+the session keeps `total` and adds `total_cents` (an additive change), marks `total` as deprecated in the contract, adds a test that an old client's request still gets the old shape, and notes that removing `total` needs a new version.
+
+The session's reply:
+<<<
+I followed the api skill. I did not change any code or contract, because the requested change is breaking and none of the files it would touch are in this workspace.
+
+## What I did
+
+1. **Looked for the inputs the skill says to read first.** This folder only has the skill itself (`.claude/skills/api/SKILL.md` and `check_domain_skill.py`). There is no ticket file, no OpenAPI or contract file for `/v1/orders`, no handler and no tests. `scenarios.md`, which SKILL.md links to, is also missing.
+2. **Tried `gov retrieve`**, as the skill says to, to find the contract and who calls it. The permission layer asked for approval, so it did not run. I didn't try to get around that.
+3. **Classified the change (step 3).** Changing `total` to `total_cents` in place renames a field, and maybe its type and unit too, inside the published version `v1`. The skill counts that as **breaking**, and it would break mobile apps you can't force to update. The skill says a breaking change is never made in place, so I stopped there and escalated rather than editing.
+
+## The return
+
+```
+task: GET /v1/orders/{id} — return total_cents where it returns total today
+status: blocked — escalated P2; no contract or code in workspace; nothing changed
+work_completed: Classified the change against v1 as breaking (rename within a published version). Wrote the escalation package below. No contract, code or test edits.
+files_changed: none
+evidence: The workspace holds only .claude/skills/api/*; `gov retrieve` needed approval and did not run
+tests: none written or run; `gov accept` not run (no implementation, change escalated)
+discoveries: (1) The ticket can be read two ways: "replace total" (breaking) or "also return total_cents" (additive). The simplest compatible reading is additive. (2) The type and unit of `total` are unknown (decimal currency units vs. a string?), so the rounding and currency rules for total_cents are open. (3) scenarios.md, linked from SKILL.md, is missing.
+risks: Mobile apps that can't be forced to update read `total`. Removing or renaming it in v1 breaks them for their whole install life. I could not find any other callers (no repo, retrieve blocked).
+lessons: The ticket asks for a field change without a caller list; tickets should name the affected consumers.
+proposed_decisions: Option A below.
+unresolved: Does the spec require `total` to be gone from v1 (which makes this P1), or only that `total_cents` be available?
+recommended_next_action: Whoever started the session picks an option; then give me the repo or contract path and allow `gov retrieve`/`gov accept`.
+```
+
+**Escalation package (P2: a breaking change other callers would feel, and the ticket's scope is unclear)**
+
+- **Option A (recommended): add the field in v1 and keep the old one.** Add `total_cents` (integer, minor units) as a new field and leave `total` exactly as it is. Mark `total` deprecated in the contract, say it is replaced by `total_cents`, and give no removal date. Write tests that check both fields and that they agree. This meets the ticket's need and breaks no one.
+- **Option B: a new version.** `/v2/orders/{id}` returns only `total_cents` and `/v1` stays unchanged. This gives a clean shape, but you end up running two versions.
+- **Option C: rename in place in v1. Rejected.** It breaks the mobile apps, and the skill forbids it.
+- **Removing `total` later** would be its own change. It should only happen once usage data shows the oldest supported app version reads `total_cents`. If that never happens, it means retiring v1, which is a P1 decision.
+
+## What's needed to go ahead
+
+- A decision between Option A and Option B. If the spec really requires `total` to disappear from v1, say so, because that turns this into a P1.
+- The repo or contract location for the orders API.
+- Approval for `gov retrieve` and `gov accept`.
+
+Once I have those, I'll change the contract first, then write the tests (including the old `total` shape) and the handler, and commit them together.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

@@ -1,0 +1,19 @@
+sssssss.............sss.................ss......................s....... [ 60%]
+...s...............ss.....sssss...........F.....                         [100%]
+=================================== FAILURES ===================================
+_________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
+
+path = PosixPath('/tmp/claude-1000/copies9-run/window-merged/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /tmp/claude-1000/copies9-run/window-merged/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-37/test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question[claude-copy]
+1 failed, 98 passed, 21 skipped in 30.29s

@@ -1,0 +1,7 @@
+log: W2-60a-A5-run4d.json
+W2: W2-60a
+status: PACKAGES
+
+task: DAEO-cv58
+status: PACKAGES
+work_completed: I merged `w2/integrate` (aa4d460ff) into w2/W2-60a and committed it as a work-in-progress merge, 5b7941b66, in one script, so the tree is clean. Integrate had not changed b11's four files since 84cc42343ffb, so `launcher.py`, `test_runs.py`, `test_w1_28.py` and `test_w1_32.py` went in from the merge-r4/ backups unchanged. For `.claude/templates/role-lead.md` (both branches added it) I took integrate's copy. The four acceptance files still hold their conflict markers for b12. Then I checked what the KPIs need against the code and found the RUBRIC

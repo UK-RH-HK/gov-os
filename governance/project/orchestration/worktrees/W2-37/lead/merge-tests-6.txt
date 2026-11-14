@@ -1,0 +1,4 @@
+Merge w2/W2-37-tests (df75fbd109aa): W1-07's lists and W1-32's command set record impact (td-6; DEC-812 item 6, P-7 (a)); red before the engineer's commands.py line: W1-26 [impact] x2
+
+Task: DAEO-6n5k
+Role: orchestrator

@@ -1,0 +1,49 @@
+--- a/src/gov/launch/command.py
++++ b/src/gov/launch/command.py
+@@ -1,5 +1,6 @@
+-"""``gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]`` as a
+-command module (DEC-231, DEC-317; W2-20 S19, P-1, P-2).
++"""``gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [--reason <text>]
++[--trial <id>] [--owner-named DEC-NNN] [-- <CLI arguments>]`` as a command
++module (DEC-231, DEC-317; W2-20 S19, P-1, P-2).
+ 
+ A start command, not one of the twelve governance operations. It ends with the
+ exit code of the session it started. The convention is in ``gov.cli.main``.
+@@ -8,6 +9,9 @@
+ that starts it anyway (written to ``~/.gov-os/machine/launch.log`` and stderr).
+ ``--plan`` (W2-60a; DEC-1167 (2)) prints the role file's default line, ``model <id>, effort <e>``,
+ and starts nothing: no session, no record, no gate; it refuses as a launch does (exit 1).
++``--reason``, ``--trial`` and ``--owner-named`` (W2-184; DEC-1120, DEC-1010) are RUBRIC-2's options: a worker launch's
++reason for a max effort of its own choice, the recorded trial that admits another model, and the decision that names
++a repeated review setting. They go to ``launcher.launch`` as keywords; a lead launch takes none of them.
+ """
+ 
+ from __future__ import annotations
+@@ -25,13 +29,18 @@
+ 
+ def add_arguments(parser) -> None:
+     parser.usage = ("gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] "
+-                    "[-- <CLI arguments>]")
++                    "[--reason <text>] [--trial <id>] [--owner-named DEC-NNN] [-- <CLI arguments>]")
+     parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
+                         "independent-auditor, research or product-spec")
+     parser.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
+     parser.add_argument("--gate-override", metavar="DEC-NNN", help="start the session while the resource gate is "
+                         "shut, on this decision (logged)")
+     parser.add_argument("--gpu-need-mib", metavar="<MiB>", type=int, help="the session's declared GPU need")
++    parser.add_argument("--reason", metavar="<text>", help="why the launch chooses an effort of max (recorded)")
++    parser.add_argument("--trial", metavar="<id>", help="the recorded trial (governance/project/trials/<id>.yaml) "
++                        "that admits a model and effort other than the table's")
++    parser.add_argument("--owner-named", metavar="DEC-NNN", help="the decision that names a review setting this "
++                        "ticket's earlier review already ran on")
+     parser.add_argument("--plan", action="store_true", help="print the role file's default line (model <id>, "
+                         "effort <e>) and start nothing")
+ 
+@@ -41,4 +50,6 @@
+     if getattr(args, "plan", False):
+         return launcher.plan(root, args.worker_role, args.ticket)
+     return launcher.launch(root, args.worker_role, args.ticket, args.passthrough or [],
+-                  gate_override=getattr(args, "gate_override", None), gpu_need_mib=getattr(args, "gpu_need_mib", None))
++                  gate_override=getattr(args, "gate_override", None), gpu_need_mib=getattr(args, "gpu_need_mib", None),
++                  reason=getattr(args, "reason", None), trial=getattr(args, "trial", None),
++                  owner_named=getattr(args, "owner_named", None))

@@ -1,0 +1,6 @@
+You have one skill, "backend", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+the ticket asks to rename the column `customer_ref` to `account_ref`; the service that reads it is deployed in two versions at once for an hour during every release, and the ticket's paths hold the migration folder and the service's code.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

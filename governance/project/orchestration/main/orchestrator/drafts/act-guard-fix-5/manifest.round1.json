@@ -1,0 +1,51 @@
+{
+ "act": "ACT-GUARD-FIX-5",
+ "dec": "DEC-953 (item 2), DEC-958, DEC-1050 (12)",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/hooks/bash_writes.py",
+   "before": "bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732",
+   "after": "ba4334108b8e563b76bac36d519dd2699eda3a6e8a0e00b0eebe99f8b8d41c31"
+  }
+ ],
+ "files": {
+  "before/repo/.claude/hooks/bash_writes.py": "bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732",
+  "after/repo/.claude/hooks/bash_writes.py": "ba4334108b8e563b76bac36d519dd2699eda3a6e8a0e00b0eebe99f8b8d41c31",
+  "apply.sh": "8d6a560986531aed3de5a95f532fc278205b0d606b984cb7efb941e69f5c68b1",
+  "list.txt": "57f58e5b53ca4a945d416e6d56b0fa4bb23bc77a7ee4e828acde84763f781a7c",
+  "rehearsal.log": "044e9839bc4281044917cbdad87fe385fc20ae6fad1b6a17778ef7d7f33d80fc",
+  "followup-tests.diff": "1cc793fd124bd11fca250758c1aad285a4c58b0f55e9b37d371e3e653558ffaa"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -c 'import ast; ast.parse(open(\".claude/hooks/bash_writes.py\").read())'",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import re, sys\nt = open(\".claude/hooks/bash_writes.py\").read()\nkind = t[t.index(\"\\ndef _kind(words):\"):t.index(\"\\n_SHELL_FLAGS\")]\nnew = t[t.index(\"\\n_SHELL_FLAGS\"):t.index(\"\\n_PARAM = \")]\nok = (t.count(\"\\ndef _shell_kind(args):\\n\") == 1 and t.count(\"_shell_kind(\") == 2\n      and \"    if name in _SHELLS:\\n        return _shell_kind(args)\\n    return \\\"data\\\" if name in _DATA else \\\"code\\\"\\n\" in kind\n      and \"\\\"/dev/stdin\\\"\" in new and \"\\\"/dev/fd/0\\\"\" in new and \"\\\"--rcfile\\\"\" in new and \"\\\"--init-file\\\"\" in new\n      and t.index(\"\\ndef _kind(\") < t.index(\"\\n_SHELL_FLAGS\") < t.index(\"\\ndef _shell_kind(\") < t.index(\"\\n_PARAM = \")\n      and not any(b in new for b in (\"subprocess\", \"open(\", \"write\", \"os.\", \"import \")))\nsys.exit(0 if ok else 1)'\n",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I - <<'EOF'\nimport importlib.util, random, sys\nspec = importlib.util.spec_from_file_location(\"bash_writes_bed\", \".claude/hooks/bash_writes.py\")\nbw = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(bw)\nSHELL, DATA = \"shell\", \"data\"\nTABLE = (\n    (\"bash -euo pipefail\", SHELL), (\"bash -o pipefail\", SHELL), (\"bash -O extglob\", SHELL), (\"bash +o history\", SHELL),\n    (\"bash +O extglob\", SHELL), (\"bash -oe pipefail\", SHELL), (\"bash --rcfile f\", SHELL), (\"bash --init-file f\", SHELL),\n    (\"zsh -o pipefail\", SHELL), (\"bash -o a -O b\", SHELL), (\"bash -oo a b\", SHELL), (\"bash -\", SHELL),\n    (\"bash /dev/stdin\", SHELL), (\"bash /dev/fd/0\", SHELL), (\"bash -eu -\", SHELL), (\"bash -s\", SHELL), (\"bash\", SHELL),\n    (\"bash --nosuchoption\", SHELL), (\"bash --nosuchoption script.sh\", SHELL), (\"bash -Z script.sh\", SHELL),\n    (\"bash -c x\", DATA), (\"bash -ec x\", DATA), (\"bash -euo pipefail -c x\", DATA), (\"bash -Z -c x\", DATA),\n    (\"bash script.sh\", DATA), (\"bash -x script.sh\", DATA), (\"bash -o pipefail script.sh\", DATA),\n    (\"bash -euo pipefail script.sh\", DATA), (\"bash -O extglob script.sh\", DATA), (\"bash --rcfile f script.sh\", DATA),\n    (\"bash --norc script.sh\", DATA), (\"sh script.sh\", DATA), (\"cat\", DATA), (\"tee x\", DATA))\nbad = []\nfor words, want in TABLE:\n    got = bw._kind(words.split())\n    if got != want:\n        bad.append(f\"{words!r}: {got}, not {want}\")\n\n\ndef old_kind(args):\n    opts = [a for a in args if a.startswith(\"-\")]\n    operands = [a for a in args if not a.startswith(\"-\")]\n    if any(\"c\" in o.lstrip(\"-\") for o in opts if not o.startswith(\"--\")):\n        return DATA\n    return SHELL if not operands or \"-s\" in opts else DATA\n\n\n# stricter only: a shell the old reading took as reading its input is still read so (2,000 seeded random argument lists)\nrng = random.Random(5)\nwords = [\"-e\", \"-u\", \"-x\", \"-euo\", \"-o\", \"-O\", \"+o\", \"+O\", \"-c\", \"-s\", \"-ec\", \"-es\", \"-i\", \"-l\", \"-\", \"--\", \"--norc\",\n         \"--rcfile\", \"--init-file\", \"--posix\", \"--login\", \"--zzz\", \"-Z\", \"pipefail\", \"extglob\", \"f\", \"script.sh\",\n         \"/dev/stdin\", \"/dev/fd/0\", \"a b\"]\nfor _ in range(2000):\n    args = [rng.choice(words) for _ in range(rng.randint(0, 5))]\n    if old_kind(args) == SHELL and bw._kind([\"bash\"] + args) != SHELL:\n        bad.append(f\"stricter-only broken by {args}\")\n        break\nprint(\"; \".join(bad) or \"bash_writes: a shell's option values are not its script; standard input and unknown options read as shell; -c is data; never less strict\")\nsys.exit(1 if bad else 0)\nEOF\n",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "companion": {
+  "diff": "followup-tests.diff",
+  "lands": "after the apply (ten of its cases are red on the before)",
+  "touches": [
+   "tests/unit/hooks/test_live_hook.py"
+  ]
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "044e9839bc4281044917cbdad87fe385fc20ae6fad1b6a17778ef7d7f33d80fc"
+ }
+}

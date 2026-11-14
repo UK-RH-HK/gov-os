@@ -1,0 +1,6 @@
+manifest sha256: 973eba5fd258ef6293cf37500ff7c2777b5f551ff524a6f8caf6dac6d8fbd9e8
+validate_manifest: pass
+check_act: pass
+path_rule: pass
+hash mismatches: [] ; unnamed on disk: []
+act_class: class O; rows ['operator-own', 'unknown']; hits []

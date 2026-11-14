@@ -1,0 +1,44 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply puts the contract change before the handler in its order of work and says the unit tests follow the contract.
+
+Expected behaviour:
+the session writes the endpoint's contract in the OpenAPI file first (request, responses with their error codes, status codes), derives its unit tests from the contract, and writes the handler last, checking the handler against the contract.
+
+The session's reply:
+<<<
+I used the api skill, but I couldn't do the ticket's work: none of its inputs are in this workspace. The folder holds only the skill itself (`SKILL.md` and `check_domain_skill.py`). There is no ticket, no OpenAPI file, no handler and no tests, and I didn't confirm that the `gov` tool is installed. The skill says to write the contract first, then the tests, then the handler, and to follow the existing contract's naming and error format. Writing a contract from nothing would mean inventing the API's shape, so **I wrote no files.** Below is the hand-back report the skill requires, with the contract change I plan to make.
+
+```
+task: POST /v1/exports — start an export job and return its id (STANDARD ticket)
+status: BLOCKED — inputs missing; nothing written
+work_completed: Loaded the api skill. Step 1 (read the ticket's KPI lines and allowed paths, the existing OpenAPI file and who calls the interface) could not be done because none of those files are in the workspace. Steps 2–8 were not started, since each depends on the existing contract.
+files_changed: none
+evidence: The workspace contains only .claude/skills/api/{SKILL.md, check_domain_skill.py}. No ticket, OpenAPI file, handler or test file exists.
+tests: none written, none run; gov accept not run (there is no ticket to accept against, and gov was not confirmed to be installed)
+discoveries: The open points below can't be settled until the existing contract can be read.
+risks: Callers of the other /v1 endpoints are unknown. If I wrote a contract now, its error format and naming could differ from the existing file and break consistency across the interface.
+lessons: When the inputs are missing, stop at step 1. Inventing a contract would be "code first, contract afterwards" in another form.
+proposed_decisions: none
+unresolved: The ticket text, its allowed paths and its KPIs; the location of the existing OpenAPI file and the error format it uses.
+recommended_next_action: Give the session the ticket and the repository (OpenAPI file, handler and test locations), then re-run from step 1.
+```
+
+**Planned contract change (written once the existing file is readable):**
+- **Change type:** a new endpoint under `/v1`, so it's **additive**. Nothing that is already published changes.
+- **Request:** follows the existing file's naming conventions. Only fields the ticket names are required, and unknown fields are ignored.
+- **Response:** `202 Accepted` with `{ "id": "<export id>" }`, plus a `Location` header if the existing contract uses one. 202 is the simplest reading, because the request starts a job rather than finishing one.
+- **Errors:** `400` for invalid input and `401`/`403` for authentication and permission failures. All of them use the interface's existing error format with stable error codes.
+- **Open points, each a P3 under the skill's escalation rubric:** whether to answer 202 or 201, whether to accept an `Idempotency-Key` header, and whether the ticket also wants a `GET /v1/exports/{id}` to check status. For each I'd take the simplest reading, write it into the contract and log it in `discoveries`. Adding the GET endpoint would only happen if the ticket's paths and KPIs include it.
+
+After the contract, the steps are:
+1. Write unit tests from the contract: the 202 response, each error checked against its schema, and edge inputs (missing field, extra field, wrong type).
+2. Write the handler and check it against the contract.
+3. Run the suite for the touched area and go through the pre-commit checklist.
+4. Run `gov accept`.
+5. Commit the contract and the code together.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

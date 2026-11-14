@@ -1,0 +1,931 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+......................................................s..s..s........... [ 14%]
+s..s..s..s..s..s...........s..s..s..s..s..s..s..s..s.................... [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+................................F...........F........................... [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+.F.......................F....................F.......F........F........ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+................F..F...........F.F...................................... [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+....................................................F.F...ssssss........ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+.................................F...................................... [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+................sss..................................................... [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+__ TestKernelAgainstAdapterSource.test_kernel_role_changed_without_its_source __
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e6452129220>
+generated_project = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_kernel_role_changed_without_its_source(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_KERNEL)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a kernel role file was changed without its rulesync source")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e6452129220>
+project = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = 'a kernel role file was changed without its rulesync source'
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a kernel role file was changed without its rulesync source: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md'} and {'.rulesync/s...-engineer.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         'governance/kernel/templates/role-engineer.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:492: AssertionError
+_ TestKernelAgainstAdapterSource.test_role_source_changed_without_its_kernel_role _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e64521167b0>
+generated_project = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_role_source_changed_without_its_kernel_role(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_SOURCE)
+        support.regenerate(generated_project)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a role's rulesync source was changed without its kernel role file")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x7e64521167b0>
+project = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_role_source_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = "a role's rulesync source was changed without its kernel role file"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a role's rulesync source was changed without its kernel role file: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/templates/role-engineer.md'} and {'.rulesync/s...-engineer.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         'governance/kernel/templates/role-engineer.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:492: AssertionError
+_ TestALaunchedSessionInAProjectMadeFromTheTemplate.test_the_launchers_settings_close_the_folder_for_every_other_role[engineer] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate object at 0x7e645218fd40>
+launched = <function launched.<locals>._launch at 0x7e644a41b7e0>
+product = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl0/sandbox/elsewhere'))
+role = 'engineer'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("role", LAUNCHED_NOT_THE_TEST_DESIGNER)
+    def test_the_launchers_settings_close_the_folder_for_every_other_role(self, launched, product, sandbox, role):
+        """Green before implementation; it must stay green. The launcher's settings alone are looked at: with
+        the template's rule gone they are the only deny rule left for these sessions."""
+>       result = launched(role)
+                 ^^^^^^^^^^^^^^
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role = 'engineer'
+
+    def _launch(role):
+        before = len(launch_support.calls(cli))
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
+        result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
+>       assert run.returncode == 0, (
+            f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
+            f"{result.describe()}"
+        )
+E       AssertionError: gov launch engineer DAEO-zz90 was refused in the stand-in project made from the template
+E         gov launch engineer DAEO-zz90
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         CLI starts recorded: []
+E       assert 1 == 0
+E        +  where 1 = Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr='gov launch: LAUNCH_REFUSED: the role fi...roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', seconds=0.4865254100004677).returncode
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:270: AssertionError
+_ TestALaunchedSessionInAProjectMadeFromTheTemplate.test_the_launchers_settings_close_the_folder_for_every_other_role[product-spec] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate object at 0x7e645218c230>
+launched = <function launched.<locals>._launch at 0x7e644a41e5c0>
+product = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl1/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl1/sandbox/elsewhere'))
+role = 'product-spec'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("role", LAUNCHED_NOT_THE_TEST_DESIGNER)
+    def test_the_launchers_settings_close_the_folder_for_every_other_role(self, launched, product, sandbox, role):
+        """Green before implementation; it must stay green. The launcher's settings alone are looked at: with
+        the template's rule gone they are the only deny rule left for these sessions."""
+>       result = launched(role)
+                 ^^^^^^^^^^^^^^
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role = 'product-spec'
+
+    def _launch(role):
+        before = len(launch_support.calls(cli))
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
+        result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
+>       assert run.returncode == 0, (
+            f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
+            f"{result.describe()}"
+        )
+E       AssertionError: gov launch product-spec DAEO-zz92 was refused in the stand-in project made from the template
+E         gov launch product-spec DAEO-zz92
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         CLI starts recorded: []
+E       assert 1 == 0
+E        +  where 1 = Run(args=('launch', 'product-spec', 'DAEO-zz92'), returncode=1, stdout='', stderr='gov launch: LAUNCH_REFUSED: the rol...s/product-spec.md cannot be read: the session would start without its role (DEC-826 Q1)\n', seconds=0.6566585580003448).returncode
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:270: AssertionError
+_ TestALaunchedSessionInAProjectMadeFromTheTemplate.test_the_launchers_settings_close_the_folder_for_every_other_role[independent-auditor] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate object at 0x7e645218c5c0>
+launched = <function launched.<locals>._launch at 0x7e644a41ede0>
+product = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl2/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_cl2/sandbox/elsewhere'))
+role = 'independent-auditor'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("role", LAUNCHED_NOT_THE_TEST_DESIGNER)
+    def test_the_launchers_settings_close_the_folder_for_every_other_role(self, launched, product, sandbox, role):
+        """Green before implementation; it must stay green. The launcher's settings alone are looked at: with
+        the template's rule gone they are the only deny rule left for these sessions."""
+>       result = launched(role)
+                 ^^^^^^^^^^^^^^
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role = 'independent-auditor'
+
+    def _launch(role):
+        before = len(launch_support.calls(cli))
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
+        result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
+>       assert run.returncode == 0, (
+            f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
+            f"{result.describe()}"
+        )
+E       AssertionError: gov launch independent-auditor DAEO-zz94 was refused in the stand-in project made from the template
+E         gov launch independent-auditor DAEO-zz94
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         CLI starts recorded: []
+E       assert 1 == 0
+E        +  where 1 = Run(args=('launch', 'independent-auditor', 'DAEO-zz94'), returncode=1, stdout='', stderr='gov launch: LAUNCH_REFUSED: ...ndent-auditor.md cannot be read: the session would start without its role (DEC-826 Q1)\n', seconds=0.43093210001825355).returncode
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:270: AssertionError
+_ TestALaunchedSessionInAProjectMadeFromTheTemplate.test_the_launchers_settings_leave_the_folder_to_the_test_designer _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate object at 0x7e645218eba0>
+launched = <function launched.<locals>._launch at 0x7e644a41f7e0>
+product = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_le0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_le0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_the_launchers_settings_le0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_the_launchers_settings_leave_the_folder_to_the_test_designer(self, launched, product, sandbox):
+        """Green before implementation; it must stay green."""
+>       result = launched(TEST_DESIGNER)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:445: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role = 'independent-test-designer'
+
+    def _launch(role):
+        before = len(launch_support.calls(cli))
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
+        result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
+>       assert run.returncode == 0, (
+            f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
+            f"{result.describe()}"
+        )
+E       AssertionError: gov launch independent-test-designer DAEO-zz90 was refused in the stand-in project made from the template
+E         gov launch independent-test-designer DAEO-zz90
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         CLI starts recorded: []
+E       assert 1 == 0
+E        +  where 1 = Run(args=('launch', 'independent-test-designer', 'DAEO-zz90'), returncode=1, stdout='', stderr='gov launch: LAUNCH_REF...-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', seconds=0.8554474670090713).returncode
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:270: AssertionError
+_ TestALaunchedSessionInAProjectMadeFromTheTemplate.test_no_settings_of_a_launched_test_designer_close_the_folder _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate object at 0x7e645218e360>
+launched = <function launched.<locals>._launch at 0x7e644a41f560>
+product = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_no_settings_of_a_launched0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_no_settings_of_a_launched0/sa...xPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_no_settings_of_a_launched0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_no_settings_of_a_launched_test_designer_close_the_folder(self, launched, product, sandbox):
+        """The decided state: the session ``gov launch independent-test-designer <ticket>`` starts in a project
+        made from the template can write its acceptance tests. Red before implementation: the project's own
+        generated settings carry the template's deny rule."""
+>       result = launched(TEST_DESIGNER)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:460: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+role = 'independent-test-designer'
+
+    def _launch(role):
+        before = len(launch_support.calls(cli))
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
+        result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
+>       assert run.returncode == 0, (
+            f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"
+            f"{result.describe()}"
+        )
+E       AssertionError: gov launch independent-test-designer DAEO-zz90 was refused in the stand-in project made from the template
+E         gov launch independent-test-designer DAEO-zz90
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E         
+E         CLI starts recorded: []
+E       assert 1 == 0
+E        +  where 1 = Run(args=('launch', 'independent-test-designer', 'DAEO-zz90'), returncode=1, stdout='', stderr='gov launch: LAUNCH_REF...test-designer.md cannot be read: the session would start without its role (DEC-826 Q1)\n', seconds=0.42341372900409624).returncode
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:270: AssertionError
+_ test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-33/w2_33_support.py::copy_folder] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_stri0')
+
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_whole_tree_fixture_strips_the_held_out_deny_rules(function, tmp_path):
+        source = _source(tmp_path / "source")
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_stri0/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_stri0/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7e6453f6e3e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_stri0/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_ test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-33/w2_33_support.py::copy_folder] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_keep0')
+
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file(function, tmp_path):
+        """Only those rules go: the other deny rules in their order, the allow rules, the hooks and the environment."""
+>       produced = check.run_copier(function, _source(tmp_path / "source"), tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_keep0/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_keep0/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7e6453f6e3e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_whole_tree_fixture_keep0/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_ test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-permissions] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+settings = {'hooks': {}}
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth0')
+
+    @pytest.mark.parametrize("settings", ({"hooks": {}}, {"permissions": {"allow": ["Read(./docs/**)"]}}),
+                             ids=("no-permissions", "no-deny-list"))
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is(function, settings, tmp_path):
+        source = _source(tmp_path / "source", settings)
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth0/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth0/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7e6453f6e3e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth0/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_ test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-deny-list] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+settings = {'permissions': {'allow': ['Read(./docs/**)']}}
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth1')
+
+    @pytest.mark.parametrize("settings", ({"hooks": {}}, {"permissions": {"allow": ["Read(./docs/**)"]}}),
+                             ids=("no-permissions", "no-deny-list"))
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is(function, settings, tmp_path):
+        source = _source(tmp_path / "source", settings)
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth1/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth1/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7e6453f6e3e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw2/test_a_settings_file_with_noth1/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_ test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-tracked] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+tracked = True
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro0')
+
+    @pytest.mark.parametrize("tracked", (True, False), ids=("tracked", "untracked"))
+    @pytest.mark.parametrize("function", COPIERS, ids=lambda function: function.label)
+    def test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out(function, tracked, tmp_path):
+        source = check.make_source(tmp_path / "source", tracked=tracked)
+        assert (source / check.HELD_OUT_REL).is_file(), "the synthetic source has no held-out file"
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro0/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro0/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7d21b65763e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro0/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_ test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-untracked] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-185/tests/acceptance/W2-33/w2_33_support.py'), name='copy_folder', root_parameters=('repo',), top_level=True, copies=True, lists_whole_tree=False, whole_tree_route=True)
+tracked = False
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro1')
+
+    @pytest.mark.parametrize("tracked", (True, False), ids=("tracked", "untracked"))
+    @pytest.mark.parametrize("function", COPIERS, ids=lambda function: function.label)
+    def test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out(function, tracked, tmp_path):
+        source = check.make_source(tmp_path / "source", tracked=tracked)
+        assert (source / check.HELD_OUT_REL).is_file(), "the synthetic source has no held-out file"
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-28/w1_28_copy_check.py:344: in run_copier
+    callable_(destination, **{name: source for name in function.root_parameters})
+tests/acceptance/W2-33/w2_33_support.py:376: in copy_folder
+    shutil.copytree(roles_dir(repo), destination)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro1/source/template/governance/kernel/roles')
+dst = PosixPath('/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro1/produced')
+symlinks = False, ignore = None
+copy_function = <function copy2 at 0x7d21b65763e0>
+ignore_dangling_symlinks = False, dirs_exist_ok = False
+
+    def copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2,
+                 ignore_dangling_symlinks=False, dirs_exist_ok=False):
+        """Recursively copy a directory tree and return the destination directory.
+    
+        If exception(s) occur, an Error is raised with a list of reasons.
+    
+        If the optional symlinks flag is true, symbolic links in the
+        source tree result in symbolic links in the destination tree; if
+        it is false, the contents of the files pointed to by symbolic
+        links are copied. If the file pointed by the symlink doesn't
+        exist, an exception will be added in the list of errors raised in
+        an Error exception at the end of the copy process.
+    
+        You can set the optional ignore_dangling_symlinks flag to true if you
+        want to silence this exception. Notice that this has no effect on
+        platforms that don't support os.symlink.
+    
+        The optional ignore argument is a callable. If given, it
+        is called with the `src` parameter, which is the directory
+        being visited by copytree(), and `names` which is the list of
+        `src` contents, as returned by os.listdir():
+    
+            callable(src, names) -> ignored_names
+    
+        Since copytree() is called recursively, the callable will be
+        called once for each directory that is copied. It returns a
+        list of names relative to the `src` directory that should
+        not be copied.
+    
+        The optional copy_function argument is a callable that will be used
+        to copy each file. It will be called with the source path and the
+        destination path as arguments. By default, copy2() is used, but any
+        function that supports the same signature (like copy()) can be used.
+    
+        If dirs_exist_ok is false (the default) and `dst` already exists, a
+        `FileExistsError` is raised. If `dirs_exist_ok` is true, the copying
+        operation will continue if it encounters existing directories, and files
+        within the `dst` tree will be overwritten by corresponding files from the
+        `src` tree.
+        """
+        sys.audit("shutil.copytree", src, dst)
+>       with os.scandir(src) as itr:
+             ^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-41/popen-gw0/test_a_fixture_that_copies_fro1/source/template/governance/kernel/roles'
+
+/usr/lib/python3.12/shutil.py:598: FileNotFoundError
+_____ test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep():
+        text = _sweep_text()
+        starting = support.files_that_start_git()
+        assert starting, "no file of src/gov names git: the lower bound of the sweep is empty, the case is wrong"
+        unnamed = [rel for rel in starting if not support.names_file(text, rel)]
+>       assert not unnamed, (f"{support.SWEEP_REL} does not name {len(unnamed)} of the {len(starting)} files of "
+                             f"src/gov that start git: {unnamed}")
+E       AssertionError: docs/research/AR-2-git-sweep.md does not name 7 of the 41 files of src/gov that start git: ['src/gov/adopt/assess.py', 'src/gov/check/structural.py', 'src/gov/close/attribution.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/shell.py', 'src/gov/guard/bash_writes.py', 'src/gov/impact/__init__.py']
+E       assert not ['src/gov/adopt/assess.py', 'src/gov/check/structural.py', 'src/gov/close/attribution.py', 'src/gov/dispatch/landing.py', 'src/gov/dispatch/shell.py', 'src/gov/guard/bash_writes.py', ...]
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:42: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-185/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=2621866) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file independent-auditor.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file orchestrator.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file product-spec.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file research.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file senior-engineer.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [3] tests/acceptance/W2-153/test_w2_153_routed.py:72: the kernel role file ticket-lead.md has no 'Launch by criticality' line, so there is no line to carry
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+14 failed, 10693 passed, 27 skipped, 6 warnings in 1853.92s (0:30:53)

@@ -1,0 +1,31 @@
+gitleaks: off by configuration (DEC-1045): no ticket's change is scanned (/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/secrets.yaml)
+W2-88 (DAEO-2bdu, FULL) at df9f4910e00e: pre-check passed
+W2-88: kernel gate at df9f4910e00e: exit 0
+kernel_gate: no kernel path changed
+reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
+2026-11-13 19:20:09 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 19:20:09 merged W2-88 onto 8801ffd17df9: 83069aa6163b
+2026-11-13 19:59:00 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 19:59:07 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 19:59:11 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 19:59:12 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 19:59:13 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-13 19:59:52 the head without the batch: a throwaway worktree head-8801ffd17df9-0 at 8801ffd17df9 with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 19:59:54 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-23/test_w2_23_space.py::test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir
+2026-11-13 19:59:54 ADVANCED refs/heads/w2/integrate 8801ffd17df9 -> 83069aa6163b; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/83069aa6163b.json
+2026-11-13 19:59:54 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 20:02:00 integration store promoted: the merged clone's stores at 83069aa6163b into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-88: 5bdb28bc9 W2-88 (DAEO-2bdu): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: NOTICE 46 findings: .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/ (+43 more)
+structural pass: authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 8801ffd17df9)
+structural pass: links: NOTICE 3 new since 8801ffd17df97ba59e5aae77afb925c92694d498 (1736 standing): UNLINKED_ID DEC-1132 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:80 | orchestrator | add DEC-1132 to DAEO-2bdu's sources: | UNLINKED_ID W2-124 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:80 | orchestrator | add W2-124 to DAEO-2bdu's sources: | UNLINKED_ID W2-26 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:80 | orchestrator | add W2-26 to DAEO-2bdu's sources:
+structural pass: structural pass at 5bdb28bc962c: NOTICE in mutation, authority, links (6 of 9 families ok), 18.9 s; a notice, not a refusal
+structural pass: notice -> inbox/20261113-200219-structural-notice.txt

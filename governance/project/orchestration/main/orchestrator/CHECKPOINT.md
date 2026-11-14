@@ -1,5 +1,141 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
+## RESUME HERE — 2026-11-14 12:10: session `f3886235` HANDING OVER. Next free id **DEC-1177** (DEC-1176 recorded e3c94cd77). READ THE NOW BLOCK FIRST; the dated lines below are history.
+
+### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
+
+- **12:25 (session 6ff2ee7c, the trial session; env 300000/orchestrator/DAEO-sdxk confirmed; id in cto-session.txt 12:18; standby ended):** old session 949029's watchers STOPPED by pgid and re-armed here (inbox, helper_watch, sentinel_check, bare_watch, store_refresh_daily, usage_log, refused_starts); digest crons 9b387fd8 (09:02, fires ~09:32) and e1f35618 (18:02, fires ~18:32). Waits: land pid 3207880 (W2-88b), W2-184 lead pid 3158746. W2-134 fresh accept 28/0 at c451c2180 (log/accept-20261114-w2134/, worktree ~/gov-os-runs/W2-00/accept-20261114-w2134 to remove). DRAFTS (apply after the land, main tree must stay clean): drafts/dec-1177/entry.md (P-W2-184-1 -> DEC-1177; MEMORY-AUDIT's draft becomes DEC-1178), drafts/P-W2-61H-HEAD-1.md (to packages/; given to the owner). MISSED by the last session: DIF has no lines for DEC-1172..1176 (DEC-1176 (1) is standing) -> add with the DEC-1177 commit. Trial count from 12:18: stale 1 (report-state closes_next/countdown named W2-130 as next), corrections 0, missed 1 (DIF lines).
+
+- **11:45:** OWNER: P-W2-184-1 (a) + (c) stop-gap -> ticket note c451c2180, W2-184 f1 run RELEASED (briefs/W2-184-A5-f1.md). Operator runs W2-61h hidden-form now (closes W2-134). Owner at PC: asked which P-RELEASE-1 steps need a plain terminal + timing; handover (300k trial) best moment -> answered: plain terminal = gov release+commit+tag (sitting 1) and the re-pin script (sitting 2, ACT-REPIN-W5 form); rec one evening sitting after the re-pin bundle is reviewed; handover ~12:30-13:00 after this message. RECORD P-W2-184-1 in the next DEC batch. Session restarted ~11:40 (bg tasks untracked but alive).
+- **12:14:** W2-88b DONE 266ec245e792 (verify green 5377/0; narrow PASS R1 R2) -> LANDING. Findings: F-1 redis A9 FABRIC_INCOMPLETE (codegraph: codebase-memory-mcp query_graph failed, fabric.py:705-708, though A6/A8 said codeintel recreated); F-2 A5/A7/A10 verdict path unnamed (row); F-3 grafana A9 ADOPT_GIT_FAILED (grafana .gitignore:84 ignores .claude/skills/*; gov's git add refused); obs: grafana A6 7 h 26 min (gitleaks once per file serially ~2 files/s, 2 passes x 3.4 h + 5729 s embedding); peak 6.6 GB vs MA est 38.4 GB (A9 stopped before build). PLAN: reopen W2-88 (DAEO-2bdu) under DEC-1164 (18) for F-1 + F-3 (+ P-1 if owner says P-1 (a)), after the land.
+- **09:56:** W2-130 LANDED + CLOSED (6f8158a0eed5). All six nightly reds addressed on integrate. Leads: W2-88b only.
+- **09:55:** W2-130 pin3 DONE 6f8158a0eed5 (narrow PASS) -> LANDING. PIN3-WT (a): rows F1 (W2-130 S7 lessons read the working tree), F2 (W2-175 S1-S5 read live templates, S5 asserts 1.0.1) -> ride along at the next reopen of W2-130/W2-175 (DEC-802). NO COMMIT DURING THE LAND.
+- **09:14:** W2-130 pin2 DONE aafaf6259d10 (narrow PASS) -> PIN2-HEAD (a) + F1 (variant_findings pinned tool; README + test_w2_130_audit.py in its own folder) -> pin3 RELEASED; LAND ONCE after pin3.
+- **09:15:** MORNING PACKAGE committed 1d5af6d75 (governance/project/orchestration/packages/P1-MORNING-20261114.md), ping logged + sent, status_block marked. COUNT CORRECTED: 158 closed (status_block), not 161. report-state.json updated (countdown, held, merged, owner_action). W2-61h is CLOSED (01:13 batch); the hidden-form result now closes W2-134.
+- **08:50:** W2-130 pin PACKAGES (67364dbea2fb; S8+W2-175 S7 revised, narrow PASS) + S4 red from my ce8ae4353 (3 UNLINKED_ID on live tickets) -> PIN-S4 (a) pin S4 at measured_at, F1 confirmed (pin = counts-after.measured_at 6b62de94e), F4 pinned tool (clone's own src) -> pin2 RELEASED.
+- **08:55:** W2-54's two nightly reds GREEN at 0fa0df282 after a fresh store rebuild (2 passed, 486 s). Remaining nightly reds = the four in W2-130's pin run.
+- **08:35:** main store rebuilt (327 s); gov context 6f0s/6w5n/sq3a exit 0. W2-130 REOPENED 0fa0df282 (+ W2-175 record test/support widened) -> pin run RELEASED (briefs/W2-130-A5-pin.md). W2-54 two cases re-running (bg). Row: gov links --propose-sources proposes wbs ids (W2-60a, W2-56, W2-H046) that are no store records -> check if defect (links' ticket scope).
+- **08:25:** NIGHTLY red 6 diagnosed (drafts/nightly-20261114/DIAG.md): W2-54 x2 = 3 wbs ids in sources: (fixed ce8ae4353) + stale main store -> rebuild_pinned.sh on the main tree RUNNING (bg); W2-175 S7 x2 + W2-130 S8 x2 = pinned moving values -> W2-130 reopen + widen by tests/acceptance/W2-175/test_w2_175_record.py (+ w2_175_support.py) + td revision + narrow check: brief part WRITTEN briefs/W2-130-A5-pin.part.md; COMMIT the reopen + widening AFTER the rebuild ends, then gov brief + ready line.
+
+- **Integrate head** c451c2180. No land running. Main tree clean. Next free id **DEC-1177** (MEMORY-AUDIT's draft holds that number; renumber if another decision is recorded first).
+- **Leads running:** W2-88b run 4 (smoke run record final at 9aa5957be: grafana A6/A8/A9, A9 ADOPT_GIT_FAILED F-3; narrow check next, then DONE with the failures list -> bring it to the owner as found, no measure). W2-184 F1 fix run (briefs/W2-184-A5-f1.md, released 12:00).
+- **To record (owner decisions not yet in the register):** P-W2-184-1 (a), with (c) as the stop-gap until (a) lands (owner, chat 2026-11-14 ~11:40; written in DAEO-6f0s c451c2180). Record it in the next DEC batch.
+- **W2-61h hidden-form result (owner's operator, 2026-11-14 ~12:05): 1 failed, 6 passed.** h03's cited lines changed at HEAD (a real change); h11, h16, h23, h37, h38 and h39 moved unchanged. W2-61h is CLOSED (01:13 batch); this check gates **W2-134's close**. **The owner asks for (1) a structural fix:** the check judges each question at its own commit; re-anchoring is routine maintenance; a question whose cited lines changed goes to the walled writer in the weekly cycle and never blocks a close; and **(2) the quickest clean way to close W2-134.** -> Bring one package (options, costs, recommendation; which ticket's scope holds the check: W2-61h / W2-134 / the memory-audit tickets W2-187/188 of the MEMORY-AUDIT-P1 draft; no new ticket without the owner's P1, DEC-974). Never read the hidden half yourself: hidden-form runs are the owner's operator's (`env -u GOV_ROLE -u GOV_TICKET`).
+- **Built and held:** W2-100 (cdac25763613) and W2-101 (3bf1c96b47c1), with COPIES-10 (f535215e) and COPIES-11 (3b4e462f) built and reviewed (review.md in each bundle). **The owner sends the eleven lines (seven P-RELEASE-1 + four W2-100/W2-101) to the new session after reading the packages.** On the W2-100/101 yeses: write `owner_approval` into each CIT-P + tools/kernel-approved.txt rows (DEC-1166 (4) form, W2-37 precedent), hand merge (one commit, Task: DAEO-uw5h / DAEO-6icv), write the .req for each copies ACT (operator agent), close on fresh accepts.
+- **P-RELEASE-1** (drafts/examin-release/: P-RELEASE-1.md, EXAMIN-CTO-first-brief.md sha 995d0dcf…, NOTES.md). Plain-terminal steps (the owner at the PC): (1) `gov release 0.1.0` + record commit + tag `v0.1.0` on the record commit; (2) the re-pin from the release (ACT-REPIN-W5 form, reinstalls gov). Everything else by the owner's operator (copies ACTs, clone + remote removal + held-out.yaml, kit install + A0, examin-cto start/restart). Timetable given 12:02 (if the lines come ~12:15): P-1 fix (W2-88 = DAEO-2bdu reopen, DEC-1164 (18), fabric.py:36 parents[3]) 13:00-16:00; "release ready at <C>" ~16:00 with a land hold; re-pin bundle for <C> built/rehearsed/reviewed 16:00-18:00 (wheel sha computable in advance); ONE owner sitting ~18:00-18:45 (release, commit, tag, 5-min wheel-sha check, re-pin); hash check + release-check.md (docs/plan/wave-2/examin-copy/, Task DAEO-h4rh) 18:45-19:15; operator clone/kit/A0/start ~19:15-19:45. Split alternative: step 1 ~16:30, step 2 ~18:30. Replies file: .gov-runtime/scratch/orchestrator/examin/REPLIES.md.
+- **Other owner waits:** `approve q02 variant 0703aebf`; MEMORY-AUDIT-P1 (drafts/memory-audit-p1/).
+- **Mine, next:** the W2-61h/W2-134 package above; the live-hook ACT copying W2-42a's parser (hardening list in the 06:40 line, + CLAUDE-RULES F3); W2-23 P2 after W2-27 starts; W2-145 closes after the re-pin + a day (S7); rows: W2-130 S7 lessons + W2-175 S1-S5 live templates (ride along at the next reopen), `gov links --propose-sources` proposes wbs ids; LANDING-CTO-ROUTE-1 §7 (a) later; the trial's digest (stale facts / corrections / missed items / cost vs the 11-13 baseline: 5, ~3, ~2).
+- **Status at 12:10:** 159 closed · 4 merged not closed (W2-134, W2-138, W2-145, W2-155) · 2 built and held (W2-100, W2-101) · 2 in flight (W2-88b, W2-184) · 23 not started (190). No new ticket since 11-13. report-state.json is current except W2-184 (now in flight).
+
+- **Integrate head** 77220f814 (W2-42a closed by the queue). No land running. Main tree clean.
+- **Lead running:** W2-88b run 4 (smoke run; grafana A6 running 3.5 h at 07:43 — slow rebuild/embedding is itself a finding; lead pid 2682503 waiting by wait_for). Then its narrow check, then DONE with the failures list.
+- **Built and held, each waiting on the owner:**
+  - W2-100 (cdac25763613): `yes W2-100-CIT-P 7bb4f1ac` then `yes ACT-CLAUDE-COPIES-10 f535215e` (bundle + review.md ready). On yes: write `owner_approval` into docs/changes/W2-100-CIT-P.md + tools/kernel-approved.txt rows (DEC-1166 (4) form, see W2-37's precedent), hand merge `w2/W2-100` (one commit, Task: DAEO-uw5h), write the .req for COPIES-10, then close W2-100 on a fresh accept.
+  - W2-101 (3bf1c96b47c1): `yes W2-101-CIT-P 42c1cc38` then `yes ACT-CLAUDE-COPIES-11 3b4e462f` (ready). Same sequence (Task: DAEO-6icv). COPIES-10 and -11 are disjoint, either order.
+  - W2-184 (DAEO-6f0s): P-W2-184-1 to the owner (rec (a) _probe_files reads launch-record roots + (c) stop-gap).
+- **Other owner waits:** the seven P-RELEASE-1 lines (drafts/examin-release/: commit (B), 0.1.0, P-1 (a), pins (a), setup (a), W2-81 (b), walls (a), `yes EXAMIN-CTO-first-brief 995d0dcf`); `approve q02 variant 0703aebf`; MEMORY-AUDIT-P1 line (DEC-1177 draft in drafts/memory-audit-p1/); W2-61h hidden-form result (expect 7 passed -> close W2-61h + W2-134).
+- **Mine, next:** on P-RELEASE-1 yes: record its DEC, route P-1 (A9 from an installed wheel, fabric.py:36 parents[3]) under DEC-1164 (18) on W2-88 (DAEO-2bdu) with a narrow check; then "release ready at <C>" after W2-100/W2-101/P-1 land; then the hash check, the re-pin from the release (ladder window), REPLIES.md at .gov-runtime/scratch/orchestrator/examin/. The live-hook ACT copying W2-42a's parser (hardening list in the 06:40 line). W2-23 P2 after W2-27 starts. W2-145 closes after the re-pin + a day (S7). LANDING-CTO-ROUTE-1 §7 (a) later. Morning digest with the trial's counts (DEC-1171 (6)) after the handover.
+- **Status at 07:45:** 161 closed · 5 merged not closed · 3 built and held · 1 in flight · 20 not started (190). No new ticket since 11-13.
+- **06:40:** W2-42a r3b DONE c24a414f1d49 (accept 990/0; narrow PASS; check passed) -> LANDING (land.txt). NO COMMIT DURING THE LAND. After: close W2-42a (fresh accept) -> W2-27's dep met again. Live-hook ACT hardening list: R3 F2-F5 + R3b F1 (data run as code via copy/array/pipe/trap/set --), F2 (awk NR>1, sed labels), F3 (ssh/docker exec in loops), F4 (gawk @c), F5 (decide() 13 s at 300 read vars) + CLAUDE-RULES F3 (writes into another worktree's tests/acceptance).
+- **06:02:** W2-42a R3 DONE 209ec8464f9e (accept 914/0; narrow PASS by code) BUT F1: read-only here-strings (read <<< "$v", while…done <<< "$(…)", mapfile, sed/awk/bc <<< "$v") now refused (bash_writes.py:1778) -> F1 (a) mine: r3b RELEASED (briefs/W2-42a-A5-r3b.md); land ONCE after r3b. Rows F2-F5 for the live-hook ACT.
+- **(~05:50 real):** COPIES-11 review PASS (rows F1 CIT-P pending, F2 later head) -> review.md placed. Both copies ACTs ready for the owner's yes.
+- **(~05:40 real):** COPIES-11 BUILT (manifest 3b4e462f1e1f…, class b, 15 files; both orders green, 21 named cases pass) -> review RUNNING (reviews/act-claude-copies-11.md) -> place as review.md -> owner line `yes ACT-CLAUDE-COPIES-11 3b4e462f` after `yes W2-101-CIT-P 42c1cc38`.
+- **(~05:15 real):** COPIES-10 review PASS (F1-F3 rows; manifest f535215e) -> review.md placed. Owner line `yes ACT-CLAUDE-COPIES-10 f535215e` after `yes W2-100-CIT-P 7bb4f1ac`; order: CIT-P approval line + kernel-approved rows (commit on w2/W2-100? or integrate) -> hand merge -> .req COPIES-10.
+- **(~05:10 real):** drafts/examin-release/ READY (P-RELEASE-1, EXAMIN-CTO-first-brief (rule 2.4 fixed by me), NOTES) -> to the owner: 7 lines (commit (B), 0.1.0, P-1 (a) A9-from-wheel fix under DEC-1164 (18) on W2-88, pins (a), setup (a), W2-81 (b), brief yes; + P-4/P-5 walls (a) accept with mitigations + Wave 3 rows). On yes: record DEC-1177/1178 (check which id is free: MEMORY-AUDIT may take 1177).
+- **(~04:45 real):** W2-102 release skill RETIRED (DEC-1083): release = W2-16's `gov release <v>` (owner only, plain terminal; docs/releases/README.md; no record yet, pyproject 0.1.0). Helper drafting drafts/examin-release/ (P-RELEASE-1.md, EXAMIN-CTO-first-brief.md with DEC-1174 (2) conditions, NOTES.md). Running helpers: COPIES-10 review, COPIES-11 build, release drafts.
+- **(~04:35 real):** W2-42a REOPENED 2b034037a (R3: write after <<< missed + fallback forms bash <<<, xargs <<<, body-less heredoc after python3 -c; DEC-1164 (18), before the live-hook ACT). R3 run RELEASED (briefs/W2-42a-A5-r3.md). Then: the live-hook ACT copying the parser (+ hardening list incl. F3).
+- **04:50:** W2-101 run3 PACKAGES (3bf1c96b47c1; kernel bytes 1ef54a70037a; round 2 PASS; accept 271/6, verify 9 reds = .claude copies). CIT-P sha 42c1cc38 -> owner line `yes W2-101-CIT-P 42c1cc38`. CTX-1 residual: NO ACTION (gov close builds at budgets.close_context_tokens 65536, facts.yaml:179; 6000 is gov context's default only). Helper building ACT-CLAUDE-COPIES-11 (both orders rehearsed). Rows F7 (path class broad for W2-11 lint), F8 (entry criterion for skilleval sessions with tools, DEC-803), F9 (SKILL.md links scenarios.md the harness leaves out); brief gap: launch_worker needs --model/--class in the lead template; skip_known has no .claude copy cases.
+- **04:40:** ACT-CLAUDE-COPIES-10 BUILT (manifest f535215e5ba0…, class b, 20 new .claude/skills files; rehearsal 12/12 named cases green, merge clean) -> independent review RUNNING (reviews/act-claude-copies-10.md) -> copy to acts/ACT-CLAUDE-COPIES-10/review.md -> owner line `yes ACT-CLAUDE-COPIES-10 f535215e` after CIT-P yes.
+- **04:02:** W2-100 run2 PACKAGES (cdac25763613; product head f7637bd03e25; 2 narrow PASS; accept 222/8, lead_verify 12 reds = .claude/skills copies, by design). CIT-P docs/changes/W2-100-CIT-P.md sha 7bb4f1ac -> owner line `yes W2-100-CIT-P 7bb4f1ac`. P-W2-100-F2 ALREADY FIXED (W2-104 c9f07ef3). Helper building ACT-CLAUDE-COPIES-10 (acts/, drafts/claude-copies-10/) -> then a fresh review -> owner yes. On CIT-P yes: write owner_approval + tools/kernel-approved.txt rows (DEC-1166 (4) form), hand merge w2/W2-100, operator applies COPIES-10. Rows: F4, F5, N1-N4; quiet-hours (DEC-991) refused auditors' own TMPDIR writes (worth review).
+- **03:50:** W2-184 PACKAGES filed: P-2 (a) widened by command.py + P-3 confirmed (f3d3438fc); P-W2-184-1 (round-2 F1, td from tests worktree misses probe records) to the owner, rec (a) + (c) stop-gap. Leads: W2-100 run2, W2-101 run3, W2-88b run4. Owner waits: q02 0703aebf, MEMORY-AUDIT-P1, W2-61h hidden-form, P-W2-184-1. Next free DEC-1177.
+- **03:43:** W2-184 FULL review round 2 FAIL F1 (td launch from tests worktree never sees the probe records) -> owner package (DEC-1010) when the lead returns.
+- **03:42:** W2-104 CLOSED again (harness fix). W2-101 run3 RELEASED. Leads: W2-184, W2-100 run2, W2-88b run4, W2-101 run3.
+- **03:38:** W2-104 harness fix DONE c9f07ef3782b (narrow PASS) -> LANDING. Then W2-101 run3 brief (L1 + 9 scenarios + round 2).
+- **03:01:** W2-185 CLOSED. W2-104 REOPENED c82335a40 + fix run released (W2-104-A5-sum). Interfaces condensed (CTX-1). After W2-104 lands: W2-101 run3 (L1, re-run 9 scenarios, round 2) and W2-100 same if needed.
+- **02:32:** W2-101 run2 PACKAGES (review r1 FAIL F1: harness would show scenario-summaries.md to the session). DECIDED (mine): reopen W2-104 under DEC-1164 (18): harness leaves out scenario-records.yaml + scenario-summaries.md (W2-104 spec already excludes scenarios.md) + unit test + narrow check, fixes W2-100 and W2-101 alike; CTX-1 (a): condense the Interface sections of DAEO-uw5h/6icv. DO AFTER W2-185 land: commit tickets (W2-104 reopen note, condensed interfaces), brief W2-104 fix run, then W2-101 run3 (L1 + summaries + round 2) after W2-104 lands. W2-100 will hit the same: brief it the same.
+- **02:15:** W2-185 DONE 47e708a2317c -> LANDING (fixes the known red test_w2_23_space.py:94).
+- **01:43:** W2-130 CLOSED (land).
+- **01:42:** W2-88b run3 PACKAGES: MA+A0-A4 exit 0 both copies; A5 auditors judged pass but the live hook refused the verdict write (pretooluse.py:1100) -> run4: verdict at docs/audit/A5-path-map-verdict.md in each copy (CTO, within DEC-1176 (3) (a)); if refused again -> P5 (a) ACT / (b) NO_VERDICT+gov rebuild / (c) record to the owner. grafana MA est 38.4 GB vs 15 GB: a finding. W2-185 REDS-2 (a) widened e2a0d6191, run3 released. W2-130 run4 narrow PASS (0fe423d8f) -> DONE expected -> land.
+- **01:35:** W2-130 land EJECTED (conflict DAEO-aks1 vs DEC-1176); CTO merged integrate into w2/W2-130 6b62de94e taking integrate's aks1; 3 record cases red (counts moved) -> run4 refresh released. W2-185 run2 narrow PASS (39779395d) -> DONE expected.
+- **01:20:** W2-100 + W2-101 run1 PACKAGES (no interface) -> P-W2-100-IF-1 (a) mine, written into both tickets 0a706dc4c (I1 check_domain_skill.py; clause readings; no product code); run2 released for both.
+- **01:13:** batch LANDED+CLOSED (W2-104, W2-94, W2-174, W2-61h). DEC-1176 RECORDED e3c94cd77 (W2-88b patch applied; DEC-954/1150/1099 marked; MEMORY-SPEC-MAP row 180). W2-100, W2-101 claimed e09607093 + released. W2-88b run3 smoke run released. W2-61h hidden-form command to the owner (GOV_EVAL_SETS_ROOT; expect 7 passed) -> close W2-61h + W2-134. Owner waits on: approve q02 variant 0703aebf; MEMORY-AUDIT-P1 line (package presented 00:58, O3 (a) my rec). Next free DEC-1177.
+- **(was) NOW (00:35):** batch land IN FLIGHT: W2-104 050a3e9a1725, W2-94 72a339b9d7b5, W2-174 d5922ed34d9c, W2-61h d317baf20718. NO COMMIT during it. AFTER it: (1) record DEC-1176 from drafts/memory-scope-20261113/DEC-draft.md with A5 (a), apply W2-88b.patch, add "Changed by: DEC-1176" to DEC-954/1150/1099 status lines, mark MEMORY-SPEC-MAP row 180; commit (trailers ONE paragraph). (2) claim W2-100 + W2-101 (tk start, new_worktree.sh, gov brief with briefs/W2-10x-A5-run1.part.md, ready lines). (3) W2-61h landed -> operator hidden-form command (expect 7 passed) -> close W2-61h + W2-134 (fresh accepts). (4) W2-88b smoke run brief (A5 by fresh auditor per copy; record experiments/W2-88/smoke-run.md). (5) W2-42a R3 (tee <<< write) reopen + run, then the live-hook ACT copying the parser. (6) release cut (W2-102 skill) + EXAMIN CTO fixed first brief (P-EXAMIN-CTO-1 with DEC-1174 (2) conditions; findings in clone .gov-runtime/scratch/govos/).
+- **Owner waits on me:** Q02 brief variant (drafts/q02-writer-r2/EXAMIN-writer-q02-fix.md, sha 0703aebf6952; pasted? NO -> paste for approval); memory-audit P1 package (helper drafting drafts/memory-audit-p1/; answer close impact + below-95 % trigger).
+- **Leads running:** W2-184 run1, W2-130 run3, W2-185 run2. Stopped: W2-88b (scope change). Today closed: W2-37, W2-42a, W2-60a, W2-88, W2-93, W2-116, W2-128, W2-136, W2-147 (+ earlier). Recorded today: DEC-1172..DEC-1175. Rules learned: trailers in ONE paragraph (memory); no inline comments on ticket scalar/research-path lines (memory); a merge conflicting in tests/acceptance is committed by the td (DEC-1175 (4)); land.py G-1 honours path-map acceptance_exemptions.
+- **Morning handover (owner yes):** new CTO launch line with --settings env GOV_ROLE/GOV_TICKET/CLAUDE_CODE_AUTO_COMPACT_WINDOW=300000 (steps given 19:25 report); morning digest with the trial's counts.
+- **00:33 OWNER:** yes DEC-1176 A5 (a) -> record (drafts/memory-scope-20261113/DEC-draft.md + A5 (a)) + apply W2-88b.patch + mark DEC-954/1150/1099 AFTER the batch land; then W2-88b smoke run (A5 by a fresh auditor per copy). Q02 (a) fallback (b): brief variant drafts/q02-writer-r2/EXAMIN-writer-q02-fix.md sha 0703aebf6952 to the owner. MEMORY-AUDIT (a): G1-G6, standing set judged end to end weekly as Gov OS (double search, agents as second rerankers), 95 %, counts only, monthly fresh-set drift check; helper drafting the P1 package (drafts/memory-audit-p1/: PACKAGE, W2-187, W2-188 tickets, W2-188 CIT-P; close impact; below-95 % trigger rule).
+- **00:24:** owner: P-9b confirmed; land W2-104 (in the batch); START W2-100 + W2-101 after it (briefs/W2-100-A5-run1.part.md, W2-101-A5-run1.part.md written; claim, new_worktree, gov brief, ready lines once W2-104 is closed). After W2-61h lands: operator hidden-form command.
+- **00:18 (11-14):** W2-42a CLOSED (land 00:15). DEC-1175 COMMITTED e1fce4ed8 (next free DEC-1176 = the W2-88b draft). P-9b in (235fc1cc6). Batch QUEUED: W2-104, W2-94, W2-174, W2-61h (after: operator hidden-form run for W2-61h, then close W2-61h + W2-134). W2-61h c39b DONE d317baf20718. TODO: W2-42a R3 follow-up (reopen under DEC-1164 (18)) before the live-hook ACT; release cut + EXAMIN CTO brief (W2-60a + W2-88 merged).
+- **23:59 clock:** W2-116 CLOSED (8b520714a). Committed c2d10bb45 (W2-130 S4 -> DEC-1123 (2); W2-185 widened by 8 files). Released W2-130 run3, W2-185 run2. P-9b WINDOW open now: W2-42a land queued after the P-9b commit or 15 min. Then W2-94 72a339b9d7b5, W2-174 d5922ed34d9c, W2-104 050a3e9a1725 (after P-9b). DEC-1176 + MEMORY-AUDIT given to the owner (A5 (a) rec). Q02 package given.
+- **23:43 clock OWNER:** W2-88b smoke run purpose = test whether gov adopt works on repos different from ours (small and large: redis, grafana) and where it fails; no measuring, no validation. Passed to the DEC-1176 helper.
+- **23:40 clock:** W2-130 run2 PACKAGES P-W2-130-4 -> (a) mine: S4 excludes DEC-1123 (2) forms (script scratchpad/s4_edit.py). AFTER W2-116 land: commit S4 edit + W2-185 widening (8 files), release W2-130 run3 + W2-185 run2; hold W2-42a for P-9b window (15 min).
+- **23:36 clock OWNER:** P-9b (a) (operator applies when no land in flight). Gold re-run + h10 category by the operator now (h10 file is retired-hidden/h10-retired-20261113.yaml). W2-88b SCOPE CHANGED: smoke run only on grafana+redis (index/embed/stores, no questions, no measure); no P3 clones, no P4 questions; memory proven per repository in its own Wave 0 at >=95 % with weekly maintenance + re-measure. W2-88b lead STOPPED (pgids 2908634 etc.). Helper drafting DEC-1176 (W2-88b KPI edit + DEC-954 Q9f) and MEMORY-AUDIT.md (adopt skill "measured once" vs weekly re-measure; product today; gaps) in drafts/memory-scope-20261113/.
+- **23:21 clock:** W2-185 PACKAGES (S1-S3,F1 built, narrow PASS); 18 reds outside its paths pin pre-DEC-1167 (4) behaviour -> TODO: widen DAEO-qyt2 by those files (list in log/W2-185-A5-run1.json P-W2-185-REDS) + run2 td revision. Owner asked all four packages in one message (sent 23:20).
+- **23:16 clock:** W2-93 CLOSED (land 23:15). W2-116 queued (land.txt). Next W2-42a cd17d270668f, then R3 run; W2-104 after P-9b; W2-94 after the gold re-run.
+- **22:57 clock:** W2-42a apostrophe fix DONE cd17d270668f (accept 883/0; scoped 6 reds = W2-33 fixture copy, pre-existing, mine DEC-1156 (7)); LAND after W2-116; then R3 (tee <<< "…" file missed, fails open) as a short ride-along BEFORE the live-hook ACT copies the parser. 4 detached workers died 22:41-46 (transient, leads relaunched).
+- **22:36 clock:** W2-60a CLOSED (1496e4b0e). W2-130 re-baseline committed 617f884f5, run2 released (started, merged integrate). W2-93 LANDING. W2-184 claimed b624fa3c1 + run1 released (interface = run 4d proposal). W2-61h c39 PACKAGES: count 39 merged; h10 category from the operator (grep command given). Next lands: W2-116, then W2-104 (after P-9b), W2-94 (after gold re-run). Then the release (W2-102 skill) for the EXAMIN CTO.
+- **22:20 clock:** W2-130 Verify re-baseline patch READY (drafts/verify-20261113/DAEO-q8cl-rebaseline.patch; 3 extensions confirmed) -> apply + commit AFTER W2-60a's land, then relaunch W2-130 (run2 brief: P-1/2/3 (a)), then queue W2-93 land.
+- **22:10 clock:** W2-93 + W2-116 land checks PASS (queue after W2-60a). W2-104 REFUSED again: run-4 merge 0e469cc379cd (took integrate's side exactly) still differs from git's own merge -> MY DEC-1173 (1) merge form WRONG; correct form: a merge conflicting in tests/acceptance is committed by the independent test designer (its Role on the merge). P-9b script drafts/p9b-w2-104/apply.sh sha 276ab3d83d02 (rehearsed) to the owner. W2-94 GOLD DONE 72a339b9d7b5 -> operator re-runs check_gold (expect 19/20, q02 only), then land; q02 package owed.
+- **22:01 clock:** ACT-CLAUDE-RULES-1 APPLIED 62da0dcbc. W2-60a LANDING (land.txt). Then W2-104 050a3e9a1725, W2-93 206d2b47d7f5, W2-116 f9d473b871f7 (land.py --check each first). W2-88b run 2 released (P1 fixed c0cfe3099, P2 (a)); P3/P4 to the owner. DEC-1175 to record after the lands (no commit during a land).
+- **23:20 (21:57 clock):** owner's 3 commits IN: P-9 c9ce1e5c0, LANDING 80d1da428 (APPROVED ef5afbac), CLASS-RULES 5f13be0ef (APPROVED 4209aac2, the install now). act-in-progress REMOVED. yes CLAUDE-RULES-1 38d4a2df LOGGED + .req QUEUED (operator 22:00). Committed: TRAILERS record 252091c8b; Verify patches + DEC-1171 marks + W2-130/W2-174 claims f2b1d38af. land.py G-1 now honours path-map acceptance_exemptions (32 tests pass); W2-60a check PASSES -> land.txt after the operator's commit, then W2-104, W2-93, W2-116. Released: W2-174 run1, W2-130 run1, W2-61h-c39. DEC-1175 still to record.
+- **23:10 UTC OWNER:** LANDING-72C6 (a). Operator running P-9 -> LANDING -> CLASS-RULES now. log/act-in-progress.txt WRITTEN (21:46 clock). NO COMMIT OF MINE until both commit ids + APPROVED line arrive; then remove act-in-progress.txt, commit TRAILERS-UNPARSED record (drafts/landing-72c6/), DEC-1175 (W2-94 GOLD; yeses; §7 neither; LANDING-72C6 (a); APOS-3/4, GOLD-2), the Verify patches, then lands W2-60a, W2-104, W2-93, W2-116, then queue CLAUDE-RULES-1 on the owner's yes.
+- **23:05 UTC:** 30 not-started sorted: DEFERRED W3 (DEC-954): W2-17, W2-18, W2-19, W2-34, W2-35, W2-36, W2-42; PARKED (DEC-1142 (8)): W2-115b, W2-121c, W2-121d; after the copy starts: W2-60b, W2-156, W2-186; EXAMIN chain: W2-27, W2-28, W2-29, W2-30, W2-82; end: W2-46, W2-47, W2-00; after a land: W2-184 (W2-60a), W2-100, W2-101 (W2-104); W2-15b (W2-15a). STARTED: W2-185 run1, W2-88b run1 (claimed 31eab2103, worktrees made). W2-130, W2-174, W2-15a + W2-61h-c39 need Verify clauses: helper drafting drafts/verify-20261113/ -> commit -> briefs (W2-61h-c39 brief part written, worktree made).
+- **22:45 UTC:** W2-94 gold PACKAGES: td-3 cases merged (29 red), but no role could change check_gold.py (path map denies td the read; launcher.py:255 refuses an engineer on an auditor ticket) -> GOLD-2 (A): ticket role engineer (db09788ff) -> gold2 RELEASED. Row: check_gold.py classed {ticket_impl} vs S4 "the test designer's script".
+- **22:35 UTC:** W2-42a apos2 narrow FAIL F1 (# inside ${…} dropped a later write, fails open) -> APOS-3 (1) fix now (my P2, DEC-1154 narrow), APOS-4 (a) departure 1 (python3 -c writes are targets, fails closed) + F4 here-strings; rows F2, F5 -> apos3 RELEASED. W2-94 GOLD run RELEASED (W2-94-A5-gold). Record all with DEC-1175 after the owner's 3 commits.
+- **22:22 UTC:** W2-116 DONE f9d473b871f7 (accept 60/0; 7 files 127 passed; scoped 6 reds were its own record YAML, fixed). LAND QUEUE after the owner's 3 commits: W2-60a a7aa762ab890, W2-104 050a3e9a1725, W2-93 206d2b47d7f5, W2-116 f9d473b871f7 (one at a time, land.py --check first).
+- **22:15 UTC:** CLAUDE-RULES-1 b2 review PASS (review.md placed); rows F1 (held-out text narrower than the hook: fails closed), F2 (acceptance-writer sentence wider than the hook), F3 HOOK GAP: file-tool/plain-shell writes into ANOTHER worktree's tests/acceptance pass the live hook (landing G-1 still refuses the commit) -> hardening list with the W2-42a live-hook ACT. Yes line 38d4a2df after the CLASS-RULES commit.
+- **22:05 UTC:** CLAUDE-RULES-1 round b2 BUILT (38d4a2df, 49 ok; F1-F3 folded; b1 kept as round-b1) -> review running (reviews/act-claude-rules-1-b2.md) -> review.md -> owner yes after CLASS-RULES commit, then .req for the operator agent.
+- **22:00 UTC OWNER:** push DONE (integrate ..e437c799c, record ..429dc5715). W2-93 validator VALID (60 hidden, 6 repos, 13 variants) -> LAND 206d2b47d7f5 after the ACT commits. W2-94 GOLD: (a) for q01/q12; draw: CHECK accepts literal SEED+k= (set unchanged); correct §6 to SEED+<k>= (indep-briefs = O, owner route); q02 real defect -> package (writer fix or retire). yes LANDING 973eba5f §7 neither, (a) later; yes CLASS-RULES 244d5a39 (logged). Operator order: P-9 (cc56a05603c8) -> LANDING (act-in-progress.txt while) -> CLASS-RULES -> then I land W2-60a, W2-104, W2-93. LANDING-72C6 (a): owner asked to see it in full first (drafts/landing-72c6/TRAILERS-UNPARSED-20261113.md, 12 commits incl 713fcf744).
+- **21:45 UTC:** CLAUDE-RULES-1 (b) review PASS with F1-F3 text rows (rules 2d + sudo missing; 2b/2c; DEC-953 item 2 = four, fifth DEC-954) -> builder REBUILDING with F1-F3 (old as round-b1), then a fresh narrow review, then owner yes after CLASS-RULES applied. W2-104 run 4 narrow PASS (050a3e9a1).
+- **21:35 UTC:** W2-116 pass 2c RELEASED (7 files widened 9a467f336). LANDING-CTO-ROUTE-1 review READY (review.md placed; F1 fails-open trailer reuse -> owner §7 choice; rec neither now + (a) later). Both O yes lines to owner (LANDING 973eba5f first, CLASS-RULES 244d5a39). W2-42a PACKAGES: APOS-1 (A) decide.py _lift_in too, APOS-2 (i) recorded (acts/ACT-GUARD-FIX-5.live-hook-paired-apostrophe.md) -> apos2 released.
+- **21:15 UTC:** W2-37 CLOSED d984c5677 (accept 120/0; copies cases 34 passed; landing check GREEN after COPIES-9). W2-42a REOPENED (abadad60e) + fix run released (W2-42a-A5-apos). Rows: W2-37 conftest:566 + count rename.
+- **20:55 UTC:** DEC-1174 COMMITTED 454771c4e (GUARD-FIX-5 (b): product parser fails closed on F1 but refuses harmless apostrophe-comment heredocs -> fix W2-42a parser first (my P2, DEC-1164 (18)), then one live-hook ACT; P-EXAMIN-CTO-1 yes + 2 conditions: restart after A0 + precondition probes; write rule = decide.py _path_allowed; findings in clone .gov-runtime/scratch/govos/). COPIES-9 APPLIED e437c799c (re-run W2-37 claude-copy etc, then close W2-37). P-9 script FIXED to DEC-1173 ids: sha cc56a05603c8 (owner told). CLASS-RULES review READY (placed review.md; yes line 244d5a39, apply AFTER LANDING). GUARD-FIX-5 bundle WITHDRAWN.
+- **20:40 UTC:** ACT-CLASS-RULES-AGENTS-1 BUILT (O, 244d5a39, 91 ok) + ACT-CLAUDE-RULES-1 REBUILT (b, 199dd123, 49 ok; old round-O kept). REVIEWS RUNNING (3, Opus): reviews/act-class-rules-agents-1.md, act-claude-rules-1-b.md, act-landing-cto-route-1.md -> copy each to acts/<ACT>/review.md, then owner yes lines. ORDER: LANDING-CTO-ROUTE-1 first (both edit APPROVED), then CLASS-RULES-AGENTS-1 (operator by hand), then CLAUDE-RULES-1 (operator agent, .req).
+- **20:12 UTC FAULT (mine):** 11 commits since the summary had a blank line before Co-Authored-By -> Task/Role trailers unparsed; landing check P1 on 72c6def88 (W2-37 merge, kernel path). Package P1-LANDING-72C6 to the owner (rec (a) record + fix forward). Memory trailers-one-block written. FROM NOW: trailers and attribution in ONE paragraph.
+- **20:20 UTC:** W2-88 CLOSED (land 5bdb28bc9). W2-27 deps fixed 5b6ed1b49. DEC-1173 committed 73569aafd (next free DEC-1174). W2-37 HAND-MERGED 72c6def88 (after: its 4 review records committed on its branch 0ee2de2d9 schema-valid; kernel-approved.txt + 2 lines for change/SKILL.md cdf43a49 under DEC-1166 (4)). COPIES-9 QUEUED ~/gov-os-operator/queue/ACT-CLAUDE-COPIES-9.req (224deee3...) -> on apply: re-run W2-37 [claude-copy], W2-11 [change], W1-35 :845/:991, then close W2-37 (fresh accept). W2-37 rows: conftest.py:566 (mine, DEC-1156 (7)) + count-case rename (td). W2-104 run 4 needed (merge integrate taking integrate's side, td+eng re-add skilleval; W2-37's impact now on integrate).
+- **19:58 UTC OWNER REVISED:** the split: NO PLAN CHANGE (split helper STOPPED; drafts/split-dec/ void). Instead a separate EXAMIN CTO in the copy using only the product; I keep W2-27..30 + W2-94 as records. Package drafts/P-EXAMIN-CTO-1.md given (release cut needed after W2-88+W2-60a; clone ~/gov-os-runs/W2-27/examin; FINDINGS.md channel; replies in ~/gov-os-runs/W2-00/examin-replies.md). Fix W2-27 stale deps after W2-88's land (commit). GUARD-FIX-5 still ambiguous (asked again). Class-rules ACT helper still building.
+- **19:50 UTC:** W2-60a DONE a7aa762ab890 (accept 242/0, only red = P-9): land.txt after the owner's P-9 commit lands on integrate (and W2-88's land ends); then W2-27 can start.
+- **19:45 UTC OWNER:** P-9 (a) applied by the owner's operator now (+ backup push, W2-94 diagnostics, W2-93 validator; outputs follow). GUARD-FIX-5: the owner's line had BOTH (b) and (a) in brackets -> ASKED which. GO class-rules ACT (agent-instructions row) then CLAUDE-RULES-1 as (b): helper building (acts/ACT-CLASS-RULES-AGENTS-1). SPLIT yes in principle: one DEC (DEC-1174) for the owner's yes, helper drafting in drafts/split-dec/ (entry, tickets.patch incl. W2-27's stale deps, plan.patch, summary). DEC-1173 to record (CLAUDE.md (b) + go; P-9 (a); handover as written) after W2-88's land. Handover tomorrow: as written (owner yes). W2-37 DONE 9f4878987af8 -> hand merge after W2-88's land, then queue COPIES-9 .req; W2-104 run 4 after (merge takes integrate's side, then td + eng add skilleval).
+- **19:36 UTC:** W2-88 DONE df9f4910e00e (accept 217/0; scoped reds: W2-23:94 known + 2 W2-124 load cases pass alone) -> land.txt W2-88=df9f4910e00e (check passed). NO COMMIT ON INTEGRATE DURING THE LAND. NC2-1 (test pinning project.py) goes with my W2-23 P2. After land: W2-27 waits only on W2-60a (P-10 + owner's P-9 commit).
+- **19:30 UTC:** W2-88 run 6 narrow check PASS (df9f4910e; NC2-1 a row for my P2) -> DONE expected, then LAND (critical path). W2-104 PACKAGES: head 39ceaec2a ready (43/0, narrow PASS), W1-01 red on its own WIP merge 349341ab8f03 (the briefs' "save the merge with markers" form breaks DEC-253: ROW, fix the brief form: resolve before committing a merge). P-9 script now adds BOTH entries (sha 2f707e92f96b). After the owner's commit: land W2-60a (after P-10) and W2-104 39ceaec2a; W2-37 P-7 then merges integrate with W2-104's skilleval lines (keep both).
+- **19:20 UTC OWNER:** CLAUDE.md/AGENTS.md (b) row in class-rules (to record as DEC-1173; class-rules is (O): an ACT adding the row, operator by hand, precedent ACT-W2-148-S15-1; then ACT-CLAUDE-RULES-1 rebuilt as (b)). Owner asked the A/B/C sort of 190 tickets (sent drafts/W2-SORT-A-B-C-20261113.md: A 179, B 6, C 5) + Wave 0 / Wave 2 split; CHANGE NOTHING until the owner decides. Morning handover: new CTO line with --settings env GOV_ROLE/GOV_TICKET/CLAUDE_CODE_AUTO_COMPACT_WINDOW=300000 (given). Backup push: last 11-11 02:30; 957 + 17 commits ahead, both fast-forward. W2-104 run 3 narrow check PASS (39ceaec2a).
+- **18:50 UTC:** 18:00 digest delivered + marked (drafts/digest-1800-20261113.md); 16 guard refusals classified (4 true, 12 FP). W2-60a b19 merged 547bf1030 (older suites green, no assertion changed); P-10 (a) mine (DEC-1156 (7)): the w1_46_support.py:506 helper accepts the one role-file pair (P-4 (A)); the lead fixes test_w2_56_sandbox_block.py:105 deny order in its own code. P-9 still the owner's. For the next digest: P-10 (a) delegated. Owner's backup push last 11-11 02:30 (flagged).
+- **18:28 UTC:** W2-42a CLOSED (land 03c7ec427). DEC-1172 COMMITTED 579f889f4. cv58 P-8 widening f7ab50ac0, lead told (b19). CLOSED W2-128/W2-136/W2-147 0d08622f0 (accepts 121/76/25, 0 failed). W2-37 P-7 run RUNNING (paths 730477098; then MY HAND MERGE + queue COPIES-9 .req). W2-104 run 3 RUNNING (Verify bdcf7af73, template 713fcf744). W2-116 pass 2b QUEUED (8801ffd17: Q1 (a), Q2 (b) rebuild.yaml in ticket, Q3 (a)). Digest written drafts/digest-1800-20261113.md (delivered 18:30, --mark). Owner waits: P-9 (a), W2-94 diag outputs, W2-93 validate, GUARD-FIX-5. Next: W2-145 after W2-104 merges; W2-61h count-39 test designer; h10 (a) brief variant.
+- **18:05 UTC:** OWNER: W2-88 NC-1 (a) -> run 6 RELEASED (briefs/W2-88-A5-run6.md). W2-23 project.commit reset = CTO P2 under DEC-1164 (18) after W2-27 starts, before EXAMIN real adoption, listed for reading. DEC-1172 drafted (drafts/dec-1172/entry.md + DND 188, 189): COMMIT WHEN W2-42a's LAND ENDS, with the DAEO-cv58 widening for W2-60a P-8 (a) (my decision, DEC-1156 (7): the support modules W1-28/W1-32/W1-46/W1-50/W2-116/W2-136/W2-20/W2-56 (2 files) + tests/unit/resources/test_w2_20_unit_launch.py, test_w2_20_round3.py, conftest.py), THEN message the W2-60a lead (uds:/tmp/cc-socks/2907548.sock) to start b19. P-9 (a) to the owner (owner commit drafts/p9-w2-60a/apply.sh, sha b95a377d5a2f, DEC-1172 cites it; pushed). W2-94 gold: P-W2-94-GOLD-1 (drafts/), rec (a) check fix + (d) draw line; operator runs drafts/w2-94-gold/gold_diag.py draw + tokens q02. GUARD-FIX-5 package pending.
+- **17:35 UTC (the dated lines below are UTC+1):** ACT-GUARD-FIX-5 r2 NOT READY. F1 confirmed by my run (reviews/act-guard-fix-5-f1-run.md: 4 of 4 deny->allow). Record placed at acts/ACT-GUARD-FIX-5.review-round-2.md. DO NOT APPLY. Package drafts/P1-GUARD-FIX-5-R2-1.md went to the owner (rec (a) round 3). W2-42a LANDING since 17:33: my untracked P1-W2-88-NC-1.md had held it ("main tree not clean"), committed 5a2f5223c. **Never leave an untracked file in the main tree: it blocks lands.** W2-93 DONE 206d2b47d7f5, ready line commented out; validate_hidden on the real delivery goes to the owner's operator (message sent). Next: W2-94 and W2-93 lands after the operator's results; W2-37 hand merge after the land.
+- **Integrate head** b3106ac57 (+ my commits after it). Closed today in this session: W2-88a, W2-111, W2-183 (lands), W2-98 (hand merge + COPIES-7), W2-139, W2-140, W2-150, W2-32, W2-137 (DEC-953 practice). Recorded: DEC-1165..DEC-1170 (DEC-1164 ACCEPTED 16:00 with 6 corrections, NOT YET RECORDED: see below).
+- **Owner decisions in force today:** DEC-1165 ceiling (W2-183 done/closed); DEC-1166 yeses (COPIES-8/7 applied, DISPATCH slot applied 7cc654e49 accepted); DEC-1167 (RV2-1 (a), P-5 (B), cuts, E (1), W2-111 (a)+(c), SANDBOX-1 (b)); DEC-1168 B4 (a) W2-186; DEC-1169 W2-32 own review + status block names each new ticket WITH its approving decision; DEC-1170 gitleaks off (private repo, never raise again). GUARD-HEREDOC (a), no hold on launches (owner 16:15; record in the DEC-1164 batch as DEC-1171).
+- **DEC-1164 RECORDED b97d9604b** (entry, 31 marks + 2 extra, DIF, archive). The owner's operator commits drafts/dec-1164-final/prompt.patch (files sent). Open question to the owner: the "Your own record edits (DEC-868)" paragraph is half-lifted (record_checks.sh lifted by DEC-953; the placeholder scan, DEC-893, nowhere lifted). Record GUARD-HEREDOC (a) as DEC-1171 next.
+- **Leads running/queued (dispatch/ready.txt):** W2-88 run 5 (RV2-1 fix, W2-27 gate), W2-42a resume (F1 fix round then review r2, W2-27 gate), W2-60a run 5 (b12/b13/b15, P-6 (a) command.py, P-7 (a) vendored version, LAUNCH_CODE_ROOT=main tree for workers, W2-27 gate), W2-153 routed line, W2-116 pass 2 (S2), W2-93 close run, W2-94 close run. W2-182 DONE 04914c869ed3 -> LAND after fixing docs/changes/W2-98-CIT-P.md front matter (invalid YAML line 10 col 179: quote the value) which reds W2-02 core-schema. W2-104 run 3 brief ready (briefs/W2-104-A5-r3b.part.md, build with gov brief lead DAEO-drhj --run build) -> release AFTER W2-182 lands. W2-37 DONE 7bde87727b0f -> hand merge after W2-182 lands with P-7 (`impact` in src/gov/check/commands.py; W1-07/W1-32 lists by a test designer) + conftest _CBM_SUITES W2-37 + COPIES-9.
+- **ACTs:** COPIES-9 review PASS (placed acts/ACT-CLAUDE-COPIES-9/review.md 17:20; owner line `yes ACT-CLAUDE-COPIES-9 224deee3` asked); was: review RUNNING -> on PASS bring `yes ACT-CLAUDE-COPIES-9 224deee3`; applies after W2-37's hand merge. ACT-GUARD-FIX-5 round 1 FAIL (F1 loosens unquoted-body substitutions; F2 pycache) -> round 2 building by the same helper -> fresh review r2 (the last) -> owner yes. ACT-LANDING-CTO-ROUTE-1 + ACT-CLAUDE-RULES-1 building (helper). Round-1 record: acts/ACT-GUARD-FIX-5.review-round-1.md (beside the bundle).
+- **W2-61h:** owner's operator ran the hidden-form check: 6/1 (3 moved blocks h22 e1,e2, h23 e1) -> I gave the re-anchor message (repin_gold.py dry run, --write, re-check). On `7 passed`: close W2-61h, then W2-134.
+- **Remaining merged-not-closed:** W2-145 (needs watcher retirement: rerank_service_slot_hold.py --watch pid 31778 retires when live worktrees carry 22b734cb1 — W2-104 merge + sweep the dead worktrees of closed tickets; then commit reviews/w2-145.md as docs/probes/DAEO-2tfd/PR-DAEO-2tfd.md with implementer_session; close), W2-155 (after W2-145, W2-138), W2-138 (after W2-116), W2-136 + W2-147 + W2-128 (after W2-182 lands), W2-61h + W2-134.
+- **Helpers out:** effort breakdown (research, drafts/effort-20261113/REPORT.md) -> paste to owner as 100 % tables; DEC-1164 final; COPIES-9 review; GUARD-FIX-5 r2; two route ACTs.
+- **Owner given 17:05:** effort report (drafts/effort-20261113/REPORT.md, sent) and DEC-1164 operator files. W2-182 LANDING (land.txt) since 17:00; W2-98 CIT-P YAML fixed 6d1b7815f.
+- **Tools changed (mine, class O):** landing_select.sh PATH (~/.local/bin, Node 22, /usr/local/bin); launch_worker.sh LAUNCH_CODE_ROOT opt-in (tests pass). Withdrawn: drafts/act-sandbox-cache-1 (WITHDRAWN.md).
+- **18:20:** ACT-GUARD-FIX-5 r2 BUILT (manifest ef9078eb, 52 ok, stricter-only over 1,280 calls); review r2 RUNNING -> record at reviews/act-guard-fix-5-r2.md, then CTO copies it to acts/ACT-GUARD-FIX-5/review.md and brings `yes ACT-GUARD-FIX-5 ef9078eb`.
+- **18:15:** W2-42a DONE 5d58123b11c4 (review r2 PASS), LANDING (critical path). ACT-GUARD-FIX-5 r2 can reuse W2-42a's merged fix as reference.
+- **18:10:** W2-153 CLOSED 17:06 (land). P1-W2-88-NC-1 to the owner (pushed; run 6 on (a)). NO land running now: free to commit. DO NEXT: W2-37 hand merge (kernel gate, P-7, conftest _CBM_SUITES) then queue ~/gov-os-operator/queue/ACT-CLAUDE-COPIES-9.req (224deee3dfa544f924e686ebb52e0d6e58586c846c96fa0a6de8a81e1b78dd79); closes W2-128, W2-136, W2-147 (fresh accepts); W2-104 Verify + role template; W2-116 pass 2b; 18:02 evening digest overdue -> write it.
+- **18:00:** W2-182 CLOSED 16:48; DEC-1171 committed dff6e4661; W2-153 LANDING (land.txt). W2-104 NOT launchable: (1) KPI_NO_VERIFY on S1-S4, F1-F3 -> add Verify clauses from tests/acceptance/W2-104/README.md on refs/heads/w2/W2-104 (git show), commit; (2) its old branch lacks .claude/templates/role-lead.md -> commit integrate's copy onto w2/W2-104 in its worktree (precedent W2-60a 7ff4b82c9), then gov brief lead DAEO-drhj --run build --part briefs/W2-104-A5-r3b.part.md, release. NEXT after W2-153's land: closes W2-128, W2-136, W2-147 (fresh accepts first), W2-37 hand merge (P-7 + conftest + queue COPIES-9 .req), W2-116 pass 2b (state S2 interface + widen governance/project/rebuild.yaml), the 18:02 evening digest.
+- **17:50:** DEC-1164 prompt commit by the owner 56ffe611f. DEC-1171 WRITTEN, UNCOMMITTED (register + DIF + START-NEXT-SESSION 0a): commit as soon as W2-182's land ends (Task decision-record, Decided-by owner), then land W2-153, then W2-61h count-39 test revision (test designer) after the owner's h10 counts. CTO cap (d) TRIAL from the 11-14 morning handover: the operator's CTO launch line gets CLAUDE_CODE_AUTO_COMPACT_WINDOW=300000; morning digest reports stale facts / corrections / missed items / cost vs baseline (5, ~3, ~2).
+- **17:30 OWNER:** yes COPIES-9 224deee3 (approvals logged; queue AFTER W2-37 hand merge); h10 (b)+(a) (retire h10 now, count 39, (a) brief variant later); W2-15a Q-2 (a) 34 of 39 then 35 of 40; GUARD-HEREDOC (a) -> record all as DEC-1171 when no land runs. Owner asked: paste DEC-1164 operator message; paste "record edits: scan only" + "CTO cap 300k" (owner: DEC-1141 no cap; explain why it came back).
+- **17:10 NEW:** W2-116 pass 2 PACKAGES (log/W2-116-A5-pass2.json): S2's interface unstated + this repo's refresh times need `governance/project/rebuild.yaml` (outside paths) -> decide (mine, DEC-1157 (12)): state S2's interface in the ticket (two times in rebuild.yaml or facts; gov status line) + widen by rebuild.yaml, rebrief pass2b, release. ACT-LANDING-CTO-ROUTE-1 (973eba5f, class O, 66 ok) and ACT-CLAUDE-RULES-1 (83c5faf6, class O: CLAUDE.md/AGENTS.md match no row; text follows pretooluse.py's real five rules) BUILT -> start independent reviews (operator reviewer brief), then owner yes lines; ask the owner: a (b) row for CLAUDE.md/AGENTS.md or (O) by hand. Owner asked: the effort report (sent 17:05), DEC-1164 prompt files (sent).
+- **Rules learned today:** status block lists each new ticket + its approving decision (DEC-1169 (2), memory file); the guard crashes on some Bash heredocs (row 123) — use the Edit tool for file edits; a zero-byte read-only .git/config.lock is a sandbox placeholder while workers run (B5 sweep, don't remove live).
+
+## RESUME HERE — 2026-11-13 12:58 UTC: session `f3886235` (fresh; cto-session.txt written 12:41). Next free id DEC-1166 (DEC-1164 held, PROPOSED, the owner reading).
+- **Done this session:** test push sent; old session's orphaned watchers (started 11:19, ppid 1) stopped by -pgid and re-armed here (inbox waiter, helper_watch, sentinel_check, bare_watch, store_refresh_daily, usage_log, usage_lines, refused_starts, measure_week loop); digest crons c472762e (18:02) and 950087be (09:02). Landing-select RED of 11:25 (head 36d1a151b) triaged: NEW red = docs/probes/DAEO-lrre/PR-DAEO-lrre.md lacked `implementer_session` -> fixed 63bebafd7 (4 cases pass); known: W2-128 row 8 x2 (W2-182 F), W2-153 x4 (COPIES-8), W1-05 p95 x9 (bench load). DEC-1165 + W2-183 (DAEO-href) + DEC-1163 (1) exception note + START next id + DNDone row 180 + packages/P-W2-111-MEASURE-1-R2.md: 36fc597ca. record/w2 429dc5715.
+- **Bench DONE 12:47** (drafts/w2-111-bench/formB): quiet 15/15, load20 14/15 (W2-57 judged 172.5/138.8/104.0), load50 15/15, planted 15/15 fail at both. Package R2 to the owner: rec (a) land + (c) a guard speed ticket (owner files). W2-111 (3da7242f4461) still HELD.
+- **Landing:** dispatch/land.txt = W2-88a=c79a20f1fa69 (pre-check passed, kernel gate 0) released 12:52. NO commit on integrate until it ends (3-move limit). After it: add CAP-15.d to DAEO-href's sources (structural pass link notice).
+- **Leads:** W2-88 run4b pid 13859, W2-37 pid 95691, W2-182 pid 428527 (all NO add-dir; pid waits armed). W2-37's worker ps-4e exited 1 (helper-watch 12:06): its lead handles it. Message 5 to the owner when all three have ended (re-run the /proc check of acts/ACT-LEADS-ADD-DIR-1.package.md §5).
+- **Owner items brought 13:00:** yes COPIES-8 e2fc9815 (-> queue ~/gov-os-operator/queue/ACT-CLAUDE-COPIES-8.req "ACT-CLAUDE-COPIES-8 <full sha256>", act-in-progress absent, no land running); yes COPIES-7 78de1c5f (-> hand merge w2/W2-98 head ab2d4fdc9e13, Task DAEO-wi46, one command, then queue COPIES-7, close W2-98); yes DISPATCH-NIGHTLY-SLOT-1 9ff4f275 (review in acts/…/review.md, pycache removed; the CTO applies, class b: apply.sh check/apply/verify, then followup-tests.diff); P-W2-111-MEASURE-1 R2; DEC-1164 (owner reading); sandbox decision (drafts/sandbox-package-20261113.md).
+- **13:05 P1-W2-88-RV2-1 to the owner (pushed):** W2-88 round 2 FAIL, RV2-1 blocker (A9 undo = reset --hard). On (a): the lead (or a fresh one in the worktree) fixes fabric.py + RV2-2, then a narrow independent check (DEC-1154), then land.
+- **13:35:** W2-88a CLOSED 13:13 (655421b3d). 4233668ea: W2-183 claimed + W2-182 widened (tests/acceptance/W2-182/**) + P1 package; 00c6b1101: the setting is budgets.close_context_tokens. Released: W2-182 run 2, W2-183 run 1. Ready (commented): W2-88 run 5 on the owner's RV2-1 (a).
+- **14:25:** owner 13:50: yes COPIES-8 (queued .req), COPIES-7 (hand merge W2-98 after COPIES-8 lands, then queue), DISPATCH-NIGHTLY-SLOT-1 (applied 7cc654e49 + tests 689abbafa; landing check P1 on Role: orchestrator -> owner), W2-37 CIT-P v1.1.0 (W2-37-A5-v110 released); DEC-1166 fc2b43eee. W2-42a RESUMED (missed at the lift): merge 4caf8475f, ticket de09ee318 + Verify 1ead5f91a, lead released. W2-182 run 3 PACKAGES P-W2-182-E-1 (my E line turns 4 reds) -> owner. Owner pending: RV2-1, the 18-Nov cuts (W2-60b, W2-156, W2-93, W2-94, W2-174 off W2-27's gate), W2-111 R2, SANDBOX-1, W2-182 E, accept 7cc654e49, DEC-1164.
+- **14:10:** MESSAGE 5 DONE (owner 14:05: additionalDirectories removed, backup .claude/settings.local.json.pre-dec1161). W2-60a run 4d released (finish its merge). Session check: one process (pid 949029), ps start times skewed ~+7 min by a WSL clock step; transcript continuous from 12:38:50.
+- **14:35:** COPIES-8 applied bb9dfca7a (operator); landing check RED 62 = cron PATH (58 env) + W2-128 row 8 x4: landing_select.sh PATH fixed, re-run by hand running. W2-98 hand-merged 380860ef1, COPIES-7 applied f351c7286, checks 824/0, W2-98 CLOSED 229924171, worktree + branch removed.
+- **15:25:** owner 14:45 decisions recorded DEC-1167 81d16e088 (W2-184 DAEO-6f0s, W2-185 DAEO-qyt2 filed; cuts applied; W2-60a S3/S4/S8/S10 restored, S11/F4 out; then S10 moved to W2-184 too, UNCOMMITTED in .tickets/DAEO-cv58.md: commit after W2-111's land). Released: W2-88 run 5, W2-60a run 5 (LAUNCH_CODE_ROOT, P-LB-1 (1)), W2-182 run 4 (E reverted f299a5eb6). W2-111 LANDING since 14:48. W2-145-cause worktree: reranker log fix + test (suite run bvj73tss7), then narrow check + hand merge (DEC-1088 (6)). Helpers: COPIES-9 + adopt copy (rebuild), B1 drafts, B3 probe, ACT-LANDING-CTO-ROUTE-1 + ACT-CLAUDE-RULES-1. W2-93/W2-94: lacks validator, acceptance, --sets-root, S4 script, W2-61 close line, owner git-status step.
+- **Next:** COPIES-8 landing -> W2-98 hand merge + COPIES-7; W2-174 claim if the owner cuts it to parallel; message 5 done -> W2-60a merge.
+
 ## RESUME HERE — 2026-11-12 20:05 UTC (context 85 %): read `drafts/digest-0900-20261113-items.md` (the 09:00 digest's items).
 - **12:25 — HANDOVER TO THE FRESH CTO (the owner's order; session b2f0511f closes). READ THIS FIRST.**
   - **State of integrate:** head 775b430cd. Today: nightly Node 22 (8f68e0c7c); W2-33 merged f6163461e + template d172bc71f + COPIES-6 36d1a151b (Role owner) -> W2-33 CLOSED 3ec28e859; HOURS-3 B 44a290a49 + d2431568a (owner), HOURS-3 A applied by the CTO (crontab every 10 min); S15-1 4be656e70 (owner) -> W2-148 CLOSED ae6537878; "until W2-56" line deleted from the 3 sources b88a76172 (the owner's recorded EXCEPTION (a) to the control-path rule: add "(the owner's exception (a), COPIES-8's review covers it)" to DEC-1163 (1) in the next register commit); DEC-1163 df9d442e8 (moved after DEC-1162 in 3ec28e859); ACT-LEADS-ADD-DIR-1 applied by the operator agent 008c4e6c0 (companion merged c0918f144); W2-182 (DAEO-5y8d) filed and widened (775b430cd). Next free id DEC-1164 (DEC-1164 is drafted, PROPOSED).
@@ -33,9 +169,13 @@
 - **06:37:** W2-111 benchmark RUNNING (drafts/w2-111-bench/bench.sh -> bench.out, *.log, *.figs; quiet, load 20, load 50, planted at both; burners by -pgid). Helpers: W2-142 adoption count (tools/adoption_count.py -> log/adoption/20261113.*), W2-56 close review (drafts/w2-56-close/PR-DAEO-wnnz.md, incl. GOV_W2_56_REAL + gate (a)), nightly reds analysis.
 - **06:35:** deadman wake. NIGHTLY RED 99 (log/nightly/20261113-0404/run.txt; last night 15); many red-alone incl. W2-66 close cases: suspect W2-154 (landed 02:20). Analysis helper running -> drafts/nightly-20261113-analysis.md. S15 ACT review PASS (review.md written). STILL TO DO: W2-111 load-50 benchmark (run_real.sh in W2-111 worktree, slots free now), W2-56 close probe + real cases, W2-142 S3 reading, the 09:00 digest (items 1-32) + handover.
 - **05:36:** W2-88 run 3: review r1 FAIL (3 blockers); P-W2-88-B-1 decided by me (94132594a), run 4 RELEASED (fixes + round 2, the last). S15 ACT review running (acts/ACT-W2-148-S15-1). Nightly running.
-- **04:58:** deadman wake handled. Nightly RUNNING since 04:04 beside leads (cap 12 GiB, 16 workers, slots held 04:32). W2-113 CLOSED (cb208f943). W2-145 S7 recorded (335c8f3c5) + finding: sandboxed workers' searches unranked (read-only ~/.cache/gov-os), digest item 29. W2-148 S15 ACT helper running (acts/ACT-W2-148-S15-1). After the nightly (~05:30): W2-111 load-50 benchmark (run_real.sh in W2-111 worktree), W2-56 close probe + 4 GOV_W2_56_REAL cases. Still waiting on the owner: go W2-33, W2-98 CIT-P, HOURS-3 yes, W2-37 F1.
+- **(~04:35 real):** deadman wake handled. Nightly RUNNING since 04:04 beside leads (cap 12 GiB, 16 workers, slots held 04:32). W2-113 CLOSED (cb208f943). W2-145 S7 recorded (335c8f3c5) + finding: sandboxed workers' searches unranked (read-only ~/.cache/gov-os), digest item 29. W2-148 S15 ACT helper running (acts/ACT-W2-148-S15-1). After the nightly (~05:30): W2-111 load-50 benchmark (run_real.sh in W2-111 worktree), W2-56 close probe + 4 GOV_W2_56_REAL cases. Still waiting on the owner: go W2-33, W2-98 CIT-P, HOURS-3 yes, W2-37 F1.
 - **03:26:** W2-33 hand-merge check DONE (log/hm-W2-33.out): merge clean, kernel gate ok, W2-33 acceptance 96/96, tests/unit 4530 passed + 2 failed (the W2-153 adapters cases the copies ACT fixes). HOLDING the merge for the owner's "go W2-33" (pushed 03:26) so integrate is never in the copies window during the nightly. On "go": git merge --no-ff refs/heads/w2/W2-33 (Task: DAEO-lrre trailer, one command), template-patch apply + commit, push READY, operator applies COPIES-6, checks, close W2-33, restore land.txt (W2-113 only). If no answer: at 09:00.
 - **02:35:** W2-33 DONE at 82da49202ab1 (narrow check PASS). land.txt HELD (moved to dispatch/land.held-for-w2-33.txt: W2-154 then W2-113) until the hand merge: after W2-154's land ends: hand merge W2-33 + template commit, push the owner READY, owner's operator applies COPIES-6, checks, close W2-33; then restore land.txt with W2-113 only.
+- **03:43:** W2-184 FULL review round 2 FAIL F1 (td launch from tests worktree never sees the probe records) -> owner package (DEC-1010) when the lead returns.
+- **03:42:** W2-104 CLOSED again (harness fix). W2-101 run3 RELEASED. Leads: W2-184, W2-100 run2, W2-88b run4, W2-101 run3.
+- **03:38:** W2-104 harness fix DONE c9f07ef3782b (narrow PASS) -> LANDING. Then W2-101 run3 brief (L1 + 9 scenarios + round 2).
+- **03:01:** W2-185 CLOSED. W2-104 REOPENED c82335a40 + fix run released (W2-104-A5-sum). Interfaces condensed (CTX-1). After W2-104 lands: W2-101 run3 (L1, re-run 9 scenarios, round 2) and W2-100 same if needed.
 - **02:32:** operator ACT HOURS-3 review PASS (acts/ACT-OPERATOR-HOURS-3/review.md); package yes line fixed to 716da9dc; pushed the owner (Part B by the owner's operator first, then Part A by the CTO). Copies ACT: the owner said yes (02:20); hand-merge plan + operator message given.
 - **02:25 — STATE FOR A FRESH CONTEXT (session b2f0511f, context 85 %).** Owner decided tonight (recorded): DEC-1156 to DEC-1161 (no holds; emergency lifted; nightly beside leads + min 7.5 GiB; W2-33 CIT-P approved C0 Haiku low; P-W2-98-R2 (a); W2-60a P-1 at handover). NOT YET RECORDED: owner 02:20 **W2-141 (a)** (close as built, switch-on parked as a DECIDED-NOT-DONE row under DEC-1128 (2)) and **`yes ACT-CLAUDE-COPIES-6 85c9b1c7`** -> record both in DEC-1162 (commit BETWEEN lands only: my commits stopped W2-154's land once, the queue's 3-move limit).
   - **W2-33 hand merge tonight (owner wants it):** (1) wait: the land of W2-154+W2-113 (land.txt has both; W2-154 alone started 01:54, may refuse; then both) and W2-33 run 4 DONE (its head 9ace61e8c has the W1-33 revisions and the approval line; lead w2-33-bc doing the narrow check); (2) CTO: hand merge w2/W2-33 into integrate (tools/hand_merge_check.sh, kernel gate passes: kernel-approved.txt has its 10 hashes), then the template commit: bash drafts/claude-copies-6/template-patch/apply.sh (read it) and commit (Role: orchestrator); (3) owner's operator applies COPIES-6 by hand (message given 02:25: acts/ACT-CLAUDE-COPIES-6.package.md §4, Role: owner); (4) CTO: checks (W2-33 acceptance, W1-33, W1-38, W2-153, tests/unit/adapters, kernel gate), close W2-33 (tk close + close record). Hold land.txt empty during it; leads not merging integrate meanwhile.
@@ -1436,162 +1576,155 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-13T06:33:53Z fd026884930ac37134b26758b863f4a81275d0e9cbc7619a7c57ecbce544bdd7
-git head: 94132594a02ab39adad785b5f4b46612b5f00560
+generated: 2026-11-14T03:44:52Z 6bcddbb2e2b81e929688c86ddbaec3b3a2430934589922004adf2ad3dbb95921
+git head: f3d3438fcb45c765928557d78aa8791136464ccd
 tickets in progress (`tk ls --status=in_progress`):
-  DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
-  DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the memory line <- [DAEO-g0ip, DAEO-rd0g]
-  DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
-  DAEO-5ce2 [in_progress] - W2-140 W2-49's acceptance suite for Contract 4.3
-  DAEO-5emz [in_progress] - W2-137 The shared reranker's request cap raised
-  DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
-  DAEO-8s85 [in_progress] - W2-153 The role template delivered at launch (W2-128's code half, part 2)
+  DAEO-6f0s [in_progress] - W2-184 RUBRIC-2 at launch (from W2-60a) <- [DAEO-cv58]
+  DAEO-6icv [in_progress] - W2-101 Domain skills B <- [DAEO-drhj]
+  DAEO-aks1 [in_progress] - W2-88b gov adopt's smoke run on two real public repositories (a child of W2-88) <- [DAEO-2bdu]
   DAEO-ar89 [in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget
-  DAEO-cv58 [in_progress] - W2-60a The role, its skills and its model and effort loaded at launch; the launch record
-  DAEO-drhj [in_progress] - W2-104 The skill evaluation harness
-  DAEO-f58b [in_progress] - W2-116 The designers' store in the product <- [DAEO-ecac, DAEO-lrre]
-  DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
-  DAEO-ijf5 [in_progress] - W2-150 Memory's import closure free of the gates (E-2's four edges)
-  DAEO-lrre [in_progress] - W2-33 Wave 2 roles and typed handoff records <- [DAEO-g0ip]
   DAEO-m4rq [in_progress] - W2-134 The measure re-anchors in memory <- [DAEO-h2k3]
-  DAEO-ongl [in_progress] - W2-139 CAP-45.a to Wave 3: the Contract edit (version 4.3)
-  DAEO-p3ln [in_progress] - W2-136 gov plan: the dependency map and the launch batches <- [DAEO-t8mp, DAEO-r30l]
-  DAEO-pg6i [in_progress] - W2-88a The adopt skill's kernel text (a child of W2-88)
-  DAEO-qskx [in_progress] - W2-142 Search again once in the kernel skills
-  DAEO-qvff [in_progress] - W2-111 The hook-latency cases time the hook's own work <- [DAEO-nqa2]
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
-  DAEO-t8mp [in_progress] - W2-128 The templates (P1-7, R3-TEMPLATES §D) <- [DAEO-o5x1, DAEO-8s85]
-  DAEO-wi46 [in_progress] - W2-98 The spec-writing skill for product-spec <- [DAEO-k7hz]
-  DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
-  DAEO-xafn [in_progress] - W2-148 The operator agent: ACTs applied by class from a queue, in a walled session
-  DAEO-zi7s [in_progress] - W2-147 gov plan breaks a cycle only at a ticket inside it
+  DAEO-uw5h [in_progress] - W2-100 Domain skills A <- [DAEO-drhj]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS        94132594a [w2/integrate]
-  /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
-  /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
-  /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record         ae24d9087 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a        94132594a (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b        335c8f3c5 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-04                c77dc358d [w2/W2-04]
-  /home/usain/gov-os-worktrees/W2-05                52de591b8 [w2/W2-05]
-  /home/usain/gov-os-worktrees/W2-104               909d7ff0a [w2/W2-104]
-  /home/usain/gov-os-worktrees/W2-105               3341c7328 [w2/W2-105]
-  /home/usain/gov-os-worktrees/W2-11                6ba93fc8b [w2/W2-11]
-  /home/usain/gov-os-worktrees/W2-110               6a7862c03 [w2/W2-110]
-  /home/usain/gov-os-worktrees/W2-111               8b8b561fc [w2/W2-111]
-  /home/usain/gov-os-worktrees/W2-112-d10r2-tests   73e33d7b3 [w2/W2-112-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-113               f42f86309 [w2/W2-113]
-  /home/usain/gov-os-worktrees/W2-115               cb4510513 [w2/W2-115]
-  /home/usain/gov-os-worktrees/W2-120               1eec1209b [w2/W2-120]
-  /home/usain/gov-os-worktrees/W2-121               f45614f15 [w2/W2-121]
-  /home/usain/gov-os-worktrees/W2-121b              6e10493a5 [w2/W2-121b]
-  /home/usain/gov-os-worktrees/W2-122               3fc448601 [w2/W2-122]
-  /home/usain/gov-os-worktrees/W2-123               3de9bcf44 [w2/W2-123]
-  /home/usain/gov-os-worktrees/W2-124               80ee394a8 [w2/W2-124]
-  /home/usain/gov-os-worktrees/W2-128               5cfa4b28f [w2/W2-128]
-  /home/usain/gov-os-worktrees/W2-128-tests         eb1c4fbb8 [w2/W2-128-tests]
-  /home/usain/gov-os-worktrees/W2-128-tpl101        0aa20ac0c [w2/W2-128-tpl101]
-  /home/usain/gov-os-worktrees/W2-128-w108-tests    a0957eb56 [w2/W2-128-w108-tests]
-  /home/usain/gov-os-worktrees/W2-129-d6            0eb83d9ad [w2/W2-129-d6]
-  /home/usain/gov-os-worktrees/W2-129-d6-tests      7255284ac [w2/W2-129-d6-tests]
-  /home/usain/gov-os-worktrees/W2-129-f2            c031faba0 [w2/W2-129-f2]
-  /home/usain/gov-os-worktrees/W2-129-f2-tests      d0d071353 [w2/W2-129-f2-tests]
-  /home/usain/gov-os-worktrees/W2-13                5e5d74dde [w2/W2-13]
-  /home/usain/gov-os-worktrees/W2-136               921441f8d [w2/W2-136]
-  /home/usain/gov-os-worktrees/W2-136-tests         543b69540 [w2/W2-136-tests]
-  /home/usain/gov-os-worktrees/W2-137               f01d51a4e [w2/W2-137]
-  /home/usain/gov-os-worktrees/W2-137-tests         0cb8ba995 [w2/W2-137-tests]
-  /home/usain/gov-os-worktrees/W2-138               8fa4dab8a [w2/W2-138]
-  /home/usain/gov-os-worktrees/W2-138-d10r2-tests   3e403a285 [w2/W2-138-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-138-tests         9a93f9338 [w2/W2-138-tests]
-  /home/usain/gov-os-worktrees/W2-139               c0d6584e6 [w2/W2-139]
-  /home/usain/gov-os-worktrees/W2-140-tests         3fea21bb5 [w2/W2-140-tests]
-  /home/usain/gov-os-worktrees/W2-141               7716610e2 [w2/W2-141]
-  /home/usain/gov-os-worktrees/W2-141-d6-tests      92b38e74e [w2/W2-141-d6-tests]
-  /home/usain/gov-os-worktrees/W2-141-tests         eb70ba840 [w2/W2-141-tests]
-  /home/usain/gov-os-worktrees/W2-142               daf56805b [w2/W2-142]
-  /home/usain/gov-os-worktrees/W2-142-tests         510f3433b [w2/W2-142-tests]
-  /home/usain/gov-os-worktrees/W2-145               1be3e47de [w2/W2-145]
-  /home/usain/gov-os-worktrees/W2-145-tests         aadce89d6 [w2/W2-145-tests]
-  /home/usain/gov-os-worktrees/W2-146               ebdbabd2e [w2/W2-146]
-  /home/usain/gov-os-worktrees/W2-147               fd4b2763f [w2/W2-147]
-  /home/usain/gov-os-worktrees/W2-147-tests         cf55a4880 [w2/W2-147-tests]
-  /home/usain/gov-os-worktrees/W2-148               1af33c535 [w2/W2-148]
-  /home/usain/gov-os-worktrees/W2-148-f21           0fe71aa8b [w2/W2-148-f21]
-  /home/usain/gov-os-worktrees/W2-148-f21-tests     51f0c70b0 [w2/W2-148-f21-tests]
-  /home/usain/gov-os-worktrees/W2-148-replay        24abf75a1 [w2/W2-148-replay]
-  /home/usain/gov-os-worktrees/W2-148-replay-tests  841c64944 [w2/W2-148-replay-tests]
-  /home/usain/gov-os-worktrees/W2-148-tests         fab2be2a2 [w2/W2-148-tests]
-  /home/usain/gov-os-worktrees/W2-149               a929356ea [w2/W2-149]
-  /home/usain/gov-os-worktrees/W2-149-f11           ee534d2bc [w2/W2-149-f11]
-  /home/usain/gov-os-worktrees/W2-149-sgx           2f98aecbc [w2/W2-149-sgx]
-  /home/usain/gov-os-worktrees/W2-149-sgx-tests     be77be65a [w2/W2-149-sgx-tests]
-  /home/usain/gov-os-worktrees/W2-149-tests         8f456962f [w2/W2-149-tests]
-  /home/usain/gov-os-worktrees/W2-150               892c6f851 [w2/W2-150]
-  /home/usain/gov-os-worktrees/W2-150-f1-tests      389b264df [w2/W2-150-f1-tests]
-  /home/usain/gov-os-worktrees/W2-150-tests         321d2bf4b [w2/W2-150-tests]
-  /home/usain/gov-os-worktrees/W2-151               539437dff [w2/W2-151]
-  /home/usain/gov-os-worktrees/W2-152               2900a31d2 [w2/W2-152]
-  /home/usain/gov-os-worktrees/W2-153               cd7efdc67 [w2/W2-153]
-  /home/usain/gov-os-worktrees/W2-153-d10r2-tests   a7d476c16 [w2/W2-153-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-153-tests         9a6f55c5a [w2/W2-153-tests]
-  /home/usain/gov-os-worktrees/W2-154               7bcff333b [w2/W2-154]
-  /home/usain/gov-os-worktrees/W2-155               8da607e3d [w2/W2-155]
-  /home/usain/gov-os-worktrees/W2-157               30e969875 [w2/W2-157]
-  /home/usain/gov-os-worktrees/W2-158               23acb6361 [w2/W2-158]
-  /home/usain/gov-os-worktrees/W2-159               f08424c88 [w2/W2-159]
-  /home/usain/gov-os-worktrees/W2-15a               fd637510d [w2/W2-15a]
-  /home/usain/gov-os-worktrees/W2-160               54a64edba [w2/W2-160]
-  /home/usain/gov-os-worktrees/W2-170               75a5af14b [w2/W2-170]
-  /home/usain/gov-os-worktrees/W2-171               683ecd9c6 [w2/W2-171]
-  /home/usain/gov-os-worktrees/W2-172               d23959592 [w2/W2-172]
-  /home/usain/gov-os-worktrees/W2-173               5cbd79b4e [w2/W2-173]
-  /home/usain/gov-os-worktrees/W2-175               4c0c73472 [w2/W2-175]
-  /home/usain/gov-os-worktrees/W2-176               3b6c5cb79 [w2/W2-176]
-  /home/usain/gov-os-worktrees/W2-177               21627697d [w2/W2-177]
-  /home/usain/gov-os-worktrees/W2-178               6056c4f98 [w2/W2-178]
-  /home/usain/gov-os-worktrees/W2-179               996bffd9b [w2/W2-179]
-  /home/usain/gov-os-worktrees/W2-180               21dc73cb5 [w2/W2-180]
-  /home/usain/gov-os-worktrees/W2-181               499543a83 [w2/W2-181]
-  /home/usain/gov-os-worktrees/W2-20                057926aa3 [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-20-1017           1a54976c7 [w2/W2-20-1017]
-  /home/usain/gov-os-worktrees/W2-20-collect        a38809a33 [w2/W2-20-collect]
-  /home/usain/gov-os-worktrees/W2-20-tests          f12b7e00a [w2/W2-20-tests]
-  /home/usain/gov-os-worktrees/W2-23                6f171066f [w2/W2-23]
-  /home/usain/gov-os-worktrees/W2-27-citp           33f72aab2 [w2/W2-27-citp]
-  /home/usain/gov-os-worktrees/W2-32-proto          f8a5fdade [w2/W2-32-proto]
-  /home/usain/gov-os-worktrees/W2-33                82da49202 [w2/W2-33]
-  /home/usain/gov-os-worktrees/W2-37                65e8c0768 [w2/W2-37]
-  /home/usain/gov-os-worktrees/W2-40                29753c768 [w2/W2-40]
-  /home/usain/gov-os-worktrees/W2-42a               ce03bb8b3 [w2/W2-42a]
-  /home/usain/gov-os-worktrees/W2-42a-tests         6f4a6f3c9 [w2/W2-42a-tests]
-  /home/usain/gov-os-worktrees/W2-45                5e53394ce [w2/W2-45]
-  /home/usain/gov-os-worktrees/W2-52                a77ef5f20 [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-55-f2             2fe928a4c [w2/W2-55-f2]
-  /home/usain/gov-os-worktrees/W2-55-f2-tests       c5ed68d4e [w2/W2-55-f2-tests]
-  /home/usain/gov-os-worktrees/W2-56                befa57695 [w2/W2-56]
-  /home/usain/gov-os-worktrees/W2-56-d10r2-tests    843777f66 [w2/W2-56-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-56-f              1d5adb177 [w2/W2-56-f]
-  /home/usain/gov-os-worktrees/W2-56-f-tests        3ea3411e1 [w2/W2-56-f-tests]
-  /home/usain/gov-os-worktrees/W2-56-tests          85b28ef0f [w2/W2-56-tests]
-  /home/usain/gov-os-worktrees/W2-60a               7ff4b82c9 [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
-  /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
-  /home/usain/gov-os-worktrees/W2-66c               400991361 [w2/W2-66c]
-  /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-81                6e2003ff3 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-88                e9720a4a4 [w2/W2-88]
-  /home/usain/gov-os-worktrees/W2-88-tests          c3c5fdccd [w2/W2-88-tests]
-  /home/usain/gov-os-worktrees/W2-88a               c79a20f1f [w2/W2-88a]
-  /home/usain/gov-os-worktrees/W2-90b               cb0e69ba5 [w2/W2-90b]
-  /home/usain/gov-os-worktrees/W2-91-tests          3191a7948 [w2/W2-91-tests]
-  /home/usain/gov-os-worktrees/W2-92-d6             27d9ecaa3 [w2/W2-92-d6]
-  /home/usain/gov-os-worktrees/W2-92-d6-tests       cc6d5609f [w2/W2-92-d6-tests]
-  /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
-  /home/usain/gov-os-worktrees/W2-96-d10b           bb71be1cf [w2/W2-96-d10b]
-  /home/usain/gov-os-worktrees/W2-98                3a86f11c3 [w2/W2-98]
-  /home/usain/gov-os-worktrees/research-retrieval   a5c0c34f6 [w2/research-retrieval]
+  /home/usain/Dynamic-Agentic-Engineering-OS          f3d3438fc [w2/integrate]
+  /home/usain/gov-os-runs/W2-00/accept-20261113-eve   730477098 (detached HEAD)
+  /home/usain/gov-os-runs/W2-00/accept-w237-20261113  454771c4e (detached HEAD)
+  /home/usain/gov-os-worktrees/D6-F-tests             2761682a2 [w2/D6-F-tests]
+  /home/usain/gov-os-worktrees/EMG-queue              04568e140 [emg/queue]
+  /home/usain/gov-os-worktrees/W2-00-d10r2-records    66303c373 [w2/W2-00-d10r2-records]
+  /home/usain/gov-os-worktrees/W2-00-record           429dc5715 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a          f3d3438fc (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b          aeee743e9 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-04                  c77dc358d [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-05                  52de591b8 [w2/W2-05]
+  /home/usain/gov-os-worktrees/W2-100                 f7637bd03 [w2/W2-100]
+  /home/usain/gov-os-worktrees/W2-100-tests           26a1a98ce [w2/W2-100-tests]
+  /home/usain/gov-os-worktrees/W2-101                 3cd17b73e [w2/W2-101]
+  /home/usain/gov-os-worktrees/W2-104                 c9f07ef37 [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-105                 3341c7328 [w2/W2-105]
+  /home/usain/gov-os-worktrees/W2-11                  6ba93fc8b [w2/W2-11]
+  /home/usain/gov-os-worktrees/W2-110                 6a7862c03 [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-111                 3da7242f4 [w2/W2-111]
+  /home/usain/gov-os-worktrees/W2-112-d10r2-tests     73e33d7b3 [w2/W2-112-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-113                 f42f86309 [w2/W2-113]
+  /home/usain/gov-os-worktrees/W2-115                 cb4510513 [w2/W2-115]
+  /home/usain/gov-os-worktrees/W2-116                 f9d473b87 [w2/W2-116]
+  /home/usain/gov-os-worktrees/W2-120                 1eec1209b [w2/W2-120]
+  /home/usain/gov-os-worktrees/W2-121                 f45614f15 [w2/W2-121]
+  /home/usain/gov-os-worktrees/W2-121b                6e10493a5 [w2/W2-121b]
+  /home/usain/gov-os-worktrees/W2-122                 3fc448601 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123                 3de9bcf44 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-124                 80ee394a8 [w2/W2-124]
+  /home/usain/gov-os-worktrees/W2-128                 5cfa4b28f [w2/W2-128]
+  /home/usain/gov-os-worktrees/W2-128-tests           eb1c4fbb8 [w2/W2-128-tests]
+  /home/usain/gov-os-worktrees/W2-128-tpl101          0aa20ac0c [w2/W2-128-tpl101]
+  /home/usain/gov-os-worktrees/W2-128-w108-tests      a0957eb56 [w2/W2-128-w108-tests]
+  /home/usain/gov-os-worktrees/W2-129-d6              0eb83d9ad [w2/W2-129-d6]
+  /home/usain/gov-os-worktrees/W2-129-d6-tests        7255284ac [w2/W2-129-d6-tests]
+  /home/usain/gov-os-worktrees/W2-129-f2              c031faba0 [w2/W2-129-f2]
+  /home/usain/gov-os-worktrees/W2-129-f2-tests        d0d071353 [w2/W2-129-f2-tests]
+  /home/usain/gov-os-worktrees/W2-13                  5e5d74dde [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-130                 0fe423d8f [w2/W2-130]
+  /home/usain/gov-os-worktrees/W2-136                 921441f8d [w2/W2-136]
+  /home/usain/gov-os-worktrees/W2-136-tests           543b69540 [w2/W2-136-tests]
+  /home/usain/gov-os-worktrees/W2-137                 f01d51a4e [w2/W2-137]
+  /home/usain/gov-os-worktrees/W2-137-tests           0cb8ba995 [w2/W2-137-tests]
+  /home/usain/gov-os-worktrees/W2-138                 8fa4dab8a [w2/W2-138]
+  /home/usain/gov-os-worktrees/W2-138-d10r2-tests     3e403a285 [w2/W2-138-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-138-tests           9a93f9338 [w2/W2-138-tests]
+  /home/usain/gov-os-worktrees/W2-139                 c0d6584e6 [w2/W2-139]
+  /home/usain/gov-os-worktrees/W2-140-tests           3fea21bb5 [w2/W2-140-tests]
+  /home/usain/gov-os-worktrees/W2-141                 7716610e2 [w2/W2-141]
+  /home/usain/gov-os-worktrees/W2-141-d6-tests        92b38e74e [w2/W2-141-d6-tests]
+  /home/usain/gov-os-worktrees/W2-141-tests           eb70ba840 [w2/W2-141-tests]
+  /home/usain/gov-os-worktrees/W2-142                 daf56805b [w2/W2-142]
+  /home/usain/gov-os-worktrees/W2-142-tests           510f3433b [w2/W2-142-tests]
+  /home/usain/gov-os-worktrees/W2-145                 1be3e47de [w2/W2-145]
+  /home/usain/gov-os-worktrees/W2-145-tests           aadce89d6 [w2/W2-145-tests]
+  /home/usain/gov-os-worktrees/W2-146                 ebdbabd2e [w2/W2-146]
+  /home/usain/gov-os-worktrees/W2-147                 fd4b2763f [w2/W2-147]
+  /home/usain/gov-os-worktrees/W2-147-tests           cf55a4880 [w2/W2-147-tests]
+  /home/usain/gov-os-worktrees/W2-148                 1af33c535 [w2/W2-148]
+  /home/usain/gov-os-worktrees/W2-148-f21             0fe71aa8b [w2/W2-148-f21]
+  /home/usain/gov-os-worktrees/W2-148-f21-tests       51f0c70b0 [w2/W2-148-f21-tests]
+  /home/usain/gov-os-worktrees/W2-148-replay          24abf75a1 [w2/W2-148-replay]
+  /home/usain/gov-os-worktrees/W2-148-replay-tests    841c64944 [w2/W2-148-replay-tests]
+  /home/usain/gov-os-worktrees/W2-148-tests           fab2be2a2 [w2/W2-148-tests]
+  /home/usain/gov-os-worktrees/W2-149                 a929356ea [w2/W2-149]
+  /home/usain/gov-os-worktrees/W2-149-f11             ee534d2bc [w2/W2-149-f11]
+  /home/usain/gov-os-worktrees/W2-149-sgx             2f98aecbc [w2/W2-149-sgx]
+  /home/usain/gov-os-worktrees/W2-149-sgx-tests       be77be65a [w2/W2-149-sgx-tests]
+  /home/usain/gov-os-worktrees/W2-149-tests           8f456962f [w2/W2-149-tests]
+  /home/usain/gov-os-worktrees/W2-150                 892c6f851 [w2/W2-150]
+  /home/usain/gov-os-worktrees/W2-150-f1-tests        389b264df [w2/W2-150-f1-tests]
+  /home/usain/gov-os-worktrees/W2-150-tests           321d2bf4b [w2/W2-150-tests]
+  /home/usain/gov-os-worktrees/W2-151                 539437dff [w2/W2-151]
+  /home/usain/gov-os-worktrees/W2-152                 2900a31d2 [w2/W2-152]
+  /home/usain/gov-os-worktrees/W2-153                 94b3cfa1d [w2/W2-153]
+  /home/usain/gov-os-worktrees/W2-153-d10r2-tests     a7d476c16 [w2/W2-153-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-154                 7bcff333b [w2/W2-154]
+  /home/usain/gov-os-worktrees/W2-155                 8da607e3d [w2/W2-155]
+  /home/usain/gov-os-worktrees/W2-157                 30e969875 [w2/W2-157]
+  /home/usain/gov-os-worktrees/W2-158                 23acb6361 [w2/W2-158]
+  /home/usain/gov-os-worktrees/W2-159                 f08424c88 [w2/W2-159]
+  /home/usain/gov-os-worktrees/W2-15a                 fd637510d [w2/W2-15a]
+  /home/usain/gov-os-worktrees/W2-160                 54a64edba [w2/W2-160]
+  /home/usain/gov-os-worktrees/W2-170                 75a5af14b [w2/W2-170]
+  /home/usain/gov-os-worktrees/W2-171                 683ecd9c6 [w2/W2-171]
+  /home/usain/gov-os-worktrees/W2-172                 d23959592 [w2/W2-172]
+  /home/usain/gov-os-worktrees/W2-173                 5cbd79b4e [w2/W2-173]
+  /home/usain/gov-os-worktrees/W2-174                 d5922ed34 [w2/W2-174]
+  /home/usain/gov-os-worktrees/W2-175                 4c0c73472 [w2/W2-175]
+  /home/usain/gov-os-worktrees/W2-176                 3b6c5cb79 [w2/W2-176]
+  /home/usain/gov-os-worktrees/W2-177                 21627697d [w2/W2-177]
+  /home/usain/gov-os-worktrees/W2-178                 6056c4f98 [w2/W2-178]
+  /home/usain/gov-os-worktrees/W2-179                 996bffd9b [w2/W2-179]
+  /home/usain/gov-os-worktrees/W2-180                 21dc73cb5 [w2/W2-180]
+  /home/usain/gov-os-worktrees/W2-181                 499543a83 [w2/W2-181]
+  /home/usain/gov-os-worktrees/W2-182                 04914c869 [w2/W2-182]
+  /home/usain/gov-os-worktrees/W2-183                 6a82ec67a [w2/W2-183]
+  /home/usain/gov-os-worktrees/W2-184                 8d7aee0c4 [w2/W2-184]
+  /home/usain/gov-os-worktrees/W2-185                 47e708a23 [w2/W2-185]
+  /home/usain/gov-os-worktrees/W2-20                  057926aa3 [w2/W2-20]
+  /home/usain/gov-os-worktrees/W2-20-1017             1a54976c7 [w2/W2-20-1017]
+  /home/usain/gov-os-worktrees/W2-20-collect          a38809a33 [w2/W2-20-collect]
+  /home/usain/gov-os-worktrees/W2-20-tests            f12b7e00a [w2/W2-20-tests]
+  /home/usain/gov-os-worktrees/W2-23                  6f171066f [w2/W2-23]
+  /home/usain/gov-os-worktrees/W2-27-citp             33f72aab2 [w2/W2-27-citp]
+  /home/usain/gov-os-worktrees/W2-32-proto            f8a5fdade [w2/W2-32-proto]
+  /home/usain/gov-os-worktrees/W2-33                  82da49202 [w2/W2-33]
+  /home/usain/gov-os-worktrees/W2-37                  0ee2de2d9 [w2/W2-37]
+  /home/usain/gov-os-worktrees/W2-40                  29753c768 [w2/W2-40]
+  /home/usain/gov-os-worktrees/W2-42a                 cd17d2706 [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-45                  5e53394ce [w2/W2-45]
+  /home/usain/gov-os-worktrees/W2-52                  a77ef5f20 [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-55-f2               2fe928a4c [w2/W2-55-f2]
+  /home/usain/gov-os-worktrees/W2-55-f2-tests         c5ed68d4e [w2/W2-55-f2-tests]
+  /home/usain/gov-os-worktrees/W2-56                  befa57695 [w2/W2-56]
+  /home/usain/gov-os-worktrees/W2-56-d10r2-tests      843777f66 [w2/W2-56-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-56-f                1d5adb177 [w2/W2-56-f]
+  /home/usain/gov-os-worktrees/W2-56-f-tests          3ea3411e1 [w2/W2-56-f-tests]
+  /home/usain/gov-os-worktrees/W2-56-tests            85b28ef0f [w2/W2-56-tests]
+  /home/usain/gov-os-worktrees/W2-60a                 a7aa762ab [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-61h-c39             d317baf20 [w2/W2-61h-c39]
+  /home/usain/gov-os-worktrees/W2-61h-d10r2-tests     35396225e [w2/W2-61h-d10r2-tests]
+  /home/usain/gov-os-worktrees/W2-61h-q23-tests       53affe533 [w2/W2-61h-q23-tests]
+  /home/usain/gov-os-worktrees/W2-66c                 400991361 [w2/W2-66c]
+  /home/usain/gov-os-worktrees/W2-78                  8e7640b96 [w2/W2-78]
+  /home/usain/gov-os-worktrees/W2-81                  6e2003ff3 [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-88                  df9f4910e [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88a                 c79a20f1f [w2/W2-88a]
+  /home/usain/gov-os-worktrees/W2-88b                 bbbfc379a [w2/W2-88b]
+  /home/usain/gov-os-worktrees/W2-90b                 cb0e69ba5 [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91-tests            3191a7948 [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92-d6               27d9ecaa3 [w2/W2-92-d6]
+  /home/usain/gov-os-worktrees/W2-92-d6-tests         cc6d5609f [w2/W2-92-d6-tests]
+  /home/usain/gov-os-worktrees/W2-92-proto            e884675b4 [w2/W2-92-proto]
+  /home/usain/gov-os-worktrees/W2-93                  206d2b47d [w2/W2-93]
+  /home/usain/gov-os-worktrees/W2-94                  72a339b9d [w2/W2-94]
+  /home/usain/gov-os-worktrees/W2-96-d10b             bb71be1cf [w2/W2-96-d10b]
+  /home/usain/gov-os-worktrees/research-retrieval     a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

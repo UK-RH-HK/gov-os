@@ -1,0 +1,324 @@
+.....FFFFFFFFF..........................                                 [100%]
+=================================== FAILURES ===================================
+__________ test_without_condition_1_the_commit_stays_flagged[no log] ___________
+
+w = <test_landing_cto_route.World object at 0x7e1a02332b70>, why = 'no log'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'55aaf4215a8...f76b0e185243'}
+E         
+E         Extra items in the right set:
+E         '55aaf4215a84968b26e49a5228aff76b0e185243'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+_________ test_without_condition_1_the_commit_stays_flagged[empty log] _________
+
+w = <test_landing_cto_route.World object at 0x7e1a02224b00>, why = 'empty log'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'55aaf4215a8...f76b0e185243'}
+E         
+E         Extra items in the right set:
+E         '55aaf4215a84968b26e49a5228aff76b0e185243'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+________ test_without_condition_1_the_commit_stays_flagged[another act] ________
+
+w = <test_landing_cto_route.World object at 0x7e1a02310f80>, why = 'another act'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+_____ test_without_condition_1_the_commit_stays_flagged[another manifest] ______
+
+w = <test_landing_cto_route.World object at 0x7e1a0259c8c0>
+why = 'another manifest'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+_________ test_without_condition_1_the_commit_stays_flagged[no route] __________
+
+w = <test_landing_cto_route.World object at 0x7e1a02312630>, why = 'no route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+______ test_without_condition_1_the_commit_stays_flagged[operator route] _______
+
+w = <test_landing_cto_route.World object at 0x7e1a02226000>
+why = 'operator route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+_ test_without_condition_1_the_commit_stays_flagged[route mentions the CTO late] _
+
+w = <test_landing_cto_route.World object at 0x7e1a023335f0>
+why = 'route mentions the CTO late'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+________ test_without_condition_1_the_commit_stays_flagged[other route] ________
+
+w = <test_landing_cto_route.World object at 0x7e1a02227320>, why = 'other route'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+______ test_without_condition_1_the_commit_stays_flagged[route not text] _______
+
+w = <test_landing_cto_route.World object at 0x7e1a02311c10>
+why = 'route not text'
+
+    @pytest.mark.parametrize("why", ["no log", "empty log", "another act", "another manifest", "no route", "operator route",
+                                     "route mentions the CTO late", "other route", "route not text"])
+    def test_without_condition_1_the_commit_stays_flagged(w, why):
+        h = w.bundle(approve=None)
+        if why == "empty log":
+            write(w.approvals, "")
+        elif why == "another act":
+            w.approve("ACT-OTHER-1", h, CTO_ROUTE)
+        elif why == "another manifest":
+            w.approve(ACT, "0" * 64, CTO_ROUTE)
+        elif why == "no route":
+            w.approve(ACT, h, None)
+        elif why == "operator route":
+            w.approve(ACT, h, OP_ROUTE)
+        elif why == "route mentions the CTO late":
+            w.approve(ACT, h, "an agent, for the CTO")
+        elif why == "other route":
+            w.approve(ACT, h, "the owner, by hand")
+        elif why == "route not text":
+            w.approve(ACT, h, ["the CTO"])
+        c = w.commit([HOOK], route(h))
+        got = w.flagged()
+>       assert set(got) == {c}
+E       AssertionError: assert set() == {'47bf1b51339...a15f1918df65'}
+E         
+E         Extra items in the right set:
+E         '47bf1b5133989fe710f9f846f228a15f1918df65'
+E         Use -v to get more diff
+
+tests/unit/operator/test_landing_cto_route.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[no log]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[empty log]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[another act]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[another manifest]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[no route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[operator route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[route mentions the CTO late]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[other route]
+FAILED tests/unit/operator/test_landing_cto_route.py::test_without_condition_1_the_commit_stays_flagged[route not text]
+9 failed, 31 passed in 4.75s
+heavy_slot: all 3 slots taken; waiting (2026-11-13 16:13:03)

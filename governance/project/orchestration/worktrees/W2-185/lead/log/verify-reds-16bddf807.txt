@@ -1,0 +1,32 @@
+NEW   tests.acceptance.W1-38.test_w1_38_hooks_command_line.TestGeneratedCommandLines::test_the_generated_command_line_is_the_kernel_template_s[PostToolUse]
+      AssertionError: .claude/settings.json, generated from template/.rulesync/hooks.jsonc, registers 2 guard hook entries under PostToolUse; one is expected: ['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g
+NEW   tests.acceptance.W1-38.test_w1_38_hooks_command_line::test_the_source_s_command_line_is_the_kernel_template_s_form[PostToolUse]
+      AssertionError: template/.rulesync/hooks.jsonc holds 2 entries under PostToolUse; one is expected assert 2 == 1  +  where 2 = len(['h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"
+NEW   tests.acceptance.W1-38.test_w1_38_rulesync.TestKernelAgainstAdapterSource::test_kernel_role_changed_without_its_source
+      AssertionError: a kernel role file was changed without its rulesync source: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync
+NEW   tests.acceptance.W1-38.test_w1_38_rulesync.TestKernelAgainstAdapterSource::test_role_source_changed_without_its_kernel_role
+      AssertionError: a role's rulesync source was changed without its kernel role file: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.r
+NEW   tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role[engineer]
+      AssertionError: gov launch engineer DAEO-zz90 was refused in the stand-in project made from the template   gov launch engineer DAEO-zz90   exit code: 1   stdout:      stderr:   gov launch: LAUNCH_REFUSED: the role file t
+NEW   tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role[product-spec]
+      AssertionError: gov launch product-spec DAEO-zz92 was refused in the stand-in project made from the template   gov launch product-spec DAEO-zz92   exit code: 1   stdout:      stderr:   gov launch: LAUNCH_REFUSED: the rol
+NEW   tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role[independent-auditor]
+      AssertionError: gov launch independent-auditor DAEO-zz94 was refused in the stand-in project made from the template   gov launch independent-auditor DAEO-zz94   exit code: 1   stdout:      stderr:   gov launch: LAUNCH_RE
+NEW   tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_leave_the_folder_to_the_test_designer
+      AssertionError: gov launch independent-test-designer DAEO-zz90 was refused in the stand-in project made from the template   gov launch independent-test-designer DAEO-zz90   exit code: 1   stdout:      stderr:   gov launc
+NEW   tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate::test_no_settings_of_a_launched_test_designer_close_the_folder
+      AssertionError: gov launch independent-test-designer DAEO-zz90 was refused in the stand-in project made from the template   gov launch independent-test-designer DAEO-zz90   exit code: 1   stdout:      stderr:   gov launc
+NEW   tests.acceptance.W1-50.test_w1_50_freeze_fixture_settings::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-33/w2_33_support.py::copy_folder]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw2/test_a_whole_tree_fixture_stri0/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W1-50.test_w1_50_freeze_fixture_settings::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-33/w2_33_support.py::copy_folder]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw2/test_a_whole_tree_fixture_keep0/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W1-50.test_w1_50_freeze_fixture_settings::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-permissions]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw2/test_a_settings_file_with_noth0/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W1-50.test_w1_50_freeze_fixture_settings::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-33/w2_33_support.py::copy_folder-no-deny-list]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw2/test_a_settings_file_with_noth1/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W1-28.test_w1_28_fixture_copies::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-tracked]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw1/test_a_fixture_that_copies_fro0/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W1-28.test_w1_28_fixture_copies::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out[W2-33/w2_33_support.py::copy_folder-untracked]
+      FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-os-lead-W2-185/pytest-of-usain/pytest-20/popen-gw1/test_a_fixture_that_copies_fro1/source/template/governance/kernel/roles'
+NEW   tests.acceptance.W2-05.test_w2_05_sweep::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep
+      AssertionError: docs/research/AR-2-git-sweep.md does not name 7 of the 41 files of src/gov that start git: ['src/gov/adopt/assess.py', 'src/gov/check/structural.py', 'src/gov/close/attribution.py', 'src/gov/dispatch/land

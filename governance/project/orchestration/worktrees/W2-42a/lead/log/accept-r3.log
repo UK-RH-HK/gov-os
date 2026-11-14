@@ -1,0 +1,383 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 15:30:38)
+.FFFFFFF.FFF.FF.....FFFFFFF.FFF.FF.....xx............................... [ 14%]
+........................................................................ [ 29%]
+........................................................................ [ 43%]
+........................................................................ [ 58%]
+........................................................................ [ 73%]
+........................................................................ [ 87%]
+.............................................................            [100%]
+=================================== FAILURES ===================================
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-euo-pipefail-auditor] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op0/case'
+case = {'command': "bash -euo pipefail <<'EOF'\nsed -i s/a/b/ tests/acceptance/X/t.py; cp x.py src/other.py\nEOF", 'expect': ...bash-euo-pipefail-auditor', 'note': "the auditor's example: no target on the review head; the base parser gave 3", ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (the auditor's example: no target on the review head; the base parser gave 3)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-euo-pipefail] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op1/case'
+case = {'command': "bash -euo pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-euo-pipefail', 'note': 'combined short options with an option value (pipefail)', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (combined short options with an option value (pipefail))
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-e-u-o-pipefail] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op2/case'
+case = {'command': "bash -e -u -o pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\n...'expect': 'write', 'id': 'bash-e-u-o-pipefail', 'note': "separate short options; -o's value is not a script name", ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (separate short options; -o's value is not a script name)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-eu-o-pipefail-unquoted] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op3/case'
+case = {'command': 'bash -eu -o pipefail <<EOF\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF', 'expect': 'write', 'id': 'bash-eu-o-pipefail-unquoted', 'note': 'unquoted delimiter; the body holds no expansion', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (unquoted delimiter; the body holds no expansion)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[sh-o-errexit] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op4/case'
+case = {'command': "sh -o errexit <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'sh-o-errexit', 'note': 'sh with a long-named -o option', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (sh with a long-named -o option)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-O-extglob] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op5/case'
+case = {'command': "bash -O extglob <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-O-extglob', 'note': '-O takes a shopt name as its value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (-O takes a shopt name as its value)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-plus-o-posix] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op6/case'
+case = {'command': "bash +o posix <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-plus-o-posix', 'note': 'a + option (unset) with a value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (a + option (unset) with a value)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-rcfile-f] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op7/case'
+case = {'command': "bash --rcfile f <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-rcfile-f', 'note': 'a long option with a separate value (f is not a script name)', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (a long option with a separate value (f is not a script name))
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[cat-pipe-bash-o-pipefail] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op8/case'
+case = {'command': "cat <<'EOF' | bash -o pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\n...'expect': 'write', 'id': 'cat-pipe-bash-o-pipefail', 'note': 'the body reaches the shell through a pipe from cat', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (the body reaches the shell through a pipe from cat)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[cat-pipe-bash-euo-pipefail] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op9/case'
+case = {'command': "cat <<'EOF' | bash -euo pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py...", 'expect': 'write', 'id': 'cat-pipe-bash-euo-pipefail', 'note': 'through a pipe, combined options with a value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (through a pipe, combined options with a value)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-dev-stdin] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op10/case'
+case = {'command': "bash /dev/stdin <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-dev-stdin', 'note': 'F4 ride-along: /dev/stdin as the script is standard input', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (F4 ride-along: /dev/stdin as the script is standard input)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[sh-dev-fd-0] _
+
+at = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op11/case'
+case = {'command': "sh /dev/fd/0 <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'sh-dev-fd-0', 'note': 'F4 ride-along: /dev/fd/0 as the script is standard input', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands(at, case):
+        got = set(s.parse(case["command"], at) or [])
+        want = {s.real(at, t) for t in case["targets_include"]}
+>       assert got, f"no write for a shell's body ({case['note']})"
+E       AssertionError: no write for a shell's body (F4 ride-along: /dev/fd/0 as the script is standard input)
+E       assert set()
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:84: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-euo-pipefail-auditor] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op12/proj'
+case = {'command': "bash -euo pipefail <<'EOF'\nsed -i s/a/b/ tests/acceptance/X/t.py; cp x.py src/other.py\nEOF", 'expect': ...bash-euo-pipefail-auditor', 'note': "the auditor's example: no target on the review head; the base parser gave 3", ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-euo-pipefail] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op13/proj'
+case = {'command': "bash -euo pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-euo-pipefail', 'note': 'combined short options with an option value (pipefail)', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-e-u-o-pipefail] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op14/proj'
+case = {'command': "bash -e -u -o pipefail <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\n...'expect': 'write', 'id': 'bash-e-u-o-pipefail', 'note': "separate short options; -o's value is not a script name", ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-eu-o-pipefail-unquoted] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op15/proj'
+case = {'command': 'bash -eu -o pipefail <<EOF\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF', 'expect': 'write', 'id': 'bash-eu-o-pipefail-unquoted', 'note': 'unquoted delimiter; the body holds no expansion', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[sh-o-errexit] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op16/proj'
+case = {'command': "sh -o errexit <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'sh-o-errexit', 'note': 'sh with a long-named -o option', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-O-extglob] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op17/proj'
+case = {'command': "bash -O extglob <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-O-extglob', 'note': '-O takes a shopt name as its value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-plus-o-posix] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op18/proj'
+case = {'command': "bash +o posix <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-plus-o-posix', 'note': 'a + option (unset) with a value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-rcfile-f] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op19/proj'
+case = {'command': "bash --rcfile f <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-rcfile-f', 'note': 'a long option with a separate value (f is not a script name)', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[cat-pipe-bash-o-pipefail] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op20/proj'
+case = {'command': "cat <<'EOF' | bash -o pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\n...'expect': 'write', 'id': 'cat-pipe-bash-o-pipefail', 'note': 'the body reaches the shell through a pipe from cat', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[cat-pipe-bash-euo-pipefail] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op21/proj'
+case = {'command': "cat <<'EOF' | bash -euo pipefail\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py...", 'expect': 'write', 'id': 'cat-pipe-bash-euo-pipefail', 'note': 'through a pipe, combined options with a value', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-dev-stdin] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op22/proj'
+case = {'command': "bash /dev/stdin <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'bash-dev-stdin', 'note': 'F4 ride-along: /dev/stdin as the script is standard input', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+_ test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[sh-dev-fd-0] _
+
+root = '/tmp/w2-42a-lead/tmp/pytest-of-usain/pytest-1/test_review_f1_a_shell_with_op23/proj'
+case = {'command': "sh /dev/fd/0 <<'EOF'\necho start\ntouch tests/acceptance/X/new_test.py\necho x > src/other.py\nEOF", 'expect': 'write', 'id': 'sh-dev-fd-0', 'note': 'F4 ride-along: /dev/fd/0 as the script is standard input', ...}
+
+    @pytest.mark.parametrize("case", WRITES, ids=ids(WRITES))
+    def test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused(root, case):
+        _, _, hidden = s.refusal_texts()
+        head, end = head_and_delimiter(case["command"])
+>       assert s.judge(f"{head}\n{HIDDEN_READ}\n{end}", root) == hidden
+E       AssertionError: assert '' == 'the call rea...(d), DEC-845)'
+E         
+E         - the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC-845)
+
+tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py:101: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-euo-pipefail-auditor]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-euo-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-e-u-o-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-eu-o-pipefail-unquoted]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[sh-o-errexit]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-O-extglob]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-plus-o-posix]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-rcfile-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[cat-pipe-bash-o-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[cat-pipe-bash-euo-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[bash-dev-stdin]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_reading_a_heredoc_judges_its_body_as_commands[sh-dev-fd-0]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-euo-pipefail-auditor]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-euo-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-e-u-o-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-eu-o-pipefail-unquoted]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[sh-o-errexit]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-O-extglob]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-plus-o-posix]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-rcfile-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[cat-pipe-bash-o-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[cat-pipe-bash-euo-pipefail]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[bash-dev-stdin]
+FAILED tests/acceptance/W2-42a/test_w2_42a_f1_shell_options.py::test_review_f1_a_shell_with_options_body_naming_a_hidden_file_is_refused[sh-dev-fd-0]
+24 failed, 467 passed, 2 xfailed in 29.55s

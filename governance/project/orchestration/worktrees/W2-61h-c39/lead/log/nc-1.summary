@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-h2k3: session exit 0; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-61h-c39/.gov-runtime/scratch/lead/log/nc-1.json; spend recorded (projection none)

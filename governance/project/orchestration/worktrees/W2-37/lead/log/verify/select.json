@@ -1,10 +1,13 @@
 {
  "scope": "scoped",
  "why_full": [],
- "core_changed": [],
+ "core_changed": [
+  "src/gov/check/commands.py",
+  "tests/conftest.py"
+ ],
  "unplaced": [],
- "base": "5bac674cbcdf68231c898f3c19f7a25c3ead9b15",
- "head": "65e8c076873d565b85a9f3f4dd0ba9873fd626c9",
+ "base": "7304770982f255ffb578bed1494c8b2f3f8f1c71",
+ "head": "9f4878987af8622766c4e53846dc665482c91947",
  "governance_left_out": [
   "docs/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0002.md",
   "docs/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0004.md",
@@ -12,9 +15,16 @@
   "docs/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0010.md"
  ],
  "changed": [
+  "src/gov/check/commands.py",
   "src/gov/impact/__init__.py",
   "src/gov/impact/command.py",
   "src/gov/impact/readings.py",
+  "template/.rulesync/skills/change/SKILL.md",
+  "template/governance/kernel/skills/change/SKILL.md",
+  "tests/acceptance/W1-07/README.md",
+  "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+  "tests/acceptance/W1-07/w1_07_support.py",
+  "tests/acceptance/W1-32/test_w1_32_command_set.py",
   "tests/acceptance/W2-37/README.md",
   "tests/acceptance/W2-37/conftest.py",
   "tests/acceptance/W2-37/test_w2_37_code_graph.py",
@@ -30,7 +40,9 @@
   "tests/acceptance/W2-37/test_w2_37_review_findings.py",
   "tests/acceptance/W2-37/test_w2_37_rows.py",
   "tests/acceptance/W2-37/test_w2_37_skill_routing.py",
+  "tests/acceptance/W2-37/test_w2_37_stated_links.py",
   "tests/acceptance/W2-37/w2_37_support.py",
+  "tests/conftest.py",
   "tests/unit/impact/__init__.py",
   "tests/unit/impact/test_impact.py"
  ],
@@ -45,9 +57,17 @@
      "reason": "OVERLAP",
      "ticket": "DAEO-6n5k",
      "paths": [
+      "src/gov/check/commands.py",
       "src/gov/impact/__init__.py",
       "src/gov/impact/command.py",
       "src/gov/impact/readings.py",
+      "template/.rulesync/skills/change/SKILL.md",
+      "template/governance/kernel/skills/change/SKILL.md",
+      "tests/acceptance/W1-07/README.md",
+      "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+      "tests/acceptance/W1-07/w1_07_support.py",
+      "tests/acceptance/W1-32/test_w1_32_command_set.py",
+      "tests/conftest.py",
       "tests/unit/impact/__init__.py",
       "tests/unit/impact/test_impact.py"
      ]
@@ -70,6 +90,7 @@
       "tests/acceptance/W2-37/test_w2_37_review_findings.py",
       "tests/acceptance/W2-37/test_w2_37_rows.py",
       "tests/acceptance/W2-37/test_w2_37_skill_routing.py",
+      "tests/acceptance/W2-37/test_w2_37_stated_links.py",
       "tests/acceptance/W2-37/w2_37_support.py"
      ]
     }
@@ -380,6 +401,82 @@
    ]
   },
   {
+   "target": "tests/unit/close/test_serial_eng_w2_154.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/close/test_serial_w2_154_nightly.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/close/test_serial_w2_154_plugin.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/close/test_serial_w2_154_support.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
    "target": "tests/unit/close/test_tool.py",
    "why": [
     {
@@ -533,6 +630,25 @@
   },
   {
    "target": "tests/unit/close/test_w2_115_verify.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/close/test_w2_183_context_setting.py",
    "why": [
     {
      "reason": "UNIT"
@@ -1330,6 +1446,44 @@
    ]
   },
   {
+   "target": "tests/unit/guard/test_w2_42a_parser.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
+   "target": "tests/unit/guard/test_w2_42a_reads.py",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/impact/__init__.py",
+      "tests/unit/impact/test_impact.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/unit"
+    }
+   ]
+  },
+  {
    "target": "tests/unit/hooks",
    "why": [
     {
@@ -1938,16 +2092,2059 @@
    ]
   },
   {
+   "target": "tests/acceptance/W1-35/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-0i6h",
+     "paths": [
+      "template/governance/kernel/skills/change/SKILL.md"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
    "target": "tests/acceptance/W2-05/",
    "why": [
     {
      "reason": "OVERLAP",
      "ticket": "DAEO-0z8c",
      "paths": [
+      "src/gov/check/commands.py",
       "src/gov/impact/__init__.py",
       "src/gov/impact/command.py",
-      "src/gov/impact/readings.py"
+      "src/gov/impact/readings.py",
+      "tests/conftest.py"
      ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_returns_api_0002_envelope",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_succeeds_on_green_standard_ticket",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_acceptance_tests",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_failure_blocks_close",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_packet_hash",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_tests_and_deviations",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-30/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-38/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-3ef2",
+     "paths": [
+      "template/.rulesync/skills/change/SKILL.md"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "template/governance/kernel/skills/change/SKILL.md"
+     ],
+     "coupling": "W1-38's fixture copies the kernel's roles and skills into every generated project (I4 \u00a74.1 item 3)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-16/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-49o5",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-182/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-5y8d",
+     "paths": [
+      "tests/acceptance/W1-32/test_w1_32_command_set.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-159/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-6lid",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-15/test_w1_15_check_time_limit.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-7nne",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-15/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-15/test_w1_15_product_data.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-7nne",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-15/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-9nys",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-160/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fd0p",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_audit_validator.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_authority.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_command.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_dec436.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_dec438.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_decisions.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_derived.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_gap_tickets.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_green_base.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_not_applicable.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_openspec.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_planted_defects.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_provenance.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_readiness.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_recorded_commands.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_registry.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_skill_validator.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_taxonomy.py",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    },
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-26/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-126/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-jpr0",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-11/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-k7hz",
+     "paths": [
+      "template/.rulesync/skills/change/SKILL.md",
+      "template/governance/kernel/skills/change/SKILL.md"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-45/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-neam",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-96/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-ouet",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-20/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-r30l",
+     "paths": [
+      "src/gov/check/commands.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-52/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-siiz",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-128/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-t8mp",
+     "paths": [
+      "template/.rulesync/skills/change/SKILL.md"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-76/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-tgk2",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-56/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-wnnz",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-141/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-xwro",
+     "paths": [
+      "tests/conftest.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/",
+   "why": [
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W1-07/README.md",
+      "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-32/",
+   "why": [
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W1-32/test_w1_32_command_set.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-13/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-25/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-28/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-31/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-39/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-41/",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_bypass_and_added_directories.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_duplicate_keys.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_exit_codes.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_on_the_acceptance_tests_refuses_the_launch",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_the_guard_refuses_a_research_write_to_an_acceptance_test_on_a_ticket_that_names_them",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_the_guard_refuses_a_research_bash_write_to_an_acceptance_test_on_a_ticket_that_names_them",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_an_entry_with_dot_dot_is_refused_or_the_fence_and_the_guard_hold_the_same_folder",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_whose_folder_is_not_under_the_experiments_root_refuses_the_launch",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_guard_wiring.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_there",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_held_out.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_install_spellings.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_launch_refusals.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_acceptance_tests_as_the_target_directory_option",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_live_sessions.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_the_built_settings_deny_edits_of_the_acceptance_tests",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_the_built_settings_deny_edits_of_the_tickets",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_the_built_settings_deny_edits_under_dot_claude",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_the_test_designers_settings_carry_no_rule_for_the_acceptance_tests",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_the_test_designer_on_another_roles_ticket_keeps_its_own_rules",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_ticket_that_names_a_path_under_the_three_trees_keeps_the_rules",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_allowlist.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_every_other_path_that_exists_at_launch_is_denied",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_experiment_folder_stays_writable",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_git_is_left_out_of_the_list",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_an_entry_with_a_glob_character_in_its_name_is_left_out_of_the_list",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_a_path_that_does_not_exist_at_launch_is_not_in_the_list",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_a_path_that_exists_at_the_next_launch_is_in_that_launchs_list",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_other_roles_are_not_fenced_out_of_their_tickets_paths",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_below_the_experiment_folder_is_let_through",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_after_cd_into_the_experiment_folder_is_let_through",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_after_cd_into_another_folder_is_denied",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_no_permission_mode_turns_the_research_install_into_a_prompt",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_the_committed_settings_carry_no_ask_rule_on_installs",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_the_built_settings_carry_no_ask_rule_on_installs",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_outside_the_experiment_folder_is_denied",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_on_another_roles_ticket_is_denied",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_sudo_stays_denied_to_the_research_role",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_the_same_commands_stay_denied_for_the_other_worker_roles",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_another_role_on_the_research_ticket_gets_no_install_through",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_has_a_role_file",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_role_file_states_the_six_parts_the_kpi_names",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_is_a_session_role_definition_like_the_others",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_roster_has_an_entry_for_the_research_role",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_session_may_write_inside_its_experiment_folder",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_session_may_write_inside_its_experiment_folder_with_bash",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_session_may_use_scratch",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_guard_grants_the_research_role_no_network_and_asks_nothing_for_it",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_the_session_is_given_its_role_and_its_ticket",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_the_role_and_the_ticket_are_in_the_settings_env_block",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_both_variables_reach_the_guard",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_the_built_settings_deny_edits_under_gov_runtime",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_the_built_settings_leave_scratch_writable",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_the_launcher_sets_a_temp_directory_of_the_sessions_own",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_two_sessions_get_two_temp_directories",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_engineer_test_designer_and_auditor_get_an_empty_allowlist",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_each_name_under_gov_runtime_at_launch_has_a_literal_edit_deny_rule",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_freeze_flag_has_no_literal_rule_when_it_does_not_exist_at_launch",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_literal_rules_are_computed_at_each_launch",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_no_literal_rule_names_scratch_or_a_path_under_it",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/test_w1_46_sandbox_settings.py",
+   "why": [
+    {
+     "reason": "HELPER",
+     "path": "tests/acceptance/W1-07/w1_07_support.py",
+     "paths": [
+      "tests/acceptance/W1-07/w1_07_support.py"
+     ]
+    },
+    {
+     "reason": "LIFTED_SPLIT",
+     "from": "tests/acceptance/W1-46/"
     }
    ]
   },
@@ -1957,6 +4154,9 @@
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+      "tests/acceptance/W1-07/w1_07_support.py",
+      "tests/acceptance/W1-32/test_w1_32_command_set.py",
       "tests/acceptance/W2-37/conftest.py",
       "tests/acceptance/W2-37/test_w2_37_code_graph.py",
       "tests/acceptance/W2-37/test_w2_37_code_under_test.py",
@@ -1971,6 +4171,7 @@
       "tests/acceptance/W2-37/test_w2_37_review_findings.py",
       "tests/acceptance/W2-37/test_w2_37_rows.py",
       "tests/acceptance/W2-37/test_w2_37_skill_routing.py",
+      "tests/acceptance/W2-37/test_w2_37_stated_links.py",
       "tests/acceptance/W2-37/w2_37_support.py"
      ],
      "coupling": "file scan: W1-28's held-out copy check and W1-50's whole-tree fixture count read every Python source under tests/acceptance/ (I1 \u00a74.1, DEC-385, DEC-912 item 3; P-SELECT-FIXES-1 (i), K10, DEC-1100 (1))"
@@ -1983,6 +4184,9 @@
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+      "tests/acceptance/W1-07/w1_07_support.py",
+      "tests/acceptance/W1-32/test_w1_32_command_set.py",
       "tests/acceptance/W2-37/conftest.py",
       "tests/acceptance/W2-37/test_w2_37_code_graph.py",
       "tests/acceptance/W2-37/test_w2_37_code_under_test.py",
@@ -1997,6 +4201,7 @@
       "tests/acceptance/W2-37/test_w2_37_review_findings.py",
       "tests/acceptance/W2-37/test_w2_37_rows.py",
       "tests/acceptance/W2-37/test_w2_37_skill_routing.py",
+      "tests/acceptance/W2-37/test_w2_37_stated_links.py",
       "tests/acceptance/W2-37/w2_37_support.py"
      ],
      "coupling": "file scan: W1-28's held-out copy check and W1-50's whole-tree fixture count read every Python source under tests/acceptance/ (I1 \u00a74.1, DEC-385, DEC-912 item 3; P-SELECT-FIXES-1 (i), K10, DEC-1100 (1))"
@@ -2009,6 +4214,10 @@
     {
      "reason": "COUPLING",
      "paths": [
+      "tests/acceptance/W1-07/README.md",
+      "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+      "tests/acceptance/W1-07/w1_07_support.py",
+      "tests/acceptance/W1-32/test_w1_32_command_set.py",
       "tests/acceptance/W2-37/README.md",
       "tests/acceptance/W2-37/conftest.py",
       "tests/acceptance/W2-37/test_w2_37_code_graph.py",
@@ -2024,6 +4233,7 @@
       "tests/acceptance/W2-37/test_w2_37_review_findings.py",
       "tests/acceptance/W2-37/test_w2_37_rows.py",
       "tests/acceptance/W2-37/test_w2_37_skill_routing.py",
+      "tests/acceptance/W2-37/test_w2_37_stated_links.py",
       "tests/acceptance/W2-37/w2_37_support.py"
      ],
      "coupling": "history rule: W1-01 judges every merge that touches tests/acceptance/ (DEC-253, DEC-912; P-SELECT-FIXES-1 (i), K6)"
@@ -2139,30 +4349,6 @@
    "why": [
     {
      "reason": "RECORD_READING"
-    }
-   ]
-  },
-  {
-   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed",
-   "why": [
-    {
-     "reason": "RECORD_READING"
-    },
-    {
-     "reason": "LIFTED_SPLIT",
-     "from": "tests/acceptance/W1-26/test_w1_26_probe_records.py"
-    }
-   ]
-  },
-  {
-   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record",
-   "why": [
-    {
-     "reason": "RECORD_READING"
-    },
-    {
-     "reason": "LIFTED_SPLIT",
-     "from": "tests/acceptance/W1-26/test_w1_26_probe_records.py"
     }
    ]
   },
@@ -2301,11 +4487,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-06/test_w1_06_registry.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-06/test_w1_06_vendor.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-07/test_w1_07_check_declarations.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-07/test_w1_07_help.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-07/test_w1_07_read_act.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-07/test_w1_07_registry.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-08/test_w1_08_floor.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-08/test_w1_08_frontmatter.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-08/test_w1_08_id_grammar.py",
@@ -2321,9 +4502,7 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-10/test_w1_10_queries.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-11",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-12",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-13",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-14",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-15",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-16",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-17",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-18",
@@ -2333,129 +4512,16 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-22",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-23",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-24",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-25",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_audit_validator.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_authority.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_command.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_dec436.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_dec438.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_decision_citations.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_decisions.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_derived.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_gap_tickets.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_green_base.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_not_applicable.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_openspec.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_planted_defects.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_policy.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_provenance.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_readiness.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_recorded_commands.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_registry.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_skill.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_skill_validator.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_taxonomy.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_adoption.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_drift.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_held_out.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_recovery_check.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_schema.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w2_67_codegraph_folders.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w2_67_copies.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-27/test_w2_67_temp_folders.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_cancel.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_command.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_freeze.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_launch_product_spec.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_repeat.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_roles.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-28/test_w1_28_rollback.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-29",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_check_blocks.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_close.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_commit_models.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_containment_places.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_context_failures.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_disposition.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_governance_checks.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_iteration.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_probe.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_probe_commits.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_git.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_skips.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_commits.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_tree.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_receipt.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_regression_scope.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_stale.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_test_runner.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_time_limit.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_traceability.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_watchdog.py",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-31",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-32",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-33/test_w1_33_roster.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-34",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-35",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-36",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-37",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-38",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-39",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-40",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-41",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-44",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-45",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-46",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-47",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-49/test_w1_49_live_session.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-49/test_w1_49_precompact.py",
@@ -2533,9 +4599,9 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-106",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-107",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-108",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-11",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-110",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-112",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-113",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-115",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-116",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-120",
@@ -2544,8 +4610,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-122",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-123",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-124",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-126",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-128",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-129",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-13",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-131",
@@ -2555,7 +4619,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-136",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-137",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-138",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-141",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-142",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-145",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-146",
@@ -2567,23 +4630,20 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-153",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-157",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-158",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-159",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-16",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-160",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-170",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-171",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-172",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-173",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-175",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-178",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-20",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-183",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-23",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-32",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-45",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-33",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-42a",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-49",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-50",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-51",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-52",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-53",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-54/test_w2_54_audit_report.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",
@@ -2594,7 +4654,6 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-54/test_w2_54_time_limit.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-55",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-56",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-57",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-58",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-59",
@@ -2622,19 +4681,19 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-69",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-71",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-72",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-76",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-77",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-81",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-84",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-86",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-87",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-88a",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-90",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-90b",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-91",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-92",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-95",
-  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-96",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-97",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-98",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-02/test_w1_02_allow_list.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-02/test_w1_02_bounded_time.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-02/test_w1_02_brace_bound.py",
@@ -2736,7 +4795,63 @@
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-16/test_w1_16_token_rule.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_policy.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_skill.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_commit_models.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_containment_places.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_context_failures.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_disposition.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_iteration.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_probe.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_git.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_stale.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_test_runner.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_time_limit.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_traceability.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/acceptance/W1-30/test_w1_30_watchdog.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/unit/close/test_batch_refresh.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/unit/close/test_batch_reuse.py",
   "--ignore=/home/usain/gov-os-worktrees/W2-37/tests/unit/close/test_collection_gate.py",
@@ -3521,11 +5636,6 @@
   "tests/acceptance/W1-06/test_w1_06_registry.py",
   "tests/acceptance/W1-06/test_w1_06_vendor.py",
   "tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
-  "tests/acceptance/W1-07/test_w1_07_check_declarations.py",
-  "tests/acceptance/W1-07/test_w1_07_help.py",
-  "tests/acceptance/W1-07/test_w1_07_read_act.py",
-  "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
-  "tests/acceptance/W1-07/test_w1_07_registry.py",
   "tests/acceptance/W1-08/test_w1_08_floor.py",
   "tests/acceptance/W1-08/test_w1_08_frontmatter.py",
   "tests/acceptance/W1-08/test_w1_08_id_grammar.py",
@@ -3541,9 +5651,7 @@
   "tests/acceptance/W1-10/test_w1_10_queries.py",
   "tests/acceptance/W1-11/",
   "tests/acceptance/W1-12/",
-  "tests/acceptance/W1-13/",
   "tests/acceptance/W1-14/",
-  "tests/acceptance/W1-15/",
   "tests/acceptance/W1-16/",
   "tests/acceptance/W1-17/",
   "tests/acceptance/W1-18/",
@@ -3553,129 +5661,16 @@
   "tests/acceptance/W1-22/",
   "tests/acceptance/W1-23/",
   "tests/acceptance/W1-24/",
-  "tests/acceptance/W1-25/",
-  "tests/acceptance/W1-26/test_w1_26_audit_validator.py",
-  "tests/acceptance/W1-26/test_w1_26_authority.py",
-  "tests/acceptance/W1-26/test_w1_26_command.py",
-  "tests/acceptance/W1-26/test_w1_26_dec436.py",
-  "tests/acceptance/W1-26/test_w1_26_dec438.py",
-  "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
-  "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
-  "tests/acceptance/W1-26/test_w1_26_decisions.py",
-  "tests/acceptance/W1-26/test_w1_26_derived.py",
-  "tests/acceptance/W1-26/test_w1_26_gap_tickets.py",
-  "tests/acceptance/W1-26/test_w1_26_green_base.py",
-  "tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
-  "tests/acceptance/W1-26/test_w1_26_not_applicable.py",
-  "tests/acceptance/W1-26/test_w1_26_openspec.py",
-  "tests/acceptance/W1-26/test_w1_26_planted_defects.py",
-  "tests/acceptance/W1-26/test_w1_26_policy.py",
-  "tests/acceptance/W1-26/test_w1_26_provenance.py",
-  "tests/acceptance/W1-26/test_w1_26_readiness.py",
-  "tests/acceptance/W1-26/test_w1_26_recorded_commands.py",
-  "tests/acceptance/W1-26/test_w1_26_registry.py",
-  "tests/acceptance/W1-26/test_w1_26_skill.py",
-  "tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
-  "tests/acceptance/W1-26/test_w1_26_skill_validator.py",
-  "tests/acceptance/W1-26/test_w1_26_taxonomy.py",
-  "tests/acceptance/W1-27/test_w1_27_adoption.py",
-  "tests/acceptance/W1-27/test_w1_27_drift.py",
-  "tests/acceptance/W1-27/test_w1_27_held_out.py",
-  "tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
-  "tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
-  "tests/acceptance/W1-27/test_w1_27_recovery_check.py",
-  "tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
-  "tests/acceptance/W1-27/test_w1_27_schema.py",
-  "tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
-  "tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
-  "tests/acceptance/W1-27/test_w2_67_codegraph_folders.py",
-  "tests/acceptance/W1-27/test_w2_67_copies.py",
-  "tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
-  "tests/acceptance/W1-27/test_w2_67_temp_folders.py",
-  "tests/acceptance/W1-28/test_w1_28_cancel.py",
-  "tests/acceptance/W1-28/test_w1_28_command.py",
-  "tests/acceptance/W1-28/test_w1_28_freeze.py",
-  "tests/acceptance/W1-28/test_w1_28_launch_product_spec.py",
-  "tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py",
-  "tests/acceptance/W1-28/test_w1_28_repeat.py",
-  "tests/acceptance/W1-28/test_w1_28_roles.py",
-  "tests/acceptance/W1-28/test_w1_28_rollback.py",
   "tests/acceptance/W1-29/",
-  "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
-  "tests/acceptance/W1-30/test_w1_30_close.py",
-  "tests/acceptance/W1-30/test_w1_30_commit_models.py",
-  "tests/acceptance/W1-30/test_w1_30_containment_places.py",
-  "tests/acceptance/W1-30/test_w1_30_context_failures.py",
-  "tests/acceptance/W1-30/test_w1_30_disposition.py",
-  "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
-  "tests/acceptance/W1-30/test_w1_30_iteration.py",
-  "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
-  "tests/acceptance/W1-30/test_w1_30_probe.py",
-  "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
-  "tests/acceptance/W1-30/test_w1_30_r10_git.py",
-  "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
-  "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
-  "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
-  "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
-  "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
-  "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
-  "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
-  "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
-  "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
-  "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
-  "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
-  "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
-  "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
-  "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
-  "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
-  "tests/acceptance/W1-30/test_w1_30_receipt.py",
-  "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
-  "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
-  "tests/acceptance/W1-30/test_w1_30_stale.py",
-  "tests/acceptance/W1-30/test_w1_30_test_runner.py",
-  "tests/acceptance/W1-30/test_w1_30_time_limit.py",
-  "tests/acceptance/W1-30/test_w1_30_traceability.py",
-  "tests/acceptance/W1-30/test_w1_30_watchdog.py",
-  "tests/acceptance/W1-31/",
-  "tests/acceptance/W1-32/",
   "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
   "tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
   "tests/acceptance/W1-33/test_w1_33_roster.py",
   "tests/acceptance/W1-34/",
-  "tests/acceptance/W1-35/",
   "tests/acceptance/W1-36/",
   "tests/acceptance/W1-37/",
-  "tests/acceptance/W1-38/",
-  "tests/acceptance/W1-39/",
   "tests/acceptance/W1-40/",
-  "tests/acceptance/W1-41/",
   "tests/acceptance/W1-44/",
   "tests/acceptance/W1-45/",
-  "tests/acceptance/W1-46/",
   "tests/acceptance/W1-47/",
   "tests/acceptance/W1-49/test_w1_49_live_session.py",
   "tests/acceptance/W1-49/test_w1_49_precompact.py",
@@ -3753,9 +5748,9 @@
   "tests/acceptance/W2-106/",
   "tests/acceptance/W2-107/",
   "tests/acceptance/W2-108/",
-  "tests/acceptance/W2-11/",
   "tests/acceptance/W2-110/",
   "tests/acceptance/W2-112/",
+  "tests/acceptance/W2-113/",
   "tests/acceptance/W2-115/",
   "tests/acceptance/W2-116/",
   "tests/acceptance/W2-120/",
@@ -3764,8 +5759,6 @@
   "tests/acceptance/W2-122/",
   "tests/acceptance/W2-123/",
   "tests/acceptance/W2-124/",
-  "tests/acceptance/W2-126/",
-  "tests/acceptance/W2-128/",
   "tests/acceptance/W2-129/",
   "tests/acceptance/W2-13/",
   "tests/acceptance/W2-131/",
@@ -3775,7 +5768,6 @@
   "tests/acceptance/W2-136/",
   "tests/acceptance/W2-137/",
   "tests/acceptance/W2-138/",
-  "tests/acceptance/W2-141/",
   "tests/acceptance/W2-142/",
   "tests/acceptance/W2-145/",
   "tests/acceptance/W2-146/",
@@ -3787,23 +5779,20 @@
   "tests/acceptance/W2-153/",
   "tests/acceptance/W2-157/",
   "tests/acceptance/W2-158/",
-  "tests/acceptance/W2-159/",
-  "tests/acceptance/W2-16/",
-  "tests/acceptance/W2-160/",
   "tests/acceptance/W2-170/",
   "tests/acceptance/W2-171/",
   "tests/acceptance/W2-172/",
   "tests/acceptance/W2-173/",
   "tests/acceptance/W2-175/",
   "tests/acceptance/W2-178/",
-  "tests/acceptance/W2-20/",
+  "tests/acceptance/W2-183/",
   "tests/acceptance/W2-23/",
   "tests/acceptance/W2-32/",
-  "tests/acceptance/W2-45/",
+  "tests/acceptance/W2-33/",
+  "tests/acceptance/W2-42a/",
   "tests/acceptance/W2-49/",
   "tests/acceptance/W2-50/",
   "tests/acceptance/W2-51/",
-  "tests/acceptance/W2-52/",
   "tests/acceptance/W2-53/",
   "tests/acceptance/W2-54/test_w2_54_audit_report.py",
   "tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",
@@ -3814,7 +5803,6 @@
   "tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
   "tests/acceptance/W2-54/test_w2_54_time_limit.py",
   "tests/acceptance/W2-55/",
-  "tests/acceptance/W2-56/",
   "tests/acceptance/W2-57/",
   "tests/acceptance/W2-58/",
   "tests/acceptance/W2-59/",
@@ -3842,19 +5830,19 @@
   "tests/acceptance/W2-69/",
   "tests/acceptance/W2-71/",
   "tests/acceptance/W2-72/",
-  "tests/acceptance/W2-76/",
   "tests/acceptance/W2-77/",
   "tests/acceptance/W2-81/",
   "tests/acceptance/W2-84/",
   "tests/acceptance/W2-86/",
   "tests/acceptance/W2-87/",
+  "tests/acceptance/W2-88a/",
   "tests/acceptance/W2-90/",
   "tests/acceptance/W2-90b/",
   "tests/acceptance/W2-91/",
   "tests/acceptance/W2-92/",
   "tests/acceptance/W2-95/",
-  "tests/acceptance/W2-96/",
   "tests/acceptance/W2-97/",
+  "tests/acceptance/W2-98/",
   "tests/acceptance/W1-02/test_w1_02_allow_list.py",
   "tests/acceptance/W1-02/test_w1_02_bounded_time.py",
   "tests/acceptance/W1-02/test_w1_02_brace_bound.py",
@@ -3956,7 +5944,63 @@
   "tests/acceptance/W1-16/test_w1_16_token_rule.py",
   "tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py",
   "tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py",
+  "tests/acceptance/W1-26/test_w1_26_policy.py",
+  "tests/acceptance/W1-26/test_w1_26_skill.py",
+  "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+  "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+  "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+  "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+  "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+  "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+  "tests/acceptance/W1-30/test_w1_30_disposition.py",
+  "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+  "tests/acceptance/W1-30/test_w1_30_iteration.py",
+  "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+  "tests/acceptance/W1-30/test_w1_30_probe.py",
+  "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
   "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+  "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+  "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+  "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+  "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+  "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+  "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+  "tests/acceptance/W1-30/test_w1_30_stale.py",
+  "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+  "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+  "tests/acceptance/W1-30/test_w1_30_traceability.py",
+  "tests/acceptance/W1-30/test_w1_30_watchdog.py",
   "tests/unit/close/test_batch_refresh.py",
   "tests/unit/close/test_batch_reuse.py",
   "tests/unit/close/test_collection_gate.py",
@@ -4364,7 +6408,104 @@
  "nightly_only_list": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/nightly_only.txt: 0 entries",
  "nightly_only_absent": [],
  "helper_exceptions_list": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/helper_exceptions.txt: 1 entries",
- "helper_exceptions_dropped": [],
+ "helper_exceptions_dropped": [
+  {
+   "suite": "tests/acceptance/W1-05/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W1-32/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W1-33/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W1-47/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W1-49/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W1-50/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-01/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-05/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-07/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-105/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-106/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-110/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-113/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-115/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-52/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-53/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-54/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-57/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-59/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-65/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-66/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-68/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-77/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "suite": "tests/acceptance/W2-90/",
+   "helper": "tests/acceptance/W1-07/w1_07_support.py"
+  }
+ ],
  "left_out_lifted": [
   {
    "entry": "tests/unit/guard/test_decide.py::TestDesignerNoTicketReadOnly",
@@ -4775,6 +6916,761 @@
    "entry": "tests/unit/secrets_check/test_w2_20_pool.py",
    "why": "the secrets scan, off here (DEC-1045)",
    "target": "tests/unit"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_disposition.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_iteration.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_probe.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_stale.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_traceability.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_watchdog.py",
+   "why": "a lifted gate of the strict close (home: W2-115, D-9)",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_sets_ticket_status",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_regression_tests_when_present",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_implements_trailer",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_task_trailer",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_containment_check",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_writes_checkpoint_on_success",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_has_kernel_skill_versions",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_vendor_skill_without_version",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_empty_skill_versions_when_none",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_blocks_close_for_out_of_scope_commit",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_task_trailer_exact_match_not_substring",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_closed_through_ticket_tool_interface",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_exists_before_ticket_status_changes",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_checkpoint_exists_before_ticket_status_changes",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_includes_other_acceptance_folders",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_collection_error_refuses_close",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_test_counts",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_exceeded_refuses_close",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_commits_from_head_only",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_git_failure_is_error_not_empty_list",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_is_configurable",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_acceptance_tests",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_docs_outside_paths",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_clean_within_paths",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_tool_close_is_what_tk_produces",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_fails_when_ticket_tool_absent",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_unwritable_ticket_stays_open",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_input_ids_and_hashes",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_outputs",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_requirements_implemented",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_decisions_applied",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_packet_hash_matches_context",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_no_fallback_hash_when_context_fails",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_outputs_lists_files_from_ticket_commits",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_when_unverified",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_context_failure_non_cycle_refuses_close",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests",
+   "why": "a lifted gate of the strict close",
+   "target": "tests/acceptance/W1-30/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_gitleaks_rules.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_filter.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_shelter_batch.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_parallel_scan.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_family_check.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_review_batch.py",
+   "why": "runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)",
+   "target": "tests/acceptance/W1-15/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_policy.py",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_skill.py",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_well_formed_probe_record_gives_no_finding",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_each_judgement_word_is_well_formed",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_that_states_the_shared_fields_is_well_formed_too",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_is_known_by_its_type_not_by_where_it_lies",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_two_records_of_one_ticket_are_each_judged",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_without_a_field_the_probe_gate_asks_for_is_a_finding",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_field_of_a_wrong_type_or_value_is_a_finding",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_the_codes_of_a_probe_record_s_findings",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_an_unknown_type_is_still_a_finding",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_another_type_still_owes_the_shared_fields",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_whose_type_is_no_text_is_still_a_finding",
+   "why": "a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)",
+   "target": "tests/acceptance/W1-26/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_on_the_runtime_directory_opens_nothing_there",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_the_write_when_the_symbolic_link_was_made_by_an_earlier_call",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_inside_the_roles_paths",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_cp_with_the_destination_as_the_last_operand_is_judged_as_before",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through_by_the_kernel_s_wiring",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_bash_write_outside_its_experiment_folder_is_denied",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_has_no_scope_on_another_roles_ticket",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_another_role_gains_nothing_from_the_research_ticket",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_scratch_stays_writable_for_every_role",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_holds_a_research_ln_to_the_experiment_folder",
+   "why": "the full guard (G-4/G-6; DEC-1061 (3a))",
+   "target": "tests/acceptance/W1-46/"
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_well_formed_probe_record_gives_no_finding",
@@ -5659,111 +8555,1504 @@
    ]
   },
   {
+   "entry": "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_disposition.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_iteration.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_probe.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "targets": [
+    "tests/acceptance/W1-30/",
+    "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER",
+    "RECORD_READING"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_stale.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_traceability.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_watchdog.py",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_sets_ticket_status",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_regression_tests_when_present",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_implements_trailer",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_task_trailer",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_containment_check",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_writes_checkpoint_on_success",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_has_kernel_skill_versions",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_vendor_skill_without_version",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_empty_skill_versions_when_none",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_blocks_close_for_out_of_scope_commit",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_task_trailer_exact_match_not_substring",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_closed_through_ticket_tool_interface",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_exists_before_ticket_status_changes",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_checkpoint_exists_before_ticket_status_changes",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_includes_other_acceptance_folders",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_collection_error_refuses_close",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_test_counts",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_exceeded_refuses_close",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_commits_from_head_only",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_git_failure_is_error_not_empty_list",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_is_configurable",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_acceptance_tests",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_docs_outside_paths",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_clean_within_paths",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_tool_close_is_what_tk_produces",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_fails_when_ticket_tool_absent",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_unwritable_ticket_stays_open",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_input_ids_and_hashes",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_outputs",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_requirements_implemented",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_decisions_applied",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_packet_hash_matches_context",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_no_fallback_hash_when_context_fails",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_outputs_lists_files_from_ticket_commits",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_when_unverified",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_context_failure_non_cycle_refuses_close",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests",
+   "targets": [
+    "tests/acceptance/W1-30/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_gitleaks_rules.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_filter.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_shelter_batch.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_parallel_scan.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_family_check.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-15/test_w1_15_review_batch.py",
+   "targets": [
+    "tests/acceptance/W1-15/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_policy.py",
+   "targets": [
+    "tests/acceptance/W1-26/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_skill.py",
+   "targets": [
+    "tests/acceptance/W1-26/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+   "targets": [
+    "tests/acceptance/W1-26/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+   "targets": [
+    "tests/acceptance/W1-26/"
+   ],
+   "selected_by": [
+    "OVERLAP",
+    "HELPER"
+   ]
+  },
+  {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_well_formed_probe_record_gives_no_finding",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_each_judgement_word_is_well_formed",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_that_states_the_shared_fields_is_well_formed_too",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_is_known_by_its_type_not_by_where_it_lies",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_two_records_of_one_ticket_are_each_judged",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_without_a_field_the_probe_gate_asks_for_is_a_finding",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_field_of_a_wrong_type_or_value_is_a_finding",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_the_codes_of_a_probe_record_s_findings",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_an_unknown_type_is_still_a_finding",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_another_type_still_owes_the_shared_fields",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
    "entry": "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_whose_type_is_no_text_is_still_a_finding",
    "targets": [
+    "tests/acceptance/W1-26/",
     "tests/acceptance/W1-26/test_w1_26_probe_records.py"
    ],
    "selected_by": [
+    "OVERLAP",
+    "HELPER",
     "RECORD_READING"
    ]
   },
   {
-   "entry": "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "entry": "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_on_the_runtime_directory_opens_nothing_there",
    "targets": [
-    "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"
+    "tests/acceptance/W1-46/"
    ],
    "selected_by": [
-    "RECORD_READING"
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_the_write_when_the_symbolic_link_was_made_by_an_earlier_call",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_inside_the_roles_paths",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_cp_with_the_destination_as_the_last_operand_is_judged_as_before",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through_by_the_kernel_s_wiring",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_bash_write_outside_its_experiment_folder_is_denied",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_has_no_scope_on_another_roles_ticket",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_another_role_gains_nothing_from_the_research_ticket",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_scratch_stays_writable_for_every_role",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
+   ]
+  },
+  {
+   "entry": "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_holds_a_research_ln_to_the_experiment_folder",
+   "targets": [
+    "tests/acceptance/W1-46/"
+   ],
+   "selected_by": [
+    "HELPER"
    ]
   }
  ],
@@ -5854,6 +10143,113 @@
    "tests/unit/secrets_check/test_w2_107_engine.py",
    "tests/unit/secrets_check/test_w2_107_record.py",
    "tests/unit/secrets_check/test_w2_20_pool.py",
+   "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+   "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+   "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+   "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+   "tests/acceptance/W1-30/test_w1_30_disposition.py",
+   "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+   "tests/acceptance/W1-30/test_w1_30_iteration.py",
+   "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+   "tests/acceptance/W1-30/test_w1_30_probe.py",
+   "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+   "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+   "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+   "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+   "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+   "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+   "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+   "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+   "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+   "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+   "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+   "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+   "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+   "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+   "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+   "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+   "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+   "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+   "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+   "tests/acceptance/W1-30/test_w1_30_stale.py",
+   "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+   "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+   "tests/acceptance/W1-30/test_w1_30_traceability.py",
+   "tests/acceptance/W1-30/test_w1_30_watchdog.py",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_sets_ticket_status",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_regression_tests_when_present",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_implements_trailer",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_task_trailer",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_containment_check",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_writes_checkpoint_on_success",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_has_kernel_skill_versions",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_vendor_skill_without_version",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_empty_skill_versions_when_none",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_blocks_close_for_out_of_scope_commit",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_task_trailer_exact_match_not_substring",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_closed_through_ticket_tool_interface",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_exists_before_ticket_status_changes",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_checkpoint_exists_before_ticket_status_changes",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_includes_other_acceptance_folders",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_collection_error_refuses_close",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_test_counts",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_exceeded_refuses_close",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_commits_from_head_only",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_git_failure_is_error_not_empty_list",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_is_configurable",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_acceptance_tests",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_docs_outside_paths",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_containment_clean_within_paths",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_tool_close_is_what_tk_produces",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_fails_when_ticket_tool_absent",
+   "tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_unwritable_ticket_stays_open",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_input_ids_and_hashes",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_outputs",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_requirements_implemented",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_decisions_applied",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_packet_hash_matches_context",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_no_fallback_hash_when_context_fails",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_outputs_lists_files_from_ticket_commits",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_when_unverified",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_context_failure_non_cycle_refuses_close",
+   "tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests",
+   "tests/acceptance/W1-15/test_w1_15_gitleaks_rules.py",
+   "tests/acceptance/W1-15/test_w1_15_filter.py",
+   "tests/acceptance/W1-15/test_w1_15_shelter_batch.py",
+   "tests/acceptance/W1-15/test_w1_15_parallel_scan.py",
+   "tests/acceptance/W1-15/test_w1_15_family_check.py",
+   "tests/acceptance/W1-15/test_w1_15_review_batch.py",
+   "tests/acceptance/W1-26/test_w1_26_policy.py",
+   "tests/acceptance/W1-26/test_w1_26_skill.py",
+   "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+   "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_well_formed_probe_record_gives_no_finding",
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_each_judgement_word_is_well_formed",
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_that_states_the_shared_fields_is_well_formed_too",
@@ -5865,7 +10261,39 @@
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_an_unknown_type_is_still_a_finding",
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_another_type_still_owes_the_shared_fields",
    "tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_whose_type_is_no_text_is_still_a_finding",
-   "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"
+   "tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_on_the_runtime_directory_opens_nothing_there",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_the_write_when_the_symbolic_link_was_made_by_an_earlier_call",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_inside_the_roles_paths",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_cp_with_the_destination_as_the_last_operand_is_judged_as_before",
+   "tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py",
+   "tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard",
+   "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder",
+   "tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder",
+   "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through",
+   "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through_by_the_kernel_s_wiring",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_bash_write_outside_its_experiment_folder_is_denied",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_has_no_scope_on_another_roles_ticket",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py::test_another_role_gains_nothing_from_the_research_ticket",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard",
+   "tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_scratch_stays_writable_for_every_role",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_holds_a_research_ln_to_the_experiment_folder"
   ]
  },
  "lifted_lists": [

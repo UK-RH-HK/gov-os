@@ -1,0 +1,161 @@
+diff --git a/.tickets/DAEO-6f0s.md b/.tickets/DAEO-6f0s.md
+index c0bad2691..a3945a17e 100644
+--- a/.tickets/DAEO-6f0s.md
++++ b/.tickets/DAEO-6f0s.md
+@@ -41,7 +41,7 @@ non_goals:
+ - 'not W2-60a''s reviewed core (role text, skills, the record''s base fields, no compaction, the refused arguments): W2-60a lands it first'
+ - 'not a gate for W2-27 (EXAMIN''s copy): launches during the copy use each role''s `Launch default` line (P1-W2-60a-P5 (B), DEC-1167)'
+ done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
+-sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010]
++sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010, CAP-35.c, DEC-1014, DEC-1015, W2-60a]
+ acceptance_tests: {path: tests/acceptance/W2-184/}
+ ---
+ 
+diff --git a/.tickets/DAEO-6w5n.md b/.tickets/DAEO-6w5n.md
+index c262d8c95..4c78e8eea 100644
+--- a/.tickets/DAEO-6w5n.md
++++ b/.tickets/DAEO-6w5n.md
+@@ -33,7 +33,7 @@ kpis:
+ non_goals:
+ - the dispatcher core (W2-121, part a) and the other parts
+ done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
+-sources: [DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb]
++sources: [DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb, W2-H046]
+ acceptance_tests:
+   path: tests/acceptance/W2-121d/
+   author: independent-test-designer (MR-3); written before implementation
+diff --git a/.tickets/DAEO-aks1.md b/.tickets/DAEO-aks1.md
+index d02b8128a..c5947d860 100644
+--- a/.tickets/DAEO-aks1.md
++++ b/.tickets/DAEO-aks1.md
+@@ -42,7 +42,7 @@ kpis:
+ non_goals:
+ - the code (W2-88), the skill text (W2-88a), the synthetic repositories (W2-88's proof (a)), EXAMIN's copy (W2-27, proof (d))
+ done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
+-sources: [DEC-1150, DEC-996, DEC-954, DEC-1099, DEC-078, DEC-718, DEC-723]
++sources: [DEC-1150, DEC-996, DEC-954, DEC-1099, DEC-078, DEC-718, DEC-723, CAP-10, CAP-19, DEC-1097, DEC-1098, DEC-833, DEC-860]
+ track: A
+ ---
+ # W2-88b W2-88's proofs on real repositories (a child of W2-88)
+diff --git a/.tickets/DAEO-ecac.md b/.tickets/DAEO-ecac.md
+index c34723ea0..87fdd5336 100644
+--- a/.tickets/DAEO-ecac.md
++++ b/.tickets/DAEO-ecac.md
+@@ -62,6 +62,8 @@ sources:
+ - DEC-963
+ - DEC-982
+ - DEC-1120
++- DEC-1156
++- W3-P09
+ est_loc: 160
+ acceptance_tests:
+   path: tests/acceptance/W2-60b/
+diff --git a/.tickets/DAEO-h2k3.md b/.tickets/DAEO-h2k3.md
+index e17774e44..275a723e2 100644
+--- a/.tickets/DAEO-h2k3.md
++++ b/.tickets/DAEO-h2k3.md
+@@ -62,6 +62,11 @@ sources:
+ - DEC-1083
+ - DEC-1084
+ - DEC-866
++- DEC-1097
++- DEC-1122
++- DEC-1123
++- DEC-1124
++- DEC-1171
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W2-61h/
+diff --git a/.tickets/DAEO-h4rh.md b/.tickets/DAEO-h4rh.md
+index 7a53235bf..e6a04dad8 100644
+--- a/.tickets/DAEO-h4rh.md
++++ b/.tickets/DAEO-h4rh.md
+@@ -109,6 +109,12 @@ sources:
+ - DEC-1089
+ - DEC-1090
+ - DEC-1112
++- DEC-1045
++- DEC-1134
++- DEC-1148
++- DEC-1150
++- DEC-1151
++- DEC-757
+ est_loc: 0
+ acceptance_tests:
+   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
+diff --git a/.tickets/DAEO-q8cl.md b/.tickets/DAEO-q8cl.md
+index 5c3743915..9eeb277b4 100644
+--- a/.tickets/DAEO-q8cl.md
++++ b/.tickets/DAEO-q8cl.md
+@@ -51,6 +51,7 @@ sources:
+ - DEC-1010
+ - DEC-1098
+ - DEC-1088
++- DEC-1123
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W2-130/
+diff --git a/.tickets/DAEO-rd0g.md b/.tickets/DAEO-rd0g.md
+index 6423a5cb9..6f98743a9 100644
+--- a/.tickets/DAEO-rd0g.md
++++ b/.tickets/DAEO-rd0g.md
+@@ -46,6 +46,7 @@ sources:
+ - DEC-1072
+ - DEC-1083
+ - DAEO-swdu
++- DEC-1171
+ est_loc: 100
+ acceptance_tests:
+   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
+diff --git a/.tickets/DAEO-rmhj.md b/.tickets/DAEO-rmhj.md
+index b5591814e..2a230417d 100644
+--- a/.tickets/DAEO-rmhj.md
++++ b/.tickets/DAEO-rmhj.md
+@@ -44,6 +44,7 @@ sources:
+ - DEC-1090
+ - DEC-1087
+ - DEC-1072
++- DEC-1122
+ est_loc: 150
+ acceptance_tests:
+   path: tests/acceptance/W2-138/
+diff --git a/.tickets/DAEO-sdxk.md b/.tickets/DAEO-sdxk.md
+index ba435d82f..8f51a72eb 100644
+--- a/.tickets/DAEO-sdxk.md
++++ b/.tickets/DAEO-sdxk.md
+@@ -51,6 +51,9 @@ sources:
+ - DEC-1073
+ - DEC-953
+ - DEC-968
++- DEC-1121
++- DEC-1123
++- DEC-1130
+ est_loc: 0
+ acceptance_tests:
+   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files (the exit report)'
+diff --git a/.tickets/DAEO-sq3a.md b/.tickets/DAEO-sq3a.md
+index 236987db4..723e110e7 100644
+--- a/.tickets/DAEO-sq3a.md
++++ b/.tickets/DAEO-sq3a.md
+@@ -40,7 +40,7 @@ non_goals:
+ - 'not semantic search inside the sandbox (a proxy-aware Ollama client and its port: parked, DEC-1168 (1))'
+ - 'not a gate for EXAMIN''s copy: built after W2-27 starts (DEC-1168 (1))'
+ done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
+-sources: [DEC-1168, DEC-1167, DEC-158, DEC-1114, DEC-1128]
++sources: [DEC-1168, DEC-1167, DEC-158, DEC-1114, DEC-1128, W2-56]
+ acceptance_tests: {path: tests/acceptance/W2-186/}
+ ---
+ 
+diff --git a/.tickets/DAEO-zmo4.md b/.tickets/DAEO-zmo4.md
+index c852a2399..865624797 100644
+--- a/.tickets/DAEO-zmo4.md
++++ b/.tickets/DAEO-zmo4.md
+@@ -60,7 +60,7 @@ non_goals:
+ - no change to the ticket template or schema; the marker is one extra front-matter line the schema already allows
+ - no change to W2-88's refactoring-plan text (the CTO's one-line note, below)
+ done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
+-sources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh]
++sources: [DEC-1130, DEC-1083, DEC-1052, DEC-1050, DEC-1088, DEC-1121, DEC-1122, DEC-1112, DAEO-o5x1, DAEO-t8mp, DAEO-2bdu, DAEO-kmcr, DAEO-h4rh, DEC-1147, DEC-1148]
+ acceptance_tests: {path: tests/acceptance/W2-174/}
+ ---
+ 

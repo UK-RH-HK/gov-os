@@ -1,0 +1,46 @@
+{
+  "ticket": "DAEO-6n5k",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "pass",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "pass",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "fail",
+      "passed": 10,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "pass",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 119,
+    "failed": 1,
+    "skipped": 0
+  }
+}
+exit=3

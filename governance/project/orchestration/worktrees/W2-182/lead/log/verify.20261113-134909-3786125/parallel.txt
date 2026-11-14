@@ -1,0 +1,250 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+.........F.............................................................. [ 10%]
+........................................................................ [ 11%]
+...............................................F.......................F [ 12%]
+.........F.............................................................. [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+.............F.......................................................... [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+.F...................................................................... [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+......................................sss............................... [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+..................................sss................................... [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+............................................................             [100%]
+=================================== FAILURES ===================================
+_ TestABashCallAfterAChangeOfDirectory.test_an_ordinary_allowed_call_is_not_blocked _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_hooks_any_folder.TestABashCallAfterAChangeOfDirectory object at 0x71d852c69640>
+product = PosixPath('/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_an_ordinary_allowed_call_0/project')
+session_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_an_ordinary_allowed_call_0/ses...PosixPath('/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_an_ordinary_allowed_call_0/session/systmp'))
+
+    @needs_rulesync
+    def test_an_ordinary_allowed_call_is_not_blocked(self, product, session_sandbox):
+        command = "echo changed >> main.py"
+        call = self._call(product, session_sandbox, command)
+        assert call.decision == "allow", (
+            f"`{command}` in {hooks.SUBFOLDER_REL}, inside the ticket's paths, was not let through: a session that "
+            f"changed its folder is blocked at every later call (DEC-603): {call.describe()}"
+        )
+        assert call.bash_exit == 0 and hooks.IN_SCOPE_FILE in hooks.check_support.porcelain_all(product), (
+            f"the fixture command `{command}` did not change {hooks.IN_SCOPE_FILE}: exit {call.bash_exit}"
+        )
+>       assert call.after and all(result.returncode == 0 for result in call.after), (
+            f"`{command}`: a registered {call.event} command did not end cleanly in a subfolder: {call.describe()}"
+        )
+E       AssertionError: `echo changed >> main.py`: a registered PostToolUse command did not end cleanly in a subfolder: before: `h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=0 stdout='' stderr='' | after: `h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=0 stdout='' stderr=''; `g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH" >&2; exit 1; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p" >&2; exit 1; }; exec "$p" -E "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/context_watch.py"` exit=2 stdout='' stderr="/usr/bin/python3.12: can't open file '/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_an_ordinary_allowed_call_0/project/governance/kernel/hooks/context_watch.py': [Errno 2] No such file or directory"
+E       assert ((CommandResult(command='h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f..._an_ordinary_allowed_call_0/project/governance/kernel/hooks/context_watch.py': [Errno 2] No such file or directory\n")) and False)
+E        +  where (CommandResult(command='h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py"; g="$HOME/.local/bin/gov"; [ -f..._an_ordinary_allowed_call_0/project/governance/kernel/hooks/context_watch.py': [Errno 2] No such file or directory\n")) = FolderCall(before=(CommandResult(command='h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.loc...llowed_call_0/project/governance/kernel/hooks/context_watch.py': [Errno 2] No such file or directory", new_findings=()).after
+E        +  and   False = all(<generator object TestABashCallAfterAChangeOfDirectory.test_an_ordinary_allowed_call_is_not_blocked.<locals>.<genexpr> at 0x71d853f3ea80>)
+
+tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py:188: AssertionError
+_____________________ TestHookStubs.test_hook_stubs_exist ______________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_38_rulesync.TestHookStubs object at 0x71d852aca540>
+generated_project = PosixPath('/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_hook_stubs_exist0/project')
+
+    @needs_rulesync
+    def test_hook_stubs_exist(self, generated_project):
+        settings = support.load_settings(generated_project)
+        script_paths = support.extract_hook_script_paths(settings)
+        assert script_paths, (
+            "no hook script paths found in .claude/settings.json; "
+            "hooks were not generated"
+        )
+        missing = [p for p in script_paths
+                   if not (generated_project / p).is_file()]
+>       assert not missing, (
+            f"hook scripts in .claude/settings.json do not exist: {missing}"
+        )
+E       AssertionError: hook scripts in .claude/settings.json do not exist: ['governance/kernel/hooks/context_watch.py']
+E       assert not ['governance/kernel/hooks/context_watch.py']
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:307: AssertionError
+________________ test_the_twelve_sources_are_the_composition[] _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: orchestrator
+E           assert '---\nname: o... mechanism.\n' == '---\nname: o... mechanism.\n'
+E             
+E             Skipping 1693 identical leading characters in diff, use -v to show
+E               -1052].
+E             + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E               - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E               - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E               ...
+E             
+E             ...Full output truncated (78 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...estrator.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/orchestrator.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+________________ test_this_repository_s_two_hooks_sources_agree ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_this_repository_s_two_hooks_sources_agree():
+        root = Path(__file__).resolve().parents[3]
+>       assert portability._hooks_findings(root) == []
+E       assert [{'code': 'HO...hooks.jsonc'}] == []
+E         
+E         Left contains one more item: {'code': 'HOOKS_MATCHER_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': "hook event postToolUse: matchers ['Bash'] here, ['Bash', 'Bash'] in template/.rulesync/hooks.jsonc"}
+E         Use -v to get more diff
+
+tests/unit/gitenv/test_program_env.py:114: AssertionError
+__ test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources __
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-182/pytest-of-usain/pytest-0/popen-gw1/test_adapter_portability_is_gr0')
+
+    def test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources(tmp_path):
+        """This repository's two files, byte for byte. Green once the template carries ``sessionStart``'s matcher
+        (DEC-805 item 2); the same project with that matcher taken out of the template's source is red, so that the
+        green is the comparison's and not the absence of one."""
+        w138 = _w138()
+        repository_text, _ = _read(support.REPO_HOOKS_SOURCE_REL)
+        template_text, template = _read(support.TEMPLATE_HOOKS_SOURCE_REL)
+        _repository()
+        project = _project(tmp_path, w138, repository_text, template_text)
+    
+        done, findings = _check(w138, project)
+    
+>       assert_green(w138, done, findings, "this repository's two hooks sources")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:340: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-182/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 39,\n  "generated_files": 54\n }\n}\n', stderr='')
+findings = [{'code': 'HOOKS_MATCHER_DIFFERS', 'file': '.rulesync/hooks.jsonc', 'message': "hook event postToolUse: matchers ['Bash'] here, ['Bash', 'Bash'] in template/.rulesync/hooks.jsonc"}]
+what = "this repository's two hooks sources"
+
+    def assert_green(w138, done, findings, what):
+>       assert done.returncode == 0 and not findings, (
+            f"adapter-portability is red on {what}, which is not drift (DEC-805: paths normalised; the order and the "
+            f"wrapper are not compared):\n{w138.output_of(done)[-3000:]}")
+E       AssertionError: adapter-portability is red on this repository's two hooks sources, which is not drift (DEC-805: paths normalised; the order and the wrapper are not compared):
+E         {
+E          "findings": [
+E           {
+E            "code": "HOOKS_MATCHER_DIFFERS",
+E            "message": "hook event postToolUse: matchers ['Bash'] here, ['Bash', 'Bash'] in template/.rulesync/hooks.jsonc",
+E            "file": ".rulesync/hooks.jsonc"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 39,
+E           "generated_files": 54
+E          }
+E         }
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 39,\n  "generated_files": 54\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:143: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-182/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=1601035) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+6 failed, 5592 passed, 6 skipped, 6 warnings in 953.16s (0:15:53)

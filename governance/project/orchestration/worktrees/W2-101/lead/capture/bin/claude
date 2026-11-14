@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Lead's pass-through capture for gov skilleval (W2-101): runs the real claude unchanged and appends one JSON line per
+# process (its working folder, the time, the prompt and the stdout the harness received) to replies.jsonl, so each
+# scenario's reply can be summarised in scenario-summaries.md. Reads no secret; the environment is not logged.
+REAL=/home/usain/.local/bin/claude
+LOG=/home/usain/gov-os-worktrees/W2-101/.gov-runtime/scratch/lead/capture/replies.jsonl
+IN=$(mktemp) OUT=$(mktemp)
+cat > "$IN"
+"$REAL" "$@" < "$IN" > "$OUT"
+rc=$?
+python3 -I - "$IN" "$OUT" "$PWD" "$rc" >> "$LOG" <<'PY'
+import json, sys, datetime
+p, o, cwd, rc = sys.argv[1:5]
+print(json.dumps({"at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "cwd": cwd,
+                  "rc": int(rc), "prompt": open(p).read(), "stdout": open(o).read()}))
+PY
+cat "$OUT"
+rm -f "$IN" "$OUT"
+exit "$rc"

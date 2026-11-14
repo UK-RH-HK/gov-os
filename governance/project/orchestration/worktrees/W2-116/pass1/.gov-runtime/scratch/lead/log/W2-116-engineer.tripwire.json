@@ -1,0 +1,178 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "9072eded34ee",
+   "after": "9a00b6d4eac5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "e344a13f8a56",
+   "after": "6facb561180a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116",
+   "change": "head",
+   "before": "2b733c4589b8",
+   "after": "ca757c6107d5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? src/gov/links/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? src/gov/links/check.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? src/gov/links/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? src/gov/links/patch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-129",
+   "change": "status line added",
+   "line": "?? tests/unit/links/test_links.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "head",
+   "before": "ee54d3cace9a",
+   "after": "6ca292ebb7fe"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": " M src/gov/retrieval/retrieve.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? docs/changes/W2-135-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-135",
+   "change": "status line gone",
+   "line": "?? tests/unit/retrieval/test_w2_135_item_cap.py"
+  }
+ ]
+}

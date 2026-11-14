@@ -1,0 +1,12 @@
+2026-11-13 14:48:11 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 14:48:11 merged W2-111 onto 95a55bfcac9b: 9c91d4f80208
+2026-11-13 15:08:19 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 15:08:26 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 15:08:29 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 15:08:30 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 15:08:31 flaky candidate (passes alone, decides nothing): tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+2026-11-13 15:09:04 the head without the batch: a throwaway worktree head-95a55bfcac9b-0 at 95a55bfcac9b with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 15:09:09 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-13 15:09:10 ADVANCED refs/heads/w2/integrate 95a55bfcac9b -> 9c91d4f80208; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/9c91d4f80208.json
+2026-11-13 15:09:10 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 15:10:30 integration store promoted: the merged clone's stores at 9c91d4f80208 into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)

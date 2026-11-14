@@ -1,0 +1,170 @@
+{
+ "act": "ACT-CLAUDE-COPIES-10",
+ "dec": "DEC-315, DEC-1112 (3), CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".claude/skills/api/SKILL.md",
+   "before": null,
+   "after": "9c3fa501a1fbf9251d2b9cc7902f417fe70550b061ba76610920272ca27c0f25"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/api/check_domain_skill.py",
+   "before": null,
+   "after": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/api/scenario-records.yaml",
+   "before": null,
+   "after": "a78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/api/scenario-summaries.md",
+   "before": null,
+   "after": "7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/api/scenarios.md",
+   "before": null,
+   "after": "65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/backend/SKILL.md",
+   "before": null,
+   "after": "e6f8cd8d6af5e99b2b3bc097917a828e4835875e89d4e941a844a1712343cbf2"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/backend/check_domain_skill.py",
+   "before": null,
+   "after": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/backend/scenario-records.yaml",
+   "before": null,
+   "after": "cf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/backend/scenario-summaries.md",
+   "before": null,
+   "after": "509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/backend/scenarios.md",
+   "before": null,
+   "after": "84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/data/SKILL.md",
+   "before": null,
+   "after": "d5b626f07ee83e9e1eadc53952270be44bfb950f54c7cf64f4f1be6b1bce32eb"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/data/check_domain_skill.py",
+   "before": null,
+   "after": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/data/scenario-records.yaml",
+   "before": null,
+   "after": "11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/data/scenario-summaries.md",
+   "before": null,
+   "after": "cf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/data/scenarios.md",
+   "before": null,
+   "after": "514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/security/SKILL.md",
+   "before": null,
+   "after": "973c40f5701e996877e5cb037ce4ff450c30f8635ef9a678be30782cd38dad61"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/security/check_domain_skill.py",
+   "before": null,
+   "after": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/security/scenario-records.yaml",
+   "before": null,
+   "after": "dfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/security/scenario-summaries.md",
+   "before": null,
+   "after": "4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/skills/security/scenarios.md",
+   "before": null,
+   "after": "477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea"
+  }
+ ],
+ "files": {
+  "after/repo/.claude/skills/api/SKILL.md": "9c3fa501a1fbf9251d2b9cc7902f417fe70550b061ba76610920272ca27c0f25",
+  "after/repo/.claude/skills/api/check_domain_skill.py": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382",
+  "after/repo/.claude/skills/api/scenario-records.yaml": "a78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880",
+  "after/repo/.claude/skills/api/scenario-summaries.md": "7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f",
+  "after/repo/.claude/skills/api/scenarios.md": "65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3",
+  "after/repo/.claude/skills/backend/SKILL.md": "e6f8cd8d6af5e99b2b3bc097917a828e4835875e89d4e941a844a1712343cbf2",
+  "after/repo/.claude/skills/backend/check_domain_skill.py": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382",
+  "after/repo/.claude/skills/backend/scenario-records.yaml": "cf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476",
+  "after/repo/.claude/skills/backend/scenario-summaries.md": "509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d",
+  "after/repo/.claude/skills/backend/scenarios.md": "84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a",
+  "after/repo/.claude/skills/data/SKILL.md": "d5b626f07ee83e9e1eadc53952270be44bfb950f54c7cf64f4f1be6b1bce32eb",
+  "after/repo/.claude/skills/data/check_domain_skill.py": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382",
+  "after/repo/.claude/skills/data/scenario-records.yaml": "11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589",
+  "after/repo/.claude/skills/data/scenario-summaries.md": "cf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135",
+  "after/repo/.claude/skills/data/scenarios.md": "514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418",
+  "after/repo/.claude/skills/security/SKILL.md": "973c40f5701e996877e5cb037ce4ff450c30f8635ef9a678be30782cd38dad61",
+  "after/repo/.claude/skills/security/check_domain_skill.py": "538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382",
+  "after/repo/.claude/skills/security/scenario-records.yaml": "dfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df",
+  "after/repo/.claude/skills/security/scenario-summaries.md": "4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6",
+  "after/repo/.claude/skills/security/scenarios.md": "477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea",
+  "list.txt": "80eb3bd09cfe00295b48997bf15ae5fd0e41fbb11b4b219f164c9313056255b6",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "rehearsal.log": "dbf8390b7301b43eb845e142a6dd661b3bcad3a6909a1cbe6314d578a93f774a"
+ },
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "dbf8390b7301b43eb845e142a6dd661b3bcad3a6909a1cbe6314d578a93f774a"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n9c3fa501a1fbf9251d2b9cc7902f417fe70550b061ba76610920272ca27c0f25  .claude/skills/api/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .claude/skills/api/check_domain_skill.py\na78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880  .claude/skills/api/scenario-records.yaml\n7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f  .claude/skills/api/scenario-summaries.md\n65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3  .claude/skills/api/scenarios.md\ne6f8cd8d6af5e99b2b3bc097917a828e4835875e89d4e941a844a1712343cbf2  .claude/skills/backend/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .claude/skills/backend/check_domain_skill.py\ncf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476  .claude/skills/backend/scenario-records.yaml\n509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d  .claude/skills/backend/scenario-summaries.md\n84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a  .claude/skills/backend/scenarios.md\nd5b626f07ee83e9e1eadc53952270be44bfb950f54c7cf64f4f1be6b1bce32eb  .claude/skills/data/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .claude/skills/data/check_domain_skill.py\n11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589  .claude/skills/data/scenario-records.yaml\ncf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135  .claude/skills/data/scenario-summaries.md\n514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418  .claude/skills/data/scenarios.md\n973c40f5701e996877e5cb037ce4ff450c30f8635ef9a678be30782cd38dad61  .claude/skills/security/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .claude/skills/security/check_domain_skill.py\ndfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df  .claude/skills/security/scenario-records.yaml\n4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6  .claude/skills/security/scenario-summaries.md\n477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea  .claude/skills/security/scenarios.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\nf6956285fd93785fe91534b0c5f76d1ce8bb2cff4d49775f7590cca567e5e965  .rulesync/skills/api/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .rulesync/skills/api/check_domain_skill.py\na78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880  .rulesync/skills/api/scenario-records.yaml\n7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f  .rulesync/skills/api/scenario-summaries.md\n65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3  .rulesync/skills/api/scenarios.md\n8c4e9e9d9a7e5e1f8a4bc0ba8bfe07e98d3187ea8c1026219fbdff8bcdc0b0da  .rulesync/skills/backend/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .rulesync/skills/backend/check_domain_skill.py\ncf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476  .rulesync/skills/backend/scenario-records.yaml\n509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d  .rulesync/skills/backend/scenario-summaries.md\n84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a  .rulesync/skills/backend/scenarios.md\nf388e1a605e2afd57bcc3277b240b3429b804f35bd69e977c8b09fc11843d03e  .rulesync/skills/data/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .rulesync/skills/data/check_domain_skill.py\n11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589  .rulesync/skills/data/scenario-records.yaml\ncf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135  .rulesync/skills/data/scenario-summaries.md\n514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418  .rulesync/skills/data/scenarios.md\n610371cfbc3410104fe3bfdd52cf8757402b22aaab550e15c5bb49618dcb93a1  .rulesync/skills/security/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  .rulesync/skills/security/check_domain_skill.py\ndfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df  .rulesync/skills/security/scenario-records.yaml\n4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6  .rulesync/skills/security/scenario-summaries.md\n477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea  .rulesync/skills/security/scenarios.md\nf6956285fd93785fe91534b0c5f76d1ce8bb2cff4d49775f7590cca567e5e965  template/.rulesync/skills/api/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/.rulesync/skills/api/check_domain_skill.py\na78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880  template/.rulesync/skills/api/scenario-records.yaml\n7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f  template/.rulesync/skills/api/scenario-summaries.md\n65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3  template/.rulesync/skills/api/scenarios.md\n8c4e9e9d9a7e5e1f8a4bc0ba8bfe07e98d3187ea8c1026219fbdff8bcdc0b0da  template/.rulesync/skills/backend/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/.rulesync/skills/backend/check_domain_skill.py\ncf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476  template/.rulesync/skills/backend/scenario-records.yaml\n509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d  template/.rulesync/skills/backend/scenario-summaries.md\n84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a  template/.rulesync/skills/backend/scenarios.md\nf388e1a605e2afd57bcc3277b240b3429b804f35bd69e977c8b09fc11843d03e  template/.rulesync/skills/data/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/.rulesync/skills/data/check_domain_skill.py\n11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589  template/.rulesync/skills/data/scenario-records.yaml\ncf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135  template/.rulesync/skills/data/scenario-summaries.md\n514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418  template/.rulesync/skills/data/scenarios.md\n610371cfbc3410104fe3bfdd52cf8757402b22aaab550e15c5bb49618dcb93a1  template/.rulesync/skills/security/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/.rulesync/skills/security/check_domain_skill.py\ndfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df  template/.rulesync/skills/security/scenario-records.yaml\n4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6  template/.rulesync/skills/security/scenario-summaries.md\n477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea  template/.rulesync/skills/security/scenarios.md\nf6956285fd93785fe91534b0c5f76d1ce8bb2cff4d49775f7590cca567e5e965  template/governance/kernel/skills/api/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/governance/kernel/skills/api/check_domain_skill.py\na78358a1ffd994e9f8497c08b3cbc3b1fe5f1947095ceda0d5f3995e522bd880  template/governance/kernel/skills/api/scenario-records.yaml\n7c0bc6fa0f15653b3381f3047b911f09fdfb3224d1c41e2982573f1b6007505f  template/governance/kernel/skills/api/scenario-summaries.md\n65b6460ce7b4fb628f9646e03369a40b466b1a12bf475b1a91e4de397c5fbae3  template/governance/kernel/skills/api/scenarios.md\n8c4e9e9d9a7e5e1f8a4bc0ba8bfe07e98d3187ea8c1026219fbdff8bcdc0b0da  template/governance/kernel/skills/backend/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/governance/kernel/skills/backend/check_domain_skill.py\ncf20652e825386ca82b763e811bcd93f94cba6e5ab77a4d5d0de1ac20b8f5476  template/governance/kernel/skills/backend/scenario-records.yaml\n509f68994fa29bc06f1065ff4b6ee3d62c219374efcafe1bdc82da7afe51014d  template/governance/kernel/skills/backend/scenario-summaries.md\n84b71aed50416474ecda06b9d927893b071f7ee190859b982dfe088b7d82409a  template/governance/kernel/skills/backend/scenarios.md\nf388e1a605e2afd57bcc3277b240b3429b804f35bd69e977c8b09fc11843d03e  template/governance/kernel/skills/data/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/governance/kernel/skills/data/check_domain_skill.py\n11436b7a7ec6ab9000c6ff1f15a9f1082e72cd2ae39c80e3016c202cb6e89589  template/governance/kernel/skills/data/scenario-records.yaml\ncf701bd3ed5523426f1d1e9e2a82f18b309fcddf925c69b34d9fe346d110b135  template/governance/kernel/skills/data/scenario-summaries.md\n514c5e473f2ef48346c9a69b5c30de3122ce997a65095bc0754ca302ef711418  template/governance/kernel/skills/data/scenarios.md\n610371cfbc3410104fe3bfdd52cf8757402b22aaab550e15c5bb49618dcb93a1  template/governance/kernel/skills/security/SKILL.md\n538a11b5959753b5a9f145d8752d9e776a40245f57cfc9e0371ad248e4459382  template/governance/kernel/skills/security/check_domain_skill.py\ndfcebf97d06b2d1709e7250d72fa2dbfe029e212aefb2a9270a867a4625359df  template/governance/kernel/skills/security/scenario-records.yaml\n4791045bd5b06fac8b4b6eb7d4f9f81f012030e4caed11b8d75ce2a86552e7c6  template/governance/kernel/skills/security/scenario-summaries.md\n477d93046c27d03668d98e848fd248c45d0cdcc59d57050cabd9737e179cb3ea  template/governance/kernel/skills/security/scenarios.md\nEOF",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

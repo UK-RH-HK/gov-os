@@ -1,0 +1,7 @@
+log: W2-130-A5-run1.json
+W2: W2-130
+status: PACKAGES
+
+task: DAEO-q8cl (W2-130)
+status: PACKAGES
+work_completed: I stopped this build run before launching any worker. The ticket's Verify clauses, added today in f2b1d38af, were written as if no clean-up had been done yet ("to be written before the clean-up"). In fact the clean-up was applied on 2026-11-08/09 by e12f8a30c (marks batches a0/a1/a2 and sources b1, independent audit READY after 12 marks dropped) and c4420040f (the owner's sitting on W2-130-SITTING.md, ruled in DEC-1098 (3): 150 statuses, archive H2, 16 marks, KPI 4 changed by H1 (b)). Several Verify clauses are about the shape of partic

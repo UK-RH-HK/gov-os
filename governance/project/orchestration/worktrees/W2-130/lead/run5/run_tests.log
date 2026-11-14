@@ -1,0 +1,39 @@
+== files 2026-11-14T08:33:39+00:00
+files rc=0
+..........................                                               [100%]
+26 passed in 13.74s
+== accept 2026-11-14T08:33:56+00:00
+accept rc=3
+      "kpi": "failure-3",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-4",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 80,
+    "failed": 1,
+    "skipped": 0
+  }
+}
+== scoped 2026-11-14T08:34:55+00:00
+scoped rc=1
+
+tests/acceptance/W2-130/test_w2_130_sources.py:72: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-130/test_w2_130_sources.py::test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form
+1 failed, 131 passed in 55.83s
+== end 2026-11-14T08:35:57+00:00

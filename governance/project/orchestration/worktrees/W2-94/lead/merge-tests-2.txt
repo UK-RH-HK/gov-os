@@ -1,0 +1,6 @@
+Merge w2/W2-94-tests (DAEO-g87r): the S5 map cell re-worded so gov accept reads it (ad1fd021f83a)
+
+Task: DAEO-g87r
+Role: orchestrator
+Implements: DEC-957, DEC-954
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

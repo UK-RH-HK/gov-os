@@ -1,0 +1,123 @@
+{
+ "env": {
+  "no_proxy": "localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
+  "grpc_proxy": "http://<cred>@127.0.0.1:3128",
+  "CLAUDE_CODE_HOST_SOCKS_PROXY_PORT": "33103",
+  "ftp_proxy": "socks5h://<cred>@localhost:1080",
+  "CLOUDSDK_PROXY_TYPE": "http",
+  "CLOUDSDK_PROXY_PORT": "3128",
+  "DOCKER_HTTP_PROXY": "http://<cred>@127.0.0.1:3128",
+  "https_proxy": "http://<cred>@127.0.0.1:3128",
+  "NO_PROXY": "localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
+  "FTP_PROXY": "socks5h://<cred>@localhost:1080",
+  "RSYNC_PROXY": "localhost:1080",
+  "HTTPS_PROXY": "http://<cred>@127.0.0.1:3128",
+  "HTTP_PROXY": "http://<cred>@127.0.0.1:3128",
+  "http_proxy": "http://<cred>@127.0.0.1:3128",
+  "GRPC_PROXY": "http://<cred>@127.0.0.1:3128",
+  "ALL_PROXY": "http://<cred>@127.0.0.1:3128",
+  "all_proxy": "http://<cred>@127.0.0.1:3128",
+  "CLOUDSDK_PROXY_ADDRESS": "127.0.0.1",
+  "CLAUDE_CODE_HOST_HTTP_PROXY_PORT": "33103",
+  "DOCKER_HTTPS_PROXY": "http://<cred>@127.0.0.1:3128"
+ },
+ "direct 127.0.0.1:47311": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "http_connect 127.0.0.1:47311": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 200 Connection Established",
+  "head": "HTTP/1.1 200 Connection Established\r\n\r\n",
+  "ok": true,
+  "reply": "B3-OK 47311\n"
+ },
+ "socks5 127.0.0.1:47311": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ },
+ "direct 127.0.0.1:47312": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "http_connect 127.0.0.1:47312": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 200 Connection Established",
+  "head": "HTTP/1.1 200 Connection Established\r\n\r\n",
+  "ok": true,
+  "reply": "B3-OK 47312\n"
+ },
+ "socks5 127.0.0.1:47312": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ },
+ "direct localhost:47311": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "http_connect localhost:47311": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 403 host is not on the allow list",
+  "head": "HTTP/1.1 403 host is not on the allow list\r\nContent-Type: text/plain\r\nX-Proxy-Error: blocked-by-allowlist\r\n\r\nConnection blocked by network allowlist",
+  "ok": false
+ },
+ "socks5 localhost:47311": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ },
+ "direct localhost:47312": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "http_connect localhost:47312": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 403 host is not on the allow list",
+  "head": "HTTP/1.1 403 host is not on the allow list\r\nContent-Type: text/plain\r\nX-Proxy-Error: blocked-by-allowlist\r\n\r\nConnection blocked by network allowlist",
+  "ok": false
+ },
+ "socks5 localhost:47312": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ },
+ "OLLAMA direct 127.0.0.1:11434": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "OLLAMA http_connect 127.0.0.1:11434": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 200 Connection Established",
+  "head": "HTTP/1.1 200 Connection Established\r\n\r\n",
+  "ok": true,
+  "reply": "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nDate: Fri, 13 Nov 2026 15:04:12 GMT\r\nContent-Length: 20\r\nConnection: close\r\n\r\n{\"version\":\"0.35.0\"}"
+ },
+ "OLLAMA socks5 127.0.0.1:11434": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ },
+ "OLLAMA direct localhost:11434": {
+  "ok": false,
+  "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+ },
+ "OLLAMA http_connect localhost:11434": {
+  "proxy": "http://<cred>@127.0.0.1:3128",
+  "connect_status": "HTTP/1.1 403 host is not on the allow list",
+  "head": "HTTP/1.1 403 host is not on the allow list\r\nContent-Type: text/plain\r\nX-Proxy-Error: blocked-by-allowlist\r\n\r\nConnection blocked by network allowlist",
+  "ok": false
+ },
+ "OLLAMA socks5 localhost:11434": {
+  "proxy": "socks5h://<cred>@localhost:1080",
+  "greeting": "0500",
+  "connect_reply": "05020001000000000000",
+  "ok": false
+ }
+}

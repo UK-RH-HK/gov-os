@@ -1,0 +1,6 @@
+W2-185 (DAEO-qyt2): merge the test designer's README fix (tests/acceptance/W2-185, 18 mapped) and W1-38's seven-hook fixture (w2/W2-185-tests at 2230cce50: batch 2, the self-check row under F1)
+
+Task: DAEO-qyt2
+Role: orchestrator
+Implements: DEC-1167, DEC-971, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,8 @@
+log: W2-101-A5-run1.json
+W2: W2-101
+status: PACKAGES
+
+task: DAEO-6icv
+status: PACKAGES
+work_completed: I stopped build run 1 before any worker started, as role-lead requires (DEC-1052) when the ticket does not state its interface. The ticket has no `## Interface` section, and the claim commit e0960709 changes only `status:`. I checked the KPI clauses against the code at e0960709 and found six that need product code outside W2-101's paths. They are the same six gaps W2-100's lead reported in P-W2-100-IF-1. I wrote package P-W2-101-IF-1 and the checkpoint.
+files_changed: none committed. Records in `.gov-runtime/scratch/lead/` (gitignored): `package

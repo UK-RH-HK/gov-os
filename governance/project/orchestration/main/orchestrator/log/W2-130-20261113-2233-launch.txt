@@ -1,0 +1,101 @@
+2026-11-13 22:33:02 admitted by the dispatcher; launching W2-130
+disk gate open: 698 GiB free, 55817641 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 17586237440,
+  "sessions_live_memory_bytes": 2442825728,
+  "load_1m": 7.83,
+  "load_15m": 17.36,
+  "busy_cores_1m": 4.78,
+  "embedding_cpu_p95": {
+    "shared": 0.06,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.03,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 749161725952,
+    "free_inodes": 55817641
+  },
+  "sessions": [
+    {
+      "pid": 1832483,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a",
+      "ticket": "DAEO-03ub",
+      "role": "orchestrator",
+      "live_memory_bytes": 287805440
+    },
+    {
+      "pid": 1895967,
+      "repository": "/home/usain/gov-os-worktrees/W2-185",
+      "ticket": "DAEO-qyt2",
+      "role": "orchestrator",
+      "live_memory_bytes": 315670528
+    },
+    {
+      "pid": 2719545,
+      "repository": "/home/usain/gov-os-worktrees/W2-174",
+      "ticket": "DAEO-zmo4",
+      "role": "orchestrator",
+      "live_memory_bytes": 292798464
+    },
+    {
+      "pid": 2908634,
+      "repository": "/home/usain/gov-os-worktrees/W2-88b",
+      "ticket": "DAEO-aks1",
+      "role": "orchestrator",
+      "live_memory_bytes": 658235392
+    },
+    {
+      "pid": 2918284,
+      "repository": "/home/usain/gov-os-worktrees/W2-174-tests",
+      "ticket": "DAEO-zmo4",
+      "role": "independent-test-designer",
+      "live_memory_bytes": 332939264
+    },
+    {
+      "pid": 3635358,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a",
+      "ticket": "DAEO-03ub",
+      "role": "independent-auditor",
+      "live_memory_bytes": 269008896
+    },
+    {
+      "pid": 3639402,
+      "repository": "/home/usain/gov-os-worktrees/W2-185",
+      "ticket": "DAEO-qyt2",
+      "role": "independent-auditor",
+      "live_memory_bytes": 286367744
+    }
+  ],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 3648437,
+    "repository": "/home/usain/gov-os-worktrees/W2-130",
+    "ticket": "DAEO-q8cl",
+    "role": "orchestrator",
+    "started": "2026-11-13T22:33:02+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 18859632
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-13 22:33:02 gate open; DAEO-q8cl registered as pid 3648437; starting W2-130

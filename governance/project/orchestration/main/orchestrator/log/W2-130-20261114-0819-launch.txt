@@ -1,0 +1,67 @@
+2026-11-14 08:19:05 admitted by the dispatcher; launching W2-130
+disk gate open: 678 GiB free, 54321096 inodes free
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 18452209664,
+  "sessions_live_memory_bytes": 269565952,
+  "load_1m": 7.09,
+  "load_15m": 4.34,
+  "busy_cores_1m": 2.12,
+  "embedding_cpu_p95": {
+    "shared": 0.1,
+    "query": 0.0
+  },
+  "embedding_cpu_now": {
+    "shared": 0.0,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 727233155072,
+    "free_inodes": 54321097
+  },
+  "sessions": [
+    {
+      "pid": 2682503,
+      "repository": "/home/usain/gov-os-worktrees/W2-88b",
+      "ticket": "DAEO-aks1",
+      "role": "orchestrator",
+      "live_memory_bytes": 269565952
+    }
+  ],
+  "cleared": [
+    {
+      "pid": 1970851,
+      "repository": "/home/usain/gov-os-worktrees/W2-42a",
+      "ticket": "DAEO-03ub",
+      "role": "orchestrator",
+      "live_memory_bytes": null
+    }
+  ],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+{
+  "registered": {
+    "pid": 2420265,
+    "repository": "/home/usain/gov-os-worktrees/W2-130",
+    "ticket": "DAEO-q8cl",
+    "role": "orchestrator",
+    "started": "2026-11-14T08:19:05+00:00",
+    "boot": "30c2b5d7-9c68-4f06-b808-7c192983051f",
+    "start_ticks": 22180607
+  },
+  "registry": "/home/usain/.gov-os/machine/sessions"
+}
+2026-11-14 08:19:05 gate open; DAEO-q8cl registered as pid 2420265; starting W2-130

@@ -1,0 +1,6 @@
+You have one skill, "security", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+in a configuration file the ticket's paths hold, the session finds a line `payment_api_key: <a 40-character value>` that looks like a live production key, committed three weeks ago on a branch other people have pulled.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

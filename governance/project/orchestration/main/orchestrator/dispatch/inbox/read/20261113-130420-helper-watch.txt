@@ -1,0 +1,7 @@
+log: helper-watch.log
+Helper: worker ended with an error
+status: launched worker rev-4 (pid 1183461, /home/usain/gov-os-worktrees/W2-37/.gov-runtime/scratch/lead/log) ended with exit 1
+last: no error in its JSON result
+
+file: /home/usain/gov-os-worktrees/W2-37/.gov-runtime/scratch/lead/log/rev-4.json
+Check it and resume it (SendMessage to the agent id, or a fresh session from its brief).

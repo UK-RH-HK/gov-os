@@ -1,0 +1,7 @@
+tests/unit/launch rc=0 339 passed, 86 deselected in 8.68s
+tests/acceptance/W2-60a rc=0 236 passed, 6 deselected in 194.88s (0:03:14)
+tests/acceptance/W2-153 rc=0 137 passed, 18 skipped in 7.31s
+tests/acceptance/W2-56 rc=1 74 failed, 210 passed, 12 deselected in 174.78s (0:02:54)
+tests/acceptance/W2-58 rc=0 99 passed, 709 deselected in 44.17s
+tests/acceptance/W2-50 rc=0 24 passed, 612 deselected in 23.87s
+done

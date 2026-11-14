@@ -1,0 +1,44 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line added",
+   "line": " M template/governance/kernel/skills/api/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line added",
+   "line": " M template/governance/kernel/skills/backend/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line added",
+   "line": " M template/governance/kernel/skills/data/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line added",
+   "line": " M template/governance/kernel/skills/security/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": " D template/governance/kernel/skills/api/scenario-summaries.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": " D template/governance/kernel/skills/backend/scenario-summaries.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": " D template/governance/kernel/skills/data/scenario-summaries.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-100",
+   "change": "status line gone",
+   "line": " D template/governance/kernel/skills/security/scenario-summaries.md"
+  }
+ ]
+}

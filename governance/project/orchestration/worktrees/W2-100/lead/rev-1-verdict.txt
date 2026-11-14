@@ -1,0 +1,21 @@
+```verdict
+{"kpis": [
+ {"kpi": "w2-100-S1", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-S2", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-S3", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-S4", "verdict": "pass", "findings": [
+   {"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"},
+   {"id": "F2", "scope": "out", "ordinary_work": "yes", "consequence": "fails open"},
+   {"id": "F3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]},
+ {"kpi": "w2-100-S5", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-S6", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-F1", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-F2", "verdict": "pass", "findings": [
+   {"id": "F4", "scope": "in", "ordinary_work": "yes", "consequence": "other"},
+   {"id": "F5", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]},
+ {"kpi": "w2-100-F3", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-F4", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-F5", "verdict": "pass", "findings": []},
+ {"kpi": "w2-100-F6", "verdict": "pass", "findings": []}
+]}
+```

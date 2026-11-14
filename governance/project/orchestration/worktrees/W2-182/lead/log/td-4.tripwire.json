@@ -1,0 +1,40 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "head",
+   "before": "cc7867f9303e",
+   "after": "10213e3bb33c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-182-tests",
+   "change": "acceptance folder",
+   "folder": "W2-182"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_f1_invalid_setting.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s1_close_setting.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s2_supplementary_cap.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-183/test_w2_183_s3_unchanged.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-183-tests",
+   "change": "acceptance folder",
+   "folder": "W2-183"
+  }
+ ]
+}

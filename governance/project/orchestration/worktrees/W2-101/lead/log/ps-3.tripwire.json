@@ -1,0 +1,25 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "head",
+   "before": "33484a699983",
+   "after": "0b0d4cb3053d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/devops/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/frontend/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "status line gone",
+   "line": "?? template/governance/kernel/skills/ui-ux/scenario-records.yaml"
+  }
+ ]
+}

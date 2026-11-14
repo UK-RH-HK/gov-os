@@ -1,36 +1,11 @@
-# Lead checkpoint, DAEO-drhj (W2-104), run 2 — FINAL (returned DONE)
+task: DAEO-drhj
+decisions_applied: DEC-959, DEC-820, DEC-1164 (18) (the reopening), DEC-968 (scoped run), DEC-801, DEC-808, DEC-1010
 
-## Run 1 (returned DONE at ac2d92af8c0e)
-- Verified code head 738cec98cf63; gov accept 43 passed, 7/7 KPI lines. One P2 (P-W2-104-CMDLIST) decided by
-  DEC-1020 (a); P-W2-104-CLAUDEPATH (c): a residual.
+STATE: run 5 returned DONE at c9f07ef3782b (verified ac18ac2ab7c8 + probe record) | HEAD: c9f07ef3782b | NEXT: the queue lands w2/W2-104 at c9f07ef3782b | WAITING ON: none
 
-## Run 2
-- Head at start ac2d92af8c0e, clean.
-- 4ee33fecc23b (lead): merge of w2/integrate (head 9d605eba20a2, ticket file d942524f), --no-ff, clean.
-- 9fc5bcc3f90d (engineer eng-3, gov launch, sandboxed, effort high, session 2690bd5e): "skilleval" appended to
-  RECORDED_GOV_COMMANDS; one line; trailers Task/Role: engineer/Implements: DEC-747,DEC-1020/Co-Authored-By.
-  Tripwire 5: only this tree's head moved. Its unit run: 97 passed.
-- 909d7ff0a926 (lead): CP-DAEO-drhj-0006 (gov checkpoint). Selection is the same at 909d7ff0a926 and
-  9fc5bcc3f90d.
-- Verified head: 9fc5bcc3f90d (code); returned head 909d7ff0a926.
-- select-3/-4: scoped, core_changed [src/gov/check/commands.py], unplaced [], 66 targets.
-- W1-26 folder: 419 passed, 1 skipped. Scoped parallel: 17 failed, 9882 passed, 4 skipped, 2 errors (W2-104 43/43;
-  W1-26, W1-07, W1-32, W2-96, unit check and unit skilleval all green). Serial (13 of 65 entries): 3 failed,
-  63 passed (W2-54 x3, inherited).
-- No red is this ticket's. The run-1 reds W1-26 [skilleval] x2 are gone. New inherited reds: test_dispatcher x6 (from
-  integrate 66b08891; it reads .gov-runtime/scratch/orchestrator/tools/{land,close_build}.py in the tree, which
-  exists only in the main tree; also red when run alone). DEC-919 known: W2-66 lead_verification (W2-104 conftest).
-- gov check exit 3: RED context-reproducibility (DAEO-i89t AR-5 not in store), core-mutation (.tickets/DAEO-a3u2.md),
-  retrieval-regression (600 s limit); YELLOW core-decision-citations, openspec-validate. All inherited.
-- rebuild-6 and rebuild-7: exit 75, semantic not_recreated (Ollama did not embed; a 1-word embed probe timed out
-  at 30 s). The record and lexical stores were recreated.
-- collect-only: 19263/19265 tests collected (2 deselected). trailer_gate: 14 judged, 0 lacking. keyword_warn: 0.
-- Outputs: /tmp/gov-os-lead-W2-104/run2/{w1_26,parallel,serial}.xml and run2-*.txt.
-
-## Brief gaps
-- jq is not installed (I wrote small Python summarisers) | tool | ~2 min
-- The sandbox shows 11 /dev/null mount points as untracked in git status (from the engineer) | common brief | ~1 min (engineer)
-- A rebuild_slot exit 75 because the shared embedder is hung: the brief has no rule for it | common brief | ~35 min (two rebuilds)
-
-## Leftovers for the orchestrator
-- /tmp/gov-os-lead-W2-104/ (329 MB, 39,650 inodes); /tmp/gov-launch-engineer-* (tiny)
+Workers: eng-6 (engineer, Sonnet 5.5 medium, 64096c62-be03-471e-be62-87ed0bd9b6ab, DONE ac18ac2ab) · rev-5 (auditor, Opus high, 71669588-4473-4c9d-a058-772b769930dd, PASS no findings)
+Rounds: converged
+Decisions taken: integrate c82335a401df merged clean as 3ef7c62c4 (tree = integrate's); no test designer this run (the CTO's order: engineer writes the unit case); probe record c9f07ef37.
+Open packages: none
+Verification at ac18ac2ab7c8: gov accept 43/0/0; unit skilleval 35/0; rebuild-10 exit 0; lead_verify scoped (140 files, 5732 tests): 5725 passed, 1 failed (test_w2_112_shared_reranker::test_the_running_service_writes_one_memory_line_per_request, load race; green alone with short TMPDIR), 6 skipped.
+Paths: briefs lead/briefs/{eng-6,rev-5,ctx-engineer-6}.md; logs lead/log/{eng-6,rev-5,accept-5,unit-5,rebuild-10,verify-5,rerun-5,rerun-5b}.*, lead/log/verify/; auditor return lead/rev-5-return.md. No tests worktree made.

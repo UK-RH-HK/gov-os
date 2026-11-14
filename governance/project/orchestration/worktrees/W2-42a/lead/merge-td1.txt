@@ -1,0 +1,9 @@
+Merge w2/W2-42a-tests (49ea1fa10a69): the replay of a vanished worktree's refusal in a stand-in clone (td-1)
+
+The 33 replay rows whose logged worktree was removed after its ticket landed (W2-16, 64, 67, 76, 84, 90, 95, 96,
+107, 112) failed with FileNotFoundError on a11ddc51e (the environment's red); each is now replayed in a stand-in clone
+of the tree under test, with every verdict, HELD and the hook fixture unchanged (DEC-1052: the restore is the test
+designer's).
+
+Task: DAEO-03ub
+Role: orchestrator

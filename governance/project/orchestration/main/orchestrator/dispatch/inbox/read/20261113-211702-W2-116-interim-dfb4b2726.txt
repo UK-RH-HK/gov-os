@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-116
+status: interim result dfb4b2726: W2-116 pass 2c (DAEO-f58b): the pass 2b narrow probe record's implementer_session quoted, so its frontmatter is YAML (core-schema green)

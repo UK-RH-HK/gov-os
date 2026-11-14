@@ -1,92 +1,158 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-13 18:36:43)
 bringing up nodes...
 bringing up nodes...
 
+........................................................................ [  0%]
 ........................................................................ [  1%]
-........................................................................ [  2%]
-........................................................................ [  4%]
+............................................................F........... [  2%]
+........................................................................ [  3%]
+........................s............................................... [  4%]
 ........................................................................ [  5%]
+........................................................................ [  6%]
 ........................................................................ [  7%]
 ........................................................................ [  8%]
+........................................................................ [  9%]
 ........................................................................ [ 10%]
 ........................................................................ [ 11%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
 ........................................................................ [ 13%]
 ........................................................................ [ 14%]
-........................................................................ [ 15%]
-........................................................................ [ 17%]
+.........s.............................................................. [ 15%]
+........................................................................ [ 16%]
+.......................................F................................ [ 17%]
 ........................................................................ [ 18%]
+........................................................................ [ 19%]
 ........................................................................ [ 20%]
 ........................................................................ [ 21%]
+........................................................................ [ 22%]
 ........................................................................ [ 23%]
-........................................................................ [ 24%]
+........................................................................ [ 23%]
+...........................................F............................ [ 24%]
+........................................................................ [ 25%]
 ........................................................................ [ 26%]
-........................................................................ [ 27%]
+.................................................................s...... [ 27%]
+........................................................................ [ 28%]
 ........................................................................ [ 29%]
 ........................................................................ [ 30%]
 ........................................................................ [ 31%]
+........................................................................ [ 32%]
 ........................................................................ [ 33%]
 ........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 35%]
 ........................................................................ [ 36%]
 ........................................................................ [ 37%]
+......................................F................................. [ 38%]
 ........................................................................ [ 39%]
 ........................................................................ [ 40%]
+........................................................................ [ 41%]
 ........................................................................ [ 42%]
 ........................................................................ [ 43%]
+........................................................................ [ 44%]
 ........................................................................ [ 45%]
-.................sssssss..................sss........................... [ 46%]
+........................................................................ [ 46%]
 ........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
 ........................................................................ [ 49%]
-.............................ss....................................s.... [ 50%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
 ........................................................................ [ 52%]
-.........s.............................................................. [ 53%]
-..........................................ss................sssss.....ss [ 55%]
-s....................FF................................................. [ 56%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
 ........................................................................ [ 58%]
 ........................................................................ [ 59%]
+........................................................................ [ 59%]
 ........................................................................ [ 60%]
-........................................................................ [ 62%]
+........................................................................ [ 61%]
+.....................................ssss............................... [ 62%]
 ........................................................................ [ 63%]
+........................................................................ [ 64%]
 ........................................................................ [ 65%]
 ........................................................................ [ 66%]
+........................................................................ [ 67%]
 ........................................................................ [ 68%]
 ........................................................................ [ 69%]
+........................................................................ [ 70%]
 ........................................................................ [ 71%]
+..sss................................................................... [ 71%]
 ........................................................................ [ 72%]
+................................sss..................................... [ 73%]
 ........................................................................ [ 74%]
 ........................................................................ [ 75%]
 ........................................................................ [ 76%]
+........................................................................ [ 77%]
 ........................................................................ [ 78%]
-.................sss.................................................... [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
 ........................................................................ [ 81%]
 ........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
 ........................................................................ [ 84%]
 ........................................................................ [ 85%]
+........................................................................ [ 86%]
 ........................................................................ [ 87%]
 ........................................................................ [ 88%]
+........................................................................ [ 89%]
 ........................................................................ [ 90%]
 ........................................................................ [ 91%]
 ........................................................................ [ 92%]
+........................................................................ [ 93%]
 ........................................................................ [ 94%]
 ........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
 ........................................................................ [ 97%]
 ........................................................................ [ 98%]
-...............................................................          [100%]
+........................................................................ [ 99%]
+..........................                                               [100%]
 =================================== FAILURES ===================================
-__________ test_the_skill_runs_gov_impact_for_the_question[template] ___________
-[gw0] linux -- Python 3.12.3 /usr/bin/python3
+________ test_the_skill_carries_one_version_in_all_four_places[change] _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
 
-path = PosixPath('/home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md')
+name = 'change'
 
-    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
-    def test_the_skill_runs_gov_impact_for_the_question(path):
-        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
-        text = section(path)
->       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
-E       AssertionError: /home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
-E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+        assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+>       assert len({str(v) for v in versions.values()}) == 1, f"{name}: the versions differ: {versions}"
+E       AssertionError: change: the versions differ: {'template/governance/kernel/skills': '1.1.0', '.claude/skills': '1.0.0', '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.1.0'}
+E       assert 2 == 1
+E        +  where 2 = len({'1.0.0', '1.1.0'})
 
-tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+tests/acceptance/W2-11/test_w2_11_skills.py:150: AssertionError
+_ test_s1_the_code_graph_tool_is_off_path_in_a_suite_other_than_w1_16_and_w1_20 _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+sessions = [{'code': 0, 'daemons': ['/tmp/gov-cbm-1000-cr5prf0u/2ad4a05f47c89b0a', '/tmp/gov-cbm-1000-cr5prf0u/83b9ee4865064e89']...'}], 'output': '...                                                                      [100%]\n3 passed in 0.32s\n'}]
+
+    def test_s1_the_code_graph_tool_is_off_path_in_a_suite_other_than_w1_16_and_w1_20(sessions):
+        for session in sessions:
+            seen = [note["found"] for note in session["notes"] if note["kind"] == "which"]
+            assert seen, f"the probe session did not run\n{session['output']}"
+>           assert seen == [None], f"{TOOL} is on PATH in the probe's suite: {seen[0]}"
+E           AssertionError: codebase-memory-mcp is on PATH in the probe's suite: /home/usain/.local/bin/codebase-memory-mcp
+E           assert ['/home/usain...e-memory-mcp'] == [None]
+E             
+E             At index 0 diff: '/home/usain/.local/bin/codebase-memory-mcp' != None
+E             Use -v to get more diff
+
+tests/acceptance/W2-56/test_w2_56_suite_daemon.py:99: AssertionError
 _________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
-[gw0] linux -- Python 3.12.3 /usr/bin/python3
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
 
 path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
 
@@ -99,6 +165,23 @@ E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change
 E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
 
 tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+_ test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e9c4d3d5d00>
+
+    def test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path(monkeypatch):
+        """W2-56 S1, through tests/conftest.py: this session's folder is named, and the real tool is off PATH here."""
+        monkeypatch.undo()
+        base = os.environ.get(codeintel.BASE_ENV)
+        assert base and Path(base).is_dir()
+>       assert shutil.which(codeintel.TOOL) is None
+E       AssertionError: assert '/home/usain/.local/bin/codebase-memory-mcp' is None
+E        +  where '/home/usain/.local/bin/codebase-memory-mcp' = <function which at 0x7e9c5696fa60>('codebase-memory-mcp')
+E        +    where <function which at 0x7e9c5696fa60> = shutil.which
+E        +    and   'codebase-memory-mcp' = codeintel.TOOL
+
+tests/unit/codeintel/test_codeintel.py:168: AssertionError
 =============================== warnings summary ===============================
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
@@ -106,34 +189,22 @@ tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_adm
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
 tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
-  /home/usain/gov-os-worktrees/W2-37/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=731334) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  /home/usain/gov-os-worktrees/W2-37/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=2968557) is multi-threaded, use of fork() may lead to deadlocks in the child.
     pid = os.fork()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ============================
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:24: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:31: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:38: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:52: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:59: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:72: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_code_graph.py:78: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:48: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:54: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_deletable.py:64: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:51: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_incomplete.py:58: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_question.py:40: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_resume_findings.py:227: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:109: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:211: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:277: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [1] tests/acceptance/W2-37/test_w2_37_review_findings.py:290: codebase-memory-mcp is not on PATH on this machine
-SKIPPED [2] tests/acceptance/W2-37/test_w2_37_review_findings.py:309: codebase-memory-mcp is not on PATH on this machine
+SKIPPED [1] tests/acceptance/W2-159/test_f4_scope.py:66: F4 judges only the branch w2/W2-159; this is the branch w2/W2-37: not judged here
+SKIPPED [1] tests/acceptance/W2-20/test_w2_20_measured.py:183: S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/acceptance/W2-56/test_w2_56_real_sandbox.py:136: real_sandbox: starts real CLI sessions; set GOV_W2_56_REAL=1 (the CTO, outside the launch sandbox)
+SKIPPED [1] tests/acceptance/W2-56/test_w2_56_real_sandbox.py:165: real_sandbox: starts real CLI sessions; set GOV_W2_56_REAL=1 (the CTO, outside the launch sandbox)
+SKIPPED [1] tests/acceptance/W2-56/test_w2_56_real_sandbox.py:224: real_sandbox: starts real CLI sessions; set GOV_W2_56_REAL=1 (the CTO, outside the launch sandbox)
+SKIPPED [1] tests/acceptance/W2-56/test_w2_56_real_sandbox.py:266: real_sandbox: starts real CLI sessions; set GOV_W2_56_REAL=1 (the CTO, outside the launch sandbox)
 SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
 SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
 SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
 SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
-2 failed, 4930 passed, 27 skipped, 6 warnings in 813.15s (0:13:33)
+4 failed, 7785 passed, 13 skipped, 6 warnings in 2079.10s (0:34:39)

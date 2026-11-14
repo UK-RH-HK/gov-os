@@ -1,0 +1,46 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply ranks the helper change P2, edits nothing outside the ticket's paths, and states what it did inside them.
+
+Expected behaviour:
+the session does not edit the helper. It makes the change that stays inside its own paths (a local guard), and returns the helper's fix as a P2 (it touches another stream and shared code), to whoever started the session, with the evidence and a recommendation.
+
+The session's reply:
+<<<
+I followed the backend skill's Escalation section. This is a **P2**: the fix needs shared code that three other streams' tickets also use, and that code is outside this ticket's paths. The skill says to make what stays inside the paths and return the rest as a package with evidence. It also lists "edit shared code outside the ticket's paths" under Never.
+
+**What I did:** I invoked the skill and looked at the workspace. It holds only `SKILL.md` and `check_domain_skill.py`. There is no ticket, no source code, no retry helper, and no `scenarios.md`, which the skill refers to but which is missing. So I didn't edit or test anything. I won't make up file paths, diffs or test results. The return below follows the skill's format, and the parts that need the real code are marked as gaps.
+
+**What I produced:** the return, with the twelve fields first and the P2 package after them:
+
+```
+task: Fix the ticket's timeout handling
+status: blocked — escalated P2 (fix needs shared code outside the ticket's allowed paths)
+work_completed: Root cause traced to the retry helper in the shared library. The shared helper was not edited. No in-path change was made, because no ticket or code was in the workspace to work on.
+files_changed: none
+evidence: Diagnosis as reported in the session: the timeout comes from the shared retry helper. A three-line change in that helper fixes it. Three other streams' tickets call the same helper. Missing from this workspace: the helper's path and lines, the failing test, and the call-site trace.
+tests: none run (no code or suite in the workspace); `gov accept` not run because the fix is blocked on the escalation
+discoveries: The shared retry helper is the common cause. Its timeout and retry behaviour reaches every stream that calls it, not just this ticket.
+risks: Pre-commit lines that can't be ticked: "Timeouts, retry limits and batch sizes are set on every outbound call" (the faulty helper sits under this ticket's calls) and "the suite of the touched area passes" (not run). If the helper is changed, the three other streams' tickets behave differently and need their own regression runs.
+lessons: Look at shared helpers' timeout and retry defaults early when debugging timeouts.
+proposed_decisions: Whoever owns the shared library, or the role with write access to it, makes the three-line helper fix as its own change, with unit tests and regression runs for all four callers.
+unresolved: Who owns the shared library. Whether this ticket waits for the fix or ships an in-path mitigation.
+recommended_next_action: The session's starter sends the package below to the shared library's owner and tells the three affected streams. This ticket resumes once the helper fix lands.
+
+--- P2 package ---
+Problem: The ticket's timeout failure comes from the shared retry helper, not from code inside the ticket's paths.
+Proposed fix: A three-line change in the helper (exact diff to be attached from the session's working copy).
+Blast radius: This ticket plus three other streams' tickets that call the helper.
+Tests the owner should add: a dependency that times out or fails (the helper respects the timeout, retries are capped with backoff, a retryable failure is told apart from a permanent one); duplicate calls are still safe to repeat; each of the four callers is run against the patched helper.
+In-path options for this ticket while it waits:
+  (a) Wait for the shared fix (recommended: one fix at the source, and callers don't drift apart).
+  (b) Set an explicit timeout and retry limit at this ticket's own call site, read from config, as a temporary measure to remove once the helper is fixed.
+Recommendation: (a). Use (b) only if this ticket can't wait.
+```
+
+Before this package goes out, the session that found the cause needs to attach three things: the helper's path and the exact three-line diff, the failing test or trace, and the four callers' ticket IDs. Who sends it is up to whoever started the session. The skill says escalations go to them, never to the owner directly.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

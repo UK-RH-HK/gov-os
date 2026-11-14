@@ -695,3 +695,129 @@
 2026-11-13 12:23:32 landing ae6537878c8c..775b430cde60: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-13 12:43:50 landing 775b430cde60..63bebafd7441: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-13 12:51:04 landing 63bebafd7441..36fc597ca74f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:11:56 landing 36fc597ca74f..5d535ee621ba: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:12:43 landing 5d535ee621ba..655421b3d2d1: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:13:47 landing 655421b3d2d1..4233668ea66e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:14:46 landing 4233668ea66e..00c6b11012b4: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:29:24 landing 00c6b11012b4..f6cc9ba735a0: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:33:40 landing f6cc9ba735a0..0d61c24dc8d6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:37:26 landing 0d61c24dc8d6..5003357b49e2: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:53:11 landing check: P1 7cc654e49f9b (governance/project/orchestration/tools/dispatch/dispatcher.py): a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+2026-11-13 13:53:11 landing 5003357b49e2..7cc654e49f9b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:55:26 landing 7cc654e49f9b..689abbafab7d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:57:52 landing 689abbafab7d..de09ee31816d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 13:59:35 landing de09ee31816d..fc2b43eee475: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:00:53 hook: waited 30s for the operator's commit freeze to clear
+2026-11-13 14:00:53 landing fc2b43eee475..bb9dfca7aad9: 1 commit(s); outside a ticket on the trigger paths: bb9dfca7aad9 (.rulesync/subagents/orchestrator.md) 
+2026-11-13 14:00:53 run 20261113-140053-2038511: started detached, pid 2051269 (its own session); folder /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261113-140053-2038511
+2026-11-13 14:01:31 landing bb9dfca7aad9..1ead5f91a155: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:01:42 landing 1ead5f91a155..7c6a7427329e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:14:23 run 20261113-140053-2038511 (fc2b43eee475..bb9dfca7aad9): RED: lead_verify W2-00 DAEO-sdxk head bb9dfca7aad9: RED parallel exit 1 in 734 s (5559 tests 62 failed 0 errors 175 skipped); serial exit 0 in 37 s, 1 entries (9 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261113-140053-2038511 (DEC-968: fix at once or revert)
+2026-11-13 14:16:00 landing fc2b43eee475..bb9dfca7aad9: 1 commit(s); outside a ticket on the trigger paths: bb9dfca7aad9 (.rulesync/subagents/orchestrator.md) 
+2026-11-13 14:16:00 run 20261113-141600-2391461: in the foreground
+2026-11-13 14:16:16 landing 7c6a7427329e..380860ef1e45: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:20:52 hook: waited 30s for the operator's commit freeze to clear
+2026-11-13 14:20:52 landing 380860ef1e45..f351c7286673: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:25:16 landing f351c7286673..229924171407: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:27:08 landing 229924171407..aa4d460fffad: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:35:12 landing aa4d460fffad..1c793311a5ab: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:35:45 run 20261113-141600-2391461 (fc2b43eee475..bb9dfca7aad9): RED: lead_verify W2-00 DAEO-sdxk head bb9dfca7aad9: RED parallel exit 1 in 1068 s (5559 tests 5 failed 0 errors 9 skipped); serial exit 0 in 28 s, 1 entries (9 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261113-141600-2391461 (DEC-968: fix at once or revert)
+2026-11-13 14:46:18 landing 1c793311a5ab..81d16e08893f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 14:47:14 landing 81d16e08893f..95a55bfcac9b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 15:09:10 landing 95a55bfcac9b..9c91d4f80208: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 15:10:30 landing 9c91d4f80208..ce4bdfdfb74d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 15:12:12 landing ce4bdfdfb74d..2655dbf402e4: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 15:17:19 landing 2655dbf402e4..79159cd44c5b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:02:08 landing 79159cd44c5b..8c10b3745aff: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:04:13 landing 8c10b3745aff..aea1e11b17a9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:05:47 landing aea1e11b17a9..a7b36bcfd98a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:06:53 landing a7b36bcfd98a..40520d4a6cdb: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:07:05 landing 40520d4a6cdb..8ba025e8fa26: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:08:43 landing 8ba025e8fa26..a8d14566f1e6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:10:39 landing a8d14566f1e6..b3106ac57013: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:16:31 landing b3106ac57013..6d1b7815f06a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:17:08 landing 6d1b7815f06a..b97d9604b316: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:40:46 landing b97d9604b316..56ffe611f94e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:47:09 landing 56ffe611f94e..79857306c723: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:47:10 landing 79857306c723..aa976b8f33f5: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 16:49:11 landing aa976b8f33f5..dff6e46615b5: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:05:33 landing dff6e46615b5..8865f016fea9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:05:33 landing 8865f016fea9..f7b9ff50cbd4: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:32:58 landing f7b9ff50cbd4..5a2f5223c18b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:49:53 landing 5a2f5223c18b..f776ad1c356d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:57:09 landing f776ad1c356d..03c7ec42787f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:58:25 landing 03c7ec42787f..f7ab50ac008e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 17:59:05 landing f7ab50ac008e..579f889f4b03: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 18:00:28 landing 579f889f4b03..7304770982f2: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 18:02:19 landing 7304770982f2..bdcf7af7384b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 18:03:05 landing bdcf7af7384b..0d08622f0d1f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 18:04:37 landing 0d08622f0d1f..8801ffd17df9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 19:59:54 landing 8801ffd17df9..83069aa6163b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:02:00 landing 83069aa6163b..5bdb28bc962c: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:04:22 landing 5bdb28bc962c..5b6ed1b49e7d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:04:22 landing 5b6ed1b49e7d..73569aafdd0a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:06:50 landing check: P1 72c6def8871a (template/governance/kernel/skills/change/SKILL.md): a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+2026-11-13 20:06:50 landing 73569aafdd0a..72c6def8871a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:10:48 hook: waited 30s for the operator's commit freeze to clear
+2026-11-13 20:10:48 landing 72c6def8871a..e437c799c931: 1 commit(s); outside a ticket on the trigger paths: e437c799c931 (.rulesync/skills/change/SKILL.md) 
+2026-11-13 20:10:48 run 20261113-201048-557788: started detached, pid 574629 (its own session); folder /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261113-201048-557788
+2026-11-13 20:22:11 landing e437c799c931..454771c4effe: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:24:07 landing 454771c4effe..abadad60ed62: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:26:50 run 20261113-201048-557788 (72c6def8871a..e437c799c931): GREEN: lead_verify W2-00 DAEO-sdxk head e437c799c931: GREEN parallel exit 0 in 878 s (5579 tests 0 failed 0 errors 9 skipped); serial exit 0 in 0 s, 0 entries (0 tests 0 failed 0 errors 0 skipped)
+2026-11-13 20:32:59 landing abadad60ed62..d984c56779f7: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 20:33:54 landing d984c56779f7..9a467f3360a9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:34:07 landing 9a467f3360a9..db09788ff689: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:37:17 landing db09788ff689..acaaf1f1f845: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:39:24 landing acaaf1f1f845..31eab21031de: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:48:21 landing 31eab21031de..c9ce1e5c0b94: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:48:55 landing c9ce1e5c0b94..80d1da4281a7: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:49:21 landing 80d1da4281a7..5f13be0ef034: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:52:06 landing 5f13be0ef034..252091c8b353: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:52:24 landing 252091c8b353..f2b1d38af5b7: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 21:58:02 landing f2b1d38af5b7..c0cfe30999d2: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 22:00:44 hook: waited 30s for the operator's commit freeze to clear
+2026-11-13 22:00:44 landing c0cfe30999d2..62da0dcbc3ee: 1 commit(s); outside a ticket on the trigger paths: 62da0dcbc3ee (.rulesync/rules/governance.md) 
+2026-11-13 22:00:44 run 20261113-220044-2910021: started detached, pid 2911856 (its own session); folder /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261113-220044-2910021
+2026-11-13 22:23:20 run 20261113-220044-2910021 (c0cfe30999d2..62da0dcbc3ee): RED: lead_verify W2-00 DAEO-sdxk head 62da0dcbc3ee: RED parallel exit 1 in 1290 s (5384 tests 1 failed 0 errors 8 skipped); serial exit 0 in 0 s, 0 entries (0 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261113-220044-2910021 (DEC-968: fix at once or revert)
+2026-11-13 22:23:43 triage (CTO): landing-select RED 20261113-220044 after 62da0dcbc (ACT-CLAUDE-RULES-1): the one red is tests/acceptance/W2-23/test_w2_23_space.py test_s6 (the settings' hook lines lack context_watch.py, the 7th kernel hook) = the known red named in every brief; it fails before and after the ACT (both reviewers' runs); its fix is W2-185 (W2-182's E gap), running. Not caused by the ACT; no revert (DEC-968 triage).
+2026-11-13 22:30:38 landing 62da0dcbc3ee..f3cd2490a463: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 22:31:26 landing f3cd2490a463..1496e4b0e373: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 22:32:23 landing 1496e4b0e373..617f884f5ad8: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 22:32:57 landing 617f884f5ad8..b624fa3c1c99: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 22:51:39 landing b624fa3c1c99..8b0a1f641a2e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 23:13:57 landing 8b0a1f641a2e..1fd0066e1c9c: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 23:53:12 landing 1fd0066e1c9c..679fdbad40b5: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 23:55:43 landing 679fdbad40b5..8b520714a2a4: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 23:56:34 landing 8b520714a2a4..c2d10bb457be: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-13 23:56:34 landing c2d10bb457be..235fc1cc6858: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 00:13:03 landing 235fc1cc6858..6a30444e9c92: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 00:14:02 landing 6a30444e9c92..de35a378f9c6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 00:15:55 landing de35a378f9c6..e1fce4ed886a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 00:57:21 landing e1fce4ed886a..98bc0f937d2b: 4 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:05:25 landing 98bc0f937d2b..394e39278da6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:05:25 landing 394e39278da6..cc6daeb444f8: 2 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:05:25 landing cc6daeb444f8..8a350ee2596c: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:06:55 landing 8a350ee2596c..e3c94cd776e7: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:07:05 landing e3c94cd776e7..e09607093884: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:16:08 landing e09607093884..0a706dc4c2f1: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:28:58 landing 0a706dc4c2f1..e2a0d619172a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:41:05 landing e2a0d619172a..127eaf409f90: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 01:41:05 landing 127eaf409f90..06801fb31270: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 02:43:35 landing 06801fb31270..5f689a9f7725: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 02:57:25 landing 5f689a9f7725..e8236b19f19f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 02:58:58 landing e8236b19f19f..c82335a401df: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 03:38:06 landing c82335a401df..e133afea4eee: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 03:38:06 landing e133afea4eee..aeee743e9e41: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 03:44:51 landing aeee743e9e41..f3d3438fcb45: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 04:39:17 landing f3d3438fcb45..2b034037a4b6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 06:39:05 landing 2b034037a4b6..5babbc5517cb: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 06:39:05 landing 5babbc5517cb..77220f8149af: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 08:11:19 landing 77220f8149af..ce8ae4353506: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 08:18:06 landing ce8ae4353506..0fa0df282b0e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 09:04:01 landing 0fa0df282b0e..1d5af6d75e41: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 09:54:05 landing 1d5af6d75e41..3c20f9cc469d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 09:54:05 landing 3c20f9cc469d..0107ce84e91b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 12:01:19 landing 0107ce84e91b..c451c21801b0: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 12:28:12 landing c451c21801b0..92019d882ed6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 12:29:08 landing 92019d882ed6..7ccc0bb618c3: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-14 12:30:33 landing 7ccc0bb618c3..29c8bb421419: 1 commit(s); none outside a ticket on the trigger paths

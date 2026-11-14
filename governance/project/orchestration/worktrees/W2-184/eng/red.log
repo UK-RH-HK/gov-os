@@ -1,0 +1,483 @@
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+heavy_slot: all 3 slots taken; waiting (2026-11-14 02:18:14)
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-3337858': Read-only file system
+473: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system
+.........................................................FFF.FF.FF.....F [ 34%]
+FFFFFFFFFFF............................................................. [ 69%]
+........................................F.....................           [100%]
+=================================== FAILURES ===================================
+________ test_the_project_s_own_rules_place_the_named_paths[paths7-C3] _________
+
+paths = ['fixtures/evaluation/examin/hidden/**'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths8-C3] _________
+
+paths = ['fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json']
+expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths9-C3] _________
+
+paths = ['fixtures/evaluation/**'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths11-C3] ________
+
+paths = ['.claude/settings.local.json'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths12-C3] ________
+
+paths = ['governance/project/secrets.yaml'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths14-C3] ________
+
+paths = ['governance/project/indep-walls/**'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+________ test_the_project_s_own_rules_place_the_named_paths[paths15-C3] ________
+
+paths = ['governance/project/indep-walls/W2-1.yaml'], expected = 'C3'
+
+    @pytest.mark.parametrize("paths, expected", (
+        (["src/gov/guard/decide.py"], "C3"), ([".claude/hooks/pretooluse.py"], "C3"),
+        (["governance/project/path-map.yaml"], "C3"), (["governance/project/operator/x.md"], "C3"),
+        (["template/governance/kernel/roles/x.md"], "C3"), (["governance/kernel/x.md"], "C3"),
+        (["docs/contract/x.md"], "C3"),
+        # F1: hidden sets (the path map's hidden halves); F8: permissions beside .claude/settings.json and held-out.yaml
+        (["fixtures/evaluation/examin/hidden/**"], "C3"),
+        (["fixtures/evaluation/adoption-proving-ground/hidden/cases/a.json"], "C3"),
+        (["fixtures/evaluation/**"], "C3"),  # a broad path over the hidden halves is C3 as well
+        ([".claude/settings.json"], "C3"), ([".claude/settings.local.json"], "C3"),
+        (["governance/project/secrets.yaml"], "C3"), (["governance/project/held-out.yaml"], "C3"),
+        (["governance/project/indep-walls/**"], "C3"), (["governance/project/indep-walls/W2-1.yaml"], "C3"),
+        (["fixtures/evaluation/examin/visible/**"], "C2"),  # a visible half is no hidden set: the default
+        (["src/gov/launch/launcher.py"], "C2"), (["governance/project/test-map.yaml"], "C2"),
+        (["docs/changes/x.md"], "C1"), (["governance/project/orchestration/x.md"], "C1"),
+    ))
+    def test_the_project_s_own_rules_place_the_named_paths(paths, expected):
+>       assert criticality.ticket_criticality(REPO, {"profile": "STANDARD", "allowed_paths": paths}) == expected
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:186: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-STANDARD] _
+
+profile = 'STANDARD', path = 'fixtures/evaluation/examin/hidden/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-FULL] _
+
+profile = 'FULL', path = 'fixtures/evaluation/examin/hidden/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-LITE] _
+
+profile = 'LITE', path = 'fixtures/evaluation/examin/hidden/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-STANDARD] _
+
+profile = 'STANDARD', path = 'governance/project/secrets.yaml'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-FULL] _
+
+profile = 'FULL', path = 'governance/project/secrets.yaml'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-LITE] _
+
+profile = 'LITE', path = 'governance/project/secrets.yaml'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-STANDARD] _
+
+profile = 'STANDARD', path = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-FULL] _
+
+profile = 'FULL', path = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-LITE] _
+
+profile = 'LITE', path = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-STANDARD] _
+
+profile = 'STANDARD', path = 'governance/project/indep-walls/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-FULL] _
+
+profile = 'FULL', path = 'governance/project/indep-walls/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C2' == 'C3'
+E         
+E         - C3
+E         + C2
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-LITE] _
+
+profile = 'LITE', path = 'governance/project/indep-walls/**'
+
+    @pytest.mark.parametrize("profile", ("STANDARD", "FULL", "LITE"))
+    @pytest.mark.parametrize("path", ("fixtures/evaluation/examin/hidden/**", "governance/project/secrets.yaml",
+                                      ".claude/settings.local.json", "governance/project/indep-walls/**"))
+    def test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment(profile, path):  # F1, F8
+        ticket = {"profile": profile, "allowed_paths": [path, "docs/probes/DAEO-xxxx/**  # the probe record"]}
+>       assert criticality.ticket_criticality(REPO, ticket) == "C3"
+E       AssertionError: assert 'C1' == 'C3'
+E         
+E         - C3
+E         + C1
+
+tests/unit/launch/test_w2_184_criticality.py:194: AssertionError
+_ test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_dec_1010 _
+
+full = <launch.test_w2_184_launch.Project object at 0x7ebe599a4350>
+
+    def test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_dec_1010(full):  # 6.3, F2
+        _review(full)
+        _review(full, args=["--effort", "xhigh"])
+        assert (full.last()["review_round"], full.last()["effort"]) == (2, "xhigh")
+>       error = full.refused("3", "DEC-1010", role="independent-auditor", tid="T-a")  # Opus max: neither earlier setting
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/launch/test_w2_184_launch.py:703: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <launch.test_w2_184_launch.Project object at 0x7ebe599a4350>
+role = 'independent-auditor', tid = 'T-a', args = ()
+needles = ('3', 'DEC-1010'), keywords = {}, before = 2, files = 2
+caught = <ExceptionInfo for raises contextmanager>
+
+    def refused(self, *needles, role="engineer", tid="T-1", args=(), **keywords) -> GovError:
+        before, files = len(self.started), len(self.records())
+>       with pytest.raises(GovError) as caught:
+E       Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+
+tests/unit/launch/test_w2_184_launch.py:136: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths7-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths8-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths9-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths11-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths12-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths14-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_the_project_s_own_rules_place_the_named_paths[paths15-C3]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-STANDARD]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-FULL]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[fixtures/evaluation/examin/hidden/**-LITE]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-STANDARD]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-FULL]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/secrets.yaml-LITE]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-STANDARD]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-FULL]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[.claude/settings.local.json-LITE]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-STANDARD]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-FULL]
+FAILED tests/unit/launch/test_w2_184_criticality.py::test_a_hidden_set_or_permission_ticket_stays_c3_beside_a_probe_record_path_with_its_comment[governance/project/indep-walls/**-LITE]
+FAILED tests/unit/launch/test_w2_184_launch.py::test_round_three_after_a_round_two_at_xhigh_is_refused_naming_the_round_and_dec_1010
+20 failed, 186 passed in 1.38s

@@ -1,0 +1,14 @@
+W2-182 (DAEO-5y8d): merge the revised cases (B, C, R, D, E: 6e3697785; F: 498968115)
+
+The independent test designer's two batches: W1-32's command list records adapters, dispatch, session-watch and
+wait; W1-18 and W2-123 expect REBUILD_FAILED where the semantic store is not recreated; W2-121 S1 waits for the
+job's .exit file before its first snapshot; W2-136 S10 allows src/gov/session_watch; W2-23 S6 expects seven kernel
+hooks (red until template/.rulesync/hooks.jsonc wires context_watch.py); W2-128 row 8 records the gone
+"until W2-56" line. Each was shown failing on a planted break. No skip, xfail or mark was added.
+
+Task: DAEO-5y8d
+Role: orchestrator
+Implements: DEC-1163, DEC-1156, DEC-1150, DEC-105
+Rewrite-Reason: DEC-1163 (6), DEC-1163 (1)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

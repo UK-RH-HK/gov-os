@@ -1,0 +1,9 @@
+log: W2-42a-A5-r3.json
+W2: W2-42a
+status: DONE. Head to land: 209ec8464f9e0c7a148a823279b60323ce348463 (`git status --short` empty). The narrow check passes by code: R3, FALLBACK, DEC409 and FC pass. RO fails on F1, which the CTO needs to decide (below).
+
+task: DAEO-03ub (W2-42a), the R3 round (DEC-1164 (18)): a write argument after a here-string, and the unreadable fallback's here-string forms
+status: DONE. Head to land: 209ec8464f9e0c7a148a823279b60323ce348463 (`git status --short` empty). The narrow check passes by code: R3, FALLBACK, DEC409 and FC pass. RO fails on F1, which the CTO needs to decide (below).
+work_completed:
+- Step 0: merged `w2/integrate` (2b034037a) into `w2/W2-42a` in one `--no-ff` command, as d3ba8e50b. There were no conflicts; integrate held the branch head.
+- My own probe of d3ba8e50b showed these forms allowed for T: `

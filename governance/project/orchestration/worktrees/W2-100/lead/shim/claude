@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# The lead's pass-through shim (W2-100, S4 summaries): runs the real claude with the same arguments and standard input,
+# and keeps a copy of the prompt and of its standard output (the JSON object with the reply) in the lead's scratch,
+# one set of files per call. It changes nothing that gov skilleval sees.
+LOG=/home/usain/gov-os-worktrees/W2-100/.gov-runtime/scratch/lead/skilleval/transcripts
+mkdir -p "$LOG"
+f="$LOG/$(date -u +%Y%m%dT%H%M%S%N)-$$"
+{ echo "cwd=$PWD"; echo "skills=$(ls "$PWD/.claude/skills" 2>/dev/null | tr '\n' ' ')"; } > "$f.meta"
+cat > "$f.prompt"
+/home/usain/.local/bin/claude "$@" < "$f.prompt" | tee "$f.json"
+exit "${PIPESTATUS[0]}"

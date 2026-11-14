@@ -1,0 +1,106 @@
+{
+ "act": "ACT-CLASS-RULES-AGENTS-1",
+ "dec": "DEC-1173, DEC-1104",
+ "author": "cto",
+ "claimed_class": "O",
+ "what": "the agent instructions every session loads (the repository's CLAUDE.md and AGENTS.md) a fixed class (b) in the operator's rule table (a new row agent-instructions, straight after guard-hook, control: true), in the repository's source and the install's copy, with APPROVED's one line; an approved change to them is then applied by the operator agent (DEC-1173)",
+ "applied_by": "the owner's operator, by hand (class (O): the operator's own rule table and install, OPERATOR-AGENT-1 \u00a75, DEC-1104 (4))",
+ "steps": "bash apply.sh check|apply|verify|undo, then the owner's one commit of governance/project/operator/class-rules.yaml",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/operator/class-rules.yaml",
+   "before": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+   "after": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/class-rules.yaml",
+   "before": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+   "after": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb"
+  },
+  {
+   "root": "home",
+   "path": "gov-os-operator/install/APPROVED",
+   "before": "3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815",
+   "after": "af28cefe7b99c91d3bf780639746deef71f25e56e101f5ac796b06a2922417d7"
+  }
+ ],
+ "alt_base": {
+  "why": "the same change on the install after ACT-LANDING-CTO-ROUTE-1 (its landing_check.py and APPROVED); apply.sh picks the base by the install's APPROVED",
+  "list": "alt/landing/list.txt",
+  "keep": "alt/landing/keep.txt",
+  "touched": [
+   {
+    "root": "repo",
+    "path": "governance/project/operator/class-rules.yaml",
+    "before": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+    "after": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb"
+   },
+   {
+    "root": "home",
+    "path": "gov-os-operator/install/class-rules.yaml",
+    "before": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+    "after": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb"
+   },
+   {
+    "root": "home",
+    "path": "gov-os-operator/install/APPROVED",
+    "before": "ef5afbac78f3fce16ab7551ef88987a6898acd8f9a7a18439bf83aeb9216c157",
+    "after": "4209aac246a9765962b5c612289deb5bb585724d553a10935f237508421a8f3a"
+   }
+  ]
+ },
+ "files": {
+  "before/home/gov-os-operator/install/APPROVED": "3744df3a637feadc26c673b88a10cbc757e8c8746aced078d700300906962815",
+  "before/home/gov-os-operator/install/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "before/repo/governance/project/operator/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "after/home/gov-os-operator/install/APPROVED": "af28cefe7b99c91d3bf780639746deef71f25e56e101f5ac796b06a2922417d7",
+  "after/home/gov-os-operator/install/class-rules.yaml": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+  "after/repo/governance/project/operator/class-rules.yaml": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+  "alt/landing/after/home/gov-os-operator/install/APPROVED": "4209aac246a9765962b5c612289deb5bb585724d553a10935f237508421a8f3a",
+  "alt/landing/after/home/gov-os-operator/install/class-rules.yaml": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+  "alt/landing/after/repo/governance/project/operator/class-rules.yaml": "a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+  "alt/landing/before/home/gov-os-operator/install/APPROVED": "ef5afbac78f3fce16ab7551ef88987a6898acd8f9a7a18439bf83aeb9216c157",
+  "alt/landing/before/home/gov-os-operator/install/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "alt/landing/before/repo/governance/project/operator/class-rules.yaml": "38ac2f2decce660a9e190c85038b7175dcbae0e0c0ce79acc0597df17d0e79a4",
+  "alt/landing/keep.txt": "d926966c02db126eb57ac2efbd1e585b6efa8b5f3c6351634aaad548236a60d4",
+  "alt/landing/list.txt": "0145aa1a068df35936d3e3487465aad4de2f20a53155b560c562a7a4251814eb",
+  "apply.sh": "41a83378d91e01cb2804462c5497fa5a70a51ee55877063304c082c0c3b54725",
+  "list.txt": "ed75287458d94c2f7b78b8ca0ec73b4558a87e9ba37b8fe9416e7b88ca1612a8",
+  "keep.txt": "2ed5eb2bcaad6fa0763236af5413418e04396e57d9e609442a9c8b5791ddb833",
+  "rehearsal.log": "e3652b6668bf3494f933e8bf116277bbf729ffd582a2cf6c23f786e4f88b6ddc"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/class-rules.yaml\" | grep -c a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum \"$HOME/gov-os-operator/install/APPROVED\" | grep -cE \"^(af28cefe7b99c91d3bf780639746deef71f25e56e101f5ac796b06a2922417d7|4209aac246a9765962b5c612289deb5bb585724d553a10935f237508421a8f3a) \"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "grep -c \"^a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb  class-rules.yaml$\" \"$HOME/gov-os-operator/install/APPROVED\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "cd \"$HOME/gov-os-operator/install\" && python3 -I -B -c 'import sys; sys.path.insert(0, \".\"); import act_class as a; r = a.load_rules(); c = a.row_for(r, \"repo\", \"CLAUDE.md\"); g = a.row_for(r, \"repo\", \"AGENTS.md\"); h = a.row_for(r, \"home\", \".claude/CLAUDE.md\"); d = a.row_for(r, \"repo\", \"docs/CLAUDE.md\"); print(c[\"id\"], c.get(\"class\"), g[\"id\"], g.get(\"class\"), h[\"id\"], h.get(\"class\"), d[\"id\"], d.get(\"class\"))' | grep -c \"^agent-instructions b agent-instructions b agents-skills-kernel b unknown O$\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "sha256sum governance/project/operator/class-rules.yaml | grep -c a040a103cbda4f6fb28a0060464c43689b780bd83cdee591a76a60f23b68b2eb",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "e3652b6668bf3494f933e8bf116277bbf729ffd582a2cf6c23f786e4f88b6ddc"
+ }
+}

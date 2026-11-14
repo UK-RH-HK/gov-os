@@ -1,0 +1,64 @@
+{
+ "act": "ACT-CLAUDE-RULES-1",
+ "dec": "DEC-1167 (7), DEC-1173, DEC-953 (2), DEC-1128 (4), DEC-820, CAP-33",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": ".rulesync/rules/governance.md",
+   "before": "aab9e7c05dd61f6fb734cc8973e0489c5f176362971c7b4b869c8b016a5155d7",
+   "after": "3b141726f84a87317c6a745193f8fe671da66208ca0e1f35ec63f9e5b8daabc7"
+  },
+  {
+   "root": "repo",
+   "path": "CLAUDE.md",
+   "before": "f672e46802d34c2fbc6340b97b06336c0f93119785572f45a67a49e13d258249",
+   "after": "65e244836adf4ed79a158b144e5b80bfd022d17b414991e19c3530ef6c2639f2"
+  },
+  {
+   "root": "repo",
+   "path": "AGENTS.md",
+   "before": "18e826269b0a0cdc02883c206162d7694b2a9fecc8ce43a578b4c94013eae7d0",
+   "after": "931f1fe2014e52c7e899dd0589b6f78b308d16fce778c3b2eb4f13aa6527faa1"
+  }
+ ],
+ "files": {
+  "before/repo/.rulesync/rules/governance.md": "aab9e7c05dd61f6fb734cc8973e0489c5f176362971c7b4b869c8b016a5155d7",
+  "before/repo/AGENTS.md": "18e826269b0a0cdc02883c206162d7694b2a9fecc8ce43a578b4c94013eae7d0",
+  "before/repo/CLAUDE.md": "f672e46802d34c2fbc6340b97b06336c0f93119785572f45a67a49e13d258249",
+  "after/repo/.rulesync/rules/governance.md": "3b141726f84a87317c6a745193f8fe671da66208ca0e1f35ec63f9e5b8daabc7",
+  "after/repo/AGENTS.md": "931f1fe2014e52c7e899dd0589b6f78b308d16fce778c3b2eb4f13aa6527faa1",
+  "after/repo/CLAUDE.md": "65e244836adf4ed79a158b144e5b80bfd022d17b414991e19c3530ef6c2639f2",
+  "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
+  "list.txt": "a9b3b90cd70817375c52fee7d50205b48385bdd18b3b331e57ff9bbb7f87672e",
+  "rehearsal.log": "3c9ba3cf9a0283ce157480360b4549be9476ab37bccd23470c2aa7bb8a233e0d"
+ },
+ "checks": [
+  {
+   "cmd": "sha256sum -c - <<'EOF'\n3b141726f84a87317c6a745193f8fe671da66208ca0e1f35ec63f9e5b8daabc7  .rulesync/rules/governance.md\n65e244836adf4ed79a158b144e5b80bfd022d17b414991e19c3530ef6c2639f2  CLAUDE.md\n931f1fe2014e52c7e899dd0589b6f78b308d16fce778c3b2eb4f13aa6527faa1  AGENTS.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "sha256sum -c - <<'EOF'\nb7ff8b723440819e64ef527ffd40cf667b3230cb10d8c695938f66282254ee9f  template/.rulesync/rules/governance.md\nEOF",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "grep -l -e 'writes stay inside the ticket' -e 'refuses writes outside a ticket' .rulesync/rules/governance.md CLAUDE.md AGENTS.md | wc -l",
+   "exit": 0,
+   "count": 0
+  },
+  {
+   "cmd": "grep -l 'OS sandbox of .gov launch.' .rulesync/rules/governance.md CLAUDE.md AGENTS.md | wc -l",
+   "exit": 0,
+   "count": 3
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "3c9ba3cf9a0283ce157480360b4549be9476ab37bccd23470c2aa7bb8a233e0d"
+ }
+}

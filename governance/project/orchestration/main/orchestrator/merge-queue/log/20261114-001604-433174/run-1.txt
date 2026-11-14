@@ -1,0 +1,252 @@
+...................................................................... [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 46%]
+.............................sss........................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+....................................................s................... [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+.....s.................................................................. [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+.......................s................................................ [ 92%]
+..................................................s..................... [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+...............s........................................................ [ 96%]
+.................F.................................................F...F [ 97%]
+...........................................................s.ssssss..... [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+...................                                                      [100%]
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/dispatch/test_peaks.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_peaks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_peaks.py:7: in <module>
+    from conftest import GIB
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_returns.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_returns.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_returns.py:7: in <module>
+    from conftest import git
+E   ImportError: cannot import name 'git' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+______________ ERROR collecting tests/unit/dispatch/test_start.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_start.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_start.py:9: in <module>
+    from conftest import GIB, REPO, git
+E   ImportError: cannot import name 'GIB' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+_____________ ERROR collecting tests/unit/dispatch/test_status.py ______________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/dispatch/test_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/dispatch/test_status.py:12: in <module>
+    from conftest import REPO, GIB
+E   ImportError: cannot import name 'REPO' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+____________ ERROR collecting tests/acceptance/W1-35/test_w1_35.py _____________
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W1-35/test_w1_35.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-35/test_w1_35.py:19: in <module>
+    from conftest import (
+E   ImportError: cannot import name 'CHECKS_DIR' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+_____ ERROR collecting tests/acceptance/W1-35/test_w1_35_orchestration.py ______
+ImportError while importing test module '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W1-35/test_w1_35_orchestration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-35/test_w1_35_orchestration.py:27: in <module>
+    from conftest import (
+E   ImportError: cannot import name 'CITATION_PATTERN' from 'conftest' (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/acceptance/W2-52/conftest.py)
+=================================== FAILURES ===================================
+____ test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-1337/popen-gw4/test_s6_every_kernel_hook_exit0')
+
+    def test_s6_every_kernel_hook_exits_alike_with_a_space_in_the_project_dir(tmp_path):
+        """Revised for DEC-1163 (6) E (a) (W2-182, DAEO-5y8d; a recorded rewrite by a fresh test designer, DEC-491; routed
+        by DEC-1156 (7)). Reason: W2-176 added the seventh kernel hook, ``context_watch.py`` (13fd1dd34, hand merge
+        3430341c4), so the case, which pinned six, failed in the nightly of 2026-11-13; ACT-CONTEXT-WATCH-1 wired it into
+        the repository's own settings only. Decided behaviour: adopted projects get the context watch, so the template's
+        hooks source (``template/.rulesync/hooks.jsonc``) wires ``context_watch.py`` and the case expects seven hooks,
+        each reached by a settings command line and each run with a space in the project dir. What the case still catches:
+        any hook script of the kernel folder that no settings line reaches (named in the failure), a count other than
+        seven, and any exit code or path error that differs with a space. Until the template wires ``context_watch.py``
+        the case is red, and the message names it as unreached."""
+        pair = _pair(tmp_path)
+        events = support.kernel_hook_events()
+        scripts = {path.name for path in support.KERNEL_HOOKS.glob("*.py")}
+        reached = {name for name in scripts if any(name in command for _, command in events)}
+>       assert reached == scripts and len(scripts) == 7, \
+            f"the settings' hook command lines do not reach the seven kernel hooks: {sorted(scripts - reached)}"
+E       AssertionError: the settings' hook command lines do not reach the seven kernel hooks: ['context_watch.py']
+E       assert ({'posttooluse...agentstop.py'} == {'context_wat...stop.py', ...}
+E         
+E         Extra items in the right set:
+E         'context_watch.py'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-23/test_w2_23_space.py:108: AssertionError
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7e11dccec400>
+project = PosixPath('/tmp/pytest-of-usain/pytest-1337/popen-gw2/test_the_guard_refuses_install0/repo')
+name = 'created-path-under-the-tickets'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7e11dccef4c0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-1337/popen-gw2/test_the_guard_refuses_install1/repo')
+name = 'two-operands-onto-a-ticket'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=1438594) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/acceptance/W2-159/test_f4_scope.py:63: F4 judges only the branch w2/W2-159; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-20/test_w2_20_measured.py:183: S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only
+SKIPPED [1] tests/acceptance/W2-88/test_w2_88_f5_paths.py:37: this check judges only the branch w2/W2-88; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+SKIPPED [1] tests/acceptance/W2-88/test_w2_88_s7_s9_proofs.py:172: S9's branch check judges only the branch w2/W2-88; this is a detached HEAD: not judged here
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:72: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:81: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:104: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:140: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:152: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:168: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:208: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+3 failed, 8421 passed, 19 skipped, 6 warnings, 6 errors in 1775.61s (0:29:35)

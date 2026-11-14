@@ -1,0 +1,8 @@
+log: W2-88-A5-run4b.json
+W2: W2-88
+status: PACKAGES. Review round 2, the last (DEC-1010), is FAIL on one new blocker, RV2-1: when A9 is refused or interrupted, its undo runs `git reset --hard` and throws away edits or commits made in the repository while A9 ran. The owner must choose fix, residual or re-baseline (P-W2-88-RV2-1). There is no 
+
+task: DAEO-2bdu (W2-88), run 4 resumed (build), FULL, C2
+status: PACKAGES. Review round 2, the last (DEC-1010), is FAIL on one new blocker, RV2-1: when A9 is refused or interrupted, its undo runs `git reset --hard` and throws away edits or commits made in the repository while A9 ran. The owner must choose fix, residual or re-baseline (P-W2-88-RV2-1). There is no third review round.
+work_completed:
+- **eng-3:** it had committed both L-1 batches (b3f4e768f, the fix with unit tests; 8cc56e62f, the evidence and proof (a) re-run) before the API 403 ended it. With nothing left to build, I did not re

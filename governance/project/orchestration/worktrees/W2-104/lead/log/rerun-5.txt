@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+
+home = PosixPath('/home/usain/gov-os-worktrees/W2-104/.gov-runtime/scratch/tmp-unit5/pytest-of-usain/pytest-0/h0')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+>           assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+E           AssertionError: assert 'unavailable' == 'service'
+E             
+E             - service
+E             + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:563: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/retrieval/test_w2_112_shared_reranker.py::test_the_running_service_writes_one_memory_line_per_request
+1 failed in 0.24s

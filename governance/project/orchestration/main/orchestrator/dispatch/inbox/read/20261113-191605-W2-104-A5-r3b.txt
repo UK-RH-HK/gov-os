@@ -1,0 +1,6 @@
+log: W2-104-A5-r3b.json
+W2: W2-104
+status: PACKAGES. Everything was done and nearly everything is green, but the head cannot land yet. One red, W1-01 `test_the_integration_merges_of_this_repository_pass`, is caused by run 3's own WIP merge commit `349341ab8f03`. The brief's order required that commit (the merge saved with its conflict marker
+
+task: DAEO-drhj (W2-104) run 3, build: merge `w2/integrate`, resolve its conflicts, build the two gitleaks literals from parts, verify, run a narrow independent check, and return the head to land.
+status: PACKAGES. Everything was done and nearly everything is green, but the head cannot land yet. One red, W1-01 `test_the_integration_merges_of_this_repository_pass`, is caused by run 3's own WIP merge commit `349341ab8f03`. The brief's order required that commit (the merge saved with its conflict markers, resolutions after). A new commit cannot clear it: only an owner exemption or rebuilding the 

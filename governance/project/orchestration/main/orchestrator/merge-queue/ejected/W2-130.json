@@ -1,0 +1,14 @@
+{
+ "ticket": "W2-130",
+ "task": "DAEO-q8cl",
+ "branch": "w2/W2-130",
+ "commit": "798278be519d4128630c1019a6a1be4fbef48c94",
+ "requested_at": "2026-11-14 01:24:05",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-14T01:24:05.193546",
+ "reason": "conflict",
+ "failing": [],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261114-012405-244569",
+ "tested_on": "0a706dc4c2f15fbca066d72a852a5c126602b432",
+ "ejected_at": "2026-11-14 01:24:05"
+}

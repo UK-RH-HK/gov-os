@@ -1,0 +1,22 @@
+allow      'tee <<< "x" tests/acceptance/X/zz.py'                                 
+allow      'tee <<< "x" src/ok.py'                                                
+allow      'tee -a <<< "x" tests/acceptance/X/zz.py'                              
+allow      'tee -a <<< "x" src/ok.py'                                             
+deny       'cat <<< "x" > tests/acceptance/X/zz.py'                               Bash write to '/tmp/w242a-probe/tmp0_s7suem/tests/acceptance/X/zz.py' denied for role 'engineer'
+allow      'cat <<< "x" > src/ok.py'                                              
+allow      "bash <<< 'touch tests/acceptance/X/zz.py'"                            
+allow      "bash <<< 'touch src/ok.py'"                                           
+allow      "sh <<< 'touch tests/acceptance/X/zz.py'"                              
+allow      "sh <<< 'touch src/ok.py'"                                             
+allow      'xargs touch <<< tests/acceptance/X/zz.py'                             
+allow      'xargs touch <<< src/ok.py'                                            
+allow      'python3 -c "open(\'tests/acceptance/X/zz.py\',\'w\').write(\'x\')"; cat <<EOF' 
+allow      'python3 -c "open(\'src/ok.py\',\'w\').write(\'x\')"; cat <<EOF'       
+allow      'python3 -c "open(\'tests/acceptance/X/zz.py\',\'w\').write(\'x\')"; cat <<\'EOF\'' 
+allow      'python3 -c "open(\'src/ok.py\',\'w\').write(\'x\')"; cat <<\'EOF\''   
+allow      'grep -c b <<< "a"'                                                    
+allow      'wc -l <<< "$v"'                                                       
+allow      "tee <<< x tests/acceptance/X/zz.py # it's"                            
+allow      "tee <<< x src/ok.py # it's"                                           
+allow      'cp <<< x x.py tests/acceptance/X/zz.py'                               
+allow      'cp <<< x x.py src/ok.py'                                              

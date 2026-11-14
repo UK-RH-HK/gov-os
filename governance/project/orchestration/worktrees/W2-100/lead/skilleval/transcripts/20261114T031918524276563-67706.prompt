@@ -1,0 +1,124 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply states an idempotence mechanism that holds for a second delivery, replaces the swallowing `except`, and names the test of a duplicate delivery.
+
+Expected behaviour:
+the session makes the handler safe to run twice (a key taken from the message and a unique constraint or an upsert), separates a failure worth retrying from one that is not, lets the failure be seen (logged and returned or raised) instead of swallowed, and names a unit test that delivers the same message twice and asserts one invoice.
+
+The session's reply:
+<<<
+I was refused permission to write files (and earlier to run `gov` and read its binary). The skill says work that needs writes I don't have goes back as a package, never routed round, so I won't try writing through Bash. Below is the return, with the design and code as the payload.
+
+---
+
+**task:** STANDARD ticket: a queue worker that creates one invoice per "order paid" message. The queue redelivers any message not acked within 30 s. The first draft inserts a row on every delivery inside a bare `except Exception: pass`.
+
+**status:** BLOCKED (partial). The design and code are done; nothing is on disk. Writing to `invoice_worker/` was refused, and so was running `gov`.
+
+**work_completed:**
+- Read the skill. Its `scenarios.md` is missing from the folder.
+- Looked for the ticket, its KPI lines, allowed paths and existing code. None are in the folder.
+- Tried `gov --help` and reading the `gov` binary so I could use `gov retrieve`. Both were refused.
+- Step 1, listing what changes state:
+  - **Inserting the invoice.** In the draft, a redelivery (over 30 s, or a lost ack) creates a second invoice. That is the mistake the skill calls "an insert on every delivery".
+  - **The bare `except Exception: pass`.** A failed write gets swallowed, then acked and lost. That is the mistake the skill calls "a catch-all that logs and carries on".
+- Step 2, tests written before the code: 30 unit tests (below). I could not save or run them.
+- Step 3: wrote the worker (below).
+
+**files_changed:** none. Both writes were refused.
+
+**evidence:** the Write tool refused `invoice_worker/test_invoice_worker.py` and `invoice_worker/__init__.py`. Bash refused `gov --help`. Read refused `~/.local/bin/gov`.
+
+**tests:** none run. The suite I drafted covers:
+- **Parsing:** bad JSON, missing or empty `order_id`, negative / float / bool amount, bad currency, and a zero amount as the boundary case.
+- **Running twice:** 2 and 10 deliveries still leave 1 row. Two connections racing on the same order give exactly one insert.
+- **Conflicts and failures:** the same order with a different amount is a permanent conflict. A locked DB raises a retryable error and writes nothing. A missing table is not swallowed.
+- **The handler:** it acks only after commit, and a redelivery is acked with one row left. A bad message goes to the dead letter without a retry. A retryable error is nacked, and dead-lettered once it reaches `max_deliveries`. An unexpected exception is never acked.
+- **Config:** read from the environment. The DB timeout must stay under 30 s, and `max_deliveries` must be at least 1.
+- **Migration:** up, down, up on a throwaway SQLite file. Running up twice is safe. Down refuses when rows exist. The UNIQUE constraint is in place.
+
+**discoveries:**
+- The ticket's allowed paths, schema, queue client and DB were unknown. I read it as a standalone Python module on stdlib `sqlite3` with a generic queue client that has `ack`, `nack` and `dead_letter` (P3).
+- Amounts are integer cents.
+- A redelivery with a different amount for the same `order_id` is treated as a permanent conflict and dead-lettered, not overwritten (P3; needs product confirmation).
+- `scenarios.md`, which the skill links to, is missing.
+
+**risks:**
+- The whole pre-commit checklist is unticked, because nothing is on disk and the suite was not run.
+- I couldn't check the allowed-paths line.
+- `gov accept` was not run.
+- The duplicate check needs the UNIQUE(`order_id`) constraint to exist in the real DB. If the real `invoices` table already holds duplicates, adding it is a data-cleanup migration. That would be P1, because it is destructive.
+
+**lessons:** this session has no write or `gov` permission. Confirm the ticket's paths and the session's write access before starting.
+
+**proposed_decisions:** idempotency key = `order_id` (the business key), not `message_id`. A broker may give a republished message a new id, but the order stays the same.
+
+**unresolved:** the ticket file, allowed paths, the real DB and queue stack, and the policy for a conflicting amount.
+
+**recommended_next_action:** grant write access to the ticket's paths (or tell me what they are) and access to `gov`. Then I save the files below, run the suite and `gov accept`, and commit.
+
+---
+
+**Payload: the core of `invoice_worker/worker.py`**
+
+```python
+@dataclass(frozen=True)
+class Config:
+    db_path: str; db_timeout_seconds: float; max_deliveries: int
+    @classmethod
+    def from_env(cls, env=os.environ):
+        cfg = cls(env["INVOICE_DB_PATH"],                                  # KeyError at start-up if missing
+                  float(env.get("INVOICE_DB_TIMEOUT_SECONDS", "10")),
+                  int(env.get("INVOICE_MAX_DELIVERIES", "5")))
+        if not 0 < cfg.db_timeout_seconds < 25: raise ValueError("DB timeout must fit inside the 30 s ack window")
+        if cfg.max_deliveries < 1: raise ValueError("INVOICE_MAX_DELIVERIES must be >= 1")
+        return cfg
+
+def create_invoice(conn, order) -> bool:            # True = created, False = already existed
+    try:
+        with conn:                                   # one transaction; commit before any ack
+            cur = conn.execute(
+                "INSERT INTO invoices (order_id, customer_id, amount_cents, currency) VALUES (?,?,?,?) "
+                "ON CONFLICT(order_id) DO NOTHING",
+                (order.order_id, order.customer_id, order.amount_cents, order.currency))
+            if cur.rowcount == 1: return True
+            row = conn.execute("SELECT amount_cents, currency FROM invoices WHERE order_id=?",
+                               (order.order_id,)).fetchone()
+    except sqlite3.OperationalError as e:            # locked/busy/IO -> retry; carries the id, never the payload
+        raise RetryableError(f"invoice insert failed: {e}", order_id=order.order_id) from e
+    if row != (order.amount_cents, order.currency):
+        raise PermanentError("conflicting duplicate for order", order_id=order.order_id)
+    return False
+
+class InvoiceWorker:
+    def handle(self, msg):
+        try:
+            order = parse_message(msg.body)
+            created = self.create(self.conn, order)
+        except PermanentError as e:
+            log.error("dead-lettering message_id=%s: %s", msg.message_id, e)
+            self.queue.dead_letter(msg, str(e)); return
+        except RetryableError as e:
+            if msg.delivery_count >= self.cfg.max_deliveries:
+                log.error("retry limit reached message_id=%s: %s", msg.message_id, e)
+                self.queue.dead_letter(msg, str(e))
+            else:
+                log.warning("retrying message_id=%s delivery=%d: %s", msg.message_id, msg.delivery_count, e)
+                self.queue.nack(msg)
+            return
+        # anything else propagates un-acked: redelivered, bounded by max_deliveries
+        log.info("invoice %s order_id=%s message_id=%s",
+                 "created" if created else "already existed", order.order_id, msg.message_id)
+        self.queue.ack(msg)
+```
+
+**`migrations.py`:**
+- `up` runs `CREATE TABLE IF NOT EXISTS invoices (id INTEGER PRIMARY KEY, order_id TEXT NOT NULL UNIQUE, customer_id TEXT NOT NULL, amount_cents INTEGER NOT NULL CHECK (amount_cents >= 0), currency TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`.
+- `down` drops the table only when it is empty, and raises otherwise, so the way back never loses data.
+
+`parse_message` raises `PermanentError` on bad JSON, a missing or empty `order_id`/`customer_id`, a non-integer or negative `amount_cents` (bools rejected), or a `currency` that isn't three uppercase letters. The full test file is the 30-test suite summarised under **tests**, ready to save once I have write access.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

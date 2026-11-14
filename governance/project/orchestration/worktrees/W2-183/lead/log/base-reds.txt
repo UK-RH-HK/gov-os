@@ -1,0 +1,107 @@
+FF.FF.F                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead] _____
+
+stem = 'role-lead'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-lead', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-lead.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+_____ test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto] _____
+
+stem = 'role-cto'
+
+    @pytest.mark.parametrize("stem", LEAD_AND_CTO)
+    def test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56(stem):
+        hits = s.units_with(stem, "gov accept", "outside", "sandbox", "W2-56")
+>       _cited(hits, stem, 8)
+
+tests/acceptance/W2-128/test_w2_128_rows.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+hits = [], stem = 'role-cto', row = 8
+
+    def _cited(hits: list[str], stem: str, row: int) -> None:
+>       assert hits, f"{stem}.md has no line carrying D5 row {row}"
+E       AssertionError: role-cto.md has no line carrying D5 row 8
+E       assert []
+
+tests/acceptance/W2-128/test_w2_128_rows.py:21: AssertionError
+___________________ test_s10_gov_accept_w2_128_still_passes ____________________
+
+tmp_path = PosixPath('/tmp/w2-183-lead/pytest-of-usain/pytest-0/test_s10_gov_accept_w2_128_sti0')
+
+    def test_s10_gov_accept_w2_128_still_passes(tmp_path):
+        """W2-128's acceptance cases pass on this tree, through gov accept (a green guard on integrate)."""
+        done = subprocess.run([sys.executable, "-B", "-m", "gov.cli.main", "accept", "W2-128", "--root", str(s.REPO),
+                               "--json"], capture_output=True, text=True, timeout=900, cwd=str(tmp_path),
+                              env=s.accept_env(tmp_path), stdin=subprocess.DEVNULL)
+        try:
+            data = json.loads(done.stdout)
+        except ValueError:
+            raise AssertionError(f"gov accept W2-128 printed no envelope: exit {done.returncode}\n{done.stderr[-2000:]}") \
+                from None
+        result = data.get("result") or {}
+        failing = [line.get("kpi") for line in result.get("lines", []) if line.get("outcome") != "pass"]
+>       assert done.returncode == 0 and result.get("outcome") == "pass", \
+            f"gov accept W2-128: exit {done.returncode}, outcome {result.get('outcome')}, error kind " \
+            f"{result.get('error_kind')}, failing lines {failing}, totals {result.get('totals')}, error {data.get('error')}"
+E       AssertionError: gov accept W2-128: exit 3, outcome fail, error kind None, failing lines ['success-21'], totals {'passed': 119, 'failed': 2, 'skipped': 0}, error None
+E       assert (3 == 0)
+E        +  where 3 = CompletedProcess(args=['/usr/bin/python3', '-B', '-m', 'gov.cli.main', 'accept', 'W2-128', '--root', '/home/usain/gov-...d": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 119, "failed": 2, "skipped": 0}}, "session": ""}\n', stderr='').returncode
+
+tests/acceptance/W2-152/test_w2_152_facts.py:73: AssertionError
+________________ test_the_twelve_sources_are_the_composition[] _________________
+
+base = ''
+
+    @pytest.mark.parametrize("base", ["", "template"])
+    def test_the_twelve_sources_are_the_composition(base):
+        root = REPO / base if base else REPO
+        for role in portability.ROLE_SKILLS:
+>           assert (root / ".rulesync/subagents" / f"{role}.md").read_text(encoding="utf-8") == \
+                portability.compose(root, role), role
+E           AssertionError: orchestrator
+E           assert '---\nname: o... mechanism.\n' == '---\nname: o... mechanism.\n'
+E             
+E             Skipping 1693 identical leading characters in diff, use -v to show
+E               -1052].
+E             + - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
+E               - Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
+E               - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
+E               ...
+E             
+E             ...Full output truncated (78 lines hidden), use '-vv' to show
+
+tests/unit/adapters/test_w2_153_compose.py:134: AssertionError
+______________ test_this_repositorys_sources_are_the_composition _______________
+
+    def test_this_repositorys_sources_are_the_composition():
+        findings, _count = portability._kernel_findings(REPO)
+>       assert [f for f in findings if f.get("file", "").startswith(".rulesync/subagents/")] == []
+E       AssertionError: assert [{'code': 'SO...estrator.md'}] == []
+E         
+E         Left contains one more item: {'code': 'SOURCE_DIFFERS', 'file': '.rulesync/subagents/orchestrator.md', 'message': 'differs from its composition of template/governance/kernel/templates/role-lead.md and template/governance/kernel/roles/orchestrator.md'}
+E         Use -v to get more diff
+
+tests/unit/adapters/test_w2_153_portability.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead]
+FAILED tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]
+FAILED tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes
+FAILED tests/unit/adapters/test_w2_153_compose.py::test_the_twelve_sources_are_the_composition[]
+FAILED tests/unit/adapters/test_w2_153_portability.py::test_this_repositorys_sources_are_the_composition
+5 failed, 2 passed in 19.92s

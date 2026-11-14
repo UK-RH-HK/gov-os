@@ -1,0 +1,16 @@
+2026-11-13 15:18:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-13 15:18:09 merged W2-183 onto 79159cd44c5b: 8c10b3745aff
+2026-11-13 15:45:55 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_peaks.py
+2026-11-13 15:46:03 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_returns.py
+2026-11-13 15:46:08 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_start.py
+2026-11-13 15:46:12 flaky candidate (passes alone, decides nothing): tests/unit/dispatch/test_status.py
+2026-11-13 15:54:48 the head without the batch: a throwaway worktree head-79159cd44c5b-0 at 79159cd44c5b with the integration store's stores (.gov-runtime/store.db, .gov-runtime/query-vector-cache.db; no rebuild, nothing embedded); its code index made anew
+2026-11-13 15:54:55 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_core_schema_is_green_on_this_repository_with_w1_43_untouched
+2026-11-13 15:54:56 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-lead]
+2026-11-13 15:54:58 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-128/test_w2_128_rows.py::test_row_8_gov_accept_runs_outside_the_sandbox_until_w2_56[role-cto]
+2026-11-13 15:55:17 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-152/test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes
+2026-11-13 16:02:02 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+2026-11-13 16:02:07 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository
+2026-11-13 16:02:07 ADVANCED refs/heads/w2/integrate 79159cd44c5b -> 8c10b3745aff; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/8c10b3745aff.json
+2026-11-13 16:02:08 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-13 16:04:12 integration store promoted: the merged clone's stores at 8c10b3745aff into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

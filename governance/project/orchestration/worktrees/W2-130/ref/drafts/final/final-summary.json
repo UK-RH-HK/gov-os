@@ -1,0 +1,270 @@
+{
+ "head": "d4463749610c364fd7c79d3b7e2811f8ae9934b0",
+ "rulings": 150,
+ "status_changes_by_id": {
+  "DEC-001": "ACCEPTED",
+  "DEC-003": "ACCEPTED",
+  "DEC-004": "ACCEPTED",
+  "DEC-005": "ACCEPTED",
+  "DEC-006": "ACCEPTED",
+  "DEC-010": "ACCEPTED",
+  "DEC-011": "ACCEPTED",
+  "DEC-012": "ACCEPTED",
+  "DEC-014": "ACCEPTED",
+  "DEC-015": "ACCEPTED",
+  "DEC-022": "ACCEPTED",
+  "DEC-023": "ACCEPTED",
+  "DEC-025": "ACCEPTED",
+  "DEC-026": "ACCEPTED",
+  "DEC-027": "ACCEPTED",
+  "DEC-041": "ACCEPTED",
+  "DEC-044": "ACCEPTED",
+  "DEC-046": "ACCEPTED",
+  "DEC-050": "ACCEPTED",
+  "DEC-007": "ACCEPTED",
+  "DEC-016": "ACCEPTED",
+  "DEC-017": "ACCEPTED",
+  "DEC-024": "ACCEPTED",
+  "DEC-031": "ACCEPTED",
+  "DEC-032": "ACCEPTED",
+  "DEC-033": "ACCEPTED",
+  "DEC-034": "ACCEPTED",
+  "DEC-035": "ACCEPTED",
+  "DEC-036": "ACCEPTED",
+  "DEC-037": "ACCEPTED",
+  "DEC-040": "ACCEPTED",
+  "DEC-042": "ACCEPTED",
+  "DEC-002": "SUPERSEDED",
+  "DEC-043": "SUPERSEDED",
+  "DEC-045": "SUPERSEDED",
+  "DEC-047": "SUPERSEDED",
+  "DEC-013": "SUPERSEDED",
+  "DEC-062": "WITHDRAWN",
+  "DEC-018": "DEFERRED",
+  "DEC-019": "DEFERRED",
+  "DEC-063": "DONE",
+  "DEC-739": "DONE",
+  "DEC-743": "DONE",
+  "DEC-746": "DONE",
+  "DEC-748": "DONE",
+  "DEC-749": "DONE",
+  "DEC-750": "DONE",
+  "DEC-751": "DONE",
+  "DEC-752": "DONE",
+  "DEC-753": "DONE",
+  "DEC-754": "DONE",
+  "DEC-755": "DONE",
+  "DEC-756": "DONE",
+  "DEC-758": "DONE",
+  "DEC-761": "DONE",
+  "DEC-763": "DONE",
+  "DEC-764": "DONE",
+  "DEC-765": "DONE",
+  "DEC-767": "DONE",
+  "DEC-768": "DONE",
+  "DEC-771": "DONE",
+  "DEC-773": "DONE",
+  "DEC-774": "DONE",
+  "DEC-775": "DONE",
+  "DEC-776": "DONE",
+  "DEC-777": "DONE",
+  "DEC-779": "DONE",
+  "DEC-781": "DONE",
+  "DEC-783": "DONE",
+  "DEC-785": "DONE",
+  "DEC-790": "DONE",
+  "DEC-794": "DONE",
+  "DEC-800": "DONE",
+  "DEC-804": "DONE",
+  "DEC-805": "DONE",
+  "DEC-807": "DONE",
+  "DEC-811": "DONE",
+  "DEC-812": "DONE",
+  "DEC-813": "DONE",
+  "DEC-814": "DONE",
+  "DEC-817": "DONE",
+  "DEC-821": "DONE",
+  "DEC-823": "DONE",
+  "DEC-824": "DONE",
+  "DEC-834": "DONE",
+  "DEC-835": "DONE",
+  "DEC-840": "DONE",
+  "DEC-842": "DONE",
+  "DEC-853": "DONE",
+  "DEC-854": "DONE",
+  "DEC-857": "DONE",
+  "DEC-858": "DONE",
+  "DEC-863": "DONE",
+  "DEC-864": "DONE",
+  "DEC-865": "DONE",
+  "DEC-867": "DONE",
+  "DEC-870": "DONE",
+  "DEC-871": "DONE",
+  "DEC-872": "DONE",
+  "DEC-874": "DONE",
+  "DEC-879": "DONE",
+  "DEC-882": "DONE",
+  "DEC-884": "DONE",
+  "DEC-885": "DONE",
+  "DEC-886": "DONE",
+  "DEC-888": "DONE",
+  "DEC-894": "DONE",
+  "DEC-895": "DONE",
+  "DEC-897": "DONE",
+  "DEC-903": "DONE",
+  "DEC-904": "DONE",
+  "DEC-907": "DONE",
+  "DEC-908": "DONE",
+  "DEC-909": "DONE",
+  "DEC-910": "DONE",
+  "DEC-913": "DONE",
+  "DEC-914": "DONE",
+  "DEC-915": "DONE",
+  "DEC-917": "DONE",
+  "DEC-919": "DONE",
+  "DEC-920": "DONE",
+  "DEC-921": "DONE",
+  "DEC-922": "DONE",
+  "DEC-923": "DONE",
+  "DEC-926": "DONE",
+  "DEC-931": "DONE",
+  "DEC-932": "DONE",
+  "DEC-935": "DONE",
+  "DEC-937": "DONE",
+  "DEC-940": "DONE",
+  "DEC-721": "DONE",
+  "DEC-738": "DONE",
+  "DEC-747": "DONE",
+  "DEC-757": "DONE",
+  "DEC-784": "DONE",
+  "DEC-856": "DONE",
+  "DEC-877": "DONE",
+  "DEC-890": "DONE",
+  "DEC-891": "DONE",
+  "DEC-892": "DONE",
+  "DEC-896": "DONE",
+  "DEC-899": "DONE",
+  "DEC-900": "DONE"
+ },
+ "status_changes": {
+  "ACCEPTED": 32,
+  "DEFERRED": 2,
+  "DONE": 103,
+  "SUPERSEDED": 5,
+  "WITHDRAWN": 1
+ },
+ "no_status_change": [
+  "DEC-729",
+  "DEC-786",
+  "DEC-912",
+  "DEC-918",
+  "DEC-924",
+  "DEC-927",
+  "DEC-928"
+ ],
+ "marks_named_by_rulings": {
+  "DEC-007": [
+   "DEC-075"
+  ],
+  "DEC-016": [
+   "DEC-074 (R1)"
+  ],
+  "DEC-017": [
+   "DEC-074 (R1)"
+  ],
+  "DEC-024": [
+   "DEC-074 (Q5)"
+  ],
+  "DEC-031": [
+   "DEC-080"
+  ],
+  "DEC-032": [
+   "DEC-080"
+  ],
+  "DEC-033": [
+   "DEC-080"
+  ],
+  "DEC-034": [
+   "DEC-080"
+  ],
+  "DEC-035": [
+   "DEC-080 (numbers stay placeholders)"
+  ],
+  "DEC-036": [
+   "DEC-080"
+  ],
+  "DEC-037": [
+   "DEC-080"
+  ],
+  "DEC-040": [
+   "DEC-083 (installs: owner approval per tool)"
+  ],
+  "DEC-042": [
+   "DEC-083 (MR-3 for every task)"
+  ],
+  "DEC-786": [
+   "DEC-942"
+  ],
+  "DEC-927": [
+   "DEC-1057 (item 2)"
+  ]
+ },
+ "archive_lines_rewritten": 7,
+ "in_force_clashes": [],
+ "f5": {
+  "pairs": 17,
+  "entries": 12,
+  "dropped": [
+   {
+    "entry": "DEC-056",
+    "changer": "DEC-017",
+    "mark": "**Changed by:** DEC-017",
+    "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+   },
+   {
+    "entry": "DEC-072",
+    "changer": "DEC-064",
+    "mark": "**Changed by:** DEC-064",
+    "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+   },
+   {
+    "entry": "DEC-120",
+    "changer": "DEC-173",
+    "mark": "**Changed by:** DEC-173",
+    "why": "the independent audit's F2: the register's text does not support it"
+   },
+   {
+    "entry": "DEC-162",
+    "changer": "DEC-156",
+    "mark": "**Changed by:** DEC-156",
+    "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+   },
+   {
+    "entry": "DEC-724",
+    "changer": "DEC-860",
+    "mark": "**Changed by:** DEC-860",
+    "why": "the independent audit's F3: the register's text does not support it"
+   },
+   {
+    "entry": "DEC-780",
+    "changer": "DEC-775",
+    "mark": "**Changed by:** DEC-775",
+    "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+   },
+   {
+    "entry": "DEC-1050",
+    "changer": "DEC-1057",
+    "mark": "**Changed by:** DEC-1057 (8)",
+    "why": "the independent audit's F1: the register's text does not support it"
+   },
+   {
+    "entry": "DEC-1053",
+    "changer": "DEC-880",
+    "mark": "**Changed by:** DEC-880",
+    "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+   }
+  ],
+  "pre_check_flags": 0,
+  "free_text": 1
+ }
+}

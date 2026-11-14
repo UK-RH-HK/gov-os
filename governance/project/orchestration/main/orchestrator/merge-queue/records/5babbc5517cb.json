@@ -1,0 +1,28 @@
+{
+ "head": "5babbc5517cb8f4418c03d379f2bd89eac2144ff",
+ "base": "2b034037a4b6f943a53a512cb42467245be9f103",
+ "skipped": "the merged code is identical to c24a414f1d490337c978f4cd86b6e55a55c667ef, W2-42a's approved commit, which its lead tested; governance paths left out of the comparison: none differ (patterns: governance/project/briefs/**, governance/project/prompts/**, governance/project/orchestration/**, .gov-runtime/**, .tickets/**.md, docs/checkpoints/**.md, docs/close/**.md, docs/close/nightly/*.json, docs/probes/**.md, docs/DECISION_REGISTER.md, docs/plan/**.md, docs/plan/wave-1-exit/evidence/**.txt, docs/plan/wave-1-exit/evidence/**.json, governance/project/orchestration/**.md, governance/project/orchestration/packages/*.patch, governance/project/orchestration/packages/*.diff, governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json, governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json, governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service, governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft)",
+ "tickets": [
+  {
+   "ticket": "W2-42a",
+   "task": "DAEO-03ub",
+   "commit": "c24a414f1d490337c978f4cd86b6e55a55c667ef",
+   "merge": "5babbc5517cb8f4418c03d379f2bd89eac2144ff"
+  }
+ ],
+ "selection": {
+  "targets": [],
+  "core_changed": [],
+  "unplaced": []
+ },
+ "counts": null,
+ "flaky": [],
+ "unowned": [],
+ "ejected": [],
+ "trace_base": null,
+ "record_rerun": null,
+ "cleared_by_results": [],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261114-063905-147407",
+ "started": "2026-11-14 06:39:05",
+ "finished": "2026-11-14 06:39:05"
+}

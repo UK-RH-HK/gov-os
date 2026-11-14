@@ -1,0 +1,4 @@
+Merge w2/W2-42a-tests (77cdf5993f57): the two hook-fixture F1 cases are strict xfails naming ACT-GUARD-FIX-5 (td-3, the CTO's request)
+
+Task: DAEO-03ub
+Role: orchestrator

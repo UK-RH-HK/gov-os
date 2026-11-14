@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261113-231603.out
+Structural: after the landing of W2-116 (base 1fd0066e1c9c)
+status: structural pass at 8b520714a2a4: NOTICE in mutation, authority, links (6 of 9 families ok), 15.3 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: NOTICE 50 findings: .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/w1_07_support.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/test_w1_07_recorded_commands.py' covers tests/acceptance/ | .tickets/DAEO-6n5k.md: implementer allowed_paths pattern 'tests/acceptance/W1-07/README.md' covers tests/acceptance/ (+47 more)
+authority: NOTICE 3 findings: governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/check-node22-path.md: the frontmatter is not valid YAML: mapping values are not allowed here ... | governance/project/orchestration/packages/ACT-NIGHTLY-RESTART-1/review-beside-leads-dec1159.md: the frontmatter is not valid YAML: mapping values are not all... | W2-176-CIT-P cites owner, 2026-11-12, "W2-176's CIT-P approved at 3b6c5cb79d39" (DEC-1142 (1)): context_watch.py sha256 213882efd7b83e9988a50d3a348dc92479d4b...
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 1fd0066e1c9c)
+links: NOTICE 3 new since 1fd0066e1c9c58fb07e5823dd5a7057141634a55 (1766 standing): UNLINKED_ID DEC-1157 in DAEO-f58b's KPI brackets, not in its sources | .tickets/DAEO-f58b.md:54 | orchestrator | add DEC-1157 to DAEO-f58b's sources: | UNLINKED_ID W2-06 in DAEO-f58b's KPI brackets, not in its sources | .tickets/DAEO-f58b.md:54 | orchestrator | add W2-06 to DAEO-f58b's sources: | UNLINKED_ID W2-M088 in DAEO-f58b's KPI brackets, not in its sources | .tickets/DAEO-f58b.md:54 | orchestrator | add W2-M088 to DAEO-f58b's sources:
+structural pass at 8b520714a2a4: NOTICE in mutation, authority, links (6 of 9 families ok), 15.3 s; a notice, not a refusal

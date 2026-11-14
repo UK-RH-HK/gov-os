@@ -1,0 +1,59 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "63bebafd7441",
+   "after": "36fc597ca74f"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M docs/DECISION_REGISTER.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/START-NEXT-SESSION.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? .tickets/DAEO-href.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "ae24d9087d32",
+   "after": "429dc5715249"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "63bebafd7441",
+   "after": "36fc597ca74f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "775b430cde60",
+   "after": "36fc597ca74f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-37",
+   "change": "head",
+   "before": "96498443f237",
+   "after": "68d9a917b8db"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line added",
+   "line": " M docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "status line added",
+   "line": "?? docs/probes/DAEO-2bdu/PR-DAEO-2bdu-round-2.md"
+  }
+ ]
+}

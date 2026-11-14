@@ -34,6 +34,9 @@
 # the CTO clears it (spend.py clear <W2>). Env: LAUNCH_ORCH (the CTO's scratch root), LAUNCH_SPEND_TOOL.
 # Env (tests): LAUNCH_TREE, LAUNCH_TICKET, LAUNCH_MODEL (the model, also for real launches), LAUNCH_DISK_GATE, LAUNCH_TRIPWIRE, LAUNCH_TRIAL_DIR,
 # LAUNCH_COMMON_DIR, LAUNCH_MAIN.
+# LAUNCH_CODE_ROOT (the CTO's word only, 2026-11-13, W2-60a P-LB-1 (1)): the checkout whose src/ runs `gov launch` and
+# the dry run, when a ticket's own launcher is the code under change and refuses its workers; the sandbox root, the
+# ticket and every check stay the worker's tree. Unset, the tree's own code runs, as before.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 MAIN=${LAUNCH_MAIN:-/home/usain/Dynamic-Agentic-Engineering-OS}
@@ -51,7 +54,7 @@ if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, t
   [ -n "$MODEL" ] || { say "the session was started without a model"; exit 2; }
   echo "$$" > "$base.pid"; cd "$tree" || exit 2
   cli "$role" "$effort"
-  PYTHONPATH="$tree/src" python3 -m gov.cli.main launch "$role" "$ID" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
+  PYTHONPATH="${LAUNCH_CODE_ROOT:-$tree}/src" python3 -m gov.cli.main launch "$role" "$ID" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
   rc=$?
   python3 "$TRIP" compare "$base.tripwire-before.json" > "$base.tripwire.json" 2>&1; trc=$?
   tw="tripwire clean"; [ $trc = 0 ] || tw="tripwire CHANGED (exit $trc; $base.tripwire.json: attribute each change)"
@@ -161,7 +164,7 @@ copy.write_text(text, encoding="utf-8")
 PY
 [ -e "$TRIAL_DIR/.sandbox-trial-$ID" ] && refuse 4 "a sandbox trial file is already there ($TRIAL_DIR/.sandbox-trial-$ID): the after-check would prove nothing; the CTO looks at it first"
 cli "$role" "$effort"
-dry=$(cd "$tree" && PYTHONPATH="$tree/src" python3 - "$tree" "$role" "$ID" "${CLI[@]}" 2>&1 <<'PY'
+dry=$(cd "$tree" && PYTHONPATH="${LAUNCH_CODE_ROOT:-$tree}/src" python3 - "$tree" "$role" "$ID" "${CLI[@]}" 2>&1 <<'PY'
 import sys
 from pathlib import Path
 from gov.launch import launcher as L

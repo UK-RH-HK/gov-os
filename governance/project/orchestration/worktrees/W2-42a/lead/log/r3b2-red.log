@@ -1,0 +1,500 @@
+FFFFFFFFFFFFFFFFF......                                                  [100%]
+=================================== FAILURES ===================================
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[loop-read-then-run-f] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_0/proj'
+template = "while read -r f; do $f; done <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "while read -r f; do $f; done <<< 'touch tests/acceptance/X/zz.py'"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_0/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do $f; done <<< 'touch tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[loop-read-two-then-run-a-b] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_1/proj'
+template = "while read -r a b; do $a $b; done <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "while read -r a b; do $a $b; done <<< 'touch tests/acceptance/X/zz.py'"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_1/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r a b; do $a $b; done <<< 'touch tests/acceptance/X/zz.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[read-two-then-run-a-b] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_2/proj'
+template = "read -r a b <<< 'touch {w}'; $a $b"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "read -r a b <<< 'touch tests/acceptance/X/zz.py'; $a $b"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_2/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         read -r a b <<< 'touch tests/acceptance/X/zz.py'; $a $b
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[loop-read-then-run-f] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_3/proj'
+template = "while read -r f; do $f; done <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path(proj, template):
+        # the guard cannot know the command the variable names, so it refuses whatever the text says
+>       assert_refused(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "while read -r f; do $f; done <<< 'touch src/ok.py'"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_3/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do $f; done <<< 'touch src/ok.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[loop-read-two-then-run-a-b] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_4/proj'
+template = "while read -r a b; do $a $b; done <<< 'touch {w}'"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path(proj, template):
+        # the guard cannot know the command the variable names, so it refuses whatever the text says
+>       assert_refused(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "while read -r a b; do $a $b; done <<< 'touch src/ok.py'"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_4/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r a b; do $a $b; done <<< 'touch src/ok.py'
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[read-two-then-run-a-b] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_5/proj'
+template = "read -r a b <<< 'touch {w}'; $a $b"
+
+    @pytest.mark.parametrize("template", V_LITERAL_FORMS)
+    def test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path(proj, template):
+        # the guard cannot know the command the variable names, so it refuses whatever the text says
+>       assert_refused(template.replace("{w}", A), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = "read -r a b <<< 'touch src/ok.py'; $a $b"
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_5/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         read -r a b <<< 'touch src/ok.py'; $a $b
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[read-two-from-v-then-run-a-b] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_6/proj'
+command = 'read -r a b <<< "$v"; $a $b'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a b <<< "$v"; $a $b'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_6/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         read -r a b <<< "$v"; $a $b
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[read-from-v-then-run-a] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_7/proj'
+command = 'read -r a <<< "$v"; $a'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'read -r a <<< "$v"; $a'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_7/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         read -r a <<< "$v"; $a
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-run-braced-l] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_8/proj'
+command = 'while read -r l; do ${l}; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r l; do ${l}; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_8/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r l; do ${l}; done <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-run-quoted-f-with-an-argument] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_9/proj'
+command = 'while read -r f; do "$f" x; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do "$f" x; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_9/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do "$f" x; done <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-env-f] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_10/proj'
+command = 'while read -r f; do env $f; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do env $f; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_10/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do env $f; done <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-command-f] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_11/proj'
+command = 'while read -r f; do command $f; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do command $f; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_11/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do command $f; done <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-time-f] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_12/proj'
+command = 'while read -r f; do time $f; done <<< "$v"'
+
+    @pytest.mark.parametrize("command", V_UNKNOWN_FORMS)
+    def test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'while read -r f; do time $f; done <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_read_var_command_a_12/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         while read -r f; do time $f; done <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_callback_a_literal_callback_that_writes_t_is_refused[mapfile-literal-callback] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_literal_0/proj'
+template = 'mapfile -C \'touch {w}\' -c 1 L <<< "$v"'
+
+    @pytest.mark.parametrize("template", CB_LITERAL_FORMS)
+    def test_hsro2_callback_a_literal_callback_that_writes_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'mapfile -C \'touch tests/acceptance/X/zz.py\' -c 1 L <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_literal_0/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         mapfile -C 'touch tests/acceptance/X/zz.py' -c 1 L <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_callback_a_literal_callback_that_writes_t_is_refused[readarray-joined-tC-literal-callback] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_literal_1/proj'
+template = 'readarray -tC \'touch {w}\' -c1 L <<< "$v"'
+
+    @pytest.mark.parametrize("template", CB_LITERAL_FORMS)
+    def test_hsro2_callback_a_literal_callback_that_writes_t_is_refused(proj, template):
+>       assert_refused(template.replace("{w}", T), proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'readarray -tC \'touch tests/acceptance/X/zz.py\' -c1 L <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_literal_1/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         readarray -tC 'touch tests/acceptance/X/zz.py' -c1 L <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused[mapfile-callback-a-function-the-guard-cannot-read] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_callback0/proj'
+command = 'mapfile -C cb L <<< "$v"'
+
+    @pytest.mark.parametrize("command", CB_UNKNOWN_FORMS)
+    def test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'mapfile -C cb L <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_callback0/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         mapfile -C cb L <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+_ test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused[mapfile-callback-from-a-variable] _
+
+proj = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_callback1/proj'
+command = 'mapfile -t -C "$cb" L <<< "$v"'
+
+    @pytest.mark.parametrize("command", CB_UNKNOWN_FORMS)
+    def test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused(proj, command):
+>       assert_refused(command, proj)
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = 'mapfile -t -C "$cb" L <<< "$v"'
+root = '/tmp/w242a-lead/tmp/pytest-of-usain/pytest-1/test_hsro2_callback_a_callback1/proj'
+
+    def assert_refused(command, root):
+        """Refused, whatever the reason (the reason is in the message)."""
+        got, why = decide(command, root)
+>       assert got == "deny", f"want deny, got {got}: {why}\n--- the command ---\n{command}"
+E       AssertionError: want deny, got allow: 
+E         --- the command ---
+E         mapfile -t -C "$cb" L <<< "$v"
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py:116: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[loop-read-then-run-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[loop-read-two-then-run-a-b]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_that_would_write_t_is_refused[read-two-then-run-a-b]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[loop-read-then-run-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[loop-read-two-then-run-a-b]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_word_fed_by_a_here_string_is_refused_even_for_an_allowed_path[read-two-then-run-a-b]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[read-two-from-v-then-run-a-b]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[read-from-v-then-run-a]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-run-braced-l]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-run-quoted-f-with-an-argument]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-env-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-command-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_read_var_command_a_command_name_taken_from_a_read_variable_of_an_unknown_text_is_refused[loop-time-f]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_callback_a_literal_callback_that_writes_t_is_refused[mapfile-literal-callback]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_callback_a_literal_callback_that_writes_t_is_refused[readarray-joined-tC-literal-callback]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused[mapfile-callback-a-function-the-guard-cannot-read]
+FAILED tests/acceptance/W2-42a/test_w2_42a_here_string_ro_2.py::test_hsro2_callback_a_callback_the_guard_cannot_know_is_refused[mapfile-callback-from-a-variable]
+17 failed, 6 passed in 0.28s

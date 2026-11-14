@@ -1,0 +1,21 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "aeee743e9e41",
+   "after": "f3d3438fcb45"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-101",
+   "change": "status line added",
+   "line": " M template/governance/kernel/skills/frontend/scenario-records.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88b",
+   "change": "head",
+   "before": "bbbfc379a175",
+   "after": "cbe94d9e18a7"
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 181
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_0151TGpQobgtxnAyDE6QRqJx", "time": "2026-11-13T14:51:42.883Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-42a/b4ed5672-cd89-4b89-a968-87b10525f0bf.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-42a", "tool": "Bash", "form": "cd $TMPDIR/aud; cat > c6.txt <<'ZZQEND' bash /dev/stdin <<'EOT' touch tests/acceptance/X/a EOT ==== bash /dev/stdin arg <<'EOT' touch tests/acceptance/X/a EOT ==== sh /dev/fd/0 <<'EOT' touch tests/acc", "rule": "sudo is refused to every session (DEC-953 item 2)", "verdict": "", "cost": "", "note": ""}

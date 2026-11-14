@@ -1,0 +1,6 @@
+W2-185 (DAEO-qyt2): merge the test designer's batch 2 (w2/W2-185-tests at 2230cce50): the README's self-check row under F1, so gov accept reads the map
+
+Task: DAEO-qyt2
+Role: orchestrator
+Implements: DEC-1167, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

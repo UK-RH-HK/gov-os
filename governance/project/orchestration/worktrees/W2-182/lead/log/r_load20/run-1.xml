@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.797" timestamp="2026-11-13T13:23:16.457049+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-121.test_s1_lock_off_status" name="test_s1_status_runs_no_pass_and_writes_nothing" time="0.590" /></testsuite></testsuites>

@@ -1,0 +1,6 @@
+15:06:53 port 47311 accepted from ('127.0.0.1', 46830)
+15:06:53 port 47311 got b'HELLO\n'
+15:06:53 port 47311 accepted from ('127.0.0.1', 46838)
+15:06:53 port 47311 got b'HELLO\n'
+15:06:53 port 47311 accepted from ('127.0.0.1', 46848)
+15:06:53 port 47311 got b'HELLO\n'

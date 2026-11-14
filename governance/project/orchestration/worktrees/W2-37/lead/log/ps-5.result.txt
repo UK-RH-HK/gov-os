@@ -1,0 +1,77 @@
+**Step 0 sandbox check (reported first):**
+- (a) The write to `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k` failed with `OSError: [Errno 30] Read-only file system`, and no file exists. This is the expected result.
+- (b) `git hash-object -w --stdin` returned `1ae28402a109c3397a44b19239a00adfa9472eb0` (exit 0), and `git update-index --refresh` exited 0. Both worked.
+- The `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` check showed nothing.
+- Identity and tree checks matched what you expected: `GOV_ROLE=engineer`, `GOV_TICKET=DAEO-6n5k`, toplevel `/home/usain/gov-os-worktrees/W2-37`, branch `w2/W2-37`, HEAD `e8c414b0d`, and a clean tree.
+
+task: DAEO-6n5k (W2-37, "gov impact"), the change skill's version bump to 1.1.0, owner-approved CIT-P a25b02a7.
+status: done. The commit is `7bde87727b0f292448b1c04b11807b2f34d14d05`, and the tree is clean after it.
+work_completed: In each of the two files, line 4 is now `version: "1.1.0"` and line 6 is now `  version: "1.1.0"`. No other byte changed.
+files_changed:
+- `template/governance/kernel/skills/change/SKILL.md`
+- `template/.rulesync/skills/change/SKILL.md`
+
+evidence:
+- sha256 before, both files: `a25b02a7c5c8090c2251b945e48b60779ce7c2de7c254ae661a1cb0715932536`
+- sha256 after, both files: `cdf43a49709676acbd6d253178b193445d5e4505611bb5280bdb69cb7d3c3a76`
+- `cmp` of the two files: exit 0 (byte-equal).
+- `git diff --stat` before the commit showed 2 files, 4 insertions and 4 deletions in total (2 and 2 per file).
+- The diff, verbatim from `git show HEAD`:
+
+```
+commit 7bde87727b0f292448b1c04b11807b2f34d14d05
+    W2-37: the change skill's version 1.1.0, as the owner approved the CIT-P (a25b02a7, 2026-11-13)
+
+    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+    Task: DAEO-6n5k
+    Role: engineer
+    Implements: CAP-33.g, DEC-167
+
+diff --git a/template/.rulesync/skills/change/SKILL.md b/template/.rulesync/skills/change/SKILL.md
+index a1719761d..a7d3922b0 100644
+--- a/template/.rulesync/skills/change/SKILL.md
++++ b/template/.rulesync/skills/change/SKILL.md
+@@ -1,9 +1,9 @@
+ ---
+ name: change
+ description: Method for taking a Gov OS change through evidence, proposal, independent review and owner approval to a new version.
+-version: "1.0.0"
++version: "1.1.0"
+ metadata:
+-  version: "1.0.0"
++  version: "1.1.0"
+ ---
+ 
+ # Change
+diff --git a/template/governance/kernel/skills/change/SKILL.md b/template/governance/kernel/skills/change/SKILL.md
+index a1719761d..a7d3922b0 100644
+--- a/template/governance/kernel/skills/change/SKILL.md
++++ b/template/governance/kernel/skills/change/SKILL.md
+@@ -1,9 +1,9 @@
+ ---
+ name: change
+ description: Method for taking a Gov OS change through evidence, proposal, independent review and owner approval to a new version.
+-version: "1.0.0"
++version: "1.1.0"
+ metadata:
+-  version: "1.0.0"
++  version: "1.1.0"
+ ---
+ 
+ # Change
+```
+
+- `git log -1 --format='%H%n%B'` printed the hash above and the message with trailers `Co-Authored-By`, `Task: DAEO-6n5k`, `Role: engineer` and `Implements: CAP-33.g, DEC-167`. `git status --short` printed nothing.
+
+tests: `tests/acceptance/W2-37/test_w2_37_skill_routing.py` gave 3 passed and 1 failed. It ran through the heavy slot with `TMPDIR=/tmp/gov-launch-zj3s05kx/claude-1000/gov-os-w237-ps5`, because `/tmp` is read-only in this sandbox.
+- The `[template]` cases are green.
+- `test_the_skill_runs_gov_impact_for_the_question[claude-copy]` is red, as expected. `.claude/skills/change/SKILL.md` has no `gov impact` yet, because the CTO's ACT makes that copy.
+
+discoveries: `/tmp` is read-only in this sandbox, so I used the sandbox's own `$TMPDIR`. The brief anticipated this.
+risks: The `.rulesync/skills/change/SKILL.md` and `.claude/skills/change/SKILL.md` copies are untouched, as instructed. The `[claude-copy]` case stays red until the CTO's copy lands.
+lessons: none
+proposed_decisions: none
+unresolved: none
+recommended_next_action: Run the ACT that makes the CTO's copies (`.rulesync/skills/change/SKILL.md` and `.claude/skills/change/SKILL.md`) from the template at `7bde87727`. Then re-run the acceptance file, where `[claude-copy]` should go green.
+
+guard_refusals: none

@@ -1,0 +1,6 @@
+manifest sha256: 3b4e462f1e1fdbb3fefef7559ae2c83de03eb6ba534da34cf85d40815ffde7ba
+validate_manifest: pass
+check_act: pass
+path_rule: pass
+hash mismatches: [] ; unnamed on disk: []
+act_class: class b; rows ['agents-skills-kernel']; hits []

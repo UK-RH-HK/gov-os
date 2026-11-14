@@ -1,0 +1,86 @@
+You judge whether a session's reply meets a scenario's pass line. Judge only from the reply below.
+
+Pass line:
+the reply names at least the three rules, keeps the rejected rows somewhere with a reason, and names a test with a bad row.
+
+Expected behaviour:
+the session states the data-quality rules (key present and unique, weight in range), applies them before the load, sends the rows that break them to a rejected-rows table with the reason instead of dropping them without a trace, reports the counts loaded and rejected, and names unit tests with a bad row for each rule.
+
+The session's reply:
+<<<
+I've stopped here, and nothing is built. The session wouldn't let me write: creating the folders and writing both files (the fixture and the test file) both needed approval that wasn't given, and so did `gov retrieve`. The skill says to stop and return after two refusals, so I did. What I have is a plan, including the full test file I tried to write. Nothing was run, nothing was committed (this folder isn't a git repo), and `gov accept` wasn't run.
+
+**task:** Nightly import of partner shipment records into `shipments`, rejecting bad rows with a reason instead of loading whatever parses.
+
+**status:** Blocked. Writes and `gov` calls are not approved in this session.
+
+**work_completed:**
+- Read the data skill and its checker script. The checker validates the skill file itself, not import code.
+- Found that the ticket, the real `shipments` schema, the existing migrations, last week's sample and the current readers of the table are not in this folder.
+- Wrote the per-field rules, the migration plan and the unit tests (below). The tests went into a write that was refused.
+
+**files_changed:** None. The planned files were `shipments_import/tests/test_shipments_import.py` and `shipments_import/tests/fixtures/sample_batch.csv`. The fixture is 10 made-up rows covering every rule.
+
+**evidence:** None run. Expected counts on that fixture: 10 read, 3 loaded, 7 rejected rows, 7 reject records. My drafted test file says 4 loaded / 6 rejected and expects 7 reject records in another test; both are slips to fix before it runs. "Read = loaded + rejected" would be checked per batch and stored on the batch row.
+
+**Rules (applied before the load):**
+
+| Field | Rule | Rejection reason |
+|---|---|---|
+| `shipment_id` | present, not blank or spaces only | `shipment_id_missing` |
+| `shipment_id` | unique within the file; every copy is rejected, no copy is picked | `shipment_id_duplicate` |
+| `shipment_id` | not already in `shipments`; the stored row is not overwritten | `shipment_id_already_loaded` |
+| `weight_kg` | present | `weight_kg_missing` |
+| `weight_kg` | a finite number (`nan` and `inf` count as bad) | `weight_kg_not_a_number` |
+| `weight_kg` | ≥ 0; never sign-flipped | `weight_kg_negative` |
+| file | required columns are present, otherwise the whole file is refused | exception, nothing written |
+
+A row that breaks two rules gets one reject record per rule, but counts as one rejected row.
+
+**Migration plan (none of it touches `shipments`):**
+- *Forward:* create `shipment_import_batches` (file hash, source, the three counts, time in UTC) and `shipment_import_rejects` (batch, line number, reason, the raw values as received).
+- *Down:* drop those two tables.
+- Both steps can be run twice without harm.
+- Each batch's loads, rejects and batch row go in one transaction.
+- The same file imported twice is skipped, matched by its hash.
+
+**tests (planned only, not written or run, because the write was refused):**
+- `test_blank_shipment_id`: `,4.2` → `shipment_id_missing`, kept in the rejects.
+- `test_whitespace_only_shipment_id`: `   ,3.0` → `shipment_id_missing`.
+- `test_duplicate_shipment_id_in_batch`: `SHP-3` twice → both copies `shipment_id_duplicate`.
+- `test_shipment_id_already_loaded`: `SHP-1` again on a later night → `shipment_id_already_loaded`, stored row unchanged.
+- `test_negative_weight`: `SHP-4,-1.0` → `weight_kg_negative`.
+- `test_non_numeric_weight`: `SHP-5,abc` → `weight_kg_not_a_number`.
+- `test_non_finite_weight`: `nan` and `inf` → `weight_kg_not_a_number`.
+- `test_blank_weight`: `SHP-6,` → `weight_kg_missing`, not loaded as 0.
+- `test_row_breaking_two_rules_keeps_both_reasons`: `,-2` → both reasons recorded, counted as one rejected row.
+- `test_boundaries_pass`: weight 0 and 99999.999 load.
+- `test_missing_column_fails_whole_file`: no `weight_kg` header → whole file refused, nothing written.
+- `test_fixture_counts_reconcile`, `test_same_file_twice_is_harmless`, `test_failure_mid_batch_leaves_nothing`.
+- `test_up_down_up_on_fixture`, `test_old_reader_unaffected`.
+
+**discoveries:** "Loads whatever parses" in the first draft would load the blank-key rows if the column allows it, and fail or overwrite on duplicates depending on the key. Negative weights would go in as-is.
+
+**risks:**
+- No irreversible step is planned. The down step only drops tables this change creates; even so, it destroys the reject history, so export that before running it.
+- Rejecting every copy of a duplicate means some valid shipments won't load until someone reviews them.
+- `shipments` is probably read by other teams, and fewer rows will land than with the first draft.
+- No upper weight limit is checked, and other columns of the real schema aren't covered.
+
+**lessons:** Approve folder and file writes before handing over a data ticket.
+
+**proposed_decisions (the second and third are P2, for you to raise with whoever owns the ticket):**
+- Use the reject reasons and the two side tables above.
+- Are repeated `shipment_id`s across nights partner corrections, which would mean updating the stored row and keeping its old value, or errors to reject? I recommend rejecting for now and reviewing the rejects.
+- Is a weight of 0 valid, and is there a maximum weight?
+
+**unresolved:**
+- The real `shipments` schema, its migration tool and who reads the table.
+- The ticket's KPI lines and allowed paths.
+- Last week's daily volume, to decide whether one transaction per batch is fine.
+
+**recommended_next_action:** Approve writes to `shipments_import/` and the `gov` CLI, and give me the ticket and the real schema. Then I'll fix the count slips, write the tests and code, run the migration forward and back on a throw-away database, and run `gov accept`.
+>>>
+
+Give your reasons briefly, then end with one last line, exactly "VERDICT: PASS" if the pass line holds, or
+"VERDICT: FAIL" if it does not or cannot be told from the reply.

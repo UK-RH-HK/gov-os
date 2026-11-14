@@ -1,0 +1,34 @@
+You are a fresh engineer. Ticket: DAEO-cv58 (W2-60a, "The role, its skills and its model and effort loaded at launch; the launch record"), profile FULL, class C3. Worktree `/home/usain/gov-os-worktrees/W2-60a`, branch `w2/W2-60a`. Two small batches, both decided by the CTO today (P-6 (a), P-7 (a), recorded in the ticket). The acceptance tests are the independent test designer's (written in parallel in another worktree); you never change them.
+
+## Step 0, before any work: the sandbox check (report it first in your return)
+
+(a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-cv58','w').write('x')"` must FAIL.
+(b) `echo sandbox-trial | git hash-object -w --stdin` must WORK.
+If (a) wrote the file or (b) failed, stop and return. Then `printenv GOV_ROLE GOV_TICKET` (expect `engineer`, `DAEO-cv58`) and `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-60a`, `w2/W2-60a`). If anything differs, stop and say so.
+
+## Standing rules
+
+- Foreground only; your session ends with your last message.
+- Your paths: `src/gov/launch/command.py`, `src/gov/launch/launcher.py` (argument checks and call sites only), `src/gov/launch/role.py`, `src/gov/launch/record.py`, `tests/unit/launch/test_role*`, `tests/unit/launch/test_launch_record*`, `docs/changes/W2-60a-CIT-E.md`. Never edit `tests/acceptance/**`, and do not grep or read under `tests/acceptance/W2-60a/` (the guard refuses it to you). W2-05 holds the git-environment lines of `src/gov/**/*.py`: leave them alone.
+- If the guard refuses a write, that refusal is the answer: stop and report it (refused twice for the same call: stop; never another form).
+- Every pytest through `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh`, with your session's own `$TMPDIR` as TMPDIR, `HOME=/home/usain/gov-os-worktrees/W2-60a/.gov-runtime/scratch/empty-home`, `PYTHONUSERBASE=/home/usain/.local`, `PYTHONPATH=/home/usain/gov-os-worktrees/W2-60a/src`, `-p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"`. A resource gate's refusal is a wait.
+- Write with the Write and Edit tools and absolute paths. No `git merge`, `checkout`, `reset`, `stash`, `clean`, rebase or push. Commit after each batch, your files only: `git commit -m "<subject>" --trailer "Task: DAEO-cv58" --trailer "Role: engineer" --trailer "Implements: DEC-826, DEC-839, DEC-832" -- <your paths>`. Commit hashes in 12 digits. Time budget about 50 minutes.
+
+## Batch 1 (P-6 (a)): wire `gov launch --plan`
+
+The work is built (`launcher.plan`, `role.launch_default`, commit 2ef612682) but argparse in `gov.cli.main` rejects `--plan`. In `src/gov/launch/command.py`: add a `--plan` flag (store_true; add it to the usage line) and in `run`, when it is set, return `launcher.plan(root, args.worker_role, args.ticket)` instead of launching. Interface: `gov launch --plan <role> <ticket>` prints exactly one line `model <id>, effort <e>` from the role file's `- **Launch default:**` line and exits 0, starting nothing (no session, no CLI run, no launch record, no gate taken). A role file without the line, or with a malformed one, refuses with `LAUNCH_REFUSED` naming the role file's path and **exits 1**, like every LAUNCH_REFUSED (P-6 (a); not 2). Nothing reads `Launch by criticality` (W2-184's). Check it end to end with `PYTHONPATH=… python3 -m gov.cli.main launch --plan <role> <ticket>` in a fixture project of your own under `$TMPDIR`, and add a unit case that goes through `gov.cli.main` (the flag parsed, plan called, nothing launched). Fix the CIT-E's line for `command.py`.
+
+## Batch 2 (P-7 (a)): a vendored skill's version from its manifest
+
+The engineer role names `test-driven-development`, `systematic-debugging` and `verification-before-completion`. Their loaded copies (`.claude/skills/<name>/SKILL.md`, vendored Superpowers) carry no version, neither top-level nor `metadata.version`, so `read_role` refuses every engineer launch on the real tree. The version is recorded only in `template/governance/kernel/skills/superpowers/vendored.yaml` (`version: "v6.4.2"`; the skills listed as the keys of its `token_sizes` map; look at the file).
+
+Interface (the lead's statement of P-7 (a)):
+- When a loadable skill's copy carries no version (neither form) and its name is a key of `token_sizes` in the vendored manifest, its version is the manifest's top-level `version` (as a string). The manifest lives at `template/governance/kernel/skills/superpowers/vendored.yaml`, or `governance/kernel/skills/superpowers/vendored.yaml` in the adopted layout (the same switch `read_role` uses for the roles folder).
+- The record entry of such a skill gets one more key, `"version_source"`, whose value is that manifest's repository-relative path. Entries whose version comes from the copy keep exactly their present keys (no `version_source`), so the existing record cases stand. The `sha256` and `folder_sha256` stay the loaded copy's.
+- Applies to every loadable skill, named or not (the record shows the same version whether or not the role names it); for a named one, it is not refused.
+- A copy with no version that is not listed (or with no manifest, or a manifest that cannot be read or parsed as a mapping, or whose `version` is not a non-empty string) is `no version` exactly as today; a named one still refuses with today's message (S2 and F3 hold).
+- Add unit cases: listed and unversioned → the manifest's version and `version_source`; listed but the copy has its own version → the copy's, no `version_source`; unlisted and unversioned named → refused; no manifest → refused; malformed manifest → refused; adopted layout. Then show the real tree: `read_role(Path('/home/usain/gov-os-worktrees/W2-60a'), 'engineer')` returns without refusing (give the three skills' recorded version and source in your return). Add a line to the CIT-E.
+
+## Verify, then return
+
+Run `tests/unit/launch` and `tests/acceptance/W2-60a` (each its own run, the form above). Known reds in `tests/acceptance/W2-60a` that a test designer is revising now, not yours: 10 argv-tail checks (`test_w2_60a_launch_record.py:264` x3, `test_w2_60a_model_and_effort.py:51`/`:64` x4, `test_w2_60a_refused_arguments.py:87`, `:117`, `:124`) and `test_w2_60a_refused_arguments.py:189` `[orchestrator]`; also the integrate-side unit files whose fixtures plant no role file (`test_w2_153_template.py`, `test_w2_56.py`, `test_w2_136_plan_check.py`, being fixed in the tests worktree). Name any other red. Return the twelve fields (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action), each a labelled line: the sandbox check, the counts per folder, every red named, the guard refusals met (count), and your commits' hashes and trailers.

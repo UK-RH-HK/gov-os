@@ -1,0 +1,8 @@
+log: W2-88-A5-run5.json
+W2: W2-88
+status: PACKAGES. The narrow check fails on a new blocker, NC-1: when A9's own record commit is refused, W2-23's `project.commit` still runs `git reset --hard`, so work done in the repository during the run is lost. Review rounds are spent (DEC-1010), so it goes to the owner as P-W2-88-NC-1.
+
+task: DAEO-2bdu (W2-88), run 5 (build): the fix the owner decided under P1-W2-88-RV2-1 (a), then the narrow independent check
+status: PACKAGES. The narrow check fails on a new blocker, NC-1: when A9's own record commit is refused, W2-23's `project.commit` still runs `git reset --hard`, so work done in the repository during the run is lost. Review rounds are spent (DEC-1010), so it goes to the owner as P-W2-88-NC-1.
+work_completed:
+- Wrote the run-5 interface myself (`.gov-runtime/scratch/lead/briefs/run5-interface.md`; `HEAD_MOVED` with details `{started, now, cause}`), because the ticket did 

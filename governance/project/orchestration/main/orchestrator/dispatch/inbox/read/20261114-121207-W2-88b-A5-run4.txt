@@ -1,0 +1,13 @@
+log: W2-88b-A5-run4.json
+W2: W2-88b
+status: DONE. The verified head is `266ec245e7929faf3bdf29fc46f53b6964409c27`. Both copies ran every stage, and both stopped at A9 with two different failures. These are findings for the owner: F-1, F-2 and F-3 below.
+
+task: DAEO-aks1 (W2-88b), build run 4, resumed after P5
+
+status: DONE. The verified head is `266ec245e7929faf3bdf29fc46f53b6964409c27`. Both copies ran every stage, and both stopped at A9 with two different failures. These are findings for the owner: F-1, F-2 and F-3 below.
+
+work_completed:
+- **A5 (S4).**
+  - I checked the hook before launching anyone. A dry run of `.claude/hooks/pretooluse.py` allows an auditor to write and commit `docs/audit/…` inside a run clone. The old `governance/reviews/` path is still denied.
+  - Fresh auditors gave a pass on both copies:
+    - redis: commit `934b70218

@@ -1,0 +1,6 @@
+You have one skill, "api", installed in this folder's .claude/skills/. Use it as it directs.
+
+Situation:
+the ticket asks that `GET /v1/orders/{id}` return `total_cents` where it returns `total` today. Mobile apps that cannot be forced to update read `total`, and the ticket says nothing about them.
+
+Act on this situation as the skill directs, and report what you did and what you produced.

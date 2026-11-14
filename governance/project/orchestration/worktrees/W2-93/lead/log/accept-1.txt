@@ -1,0 +1,2 @@
+heavy_slot: a landing or close waits first; waiting (2026-11-13 16:49:34)
+gov accept: ACCEPT_MAP_UNREADABLE: ticket DAEO-6y0x: the README of tests/acceptance/W2-93/ has a map row naming no KPI line it can read
