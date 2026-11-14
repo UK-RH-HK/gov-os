@@ -42,7 +42,7 @@ kpis:
 non_goals:
 - the code (W2-88), the skill text (W2-88a), the synthetic repositories (W2-88's proof (a)), EXAMIN's copy (W2-27, proof (d))
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1150, DEC-996, DEC-954, DEC-1099, DEC-078, DEC-718, DEC-723]
+sources: [DEC-1150, DEC-996, DEC-954, DEC-1099, DEC-078, DEC-718, DEC-723, CAP-10, CAP-19, DEC-1097, DEC-1098, DEC-833, DEC-860]
 track: A
 ---
 # W2-88b W2-88's proofs on real repositories (a child of W2-88)

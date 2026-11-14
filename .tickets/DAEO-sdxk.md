@@ -51,6 +51,9 @@ sources:
 - DEC-1073
 - DEC-953
 - DEC-968
+- DEC-1121
+- DEC-1123
+- DEC-1130
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files (the exit report)'
