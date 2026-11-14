@@ -248,3 +248,15 @@ all readings join what the line parser gives, so nothing the base gave is lost. 
 alone **912 passed, 2 xfailed**; with tests/unit/guard, hooks, pause, containment and tests/acceptance/W1-28 and W1-50
 **1959 passed, 2 xfailed, 2 failed** (test_live_hook's `rm -f ~/.bashrc` cases, failing alike on the base with the
 sandbox's scratch HOME).
+
+**R3 F1: the read-only here-string forms with an expanded text stay free (DEC-1164 (18)).** The R3 fail-closed rule made
+`read -r a <<< "$v"` and every loop or filter over an expanded here-string the unresolvable target. In
+`bash_writes._check_here_strings` the here-string's reader now counts as data when it is `read`, `mapfile`, `readarray`
+or `bc`; `sed` or `awk` whose script writes and runs nothing (`_sed_reads_only` scans the script command by command, no
+`-i`, `-f`, `w`, `W`, `e` or `s///w|e`; `_awk_reads_only` refuses `system`, `>`, `|`, `getline`, `-f`, `-i`); or the `done`
+of a loop none of whose commands reads its input as code (a shell, Python, `xargs`, `eval`, `source`, `perl`...), whose
+body is then judged by its own words. A `$(…)` in the text is still judged as a command, so its writes stay targets;
+`bash`/`sh`/`zsh`/`dash`, `xargs`, `source`, `eval`, an unknown reader, a writing `sed`/`awk` script and a loop that runs
+its input keep R3's rule. **Counts:** test_w2_42a_here_string_ro.py (acceptance) went from 21 failed, 32 passed to
+**53 passed**; the builder file tests/unit/guard/test_w2_42a_here_string_ro.py holds **64 passed** (31 red on the
+unfixed parser); tests/acceptance/W2-42a with tests/unit/guard: **1670 passed, 2 xfailed** before the builder file.

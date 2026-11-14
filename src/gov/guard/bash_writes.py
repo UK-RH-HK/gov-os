@@ -421,17 +421,168 @@ def heredocs(command, comments=None, legacy=False, hstr=False, lenient=False):
     return "".join(out), bodies
 
 
+# Readers that take a here-string's text as data whatever it is, and never run it (DEC-1164 (18), R3 F1): the shell's
+# own read builtins, and the filters whose script, when it has one, is read below (sed, awk) or none (bc).
+_HS_READ = frozenset(("read", "mapfile", "readarray", "bc"))
+# Commands that read their standard input as commands or code: a loop whose body holds one runs the loop's here-string.
+_STDIN_RUNNERS = frozenset(("xargs", "parallel", "source", ".", "eval", "perl", "node", "ruby", "php"))
+
+
+def _sed_reads_only(args):
+    """Whether the ``sed`` words (after its name) are a script that only edits its input: no -i, no script file, no
+    ``w``, ``W`` or ``e`` command and no flag ``w`` or ``e`` on an ``s``. Anything not understood: not."""
+    scripts, positional, i = [], [], 0
+    while i < len(args):
+        a = args[i]
+        if a == "--":
+            positional += args[i + 1:]
+            break
+        if a.startswith("--"):
+            if a in ("--quiet", "--silent", "--regexp-extended", "--posix", "--separate", "--null-data",
+                     "--unbuffered", "--sandbox"):
+                i += 1
+            elif a == "--expression" and i + 1 < len(args):
+                scripts.append(args[i + 1])
+                i += 2
+            elif a.startswith("--expression="):
+                scripts.append(a.split("=", 1)[1])
+                i += 1
+            else:
+                return False
+            continue
+        if a.startswith("-") and len(a) > 1:
+            letters = a[1:]
+            ends_e = letters.endswith("e")
+            if not set(letters[:-1] if ends_e else letters) <= set("nErsuz"):
+                return False
+            if ends_e:
+                if i + 1 >= len(args):
+                    return False
+                scripts.append(args[i + 1])
+                i += 2
+            else:
+                i += 1
+            continue
+        positional.append(a)
+        i += 1
+    if not scripts:
+        if not positional:
+            return False
+        scripts = positional[:1]
+    return all(_sed_script_reads_only(s) for s in scripts)
+
+
+def _sed_script_reads_only(script):
+    """Scans a sed script command by command; True only when every command is one that writes no file and runs
+    nothing."""
+    i, n = 0, len(script)
+    while i < n:
+        c = script[i]
+        if c in " \t\n;{}!":
+            i += 1
+            continue
+        if c.isdigit() or c in ",$~+":
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:  # an address /re/ with its own delimiter: \cREc
+            i = _skip_delimited(script, i + 2, script[i + 1])
+            if i < 0:
+                return False
+            continue
+        if c == "/":
+            i = _skip_delimited(script, i + 1, "/")
+            if i < 0:
+                return False
+            while i < n and script[i] in "IM":
+                i += 1
+            continue
+        if c in "sy" and i + 1 < n:
+            delim = script[i + 1]
+            if delim in " \t\n\\;":
+                return False
+            i = _skip_delimited(script, i + 2, delim)
+            i = _skip_delimited(script, i, delim) if i >= 0 else -1
+            if i < 0:
+                return False
+            start = i
+            while i < n and script[i] not in ";}\n \t#":
+                i += 1
+            flags = script[start:i]
+            if c == "y" and flags or not set(flags) <= set("gpiImM0123456789"):
+                return False  # a w or e flag, or one not known
+            continue
+        if c in "pdqQnNgGhHxlP=D":
+            i += 1
+            continue
+        if c in "aic":  # the rest of the line is text
+            end = script.find("\n", i)
+            i = n if end < 0 else end
+            continue
+        return False  # w, W, e, r, R, b, t, T, labels, comments and the rest
+    return True
+
+
+def _skip_delimited(text, i, delim):
+    """The index after the next unescaped ``delim`` in ``text`` from ``i``, or -1."""
+    n = len(text)
+    while i < n:
+        if text[i] == "\\":
+            i += 2
+            continue
+        if text[i] == delim:
+            return i + 1
+        i += 1
+    return -1
+
+
+def _awk_reads_only(args):
+    """Whether the ``awk`` words only compute on their input: no program file, in-place include, ``system(``,
+    ``getline`` from a command, redirect or pipe (any ``>``, ``|`` or ``system`` in a word: not known to be free)."""
+    for a in args:
+        if a in ("-f", "--file", "-i", "--include", "-l", "--load", "-E", "--exec") or a.startswith(("-f", "--file=")):
+            return False
+        if re.search(r"system|[>|]|inplace|getline|\bclose\b|fflush", a):
+            return False
+    return True
+
+
+def _hs_data(words, loop_ok):
+    """Whether the command ``words`` takes a here-string's text as data (DEC-1164 (18), R3 F1): ``_kind`` says data;
+    or it is ``read``, ``mapfile``, ``readarray`` or ``bc``; or ``sed`` or ``awk`` with a script that writes nothing
+    and runs nothing; or ``done`` ending a loop none of whose commands reads its input as code (the loop's body is
+    judged by its own words)."""
+    if _kind(words) == "data":
+        return True
+    head = lead(words)
+    if not head:
+        return False
+    name = os.path.basename(head[0])
+    if name in _HS_READ:
+        return True
+    if name == "sed":
+        return _sed_reads_only(head[1:])
+    if name in ("awk", "gawk", "mawk"):
+        return _awk_reads_only(head[1:])
+    return words == ["done"] and loop_ok
+
+
+def _runs_stdin(words):
+    head = lead(words)
+    return bool(head) and (_kind(words) in ("shell", "python") or os.path.basename(head[0]) in _STDIN_RUNNERS)
+
+
 def _check_here_strings(cmds):
     """Raises Unreadable when a here-string's text reaches, by its own command or through a pipe, a command that
     may run it (``bash <<< ...``, ``cat <<< ... | sh``, an unknown program): such a call is read as it was before
     here-strings were read (APOS-4, DEC-1174 (1)); a here-string only data readers take is read."""
+    loop_ok = not any(_runs_stdin(words) for words, _, _ in cmds)
     stage, at = [], None
     for words, reds, sep in cmds:
-        stage.append(_kind(words))
+        stage.append(words)
         if at is None and any(op == "<<<" for op, _ in reds):
             at = len(stage) - 1
         if sep not in ("|", "|&"):
-            if at is not None and any(kind != "data" for kind in stage[at:]):
+            if at is not None and not all(_hs_data(w, loop_ok) for w in stage[at:]):
                 raise Unreadable("a here-string a command may run")
             stage, at = [], None
 
