@@ -52,6 +52,16 @@ FAILED_CALL_EVENT = "PostToolUseFailure"       # the harness's event for a faile
 RULESYNC_FAILED_CALL_KEY = "postToolUseFailure"
 RULESYNC_AFTER_CALL_KEY = "postToolUse"
 
+# Revised (Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2)). The template's ``postToolUse`` holds a second
+# entry beside the guard's: the context watch (``context_watch.py``, matcher ``Bash``, ``"timeout": 10``). It is a
+# handover aid, not a guard line: it carries its own limit, and the kernel template's settings register no such
+# entry. Every other guard entry keeps the limit of W1-47's module.
+WATCH_PROGRAM = "context_watch.py"
+WATCH_LIMIT_S = 10
+WATCH_MATCHER = "Bash"
+WATCH_MODEL = "claude-sonnet-5-5"      # a model whose window the program knows (1,000,000 tokens)
+WATCH_USED_TOKENS = 900_000            # 90 % of that window: past the 85 % at which the program speaks
+
 ENGINEER = check_support.ENGINEER
 TICKET_ID = check_support.TICKET_ID
 TICKET_PATHS = ("src/app/**", "tests/unit/**")
@@ -159,17 +169,29 @@ def source_guard_entries(source, programs):
     return [(where, entry) for where, entry in source_entries(source)[0] if limit.is_guard_entry(entry, programs)]
 
 
+def expected_limit(entry, programs):
+    """The whole number ``timeout`` an entry carries: the context watch's own (``WATCH_LIMIT_S``), else W1-47's."""
+    return WATCH_LIMIT_S if program_of(entry, programs) == WATCH_PROGRAM else limit.LIMIT_S
+
+
+def carries_its_limit(entry, programs):
+    """Only the whole number: ``60.0``, ``"60"``, ``True`` and an absent key are not a limit (DEC-592)."""
+    value = entry.get(limit.LIMIT_KEY)
+    return type(value) is int and value == expected_limit(entry, programs)
+
+
 def source_faults(source, programs):
     """One sentence for each guard hook entry of the source that does not carry the limit, and for each misshapen part."""
     entries, found = source_entries(source)
     found = list(found)
     for where, entry in entries:
-        if not limit.is_guard_entry(entry, programs) or limit.carries_the_limit(entry):
+        if not limit.is_guard_entry(entry, programs) or carries_its_limit(entry, programs):
             continue
+        wanted = expected_limit(entry, programs)
         if limit.LIMIT_KEY not in entry:
             state = f"carries no `{limit.LIMIT_KEY}`"
         else:
-            state = f"carries `{limit.LIMIT_KEY}`: {entry[limit.LIMIT_KEY]!r}, which is not the whole number {limit.LIMIT_S}"
+            state = f"carries `{limit.LIMIT_KEY}`: {entry[limit.LIMIT_KEY]!r}, which is not the whole number {wanted}"
         found.append(f"{where}, command `{entry.get('command')}`, {state}")
     return found
 
@@ -405,11 +427,16 @@ def run_registered(command, stdin, project, sandbox, folder, role=None, ticket=N
 
 
 def _json(text):
-    try:
-        data = json.loads(text.strip() or "null")
-    except ValueError:
-        return {}
-    return data if isinstance(data, dict) else {}
+    """The object a program's standard output holds: the whole text, else its last line that is an object (the
+    PreCompact program writes its read-first line, as text, before its JSON message: W2-176)."""
+    for candidate in [text.strip() or "null"] + [line for line in reversed(text.strip().splitlines()) if line.strip()]:
+        try:
+            data = json.loads(candidate)
+        except ValueError:
+            continue
+        if isinstance(data, dict):
+            return data
+    return {}
 
 
 def _specific(result):
@@ -453,6 +480,8 @@ def start_entry(event, command, project, sandbox, folder, settings):
     as the guard does on an internal failure and as the return-contract program does on an incomplete return.
 
     - ``PreToolUse``: a call the guard refuses; the program's written refusal (exit 0, ``permissionDecision``).
+    - ``PostToolUse`` for the context watch (``WATCH_PROGRAM``): a transcript at 90 % of the model's window; the
+      reminder the program writes under its own event name.
     - ``PostToolUse``, ``PostToolUseFailure``: one whole call whose pre-call part ran from the project's root
       (where every form of the command starts); the command changed a file outside the ticket's paths; the
       check's report names that file.
@@ -472,6 +501,23 @@ def start_entry(event, command, project, sandbox, folder, settings):
         result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
         return Started(event, result, "refused" if refused_by_the_program(result) else "",
                        "the guard's written refusal of a write outside the ticket's paths (exit 0)")
+    if event == "PostToolUse" and own_programs(command, (WATCH_PROGRAM,)):
+        # The context watch (DEC-1167 (4)): a session at 90 % of its model's window is reminded to write its handover.
+        transcript = Path(base["transcript_path"])
+        transcript.parent.mkdir(parents=True, exist_ok=True)
+        transcript.write_text(json.dumps({"type": "assistant", "message": {
+            "model": WATCH_MODEL, "usage": {"input_tokens": WATCH_USED_TOKENS}}}) + "\n", encoding="utf-8")
+        stdin = live_support.hook_input(project, sandbox, event, "Bash",
+                                        {"command": "bash tools/step.sh", "description": "W1-38 acceptance call"},
+                                        tool_use_id=f"toolu_w1_38_any_{number:04d}")
+        stdin.update(session_id=base["session_id"], transcript_path=str(transcript))
+        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
+        reply = _specific(result)
+        added = reply.get("additionalContext")
+        seen = (result.returncode == 0 and reply.get("hookEventName") == event
+                and isinstance(added, str) and "Context watch" in added)
+        return Started(event, result, added if seen else "",
+                       "the context watch's reminder for a session at 90 % of its window, under its event name (exit 0)")
     if event in ("PostToolUse", FAILED_CALL_EVENT):
         tool_use_id = f"toolu_w1_38_any_{number:04d}"
         tool_input = {"command": "bash tools/step.sh", "description": "W1-38 acceptance call"}

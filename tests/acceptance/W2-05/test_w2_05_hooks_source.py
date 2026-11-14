@@ -18,6 +18,13 @@ hook events and matchers, with paths normalised.
   event in both sources is compared as any other; the check's output form is unchanged. Since ACT 1 this
   repository's two sources differ in exactly those two events, so the case over them is green with the exception.
 
+- **DEC-971 item 3's exception, per hook** (Rewrite-Reason: DEC-1167 (4), DEC-1156 (7), W2-185 run 2): since the
+  template's ``postToolUse`` also holds the ``context_watch.py`` entry (the repository's own line for it), the lift is
+  no longer a whole event. It excepts the template's entries that run ``posttooluse.py``, in those two events, while
+  the repository's source does not run ``posttooluse.py`` in that event; every other entry of the events compares as
+  any other (another matcher, another event, an entry in the repository's source only: a finding), found by its
+  program, never by its place in the list.
+
 The temporary project has this repository's shape: W1-38's adopted project (the kernel template's roles, skills,
 templates and hooks, the template's rulesync sources, the registered rulesync version and the check's declaration, copied one
 named file at a time by W1-38's own support), with its kernel moved to ``template/governance/kernel``. Its
@@ -100,6 +107,12 @@ def _template_with_the_matcher():
     source["hooks"]["sessionStart"] = [_with_matcher(entry, SESSION_START_MATCHER)
                                        for entry in source["hooks"]["sessionStart"]]
     return source
+
+
+def _program(command):
+    """The kernel hook program a command runs (the file name after ``/hooks/``)."""
+    found = re.search(r"/hooks/([A-Za-z_]+\.py)", command)
+    return found.group(1) if found else None
 
 
 def _commands(source, change):
@@ -292,12 +305,19 @@ def _only_the_wrapper(repository):
     path: the template's commands, path for path, in the repository's events, order and matchers."""
     wrapped = _template_with_the_matcher()["hooks"]
     template = copy.deepcopy(repository)
+    wrapped_differently = 0
     for event, entries in template["hooks"].items():
-        assert len(wrapped.get(event, [])) == len(entries), f"the template has not the repository's hooks of {event}"
-        for number, (entry, theirs) in enumerate(zip(entries, wrapped[event])):
-            entry["command"] = theirs["command"].replace(TEMPLATE_HOOKS_PATH, REPO_HOOKS_PATH)
-            assert entry["command"] != repository["hooks"][event][number]["command"], (
-                f"the template's command of {event} is the repository's; the case needs another wrapper")
+        for number, entry in enumerate(entries):
+            # By program, not by place: the template's postToolUse holds the guard's entry beside the repository's own
+            # context watch entry (DEC-1167 (4)); the case wraps each repository entry with the template's line for it.
+            theirs = [other for other in wrapped.get(event, []) if _program(other["command"]) == _program(entry["command"])]
+            assert len(theirs) == 1, (
+                f"the template has {len(theirs)} hooks of {event} running {_program(entry['command'])}; one is expected")
+            entry["command"] = theirs[0]["command"].replace(TEMPLATE_HOOKS_PATH, REPO_HOOKS_PATH)
+            wrapped_differently += entry["command"] != repository["hooks"][event][number]["command"]
+    # The context watch's line is the same in both sources (the pinned form, the path apart), so it differs in no
+    # wrapper; the others' lines do, and the case needs another wrapper somewhere.
+    assert wrapped_differently, "the template's commands are the repository's; the case needs another wrapper"
     return repository, template
 
 
@@ -522,3 +542,63 @@ def test_a_lifted_hook_event_back_in_both_sources_is_compared_as_any_other(tmp_p
 
     assert_the_event_named(w138, done, findings, event, what)
     assert_the_form(done, control, what)
+
+
+# --------------------------------------------------------------------------
+# DEC-1167 (4): the exception is per hook (the template's postToolUse holds the context watch beside posttooluse.py)
+# --------------------------------------------------------------------------
+#
+# Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The cases above keep their points (a lifted entry in the
+# template only is no finding; another drift is; the form is unchanged). These two keep the opposite face of a lift
+# that is per hook: a template entry of a lifted event that does not run ``posttooluse.py`` is a finding, and the
+# repository's two sources as the template now carries the context watch (one entry beside the guard's) are green
+# only while the entries beside the lifted one agree.
+
+def _hook_entry(command, hook, matcher, timeout):
+    entry = {"type": "command", "command": command(hook), "timeout": timeout}
+    return entry if matcher is None else _with_matcher(entry, matcher)
+
+
+@pytest.mark.parametrize("lifted", LIFTED)
+def test_a_template_entry_of_a_lifted_event_that_runs_another_program_is_a_finding(tmp_path, lifted):
+    """With the repository's source lacking the event, the template's ``posttooluse.py`` entry is no finding, and an
+    entry of the same event beside it that runs another program (``precompact.py``) is one, naming the event."""
+    w138 = _w138()
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    template["hooks"][lifted] = [*template["hooks"][lifted],
+                                 _hook_entry(_template_command, "precompact.py", "Bash", 60)]
+    _rewrite(w138, project, _without(repository, lifted), template,
+             f"{lifted}: another hook beside posttooluse.py in the template's hooks source")
+    what = f"{lifted} in the template's hooks source only, with an entry that runs precompact.py beside the lifted one"
+
+    done, findings = _check(w138, project)
+
+    assert_the_event_named(w138, done, findings, lifted, what)
+    assert_the_form(done, control, what)
+
+
+@pytest.mark.parametrize("watch_matcher,green", [("Bash", True), ("Bash|Edit", False)],
+                         ids=["the same matcher", "another matcher"])
+def test_the_template_s_context_watch_beside_the_lifted_entry_is_compared_as_any_other(tmp_path, watch_matcher, green):
+    """The repository's two sources as DEC-1167 (4) makes them: the repository's ``postToolUse`` holds its own
+    ``context_watch.py`` entry only (no ``posttooluse.py``, no ``postToolUseFailure``); the template's holds the
+    ``posttooluse.py`` entry (lifted) and the ``context_watch.py`` entry. Green with the same matcher; another matcher on
+    the template's context watch is a finding naming ``postToolUse``."""
+    w138 = _w138()
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    repository = _without(repository, *LIFTED)
+    repository["hooks"]["postToolUse"] = [_hook_entry(_repository_command, "context_watch.py", "Bash", 10)]
+    template["hooks"]["postToolUse"] = [*template["hooks"]["postToolUse"],
+                                        _hook_entry(_template_command, "context_watch.py", watch_matcher, 10)]
+    _rewrite(w138, project, repository, template, f"the context watch beside the lifted entry, matcher {watch_matcher}")
+    what = f"the template's context_watch.py entry with the matcher {watch_matcher!r} beside the lifted entry"
+
+    done, findings = _check(w138, project)
+
+    if green:
+        assert done.returncode == 0 and not findings, (
+            f"adapter-portability is red on {what}:\n{w138.output_of(done)[-3000:]}")
+        assert_the_form(done, control, what)
+    else:
+        assert_the_event_named(w138, done, findings, "postToolUse", what)
+        assert_the_form(done, control, what)

@@ -13,6 +13,12 @@ No real session is started; what that leaves open is in the README.
 
 What a guard hook entry is, and what carrying the limit is: DEC-592, with the
 words of ``tests/acceptance/W1-47/w1_47_hook_time_limit.py``.
+
+Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 2). The template's ``postToolUse`` holds two entries: the
+guard's (``posttooluse.py``, the limit 60, the entry the kernel template's settings register) and the context
+watch's (``context_watch.py``, matcher ``Bash``, its own limit 10, registered by no kernel settings). The cases pick
+entries by their program, never by index: the guard entry is the one the kernel template's settings register; the
+context watch is held to its own matcher and limit; every other entry keeps the limit 60.
 """
 
 from __future__ import annotations
@@ -79,7 +85,7 @@ def _conforming(source, programs):
     """The template's source as an object in which every guard hook entry carries the limit."""
     changed = copy.deepcopy(source)
     for _where, entry in hooks.source_guard_entries(changed, programs):
-        entry[limit.LIMIT_KEY] = limit.LIMIT_S
+        entry[limit.LIMIT_KEY] = hooks.expected_limit(entry, programs)
     return changed
 
 
@@ -110,6 +116,33 @@ def test_one_source_entry_without_the_whole_number_60_is_found(source, programs,
     NOT_THE_LIMIT[kind](hooks.source_guard_entries(changed, programs)[-1][1])
     found = hooks.source_faults(changed, programs)
     assert len(found) == 1, f"{kind}: one guard hook entry does not carry the limit, and the reading reports {found}"
+
+
+def test_the_context_watch_entry_of_the_source_carries_its_own_limit_and_the_bash_matcher(source, programs):
+    """The template's ``postToolUse`` holds the context watch beside the guard's entry: one entry, matcher ``Bash``,
+    the whole number 10; and the guard's ``posttooluse.py`` entry beside it still holds 60 (DEC-1167 (4))."""
+    after = [entry for where, entry in hooks.source_guard_entries(source, programs)
+             if where.startswith(f"hooks.{hooks.RULESYNC_AFTER_CALL_KEY}[")]
+    watch = [entry for entry in after if hooks.program_of(entry, programs) == hooks.WATCH_PROGRAM]
+    guard = [entry for entry in after if hooks.program_of(entry, programs) != hooks.WATCH_PROGRAM]
+    assert len(watch) == 1, f"{hooks.SOURCE_REL}'s postToolUse holds {len(watch)} {hooks.WATCH_PROGRAM} entries; one is expected"
+    assert watch[0].get("matcher") == hooks.WATCH_MATCHER and type(watch[0].get(limit.LIMIT_KEY)) is int \
+        and watch[0][limit.LIMIT_KEY] == hooks.WATCH_LIMIT_S, (
+        f"the {hooks.WATCH_PROGRAM} entry is {watch[0]!r}; the matcher {hooks.WATCH_MATCHER!r} and the whole number "
+        f"{hooks.WATCH_LIMIT_S} are expected")
+    assert [hooks.program_of(entry, programs) for entry in guard] == ["posttooluse.py"]
+    assert all(limit.carries_the_limit(entry) for entry in guard)
+
+
+def test_the_context_watch_entry_with_the_guard_s_limit_is_found(source, programs):
+    """Its limit is its own: the entry given 60, or left without one, is found, alone."""
+    for change in (_set(limit.LIMIT_S), _remove):
+        changed = _conforming(source, programs)
+        watch = [entry for _where, entry in hooks.source_guard_entries(changed, programs)
+                 if hooks.program_of(entry, programs) == hooks.WATCH_PROGRAM]
+        assert len(watch) == 1
+        change(watch[0])
+        assert len(hooks.source_faults(changed, programs)) == 1
 
 
 def test_a_limit_written_as_a_fraction_in_the_source_file_is_found(source, programs):
@@ -145,11 +178,17 @@ class TestGeneratedGuardHooks:
     def test_every_guard_hook_entry_of_the_generated_settings_carries_the_time_limit(
         self, generated_settings, programs,
     ):
-        """Every generated hook entry that runs a program of the kernel's hooks folder holds the number 60."""
+        """Every generated hook entry that runs a program of the kernel's hooks folder holds the number 60; the
+        context watch's entry holds its own, 10."""
         assert limit.guard_entries(generated_settings, programs), (
             f"{hooks.GENERATED_REL} registers no guard hook entry, so the time limit would be held for nothing"
         )
-        found = limit.faults(generated_settings, programs)
+        found = [fault for fault in limit.faults(generated_settings, programs) if hooks.WATCH_PROGRAM not in fault]
+        found += [f"{where}, command `{entry.get('command')}`, carries `{limit.LIMIT_KEY}`: "
+                  f"{entry.get(limit.LIMIT_KEY)!r}, which is not the whole number {hooks.WATCH_LIMIT_S}"
+                  for where, _group, entry in limit.guard_entries(generated_settings, programs)
+                  if hooks.program_of(entry, programs) == hooks.WATCH_PROGRAM
+                  and not (type(entry.get(limit.LIMIT_KEY)) is int and entry[limit.LIMIT_KEY] == hooks.WATCH_LIMIT_S)]
         assert not found, (
             f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}: a guard hook entry without `{LIMIT}` "
             f"(DEC-596):\n  " + "\n  ".join(found)
@@ -180,10 +219,19 @@ class TestGeneratedGuardHooks:
         compared."""
         kernel = hooks.registered(hooks.kernel_settings(), programs, event)
         assert kernel, f"{hooks.KERNEL_SETTINGS_REL} registers no guard hook entry under {event}"
-        generated = hooks.registered(generated_settings, programs, event)
+        registered = hooks.registered(generated_settings, programs, event)
+        # The context watch is the template's own second entry under PostToolUse (DEC-1167 (4)); no kernel settings
+        # registers it. Everything else under the event is the kernel template's, entry for entry.
+        generated = [row for row in registered if row[1] != hooks.WATCH_PROGRAM]
+        watch = [row for row in registered if row[1] == hooks.WATCH_PROGRAM]
         assert generated == kernel, (
             f"{event}: {hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers (matcher, program, "
-            f"limit) {generated}; {hooks.KERNEL_SETTINGS_REL} registers {kernel}"
+            f"limit) {generated} besides the context watch; {hooks.KERNEL_SETTINGS_REL} registers {kernel}"
+        )
+        assert watch == ([(hooks.WATCH_MATCHER, hooks.WATCH_PROGRAM, hooks.WATCH_LIMIT_S)] if event == "PostToolUse"
+                         else []), (
+            f"{event}: the context watch is registered as {watch}; PostToolUse alone holds it, for {hooks.WATCH_MATCHER} "
+            f"with the limit {hooks.WATCH_LIMIT_S}"
         )
 
     def test_the_three_events_compared_are_the_kernel_template_s_guard_events(self, programs):
@@ -210,8 +258,10 @@ class TestRulesyncPassesBothThrough:
         path = project / hooks.PROJECT_SOURCE_REL
         changed = hooks.load_source(path, hooks.PROJECT_SOURCE_REL)
         after = [entry for where, entry in hooks.source_guard_entries(changed, programs)
-                 if where.startswith(f"hooks.{hooks.RULESYNC_AFTER_CALL_KEY}[")]
-        assert len(after) == 1, f"the source holds {len(after)} guard hook entries after a tool call; one is expected"
+                 if where.startswith(f"hooks.{hooks.RULESYNC_AFTER_CALL_KEY}[")
+                 and hooks.program_of(entry, programs) != hooks.WATCH_PROGRAM]
+        assert len(after) == 1, (f"the source holds {len(after)} guard hook entries after a tool call besides the "
+                                 f"context watch's; one is expected")
         changed["hooks"][hooks.RULESYNC_FAILED_CALL_KEY] = [{**copy.deepcopy(after[0]), "matcher": "Bash"}]
         for _where, entry in hooks.source_guard_entries(changed, programs):
             entry[limit.LIMIT_KEY] = limit.LIMIT_S
