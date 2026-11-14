@@ -1,7 +1,9 @@
 # W2-130: the link clean-up, its record (DEC-1073 (5)(a))
 
 Ticket DAEO-q8cl (W2-130), profile STANDARD. Written by the ticket lead (orchestrator), 2026-11-14, at the end of
-run 3. This record holds what the ticket's eight success lines and four failure lines ask to be kept: the commits,
+run 3; refreshed in run 4 (2026-11-14) after the CTO merged w2/integrate into this branch (6b62de94e3fd): the counts after,
+the closed tickets' missing ids, the ids that name no record and what is left (sections 5, 9 and 10) are measured at
+that merged head, by the same commands. This record holds what the ticket's eight success lines and four failure lines ask to be kept: the commits,
 the marks and their independent check, the tickets' `sources:`, the trailer residuals, the status reconciliation,
 the lessons, the counts before and after, and what is left for D-5, D-6 and D-9. The fenced blocks named
 `w2-130:<name>` are read by `tests/acceptance/W2-130/`; the prose is for a reader.
@@ -4247,7 +4249,7 @@ diff --git a/.tickets/DAEO-zmo4.md b/.tickets/DAEO-zmo4.md
 ```
 
 **Closed tickets** are not edited (DEC-1088 (6), H1 (b)). Their missing ids, per ticket, from `gov links --all`'s
-UNLINKED_ID at the last clean-up commit (142 tickets):
+UNLINKED_ID at the merged head 6b62de94e3fd (143 tickets):
 
 ```yaml w2-130:closed-missing
 DAEO-03dg:
@@ -4533,6 +4535,9 @@ DAEO-cy5o:
 - DEC-886
 - DEC-899
 - DEC-925
+DAEO-drhj:
+- DEC-1020
+- DEC-747
 DAEO-drvn:
 - CAP-27.a
 - CAP-28.b
@@ -5061,8 +5066,8 @@ DAEO-zsvl:
 - DEC-413
 ```
 
-**Ids that name no record**, per ticket, for D-9: none. Every UNKNOWN_ID on a ticket at the last clean-up commit is
-an `acceptance_tests.path` that does not exist yet (36, listed by path under `left`, D-9).
+**Ids that name no record**, per ticket, for D-9: none. Every UNKNOWN_ID on a ticket at the merged head 6b62de94e3fd is
+an `acceptance_tests.path` that does not exist yet (35, listed by path under `left`, D-9).
 
 ```yaml w2-130:no-record
 {}
@@ -5408,24 +5413,26 @@ L-0078:
 
 `gov links --all --json` (this tree's tool, run on a clone of each commit), by code:
 
-| code | before (232efc47d) | after (the last clean-up commit) |
+| code | before (232efc47d) | after (measured at 6b62de94e3fd, after the last clean-up commit 57cbacfbfc86) |
 |---|---|---|
 | CLOSED_TICKET_EDITED | 117 | 122 |
 | ENFORCES_SUPERSEDED | 43 | 14 |
 | NOT_IN_FORCE_AS_RULE | 141 | 19 |
 | STATUS_CONFLICT | 116 | 0 |
 | TICKET_CHANGE_UNMARKED | 93 | 96 |
-| UNKNOWN_ID | 101 | 57 |
-| UNLINKED_ID | 1877 | 1417 |
+| UNKNOWN_ID | 101 | 56 |
+| UNLINKED_ID | 1877 | 1420 |
 | UNMARKED_CHANGE | 185 | 8 |
 
-The UNLINKED_ID left are on closed tickets (1352, listed above)
+The UNLINKED_ID left are on closed tickets (1355, listed above)
 and the 65 DEC-1123 (2) form ids on open and in-progress tickets. CLOSED_TICKET_EDITED and
 TICKET_CHANGE_UNMARKED rose from commits after the starting head made by other tickets, not by the clean-up.
+The after block's `head` names the last clean-up commit and its `measured_at` the merged head counted: the merges
+of w2/integrate after it bring other tickets' commits only.
 
 ```yaml w2-130:counts-before
 head: 232efc47dd707dd76038cf8211842d9b4472473c
-command: 'gov links --all --json --root <a git clone --shared of this repository checked out at 232efc47dd70> (the tool of 57cbacfbfc86, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at the clean-up''s starting head'
+command: 'gov links --all --json --root <a git clone --shared of this repository checked out at 232efc47dd70> (the tool of 6b62de94e3fd, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at the clean-up''s starting head'
 by_code:
   CLOSED_TICKET_EDITED: 117
   ENFORCES_SUPERSEDED: 43
@@ -5465,14 +5472,15 @@ unlinked_by_status:
 
 ```yaml w2-130:counts-after
 head: 57cbacfbfc861eb982cf08b6aebb3c699171a1de
-command: 'gov links --all --json --root <a git clone --shared of this repository checked out at 57cbacfbfc86> (the tool of 57cbacfbfc86, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at the last clean-up commit (the sources follow-up)'
+measured_at: 6b62de94e3fd67505998c69d3de68b937d60406b
+command: 'gov links --all --json --root <a git clone --shared of this repository checked out at 6b62de94e3fd> (the tool of 6b62de94e3fd, src/gov/links unchanged since 8f8d707f0bd0: PYTHONPATH=<worktree>/src, HOME empty, run as python3 -m gov.cli.main links); at 6b62de94e3fd, the merged head after the last clean-up commit 57cbacfbfc86 (the sources follow-up; the merges of w2/integrate since change no clean-up line, only other tickets'' files, so ''head'' names the last clean-up commit and ''measured_at'' the tree counted)'
 by_code:
   CLOSED_TICKET_EDITED: 122
   ENFORCES_SUPERSEDED: 14
   NOT_IN_FORCE_AS_RULE: 19
   TICKET_CHANGE_UNMARKED: 96
-  UNKNOWN_ID: 57
-  UNLINKED_ID: 1417
+  UNKNOWN_ID: 56
+  UNLINKED_ID: 1420
   UNMARKED_CHANGE: 8
 by_code_role:
   CLOSED_TICKET_EDITED:
@@ -5485,26 +5493,28 @@ by_code_role:
     orchestrator: 96
   UNKNOWN_ID:
     independent-test-designer: 8
-    orchestrator: 48
+    orchestrator: 47
     owner: 1
   UNLINKED_ID:
-    orchestrator: 1417
+    orchestrator: 1420
   UNMARKED_CHANGE:
     orchestrator: 8
 unlinked_by_status:
-  closed: 1352
+  closed: 1355
   in_progress: 2
   open: 63
 ```
 
 ## 10. What is left, by path and role (D-5, D-6, D-9)
 
+Measured at the merged head 6b62de94e3fd, from the same `gov links --all --json` run as the after counts.
+
 - **D-5 (kernel texts, `template/` and `docs/contract/`):** nothing (0 findings).
 - **D-6 (code and tests, `src/` and `tests/`):** 22 findings (ENFORCES_SUPERSEDED 14, UNKNOWN_ID 8),
   the test designer's. Also for D-6: `gov links` should read a backlog row in `list_rows`, and a WBS id whose
   ticket id is in `sources:`, as linked (DEC-1123 (2)); and the loader's reading of a verbless `Changed by:` and of
   the archive's group lines (the judged-wrong pairs), so that the 8 stop being reported without an allow-list.
-- **D-9 (tickets, `.tickets/`):** 1672 findings (CLOSED_TICKET_EDITED 122, NOT_IN_FORCE_AS_RULE 1, TICKET_CHANGE_UNMARKED 96, UNKNOWN_ID 36, UNLINKED_ID 1417).
+- **D-9 (tickets, `.tickets/`):** 1674 findings (CLOSED_TICKET_EDITED 122, NOT_IN_FORCE_AS_RULE 1, TICKET_CHANGE_UNMARKED 96, UNKNOWN_ID 35, UNLINKED_ID 1420).
 
 ```yaml w2-130:left
 D-5: {}
@@ -5598,6 +5608,8 @@ D-9:
     orchestrator: 3
   .tickets/DAEO-6f0s.md:
     orchestrator: 1
+  .tickets/DAEO-6icv.md:
+    orchestrator: 1
   .tickets/DAEO-6mk8.md:
     orchestrator: 51
   .tickets/DAEO-6n5k.md:
@@ -5663,7 +5675,7 @@ D-9:
   .tickets/DAEO-cy5o.md:
     orchestrator: 10
   .tickets/DAEO-drhj.md:
-    orchestrator: 1
+    orchestrator: 3
   .tickets/DAEO-drvn.md:
     orchestrator: 11
   .tickets/DAEO-dtv3.md:
@@ -5700,8 +5712,6 @@ D-9:
     orchestrator: 7
   .tickets/DAEO-g29a.md:
     orchestrator: 4
-  .tickets/DAEO-g87r.md:
-    orchestrator: 1
   .tickets/DAEO-gdzh.md:
     orchestrator: 1
   .tickets/DAEO-gjjf.md:
@@ -5846,6 +5856,8 @@ D-9:
     orchestrator: 9
   .tickets/DAEO-uudf.md:
     orchestrator: 39
+  .tickets/DAEO-uw5h.md:
+    orchestrator: 1
   .tickets/DAEO-uzme.md:
     orchestrator: 3
   .tickets/DAEO-v4is.md:
@@ -5898,8 +5910,6 @@ D-9:
     orchestrator: 9
   .tickets/DAEO-zkr9.md:
     orchestrator: 7
-  .tickets/DAEO-zmo4.md:
-    orchestrator: 1
   .tickets/DAEO-zndm.md:
     orchestrator: 8
   .tickets/DAEO-zoex.md:
