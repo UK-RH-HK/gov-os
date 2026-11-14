@@ -7,7 +7,7 @@ type: task
 class: spec
 role: product-spec
 profile: STANDARD
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-14
