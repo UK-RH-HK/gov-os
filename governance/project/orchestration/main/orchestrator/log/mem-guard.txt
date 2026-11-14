@@ -16588,3 +16588,13 @@
 2026-11-14 12:48:18 level 1 (logged, not sent): 0 rg, available 17383 MB, stall 1.1%
 2026-11-14 12:48:22 level 1 (logged, not sent): 0 rg, available 17404 MB, stall 1.1%
 2026-11-14 12:48:23 level back to 0 (rg 0, available 17407 MB)
+2026-11-14 12:49:52 level 1 (logged, not sent): 0 rg, available 16970 MB, stall 2.0%
+2026-11-14 12:49:53 level 1 (logged, not sent): 0 rg, available 16855 MB, stall 2.0%
+2026-11-14 12:49:54 level 1 (logged, not sent): 0 rg, available 17015 MB, stall 2.0%
+2026-11-14 12:49:55 level 1 (logged, not sent): 0 rg, available 16992 MB, stall 2.0%
+2026-11-14 12:49:56 level 1 (logged, not sent): 0 rg, available 17341 MB, stall 1.7%
+2026-11-14 12:49:57 level 1 (logged, not sent): 0 rg, available 17349 MB, stall 1.4%
+2026-11-14 12:49:58 level 1 (logged, not sent): 0 rg, available 17345 MB, stall 1.4%
+2026-11-14 12:49:59 level 1 (logged, not sent): 0 rg, available 17189 MB, stall 1.1%
+2026-11-14 12:50:00 level 1 (logged, not sent): 0 rg, available 17163 MB, stall 1.1%
+2026-11-14 12:50:01 level back to 0 (rg 0, available 17102 MB)
