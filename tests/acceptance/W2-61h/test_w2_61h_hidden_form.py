@@ -102,22 +102,29 @@ def test_s1_every_hidden_question_is_in_the_question_form(hidden):
 
 
 def test_s3_the_hidden_40_spread_as_r5_s_quotas_state(hidden):
-    """The hidden 40 alone (R5 item 6: the quotas apply in full to a half written wholly in W2-61h's form): R5's
-    twelve categories, each at least its quota, save the owner's accepted shortfall of one in decision, callers and
-    code-paraphrase (``R5_SHORT``) and no other; each multi-file question needs two or more files (two source entries
-    or more, on two paths or more). Only counts per category are shown."""
+    """The hidden half alone (39 files under DEC-1171 (2); R5 item 6: the quotas apply in full to a half written
+    wholly in W2-61h's form): R5's twelve categories, each at least its quota, save the owner's accepted shortfall of
+    one in decision, callers and code-paraphrase (``R5_SHORT``) and the one place h10's retirement takes from its
+    category, callers (``R5_RETIRED``; DEC-1171 (2), the owner's (b), DEC-1175 to be recorded), and no other: the
+    floors are decision 5, callers 2, code-paraphrase 2 and every other category's full minimum (R5's twelve
+    minimums sum to 40; less h10's place the half's sum to 39, as ``HIDDEN_COUNT``). Each multi-file question needs
+    two or more files (two source entries or more, on two paths or more). Only counts per category are shown."""
     def check():
         every = {f"hidden {n}": d for n, d in _maps(hidden).items()}
         counted = Counter((d or {}).get("category") if (d or {}).get("category") in s.R5_QUOTAS else "outside R5"
                           for d in every.values())
-        short = {name: want - s.R5_SHORT.get(name, 0) for name, want in s.R5_QUOTAS.items()}
+        short = {name: want - s.R5_SHORT.get(name, 0) - s.R5_RETIRED.get(name, 0)
+                 for name, want in s.R5_QUOTAS.items()}
         if any(counted.get(name, 0) < floor for name, floor in short.items()) or counted.get("outside R5"):
             lines = [f"{name}: {counted.get(name, 0)} (R5: at least {want}"
-                     + (f", {short[name]} with the accepted shortfall)" if short[name] != want else ")")
+                     + (f", floor {short[name]} with " + " and ".join(
+                         why for why, table in (("the accepted shortfall", s.R5_SHORT),
+                                                ("the retired place", s.R5_RETIRED)) if table.get(name))
+                        + ")" if short[name] != want else ")")
                      for name, want in s.R5_QUOTAS.items()]
             if counted.get("outside R5"):
                 lines.append(f"outside R5's twelve: {counted['outside R5']}")
-            _fail("the hidden 40's spread is not R5's:\n" + "\n".join(lines))
+            _fail("the hidden half's spread is not R5's:\n" + "\n".join(lines))
         single = []
         for name, data in every.items():
             if data.get("category") != "multi-file":

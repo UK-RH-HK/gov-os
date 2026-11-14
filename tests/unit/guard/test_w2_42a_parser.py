@@ -307,3 +307,88 @@ def test_f1_a_reader_the_earlier_kind_read_as_shell_stays_shell(reader):
     """Fail closed: where every word is an option-like word, the body was read as commands before the fix; so it is
     still, though bash takes a word after -- for the script's name."""
     assert bash_writes._kind(reader.split()) == "shell"
+
+
+# -- DEC-1174 (1): a comment in a shell's body is no quote (DEC-1164 (18), P-03ub-APOS-1 (A)) -----------------------
+
+SHELL_HEADS = ["bash <<'EOF'", "bash <<EOF", "bash -euo pipefail <<'EOF'", "cat <<'EOF' | bash -o pipefail"]
+
+
+@pytest.mark.parametrize("head", SHELL_HEADS)
+@pytest.mark.parametrize("body", ["# don't overwrite\necho hi\n", "  # it's fine\nls\n", "ls # don't\n"])
+def test_an_apostrophe_comment_in_a_shell_body_is_no_quote(root, head, body):
+    assert got(f"{head}\n{body}EOF", root) == []
+
+
+@pytest.mark.parametrize("head", SHELL_HEADS)
+@pytest.mark.parametrize("body", [
+    "# don't overwrite\necho x > {T}\n# it's done\n",
+    "# don't\ncp src/m.py {T}\n# it's\n",
+    "# don't overwrite\necho x > {T} # don't overwrite\n",
+])
+def test_two_apostrophe_comments_do_not_pair_into_a_quote(root, head, body):
+    assert f"R/{A}/W1/t.py" in got(f"{head}\n{body.replace('{T}', A + '/W1/t.py')}EOF", root)
+
+
+@pytest.mark.parametrize("line", [
+    "echo x#y > {T}",          # inside a word
+    "echo \"it's #\" > {T}",   # inside quotes
+    "echo x\\ #y > {T}",       # after an escaped blank: bash reads one word, no comment
+    "echo a\\;#b > {T}",       # after an escaped ;
+    "echo $# > {T}",           # the count of the arguments
+])
+def test_a_hash_that_starts_no_comment_keeps_the_write(root, line):
+    t = A + "/W1/t.py"
+    assert f"R/{t}" in got(line.replace("{T}", t), root)
+    assert f"R/{t}" in got(f"bash <<'EOF'\n# don't\n{line.replace('{T}', t)}\nEOF", root)
+
+
+@pytest.mark.parametrize("head", SHELL_HEADS)
+@pytest.mark.parametrize("body", ["# it's fine\necho 'unclosed\nls\n", "# it's\necho \"open\n"])
+def test_an_unclosed_quote_outside_a_comment_is_unresolvable(root, head, body):
+    assert SENT in got(f"{head}\n{body}EOF", root)
+
+
+def test_an_unreadable_shell_body_before_a_write_is_unresolvable(root):
+    assert SENT in got(f"bash <<'EOF'\necho 'open\nEOF\necho x > {A}/W1/after.py", root)
+
+
+def test_a_top_level_comment_is_no_quote(root):
+    assert got("ls # don't", root) == []
+    assert got(f"echo x > {A}/W1/t.py # it's", root) == [f"R/{A}/W1/t.py"]
+
+
+def test_a_comment_in_a_data_body_is_still_data(root):
+    assert got(f"cat > /tmp/w242a.c <<'EOF'\n# it's\ntouch {A}/x\nEOF", root) == ["/tmp/w242a.c"]
+
+
+def test_heredocs_drops_comment_text_and_names_where_it_was():
+    found = []
+    command = "ls # it's\necho 'a#b' x#y \\ #z # c\n"
+    text, _ = bash_writes.heredocs(command, found)
+    assert "it's" not in text and "'a#b'" in text and "x#y" in text and "\\ #z" in text and "# c" not in text
+    assert [command[a:b] for a, b in found] == ["# it's", "# c"]
+
+
+def test_comment_spans_reach_into_shell_bodies_only():
+    command = "bash <<'EOF'\n# it's\nEOF\ncat <<'EOF'\n# don't\nEOF\npython3 - <<'EOF'\n# x'\nEOF\n"
+    spans = bash_writes.comment_spans(command)
+    assert [command[a:b] for a, b in spans] == ["# it's"]
+    nested = "bash <<'A'\nbash <<'B'\n# it's\nB\nA\n"
+    assert [nested[a:b] for a, b in bash_writes.comment_spans(nested)] == ["# it's"]
+
+
+@pytest.mark.parametrize("command", [
+    "# it's\necho x > {T}\necho 'a",              # the old reader pairs the comment's apostrophe with the open one
+    "# it's\necho x > {T}\n(( y << 1 ))\n# don't",  # a form the scan cannot read: the old reader pairs the two
+])
+def test_where_the_scan_cannot_read_a_comment_quote_is_unresolvable(root, command):
+    assert SENT in got(command.replace("{T}", A + "/W1/t.py"), root)
+
+
+def test_a_python_c_string_writes_are_the_commands(root):
+    """The apostrophe no longer refuses the call whole (DEC-1174 (1)): the -c string's writes refuse it."""
+    py = f"python3 -c \"open('{A}/W1/zz.py','w').write('x')\""
+    assert got(py, root) == [f"R/{A}/W1/zz.py"]
+    assert f"R/{A}/W1/zz.py" in got(f"bash <<'EOF'\n# don't overwrite\necho hi\nEOF\n{py}", root)
+    assert got("python3 -c \"print(open('src/m.py').read())\"", root) == []
