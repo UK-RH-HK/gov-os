@@ -10,7 +10,8 @@ line (the six keys, the step ``push``). The wrapper calls it as its last step, o
 cycle; ``maintain`` never scans; ``push.py`` holds the only gitleaks call; A9's ACT.md step 6 states the order.
 
 Everything is planted: a repository, a bare remote, a fake gitleaks (a script on a planted path), no real scan. Readings the
-Interface leaves open (each is in the case's docstring): the ``push`` command itself writes the digest line and the ``cron.log`` line;
+Interface leaves open (each is in the case's docstring): the ``push`` command itself writes the digest line and the ``cron.log`` line
+when a push is declared (a no-declaration ``push`` writes nothing, I13's note, DEC-1157 (3));
 "the step named push" is the value of the ``mode`` or the ``reason`` key; the scan-failed reason is one word; a ``PUSH`` line with no
 digest to hold it is not tested; the wrapper's exit with ``push`` last is not tested.
 """
@@ -171,13 +172,39 @@ def test_s12_the_failure_words_are_never_the_findings_form(pw):
 
 # -- no declaration: neither step runs, and it says so ----------------------------------------------------------------------------------
 @pytest.mark.parametrize("declared", [None, ""], ids=["unset", "empty"])
-def test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so(pw, declared):
+def test_s12_a_repository_with_no_declaration_runs_neither_step_and_says_so(pw, make_world, declared):
+    """I13's note (DEC-1157 (3)): a push is declared when the scan or the push starts; a ``push`` with no declaration prints its
+    line, exits 0 and writes nothing (no ``cron.log`` line, no digest line, no file), so W2-172 S9's one-line ``cron.log`` holds.
+    Through the wrapper the line reaches the wrapper's own stdout, and the push step writes nothing."""
+    before_folder, before_tmp = W.tree_state(pw.folder), W.tree_state(pw.tmp)
     run = pw.push(declared=declared)
     assert run.code == 0, run
     assert line_of(run) == "PUSH none: no declaration", run
     assert pw.fake.calls() == [], "gitleaks is not called"
     assert pw.remote_head() == pw.first, "nothing is pushed"
-    check_logged(pw, "PUSH none: no declaration", 0)
+    assert W.tree_state(pw.folder) == before_folder, "nothing is written: no cron.log line, no digest line, no file in the key folder"
+    assert len(pw.cron_lines()) == 1
+    assert pw.digest_lines() == P.WEEK_DIGEST and pw.digest_lines("2026-W45") == P.OLD_DIGEST
+    assert W.tree_state(pw.tmp) == before_tmp, "no report or temporary file is made"
+    assert W.tree_state(pw.sets) == {}, "nothing under the sets root"
+    # through the wrapper: a cycle in which an audit step started, the real ``push`` (the shim sends it to the real interpreter)
+    world = make_world(link=False)
+    world.plant_plan("shim187_plan.json", plan(live=False, standing=True))
+    fake = P.Fake(world.base / "gl" / "fake")
+    digest = world.mem / "standing" / W.STD / "2026-W47" / "DIGEST.txt"
+    digest.parent.mkdir(parents=True)
+    digest.write_text("STANDING x\n", encoding="utf-8")
+    env = {"GOV_MEMAUDIT_GITLEAKS": str(fake.exe)}
+    if declared is not None:
+        env["GOV_MEMAUDIT_PUSH"] = declared
+    done = P.run_wrapper(world, world.base / "bin" / "py_shim187", env=env)
+    assert done.returncode == 0, (done.stdout, done.stderr)
+    assert "PUSH none: no declaration" in done.stdout.splitlines(), f"the wrapper's own stdout: {done.stdout!r}"
+    assert fake.calls() == [], "the wrapper calls no gitleaks"
+    assert digest.read_text(encoding="utf-8") == "STANDING x\n", "the push step adds no digest line"
+    crons = [line for path in world.runs_env.rglob("cron.log") for line in world.jsonl_file(path)]
+    assert len(crons) == 1 and "push" not in (crons[0]["mode"], crons[0]["reason"]), crons
+    assert not any(b"PUSH" in p.read_bytes() for p in world.runs_env.rglob("*") if p.is_file()), "nothing under the runs folder names PUSH"
 
 
 # -- a push that fails ---------------------------------------------------------------------------------------------------------------------
