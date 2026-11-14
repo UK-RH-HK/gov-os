@@ -1,0 +1,11 @@
+log: W2-184-A5-r.json
+W2: W2-184
+status: DONE. Land head 315a6a1250f0639ec86d34957143b4ea1059be25.
+
+task: DAEO-6f0s (W2-184): R1–R3, the fixes for findings F1–F3 of the earlier narrow check, after the ticket was reopened under DEC-1180 (4)
+status: DONE. Land head 315a6a1250f0639ec86d34957143b4ea1059be25.
+work_completed:
+- Merged w2/integrate into the branch before the work (bbe1510f8, clean).
+- I wrote section 10 of the interface before the pair started (DEC-1052), in `briefs/INTERFACE-R.md`:
+  - R1: a lead launch given `--reason`, `--trial` or `--owner-named` is refused by the CLI with exit 2. Calling `launcher.launch` directly is also refused, as a second check.
+  - R2: the record is writt

@@ -48,8 +48,9 @@ The CTO's hold is on from "release ready at C" until you say "done": nothing lan
 `pin-797495bdfc70` and the old store half stay, for the rollback.
 
 ## The commands (about 5 minutes)
-1. **The files the script runs are the reviewed ones, then the re-pin** (one line; `sha256sum -c` prints 13 `OK`
-   lines, the filled script, its checks, its registry edit, the smoke test and the CTO's 9 tools, and stops the line
+1. **The files the script runs are the reviewed ones, then the re-pin** (one line; `sha256sum -c` prints 18 `OK`
+   lines, the filled script, its checks, its registry edit, the smoke test, the CTO's 9 tools and the 5 files the
+   checks also run (two test suites, the heavy slots' sizes, the staged W2-141 hook pair), and stops the line
    if any file changed since the review; `fill_release.sh` writes the list at "released"):
 ```
 cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && sha256sum -c drafts/repin-rel-0.1.0/REPIN-REL-0.1.0.sha256 && bash drafts/repin-rel-0.1.0/REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee -ai ~/repin-rel-0.1.0.log

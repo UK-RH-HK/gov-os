@@ -86,3 +86,8 @@ ok   the touched file equals order 1's after bytes
 ok   order 2 check 1: exit 0
 ok   order 2 check 2: exit 0
 ok   order 2 portability after the merge: exit 0; findings []
+ok   order 2 named cases equal order 1's landed status (11 passed, 0 not)
+ok   order 2 tests/acceptance/W2-188: exit 0; 54 passed, 0 failed; red beyond order 1's landed: []
+ok   the live file unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0
+{"manifest_sha256": "22865f2ae3130452222526bda66ecd9a65982f614b0471c60a7c83cae262fca7", "touched": 1, "failures": 0, "branch_head": "790357f0215d"}

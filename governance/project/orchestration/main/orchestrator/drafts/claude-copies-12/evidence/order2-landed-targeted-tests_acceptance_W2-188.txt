@@ -1,44 +1,4 @@
-.........FF                                                              [100%]
-=================================== FAILURES ===================================
-_____________ test_f2_the_claude_copy_of_the_skill_equals_the_base _____________
-
-    def test_f2_the_claude_copy_of_the_skill_equals_the_base():
-        """Guard (holds on the base): the copies ACT regenerates it after the owner's approval, not this ticket."""
-        now = support.read_bytes(support.CLAUDE_COPY_REL)
-        then = support.base_blob(support.CLAUDE_COPY_REL)
->       assert now == then, f"{support.CLAUDE_COPY_REL} differs from the base's"
-E       AssertionError: .claude/skills/adopt/SKILL.md differs from the base's
-E       assert b'---\nname: ...44, CAP-54.\n' == b'---\nname: ...44, CAP-54.\n'
-E         
-E         At index 4424 diff: b',' != b'.'
-E         Use -v to get more diff
-
-tests/acceptance/W2-188/test_w2_188_copies.py:113: AssertionError
-_ test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests _
-
-    def test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests():
-        """Guard (holds on the base): a commit after the base with `Task: DAEO-zlog` whose `Role:` is not
-        `independent-test-designer` (or that has no Role) names no `.claude/` path and no `tests/` path."""
-        done = support.git("log", "--no-merges", "--name-only",
-                           "--format=%x1e%H%x1f%(trailers:key=Task,valueonly,separator=%x2c)%x1f"
-                           "%(trailers:key=Role,valueonly,separator=%x2c)%x1f", f"{support.BASE}..HEAD")
-        problems = []
-        for entry in done.stdout.decode("utf-8", "replace").split("\x1e"):
-            if "\x1f" not in entry:
-                continue
-            commit, tasks, roles, files = entry.split("\x1f", 3)
-            if support.TICKET not in [task.strip() for task in tasks.split(",")]:
-                continue
-            if "independent-test-designer" in [role.strip() for role in roles.split(",")]:
-                continue
-            touched = [name for name in files.split() if name.startswith((".claude/", "tests/"))]
-            if touched:
-                problems.append(f"{commit[:12]} (Role: {roles.strip() or 'none'}) touches {touched[:3]}")
->       assert not problems, "; ".join(problems)
-E       AssertionError: d2978a41898f (Role: owner) touches ['.claude/skills/adopt/SKILL.md']
-E       assert not ["d2978a41898f (Role: owner) touches ['.claude/skills/adopt/SKILL.md']"]
-
-tests/acceptance/W2-188/test_w2_188_copies.py:134: AssertionError
+...........                                                              [100%]
 ==================================== PASSES ====================================
 =========================== short test summary info ============================
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_base_pin_is_the_sha256_of_the_skill_at_5336a6fca
@@ -50,7 +10,7 @@ PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_sources_line_g
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_a9_steps_1_to_5_and_7_and_the_verify_section_are_unchanged_from_the_base
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_skills_check_exits_0_on_both_layouts
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare
-FAILED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base
-FAILED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests
-2 failed, 9 passed in 0.73s
-heavy_slot: all 3 slots taken; waiting (2026-11-14 15:26:53)
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_after_bytes
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests
+11 passed in 0.46s
+heavy_slot: all 3 slots taken; waiting (2026-11-14 17:23:35)

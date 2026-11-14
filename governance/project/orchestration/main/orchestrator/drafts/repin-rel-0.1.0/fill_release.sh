@@ -42,12 +42,19 @@ EPOCH=$(git -C "$REPO" show -s --format=%ct "$FULL")
 sed -e "s/__C__/$C/" -e "s/__EPOCH__/$EPOCH/" -e "s/__SHA__/$SHA/" -e "s/__RECORD__/$RECORD/" "$B/REPIN-COMMANDS-REL.template.sh" > "$OUT.tmp"
 ! grep -q '__[A-Z]*__' "$OUT.tmp" || { rm -f "$OUT.tmp"; die "a slot is left in the filled script"; }
 mv "$OUT.tmp" "$OUT"
-# The hash list the operator's line checks first (sha256sum -c): the filled script and every file it runs.
-O=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
+# The hash list the operator's line checks first (sha256sum -c): the filled script and every file it runs, 18 in all:
+# the filled script, its checks and registry edit, the smoke test, the CTO's 9 tools, and the 5 files part B also runs
+# (ACT-GUARD-FIX-4's and G-14's suites, the heavy slots' sizes, the staged W2-141 pair; the CTO's decision on review F3).
+R=/home/usain/Dynamic-Agentic-Engineering-OS
+O=$R/.gov-runtime/scratch/orchestrator
 HASHES=$(dirname "$OUT")/REPIN-REL-$VERSION.sha256
 ( cd / && sha256sum "$OUT" "$B/rel_checks.sh" "$B/rel_registry.py" "$O/pin/smoke_repin5.sh" \
     "$O/tools/guard4_check.py" "$O/tools/hook_timing.py" "$O/tools/heavy_slot.sh" "$O/tools/refresh_integration_store.sh" \
-    "$O/tools/seed_store.py" "$O/tools/rebuild_slot.sh" "$O/tools/test_guard_fix_3.py" "$O/tools/tree_busy.sh" "$O/tools/proc.sh" ) > "$HASHES"
+    "$O/tools/seed_store.py" "$O/tools/rebuild_slot.sh" "$O/tools/test_guard_fix_3.py" "$O/tools/tree_busy.sh" "$O/tools/proc.sh" \
+    "$O/drafts/act-guard-fix-4/test_guard_fix_4.py" "$O/drafts/g14/test_g14.py" "$O/tools/heavy_slots.conf" \
+    "$R/docs/changes/W2-141-hook/pretooluse.py" "$R/docs/changes/W2-141-hook/role_reads.py" ) > "$HASHES.tmp" \
+  || { rm -f "$OUT" "$HASHES.tmp"; die "a file the script runs cannot be read (above)"; }
+mv "$HASHES.tmp" "$HASHES"
 echo "C=$C (tag $TAG on ${TAGC:0:12})"
 echo "EPOCH=$EPOCH"
 echo "SHA=$SHA (the record's wheel sha256)"

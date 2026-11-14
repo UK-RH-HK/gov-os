@@ -8,13 +8,13 @@ For the CTO and the reviewer. The operator's page is `README.md` beside this fil
 | file | what | from |
 |---|---|---|
 | `REPIN-COMMANDS-REL.template.sh` | the operator's script with four slots: `C`, `EPOCH`, `SHA` (the record's wheel sha256), `RECORD` (manifest.json's sha256); VERSION `0.1.0`, TAG `v0.1.0`, OLD `797495bdfc70` fixed | window 5's script, plus part R; built-from-C check now against the record's sha256; §5's two lines and P-2's line after the switch; the registry commit cites DEC-1178 |
-| `fill_release.sh` | the CTO's step at "released": `bash fill_release.sh <C>` first checks `sha256sum -c BUNDLE.sha256` (the reviewed files; review F6), then reads the tag and the record, refuses unless they agree with C, writes `REPIN-COMMANDS-REL-0.1.0.sh` and the hash list `REPIN-REL-0.1.0.sha256` (13 files, absolute paths) | new (RL-1: nothing copied by hand) |
+| `fill_release.sh` | the CTO's step at "released": `bash fill_release.sh <C>` first checks `sha256sum -c BUNDLE.sha256` (the reviewed files; review F6), then reads the tag and the record, refuses unless they agree with C, writes `REPIN-COMMANDS-REL-0.1.0.sh` and the hash list `REPIN-REL-0.1.0.sha256` (18 files, absolute paths; 13 in the review's version) | new (RL-1: nothing copied by hand) |
 | `rel_checks.sh` | part B's checks | `repin7_checks.sh` unchanged but: the old pin `797495bdfc70`; section 3d (the builds since window 5: `gov adapters`, `wait`, `dispatch`, `impact`, `session-watch`, `skilleval`, `release` answer `--help`; `gov.release` build/verify and `gov.wait.liveness` import) |
 | `rel_registry.py` | part E's registry edit | `repin7_registry.py`: replaces window 5's entry (`797495bdfc70`, `04b094fb…7c3`); six arguments (adds version, tag, record sha256); the note names the release and the record; `approved_by: DEC-1178` (see 4, R-1) |
 | `rehearse_rel.sh` | the rehearsal: the scratch mirror plus a scratch release in a scratch clone | `rehearse_repin7.sh` plus the scratch release, fill and three new negative modes |
 | `README.md` | the operator's page (draft) | `ACT-REPIN-W5.md`'s form |
-| `pin/smoke_repin5.sh` and the 9 CTO tools | used by path; the 13-file hash list `fill_release.sh` writes | 12 of them are window 5's reviewed bytes (`sha256sum -c pin/REPIN-W5.sha256` OK). **`tools/heavy_slot.sh` is not:** it is the DEC-1157 version (11-12 23:46, `heavy_slot.sh.pre-dec1157` beside it), which no review record covers. This bundle's rehearsals ran with it, and `fill_release.sh` hashes whatever is there at fill time, so the post-fill review covers its bytes (review F3) |
-| what part B also runs, outside the hash list (as in window 5) | read or run by path | `drafts/act-guard-fix-4/test_guard_fix_4.py`, `drafts/g14/test_g14.py`, `tools/heavy_slots.conf`, the staged W2-141 pair `docs/changes/W2-141-hook/{pretooluse.py,role_reads.py}`, and the main tree's `tests/unit/hooks/test_live_hook.py`, `tests/unit/guard/test_w2_141_search.py` and live `.claude/hooks/` (review F3) |
+| `pin/smoke_repin5.sh` and the 9 CTO tools | used by path; in the hash list `fill_release.sh` writes | 12 of them are window 5's reviewed bytes (`sha256sum -c pin/REPIN-W5.sha256` OK). **`tools/heavy_slot.sh` is not:** it is the DEC-1157 version (11-12 23:46, `heavy_slot.sh.pre-dec1157` beside it), which no review record covers. This bundle's rehearsals ran with it, and `fill_release.sh` hashes whatever is there at fill time, so the post-fill review covers its bytes (review F3) |
+| the 5 files part B also runs, **now in the hash list** (18 files; the CTO's decision on review F3, 2026-11-14) | read or run by path | `drafts/act-guard-fix-4/test_guard_fix_4.py`, `drafts/g14/test_g14.py`, `tools/heavy_slots.conf`, the staged W2-141 pair `docs/changes/W2-141-hook/{pretooluse.py,role_reads.py}`. Window 5 left them outside its list. Part B also runs files that stay outside the list because they are the main tree's committed files: `tests/unit/hooks/test_live_hook.py`, `tests/unit/guard/test_w2_141_search.py` and the live `.claude/hooks/` |
 
 ## 2. Part R (RL-1), in order; each failure is `STOP`, nothing built
 1. `v0.1.0` is an annotated tag (`git cat-file -t` = `tag`) in the release repository (live: the main tree).
@@ -58,6 +58,18 @@ stood before that change (review F4: the neg-check log now postdates every scrip
 
 F6 tested by hand: a copy of the bundle with one byte added to `rel_checks.sh` gave "rel_checks.sh: FAILED" and
 "REFUSED, nothing written", exit 1, with no file written.
+
+**The 18-file hash list (the CTO's decision on F3, after run f7; the template unchanged, so run f7 stands):**
+- Positive: `fill_release.sh f2f28ed4ef40` on `run-f7`'s scratch release wrote an 18-line list, and
+  `sha256sum -c` printed 18 OK. The filled script is byte-identical to run f7's (`e735535d10c6…`).
+- Changed byte: a copy of `test_g14.py` with one byte added, named in a copy of the list in place of the real file
+  (the real file was not touched). The operator's line printed "FAILED" and exit 1, so the script would not run.
+  `fill_release.sh` itself hashes these 14 files as they stand at fill time; they are not in BUNDLE.sha256, so the
+  operator's check and the post-fill review cover them.
+- Unreadable file: in a scratch copy of the bundle with its root moved, `fill_release.sh` printed "REFUSED, nothing
+  written: a file the script runs cannot be read", exit 1, with neither the script nor the list written.
+- `log/repin-rel-rehearsal-neg-sha-h18.txt`: NEGATIVE RUN OK. The 18-file list fails only on the edited script, then
+  STOP at part R.
 
 **The logs the review read (before its fixes; kept):**
 

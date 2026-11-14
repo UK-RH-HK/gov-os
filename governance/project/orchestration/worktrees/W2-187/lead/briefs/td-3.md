@@ -3,7 +3,7 @@
 You are a fresh independent test designer (MR-3) for ticket DAEO-0cd2 (W2-187: the memory audit's standing hidden set).
 The suite `tests/acceptance/W2-187/` and the revisions of the W2-170, W2-171 and W2-172 files are merged with the
 engineer's code, and `w2/integrate` is merged too, which brings three changes to the ticket since the suite was written.
-You do exactly the three items below, as described behaviour (DEC-136), and change nothing else. The ticket's
+You do exactly the four items below, as described behaviour (DEC-136), and change nothing else. The ticket's
 `## Interface` (I1-I12) is binding; if you read an item differently from the reading below, say so as a package
 (question, options with cost, recommendation, confidence, what it blocks), and do not change it.
 
@@ -11,9 +11,9 @@ You do exactly the three items below, as described behaviour (DEC-136), and chan
 | what | path |
 |---|---|
 | your tree (write here only) | /home/usain/gov-os-worktrees/W2-187-tests |
-| branch | w2/W2-187-tests (now at f66fba56a) |
+| branch | w2/W2-187-tests (now at f4fdc7fa1) |
 | your allowed paths | tests/acceptance/W2-187/**, tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py, tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py |
-| the ticket (amended: read S10, F5, the Interface's I10 item 6, and the three "Amended"/"Path case" paragraphs at its end) | /home/usain/gov-os-worktrees/W2-187-tests/.tickets/DAEO-0cd2.md |
+| the ticket (amended: read S10, S12, F5, F7, the Interface's I10 item 6 and I11, the "Amended"/"Path case" paragraphs, and I13 at its end) | /home/usain/gov-os-worktrees/W2-187-tests/.tickets/DAEO-0cd2.md |
 | the suite's map and S10 helpers | tests/acceptance/W2-187/README.md, test_w2_187_s10_maintain.py, w2_187_maintain.py, w2_187_world.py |
 | W2-61h's N2 (b) cases (how a rewritten heading-cited section was planted there; read for ideas, never edit) | tests/acceptance/W2-61h/w2_61h_support.py, test_w2_61h_visible_new.py |
 | how `gov accept` reads the README's map | src/gov/accept/runner.py (`parse_map`, `line_names`) |
@@ -25,16 +25,15 @@ once more in different words, then answer from both or say "not found" (DEC-1065
 in the sandbox. Everything planted under `tmp_path`; never the real sets root, the real runs folder or any hidden or
 memory-verdict folder (DEC-820).
 
-## The three items
+## The four items
 1. **The README's map is unreadable to `gov accept`.** `gov accept W2-187` refuses with
    `ACCEPT_MAP_UNREADABLE: ... the README of tests/acceptance/W2-187/ has a map row naming no KPI line it can read`.
    The row is `| scope | ... test_scope_the_branch_changes_only_the_tickets_allowed_paths_and_its_acceptance_folder |`.
    That case guards no KPI line. Take the row out of the map table and name the case in prose below the table (an
    unmapped case still runs and still counts as a failure if red). Check the result with the parser:
    `PYTHONPATH=/home/usain/gov-os-worktrees/W2-187-tests/src python3 -c "from pathlib import Path; from gov.accept.runner import parse_map; m = parse_map(Path('tests/acceptance/W2-187/README.md').read_text()); print(sorted(m), sum(map(len, m.values())))"`
-   It must print every `success-1` to `success-11` and `failure-1` to `failure-6` and raise nothing. Do not add a map
-   row for S12 or F7: their interface is not stated yet (the lead's package W2-187-S12), and they come in a later batch.
-   Commit with no Rewrite-Reason (the README is this ticket's own).
+   It must print every `success-1` to `success-12` and `failure-1` to `failure-7` and raise nothing (the
+   `success-12` and `failure-7` rows come with item 4). Commit with no Rewrite-Reason (the README is this ticket's own).
 2. **The CTO's path case W2-187-P1 (a)** (the ticket's "Path case 2026-11-14" paragraph; DEC-1156 (7)): two W2-171 files
    pin the 85 % bar.
    - `tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py:120-121`
@@ -53,6 +52,35 @@ memory-verdict folder (DEC-820).
    S10 (6) case (one changed cited block listed, one moved unchanged block not) keeps passing, and no question, answer or
    path text is in the request or the digest. Map the new case under `success-10` in the README. Commit with
    `Rewrite-Reason: DEC-1180 (1)`. This case is red until the engineer builds N2 (b) in parallel; say so.
+4. **S12 and F7, the weekly secret scan and push** (DEC-1182 (2); the interface is the ticket's I13, by the CTO, binding).
+   Write new files `tests/acceptance/W2-187/test_w2_187_s12_push.py` (and helpers apart, e.g. `w2_187_push.py`), each case
+   doing what S12's and F7's Verify say, read with I13 and I11:
+   - Planted repositories under `tmp_path` with a planted **bare remote**, and a planted **fake gitleaks** (a script on
+     a planted path, passed by `--gitleaks` or `GOV_MEMAUDIT_GITLEAKS`) that writes a planted JSON report to
+     `--report-path` and exits with a planted code, and logs its argv. It never runs the real gitleaks, which is
+     not to be needed (one optional case may use a real `gitleaks` if `shutil.which` finds it; skip otherwise).
+   - `python3 -m gov.memaudit push --sets-root R --repo D` directly: with `GOV_MEMAUDIT_PUSH="<remote> <branch>"` and a
+     clean report: one scan with I13's argv (`detect --source <repo> --no-banner --redact --report-format json
+     --report-path <a path outside the repository, mode 0600>`), then the remote's branch equals the repository's head,
+     `PUSH pushed <remote> <branch> <12 hex>`, exit 0, the report file deleted. A report with k entries holding a planted
+     unique secret string: `PUSH blocked: findings <k>`, exit 1, the remote unchanged, and the planted string in no
+     stdout, stderr, `cron.log`, `DIGEST.txt` or file under the key folder or the sets root. A gitleaks exiting 2, a
+     missing binary, and one past `GOV_MEMAUDIT_SCAN_TIMEOUT_S` (a small value): `PUSH blocked: scan failed <word>`,
+     exit 1, the remote unchanged. No declaration (unset or empty): `PUSH none: no declaration`, exit 0, gitleaks not
+     called, nothing pushed. A push that fails (a declared remote that refuses, e.g. a missing path or a pre-receive hook
+     exiting 1): `PUSH failed: git push exit <c>`, exit 2, git's output in a 0600 file in the key folder and never on
+     stdout or stderr.
+   - The PUSH line is the last line of the cycle's latest `DIGEST.txt` in the key folder, and `cron.log` gains one line
+     with the same six keys as its other lines and the step `push`.
+   - The wrapper (W2-187's existing py-shim approach, or the real interpreter where cheap): `push` is its last step,
+     after the audit steps that ran, only when a standing or fresh step started that cycle; a cycle where nothing was due
+     calls neither `push` nor gitleaks; `maintain` never calls gitleaks (F7: a scan at a refresh).
+   - F7: a source scan shows `push.py` is the only module of `src/gov/memaudit/` and the wrapper's only path that names
+     `gitleaks`; a finding's text never in any line; no push after a non-clean scan.
+   - A9: `walls_act(..., repo=<dir>)` writes ACT.md step 6 holding I13's sentence (the order, and
+     `GOV_MEMAUDIT_PUSH="<remote> <branch>"`), and no crontab is called.
+   Map them in the README under `success-12` and `failure-7`. Commit with no Rewrite-Reason. They are red until the
+   engineer builds `push.py` in parallel; say which are red and why.
 
 ## Rules
 - **Every pytest through the heavy-slot gate**, the sandbox's own `$TMPDIR`:
@@ -63,7 +91,7 @@ memory-verdict folder (DEC-820).
 - Literal paths only as write targets. If a Write into `.gov-runtime/scratch/` is refused, write no script; use
   one-line commands.
 - **Commit** your paths only, one commit per item, the trailers in ONE final paragraph:
-  `git commit -m "<subject>" --trailer "Task: DAEO-0cd2" --trailer "Role: independent-test-designer" --trailer "Implements: DEC-1179, DEC-1156" [--trailer "Rewrite-Reason: ..."] --trailer "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" -- <your paths>`
+  `git commit -m "<subject>" --trailer "Task: DAEO-0cd2" --trailer "Role: independent-test-designer" --trailer "Implements: DEC-1182, DEC-1179, DEC-1156" [--trailer "Rewrite-Reason: ..."] --trailer "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" -- <your paths>`
   Never `Role: owner` or `Decided-by:`. No merge, no push, no edit of `.tickets/` or the register.
 - Refused twice for the same call by the guard, the sandbox or a hook: stop and say so; never reach the same effect by
   another command, form or file (DEC-1142 (9)). A permission denial of a Write is a refusal too: do not redo it by

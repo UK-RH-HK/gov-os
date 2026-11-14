@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-187
+status: interim result 2caaa984a: W2-187 (DAEO-0cd2): the S12 package's front matter quoted (a value held ': ', so gov launch refused the probe folder); the CTO's answer noted (I13 at 144d993d3)

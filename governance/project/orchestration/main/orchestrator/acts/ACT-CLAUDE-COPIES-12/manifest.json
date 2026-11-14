@@ -16,11 +16,11 @@
   "after/repo/.claude/skills/adopt/SKILL.md": "65d6abd920ddb6180e734a124ea53b02a0c5386126d09490c231b87b9eb75dbc",
   "list.txt": "c4443b55edf9c3f2630bc4a9ab82a9e2935c3e8bb1ddd9ab07f2a995c7592b09",
   "apply.sh": "84f6f595968947de01022ba7561961648b58db9df1a6e808242948259072a231",
-  "rehearsal.log": "74ae578dc41e10a9dd3d5b0cf15a5561d8df212e1a85619f3e1442b21f7a9be3"
+  "rehearsal.log": "fd6e194c612b0ee587826edc23f720731508e7b6bdd73fd4f6cd03032afc9420"
  },
  "rehearsal": {
   "log": "rehearsal.log",
-  "sha256": "74ae578dc41e10a9dd3d5b0cf15a5561d8df212e1a85619f3e1442b21f7a9be3"
+  "sha256": "fd6e194c612b0ee587826edc23f720731508e7b6bdd73fd4f6cd03032afc9420"
  },
  "checks": [
   {
