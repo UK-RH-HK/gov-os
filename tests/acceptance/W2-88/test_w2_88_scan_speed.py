@@ -36,6 +36,9 @@ DRIVER = W.HERE / "scan_driver.py"
 FORMS = ("cloud-access-key", "forge-token")
 FACTOR = 10                      # the line: at least 10 times the one-per-file form's files per second
 SAMPLE_EVERY = 10                # the one-per-file form is timed on every 10th path of the 5,000 (its run at 16 files/s would take minutes)
+# Run 8 (DEC-1183, the owner's P-W2-88-S27-1 (b)): the scan goes back to one file at a time; the cases only a batched scan can meet are
+# skipped until S27 runs as its own round. Every other S27 case stays live (the one-file scan must meet them).
+BATCHED_ONLY = pytest.mark.skip(reason="DEC-1183: S27 runs as its own round after this land (P-W2-88-S27-1 (b))")
 
 
 # ------------------------------------------------------------------------------------------------------------
@@ -226,6 +229,7 @@ def test_s27_a_second_run_on_the_same_tree_gives_the_same_verdict(box):
 # Many texts per process, in parallel, within the budget
 # ------------------------------------------------------------------------------------------------------------
 
+@BATCHED_ONLY
 def test_s27_many_texts_are_judged_per_gitleaks_process(box):
     """success-S27: 300 files with a planted secret in some are judged by far fewer gitleaks processes than files (at most one process per
     ten files; the one-per-file form starts one for each). The logging ``gitleaks`` first on ``PATH`` counts the starts; the verdict is the
@@ -242,6 +246,7 @@ def test_s27_many_texts_are_judged_per_gitleaks_process(box):
     assert len(answer["kept"]) == len(tree.paths) - len(tree.secret_paths), "a clean file is left out"
 
 
+@BATCHED_ONLY
 def test_s27_batches_run_in_parallel_and_never_more_than_the_budget_allows(box):
     """success-S27: with ``GOV_HEAVY_THREAD_BUDGET=3`` and a logging ``gitleaks`` that waits 0.2 s, 600 files are judged with never more than 3
     gitleaks processes at the same moment; where the files took more than one process, two ran at once (the batches are parallel). A design that
@@ -292,6 +297,7 @@ def test_s27_the_public_names_keep_their_signatures_and_meaning(box):
 # The speed: at least 10 times the one-per-file form's files per second, on a planted 5,000-file tree
 # ------------------------------------------------------------------------------------------------------------
 
+@BATCHED_ONLY
 @pytest.mark.slow
 def test_s27_a_five_thousand_file_tree_is_judged_at_least_ten_times_faster_with_the_same_findings(box, before_src):
     """success-S27 (the speed line): the planted 5,000-file tree (about 52 files hold a planted secret, two rules) judged by ``indexable`` of
