@@ -71,18 +71,20 @@ def shipped(rel: str, root: Path | None) -> Path:
     (``template/X`` is ``<root>/X``). Found nowhere, it refuses ``SHIPPED_FILE_MISSING``, naming ``rel`` and each place
     looked (``details``: ``file``, ``looked``): never a default in its place. Every read of a shipped file goes through
     here, at the time it is needed, never at import."""
-    looked, tree = [], _source_tree()
-    if tree is not None:
-        looked.append(str(tree / rel))
+    tree = _source_tree()
+    # The search for the source tree is a place looked, so ``looked`` is never empty: where none was found it says where
+    # the search began (the running gov package's folder) and what it needed; it is not a path that can exist.
+    looked = [str(tree / rel) if tree is not None else
+              f"no Gov OS source tree: no folder at or above the gov package's folder ({Path(__file__).resolve().parents[1]}) "
+              f"holds {', '.join(MARKERS[:2])}/ and {MARKERS[2]}/"]
     if rel.startswith("template/") and root is not None:
         looked.append(str(Path(root) / rel.removeprefix("template/")))
-    for place in looked:
+    for place in looked[(tree is None):]:
         if os.path.exists(place):
             return Path(place)
     raise GovError("SHIPPED_FILE_MISSING", f"{rel}: Gov OS ships no such file where this gov can find it (looked in: "
-                   + (", ".join(looked) or "nowhere: gov runs from no Gov OS source tree, and the file is not under "
-                                           "template/ for the project's copy") + "): nothing is installed or written, "
-                   "and no default stands in its place", {"file": rel, "looked": looked})
+                   + "; ".join(looked) + "): nothing is installed or written, and no default stands in its place",
+                   {"file": rel, "looked": looked})
 
 
 FIXED = {"reranker": "Qwen3-Reranker-0.6B", "reranker_service": "shared", "bundle_tokens": 6000, "widen": "sections"}

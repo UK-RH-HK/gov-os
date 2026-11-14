@@ -416,7 +416,10 @@ cases that pass on the old code are the ones that state what must stay the same)
 - **Built:** `fabric.shipped(rel, root)` and `fabric._source_tree()`. The source tree is the nearest ancestor of the running
   `gov` package that holds `copier.yml`, `template/` and `src/gov/` (no fixed number of levels); then, for a `rel` under
   `template/`, the project's own copy that `copier copy` installed (`template/X` read as `<root>/X`); else
-  `SHIPPED_FILE_MISSING` (`details`: `file`, `looked`), never a default. Every read of a shipped file goes through it, when
+  `SHIPPED_FILE_MISSING` (`details`: `file`, `looked`), never a default. The search for the source tree is a place looked
+  (run 7, fix 2): `looked` is never empty; it names first the tree's `<tree>/<rel>`, or, where none was found, the gov
+  package's folder and that no folder at or above it holds `copier.yml`, `template/` and `src/gov/`; then, for a `rel`
+  under `template/`, `<root>/X`; never `<root>/<rel>` for a `rel` outside `template/`. Every read of a shipped file goes through it, when
   it is needed: A9's kernel copies (`fabric._sources`, `install`), its copy of `retrieval.yaml` and the standard's `pool:`
   block (`fabric.standard_of`, read by `read_standard`; `fabric.STANDARD` is now a module attribute computed when read, and
   `departures` takes the standard as an argument), the walls template (`memory_sets.walls_act`, with the new `root`

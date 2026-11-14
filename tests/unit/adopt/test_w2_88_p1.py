@@ -138,9 +138,21 @@ def test_a_file_found_nowhere_is_refused_by_name_with_each_place_looked(tmp_path
         fabric.shipped(fabric.RETRIEVAL, root)
     assert raised.value.details == {"file": fabric.RETRIEVAL, "looked": [str(tree / fabric.RETRIEVAL)]}
     no_tree(monkeypatch)
-    with pytest.raises(GovError) as raised:  # no tree, not under template/: no place at all, and still no default
+    package = str(Path(fabric.__file__).resolve().parents[1])
+    with pytest.raises(GovError) as raised:  # no tree, not under template/: the search for the tree is the one place
         fabric.shipped(fabric.RETRIEVAL, root)
-    assert raised.value.code == "SHIPPED_FILE_MISSING" and raised.value.details["looked"] == []
+    err = raised.value
+    assert err.code == "SHIPPED_FILE_MISSING" and err.details["file"] == fabric.RETRIEVAL
+    assert len(err.details["looked"]) == 1 and package in err.details["looked"][0], err.details
+    assert "no Gov OS source tree" in err.details["looked"][0] and "copier.yml" in err.details["looked"][0]
+    assert str(root / fabric.RETRIEVAL) not in err.details["looked"] and str(root / fabric.RETRIEVAL) not in err.message
+    assert fabric.RETRIEVAL in err.message and all(place in err.message for place in err.details["looked"])
+    with pytest.raises(GovError) as raised:  # no tree, under template/, the project's copy missing: both places
+        fabric.shipped("template/.gitleaks.toml", root)
+    err = raised.value
+    assert len(err.details["looked"]) == 2 and package in err.details["looked"][0], err.details
+    assert "no Gov OS source tree" in err.details["looked"][0] and err.details["looked"][1] == str(root / ".gitleaks.toml")
+    assert all(place in err.message for place in err.details["looked"])
 
 
 def test_no_read_of_a_shipped_file_uses_a_fixed_level_above_the_package():
