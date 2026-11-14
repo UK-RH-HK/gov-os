@@ -191,7 +191,8 @@ def test_no_declaration_runs_neither_the_scan_nor_the_push_and_says_so(world, de
     done = world.push(declare=declare)
     assert done.returncode == 0 and done.stdout == "PUSH none: no declaration\n"
     assert world.calls() == [] and world.remote_head() is None
-    assert digest.read_text().splitlines()[-1] == "PUSH none: no declaration"
+    assert digest.read_text() == "STANDING x\nVERDICT y\n", "a no-declaration push writes nothing (I13 (2))"
+    assert not (world.state / "cron.log").exists() and not (world.state / "PUSH.log").exists()
 
 
 @pytest.mark.parametrize("declare", ["origin", "origin main extra", "--force main", "origin --delete"])
@@ -228,3 +229,41 @@ def test_this_module_holds_the_only_scanner_call_of_the_audit_and_the_wrapper():
     others = [p.name for p in sorted(folder.glob("*.py")) if p.name != "push.py" and "gitleaks" in p.read_text().lower()]
     assert others == [] and "gitleaks" not in wrapper.read_text().lower()
     assert (folder / "push.py").read_text().count('"detect"') == 1
+
+
+def cron_rows(world, name="cron.log"):
+    path = world.state / name
+    return [json.loads(x) for x in path.read_text().splitlines()] if path.exists() else []
+
+
+@pytest.mark.parametrize("plan, line, code", [({}, "PUSH pushed origin main", 0),
+                                              ({"entries": 2, "exit": 1}, "PUSH blocked: findings 2", 1),
+                                              ({"exit": 2}, "PUSH blocked: scan failed exit", 1)])
+def test_a_declared_push_writes_its_own_cron_log_line_with_the_six_keys_and_the_step_push(world, plan, line, code):
+    world.digest()
+    world.plan(**plan)
+    done = world.push(extra_env={"GOV_MEMAUDIT_NOW": "2026-11-16T21:00:00Z"})
+    assert done.returncode == code
+    (row,) = cron_rows(world)
+    assert set(row) == {"at", "due", "mode", "reason", "started", "exit"}
+    assert (row["at"], row["due"], row["mode"], row["started"], row["exit"]) == ("2026-11-16T21:00:00Z", True, "push", True, code)
+    assert done.stdout.startswith(line) and row["reason"] == done.stdout.strip().removeprefix("PUSH ")
+
+
+def test_a_push_that_git_refuses_is_logged_with_exit_2(world):
+    run("git", "remote", "set-url", "origin", str(world.tmp / "no-such-remote.git"), cwd=world.repo, env=world.env)
+    done = world.push()
+    assert done.returncode == 2
+    assert [(r["mode"], r["exit"], r["reason"]) for r in cron_rows(world)] == [("push", 2, "failed: git push exit 128")]
+
+
+def test_the_wrapper_may_name_the_log_the_line_goes_to(world):
+    elsewhere = world.tmp / "elsewhere" / "cron.log"
+    elsewhere.parent.mkdir()
+    done = world.push(extra_env={"GOV_MEMAUDIT_CRON_LOG": str(elsewhere)})
+    assert done.returncode == 0 and not (world.state / "cron.log").exists()
+    assert [json.loads(x)["mode"] for x in elsewhere.read_text().splitlines()] == ["push"]
+
+
+def test_a_usage_fault_writes_no_log_line(world):
+    assert world.push(declare="origin").returncode == 4 and not (world.state / "cron.log").exists()

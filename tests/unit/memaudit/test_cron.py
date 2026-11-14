@@ -21,7 +21,8 @@ args = sys.argv[1:]
 sub = args[2:]
 key = " ".join(sub[:2]) if sub[:1] == ["standing"] else sub[0] + (" --fresh" if "--fresh" in sub else "")
 with open(os.path.join(here, "calls.jsonl"), "a") as f:
-    f.write(json.dumps({"key": key, "argv": args, "cwd": os.getcwd()}) + "\\n")
+    f.write(json.dumps({"key": key, "argv": args, "cwd": os.getcwd(),
+                        "cron_log": os.environ.get("GOV_MEMAUDIT_CRON_LOG")}) + "\\n")
 spec = plan.get(key, {})
 for line in spec.get("lines", []):
     print(line)
@@ -137,7 +138,7 @@ def test_a_failing_due_is_logged_and_stops_with_its_code(cron):
 def test_without_a_live_set_it_is_todays_path_due_then_run(cron):
     cron.plan({"standing live": {"lines": [f"KEY {KEY}", "LIVE none"], "exit": 1}})
     done = cron.wrapper("--repo", str(cron.repo))
-    assert done.returncode == 0 and cron.keys() == ["standing live", "due", "run"]
+    assert done.returncode == 0 and cron.keys() == ["standing live", "due", "run", "push"]
     assert cron.log()[-1]["started"] is True  # the log is the key folder's, from the KEY line
     cron.plan({"due": {"lines": ["MODE weekly", "DUE no", "REASON x"], "exit": 1}})
     cron.wrapper("--repo", str(cron.repo))
@@ -148,8 +149,9 @@ def test_without_a_live_set_it_is_todays_path_due_then_run(cron):
 def test_when_standing_live_names_no_key_the_log_is_the_machines_old_place(cron):
     cron.plan({"standing live": {"lines": [], "exit": 4}})
     cron.wrapper("--repo", str(cron.repo))
-    assert cron.keys() == ["standing live", "due", "run"]
+    assert cron.keys() == ["standing live", "due", "run", "push"]
     assert cron.log(None)[-1]["started"] is True
+    assert cron.calls()[-1]["cron_log"] == str(cron.runs / "indep" / "memaudit" / "cron.log")  # push's line goes there too
 
 
 def test_the_repository_defaults_to_the_current_directorys_top_level(cron):
@@ -168,31 +170,29 @@ def test_the_wrapper_names_no_cron_table_and_its_syntax_holds():
 
 # ---- S12: the weekly scan and push is the last step
 
-def test_the_push_is_the_last_step_its_line_is_logged_with_the_step_push_and_the_six_keys(cron):
+def test_the_push_is_the_last_step_its_line_reaches_the_wrappers_stdout_and_the_wrapper_logs_none(cron):
     cron.plan({"push": {"lines": ["PUSH pushed origin main 0123456789ab"], "exit": 0}})
     done = cron.wrapper("--repo", str(cron.repo), push="origin main")
     assert done.returncode == 0 and cron.keys()[-2:] == ["run", "push"]
     argv = cron.calls()[-1]["argv"]
     assert argv[argv.index("--repo") + 1] == str(cron.repo) and argv[argv.index("--sets-root") + 1] == str(cron.sets)
     assert done.stdout.splitlines()[-1] == "PUSH pushed origin main 0123456789ab"
-    audit, row = cron.log()[-2:]
-    assert set(row) == {"at", "due", "mode", "reason", "started", "exit"} == set(audit)
-    assert (row["mode"], row["reason"], row["started"], row["exit"]) == ("push", "pushed origin main 0123456789ab", True, 0)
-    assert audit["mode"] == "weekly"  # the audit's own line is as it was
+    # `push` writes its own cron.log line (I13 (1)): the wrapper names its log to it and adds no line, so never two
+    assert cron.calls()[-1]["cron_log"] == str(cron.runs / "indep" / "memaudit" / KEY / "cron.log")
+    (audit,) = cron.log()
+    assert audit["mode"] == "weekly" and set(audit) == {"at", "due", "mode", "reason", "started", "exit"}
 
 
-@pytest.mark.parametrize("line, code, started", [("PUSH blocked: findings 2", 1, True),
-                                                  ("PUSH blocked: scan failed timeout", 1, True),
-                                                  ("PUSH failed: git push exit 128", 2, True)])
-def test_a_blocked_or_failed_push_is_named_by_reason_only_and_never_changes_the_wrappers_exit(cron, line, code, started):
+@pytest.mark.parametrize("line, code", [("PUSH blocked: findings 2", 1), ("PUSH blocked: scan failed timeout", 1),
+                                         ("PUSH failed: git push exit 128", 2)])
+def test_a_blocked_or_failed_push_never_changes_the_wrappers_exit_nor_adds_a_wrapper_line(cron, line, code):
     cron.plan({"push": {"lines": [line], "exit": code}, "run": {"lines": [], "exit": 0}})
     done = cron.wrapper("--repo", str(cron.repo), push="origin main")
     assert done.returncode == 0  # the exit stays the audit steps'
-    row = cron.log()[-1]
-    assert (row["mode"], row["reason"], row["started"], row["exit"]) == ("push", line.removeprefix("PUSH "), started, code)
+    assert done.stdout.splitlines()[-1] == line and [x["mode"] for x in cron.log()] == ["weekly"]
 
 
-def test_no_declaration_is_said_on_the_output_and_adds_no_log_line(cron):
+def test_no_declaration_is_said_on_the_wrappers_own_stdout_and_adds_no_log_line(cron):
     cron.plan({"push": {"lines": ["PUSH none: no declaration"], "exit": 0}})
     done = cron.wrapper("--repo", str(cron.repo))
     assert done.returncode == 0 and done.stdout.splitlines()[-1] == "PUSH none: no declaration"
@@ -220,9 +220,11 @@ def test_maintain_alone_never_runs_the_push(cron):
     assert cron.keys().index("push") > max(i for i, k in enumerate(cron.keys()) if k in ("maintain", "standing run", "run"))
 
 
-def test_todays_path_runs_the_push_only_when_the_cron_line_declares_it(cron):
-    cron.plan({"standing live": {"lines": [f"KEY {KEY}", "LIVE none"], "exit": 1}})
-    cron.wrapper("--repo", str(cron.repo))
-    assert cron.keys() == ["standing live", "due", "run"] and len(cron.log()) == 1  # byte for byte as before
+def test_todays_path_ends_with_the_push_too_declared_or_not_and_the_exit_stays_the_runs(cron):
+    cron.plan({"standing live": {"lines": [f"KEY {KEY}", "LIVE none"], "exit": 1}, "run": {"lines": [], "exit": 3},
+               "push": {"lines": ["PUSH none: no declaration"], "exit": 0}})
+    done = cron.wrapper("--repo", str(cron.repo))
+    assert cron.keys() == ["standing live", "due", "run", "push"] and done.returncode == 3
+    assert done.stdout.splitlines()[-1] == "PUSH none: no declaration" and len(cron.log()) == 1
     cron.wrapper("--repo", str(cron.repo), push="origin main")
-    assert cron.keys()[-3:] == ["due", "run", "push"] and cron.log()[-1]["mode"] == "push"
+    assert cron.keys()[-3:] == ["due", "run", "push"] and [x["mode"] for x in cron.log()] == ["weekly", "weekly"]

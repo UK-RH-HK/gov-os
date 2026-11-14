@@ -197,9 +197,14 @@ default 600) or no binary is `scan failed <word>` (`exit`, `timeout`, `missing`,
 be counted, which fails closed); `git push <remote> <branch>` only on a clean scan; the five lines and exits of I13 (1 blocked,
 2 push failed, via the exit words `refused` and `stopped`); git's output in `<key folder>/PUSH.log` (0600); the same line
 appended to the newest `DIGEST.txt` of the key folder (a fresh run's or a standing week's). `say` is the only printer.
-`memaudit_cron.sh`: `push_step` after the audit steps, on the live path always, on today's path only when the cron line
-declares `GOV_MEMAUDIT_PUSH`; its `cron.log` line has the six keys and `mode` `push`, `reason` the line without `PUSH `
-(quotes and backslashes removed); the wrapper's exit stays the audit steps'. `memory_sets.PUSH_ORDER` is I13's sentence on the
+`memaudit_cron.sh`: `push_step` after the audit steps that started, on the live path and today's path, declared or not; the
+wrapper's exit stays the audit steps'. **`push` itself writes** (fix batch 4, the lead's reading of I13, accepted by the CTO
+with DEC-1157 (3)) its `cron.log` line (six keys, `mode` `push`, `reason` the line without `PUSH `, quotes and backslashes
+removed, `exit` the push's own) and its `DIGEST.txt` last line, **only when a push is declared**; the wrapper writes no push
+line, so never two. A no-declaration `push` prints `PUSH none: no declaration`, exits 0, calls no scanner and writes nothing;
+the wrapper does not swallow it, so the cron's output names the skip. The log is `<key folder>/cron.log`; the wrapper names
+its own log (the key folder's, else the runs folder's) to `push` in `GOV_MEMAUDIT_CRON_LOG` (no new flag; I13's command line is
+unchanged). `memory_sets.PUSH_ORDER` is I13's sentence on the
 step 6 line.
 
 **Run after the change** (each folder alone through the heavy-slot gate, empty HOME, the same exclusion; the exclusion left
@@ -213,12 +218,13 @@ out the `real`, `green_here` and `time_limit` cases and `local_only`):
   with `tests/unit/adopt/test_w2_88_memory_sets.py` and `test_w2_88_fabric.py`: `25 passed`.
 - `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` after the runs: nothing of this session's.
 
-**One case met by a reading of I13 (for the lead).** The live path's S11 case
-`test_s11_a_run_is_logged_with_its_exit_and_the_wrapper_exits_with_the_last_started_steps` takes exactly one `cron.log`
-line a cycle. I13's "one more `cron.log` line" would make two on every live cycle, declared or not, so the line is written
-when a push is declared (the scan or the push started); a cycle with no declaration says `PUSH none: no declaration` on
-standard output and in the digest and adds no log line. If the CTO wants the line for that case too, the one change is the
-`"PUSH none:"*) ;;` arm of `push_step` in the wrapper, and that S11 case then needs its revision (a `Rewrite-Reason`).
+**I13 against W2-172 S9's unchanged cases (the lead's reading, fix batch 4).** The live path's S11 case and W2-172 S9's
+`one cron.log line a cycle` take exactly one wrapper line; `push` writing its own line only when a push is declared keeps the
+audit's line as it was, and the wrapper's exit is the last audit step's (`push`'s own exit goes to its line and its output,
+never to the cycle). Unit cases: `test_push.py` (a declared push writes one line with the six keys, `mode` `push` and its exit
+0, 1 or 2; a no-declaration push writes nothing; a usage fault writes no line; the wrapper may name the log) and `test_cron.py`
+(the wrapper logs no push line and hands `push` its log; no declaration reaches the wrapper's stdout; today's path ends with the
+push, declared or not, and exits with the run's code).
 
 ## Size after batch 3
 

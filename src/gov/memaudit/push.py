@@ -10,7 +10,10 @@ it, and no finding's text (a secret, a match, a line) is read into a message, pr
 One line, counts and reason words only, through ``say``: ``PUSH none: no declaration`` (exit 0), ``PUSH pushed <remote>
 <branch> <12 hex>`` (0), ``PUSH blocked: findings <k>`` (1), ``PUSH blocked: scan failed <word>`` (1: ``missing``,
 ``timeout``, ``exit`` or ``report``) and ``PUSH failed: git push exit <c>`` (2; git's own output goes to a 0600 file
-in the key folder, never printed). The same line ends the cycle's latest ``DIGEST.txt`` in the key folder.
+in the key folder, never printed). When a push is declared (the scan or the push started), the same line ends the
+cycle's latest ``DIGEST.txt`` in the key folder and one more ``cron.log`` line carries the wrapper's six keys with the step
+``push`` (``<key folder>/cron.log``, or the file ``GOV_MEMAUDIT_CRON_LOG`` names, which the wrapper sets to its own log);
+a repository with no declaration gets the first line only: nothing is written and no scanner is called (I13).
 """
 
 from __future__ import annotations
@@ -22,12 +25,13 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from gov.memaudit import layout, schedule
+from gov.memaudit import EXIT, layout, schedule
 from gov.memaudit.common import UsageError, git
 
 DECLARATION = "GOV_MEMAUDIT_PUSH"
 SCAN_TIMEOUT_S, PUSH_TIMEOUT_S = 600.0, 600.0
 PUSH_LOG = "PUSH.log"
+CRON_LOG = "GOV_MEMAUDIT_CRON_LOG"
 
 
 def add_arguments(sp) -> None:
@@ -157,6 +161,18 @@ def _append_digest(state: Path, line: str) -> None:
     os.replace(tmp, path)
 
 
+def _log_line(state: Path, line: str, code: int) -> None:
+    """One more line of the wrapper's ``cron.log``: its six keys, the step ``push`` as the mode, the line less ``PUSH `` as
+    the reason. Counts and reason words only (the line never holds a finding's text)."""
+    path = Path(os.environ.get(CRON_LOG) or state / "cron.log")
+    reason = line.removeprefix("PUSH ").replace('"', "").replace("\\", "")
+    row = {"at": schedule.stamp(schedule.now()), "due": True, "mode": "push", "reason": reason, "started": True,
+           "exit": code}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(row) + "\n")
+
+
 def _pushed(repo, branch: str) -> str:
     """The first 12 hex of the commit the branch names (else the checked-out one); the push is done, so a fault here
     never fails the step."""
@@ -185,22 +201,23 @@ def run(sets_root, *, repo=None, gitleaks=None, emit) -> str:
     where = declared()
     state = schedule.state_of(repo)
     if where is None:
-        line, word = "PUSH none: no declaration", "ok"
+        emit("PUSH none: no declaration")  # nothing started: no log line, no digest line, no scanner (I13)
+        return "ok"
+    kind, detail = scan(repo, exe, state)
+    if kind == "findings":
+        line, word = f"PUSH blocked: findings {detail}", "refused"
+    elif kind == "failed":
+        line, word = f"PUSH blocked: scan failed {detail}", "refused"
     else:
-        kind, detail = scan(repo, exe, state)
-        if kind == "findings":
-            line, word = f"PUSH blocked: findings {detail}", "refused"
-        elif kind == "failed":
-            line, word = f"PUSH blocked: scan failed {detail}", "refused"
+        code = push(repo, *where, state)
+        if code == 0:
+            line, word = f"PUSH pushed {where[0]} {where[1]} {_pushed(repo, where[1])}", "ok"
         else:
-            code = push(repo, *where, state)
-            if code == 0:
-                line, word = f"PUSH pushed {where[0]} {where[1]} {_pushed(repo, where[1])}", "ok"
-            else:
-                line, word = f"PUSH failed: git push exit {code}", "stopped"
-    try:
-        _append_digest(state, line)
-    except OSError:
-        pass
+            line, word = f"PUSH failed: git push exit {code}", "stopped"
+    for write in (lambda: _append_digest(state, line), lambda: _log_line(state, line, EXIT[word])):
+        try:
+            write()
+        except OSError:
+            pass
     emit(line)
     return word
