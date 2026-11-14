@@ -536,3 +536,40 @@ cases that pass on the old code are the ones that state what must stay the same)
   cut (the rule file), outside these paths. `gov.codeintel` still calls `path_holds_secret` once per allowed path (one
   gitleaks per path on a cold record, each answered from the record once clean); batching those calls would take a
   change of `src/gov/codeintel/__init__.py` and of `path_holds_secret`'s callers, outside these paths.
+
+## Run 8 (2026-11-14; the owner's answer of 21:50, to be recorded as DEC-1183: `P-W2-88-S27-1 (b), package 1 (a), package 2 (a)`)
+
+### S27: its next round (DEC-1183)
+
+- **S27 is not delivered in this land.** The section "Run 7: the secret scan's speed (S27)" above records what was built
+  and measured in run 7; that code is gone. `src/gov/secrets/__init__.py` is back to the one-file-at-a-time scan of
+  `a23678e27` (each file's text read by gitleaks processes of its own, one per rule set; the same findings as before S27);
+  `indexable`, `path_holds_secret`, `pool_size` and `scan_counts` keep their signatures and meaning. The batched path is
+  removed entirely (`_scan_batch`, `_batched`, `_BATCH_BYTES`, `_BATCH_FILES`, `_BATCH_MIN`, `_FENCE`): no code path in
+  `src/gov/secrets/` judges two files' texts in one gitleaks process. Nothing else in the file had changed since
+  `a23678e27` (the diff `a23678e27..2491c9bec` of the file is batching only; the `.gitleaks.toml` fallback through
+  `fabric.shipped` lives in `safety.py` and `assess.py`, not here).
+- **The reuse record's form is 6** (`_FORM`), a value no earlier form used (4: `a23678e27` and `ef9c773c3`; 5: `d766514fd`,
+  the batched scan), so no record any earlier form wrote, in the content cache or a store's record, is reused: a file the
+  batched form judged clean wrongly (P1R-1: 0 scanned, 12 remembered on a second run) is scanned again.
+- **Why the text-batch form was dropped:** run 7's narrow checks found it fails open twice. P1-1 (`PR-DAEO-2bdu-p1-check1.md`):
+  a bare generic key at one text's end took the next text's first line over the blank line between them, the match was
+  dropped by the rule's own filter, and the next file's secret was shadowed. The `#` fence of fix 3 closed that shape; P1R-1
+  (`PR-DAEO-2bdu-p1.md`): two other default rules still cross it, `curl-auth-user` (a gap of up to five lines that takes in
+  `#`) and `private-key` (a body class that takes in anything); a match dropped by a filter (the rule's allowlist or the
+  global allowlist) swallowed the next file's own secret, which was judged clean, kept as indexable and recorded clean.
+  A text batch read by one gitleaks process cannot be fenced against every rule a project's rule file may hold.
+- **Evidence kept for the next round (no code for it here):** the run 7 figures above (one gitleaks per file: 1.8 files a
+  second at budget 1, 8.7 at budget 7, on a planted 5,000-file tree; the text batches about 60 and 14 to 17 times that);
+  and the lead's record of a folder form: `gitleaks dir` judges a folder in one process and reports one file per finding
+  (its own file boundaries, so no match runs from one file into the next), and a scratch test judged 403 files in 0.34 s.
+  A next round built on it would need the one-per-file form as its oracle for every default rule (P1-1's and P1R-1's
+  shapes among them) and its own measure on the same tree.
+- **Unit tests** (`tests/unit/secrets/test_w2_88_scan.py`, 14 cases): every gitleaks process reads one file's text (12
+  clean files, 12 times the rule sets' processes, each input holding exactly one file's marker); no batched name is left
+  in the module; the verdict per file is the one-per-file form's in the order asked; links; namespaces; a gitleaks that
+  cannot run refuses; `scan: off` starts no gitleaks; counts one per file; a clean file is remembered and not scanned
+  again; P1-1's bare-key pairs (4 tails by 4 heads, three orders) and the pair in the middle of a long list; a record
+  written under form 4 or 5 is not reused; a commit hash of the project is no finding. The cases only a batched scan
+  meets (few processes, parallel batches, put-back and fence internals) are deleted. Run against the batched code
+  first: 4 of 14 failed (the one-file and no-batch cases, and the form cases); after the revert: 14 of 14 pass.

@@ -1,15 +1,15 @@
-"""Builder tests for W2-88 run 7, S27: the secret scan judges many files per gitleaks process, in parallel.
+"""Builder tests for W2-88 run 8, S27 (b) (the owner's answer to be recorded as DEC-1183): the secret scan judges each
+file's text with its own gitleaks process, as at a23678e27; S27's batched scan runs as its own round after this land.
 
-Regression evidence only (DEC-136). ``indexable`` keeps its verdict per file, in the order asked; what changes is how
-many gitleaks processes it starts. No secret stands whole in this file: the planted string is built from parts, and
-no test prints or records a value.
+Regression evidence only (DEC-136). ``indexable`` keeps its verdict per file, in the order asked, and no gitleaks
+process reads two files' texts (run 7's checks P1-1 and P1R-1: a match crossing from one file's text into the next's).
+No secret stands whole in this file: the planted string is built from parts, and no test prints or records a value.
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import shutil
-import threading
-import time
 from pathlib import Path
 
 import pytest
@@ -54,24 +54,33 @@ def _one_per_file(root: Path, rels: list[str]) -> list[str]:
 
 @pytest.fixture()
 def processes(monkeypatch):
-    """Each gitleaks process started, by the length of its input."""
+    """Each gitleaks process started, by the input it was given."""
     seen = []
     real = secrets.subprocess.run
 
     def spy(command, **options):
         if command and command[0] == "gitleaks":
-            seen.append(len(options.get("input", b"")))
+            seen.append(options.get("input", b""))
         return real(command, **options)
 
     monkeypatch.setattr(secrets.subprocess, "run", spy)
     return seen
 
 
-def test_many_files_go_to_few_gitleaks_processes(project, processes):
-    rels = _plant(project, 40)
+def test_no_gitleaks_process_reads_two_files_texts(project, processes, monkeypatch, tmp_path):
+    """Each file's text goes to gitleaks processes of its own (S27 (b), DEC-1183): one per rule set, never shared."""
+    monkeypatch.setenv("GOV_SECRETS_CACHE", str(tmp_path / "cache.sqlite"))
+    marks = [f"MARKER{number:03d}Q" for number in range(12)]
+    rels = [_write(project, f"notes/m{number:03d}.md", f"Note {mark}.\nPlain text.\n") for number, mark in enumerate(marks)]
     assert secrets.indexable(project, rels) == rels
-    rule_sets = len(secrets._rules(project))
-    assert 0 < len(processes) <= 4 * rule_sets  # the one-per-file form starts 40 * rule_sets
+    assert len(processes) == len(rels) * len(secrets._rules(project))
+    for data in processes:
+        assert sum(mark.encode() in data for mark in marks) == 1
+
+
+def test_no_batched_scan_is_left_in_the_module():
+    for name in ("_scan_batch", "_batched", "_BATCH_BYTES", "_BATCH_FILES", "_BATCH_MIN", "_FENCE"):
+        assert not hasattr(secrets, name), name
 
 
 def test_the_verdict_per_file_is_the_one_per_file_forms_in_the_order_asked(project):
@@ -107,23 +116,6 @@ def test_a_file_outside_a_governance_namespace_is_left_out_whatever_it_holds(pro
     assert secrets.indexable(project, rels) == ["notes/f000.md", "notes/f002.md", "notes/f003.md", "notes/f004.md"]
 
 
-def test_a_findings_batch_mates_are_kept_and_only_the_owner_is_left_out(project, monkeypatch):
-    rels = _plant(project, 24, secret_at={7})
-    alone = []
-    real = secrets._scan
-    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks, *rest: alone.append(chunks[0]) or real(rules, chunks, *rest))
-    got = secrets.indexable(project, rels)
-    assert got == [rel for rel in rels if rel != "notes/f007.md"]
-    # the owner alone is scanned again, and the text after it (P1-1); no other batch mate
-    assert len(alone) == 2 and PLANTED.encode() in alone[0] and PLANTED.encode() not in alone[1]
-
-
-def test_a_finding_that_cannot_be_put_back_sends_its_batch_to_one_per_file(project, monkeypatch):
-    rels = _plant(project, 12, secret_at={4})
-    monkeypatch.setattr(secrets, "_scan_batch", lambda rules, texts: None)  # no owner can be named
-    assert secrets.indexable(project, rels) == [rel for rel in rels if rel != "notes/f004.md"]
-
-
 def test_a_gitleaks_that_cannot_run_refuses_and_no_file_is_let_through(project, monkeypatch):
     rels = _plant(project, 5)
     monkeypatch.setenv("PATH", str(project / "no-such-folder"))
@@ -136,29 +128,6 @@ def test_scan_off_gives_no_content_to_gitleaks(project, processes):
     _write(project, "governance/project/secrets.yaml", "scan: off\n")
     assert secrets.indexable(project, rels) == rels
     assert processes == []
-
-
-def test_batches_run_in_parallel_and_at_most_the_workers_at_once(project, monkeypatch):
-    rels = _plant(project, 40)
-    monkeypatch.setattr(secrets, "_BATCH_FILES", 2)
-    monkeypatch.setattr(secrets.os, "sched_getaffinity", lambda pid: set(range(8)), raising=False)
-    monkeypatch.setenv("GOV_HEAVY_THREAD_BUDGET", "3")
-    real, lock, state = secrets._scan_batch, threading.Lock(), {"now": 0, "most": 0}
-
-    def watched(rules, texts):
-        with lock:
-            state["now"] += 1
-            state["most"] = max(state["most"], state["now"])
-        time.sleep(0.05)
-        try:
-            return real(rules, texts)
-        finally:
-            with lock:
-                state["now"] -= 1
-
-    monkeypatch.setattr(secrets, "_scan_batch", watched)
-    assert secrets.indexable(project, rels) == rels
-    assert state["most"] == 3
 
 
 def test_scan_counts_stay_one_per_file(project):
@@ -180,7 +149,7 @@ def test_a_clean_file_is_remembered_and_not_scanned_again(project, monkeypatch, 
     after = secrets.scan_counts()["content"]
     assert after["remembered"] - before["remembered"] == 9  # the nine clean files; the finding is scanned every time
     assert after["scanned"] - before["scanned"] == 1
-    assert len(processes) >= 1  # the one with the finding only: its batch of one
+    assert processes and all(PLANTED.encode() in data for data in processes)  # the finding's file only
 
 
 VALUE = "".join(["Zq8W", "m4Xk", "2Vn7", "Bp3R", "t9Yh"])  # a generic-key value, built from parts; never printed
@@ -188,9 +157,9 @@ TAILS = ["password:", "token =", "secret:", "token:\n\n"]  # a bare generic key 
 HEADS = [f"API_KEY={VALUE}\n", f"api_key = '{VALUE}'\n", f"secret: {VALUE}\n", f"token={VALUE}\nmore text\n"]
 
 
-def test_a_finding_that_runs_over_the_separator_is_put_back_on_every_file_it_covers(project):
-    """A bare generic key at one file's end can take the next file's first line into one match (P1-1): the next file
-    holds a secret that only that rule finds, and its verdict is the one-per-file form's, whatever the order."""
+def test_a_bare_key_ending_one_file_never_swallows_the_next_files_secret(project):
+    """Run 7's P1-1: a bare generic key at one file's end; the next file holds a secret that only that rule finds. Its
+    verdict is the one-per-file form's, whatever the order."""
     cases = 0
     for tail in TAILS:
         for head in HEADS:
@@ -206,7 +175,7 @@ def test_a_finding_that_runs_over_the_separator_is_put_back_on_every_file_it_cov
             assert b not in secrets.indexable(root, [a, b, c]), (tail, head)  # it holds a secret by itself
 
 
-def test_the_pair_in_the_middle_of_a_larger_batch_is_judged_as_one_per_file(project):
+def test_the_pair_in_the_middle_of_a_long_list_is_judged_as_one_per_file(project):
     rels = _plant(project, 14)
     rels.insert(6, _write(project, "config/a-tail.txt", "Plain notes.\npassword:"))
     rels.insert(7, _write(project, "config/b-head.env", f"API_KEY={VALUE}\n"))
@@ -214,50 +183,20 @@ def test_the_pair_in_the_middle_of_a_larger_batch_is_judged_as_one_per_file(proj
     assert got == _one_per_file(project, rels) and "config/b-head.env" not in got and "config/a-tail.txt" in got
 
 
-def test_a_file_after_a_finding_is_judged_alone_whatever_the_reported_lines(project, monkeypatch):
-    """With no fence between the texts (as run 7 had), a match that runs over into the next text is reported at A;
-    if the report's lines were short of the match, the file after an owner is still judged alone."""
-    monkeypatch.setattr(secrets, "_FENCE", b"")
-    real = secrets._gitleaks
-
-    def short(each, data, env):
-        done = real(each, data, env)
-        if done.returncode == secrets._LEAKS:
-            import json
-            report = json.loads(done.stdout)
-            for finding in report:
-                finding["EndLine"] = finding["StartLine"]
-            done.stdout = json.dumps(report).encode()
-        return done
-
-    monkeypatch.setattr(secrets, "_gitleaks", short)
-    rels = [_write(project, "config/a-tail.txt", "Plain notes.\npassword:"),
-            _write(project, "config/b-head.env", f"API_KEY={VALUE}\n"),
-            _write(project, "config/c-clean.txt", "Nothing here.\n")]
-    assert secrets.indexable(project, rels) == [rels[0], rels[2]]
-
-
-def test_a_finding_over_the_separator_covers_the_next_text_by_its_lines(project, monkeypatch):
-    """With no fence, the report's own StartLine to EndLine covers the next text, whose verdict is its own."""
-    monkeypatch.setattr(secrets, "_FENCE", b"")
-    rels = [_write(project, "config/a-tail.txt", "Plain notes.\npassword:"),
-            _write(project, "config/b-head.env", f"API_KEY={VALUE}\n")]
-    assert secrets.indexable(project, rels) == _one_per_file(project, rels) == [rels[0]]
-
-
-def test_a_record_written_by_the_earlier_batched_form_is_not_reused(project, monkeypatch, tmp_path):
+@pytest.mark.parametrize("old", [4, 5])
+def test_a_record_written_under_an_earlier_form_is_not_reused(project, monkeypatch, tmp_path, old):
+    """Forms 4 (a23678e27, ef9c773c3) and 5 (d766514fd, the batched scan) wrote records; form 6 trusts none of them."""
     monkeypatch.setenv("GOV_SECRETS_CACHE", str(tmp_path / "cache.sqlite"))
     rels = [_write(project, "config/b-head.env", f"API_KEY={VALUE}\n")]
     rules = secrets._rules(project)
-    old = 4  # the form run 7's batching wrote under
-    digest = __import__("hashlib").sha256((project / rels[0]).read_bytes()).hexdigest()
+    digest = hashlib.sha256((project / rels[0]).read_bytes()).hexdigest()
     secrets.cache.remember("content", digest, secrets.cache.engine(rules, old))
     assert secrets.cache.remembered("content", digest, secrets.cache.engine(rules, old))
     assert secrets.indexable(project, rels) == []  # the old record says clean; it is not asked
-    assert secrets._FORM != old
+    assert secrets._FORM == 6
 
 
-def test_a_commit_hash_of_the_project_is_still_no_finding_in_a_batch(project):
+def test_a_commit_hash_of_the_project_is_still_no_finding(project):
     import subprocess
 
     def git(*args):
