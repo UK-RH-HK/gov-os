@@ -44,14 +44,19 @@ def test_s7_record_status_is_accepted_only_with_the_owner_s_approval():
             f"(a DEC id or a date): {approvals}")
 
 
+def test_s7_the_pinned_landing_commit_is_an_ancestor_of_head():
+    assert t.landing_is_ancestor_of_head(), f"premise: W2-175's landing commit {t.LANDING} is not an ancestor of HEAD"
+
+
 @pytest.mark.parametrize("stem", t.SEVEN)
-def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_landing(stem):
     _, body = t.record()
     rows = [row for row in t.table_rows(body) if f"{stem}.md" in row]
     assert rows, f"docs/changes/W2-175-CIT-P.md has no table row naming {stem}.md"
-    head = t.sha256(t.path_of(stem).read_bytes())
-    assert any(head in t.HEX64.findall(row.lower()) for row in rows), \
-        f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at the head ({head}): {rows}"
+    assert t.landing_is_ancestor_of_head(), f"premise: W2-175's landing commit {t.LANDING} is not an ancestor of HEAD"
+    landing = t.sha256(t.landing_bytes(stem))
+    assert any(landing in t.HEX64.findall(row.lower()) for row in rows), \
+        f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at W2-175's landing ({landing}, at {t.LANDING[:12]}): {rows}"
 
 
 @pytest.mark.parametrize("stem", t.SEVEN)
