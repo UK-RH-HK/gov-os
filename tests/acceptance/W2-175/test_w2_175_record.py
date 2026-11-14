@@ -1,8 +1,8 @@
 """W2-175 success 7: the change's CIT-P record, docs/changes/W2-175-CIT-P.md (DEC-1116's route, CAP-33).
 
-The record is read as the tree holds it at the head; the template bytes it names are the tree's (the head's) and
-the base's (git, at each file's base commit). The record is never required to be ACCEPTED: the owner's approval
-follows the independent review, after the lead returns (README).
+The record is read as the tree holds it at the head; the template bytes it names are those at W2-175's landing
+commit (git, pinned) and the base's (git, at each file's base commit). The record is never required to be ACCEPTED:
+the owner's approval follows the independent review, after the lead returns (README).
 """
 
 from __future__ import annotations
@@ -46,12 +46,15 @@ def test_s7_record_status_is_accepted_only_with_the_owner_s_approval():
 
 @pytest.mark.parametrize("stem", t.SEVEN)
 def test_s7_record_sha256_of_each_template_is_its_sha256_at_the_head(stem):
+    """Hashes each template at W2-175's landing commit (``t.LANDING``, through git), not in the working tree, and asserts
+    the landing is an ancestor of HEAD. The name is kept because the README map names it (DEC-1156 (7) pin run)."""
     _, body = t.record()
     rows = [row for row in t.table_rows(body) if f"{stem}.md" in row]
     assert rows, f"docs/changes/W2-175-CIT-P.md has no table row naming {stem}.md"
-    head = t.sha256(t.path_of(stem).read_bytes())
-    assert any(head in t.HEX64.findall(row.lower()) for row in rows), \
-        f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at the head ({head}): {rows}"
+    assert t.landing_is_ancestor_of_head(), f"premise: W2-175's landing commit {t.LANDING} is not an ancestor of HEAD"
+    landing = t.sha256(t.landing_bytes(stem))
+    assert any(landing in t.HEX64.findall(row.lower()) for row in rows), \
+        f"docs/changes/W2-175-CIT-P.md: no row naming {stem}.md holds its sha256 at W2-175's landing ({landing}, at {t.LANDING[:12]}): {rows}"
 
 
 @pytest.mark.parametrize("stem", t.SEVEN)

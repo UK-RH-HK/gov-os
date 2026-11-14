@@ -57,9 +57,9 @@ is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 4
   `- **Status:** <WORD> (...); it was <the old status text>` plus optional marks; the WORD is the first word of the
   sitting row's proposal (ACCEPTED, DONE, SUPERSEDED, WITHDRAWN, DEFERRED) and the id is in groups A to E of
   `W2-130-SITTING.md` (DEC-1098 (3) accepted groups A to G as proposed; group F stays in force, so no word changes).
-- **"Derived from free text"** (S3, F3): `gov links` (the tree under test's) flags the pair `text: true` on the commit's
-  own tree with the marks it appends taken off (`variant_findings`: HEAD's tool, the commit's tree, its marks stripped;
-  for e12f8a30c that is the parent's register). The brief's other source, the audit's own `free_text` list, is read for
+- **"Derived from free text"** (S3, F3): `gov links` (the commit's own) flags the pair `text: true` on the commit's
+  own tree with the marks it appends taken off (`variant_findings`: the commit's own tool (its tree's `src`), the
+  commit's tree, its marks stripped; for e12f8a30c that is the parent's register). The brief's other source, the audit's own `free_text` list, is read for
   the verdicts and the comparison.
 - **`labelled`** (S3): with an integer `seed` it holds 20 distinct marks; with `seed: null` it holds at most 20 and
   every mark the commit adds that is not free text.
@@ -78,8 +78,9 @@ is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 4
   by DEC-1098 (3): superseded, withdrawn, deferred, DONE) fail the case; groups A, B and F are current.
 - **S4, DEC-1123 (2)'s forms** (`w2-130:dec-1123-linked`, ticket id -> `[{id, form, via}]`; revised for P-W2-130-4 (a)):
   an *UNLINKED_ID on an open or in-progress ticket* is a `gov links --all --json` finding of that code on a ticket file
-  whose `status:` is `open` or `in_progress` at HEAD, the pair being (its second id = the ticket, its first id). The
-  record lists exactly those pairs that a form links, and the cases read each form from the files at HEAD:
+  whose `status:` is `open` or `in_progress` at the record's `counts-after.measured_at` (S4's "at HEAD" is re-baselined
+  there, with that tree's own `gov links`; pin runs 2 and 3), the pair being (its second id = the ticket, its first id).
+  The record lists exactly those pairs that a form links, and the cases read each form from the files at that tree:
   `list_rows` = the id matches `W<n>-<letter><digits>` and is held by the ticket's `list_rows:` field (flow or block
   list), `via` equal to the id; `wbs` = the id is the `wbs_id` (or `external-ref`, the other key `gov` resolves a W2 id
   by) of some ticket file, `via` is the id of one such ticket and that id is in the listed ticket's `sources:`;
@@ -93,9 +94,15 @@ is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 4
   patch): the forms were added to `sources:` there, and nothing in the line changes that. The byte-for-byte equality of
   the `patch-sources-2` block with the proposal's sections is not asserted (the line states ids, not bytes).
 - **`left`** (S8): D-5 is findings under `template/` and `docs/contract/`, D-6 under `src/` and `tests/`, D-9 under
-  `.tickets/`; each as `{path: {role: n}}`, all codes, equal to `gov links --all` at HEAD.
-- **Tool-version sensitive**: `counts-before` for UNMARKED_CHANGE, UNLINKED_ID and STATUS_CONFLICT is compared with HEAD's
-  `gov links` on the starting head; the tool at HEAD has codes the one of that day lacked, so only those three are read.
+  `.tickets/`; each as `{path: {role: n}}`, all codes, equal to `gov links --all` at `counts-after.measured_at` (that
+  tree's own tool; pin runs 1 and 2).
+- **Tool-version sensitive**: `counts-before` for UNMARKED_CHANGE, UNLINKED_ID and STATUS_CONFLICT is compared with the
+  starting head's own `gov links` on the starting head; the tool at HEAD has codes the one of that day lacked, so only
+  those three are read.
+- **Pin run 3** (S4's `closed-missing` and `no-record`): both cases read the tickets' statuses and files, the register's
+  headings and the ticket stems in the tree at `counts-after.measured_at`, with that tree's own `gov links`, as S4's
+  other three cases do. The cases left on the branch's tool at HEAD are the HEAD-wide ones: S2's "no UNMARKED_CHANGE but
+  the eight pairs", S6's no STATUS_CONFLICT and S7's no UNKNOWN_ID on a lesson.
 
 ## Proofs outside the commits (scratch copy under `$TMPDIR`)
 
