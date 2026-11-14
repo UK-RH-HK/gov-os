@@ -4,7 +4,9 @@
 FULL ticket's probe use, and a list of rules, each giving a class (C0..C3) to the tickets whose ``allowed_paths`` match
 its globs or whose ``profile`` it names. A ticket's criticality is the highest class among the rules that match, the
 default when none does. The ticket's ``class`` key is never read: it is the ticket's kind. The file is read at each
-call; one that is missing, cannot be read or is not of the stated form refuses the launch (fail closed).
+call; one that cannot be read or is not of the stated form refuses the launch (fail closed). A launch of a project with
+no file at all does not call here: it is as before W2-184 (interface 1.4, amended 2026-11-14; DEC-1167 (2)). Called
+directly with no file, ``ticket_criticality`` and ``opus_model`` refuse (1.3).
 """
 
 from __future__ import annotations

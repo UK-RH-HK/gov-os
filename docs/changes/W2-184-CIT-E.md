@@ -30,8 +30,8 @@ record fields are unchanged.
 
 ## 2. Settled points built as written
 
-1.2 matching (comment tail dropped, either-way fnmatch, `*` crosses `/`); 1.4 the file read only when needed, else read if there
-(malformed refuses) and `criticality` null if absent; 3.1 floor judged on the table's effort, none where the table is low or
+1.2 matching (comment tail dropped, either-way fnmatch, `*` crosses `/`); 1.4 as amended 2026-11-14 (section 6 below: a file
+present is read on every worker launch and a malformed one refuses; no file, the launch as before W2-184); 3.1 floor judged on the table's effort, none where the table is low or
 medium; 3.2 a max the table or the probe sets needs no reason, a launch's own max does; 4.3 a trial's effort below the floor
 is accepted, a trial's max needs `--reason`; 5.2 a fail-open finding is checked before two failed reviews; 6.2 `probe` is a
 sixth `model_source` value, set only when the probe changed the model; 7.2 `command.py` is not edited here.
@@ -56,13 +56,20 @@ line and the three keywords passed to `launcher.launch`); it applies cleanly to 
 
 Left out of every run: the cases named `real`, `green_here` and `time_limit`, and the `local_only` mark (DEC-1012).
 
-## 5. The one red, and why it is not fixed here
+## 5. Interface 1.4, amended on 2026-11-14 (batch eng-3)
 
-`tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[independent-auditor]`
-launches the auditor twice on the same FULL ticket (DAEO-zz6a) in a fixture with no `criticality.yaml`, an auditor default
-of Opus max and no probe records. Under the interface the second launch is review round 2: the probe applies (6.2), so the
-file is needed (1.4) and its absence refuses; and with a file the probe's setting (Opus max) would equal the first
-review's (6.3). The interface (and the brief) assumed "at most one auditor launch per ticket" in the existing fixtures. This
-test is W2-60a's and is not edited here. The choice is the lead's: re-baseline that case (launch the second time as another
-ticket, or plant a record), or settle that a project with no `criticality.yaml` counts no review round and applies no
-probe (1.4's absent-file case widened to section 6).
+The earlier 1.4 refused every launch of a role whose file carries a `Launch by criticality` line (the kernel engineer's and
+test designer's do) in a project with no `criticality.yaml`. The full run at d858e409b showed 77 reds from that: 50 of W1-46's
+suite, 12 of W1-32's, 8 of W1-28's, 6 of W1-50's (fixtures that copy the kernel role files and have no such file), and 1 of
+W2-60a's (the auditor launched twice on a FULL fixture ticket, which the earlier 1.4 made a probe that needs the file). It also
+went against DEC-1167 (2): an adopted repository with no file, such as EXAMIN's copy, has to launch on each role's `Launch
+default` line. The lead replaced 1.4. `_rubric` (`launcher.py`) now tests `criticality.exists(root)` once: **with no file** the
+launch is as before W2-184 (the role's `Launch default` for every role and class, source `role default`; no promotion and no
+probe records read; no review count, so no probe and no same-setting refusal; `criticality`, `promotion` and `review_round`
+null; a `Launch by criticality` line is still read and a malformed one still refuses, but is not applied); a model after `--`
+other than the default, the floor (judged on the default line's effort), max and `--reason` (3.2a included), the forms of
+`--reason` and `--owner-named` still apply; `--trial` is refused naming `governance/project/criticality.yaml` before any trial
+file is read. **With the file** it is read on every worker launch (an unreadable or malformed one refuses, naming it) and
+sections 2.3, 4.3, 5 and 6 apply as written. `criticality.py` is unchanged but for its docstring. The W2-60a red of the
+earlier section 5 is gone: its fixture has no file, so the second auditor launch is a plain launch.
+

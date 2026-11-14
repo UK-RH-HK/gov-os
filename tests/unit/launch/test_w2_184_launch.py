@@ -243,10 +243,162 @@ def test_a_plain_launch_with_a_malformed_file_refuses_even_where_no_line_needs_i
     project.refused("governance/project/criticality.yaml")
 
 
-def test_a_role_file_with_a_table_and_no_file_refuses(project):
-    (project.root / "governance/project/criticality.yaml").unlink()
+def test_a_plain_launch_with_a_malformed_file_refuses_for_the_auditor_and_a_table_alike(project):
+    project.criticality("rules: [\n")  # not YAML
     project.ticket()
+    project.ticket("T-a", role="independent-auditor")
     project.refused("governance/project/criticality.yaml")
+    project.refused("governance/project/criticality.yaml", role="independent-auditor", tid="T-a")
+    project.criticality("version: 1\nversion: 1\ndefault: C2\nopus: " + OPUS + "\nrules: []\n")  # a key twice
+    project.refused("governance/project/criticality.yaml")
+
+
+# --- interface 1.4, amended: no criticality.yaml, the launch as before W2-184 ---------------------------------------
+
+def _without_file(project):
+    (project.root / "governance/project/criticality.yaml").unlink()
+    return project
+
+
+@pytest.mark.parametrize("allowed", (["src/guard/a.py"], ["src/x/a.py"], ["docs/a.md"], ["notes/a.md"]))
+def test_no_file_a_role_file_with_a_table_takes_its_default_line_for_every_class(project, allowed):
+    _without_file(project)
+    project.ticket(allowed=allowed)
+    argv = project.launch()
+    assert (_flag(argv, "--model"), _flag(argv, "--effort")) == (SONNET, "high")
+    record = project.last()
+    assert {k: record[k] for k in ("model", "effort", "model_source", "effort_source", "criticality", "tier")} == {
+        "model": SONNET, "effort": "high", "model_source": "role default", "effort_source": "role default",
+        "criticality": None, "tier": "sonnet"}
+    assert (record["trial"], record["promotion"], record["effort_reason"], record["owner_named"],
+            record["review_round"]) == (None, None, None, None, None)
+    assert record["subagent_model"] == SONNET
+
+
+def test_no_file_the_full_form_of_a_table_is_not_applied_either(project):
+    line = table(pair(OPUS, "high"), f"{pair(OPUS, 'high')} on FULL, {pair(HAIKU, 'low')} otherwise",
+                 pair(SONNET, "high"), pair(HAIKU, "low"))
+    project.role_file("engineer", pair(SONNET, "medium"), line)
+    _without_file(project)
+    project.ticket("T-f", profile="FULL")
+    project.launch(tid="T-f")
+    assert (project.last()["model"], project.last()["effort"], project.last()["criticality"]) == (SONNET, "medium", None)
+
+
+@pytest.mark.parametrize("line", ("- **Launch by criticality:** C3 nonsense",
+                                  table(pair(OPUS, "high"), pair(SONNET, "high"), pair(SONNET, "high"), "model x, effort low")))
+def test_no_file_a_malformed_table_line_still_refuses(project, line):
+    project.role_file("engineer", pair(SONNET, "high"), line)
+    _without_file(project)
+    project.ticket()
+    project.refused("Launch by criticality", "engineer.md")
+
+
+def test_no_file_a_fail_open_finding_is_no_promotion_and_a_broken_probe_record_is_not_read(project):
+    _without_file(project)
+    project.ticket()
+    project.probe("T-1", "a.md", judgement="fail", verdict=FAIL_OPEN)
+    project.probe("T-1", "b.md", judgement="fail")
+    project.probe("T-1", "c.md", front="type: [\n", judgement=None)
+    argv = project.launch()
+    assert (_flag(argv, "--model"), project.last()["model_source"], project.last()["promotion"]) == (SONNET, "role default", None)
+    project.launch(args=["--model", SONNET])  # the model after -- is judged against the default, not Opus
+    project.refused(OPUS, SONNET, args=["--model", OPUS])
+
+
+def test_no_file_an_auditor_on_a_full_ticket_has_no_round_no_probe_and_no_same_setting_refusal(project):
+    _without_file(project)
+    project.ticket("T-a", profile="FULL")
+    for _ in range(3):
+        project.launch("independent-auditor", "T-a")
+        record = project.last()
+        assert (record["review_round"], record["model"], record["effort"], record["effort_source"],
+                record["model_source"], record["criticality"], record["owner_named"]) == (
+            None, OPUS, "high", "role default", "role default", None, None)
+
+
+def test_no_file_a_launch_record_that_is_not_json_does_not_refuse_an_auditor_on_a_full_ticket(project):
+    _without_file(project)
+    project.ticket("T-a", profile="FULL")
+    folder = project.root / ".gov-runtime/launches"
+    folder.mkdir(parents=True)
+    (folder / "bad.json").write_text("{", encoding="utf-8")
+    project.launch("independent-auditor", "T-a")
+    assert project.last()["review_round"] is None
+
+
+def test_no_file_the_model_after_the_double_dash_is_judged_against_the_default(project):
+    _without_file(project)
+    project.ticket()
+    project.refused(HAIKU, SONNET, args=["--model", HAIKU])
+    argv = project.launch(args=["--model", SONNET])
+    assert argv.count("--model") == 1
+    assert (project.last()["model"], project.last()["model_source"]) == (SONNET, "after --")
+
+
+def test_no_file_the_floor_is_judged_on_the_default_line_s_effort(project):
+    _without_file(project)
+    project.ticket(allowed=["notes/a.md"])
+    project.refused("low", "high", args=["--effort", "low"])
+    project.refused("medium", "high", args=["--effort=medium"])
+    project.launch(args=["--effort", "xhigh"])
+    assert (project.last()["effort"], project.last()["effort_source"]) == ("xhigh", "after --")
+    project.role_file("engineer", pair(SONNET, "medium"), ENGINEER_TABLE)  # a default below the floor: none
+    project.launch(args=["--effort", "low"])
+    assert project.last()["effort"] == "low"
+
+
+def test_no_file_max_needs_a_reason_unless_it_is_the_default_s_own(project):
+    _without_file(project)
+    project.ticket()
+    project.refused("--reason", "max", args=["--effort", "max"])
+    project.launch(args=["--effort", "max"], reason="the plan names it")
+    assert (project.last()["effort_source"], project.last()["effort_reason"]) == ("after --", "the plan names it")
+    project.role_file("engineer", pair(SONNET, "max"), ENGINEER_TABLE)
+    project.launch()
+    assert (project.last()["effort"], project.last()["effort_reason"], project.last()["effort_source"]) == ("max", None, "role default")
+    project.launch(args=["--effort", "max"])  # interface 3.2a: equal to the resolved effort
+    assert (project.last()["effort_source"], project.last()["effort_reason"]) == ("after --", None)
+
+
+def test_no_file_reason_and_owner_named_are_recorded_and_their_forms_are_checked(project):
+    _without_file(project)
+    project.ticket()
+    project.launch(reason="because", owner_named="DEC-1010")
+    assert (project.last()["effort_reason"], project.last()["owner_named"], project.last()["criticality"]) == ("because", "DEC-1010", None)
+    project.refused("--reason", reason="  ")
+    project.refused("--owner-named", owner_named="1010")
+
+
+def test_no_file_a_trial_is_refused_naming_the_file_even_with_a_trial_file_planted(project):
+    _without_file(project)
+    project.ticket()
+    project.refused("governance/project/criticality.yaml", "--trial", trial=project.trial())
+    project.refused("governance/project/criticality.yaml", trial="nope")
+    project.refused("--trial", trial="../x")
+
+
+def test_no_file_every_refusal_still_comes_before_the_gate_the_temp_folder_and_the_record(project, monkeypatch):
+    made = []
+    monkeypatch.setattr(launcher.tempfile, "mkdtemp", lambda **kw: made.append(kw) or "/nonexistent")
+    monkeypatch.setattr(launcher, "_admit_start", lambda *a, **k: made.append("gate"))
+    _without_file(project)
+    project.ticket()
+    project.refused(args=["--effort", "low"])
+    project.refused(args=["--model", HAIKU])
+    project.refused(args=["--effort", "max"])
+    project.refused(trial="nope")
+    assert made == []
+
+
+def test_no_file_the_plan_and_a_lead_launch_are_untouched(project, monkeypatch, capsys):
+    _without_file(project)
+    project.ticket()
+    assert launcher.plan(project.root, "engineer", "T-1") == 0
+    assert capsys.readouterr().out == f"model {SONNET}, effort high\n"
+    monkeypatch.setattr(launcher, "check_lead", lambda root, tid: {"admitted": True, "reason": "", "override": None})
+    assert launcher.launch(project.root, "orchestrator", "T-1", ["-p", "go"]) == 0
+    assert project.records() == []
 
 
 # --- the floor, max and --reason (S1) ---------------------------------------------------------------------------
@@ -493,9 +645,8 @@ def test_a_promotion_refuses_a_model_after_the_double_dash_and_a_trial(project):
     assert (project.last()["model"], project.last()["model_source"]) == (OPUS, "promotion")
 
 
-def test_a_promotion_with_no_criticality_file_refuses(project):
-    project.role_file("engineer", pair(SONNET, "high"))
-    (project.root / "governance/project/criticality.yaml").unlink()
+def test_a_promotion_with_a_malformed_criticality_file_refuses(project):
+    project.criticality("version: 2\n")
     project.ticket()
     project.probe("T-1", "a.md", judgement="pass", verdict=FAIL_OPEN)
     project.refused("governance/project/criticality.yaml")

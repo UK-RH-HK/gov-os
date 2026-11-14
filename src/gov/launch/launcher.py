@@ -626,24 +626,31 @@ def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, g
     and before any record or session is made."""
     table, profile = loaded["by_criticality"], ticket.get("profile")
     names = _ticket_names(ticket_id, ticket)
-    promotion = _promotion(root, names)
-    if promotion is not None and trial_id is not None:
-        raise _refuse(f"--trial {trial_id} is refused: a promotion applies to {ticket_id} ({promotion['reason']}, "
-                      f"{promotion['record']}), and a lower model is refused (DEC-1120 (3))")
-    counted, review_round = [], None
-    if role == AUDITOR and profile == "FULL":
-        counted = _counted_reviews(root, names, given["resume"])
-        review_round = len(counted) + 1
-    probe = review_round is not None and review_round >= 2
-    # the file is read when the table, a promotion, the probe or a trial needs it, or when it is there (1.4)
-    needed = table is not None or promotion is not None or probe or trial_id is not None
-    ticket_class = crit.ticket_criticality(root, ticket) if needed or crit.exists(root) else None
-    opus = crit.opus_model(root) if promotion is not None or probe else None
-    if table is not None:
-        table_model, table_effort = table[ticket_class]["full" if profile == "FULL" else "other"]
-        table_source = "by criticality"
-    else:
+    if not crit.exists(root):
+        # 1.4 (amended 2026-11-14): no criticality.yaml, the launch as before W2-184 (DEC-1167 (2)): the role's default
+        # line for every class; no promotion, no review count, no probe, no same-setting refusal; a trial needs the file
+        if trial_id is not None:
+            raise _refuse(f"--trial {trial_id} is refused: a trial needs the ticket's criticality, and {crit.REL} is "
+                          f"not there")
+        counted, review_round, probe, promotion, opus, ticket_class = [], None, False, None, None, None
         table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    else:  # the file is read on every worker launch; one that cannot be read or is malformed refuses (1.3)
+        ticket_class = crit.ticket_criticality(root, ticket)
+        promotion = _promotion(root, names)
+        if promotion is not None and trial_id is not None:
+            raise _refuse(f"--trial {trial_id} is refused: a promotion applies to {ticket_id} ({promotion['reason']}, "
+                          f"{promotion['record']}), and a lower model is refused (DEC-1120 (3))")
+        counted, review_round = [], None
+        if role == AUDITOR and profile == "FULL":
+            counted = _counted_reviews(root, names, given["resume"])
+            review_round = len(counted) + 1
+        probe = review_round is not None and review_round >= 2
+        opus = crit.opus_model(root) if promotion is not None or probe else None
+        if table is not None:
+            table_model, table_effort = table[ticket_class]["full" if profile == "FULL" else "other"]
+            table_source = "by criticality"
+        else:
+            table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
     trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
 
     # the model: promotion, trial, probe (only where it changes the model), then the table's
