@@ -138,14 +138,20 @@ def test_s3_the_hidden_40_spread_as_r5_s_quotas_state(hidden):
 
 
 def test_s4_f3_every_hidden_gold_source_resolves_at_head(hidden):
-    """Each gold source is a file of this repository at HEAD, outside the evaluation files; a heading given is a
-    line of it or the stated lines are a span of it; a source cited by lines alone holds the same lines at HEAD as at
-    the question's commit. Faults name the file and the entry's number only."""
+    """DEC-1178 (1): each gold source is judged at its own commit (its ``commit``, else the question's): the path is a
+    file there and its heading or lines are a span there, else it is red, named by file and entry number only. At
+    HEAD, a cited block or section that moved unchanged is no fault, and one that changed (a block found nowhere at
+    HEAD or more than once; the path no longer a file; a heading no longer found with no lines stated; a section whose
+    heading is still found but whose text differs from the section at the source's own commit, DEC-1180 (1)) is not
+    failed: it is listed, once per entry, by file name and entry number only, as a ``GoldBlockChanged`` warning in the
+    run's default summary (the maintenance list for the walled writer). Which sources hold their answers is the
+    operator's cross-check."""
     def check():
-        faults = [f"{name}: source entry {n}: {why}" for name, data in _maps(hidden).items()
-                  for n, why in s.source_faults(data)]
+        faults, changed = s.judge_all(_maps(hidden))
+        s.notify_changed(changed)
         if faults:
-            _fail(f"{len(faults)} hidden gold sources do not resolve at HEAD:\n" + "\n".join(faults))
+            _fail(f"{len(faults)} hidden gold sources do not hold their place at their own commit:\n"
+                  + "\n".join(faults))
     _guarded(check)
 
 

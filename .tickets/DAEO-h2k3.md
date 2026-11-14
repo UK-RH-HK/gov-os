@@ -73,6 +73,7 @@ sources:
 - DEC-1171
 - DEC-1164
 - DEC-1178
+- DEC-1180
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-61h/
@@ -130,3 +131,7 @@ are reworded to match. The order: an independent test designer revises `test_w2_
 revised case on planted data (a moved block, a changed block, a source that never held its answer); a narrow
 independent check of the revision (DEC-1154); then the owner's operator's walled re-run, expecting 7 passed with h03
 on the list. The hidden half is never read by any launched session; its cases are proven on planted sets roots only.
+
+**N2 (b), 2026-11-14 (the owner, DEC-1180 (1)):** the changed-lines list also holds a heading-cited source whose section text (from its heading line to the next heading of the same or a higher level, or the end of the file) differs between the source's own commit and the head is listed too, though its heading is still found; an entry is listed once even when two of its alternatives changed (row N1, fixed in the same flow, DEC-1180 (4)). One more test revision by an independent test designer (`w2_61h_support.py`, the README, the case files only where needed; `Rewrite-Reason: DEC-1180 (1)`), proved on planted data, then a narrow independent check (`docs/probes/DAEO-h2k3/PR-DAEO-h2k3-n2.md`). W2-61h closes on this revision and the owner's operator's walled re-run. (The merge queue closed it at c1cb5285c with the F3 land; it stays open for this, status in_progress.)
+
+**Kept open 2026-11-14 15:55 by the CTO (DEC-1180 (1)):** the N2 (b) revision landed at d3f3326c4 (the queue closed the ticket in the same step); W2-61h closes on the owner's operator's walled run of the hidden-form file at that tree (expected 7 passed, a GoldBlockChanged warning listing h03's entry), with a close record (DEC-953). DEC-1180 added to sources.

@@ -1,5 +1,7 @@
 # SANDBOX-GUARD-EXP-1: the path-map guard alone against the guard with a sandbox, at a 100 % bar (DEC-1098 (4))
 
+> Note 2026-11-14 (DEC-1128 (4)): set-up B (the guard plus a sandbox) was dropped entirely and never run; its text here is kept as the record. Set-up A stays.
+
 - **For:** the owner, to approve the design and answer §7 before anything runs. **By:** a research agent for the CTO,
   2026-11-09. **Design only; nothing has run.** Nothing live changes during or after it; W2-56 builds nothing until
   you have both results.
