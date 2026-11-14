@@ -1,0 +1,37 @@
+# pytest tests/acceptance/W2-184/test_w2_184_cli_options.py --tb=line -rf at 0a4ce21fd
+     15 /home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+     10 /home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+      1 /home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:266: AssertionError: gov launch --plan engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-N
+      1 /home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:246: AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNNN] [--gpu-need-mib N] [-- <CLI arguments>]'
+      1 /home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:246: AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNNN] [--gpu-need-mib N] [-- <CLI arguments>] gov launch: error: the following arguments are required: <role>, <ticket>'
+
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_setting
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_owner_named_admits_a_third_review
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_planted_trial_admits_its_model_after_the_double_dash_and_the_record_holds_its_id
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_with_nothing_after_the_double_dash_sets_the_session_s_model_and_effort
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_that_does_not_admit_the_launch_is_refused_naming_the_file[no-file]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_that_does_not_admit_the_launch_is_refused_naming_the_file[the-wrong-role]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_reason_admits_a_max_of_the_launch_s_own_choice_and_is_recorded
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_reason_is_recorded_whatever_the_effort
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_trial_and_reason_together_admit_a_trial_s_max
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_three_options_together_are_each_recorded
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[DEC-]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[dec-1010]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[1010]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[DEC-10x]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[accent]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[empty]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[slash]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[space]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[up]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_an_empty_reason_is_refused_before_any_record_or_session[empty]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_an_empty_reason_is_refused_before_any_record_or_session[blank]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[owner-named]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[reason]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[trial]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_usage_line_names_the_three_options[help]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_usage_line_names_the_three_options[bad-call]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_plan_prints_the_default_line_alone_and_does_not_read_the_three_options
+28 failed, 7 passed in 15.63s

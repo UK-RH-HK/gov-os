@@ -1,0 +1,15 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "head",
+   "before": "5336a6fca337",
+   "after": "d782640dee6b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "status line added",
+   "line": " M docs/research/W2-88-memory-practice.md"
+  }
+ ]
+}

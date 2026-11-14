@@ -1,8 +1,16 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-14 12:50: session `6ff2ee7c` (the trial session) WORKING. Next free id **DEC-1179** (DEC-1178 recorded a23678e27; MEMORY-AUDIT = DEC-1179 once O3 is read back). READ THE NOW BLOCK FIRST; the dated lines below are history.
+## RESUME HERE — 2026-11-14 12:53: session `6ff2ee7c` (the trial session) WORKING. Next free id **DEC-1180** (DEC-1179 recorded 976e53791 + marks e0381969c). READ THE NOW BLOCK FIRST; the dated lines below are history.
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
+
+- **13:40 (real clock):** OWNER: "Sorry EXAMIN release will be tonight after repin. Once I am back." = the EXAMIN CTO starts TONIGHT right after the owner's re-pin, when the owner is back (fills DEC-1178's EXAMIN-CTO brief date) -> record WITH N2 (b) in DEC-1180 after the land. Owner away until tonight; q02 (a)/(c)/(d) still open -> draft the (a) walls ACT meanwhile (no apply without the yes). NOTE: my 13:45 line below was stamped ahead of the clock (stale 3).
+- **13:45:** OWNER: "N2 (b)" (record DEC-1180 AFTER the land: W2-61h check also lists heading-cited sections whose text changed since the source's commit, ids + entry numbers only; route W2-61h n2 revision run; W2-187 S10 (6)/I10 same); q02 "operator's exact message today"; "tell me when the land is in"; EXAMIN CTO start bracket UNFILLED -> asked. FOUND: q02 variant 0703aebf CANNOT run via indep_launch.py: writer round 2 stages the whole hidden set + XCHECK-r1.md (none for EXAMIN: round 1 had no checker, FOR-THE-OWNER C8) and delivers out/set/** REPLACING all of hidden/; variant expects input/q02.yaml+verdict.txt(+sample.json), out/q02.yaml; no EXAMIN checker brief exists. indep_launch.py = walls/control path (ACT). Package given: (a) walls ACT one-question fix flow (= DND 203's reanchor ACT too) REC; (c) owner fixes by hand; (d) drop q02. Land W2-61h merged 121a44c9a10a, tests running; inbox waiter re-armed bdgeaxcbi. Trial: stale 2, corrections 0, missed 3 (q02 run path not checked before the 13:27 report said "operator runs q02"), compactions 2.
+- **13:32:** W2-101 CLOSED 1e2dcd046 (accept 348/0). W2-61h f3 DONE 40f997704f53 -> LAND QUEUED via dispatch/land.txt 13:31 (the dispatcher lands ONLY from land.txt `W2-xx=<sha12>`, which the CTO writes; I wrongly assumed it auto-lands = missed 2). After land: operator walled run (cmd in the 13:27 report), N2 reading offered. W2-188 lead pid 3852680 (wait bs3nfxs16); W2-187 pid 3815645. Brief given to the owner 13:35 (sitting ~21:00; EXAMIN CTO ~23:00 or 11-15 morning; Wave 2 close ~11-21, range 11-20..11-25).
+
+- **13:15:** COPIES-11 APPLIED 10c0ca52b -> W2-101 fresh accept RUNNING (bg bfnekiy26, log/accept-20261114-w2101/, worktree ~/gov-os-runs/W2-00/accept-20261114-w2101 to remove after) -> close record like W2-100's. W2-187/W2-188 CLAIMED 5336a6fca (interfaces from drafts/memory-audit-p1/interfaces.md; routings G1 paths, G2 operator carries REANCHOR, U1, U2 — listed for the owner's reading); worktrees ~/gov-os-worktrees/W2-187, W2-188; briefs W2-187-A5-run1.md / W2-188-A5-run1.md; W2-187 lead STARTED 13:13 pid 3815645 (wait bg); W2-188 ready line in. DND 199 in progress, 203 (walls ACT) 6b9bfdd69. The guard refuses any Bash line naming the sets root path with a $(...) — write such text with the Write tool. W2-88 lead: an engineer launch refused for --model opus (lead fixes). Trial: stale 2 (report times 13:05/12:44 ahead of the clock), corrections 0, missed 1, compactions 1.
+
+- **12:53:** OWNER follow-up: O3 (b) (weekly active / monthly stable / weekly on miss, retrieval change, churn >=10 %); scan line = W2-88 S27 (already in). DEC-1179 RECORDED 976e53791 (package -> packages/MEMORY-AUDIT-P1.md; DIF; DND 199-202; Changed-by marks fixed e0381969c). FILED W2-187 = DAEO-0cd2 (S10 sixth item: changed-lines list; O8 split pre-approved) and W2-188 = DAEO-zlog (CIT-P draft drafts/memory-audit-p1/W2-188-CIT-P.md, DEC-1179 renamed) -> NEXT: claim both with interface (DEC-1157 (3)), worktrees, briefs, ready lines. W2-100 CLOSED 0bb111416 (COPIES-10 0f11752ce; accept 293/0). COPIES-11 .req still queued -> on applied: fresh accept W2-101 (form: detached worktree ~/gov-os-runs/W2-00/accept-20261114-w2101 + heavy_slot gov accept --json), close. W2-61h f3 lead STARTED (worktree W2-61h-c39, pid 3421558, wait b2dg4l0rg). W2-88 lead pid 3395055 (wait bg1qkfjau). W2-184 lead pid 3158746 (wait b5vw3q2i2). TODO: §5.5 re-baselines (DND 200); DND sweep apply; q02 with the owner's operator.
 
 - **12:50 (session 6ff2ee7c, after one compaction at ~12:40):** OWNER message 2 recorded as DEC-1178 (a23678e27: P-W2-61H-HEAD-1 (A)/(i); W2-100/101 CIT-Ps + COPIES-10/11 yeses (logged act-approvals.jsonl); P-RELEASE-1 (B) 0.1.0 §4 §6, P-1 (a), pins (a) [DIF], setup (a), W2-81 (b), walls (a) with P-4/P-5/P-6 fixed before W2-29 [DIF, DND 196]; EXAMIN-CTO-first-brief 995d0dcf (fill date + DEC-1178 only); q02 0703aebf; DND rows 192-198). W2-88 REOPENED (S24-S27; sources fixed 757f8cec2); brief briefs/W2-88-A5-p1.md; lead STARTED 12:43 by the dispatcher, pid 3395055 (wait bg1qkfjau). W2-134 CLOSED 6966842ad. W2-61h REOPENED 2b77eb968 (S4/F3 reworded; 4 test paths) -> NEXT: its brief (TD revision, narrow check, operator walled re-run, expect 7 passed + h03 listed) + ready line. W2-100/101: owner_approval on branches (20b9b7284, bc7221fbb), kernel-approved +105 rows (backup .pre-dec1178), gate 20/0 + 15/0, HAND MERGED 969c9b8d3 + abfd25a96; COPIES-10/11 .req QUEUED 12:45 -> close each on fresh accept after applied. q02: class (O) owner route: the operator installs the variant (sha in <sets root>/indep-walls/APPROVED, never us), runs writer -> checker -> check_gold (20/20). MEMORY-AUDIT: O3 "[(b) / (a)]" ambiguous -> ASKED the owner; then DEC-1179, file W2-187 + W2-188 (CIT-P route), G5 sixth item. DND sweep table done: drafts/dnd-sweep-20261114.md (53 rows, apply in one commit; 3 status mismatches W2-145/W2-138 in_progress though merged = merged-not-closed, fine). Evening sitting estimate ~20:30. Trial: stale 1, corrections 0, missed 1; compactions 1.
 
@@ -1578,31 +1586,31 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-14T12:36:06Z b1103cdc7188ad35b3f6787248e58bd7b089d8caf24621d5888badc6b8dcb155
-git head: 3eb371b671f53ca7507ae7343e5c7a824b2ddd44
+generated: 2026-11-14T13:34:37Z 4f50cb015b984f5054b09da636595706ca399f995f2245b3aa24d08bee0bc2c8
+git head: 1e2dcd046683a4dc7c7340491a95b51d9f31dfc9
 tickets in progress (`tk ls --status=in_progress`):
+  DAEO-0cd2 [in_progress] - W2-187 The standing hidden set, judged every week at 95 %, counts only <- [DAEO-f58b, DAEO-rmhj]
   DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
   DAEO-6f0s [in_progress] - W2-184 RUBRIC-2 at launch (from W2-60a) <- [DAEO-cv58]
-  DAEO-6icv [in_progress] - W2-101 Domain skills B <- [DAEO-drhj]
   DAEO-ar89 [in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget
-  DAEO-m4rq [in_progress] - W2-134 The measure re-anchors in memory <- [DAEO-h2k3]
+  DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
-  DAEO-uw5h [in_progress] - W2-100 Domain skills A <- [DAEO-drhj]
+  DAEO-zlog [in_progress] - W2-188 The adopt skill's step 6 and the practice record: the standing set <- [DAEO-pg6i]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS          3eb371b67 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS          1e2dcd046 [w2/integrate]
   /home/usain/gov-os-runs/W2-00/accept-20261113-eve   730477098 (detached HEAD)
   /home/usain/gov-os-runs/W2-00/accept-w237-20261113  454771c4e (detached HEAD)
   /home/usain/gov-os-worktrees/D6-F-tests             2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue              04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records    66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record           021e7b68d [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a          3eb371b67 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b          29c8bb421 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record           f48c5e051 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a          6b9bfdd69 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b          1e2dcd046 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-04                  c77dc358d [w2/W2-04]
   /home/usain/gov-os-worktrees/W2-05                  52de591b8 [w2/W2-05]
-  /home/usain/gov-os-worktrees/W2-100                 cdac25763 [w2/W2-100]
-  /home/usain/gov-os-worktrees/W2-101                 3bf1c96b4 [w2/W2-101]
+  /home/usain/gov-os-worktrees/W2-100                 20b9b7284 [w2/W2-100]
+  /home/usain/gov-os-worktrees/W2-101                 bc7221fbb [w2/W2-101]
   /home/usain/gov-os-worktrees/W2-104                 c9f07ef37 [w2/W2-104]
   /home/usain/gov-os-worktrees/W2-105                 3341c7328 [w2/W2-105]
   /home/usain/gov-os-worktrees/W2-11                  6ba93fc8b [w2/W2-11]
@@ -1686,9 +1694,13 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-181                 499543a83 [w2/W2-181]
   /home/usain/gov-os-worktrees/W2-182                 04914c869 [w2/W2-182]
   /home/usain/gov-os-worktrees/W2-183                 6a82ec67a [w2/W2-183]
-  /home/usain/gov-os-worktrees/W2-184                 94b48c130 [w2/W2-184]
-  /home/usain/gov-os-worktrees/W2-184-tests           a4ad2e380 [w2/W2-184-tests]
+  /home/usain/gov-os-worktrees/W2-184                 0a4ce21fd [w2/W2-184]
+  /home/usain/gov-os-worktrees/W2-184-tests           3e3d275a0 [w2/W2-184-tests]
   /home/usain/gov-os-worktrees/W2-185                 47e708a23 [w2/W2-185]
+  /home/usain/gov-os-worktrees/W2-187                 5336a6fca [w2/W2-187]
+  /home/usain/gov-os-worktrees/W2-187-tests           0294e1118 [w2/W2-187-tests]
+  /home/usain/gov-os-worktrees/W2-188                 8c2e5d7ff [w2/W2-188]
+  /home/usain/gov-os-worktrees/W2-188-tests           3c5167c47 [w2/W2-188-tests]
   /home/usain/gov-os-worktrees/W2-20                  057926aa3 [w2/W2-20]
   /home/usain/gov-os-worktrees/W2-20-1017             1a54976c7 [w2/W2-20-1017]
   /home/usain/gov-os-worktrees/W2-20-collect          a38809a33 [w2/W2-20-collect]
@@ -1710,13 +1722,14 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-56-f-tests          3ea3411e1 [w2/W2-56-f-tests]
   /home/usain/gov-os-worktrees/W2-56-tests            85b28ef0f [w2/W2-56-tests]
   /home/usain/gov-os-worktrees/W2-60a                 a7aa762ab [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61h-c39             d317baf20 [w2/W2-61h-c39]
+  /home/usain/gov-os-worktrees/W2-61h-c39             40f997704 [w2/W2-61h-c39]
   /home/usain/gov-os-worktrees/W2-61h-d10r2-tests     35396225e [w2/W2-61h-d10r2-tests]
   /home/usain/gov-os-worktrees/W2-61h-q23-tests       53affe533 [w2/W2-61h-q23-tests]
   /home/usain/gov-os-worktrees/W2-66c                 400991361 [w2/W2-66c]
   /home/usain/gov-os-worktrees/W2-78                  8e7640b96 [w2/W2-78]
   /home/usain/gov-os-worktrees/W2-81                  6e2003ff3 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-88                  df9f4910e [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88                  a23678e27 [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88-tests            a23678e27 [w2/W2-88-tests]
   /home/usain/gov-os-worktrees/W2-88a                 c79a20f1f [w2/W2-88a]
   /home/usain/gov-os-worktrees/W2-88b                 266ec245e [w2/W2-88b]
   /home/usain/gov-os-worktrees/W2-90b                 cb0e69ba5 [w2/W2-90b]

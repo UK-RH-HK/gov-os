@@ -1,0 +1,374 @@
+FFFFFFFFFFFFFFFFFFFFFF...FFF...FFF.                                      [100%]
+=================================== FAILURES ===================================
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-auditor DAEO-cl02 --owner-named DEC-1010 -- --effort high
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named DEC-1010
+    
+    CLI starts recorded: 0
+    records before: ['2ed46d1f-4fee-4675-a4ff-8b2bd71d8aed.json']
+    records after: ['2ed46d1f-4fee-4675-a4ff-8b2bd71d8aed.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch independent-auditor DAEO-cl02 --owner-named DEC-1010
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named DEC-1010
+    
+    CLI starts recorded: 0
+    records before: ['16c17450-2bcc-4e02-a61c-fcb90560af4f.json', '40f4b720-be3c-4efa-95e6-266beac1d0f9.json']
+    records after: ['16c17450-2bcc-4e02-a61c-fcb90560af4f.json', '40f4b720-be3c-4efa-95e6-266beac1d0f9.json']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --trial trial-1 -- --model claude-haiku-5-5
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-1
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --trial trial-1
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-1
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial trial-none -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-none
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial trial-1 -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-1
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch -- --effort max
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason the owner asked for the deepest check of this launch
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --reason a note on this launch
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason a note on this launch
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial trial-1
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-1
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1167 -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1167
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --owner-named DEC- -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named DEC-
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --owner-named dec-1010 -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named dec-1010
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --owner-named 1010 -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named 1010
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --owner-named DEC-10x -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named DEC-10x
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --owner-named  -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named 
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial té -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial té
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial  -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial 
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial x/y -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial x/y
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial a b -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial a b
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --trial ../x -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial ../x
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --reason  -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason 
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: the launch was not refused with exit code 1
+    gov launch engineer DAEO-cl01 --reason     -- -p Do the work.
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason    
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/w2_184_support.py:322: AssertionError: the launch was not refused with exit code 1
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --owner-named DEC-1010 -- -p Do the work. --owner-named DEC-2020
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --owner-named DEC-1010
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch -- -p Do the work. --reason written after the double dash
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --reason the owner asked for the deepest check of this launch
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: gov launch did not start exactly one session
+    gov launch engineer DAEO-cl01 --trial trial-1 -- -p Do the work. --trial trial-2
+    exit code: 2
+    stdout:
+    
+    stderr:
+    usage: gov [-h] <command> ...
+    gov: error: unrecognized arguments: --trial trial-1
+    
+    CLI starts recorded: 0
+    records before: []
+    records after: []
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-60a/w2_60a_support.py:870: AssertionError: gov launch did not start exactly one session
+E   AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]'
+    assert not ['--reason', '--trial', '--owner-named']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:246: AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]'
+E   AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>] gov launch: error: the following arguments are required: <role>, <ticket>'
+    assert not ['--reason', '--trial', '--owner-named']
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:246: AssertionError: the usage line does not name ['--reason', '--trial', '--owner-named']: 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>] gov launch: error: the following arguments are required: <role>, <ticket>'
+E   AssertionError: gov launch --plan engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1010
+      exit code: 2
+      stdout:
+      
+      stderr:
+      usage: gov [-h] <command> ...
+      gov: error: unrecognized arguments: --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1010
+      
+    assert (2 == 0)
+     +  where 2 = Run(args=('gov', 'launch', '--plan', 'engineer', 'DAEO-cl01', '--reason', 'the owner asked for the deepest check of th...zed arguments: --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1010\n').returncode
+/home/usain/gov-os-worktrees/W2-184/tests/acceptance/W2-184/test_w2_184_cli_options.py:266: AssertionError: gov launch --plan engineer DAEO-cl01 --reason the owner asked for the deepest check of this launch --trial trial-1 --owner-named DEC-1010
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_owner_named_admits_a_full_ticket_s_review_that_repeats_a_recorded_setting
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_owner_named_admits_a_third_review
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_planted_trial_admits_its_model_after_the_double_dash_and_the_record_holds_its_id
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_with_nothing_after_the_double_dash_sets_the_session_s_model_and_effort
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_that_does_not_admit_the_launch_is_refused_naming_the_file[no-file]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_that_does_not_admit_the_launch_is_refused_naming_the_file[the-wrong-role]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_reason_admits_a_max_of_the_launch_s_own_choice_and_is_recorded
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_reason_is_recorded_whatever_the_effort
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_trial_and_reason_together_admit_a_trial_s_max
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_three_options_together_are_each_recorded
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[DEC-]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[dec-1010]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[1010]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[DEC-10x]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_malformed_owner_named_is_refused_before_any_record_or_session[]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[accent]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[empty]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[slash]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[space]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_a_trial_id_outside_the_form_is_refused_before_any_record_or_session[up]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_an_empty_reason_is_refused_before_any_record_or_session[empty]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_an_empty_reason_is_refused_before_any_record_or_session[blank]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[owner-named]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[reason]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_option_before_the_double_dash_is_taken_and_the_same_word_after_it_is_passed_through[trial]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_usage_line_names_the_three_options[help]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_the_usage_line_names_the_three_options[bad-call]
+FAILED tests/acceptance/W2-184/test_w2_184_cli_options.py::test_cli_plan_prints_the_default_line_alone_and_does_not_read_the_three_options
+28 failed, 7 passed in 15.63s

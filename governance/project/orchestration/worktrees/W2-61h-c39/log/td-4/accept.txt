@@ -1,0 +1,32 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 13:22:08)
+{
+  "ticket": "DAEO-h2k3",
+  "outcome": "pass",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-7",
+      "outcome": "pass",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-4",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 7
+  },
+  "totals": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 7
+  }
+}

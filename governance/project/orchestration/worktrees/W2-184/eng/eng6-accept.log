@@ -1,0 +1,6 @@
+rm: cannot remove '/tmp/gov-os-heavy-prio-194800': Read-only file system
+heavy_slot: all 3 slots taken; waiting (2026-11-14 14:01:14)
+rm: cannot remove '/tmp/gov-os-heavy-prio-194800': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-194800': Read-only file system
+rm: cannot remove '/tmp/gov-os-heavy-prio-194800': Read-only file system
+164: line 3: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/heavy-slot-waits.jsonl: Read-only file system

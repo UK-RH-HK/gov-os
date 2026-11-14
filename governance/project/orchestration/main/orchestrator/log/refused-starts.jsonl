@@ -44,3 +44,4 @@
 {"t": "2026-11-14 01:19:36", "w2": "W2-88b", "ticket": "DAEO-aks1", "log": "W2-88b-A5-run3.json", "leads_running": 4, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
 {"t": "2026-11-14 01:20:37", "w2": "W2-88b", "ticket": "DAEO-aks1", "log": "W2-88b-A5-run3.json", "leads_running": 5, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
 {"t": "2026-11-14 01:21:40", "w2": "W2-88b", "ticket": "DAEO-aks1", "log": "W2-88b-A5-run3.json", "leads_running": 5, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}
+{"t": "2026-11-14 13:15:05", "w2": "W2-188", "ticket": "DAEO-zlog", "log": "W2-188-A5-run1.json", "leads_running": 4, "land_running": false, "why": ["no refusal in status.json (the dispatcher's own order or its next tick)"]}

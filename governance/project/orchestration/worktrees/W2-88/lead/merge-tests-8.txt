@@ -1,0 +1,8 @@
+Merge w2/W2-88-tests: run 7 acceptance cases for S24 to S27 (td-9, 0841cfb3c283)
+
+The independent test designer's cases for the reopen (DEC-1178 (3)(b), (4)): S24 A9 from an installed release, S25 the code graph over the tool's cap, S26 ignore rules found at the start, S27 the secret scan's speed. Red on a23678e27 for the README's stated reasons.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-44.g, CAP-20
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

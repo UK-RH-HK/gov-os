@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-188
+status: interim result 8c2e5d7ff: W2-188 (DAEO-zlog): the probe record re-runs the section 5 item 6 checks on the re-worded line

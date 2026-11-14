@@ -1,0 +1,1 @@
+gov launch: LAUNCH_REFUSED: the CLI arguments carry --model claude-opus-5-5, which is not the engineer's model claude-sonnet-5-5 (DEC-839 item 1)

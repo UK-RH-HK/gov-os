@@ -1,8 +1,8 @@
-Status at 2026-11-14 12:47:06 (the last report's block)
-- Progress: 159 closed / 5 merged-not-closed / 0 built-and-held / 3 in flight / 23 not started, of 190.
-- Leads: 2 running (W2-184, W2-88); queued next: W2-184, W2-88; the gate: open.
-- Closes: none running; next: W2-100 and W2-101 on a fresh accept once COPIES-10/-11 are applied (queued 12:45); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:44, DEC-1178 (1)); refused since the last report: none.
+Status at 2026-11-14 13:40:29 (the last report's block)
+- Progress: 161 closed / 3 merged-not-closed / 0 built-and-held / 5 in flight / 23 not started, of 192.
+- Leads: 4 running (W2-184, W2-187, W2-188, W2-88); queued next: W2-184, W2-88, W2-187, W2-188; the gate: open.
+- Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
 - Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
-- Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 merged; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO.
+- Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 closed; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO.
 - Emergency plan: none (lifted, DEC-1158).
-- OWNER_ACTION: MEMORY-AUDIT-P1's O3: (b) or (a)? (then DEC-1179, W2-187, W2-188); q02: your operator installs the variant 0703aebf and runs writer, checker, check_gold; the evening sitting (release 0.1.0 + re-pin), time in the report
+- OWNER_ACTION: q02: one line, (a), (c) or (d) when you are back (the (a) ACT drafted meanwhile); W2-61h's walled re-run by your operator once I say the land is in; the evening sitting (re-pin) then the EXAMIN CTO's start, tonight when you are back

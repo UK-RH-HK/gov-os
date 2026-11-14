@@ -213,6 +213,14 @@ then the acceptance cases that need these options call `gov.launch.launcher.laun
 in a child Python process with the same environment `gov launch` gets; every other case may drive `gov launch` as
 W2-60a's cases do.
 
+7.2a **[amended, the CTO's P-W2-184-2 (a), 2026-11-14]** `src/gov/launch/command.py` is now in the ticket's paths, and
+the options are wired: `gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [--reason
+<text>] [--trial <id>] [--owner-named <DEC-id>] [-- <CLI arguments>]`, each before `--`, passed to `launcher.launch`
+as the keywords `reason`, `trial`, `owner_named` (absent: `None`). Through the CLI they behave exactly as the keyword
+cases (the same refusals with exit 1 and no record or session; the same records), and the usage line names them. An
+option written after `--` stays a CLI argument (W2-60a's checks of the passthrough judge it, unchanged). `--plan` is
+unchanged (it does not read the three options), and so is a lead launch (7.1: a lead takes none of them).
+
 ## 8. The launch record (`src/gov/launch/record.py`, W2-60a's record plus these keys, each always present)
 
 | key | value |

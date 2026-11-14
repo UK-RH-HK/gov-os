@@ -1,0 +1,118 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "6b9bfdd695eb",
+   "after": "1e2dcd046683"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "head",
+   "before": "42d0867d3190",
+   "after": "3e3d275a06df"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-184/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-184/w2_184_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-184/test_w2_184_cli_options.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "head",
+   "before": "5336a6fca337",
+   "after": "0294e1118ab0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "acceptance folder",
+   "folder": ".claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "acceptance folder",
+   "folder": "W2-171"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "acceptance folder",
+   "folder": "W2-172"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "head",
+   "before": "d782640dee6b",
+   "after": "8ee9b7c36bc6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188",
+   "change": "status line gone",
+   "line": " M docs/research/W2-88-memory-practice.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/test_w2_188_citp.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/test_w2_188_copies.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/test_w2_188_practice.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/test_w2_188_selfchecks.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/test_w2_188_skill.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-188/w2_188_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-188-tests",
+   "change": "acceptance folder",
+   "folder": "W2-188"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-61h-c39",
+   "change": "head",
+   "before": "dda647a49eaa",
+   "after": "40f997704f53"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-61h-c39-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

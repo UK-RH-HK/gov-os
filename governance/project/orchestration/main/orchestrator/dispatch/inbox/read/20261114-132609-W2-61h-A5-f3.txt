@@ -1,0 +1,7 @@
+log: W2-61h-A5-f3.json
+W2: W2-61h
+status: DONE
+
+task: DAEO-h2k3 (W2-61h), the S4/F3 test revision under DEC-1178 (1)
+status: DONE
+work_completed: A fresh independent test designer (td-4) revised the four allowed files. Each gold source is now judged at its own commit: the path must be a file there and the heading or lines a span there; for q21-q24 the span there must also hold the designer's anchor. At HEAD, a block that moved unchanged is no fault (found at the same lines or exactly once elsewhere). A changed block is never failed: it goes on a `GoldBlockChanged` warning list that names file names and entry numbers only. A source that does

@@ -1,0 +1,6 @@
+W2-188 (DAEO-zlog): merge the independent test designer's acceptance tests (3c5167c47, 54 cases)
+
+Task: DAEO-zlog
+Role: orchestrator
+Implements: DEC-1179, DEC-105, CAP-33
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

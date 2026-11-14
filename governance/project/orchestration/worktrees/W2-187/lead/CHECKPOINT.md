@@ -1,0 +1,4 @@
+STATE: build run: td-1 and eng-1 launched in parallel | HEAD: 5336a6fca | NEXT: wait_for.sh /home/usain/gov-os-worktrees/W2-187-tests/.gov-runtime/scratch/lead/log/td-1.exit (and eng-1.exit in W2-187's lead/log) | WAITING ON: td-1 (pid 3860916), eng-1 (pid 3863121)
+Workers: td-1 (independent-test-designer, sonnet, high, C2) running in W2-187-tests · eng-1 (engineer, sonnet, high, C2) running in W2-187 · Rounds: in progress · Decisions taken: context packets built from the integration store W2-00-store with --budget 72000 (main store lacks DEC-1179; 24000 is over the ceiling at 64278) · Open packages: none · Paths: briefs/td-1.md, briefs/eng-1.md; logs W2-187-tests/.gov-runtime/scratch/lead/log/td-1.*, W2-187/.gov-runtime/scratch/lead/log/eng-1.*
+task: DAEO-0cd2
+decisions_applied: DEC-1010, DEC-1052, DEC-1065, DEC-1073, DEC-1156, DEC-1179

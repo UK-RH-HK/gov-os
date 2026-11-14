@@ -1,0 +1,53 @@
+FFFFF.FFFF                                                               [100%]
+=================================== FAILURES ===================================
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --reason a deep check --trial trial-1 --owner-named DEC-1010
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --reason v
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --trial v
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --owner-named v
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --reason  --trial  --owner-named 
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]
+__main__.py: error: unrecognized arguments: --reason r --trial t --owner-named DEC-1
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   AssertionError: assert '--reason' in 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]\n'
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_command.py:74: AssertionError: assert '--reason' in 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]\n'
+E   SystemExit: 2
+----------------------------- Captured stderr call -----------------------------
+usage: gov [-h] <command> ...
+gov: error: unrecognized arguments: --owner-named DEC-1010
+/usr/lib/python3.12/argparse.py:2664: SystemExit: 2
+E   AssertionError: assert '--reason' in 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]\ngov launch: error: the following arguments are required: <role>, <ticket>\n'
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_command.py:93: AssertionError: assert '--reason' in 'usage: gov launch <role> <ticket> [--plan] [--gate-override DEC-NNN] [--gpu-need-mib N] [-- <CLI arguments>]\ngov launch: error: the following arguments are required: <role>, <ticket>\n'
+=========================== short test summary info ============================
+FAILED tests/unit/launch/test_w2_184_command.py::test_the_three_options_reach_the_launcher_as_keywords
+FAILED tests/unit/launch/test_w2_184_command.py::test_each_option_alone_reaches_the_launcher_and_the_others_stay_absent[--reason-reason]
+FAILED tests/unit/launch/test_w2_184_command.py::test_each_option_alone_reaches_the_launcher_and_the_others_stay_absent[--trial-trial]
+FAILED tests/unit/launch/test_w2_184_command.py::test_each_option_alone_reaches_the_launcher_and_the_others_stay_absent[--owner-named-owner_named]
+FAILED tests/unit/launch/test_w2_184_command.py::test_an_empty_value_is_passed_on_for_the_launcher_to_refuse
+FAILED tests/unit/launch/test_w2_184_command.py::test_plan_does_not_read_the_three_options
+FAILED tests/unit/launch/test_w2_184_command.py::test_the_usage_line_names_the_three_options
+FAILED tests/unit/launch/test_w2_184_command.py::test_through_gov_the_options_before_the_double_dash_are_taken_and_after_it_passed_through
+FAILED tests/unit/launch/test_w2_184_command.py::test_through_gov_a_bad_call_prints_the_usage_naming_the_options
+9 failed, 1 passed in 0.20s
+exit=1

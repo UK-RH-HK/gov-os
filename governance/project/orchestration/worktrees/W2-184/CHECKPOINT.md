@@ -1,10 +1,10 @@
 ---
 task: DAEO-6f0s
-decisions_applied: [DEC-1167, DEC-1120, DEC-1119, DEC-1052, DEC-1010, DEC-1146, DEC-802, DEC-136, DEC-1154]
+decisions_applied: [DEC-1167, DEC-1120, DEC-1119, DEC-1052, DEC-1010, DEC-1146, DEC-802, DEC-136, DEC-1154, DEC-1177]
 ---
-STATE: build run (F1 fix); td-5 merged 7d275b97f (tests a4ad2e380), accept-5 red 453/19 as designed; eng-5 running (pid 3368741) | HEAD: 7d275b97f | NEXT: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-184/.gov-runtime/scratch/lead/log/eng-5.exit; then rebuild, lead_verify, gov accept, narrow check (rv-f1) | WAITING ON: eng-5
-Workers: td-1..td-5, eng-1..eng-4 done; rv-1 0be7734a (fail), rv-2 d4de9d3f (fail); td-5 83e513a0 done; eng-5 running
-Rounds: two review rounds done (DEC-1010); no third; after the fix a narrow independent check (DEC-1154), record docs/probes/DAEO-6f0s/PR-DAEO-6f0s-f1.md
-Decisions taken: interface briefs/INTERFACE.md, 5.1a added (P-W2-184-1 (a)); (c) holds: tests branch made from e99c8059c, which holds the probe-record commit 8d7aee0c4
-Open packages: none (P-W2-184-1 owner (a)+(c); -2 CTO (a); -3 confirmed)
-Paths: briefs .gov-runtime/scratch/briefs/ (td-5.md, ctx-td-5.md, ctx-eng-5.md); logs W2-184-tests/.gov-runtime/scratch/lead/log/td-5.*
+STATE: build run; F1 fix built (eng-5: 94b48c130, 42d0867d3), lead_verify running at 42d0867d3 (pid 3436431); td-6 (CLI options, P-W2-184-2 (a)) running in W2-184-tests (pid 3463848) | HEAD: 42d0867d3 | NEXT: wait_for lead/log/verify/verify.exit and W2-184-tests lead/log/td-6.exit; merge td-6; eng-6 (command.py) on the failing output; rebuild, lead_verify, gov accept; then the narrow check (needs --owner-named DEC-1177: launch_worker.sh cannot pass it -> package to the CTO) | WAITING ON: verify, td-6
+Workers: td-1..td-5, eng-1..eng-5 done (td-5 83e513a0, eng-5 06690070); rv-1 0be7734a (fail), rv-2 d4de9d3f (fail); td-6 ec344c7f running
+Rounds: two review rounds done (DEC-1010); no third; the narrow check (DEC-1154, DEC-1177 (1)) is the next auditor launch = review_round 3 by the launcher's count, refused without --owner-named
+Decisions taken: INTERFACE 5.1a (+P-td5-1 (a), P-td5-2); 7.2a (CLI options, P-W2-184-2 (a)); (c) held (tests branch from e99c8059c)
+Open packages: (to come) P-W2-184-4: the narrow check's launch needs --owner-named through launch_worker.sh
+Paths: briefs .gov-runtime/scratch/briefs/ (td-5, eng-5, td-6); logs .gov-runtime/scratch/lead/log/ and W2-184-tests/.gov-runtime/scratch/lead/log/; red-5 in .gov-runtime/scratch/log/

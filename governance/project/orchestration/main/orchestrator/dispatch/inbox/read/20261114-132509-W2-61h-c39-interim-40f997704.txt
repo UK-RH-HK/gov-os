@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-61h-c39
+status: interim result 40f997704: W2-61h: probe record of the narrow independent check of the S4/F3 revision (DEC-1178 (1)), pass at dda647a49

@@ -348,3 +348,4 @@ W2-130-A5-pin.json
 W2-130-A5-pin2.json
 W2-130-A5-pin3.json
 W2-88b-A5-run4.json
+W2-61h-A5-f3.json
