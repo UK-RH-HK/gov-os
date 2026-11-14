@@ -128,14 +128,14 @@ def assert_nothing_left(adoption, start: str, run) -> None:
 
 def test_s25_a_graph_over_the_tools_cap_is_refused_codegraph_too_large_naming_the_tool_the_cap_and_both_counts(c_world):
     """success-S25 (F-1): redis's figures (41,086 nodes, 143,008 edges) with the whole-graph read of the edges refused as the real tool refuses
-    it (``isError: true``, ``result exceeded 100k rows``). A9 is refused ``CODEGRAPH_TOO_LARGE`` (``gov adopt: CODEGRAPH_TOO_LARGE: ...`` on stderr,
-    ``ok: false``, not exit 2): the message names ``codebase-memory-mcp``, the cap of 100,000 and both counts, and that gov's read takes the whole
+    it (``isError: true``, ``result exceeded 100k rows``). A9 is refused ``CODEGRAPH_TOO_LARGE`` (the envelope's ``ok: false``, its ``error.code`` and
+    ``error.message``, as the suite checks every refusal; not exit 2): the message names ``codebase-memory-mcp``, the cap of 100,000 and both counts, and that gov's read takes the whole
     graph in one query (``gov.codeintel``); ``details`` are ``{nodes: 41086, edges: 143008, cap: 100000, tool: "codebase-memory-mcp"}``. A9 asked the
     tool for the counts (two ``count(`` queries). Never ok; no record; HEAD unmoved; A9's copies taken back."""
     adoption, run, log, start = a9_with(c_world, "f1-cap", nodes=41086, edges=143008, read="cap")
     W.assert_refused(run, CODE, "A9 on a code graph over the tool's cap")
-    assert f"gov adopt: {CODE}: " in run.stderr, f"stderr does not hold `gov adopt: {CODE}: <message>`\n{run.describe()}"
     error = run.error
+    assert error.get("code") == CODE and str(error.get("message", "")).strip(), f"the envelope's error does not hold the code {CODE} and a message: {error!r}\n{run.describe()}"
     message = digits(str(error.get("message", "")))
     assert TOOL in message, f"the message does not name the tool {TOOL!r}: {message!r}"
     assert "100000" in message, f"the message does not name the tool's cap of 100,000 rows: {message!r}"
