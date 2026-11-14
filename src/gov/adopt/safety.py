@@ -30,7 +30,7 @@ from gov.adopt.project import MOVING, git, refuse, resolve
 REFS = "refs/gov/adoption"
 GITLEAKS = ".gitleaks.toml"
 IGNORED = ".gov-runtime/"
-TEMPLATE_GITLEAKS = Path(__file__).resolve().parents[3] / "template" / GITLEAKS
+TEMPLATE_GITLEAKS_REL = f"template/{GITLEAKS}"  # where Gov OS ships it; read through ``fabric.shipped`` when needed
 STATE = "gov-adoption/a6-run.json"  # under the repository's git dir: never in the tree, never staged
 
 
@@ -38,14 +38,31 @@ STATE = "gov-adoption/a6-run.json"  # under the repository's git dir: never in t
 # S5: set-up at A0
 # --------------------------------------------------------------------------
 
+def __getattr__(name: str):
+    """``TEMPLATE_GITLEAKS``, the template's ``.gitleaks.toml`` of the Gov OS source tree gov runs from, found when asked
+    for (never at import); an ``AttributeError`` where gov runs from none."""
+    if name == "TEMPLATE_GITLEAKS":
+        from gov.adopt import fabric
+        from gov.cli.errors import GovError
+
+        try:
+            return fabric.shipped(TEMPLATE_GITLEAKS_REL, None)
+        except GovError as exc:
+            raise AttributeError(f"TEMPLATE_GITLEAKS: {exc.message}") from exc
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 def setup(root: Path) -> dict[str, str]:
     """The files A0 writes with its record: path -> text. Empty when the project is already set up."""
+    from gov.adopt import fabric
+
     files = {}
     if not os.path.lexists(root / GITLEAKS):
+        place = fabric.shipped(TEMPLATE_GITLEAKS_REL, root)  # SHIPPED_FILE_MISSING where Gov OS ships it nowhere
         try:
-            files[GITLEAKS] = TEMPLATE_GITLEAKS.read_text(encoding="utf-8")
+            files[GITLEAKS] = place.read_text(encoding="utf-8")
         except OSError as exc:
-            raise refuse("TEMPLATE_MISSING", f"the project has no {GITLEAKS} and the template's ({TEMPLATE_GITLEAKS}) "
+            raise refuse("TEMPLATE_MISSING", f"the project has no {GITLEAKS} and the template's ({place}) "
                          f"cannot be read: {exc}; nothing is set up") from None
     if project._run(root, ("check-ignore", "-q", IGNORED + "store.db"), (0, 1))[0] == 1:
         try:

@@ -33,7 +33,6 @@ from gov.adopt import assess, memory_sets, project
 from gov.cli.errors import GovError
 from gov.memaudit import declare
 
-GOV_OS = Path(__file__).resolve().parents[3]
 RETRIEVE_BUDGET_MS = 2000  # proposed (W2-88-evidence.md, seams, item 1): the code states no budget for the vector scan
 PLAIN_QUESTION = "where is the project's configuration defined"
 DIGEST_KEYS = ("record", "lexical", "vectors", "codegraph_bytes")
@@ -50,19 +49,69 @@ KERNEL_FILES = (("template/governance/kernel/templates/brief.md", "governance/ke
                 ("template/governance/kernel/templates/role-cto.md", "governance/kernel/templates/role-cto.md"))
 
 
-def _shipped_pool() -> dict:
-    """The ``pool:`` block of ``governance/project/retrieval.yaml`` as Gov OS ships it."""
+MARKERS = ("copier.yml", "template", "src/gov")  # what makes a folder the Gov OS source tree
+
+
+def _source_tree(start: Path | None = None) -> Path | None:
+    """The Gov OS source tree this ``gov`` runs from: the nearest ancestor of the running ``gov`` package that holds
+    ``copier.yml``, ``template/`` and ``src/gov/`` (never a fixed number of levels up: an installed ``gov`` lies in a
+    ``site-packages`` folder, and no ancestor of that is a source tree). None where gov runs from none. ``start`` is
+    a file or folder inside the package, for a test."""
+    here = Path(start or __file__).resolve()
+    for folder in here.parents:
+        if all((folder / marker).exists() for marker in MARKERS):
+            return folder
+    return None
+
+
+def shipped(rel: str, root: Path | None) -> Path:
+    """The path of the file or folder Gov OS ships at ``rel`` (its path in the Gov OS repository), for the adopted
+    repository ``root``. It looks, in order, at (1) the Gov OS source tree, when gov runs from one (``<tree>/<rel>``),
+    and (2) for a ``rel`` under ``template/``, the adopted project's own copy that ``copier copy`` installed
+    (``template/X`` is ``<root>/X``). Found nowhere, it refuses ``SHIPPED_FILE_MISSING``, naming ``rel`` and each place
+    looked (``details``: ``file``, ``looked``): never a default in its place. Every read of a shipped file goes through
+    here, at the time it is needed, never at import."""
+    looked, tree = [], _source_tree()
+    if tree is not None:
+        looked.append(str(tree / rel))
+    if rel.startswith("template/") and root is not None:
+        looked.append(str(Path(root) / rel.removeprefix("template/")))
+    for place in looked:
+        if os.path.exists(place):
+            return Path(place)
+    raise GovError("SHIPPED_FILE_MISSING", f"{rel}: Gov OS ships no such file where this gov can find it (looked in: "
+                   + (", ".join(looked) or "nowhere: gov runs from no Gov OS source tree, and the file is not under "
+                                           "template/ for the project's copy") + "): nothing is installed or written, "
+                   "and no default stands in its place", {"file": rel, "looked": looked})
+
+
+FIXED = {"reranker": "Qwen3-Reranker-0.6B", "reranker_service": "shared", "bundle_tokens": 6000, "widen": "sections"}
+
+
+def standard_of(root: Path | None = None) -> dict:
+    """The standard (S10): the fixed settings and the ``pool:`` block of ``governance/project/retrieval.yaml`` as Gov
+    OS ships it, read now through ``shipped``. Refuses (``SHIPPED_FILE_MISSING``) where the file or its pool is not
+    there: no pool is written in code."""
+    path = shipped(RETRIEVAL, root)
     try:
-        block = yaml.safe_load((GOV_OS / "governance/project/retrieval.yaml").read_text(encoding="utf-8")).get("pool")
-        if isinstance(block, dict):
-            return block
-    except (OSError, AttributeError, yaml.YAMLError):
-        pass
-    return {"meaning_uncut": True, "route_depth": 60, "rerank_depth": 40, "per_file_first10": 2, "drop_nested": True}
+        block = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("pool")
+    except (OSError, UnicodeDecodeError, AttributeError, yaml.YAMLError):
+        block = None
+    if not isinstance(block, dict):
+        raise GovError("SHIPPED_FILE_MISSING", f"{RETRIEVAL}: the file Gov OS ships ({path}) holds no pool: block, so "
+                       "the standard's pool is unknown: no default stands in its place",
+                       {"file": RETRIEVAL, "looked": [str(path)]})
+    return {**FIXED, "pool": block}
 
 
-STANDARD = {"reranker": "Qwen3-Reranker-0.6B", "reranker_service": "shared", "pool": _shipped_pool(),
-            "bundle_tokens": 6000, "widen": "sections"}
+def __getattr__(name: str):
+    """``STANDARD``, for a reader that wants the standard of the source tree gov runs from: read at that moment."""
+    if name == "STANDARD":
+        try:
+            return standard_of(None)
+        except GovError as exc:
+            raise AttributeError(f"STANDARD: {exc.message}") from exc
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 # ---- the standard (S10, F7)
@@ -78,7 +127,7 @@ def _code_settings() -> dict:
 
     shared = (rerank.CACHE_REL, rerank.SOCKET) == SHARED_SERVICE
     return {"reranker": str(rerank.MODEL).rsplit("/", 1)[-1],
-            "reranker_service": STANDARD["reranker_service"] if shared else f"{rerank.CACHE_REL}/{rerank.SOCKET}",
+            "reranker_service": FIXED["reranker_service"] if shared else f"{rerank.CACHE_REL}/{rerank.SOCKET}",
             "bundle_tokens": retrieve.BUNDLE_BUDGET}
 
 
@@ -91,14 +140,16 @@ def settings_of(doc: dict | None) -> dict:
     doc = doc if isinstance(doc, dict) else {}
     return {"reranker": code["reranker"], "reranker_service": code["reranker_service"],
             "pool": doc.get("pool") if declare.pool_on(doc) else False,
-            "bundle_tokens": code["bundle_tokens"], "widen": STANDARD["widen"]}
+            "bundle_tokens": code["bundle_tokens"], "widen": FIXED["widen"]}
 
 
-def departures(doc: dict | None) -> list[dict]:
-    """Every setting that differs from ``STANDARD``: ``[{setting, value}]``. The standard's pool is the whole ``pool:``
-    block as Gov OS ships it: a block that differs in any key (a value, a missing or an added key), or none, departs."""
+def departures(doc: dict | None, standard: dict | None = None) -> list[dict]:
+    """Every setting that differs from the standard (``standard``, else ``standard_of(None)``): ``[{setting, value}]``.
+    The standard's pool is the whole ``pool:`` block as Gov OS ships it: a block that differs in any key (a value, a
+    missing or an added key), or none, departs."""
+    standard = standard or standard_of(None)
     held = settings_of(doc)
-    return [{"setting": name, "value": held[name]} for name in SETTINGS if held[name] != STANDARD[name]]
+    return [{"setting": name, "value": held[name]} for name in SETTINGS if held[name] != standard[name]]
 
 
 def check_keys(doc: dict | None) -> None:
@@ -126,19 +177,20 @@ def read_standard(root: Path, decisions: list[str]) -> dict:
     for each in decisions:
         if not DECISION.fullmatch(each):
             raise project.refuse("BAD_DECISION", f"--decision {each!r} is not a decision id (DEC-n or DEC-n:setting)")
+    standard = standard_of(root)  # the shipped pool, read now: SHIPPED_FILE_MISSING before anything is judged or copied
     head = project.resolve(root, "HEAD")
     raw, doc = declare.retrieval(root, head)
     if raw is None:  # none tracked: the copy A9 installs (Gov OS's, as shipped) is the file in force (B-1.3)
-        raw = (GOV_OS / RETRIEVAL).read_bytes()
+        raw = shipped(RETRIEVAL, root).read_bytes()
         doc = yaml.safe_load(raw.decode("utf-8"))
     check_keys(doc)
-    found = _covered(departures(doc), decisions)
+    found = _covered(departures(doc, standard), decisions)
     unnamed = [item["setting"] for item in found if item["decision"] is None]
     if unnamed:
         raise GovError("STANDARD_DEPARTURE", "the store would be served with " + ", ".join(unnamed) + " other than "
                        "Gov OS's standard and no --decision names it: the stage is not ok (a setting of the standard "
                        "changes only by the owner's decision)", {"settings": unnamed, "standard": {
-                           key: STANDARD[key] for key in unnamed}})
+                           key: standard[key] for key in unnamed}})
     pin = declare.gov_pin(shutil.which("gov") or sys.argv[0] or "gov")
     try:
         from gov.retrieval import semantic
@@ -151,19 +203,21 @@ def read_standard(root: Path, decisions: list[str]) -> dict:
 
 # ---- the copy step (S15, S10; B-1.1, B-1.3)
 
-def _sources() -> list[tuple[str, str]]:
+def _sources(root: Path | None) -> list[tuple[str, str]]:
     """``(from, to)`` for every kernel file A9 installs: the files of the two skill folders (same relative names) and
-    the two templates. A source Gov OS does not ship is a refusal, never a skipped file."""
+    the two templates, ``from`` being the file's path in the Gov OS repository (read through ``shipped``). A source
+    Gov OS ships nowhere is a refusal (``SHIPPED_FILE_MISSING``), never a skipped file."""
     found = []
     for source, target in KERNEL_FOLDERS:
-        base = GOV_OS / source
+        base = shipped(source, root)
         files = sorted(path for path in base.rglob("*") if path.is_file()) if base.is_dir() else []
         if not files:
-            raise GovError("KERNEL_SOURCE_MISSING", f"{source}: Gov OS ships no file there: nothing is installed",
+            raise GovError("KERNEL_SOURCE_MISSING", f"{source}: Gov OS ships no file there ({base}): nothing is installed",
                            {"source": source})
-        found += [(path.relative_to(GOV_OS).as_posix(), f"{target}/{path.relative_to(base).as_posix()}") for path in files]
+        found += [(f"{source}/{path.relative_to(base).as_posix()}", f"{target}/{path.relative_to(base).as_posix()}")
+                  for path in files]
     for source, target in KERNEL_FILES:
-        if not (GOV_OS / source).is_file():
+        if not shipped(source, root).is_file():
             raise GovError("KERNEL_SOURCE_MISSING", f"{source}: Gov OS ships no such file: nothing is installed",
                            {"source": source})
         found.append((source, target))
@@ -174,7 +228,7 @@ def kernel_targets(root: Path) -> list[str]:
     """Every path A9 writes in the repository ``root`` besides its record: the kernel copies and ``retrieval.yaml``. Where
     the sources cannot be listed now, the skill folders' ``SKILL.md`` stands for their files: A9 itself refuses then."""
     try:
-        listed = [target for _, target in _sources()]
+        listed = [target for _, target in _sources(root)]
     except GovError:
         listed = [f"{target}/SKILL.md" for _, target in KERNEL_FOLDERS] + [target for _, target in KERNEL_FILES]
     return [*listed, RETRIEVAL]
@@ -201,10 +255,10 @@ def install(run, head: str) -> dict:
     ``commit`` adds A9's record to the same lists. The copies join ``run.tracked`` (the stores judge them like any
     file). An untracked file at a destination is never overwritten (refused, naming it)."""
     root, tracked = run.root, run.tracked
-    wanted, kept = _sources(), []
+    wanted, kept = _sources(root), []
     if RETRIEVAL in tracked:
         kept.append({"path": RETRIEVAL, "sha256": hashlib.sha256(project.blob(root, tracked[RETRIEVAL])).hexdigest()})
-    elif (GOV_OS / RETRIEVAL).is_file():
+    elif shipped(RETRIEVAL, root).is_file():
         wanted.append((RETRIEVAL, RETRIEVAL))
     else:
         raise GovError("KERNEL_SOURCE_MISSING", f"{RETRIEVAL}: Gov OS ships no such file", {"source": RETRIEVAL})
@@ -216,7 +270,7 @@ def install(run, head: str) -> dict:
               "replaced": {target: tracked[target] for _, target in wanted if target in tracked}}
     try:
         for source, target in wanted:
-            data, place = (GOV_OS / source).read_bytes(), root / target
+            data, place = shipped(source, root).read_bytes(), root / target
             walk = place.parent
             while not walk.exists():
                 copies["dirs"].append(walk)
@@ -689,6 +743,8 @@ def a9(run) -> dict:
     out = _out(args, root)
     decisions = list(getattr(args, "decision", None) or [])
     standard = read_standard(root, decisions)  # CONFIG_INVALID, STANDARD_DEPARTURE: before any copy and any store
+    for rel in (memory_sets.WALLS, memory_sets.BRIEFS):  # what the audit's files are made from: found before the stores
+        shipped(rel, root)
     head = project.resolve(root, "HEAD")
     copies = install(run, head)
     try:
@@ -726,11 +782,11 @@ def _stage(run, out: Path, standard: dict, copies: dict) -> dict:
         (out / "SCALE-PROPOSAL.md").unlink(missing_ok=True)
     domains, dropped = _domains(run.config)
     blind = [project.FOLDER + "/**", memory_sets.WALLS + "/**", "memory-audit/**"]
-    made = memory_sets.variants(GOV_OS / memory_sets.BRIEFS, domains, blind, dropped)
+    made = memory_sets.variants(shipped(memory_sets.BRIEFS, root), domains, blind, dropped)
     audit = f"memory-audit-{datetime.now(timezone.utc):%Y%m%d}"
     sets_root = str(Path.home() / f"{root.name}-memory-sets")
     memory = memory_sets.audit_record(out, sets_root=sets_root, audits=[audit], made=made)
-    memory_sets.walls_act(out, sets_root=sets_root, audit=audit, made=made, blind=blind)
+    memory_sets.walls_act(out, sets_root=sets_root, audit=audit, made=made, blind=blind, root=root)
     price = memory_sets.cost(memory_sets.COST_BASIS_N)
     (out / "memory-audit" / "COST.json").write_text(json.dumps(price, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out / "memory-audit" / "briefs").mkdir(exist_ok=True)

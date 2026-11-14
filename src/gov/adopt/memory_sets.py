@@ -26,7 +26,6 @@ from pathlib import Path
 from gov.memaudit import declare, figures, layout, pool, preflight, schedule
 
 CORE = (preflight, declare, layout, figures, schedule, pool)  # the one core (S20): imported, never restated here
-GOV_OS = Path(__file__).resolve().parents[3]
 BRIEFS = "governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs"
 WALLS = "governance/project/indep-walls"
 KINDS = ("writer", "checker", "auditor")
@@ -127,13 +126,17 @@ def audit_record(out: Path, *, sets_root: str, audits: list[str], made: dict, to
 
 # ---- the walls' ACT (S22)
 
-def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str]) -> Path:
-    """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy, the sets root's spec (mode 0700), the
+def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[str], root: Path | None = None) -> Path:
+    """Write ``<out>/memory-audit/ACT-WALLS/``: the walls' template copy (as Gov OS ships it, found by
+    ``fabric.shipped``, refused ``SHIPPED_FILE_MISSING`` where it is nowhere), the sets root's spec (mode 0700), the
     approved list with the three variant briefs, the path map's hidden globs and the refresh the operator installs.
     Nothing is applied: no folder is made at the sets root, no path map and no crontab is changed."""
+    from gov.adopt import fabric
+
+    walls = fabric.shipped(WALLS, root)
     act = Path(out) / "memory-audit" / "ACT-WALLS"
     (act / "walls").mkdir(parents=True, exist_ok=True)
-    for source in sorted((GOV_OS / WALLS).glob("*")):
+    for source in sorted(walls.glob("*")):
         if source.is_file():
             (act / "walls" / source.name).write_bytes(source.read_bytes())
     (act / "sets-root.json").write_text(json.dumps({"path": sets_root, "mode": "0700", "create": True}, indent=2) + "\n",
