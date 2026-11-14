@@ -454,6 +454,8 @@ the suite's exit 1: the lead's brief says "exits 2", 2 being argparse's usage er
   minutes) on a copy of the tree of its own, the new form on all 5,000; both figures are printed and in the failure message. No secret-shaped string sits in a test file (W2-81's
   `make_secret`, built from parts in the case's tmp folder).
 
+Revised (lead's interface correction, DEC-1052): the refusal is checked in the envelope; the stderr line only without `--json`.
+
 **Seams and plants.** The release form (S24): a `git archive HEAD` export is built with `python3 -m pip wheel -q --no-deps --no-build-isolation --no-index`, installed with
 `pip --python <venv> install --no-deps --no-index` into a fresh venv (`--system-site-packages --without-pip`), all in the module's tmp folder, never on the machine; the kit by
 `copier copy --trust --defaults --skip-tasks --overwrite --vcs-ref v0.0.0-s24` from a small repository holding `copier.yml` and `template/` of HEAD with that tag (a clone of the

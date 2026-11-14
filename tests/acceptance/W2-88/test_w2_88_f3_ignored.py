@@ -121,9 +121,9 @@ def impose(project: Path, where: str, box) -> dict:
 def assert_path_ignored_refusal(run, spec: dict, stage: str, project: Path, before: dict, log: Path, out: Path | None) -> None:
     W.assert_refused(run, "ADOPT_PATH_IGNORED", f"stage {stage} on a repository that ignores {spec['rule']!r}", stage=stage)
     assert run.returncode == 1, f"gov adopt exits {run.returncode}; a refusal exits 1 in this suite (2 is argparse's usage error)\n{run.describe()}"
-    assert f"gov adopt: ADOPT_PATH_IGNORED: " in run.stderr, f"stderr does not hold the refusal as `gov adopt: ADOPT_PATH_IGNORED: <message>`\n{run.describe()}"
     error = run.error
     message = str(error.get("message", ""))
+    assert error.get("code") == "ADOPT_PATH_IGNORED" and message.strip(), f"the envelope's error does not hold the code ADOPT_PATH_IGNORED and a message: {error!r}\n{run.describe()}"
     ignored = (error.get("details") or {}).get("ignored")
     assert isinstance(ignored, list) and ignored, f"details.ignored is no list of ignored paths: {error.get('details')!r}"
     for item in ignored:
