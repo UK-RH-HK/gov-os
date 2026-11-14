@@ -1,10 +1,10 @@
 ---
 name: frontend
-version: "1.0.0"
+version: "1.1.0"
 description: "The engineer's skill for frontend tickets: interface conventions, accessibility, state and browser support, with a pre-commit checklist and the unit-test focus. Use beside the engineer role when a ticket changes interface code."
 output: "the ticket's own allowed paths"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Frontend
@@ -105,8 +105,11 @@ If any is false: fix, then check again.
   evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action); refused
   twice for the same call, stop and return; an authentication error returns `AUTH_REQUIRED` (the orchestration
   skill's briefs-and-returns.md).
-- A support-list gap or an interface point the ticket leaves open goes in `discoveries`: take the simplest reading,
-  never widen the scope.
+- An interface point the ticket leaves open (a name, a layout, a detail inside its paths) goes in `discoveries`: take
+  the simplest reading, never widen the scope.
+- A question the spec leaves open about what its browser-support list or an approved flow promises for a browser on
+  the list (for example whether a plain page change meets the design's intent) is not an interface point: build the
+  safe, reversible fallback meanwhile, and send the question as a P1 package (Escalation), not as a note alone.
 
 ## Escalation
 
@@ -116,8 +119,10 @@ never to the owner directly.
 - P3: a naming or layout choice inside the ticket's paths that changes no KPI; note it in `discoveries`.
 - P2: a change to a component or style shared with another stream; a change to the ticket's scope or KPIs within the
   approved spec.
-- P1: a change to the spec's browser-support list or to an approved flow; a KPI that only an inaccessible control can
-  meet; a new dependency or install; anything that fails open.
+- P1: a change to the spec's browser-support list or to an approved flow; a question the spec leaves open about what
+  its support list or an approved flow promises for a browser on the list, since settling it reads the spec: send it
+  with the options and their cost and a recommendation, to whoever started you, and build the safe fallback
+  meanwhile; a KPI that only an inaccessible control can meet; a new dependency or install; anything that fails open.
 - Emergency: a secret or key found in client code or in the bundle; a risk of losing the user's data; the guard failing
   open. Stop the affected work at once, then go up as a P1.
 
