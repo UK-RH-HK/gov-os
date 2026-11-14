@@ -435,7 +435,7 @@ def test_s10_without_fix_the_variants_front_matter_is_refused_10_as_today(fw):
 
 
 # =====================================================================================================================
-# S11 -- the usage line; the walls, the briefs and the schemas unchanged
+# S11 -- the usage line; the walls and the briefs unchanged, of the schemas only the counts schema changed (S13)
 # =====================================================================================================================
 def _doc():
     return ast.get_docstring(ast.parse(SCRIPT.read_text()), clean=False)
@@ -462,7 +462,11 @@ def _git(*args):
     return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True, timeout=120)
 
 
-def test_s11_f6_the_branch_changes_no_wall_brief_or_schema_file():
+COUNTS_SCHEMA_REL = "governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json"
+
+
+def test_s11_f6_the_branch_changes_no_wall_or_brief_file_and_of_the_schemas_only_the_counts_schema():
+    # S13 (2026-11-14) changes indep-counts.schema.json by this ticket: it alone may differ under indep-schemas/
     ref = _git("rev-parse", "--verify", "--quiet", "w2/integrate")
     if ref.returncode != 0:
         pytest.skip("w2/integrate is not a ref in this repository")
@@ -472,7 +476,7 @@ def test_s11_f6_the_branch_changes_no_wall_brief_or_schema_file():
                "governance/project/orchestration/tools/indep-schemas/"]
     changed = _git("diff", "--name-only", base, "--", *guarded).stdout.split()
     untracked = _git("ls-files", "--others", "--exclude-standard", "--", *guarded).stdout.split()
-    assert changed == [] and untracked == [], (changed, untracked)
+    assert [c for c in changed if c != COUNTS_SCHEMA_REL] == [] and untracked == [], (changed, untracked)
 
 
 # =====================================================================================================================
