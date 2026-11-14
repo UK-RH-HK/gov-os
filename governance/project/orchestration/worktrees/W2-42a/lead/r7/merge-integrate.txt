@@ -1,0 +1,8 @@
+Merge w2/integrate (d79c8c939) into w2/W2-42a: the base for R4 (D1, blob-ref diffs judged as reads) and R5 (the judge never raises) (DEC-1157 (12), DEC-1180 (4))
+
+No conflict; no change under src/gov/guard/, tests/acceptance/W2-42a/ or tests/unit/guard/ from the integration side.
+
+Task: DAEO-03ub
+Role: orchestrator
+Implements: DEC-1157, DEC-1180
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

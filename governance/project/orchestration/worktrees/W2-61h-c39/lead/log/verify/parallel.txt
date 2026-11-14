@@ -83,4 +83,46 @@ ss...................................................................... [  7%]
 ........................................................................ [ 97%]
 ........................................................................ [ 98%]
 ........................................................................ [ 99%]
-...
+..................                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-42/popen-gw5/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-61h-c39/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=1622021) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:72: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:81: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:104: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:140: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:158: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:174: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/acceptance/W2-61h/test_w2_61h_hidden_form.py:214: GOV_EVAL_SETS_ROOT is not set: the hidden half is held outside every tree (G-3), never read by an ordinary run
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+1 failed, 5836 passed, 13 skipped, 6 warnings in 760.42s (0:12:40)

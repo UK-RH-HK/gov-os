@@ -370,6 +370,8 @@ W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
 W2-94-fix DAEO-g87r W2-94-A5-fix1.md W2-94-A5-fix1.json
 W2-61h-c39 DAEO-h2k3 W2-61h-A5-n2.md W2-61h-A5-n2.json
 # 14:48 W2-184 f2: narrow check rv-f1 with --owner-named DEC-1177 (P-W2-184-4 (a))
-W2-184 DAEO-6f0s W2-184-A5-f2.md W2-184-A5-f2.json
+# W2-184 DAEO-6f0s W2-184-A5-f2.md W2-184-A5-f2.json  # DONE 15:17 0a2dde35c0cc (narrow PASS; accept 507/0) -> LAND
 # 15:04 W2-188 s5: one case revised (P-W2-188-S5 (a)), narrow check
 W2-188 DAEO-zlog W2-188-A5-s5.md W2-188-A5-s5.json
+# 15:18 W2-42a r4: R4 (D1) + R5 (error path), DEC-1157 (12), DND 122/123
+W2-42a DAEO-03ub W2-42a-A5-r4.md W2-42a-A5-r4.json
