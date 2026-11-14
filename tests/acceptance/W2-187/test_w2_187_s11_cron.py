@@ -17,11 +17,13 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 
 import pytest
 
+import w2_187_push as P
 import w2_187_world as W
 
 KEY = "repo-0123abcd"
@@ -180,6 +182,55 @@ def test_s11_acts_step_6_is_the_repositorys_cron_line_for_mondays_at_21_and_is_n
     for n in "12345":
         assert any(x.startswith(f"{n}. ") for x in text.splitlines()), f"step {n} is still there"
     assert world.crontab_calls() == "" and not os.path.exists(sets_root), "text only: no crontab read, no folder made"
+
+
+def cron_span(row: str) -> str:
+    """Step 6's cron line, white space collapsed and code marks dropped: from ``0 21 * * 1`` to the wrapper's ``--repo``."""
+    flat = " ".join(row.replace("`", "").split())
+    start, end = flat.find("0 21 * * 1"), flat.find("memaudit_cron.sh --repo")
+    assert 0 <= start < end, f"step 6 holds the cron line: {row}"
+    return flat[start:end + len("memaudit_cron.sh --repo")]
+
+
+@pytest.mark.parametrize("planted", [True, False], ids=["gitleaks-on-path", "none-on-path"])
+def test_s11_step_6s_cron_line_names_the_gitleaks_a9_found_on_the_path_or_a_placeholder(make_world, tmp_path, planted):
+    """Review round 1's R1 (the CTO's fix of 2026-11-14): cron's ``PATH`` does not hold ``~/.local/bin``, so A9's step 6 line
+    carries ``GOV_MEMAUDIT_GITLEAKS=<gitleaks>`` before the wrapper: the absolute path ``shutil.which("gitleaks")`` gives when
+    A9 runs, else the literal ``<path to gitleaks>``. The rest of the line and I13's sentence stay. ``PATH`` is planted whole: a
+    folder with a planted ``gitleaks`` (never run) first, or none holding one."""
+    world = make_world(link=False)
+    empty = tmp_path / "pathbin"                     # git and nothing else
+    empty.mkdir()
+    (empty / "git").symlink_to(shutil.which("git"))
+    path = str(empty)
+    expected = "<path to gitleaks>"
+    if planted:
+        glbin = tmp_path / "glbin"
+        glbin.mkdir()
+        exe = glbin / "gitleaks"
+        exe.write_text("#!/bin/sh\necho planted gitleaks must not run >&2\nexit 9\n", encoding="utf-8")
+        exe.chmod(0o755)
+        path = f"{glbin}{os.pathsep}{empty}"
+        expected = shutil.which("gitleaks", path=path)
+        assert expected and os.path.isabs(expected)
+    else:
+        assert shutil.which("gitleaks", path=path) is None
+    out = world.base / "adoption-out"
+    sets_root = str(world.base / "never-made-sets")
+    env = world.child_env(spy=False, extra={"PYTHONPATH": str(W.SRC), "PATH": path})
+    done = subprocess.run([sys.executable, str(W.HERE / "call_walls_act.py"), str(out), sets_root, "memory-audit-20261113",
+                           str(world.repo)], cwd=str(world.work), env=env, capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stderr[-800:]
+    text = (out / "memory-audit" / "ACT-WALLS" / "ACT.md").read_text(encoding="utf-8")
+    row = step6(text)
+    line = cron_span(row)
+    names = {expected} | ({os.path.realpath(expected)} if planted else set())
+    assert any(f"GOV_MEMAUDIT_GITLEAKS={n} " in line for n in names), f"GOV_MEMAUDIT_GITLEAKS={expected} before the wrapper: {line}"
+    if planted:
+        assert "<path to gitleaks>" not in row, row
+    assert f"GOV_MEMAUDIT_SETS_ROOT={sets_root}" in line and f"memaudit_cron.sh --repo {world.repo}" in " ".join(row.split()), row
+    assert P.squash(P.STEP6_SENTENCE) in P.squash(row), "I13's step-6 sentence stays"
+    assert world.crontab_calls() == "" and not os.path.exists(sets_root), "text only"
 
 
 def test_s11_without_a_repo_the_cron_line_names_the_git_top_level_of_the_adoption_folder(make_world):

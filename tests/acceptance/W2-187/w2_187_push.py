@@ -2,7 +2,9 @@
 
 Planted under pytest's ``tmp_path``: a small repository with a bare remote (the remote holds the first commit of ``main``, the
 repository its second), a fake ``gitleaks`` (a script that logs its argv, writes a planted JSON report to ``--report-path`` and
-exits with a planted code; it never runs the real one), and the runs folder whose ``indep/memaudit/<key>/`` is the key folder.
+exits with a planted code; it never runs the real one; with ``land`` in its plan it commits, while it runs, a file holding the
+planted key on the repository's branch and writes the new commit to ``landed.txt``: review round 1's F-B), and the runs folder
+whose ``indep/memaudit/<key>/`` is the key folder.
 ``python3 -m gov.memaudit push`` runs in a child process with this tree's ``src/`` first on ``PYTHONPATH``.
 """
 
@@ -48,6 +50,18 @@ if plan.get("probe"):
     seen = subprocess.run(["git", "--git-dir=" + plan["probe"], "rev-parse", "refs/heads/main"], capture_output=True, text=True)
     open(os.path.join(HERE, "seen.txt"), "w").write(seen.stdout)
 secret = plan.get("secret", "")
+if plan.get("land"):
+    import subprocess
+    land = plan["land"]
+    with open(os.path.join(land["repo"], land["file"]), "w") as f:
+        f.write("key=" + secret + "\\n")
+    genv = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.invalid", GIT_COMMITTER_NAME="t",
+                GIT_COMMITTER_EMAIL="t@example.invalid", HOME=land["home"], GIT_CONFIG_NOSYSTEM="1")
+    for args in (["add", "-A"], ["commit", "-q", "-m", "landed during the scan"]):
+        subprocess.run([land["git"], "-C", land["repo"], *args], env=genv, check=True, capture_output=True)
+    done = subprocess.run([land["git"], "-C", land["repo"], "rev-parse", "HEAD"], env=genv, check=True, capture_output=True,
+                          text=True)
+    open(os.path.join(HERE, "landed.txt"), "w").write(done.stdout.strip())
 if plan.get("noise"):
     print(plan["noise"] + " " + secret)
     print(plan["noise"] + " " + secret, file=sys.stderr)

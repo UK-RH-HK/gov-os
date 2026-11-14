@@ -9,11 +9,15 @@ pinned prompts, schemas and cut, nothing but ``claude.py`` builds the model call
 Every search result carries ``result.store.commit`` (W2-138): one from another store makes the attempt a fault (``FAULT
 attempt-<n>: store_commit``), one restart, then ``STOPPED fault`` (and the week may start once more, S2); a later search from
 another commit is a counted search failure with an empty bundle (``why`` ``store``).
+
+The searched store is the declared store (review round 1's F-A, the CTO's fix): with the repository's own store at another
+commit than the store link's, a standing run's searches all run in the link's work tree and pass the store-commit check.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -119,3 +123,31 @@ def test_s3_a_result_with_no_store_commit_is_a_fault(make_world):
     run = world.standing_run()
     assert run.code == 2, run
     assert "FAULT attempt-1: store_commit" in (world.std_state / "measure.out").read_text(encoding="utf-8")
+
+
+# -- review round 1's F-A (the CTO's fix of 2026-11-14, DEC-1157 (12)): the searched store is the declared store ------------
+def test_s3_every_search_of_a_standing_run_reaches_the_store_links_store_though_the_repositorys_own_is_at_another_commit(
+        make_world):
+    """The repository holds its own ``.gov-runtime/store.db`` built at another commit (the base commit) than the store link's
+    (the audit commit), and the planted ``gov`` answers ``result.store.commit`` from the store of the folder it runs in, as the
+    real one does. The ``preflight``, ``measure`` and ``judge`` children work in the link's work tree (I6), so every search
+    reaches the link's store: no ``FAULT ... store_commit``, no ``STOPPED``, a verdict, and every logged search ran in the
+    link's work tree, the declaration's ``store_commit`` being the link's."""
+    world = make_world(std="pass")
+    link_store = world.link_head()
+    assert link_store == world.audit_commit != world.base_commit
+    world.plant_repo_store(world.base_commit)
+    world.write_x_plan(store_from="root")
+    run = world.standing_run()
+    measure_out = world.std_state / "measure.out"
+    out = measure_out.read_text(encoding="utf-8") if measure_out.exists() else ""
+    assert "store_commit" not in out, f"an attempt faulted on the store commit: {out[-600:]}"
+    assert not (world.std_week / "STOPPED").exists(), run
+    assert run.code == 0 and run.lines[-1] == f"STANDING {world.week} right 80 of 80: passes", run
+    assert world.std_json("DECLARATION.json")["store_commit"] == link_store, "the declared store is the link's"
+    roots = world.search_roots()
+    link = os.path.realpath(world.link)
+    assert len([s for s, _ in roots if s == "measure"]) >= 80, roots[:5]
+    assert len([s for s, _ in roots if s == "judge"]) >= 3, "the three second searches (q10, q20, q30) are the judge's"
+    assert {r for _, r in roots} == {link}, f"searches ran outside the link's work tree: {sorted({r for _, r in roots} - {link})}"
+    assert world.std_json("FIGURES.json")["beside"]["search_failures"] == 0, "no later search came from another store"
