@@ -14,13 +14,12 @@ Standard library, PyYAML and git; no gov import. The CTO runs it, from the repos
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1/labeller.md --brief-sha256 bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068 --commit 6ff398a28 --set tuning --round 2
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1/labeller-2.md --brief-sha256 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904 --commit 6ff398a28 --set held-out --round 2
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --brief governance/project/indep-briefs/sgx1/overlap-auditor.md --brief-sha256 b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab --commit 6ff398a28 --set held-out --audit sgx1-overlap
-  python3 governance/project/orchestration/tools/indep_launch.py --sets-root /tmp/planted-sets --kind writer --brief governance/project/indep-briefs/writer.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --seed 17 --dry
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/examin-sets/EXAMIN-writer-q02-fix.md --brief-sha256 0703aebf69522cbb853d77f4e134e03843f1d961307b46c77ceaa575fa469173 --commit 6ff398a28 --set examin --round 2 --fix q02 --reason ANSWER_NOT_IN_SPANS
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --run 20261109T120000Z-memory-recall-3-r1 --counts-only
 
 The line names only --sets-root <root>: never a folder under it (the guard's line rule, DEC-1097 (2)); the script
-derives every folder under the root in its own code. --dry belongs on planted sets roots only: it leaves its wall and
-tree in place for inspection (P-W2-149-DRY, option (a)).
+derives every folder under the root in its own code. --dry (with --seed <integer>, on a writer line like the first)
+belongs on planted sets roots only: it leaves its wall and tree in place for inspection (P-W2-149-DRY, option (a)).
 
 Set-up A (SANDBOX-GUARD-EXP-1; DEC-1112 (3), DEC-1113): a brief whose front matter names a `brief:` id takes its
 missing `model`, `result_schema` and `sample` from that id's entry under the template kinds.yaml's `briefs:`, and the
@@ -534,8 +533,9 @@ def parse_args(argv):
     p.add_argument("--dry", action="store_true", help="build the wall and stop (planted sets roots only)")
     p.add_argument("--counts-only", action="store_true", help="print a run's counts.json; build nothing")
     p.add_argument("--run", help="with --counts-only: the run id")
-    p.add_argument("--fix", help="the writer's round 2 only, with --reason: the one question's id (q00 to q99)")
-    p.add_argument("--reason", help="with --fix: the check's reason code")
+    # the fix flow's pair is documented in the docstring's usage line, not in the option list (W2-149's pinned list)
+    p.add_argument("--fix", help=argparse.SUPPRESS)
+    p.add_argument("--reason", help=argparse.SUPPRESS)
     return p.parse_args(argv)
 
 
