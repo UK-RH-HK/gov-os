@@ -188,7 +188,7 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
      from their answers (0.43 against 0.41), yet score 84.6 % against 67.8 %.
    - **The practice:**
      - a set used to choose or judge a fix is a tuning set from then on;
-     - a verdict comes only from a set nothing was tuned on: a fresh blind set, used once, or the standing set behind its walls, judged every week with counts only, never used to choose or judge a fix, and checked each month against a fresh set (§9; DEC-1179);
+     - a verdict comes only from a set nothing was tuned on: a fresh blind set, used once, or the standing set, which sits behind its walls, is judged every week with counts only, never chooses or judges a fix, and is checked each month against a fresh set (§9; DEC-1179);
      - consistency is judged within 5 points, on sets of about 80;
      - the next lever is chosen from the misses' kinds (never retrieved against ranked low).
 7. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
