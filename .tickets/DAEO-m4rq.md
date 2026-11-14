@@ -1,6 +1,6 @@
 ---
 id: DAEO-m4rq
-status: in_progress
+status: closed
 deps: [DAEO-h2k3]
 links: [DAEO-h2k3]
 created: 2026-11-06T15:40:00Z
