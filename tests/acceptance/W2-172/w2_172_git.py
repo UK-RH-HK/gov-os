@@ -21,7 +21,7 @@ import shutil
 from datetime import timedelta
 from pathlib import Path
 
-from w2_172_world import Driver, NOW, W171, iso, parse_iso
+from w2_172_world import Driver, NOW, W171, iso, parse_iso, state_key
 
 PLAIN = [f"docs/p{k:03d}.md" for k in range(94)]
 RETR = ["src/gov/retrieval/a.py", "src/gov/retrieve/b.py", "src/gov/store/c.py", "src/gov/codeintel/d.py",
@@ -39,13 +39,14 @@ class Light(Driver):
         self.base = Path(base)
         self.home, self.work, self.state = (self.base / n for n in ("home", "work", "state"))
         self.sets, self.repo, self.link = self.base / "sets", self.base / "repo", self.base / "link"
-        self.runs = self.base / "launch-log"
-        self.mem = self.runs / "indep" / "memaudit"
+        self.runs_env = self.base / "launch-log"  # $GOV_INDEP_RUNS_DIR
+        self.mem = self.runs_env / "indep" / "memaudit" / state_key(self.repo)  # W2-187 I2 (Rewrite-Reason: DEC-1179 (5))
+        self.runs = self.mem  # the folder whose ``indep/`` holds AUDITS.log (as ``<runs>/indep`` was)
         self.audits_log = self.runs / "indep" / "AUDITS.log"
         self.spy_dir = self.base / "nospy"
         self.now = now
         self.audit_commit = None
-        for p in (self.home, self.work, self.state, self.sets, self.runs / "indep", self.repo):
+        for p in (self.home, self.work, self.state, self.sets, self.runs_env / "indep", self.repo):
             p.mkdir(parents=True, exist_ok=True)
         self.git("init", "-q")
         self.git("checkout", "-q", "-b", "main")
