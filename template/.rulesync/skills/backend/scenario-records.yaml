@@ -1,0 +1,133 @@
+records:
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 1
+  title: A handler that a retry runs twice
+  verdict: pass
+  cause: null
+  cost_usd: 0.450697
+  seconds: 91.441
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:28:18+00:00'
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 2
+  title: A column rename on a table a running service reads
+  verdict: pass
+  cause: null
+  cost_usd: 0.268347
+  seconds: 54.822
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:29:54+00:00'
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 3
+  title: A fix that needs another stream's shared module
+  verdict: pass
+  cause: null
+  cost_usd: 0.19426
+  seconds: 31.18
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:30:52+00:00'
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 1
+  title: A handler that a retry runs twice
+  verdict: pass
+  cause: null
+  cost_usd: 0.456314
+  seconds: 97.413
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:39:07+00:00'
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 2
+  title: A column rename on a table a running service reads
+  verdict: pass
+  cause: null
+  cost_usd: 0.255117
+  seconds: 46.587
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:40:49+00:00'
+- skill: backend
+  skill_version: 1.0.0
+  scenario: 3
+  title: A fix that needs another stream's shared module
+  verdict: pass
+  cause: null
+  cost_usd: 0.191129
+  seconds: 29.878
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:41:38+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 1
+  title: A handler that a retry runs twice
+  verdict: pass
+  cause: null
+  cost_usd: 0.456852
+  seconds: 96.382
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:34:47+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 2
+  title: A column rename on a table a running service reads
+  verdict: pass
+  cause: null
+  cost_usd: 0.256089
+  seconds: 46.999
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:36:29+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 3
+  title: A fix that needs another stream's shared module
+  verdict: pass
+  cause: null
+  cost_usd: 0.21676
+  seconds: 35.0
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T02:37:17+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 1
+  title: A handler that a retry runs twice
+  verdict: pass
+  cause: null
+  cost_usd: 0.441262
+  seconds: 87.497
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:17:54+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 2
+  title: A column rename on a table a running service reads
+  verdict: pass
+  cause: null
+  cost_usd: 0.244629
+  seconds: 42.036
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:19:26+00:00'
+- skill: backend
+  skill_version: 1.0.1
+  scenario: 3
+  title: A fix that needs another stream's shared module
+  verdict: pass
+  cause: null
+  cost_usd: 0.187167
+  seconds: 26.906
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:20:12+00:00'

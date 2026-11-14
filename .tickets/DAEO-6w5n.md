@@ -33,7 +33,7 @@ kpis:
 non_goals:
 - the dispatcher core (W2-121, part a) and the other parts
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb, W2-H046]
+sources: [DEC-1007, DEC-1008, DEC-1003, DEC-979, DEC-998, DEC-1009, DEC-1010, DEC-1014, DEC-1015, DEC-1018, DEC-1030, DEC-1031, DEC-1083, DEC-1084, DEC-1088, DEC-715, DEC-944, DEC-952, DEC-982, DEC-983, DEC-989, DEC-995, DAEO-ts4y, DAEO-1ahb]
 acceptance_tests:
   path: tests/acceptance/W2-121d/
   author: independent-test-designer (MR-3); written before implementation

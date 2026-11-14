@@ -40,6 +40,15 @@ MODEL = r"claude(?:-[a-z0-9]+)+"
 DEFAULT_LINE = re.compile(rf"- \*\*Launch default:\*\* model ({MODEL}), effort ({'|'.join(EFFORTS)})")
 SKILLS_LINE = re.compile(r"- \*\*Skills:\*\* ([a-z0-9-]+(?:, [a-z0-9-]+)*)")
 DEFAULT_FORM = "- **Launch default:** model <model>, effort <effort>"
+# W2-184 (DEC-1120 (2)): the optional line with the four entries of RUBRIC-2's table, C3, C2, C1, C0 in that order.
+TABLE_HEAD = "- **Launch by criticality:**"
+TABLE_LINE = re.compile(r"- \*\*Launch by criticality:\*\* (.+)")
+TABLE_FORM = ("- **Launch by criticality:** C3 model <model>, effort <effort>; C2 ...; C1 ...; C0 ... "
+              "(an entry may read: C<n> model <model>, effort <effort> on FULL, model <model>, effort <effort> "
+              "otherwise)")
+TABLE_CLASSES = ("C3", "C2", "C1", "C0")
+_PAIR = rf"model ({MODEL}), effort ({'|'.join(EFFORTS)})"
+TABLE_ENTRY = re.compile(rf"(C[0-3]) {_PAIR}(?: on FULL, {_PAIR} otherwise)?")
 
 
 def _refuse(reason: str) -> GovError:
@@ -240,6 +249,30 @@ def launch_default(root: Path, role: str) -> tuple[str, str]:
     return default.group(1), default.group(2)
 
 
+def _table(lines: list[str], rel: str) -> dict | None:
+    """The ``Launch by criticality`` line's entries: ``{class: {"full": (model, effort), "other": (model, effort)}}``
+    in the order C3, C2, C1, C0; ``None`` when the role file has no such line. An entry of the plain form gives one
+    pair for both keys; the FULL form gives its first pair on a FULL ticket and its second otherwise."""
+    match = _one_line(lines, TABLE_HEAD, TABLE_LINE, rel, TABLE_FORM, False)
+    if match is None:
+        return None
+    entries = [TABLE_ENTRY.fullmatch(entry) for entry in match.group(1).split("; ")]
+    if None in entries or [entry.group(1) for entry in entries] != list(TABLE_CLASSES):
+        raise _refuse(f"the role file {rel} must hold its line '{TABLE_FORM}' once, whole and of that form: the four "
+                      f"entries C3, C2, C1, C0, in that order, each once, separated by '; '")
+    table = {}
+    for entry in entries:
+        first = (entry.group(2), entry.group(3))
+        table[entry.group(1)] = {"full": first, "other": (entry.group(4), entry.group(5)) if entry.group(4) else first}
+    return table
+
+
+def read_by_criticality(root: Path, role: str) -> dict | None:
+    """The role file's table alone (``_table``): the same file and refusals as ``read_role``'s for that line."""
+    rel, _, lines = _role_file(root, role)
+    return _table(lines, rel)
+
+
 def read_role(root: Path, role: str) -> dict:
     """The role file read once: its path, bytes, version, sha256, default model and effort, and the skills.
 
@@ -249,7 +282,8 @@ def read_role(root: Path, role: str) -> dict:
     rel, data, lines = _role_file(root, role)
     version = _one_line(lines, VERSION_HEAD, VERSION_LINE, rel, "- **Version:** <major>.<minor>.<patch>", True)
     default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
-    named_line = _one_line(lines, SKILLS_HEAD, SKILLS_LINE, rel, "- **Skills:** <name>, <name>", False)
+    by_criticality = _table(lines, rel)
+    named_line =_one_line(lines, SKILLS_HEAD, SKILLS_LINE, rel, "- **Skills:** <name>, <name>", False)
     named = named_line.group(1).split(", ") if named_line else []
     if len(set(named)) != len(named):
         raise _refuse(f"the role file {rel} names a skill twice in its line '- **Skills:**'")
@@ -265,5 +299,5 @@ def read_role(root: Path, role: str) -> dict:
         appended.append(skill["text"])
     text = b"".join(part if part.endswith(b"\n") else part + b"\n" for part in appended)
     return {"role_text": {"path": rel, "version": version.group(1), "sha256": sha256(data)},
-            "model": default.group(1), "effort": default.group(2), "appended": text,
+            "model": default.group(1), "effort": default.group(2), "by_criticality": by_criticality, "appended": text,
             "skills": [{k: v for k, v in skill.items() if k != "text"} for skill in skills.values()] + _commands(root)}

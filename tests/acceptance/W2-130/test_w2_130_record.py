@@ -71,17 +71,31 @@ def test_s8_counts_before_are_at_the_starting_head_and_counts_after_at_the_last_
     assert s.need_hash(after["head"], "counts-after.head") == record.commit_list("cleanup")[-1]
 
 
-def test_s8_gov_links_at_head_gives_the_after_counts(record, head_findings, head_tree):
+def _measured_at(record) -> str:
+    """The record's ``counts-after.measured_at`` (checked in ``w2_130_support.measured_at``), its block's shape checked first."""
+    _shape(record.data("counts-after"), "counts-after")
+    return s.measured_at(record)
+
+
+def test_s8_gov_links_at_head_gives_the_after_counts(record, pinned_findings):
+    """Reads the tree at ``counts-after.measured_at`` (the tree the record says it counted), not HEAD, and runs that tree's
+    own ``gov links`` (``PYTHONPATH=<clone>/src``), not the branch's: the pinned tree and the pinned tool. It compares the
+    record's after counts with the findings, and reads each ticket's status in that same tree. The name is kept because the
+    README map names it (DEC-1156 (7) pin run 2)."""
     after = record.data("counts-after")
-    _shape(after, "counts-after")
-    mine = _counts(head_findings, head_tree)
-    assert {k: v for k, v in after["by_code"].items() if v} == mine["by_code"]
-    assert {c: {r: n for r, n in rs.items() if n} for c, rs in after["by_code_role"].items() if sum(rs.values())} == mine["by_code_role"]
-    assert {k: v for k, v in after["unlinked_by_status"].items() if v} == mine["unlinked_by_status"]
+    tree, findings = pinned_findings(_measured_at(record))
+    mine = _counts(findings, tree)
+    assert {k: v for k, v in after["by_code"].items() if v} == mine["by_code"], "by_code differs from gov links at measured_at"
+    assert {c: {r: n for r, n in rs.items() if n} for c, rs in after["by_code_role"].items() if sum(rs.values())} == mine["by_code_role"], (
+        "by_code_role differs from gov links at measured_at")
+    assert {k: v for k, v in after["unlinked_by_status"].items() if v} == mine["unlinked_by_status"], (
+        "unlinked_by_status differs from gov links at measured_at")
 
 
 def test_s8_the_before_counts_of_the_codes_the_clean_up_works_on_equal_gov_links_at_the_starting_head(record, start_findings):
-    """Tool-version sensitive: HEAD's gov links run on the starting head, for the three codes the ticket names."""
+    """Reads the starting head (232efc47d) and runs that commit's own ``gov links`` (``PYTHONPATH=<clone>/src``), not
+    HEAD's tool: ``start_findings`` is ``pinned_findings(START)``. Compares the three codes the ticket names with the
+    record's before counts. The name is kept because the README map names it (DEC-1156 (7) pin run 2)."""
     before = record.data("counts-before")
     _shape(before, "counts-before")
     mine = collections.Counter(f["code"] for f in start_findings)
@@ -89,16 +103,20 @@ def test_s8_the_before_counts_of_the_codes_the_clean_up_works_on_equal_gov_links
         assert before["by_code"].get(code, 0) == mine.get(code, 0), f"{code}: record {before['by_code'].get(code, 0)}, gov links {mine.get(code, 0)}"
 
 
-def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, head_findings):
+def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, pinned_findings):
+    """Compares ``left`` (D-5, D-6, D-9 by path and role) with what ``gov links`` finds in the tree at
+    ``counts-after.measured_at``, not HEAD, run by that tree's own ``gov links`` (``PYTHONPATH=<clone>/src``), not the
+    branch's. The name is kept because the README map names it (DEC-1156 (7) pin run 2)."""
     left = record.data("left")
     assert isinstance(left, dict) and {"D-5", "D-6", "D-9"} <= set(left), "left lacks D-5, D-6 or D-9"
+    _, findings = pinned_findings(_measured_at(record))
     for area, prefixes in AREAS.items():
         mine = collections.defaultdict(dict)
-        for f in head_findings:
+        for f in findings:
             if f["path"].startswith(prefixes):
                 mine[f["path"]][f["role"]] = mine[f["path"]].get(f["role"], 0) + 1
         assert isinstance(left[area], dict), f"left.{area} is not a mapping path -> role -> n"
-        assert {p: dict(r) for p, r in left[area].items()} == dict(mine), f"left.{area} differs from the findings at HEAD"
+        assert {p: dict(r) for p, r in left[area].items()} == dict(mine), f"left.{area} differs from the findings at measured_at"
 
 
 def test_f4_e12f8a30c_has_w2_129_s_landing_and_w2_92_s_stated_links_as_ancestors():

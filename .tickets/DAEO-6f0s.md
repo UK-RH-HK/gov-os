@@ -7,7 +7,7 @@ type: task
 class: implementation
 role: engineer
 profile: FULL
-status: in_progress
+status: closed
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-13
@@ -42,7 +42,7 @@ non_goals:
 - 'not W2-60a''s reviewed core (role text, skills, the record''s base fields, no compaction, the refused arguments): W2-60a lands it first'
 - 'not a gate for W2-27 (EXAMIN''s copy): launches during the copy use each role''s `Launch default` line (P1-W2-60a-P5 (B), DEC-1167)'
 done_when: [DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6]
-sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010, CAP-35.c, DEC-1014, DEC-1015, W2-60a]
+sources: [DEC-1167, DEC-1126, DEC-1120, DEC-1119, DEC-839, DEC-1010, CAP-35.c, DEC-1014, DEC-1015, DAEO-cv58]
 acceptance_tests: {path: tests/acceptance/W2-184/}
 ---
 
@@ -57,3 +57,5 @@ records, S10 counting the auditor's launch records with `--owner-named <DEC-id>`
 review rounds (new scope).
 
 **The CTO, 2026-11-14:** P-W2-184-2 (a), `src/gov/launch/command.py` added (the interface at claim puts `--trial`, `--reason` and `--owner-named` before `--`). P-W2-184-3 confirmed: 1.4 (no `criticality.yaml`: a launch behaves as before W2-184, DEC-1167 (2)); 3.2a (a max after `--` equal to the resolved effort needs no `--reason`); `probe` as a sixth `model_source`/`effort_source`; the lead's matching rule. P-W2-184-1 (round 2's F1) is the owner's (DEC-1010).
+
+**The owner, 2026-11-14 (chat, ~11:40): P-W2-184-1 (a), with (c) as the stop-gap until it lands (DEC-1010; round 2's F1).** (a): `_probe_files` (`src/gov/launch/launcher.py`) also reads `docs/probes/<id>/` under each worktree root that the ticket's launch records name, so a test designer launched from its tests worktree sees the ticket's probe records; a root that no longer exists is skipped. (c): until (a) lands, a lead brings the ticket branch's probe-record commit into its tests branch before it launches a test designer. The fix is followed by a narrow independent check of that change only (DEC-1154).
