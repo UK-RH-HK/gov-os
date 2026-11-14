@@ -576,11 +576,12 @@ def _line_write_targets(command: str, cwd: str, literal_globs: bool = True) -> l
 
     # Split on non-redirect punctuation into simple commands.
     # A punctuation token containing '>' stays with its command (redirect).
-    # '<' stays too (input redirect, not a write).
+    # '<' stays too (input redirect, not a write), and so does '<<<': the word after a here-string is its text,
+    # not the command's end, so the words after that stay the command's arguments (R3, DEC-1164 (18)).
     cmds: list[list[str]] = []
     cur: list[str] = []
     for tok in tokens:
-        if _is_punct(tok) and ">" not in tok and tok != "<":
+        if _is_punct(tok) and ">" not in tok and tok not in ("<", "<<<"):
             if cur:
                 cmds.append(cur)
                 cur = []
@@ -611,8 +612,9 @@ def _line_write_targets(command: str, cwd: str, literal_globs: bool = True) -> l
                     continue
                 i += 1
                 continue
-            if t == "<":
-                i += 2  # skip input redirect and its target
+            if t in ("<", "<<<"):
+                # skip input redirect and its target (a here-string's text); a punctuation word is no target
+                i += 1 if i + 1 < len(scmd) and _is_punct(scmd[i + 1]) else 2
                 continue
             words.append(t)
             i += 1

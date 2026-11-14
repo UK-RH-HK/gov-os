@@ -232,3 +232,45 @@ containment and tests/acceptance/W1-28 **1847 passed, 2 xfailed, 2 failed** (tes
 failing alike on c461d79de with the sandbox's scratch HOME). **Fail closed:** across 136,925 generated commands (`${…}`,
 comment, here-string and write fragments under five wrappers), each of the 11,117 whose answer changed toward allow,
 run in real bash with a stand-in `gov`, neither writes the acceptance folder nor runs the lift form.
+
+**R3 and the here-string fail-opens (DEC-1164 (18)).** `_line_write_targets` (`src/gov/guard/decide.py`) no longer ends
+the command at `<<<`: the word after it is the here-string's text and the words after that stay the command's
+arguments, so `tee <<< "x" T`, `tee -a <<< "x" T` and `cp <<< x x.py T` give T. In `bash_writes.judge` a command the
+first reading cannot read is also read with each here-string as a heredoc of its own text (`hstr`: the shell it feeds
+judges it as commands, `bash <<< 'touch T'`, `cat <<< '…' | sh`; `xargs CMD <<< WORDS` is judged as CMD with the words
+as arguments; a word the shell expands that the command's own variables do not give, `bash <<< "$X"`, `sh <<< "$(…)"`,
+and an xargs option the scan does not read, is the unresolvable target) and with a heredoc that has no end line as bash
+reads it (`open`: its rest, or nothing, is the body), so a `python3 -c` write before a body-less `cat <<EOF` is kept;
+all readings join what the line parser gives, so nothing the base gave is lost. Read-only forms (`grep -c b <<< "a"`,
+`wc -l <<< "$v"`, `cat <<< T`, `bash <<< 'echo hi'`) stay free. A Python here-string is read as a Python heredoc is
+(opaque to the product, KPI 8). **Counts:** test_w2_42a_here_string.py went from 12 failed, 19 passed to **31 passed**
+(ed77eb353); the builder file tests/unit/guard/test_w2_42a_here_string.py holds **51 passed**; the acceptance folder
+alone **912 passed, 2 xfailed**; with tests/unit/guard, hooks, pause, containment and tests/acceptance/W1-28 and W1-50
+**1959 passed, 2 xfailed, 2 failed** (test_live_hook's `rm -f ~/.bashrc` cases, failing alike on the base with the
+sandbox's scratch HOME).
+
+**R3 F1: the read-only here-string forms with an expanded text stay free (DEC-1164 (18)).** The R3 fail-closed rule made
+`read -r a <<< "$v"` and every loop or filter over an expanded here-string the unresolvable target. In
+`bash_writes._check_here_strings` the here-string's reader now counts as data when it is `read`, `mapfile`, `readarray`
+or `bc`; `sed` or `awk` whose script writes and runs nothing (`_sed_reads_only` scans the script command by command, no
+`-i`, `-f`, `w`, `W`, `e` or `s///w|e`; `_awk_reads_only` refuses `system`, `>`, `|`, `getline`, `-f`, `-i`); or the `done`
+of a loop none of whose commands reads its input as code (a shell, Python, `xargs`, `eval`, `source`, `perl`...), whose
+body is then judged by its own words. A `$(…)` in the text is still judged as a command, so its writes stay targets;
+`bash`/`sh`/`zsh`/`dash`, `xargs`, `source`, `eval`, an unknown reader, a writing `sed`/`awk` script and a loop that runs
+its input keep R3's rule. **Counts:** test_w2_42a_here_string_ro.py (acceptance) went from 21 failed, 32 passed to
+**53 passed**; the builder file tests/unit/guard/test_w2_42a_here_string_ro.py holds **64 passed** (31 red on the
+unfixed parser); tests/acceptance/W2-42a with tests/unit/guard: **1670 passed, 2 xfailed** before the builder file.
+
+**R3 F1, second batch: a here-string read as data must not hide a command it feeds (DEC-1164 (18)).** Taking a
+here-string as data is safe only while that data is not run. In `bash_writes.Judgement` (a) `_read_bound` collects the
+variables `read` binds (its non-option words, an `-a` array, REPLY) in a text that holds a `<<<`, shared with the
+commands nested in it; `names_read_var` then gives the unresolvable target when one is a command's name (`$f`, `${f}`,
+`"$f" x`, `$a $b`, after `env`, `command`, `time`, `nohup`) or an argument of a program that runs its words (`xargs`,
+`sudo`, `find -exec`, `stdbuf`...); a variable used only as an argument of a command that writes nothing stays free.
+(b) `Judgement.callback` reads the `-C` of `mapfile`/`readarray` (also joined, `-tC`, `-C'cmd'`): a literal callback is
+judged as that command, and one the guard cannot know (a variable, a substitution, a function or a program the walker
+does not read) is the unresolvable target. **Counts:** test_w2_42a_here_string_ro_2.py (acceptance) went from 17 failed,
+6 passed to **23 passed**; the builder file tests/unit/guard/test_w2_42a_here_string_ro_2.py holds **37 passed** (27 red
+on 98eff3c84); tests/acceptance/W2-42a: **988 passed, 2 xfailed**; with tests/unit/guard and tests/unit/hooks **1990
+passed, 2 xfailed, 2 failed** (test_live_hook.py `test_a_catastrophic_rm_is_refused[outside the project]` and
+`test_the_reason_is_plain`, which fail the same on 98eff3c84 under the sandbox's empty HOME).
