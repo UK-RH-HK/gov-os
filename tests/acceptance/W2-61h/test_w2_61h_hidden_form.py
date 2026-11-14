@@ -140,10 +140,12 @@ def test_s3_the_hidden_40_spread_as_r5_s_quotas_state(hidden):
 def test_s4_f3_every_hidden_gold_source_resolves_at_head(hidden):
     """DEC-1178 (1): each gold source is judged at its own commit (its ``commit``, else the question's): the path is a
     file there and its heading or lines are a span there, else it is red, named by file and entry number only. At
-    HEAD, a cited block that moved unchanged is no fault, and one whose lines changed (found nowhere at HEAD or more
-    than once; the path no longer a file; a heading no longer found with no lines stated) is not failed: it is listed,
-    by file name and entry number only, as a ``GoldBlockChanged`` warning in the run's default summary (the
-    maintenance list for the walled writer). Which sources hold their answers is the operator's cross-check."""
+    HEAD, a cited block or section that moved unchanged is no fault, and one that changed (a block found nowhere at
+    HEAD or more than once; the path no longer a file; a heading no longer found with no lines stated; a section whose
+    heading is still found but whose text differs from the section at the source's own commit, DEC-1180 (1)) is not
+    failed: it is listed, once per entry, by file name and entry number only, as a ``GoldBlockChanged`` warning in the
+    run's default summary (the maintenance list for the walled writer). Which sources hold their answers is the
+    operator's cross-check."""
     def check():
         faults, changed = s.judge_all(_maps(hidden))
         s.notify_changed(changed)
