@@ -281,6 +281,37 @@ def launch(sandbox, cli, role, tk, *cli_args, reason=NOT_GIVEN, trial=NOT_GIVEN,
 
 
 # --------------------------------------------------------------------------
+# The CLI options (batch td-6: interface 7.2a)
+# --------------------------------------------------------------------------
+
+def cli_launch(sandbox, cli, role, tk, *cli_args, options=(), cwd=None):
+    """``gov launch <role> <ticket> <options> [-- <cli_args>]`` through the console-script entry point, always (never
+    the keyword call): ``options`` are the words written before ``--``, as given (``("--reason", "why")``). ``cwd``:
+    the tree launched from, else the project. Returns W2-60a's ``Launch``."""
+    root = Path(cwd) if cwd is not None else Path(sandbox.project)
+    records = Path(sandbox.records)
+    before_calls, before = len(b.calls(cli)), b._listing(records)
+    started = time.time()
+    run = b.run_gov(sandbox, root, "launch", role, tk, *options, *(("--", *cli_args) if cli_args else ()))
+    return b.Launch(run, tuple(b.calls(cli)[before_calls:]), records, before, b._listing(records), started,
+                    time.time(), tuple(cli_args))
+
+
+def usage_of(text):
+    """The usage paragraph argparse prints: from the line that begins ``usage:`` to the first blank line, one line."""
+    lines = text.splitlines()
+    starts = [index for index, line in enumerate(lines) if line.lstrip().lower().startswith("usage:")]
+    if not starts:
+        return ""
+    found = []
+    for line in lines[starts[0]:]:
+        if found and not line.strip():
+            break
+        found.append(line.strip())
+    return " ".join(found)
+
+
+# --------------------------------------------------------------------------
 # Assertions
 # --------------------------------------------------------------------------
 
