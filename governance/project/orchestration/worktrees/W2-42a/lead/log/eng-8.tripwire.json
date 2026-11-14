@@ -1,0 +1,36 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f2f28ed4ef40",
+   "after": "28acb676c3f6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "9d1567035bde",
+   "after": "ae2edff6fcae"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a",
+   "change": "status line added",
+   "line": "?? tests/unit/guard/test_w2_42a_blob_refs_2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "head",
+   "before": "382924bd3d91",
+   "after": "46eb8bf11856"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json"
+  }
+ ]
+}

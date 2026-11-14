@@ -1,0 +1,59 @@
+{
+ "act": "ACT-INDEP-WALLS-1",
+ "kind": "writer",
+ "run": "20261114T171901Z-memory-recall-3-r1",
+ "set": "memory-recall-3",
+ "round": 1,
+ "audit": null,
+ "commit": "82d13fe5cf5e3a2a1a269a6f579f2a1ae2dbb831",
+ "repo": "/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_the_second_wall_of_a_kind0/repo",
+ "tree": "/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_the_second_wall_of_a_kind0/home/gov-os-wall-trees/writer-20261114T171901Z-memory-recall-3-r1",
+ "runs": "/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_the_second_wall_of_a_kind0/home/gov-os-runs",
+ "home": "/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_the_second_wall_of_a_kind0/home",
+ "sets_root": "/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_the_second_wall_of_a_kind0/sets",
+ "brief": "governance/project/indep-briefs/writer.md",
+ "brief_sha256": "8e052d65cbe1333deed4a30bd157258ea4226f695ee3e0a1a4ce9c60f40b4b14",
+ "seed_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+ "settings_sha256": "33ba35f6f28e86c65d7b53fbf37c42f8057ee94dbebd35d5511efcca96bd1346",
+ "hook_sha256": "95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3",
+ "template_sha256": {
+  "settings.json.tmpl": "9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b",
+  "wall_hook.py": "95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3",
+  "CLAUDE.md.tmpl": "aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267",
+  "kinds.yaml": "ddd84ae2591061327e1730517ffbce987be7a272a72311bb3b6e79e4bf2401a7",
+  "tree-exclude.txt": "e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537",
+  "README.md": "65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49"
+ },
+ "approved_sha256": "640e27dc6e61e6868aced6e2e6d78e046a3dc4fe65604e3e67271b7781dfecf1",
+ "model": "claude-haiku-5-5",
+ "effort": null,
+ "tools": [
+  "Read",
+  "Grep",
+  "Glob",
+  "Write",
+  "Edit",
+  "TodoWrite"
+ ],
+ "budget_usd": 25,
+ "timeout_s": 20,
+ "prompt_sha256": "b86c5a8e5953db3e02c6e5b0128f66e75f0eed8e0b6429e62f71d103042b0189",
+ "result_schema": "writer-result.schema.json",
+ "brief_id": null,
+ "flow": null,
+ "selection": {
+  "changed": 0,
+  "sample": 3,
+  "overlap": 0
+ },
+ "tree_files": 25,
+ "seeded_before_content": true,
+ "runs_override": false,
+ "trees_override": false,
+ "dry": true,
+ "test_hook": false,
+ "schema_sha256": {
+  "indep-counts.schema.json": "3621016c9027dc7957d3c07e8f69cc3791a41d91f4109588ba9fbdc618a681b9",
+  "writer-result.schema.json": "9907cbc793f098f39b5d91f949afbe5c84b604e57c3db5ad783727203d55059e"
+ }
+}

@@ -2,9 +2,9 @@
 task: DAEO-6f0s
 decisions_applied: [DEC-1180, DEC-1167, DEC-1120, DEC-1119, DEC-1052, DEC-1010, DEC-1146, DEC-136, DEC-1154, DEC-1156]
 ---
-STATE: eng-7 done (fddda06e, f2f76a154: R1-R3 green; 2 builder unit cases of P-td5-2 stale); eng-8 running (pid 3169562) revising them | HEAD: f2f76a154 | NEXT: bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh /home/usain/gov-os-worktrees/W2-184/.gov-runtime/scratch/lead/log/eng-8.exit | WAITING ON: eng-8
-Workers: td-7 5a68db14 done; eng-7 fddda06e done; eng-8 (pid 3169562) running; earlier: td-5, eng-5, td-6, eng-6, rv-1, rv-2, rv-f1 done
-Rounds: two review rounds + narrow check rv-f1 done; this change gets its own narrow check (rv-r) after verify
+STATE: rv-r (7fa5e020) PASS at 90e657a35; record committed 972de0a90; w2/integrate merged 315a6a125 (clean, no shared file); gov accept + tests/unit/launch on it running | HEAD: 315a6a1250f0 | NEXT: read log/accept-r-merge.txt and log/unit-launch-merge.txt; if green return DONE with 315a6a1250f0 | WAITING ON: accept on the merge
+Workers: td-7 5a68db14, eng-7 fddda06e, eng-8 cee1beef, rv-r 7fa5e020 done; tests worktree removed (w2/W2-184-tests deleted)
+Rounds: converged (two review rounds, narrow checks rv-f1 and rv-r passed)
 Decisions taken: INTERFACE section 10 (R1-R3) stated by the lead: briefs/INTERFACE-R.md (R1 CLI exit 2 + launcher second fence; R2 temp `.<sid>.<unique>.tmp` then link; R3 any copy, one review per path)
 Open packages: P-W2-184-4 (CTO)
 Paths: briefs .gov-runtime/scratch/briefs/td-7.md; td log /home/usain/gov-os-worktrees/W2-184-tests/.gov-runtime/scratch/lead/log/td-7.*

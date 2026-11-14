@@ -1,0 +1,75 @@
+# Planted kinds.yaml (W2-149 acceptance tests, set-up A's wiring): the template's four kinds as they stand, each
+# with a model, and the briefs: map a brief's missing model, result_schema and sample are taken from (DEC-1112 (3)).
+kinds:
+  writer:
+    tools: [Read, Grep, Glob, Write, Edit, TodoWrite]
+    input: [selection]
+    input_round2: [set, notes]
+    delivers: set
+    budget_usd: 25
+    timeout_s: 7200
+    model: claude-kind-writer
+  checker:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set]
+    delivers: notes
+    budget_usd: 15
+    timeout_s: 5400
+    model: claude-kind-checker
+  auditor:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set, misses]
+    delivers: classes
+    budget_usd: 15
+    timeout_s: 5400
+    model: claude-kind-auditor
+  labeller:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [rulebook, actions]
+    delivers: labels
+    budget_usd: 30
+    timeout_s: 10800
+    model: claude-kind-labeller
+briefs:
+  sgx1-writer-tuning:
+    kind: writer
+    flow: sgx1-writer-1
+    model: claude-entry-writer-tuning
+    result_schema: sgx1-writer-tuning-result.schema.json
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-writer-heldout:
+    kind: writer
+    flow: sgx1-writer-2
+    result_schema: sgx1-writer-heldout-result.schema.json
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-labeller:
+    kind: labeller
+    flow: sgx1-labeller-1
+    model: claude-entry-labeller
+    result_schema: sgx1-labeller-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-labeller-2:
+    kind: labeller
+    flow: sgx1-labeller-2
+    model: claude-entry-labeller-2
+    result_schema: sgx1-labeller-2-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-overlap-auditor:
+    kind: auditor
+    flow: sgx1-overlap-auditor
+    model: claude-entry-overlap-auditor
+    result_schema: sgx1-overlap-auditor-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**", ".tickets/**", "governance/project/orchestration/packages/**", "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/**", "tests/unit/orchestration/test_w2_149*", "docs/changes/W2-149-evidence.md"]
+  w2-149-no-schema:
+    kind: writer
+    flow: sgx1-writer-1
+    sample: 5
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  w2-149-no-sample:
+    kind: auditor
+    flow: sgx1-overlap-auditor
+    result_schema: sgx1-overlap-auditor-result.schema.json
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]

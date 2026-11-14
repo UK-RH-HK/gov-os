@@ -1,0 +1,11 @@
+{
+ "commit": "82d13fe5cf5e3a2a1a269a6f579f2a1ae2dbb831",
+ "last_audit": null,
+ "seed_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+ "changed": [],
+ "sample": [
+  "docs/note-0.md",
+  "docs/note-1.md",
+  "governance/project/indep-walls/kinds.yaml"
+ ]
+}

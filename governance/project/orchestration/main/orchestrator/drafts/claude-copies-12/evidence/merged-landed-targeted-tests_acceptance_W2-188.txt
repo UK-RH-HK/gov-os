@@ -1,19 +1,4 @@
-.........F.                                                              [100%]
-=================================== FAILURES ===================================
-_____________ test_f2_the_claude_copy_of_the_skill_equals_the_base _____________
-
-    def test_f2_the_claude_copy_of_the_skill_equals_the_base():
-        """Guard (holds on the base): the copies ACT regenerates it after the owner's approval, not this ticket."""
-        now = support.read_bytes(support.CLAUDE_COPY_REL)
-        then = support.base_blob(support.CLAUDE_COPY_REL)
->       assert now == then, f"{support.CLAUDE_COPY_REL} differs from the base's"
-E       AssertionError: .claude/skills/adopt/SKILL.md differs from the base's
-E       assert b'---\nname: ...44, CAP-54.\n' == b'---\nname: ...44, CAP-54.\n'
-E         
-E         At index 4424 diff: b',' != b'.'
-E         Use -v to get more diff
-
-tests/acceptance/W2-188/test_w2_188_copies.py:113: AssertionError
+...........                                                              [100%]
 ==================================== PASSES ====================================
 =========================== short test summary info ============================
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_base_pin_is_the_sha256_of_the_skill_at_5336a6fca
@@ -25,6 +10,6 @@ PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_sources_line_g
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_a9_steps_1_to_5_and_7_and_the_verify_section_are_unchanged_from_the_base
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_s4_the_skills_check_exits_0_on_both_layouts
 PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f1_no_copy_names_a_memaudit_subcommand_or_standing_declare
-PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_touches_claude_or_tests
-FAILED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base
-1 failed, 10 passed in 0.55s
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_the_claude_copy_of_the_skill_equals_the_base_or_the_copies_acts_after_bytes
+PASSED tests/acceptance/W2-188/test_w2_188_copies.py::test_f2_no_commit_of_the_ticket_outside_the_test_designer_or_the_copies_act_touches_claude_or_tests
+11 passed in 0.44s

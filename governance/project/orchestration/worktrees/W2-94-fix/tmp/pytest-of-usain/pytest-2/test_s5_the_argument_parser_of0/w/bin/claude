@@ -1,0 +1,376 @@
+#!/usr/bin/python3 -I
+"""The W2-149 stub `claude` (acceptance tests only). It records each call (argv, cwd, environment, process ids,
+stdin, its parent's command line) and plays Claude Code:
+  - the canary is the call whose prompt names an existing file by its absolute path (the launch prompt names none);
+  - --restricted refuses a Read outside the session's folder and every --add-dir folder;
+  - a --settings file it cannot read, parse or validate is ignored without a word;
+  - with the settings loaded, the Read is refused only when a PreToolUse hook in them refuses it (run as Claude Code
+    runs a command hook: sh -c, the event on stdin, exit 2 or a "deny" decision refuses);
+  - the real session plays the case's script (out/ files, a sleep, a child, the budget's end, a trace file);
+  - the user's settings source (S10, DEC-1112 (3)): with no --setting-sources, or a list naming "user", it loads
+    $HOME/.claude/settings.json when that file is valid: its SessionStart hooks run at every call's start and its
+    PreToolUse hooks run beside the --settings file's on the canary's Read (allow lines never lift a refusal: Claude
+    Code's deny-over-allow); a list that leaves "user" out loads nothing from it. Each call records which."""
+import hashlib, json, os, re, subprocess, sys, time, uuid
+
+CFG = '/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_s5_the_argument_parser_of0/w/rec/stub.json'
+REC = '/home/usain/gov-os-worktrees/W2-94-fix/.gov-runtime/scratch/tmp/pytest-of-usain/pytest-2/test_s5_the_argument_parser_of0/w/rec'
+VALUE = {"--settings", "--tools", "--model", "--max-budget-usd", "--output-format", "--permission-prompts",
+         "--max-turns", "--setting-sources", "--allowedTools", "--allowed-tools", "--disallowedTools",
+         "--disallowed-tools", "--system-prompt", "--append-system-prompt", "--mcp-config", "--permission-mode",
+         "--session-id", "--fallback-model", "--input-format"}
+MODES = {"default", "acceptEdits", "plan", "bypassPermissions", "dontAsk"}
+
+
+def parse(argv):
+    flags, adds, rest, i = {}, [], [], 0
+    while i < len(argv):
+        a = argv[i]
+        name, eq, val = a.partition("=")
+        if name == "--add-dir":
+            if eq:
+                adds.append(val)
+                i += 1
+                continue
+            i += 1
+            if i < len(argv):
+                adds.append(argv[i])
+                i += 1
+            while i < len(argv) and not argv[i].startswith("-") and os.path.isdir(argv[i]):
+                adds.append(argv[i])
+                i += 1
+            continue
+        if a.startswith("--") and name in VALUE:
+            if eq:
+                flags[name] = val
+                i += 1
+            else:
+                flags[name] = argv[i + 1] if i + 1 < len(argv) else None
+                i += 2
+            continue
+        if a.startswith("-"):
+            flags[a] = True
+            i += 1
+            continue
+        rest.append(a)
+        i += 1
+    return flags, adds, (rest[-1] if rest else None)
+
+
+def target_of(prompt):
+    for m in re.finditer(r"(?:^|(?<=[\s'\"`(]))(/[^\s'\"`]+)", prompt or ""):
+        t = m.group(1).rstrip(".,;:)!?")
+        if os.path.isfile(t):
+            return t
+    return None
+
+
+def inside(p, d):
+    return p == d or p.startswith(d.rstrip("/") + "/")
+
+
+def settings_ok(path):
+    try:
+        with open(path) as f:
+            d = json.load(f)
+    except Exception:
+        return None
+    if not isinstance(d, dict):
+        return None
+    p = d.get("permissions", {})
+    if not isinstance(p, dict):
+        return None
+    for k in ("allow", "deny", "ask"):
+        if k in p and not (isinstance(p[k], list) and all(isinstance(x, str) for x in p[k])):
+            return None
+    if "defaultMode" in p and p["defaultMode"] not in MODES:
+        return None
+    if "disableBypassPermissionsMode" in p and p["disableBypassPermissionsMode"] != "disable":
+        return None
+    if "model" in d and not isinstance(d["model"], str):
+        return None
+    h = d.get("hooks", {})
+    if not isinstance(h, dict):
+        return None
+    for entries in h.values():
+        if not isinstance(entries, list):
+            return None
+        for e in entries:
+            if not isinstance(e, dict) or not isinstance(e.get("hooks"), list):
+                return None
+            if "matcher" in e and not isinstance(e["matcher"], str):
+                return None
+            for x in e["hooks"]:
+                if not isinstance(x, dict) or x.get("type") != "command" or not isinstance(x.get("command"), str):
+                    return None
+                if "timeout" in x and (isinstance(x["timeout"], bool) or not isinstance(x["timeout"], (int, float))):
+                    return None
+    for k, t in (("enableAllProjectMcpServers", bool), ("cleanupPeriodDays", int)):
+        if k in d and not isinstance(d[k], t):
+            return None
+    return d
+
+
+def hook_denies(settings, tool, tin, cwd, sid):
+    for e in settings.get("hooks", {}).get("PreToolUse", []):
+        m = e.get("matcher", "")
+        if m not in ("", "*"):
+            try:
+                if not re.fullmatch(m, tool):
+                    continue
+            except re.error:
+                continue
+        for x in e["hooks"]:
+            event = {"session_id": sid, "transcript_path": "", "cwd": cwd, "hook_event_name": "PreToolUse",
+                     "tool_name": tool, "tool_input": tin}
+            try:
+                p = subprocess.run(["/bin/sh", "-c", x["command"]], input=json.dumps(event), capture_output=True,
+                                   text=True, cwd=cwd, timeout=x.get("timeout", 60))
+            except Exception:
+                continue  # a hook that cannot run is a non-blocking error in Claude Code
+            if p.returncode == 2:
+                return True
+            if p.returncode == 0 and p.stdout.strip():
+                try:
+                    out = json.loads(p.stdout)
+                except Exception:
+                    continue
+                if (out.get("hookSpecificOutput") or {}).get("permissionDecision") == "deny":
+                    return True
+    return False
+
+
+def user_source(flags):
+    """The user's settings source: on with no --setting-sources or a list naming "user"; its file loaded when valid."""
+    src = flags.get("--setting-sources")
+    on = src is None or "user" in [x.strip() for x in str(src).split(",")]
+    path = os.path.join(os.environ.get("HOME", "/nonexistent"), ".claude", "settings.json")
+    present = os.path.isfile(path)
+    loaded = settings_ok(path) if (on and present) else None
+    return {"sources": src, "user_on": on, "path": path, "present": present, "loaded": loaded is not None}, loaded
+
+
+def run_hooks(settings, event_name, cwd, sid, **extra):
+    for e in settings.get("hooks", {}).get(event_name, []):
+        for x in e["hooks"]:
+            event = dict({"session_id": sid, "transcript_path": "", "cwd": cwd, "hook_event_name": event_name}, **extra)
+            try:
+                subprocess.run(["/bin/sh", "-c", x["command"]], input=json.dumps(event), capture_output=True,
+                               text=True, cwd=cwd, timeout=x.get("timeout", 60))
+            except Exception:
+                pass
+
+
+def record(name, data):
+    with open(os.path.join(REC, name), "a") as f:
+        f.write(json.dumps(data) + "\n")
+
+
+# Set-up A's sessions (DEC-1112 (3)): a program reads the wall's own input/ and writes what the brief asks, so a real
+# run (whose seed the script draws) still answers its own staged ids. Each returns {out/ file: text}.
+LABELS = ("allow", "refuse", "ask")
+
+
+def _jsonl(path):
+    with open(path) as f:
+        return [json.loads(x) for x in f if x.strip()]
+
+
+def _by_class(lines):
+    return {str(k): sum(1 for x in lines if str(x["rule_class"]) == str(k)) for k in range(1, 15)}
+
+
+def _class_forms(lines, a):
+    """S31: ``class_form`` "str" writes every rule_class as its decimal string; ``bad_class`` (JSON text) replaces the
+    first line's rule_class with that value."""
+    if a.get("class_form") == "str":
+        for x in lines:
+            x["rule_class"] = str(x["rule_class"])
+    if a.get("bad_class") is not None and lines:
+        lines[0]["rule_class"] = json.loads(a["bad_class"])
+    return lines
+
+
+def prog_hand_labels(cwd, a):
+    """Labeller 1, round 2: a hand label for every id the script marked uncertain, put in classes 1-13, or drew in
+    the sample (``drop``: leave out the required id at that index; ``extra``: also label that many other ids;
+    ``class_form``/``bad_class``: S31's forms)."""
+    script = _jsonl(os.path.join(cwd, "input", "script-labels.jsonl"))
+    with open(os.path.join(cwd, "input", "sample.json")) as f:
+        sample = set(json.load(f)["ids"])
+    need = [x["id"] for x in script if x["uncertain"] or 1 <= int(x["rule_class"]) <= 13 or x["id"] in sample]
+    more = [x["id"] for x in script if x["id"] not in need][:a.get("extra", 0)]
+    if a.get("drop") is not None:
+        need = need[:a["drop"]] + need[a["drop"] + 1:]
+    by = {x["id"]: x for x in script}
+    lines = [{"id": i, "label": "refuse" if by[i]["label"] == "allow" else "allow", "rule_class": 11,
+              "clauses": ["DEC-820 (4)"], "reason": "names docs/ and DEC-820 (4) only"} for i in need + more]
+    lines = _class_forms(lines, a)
+    result = {"round": 2, "hand_labelled": len(lines), "allow": sum(x["label"] == "allow" for x in lines),
+              "refuse": sum(x["label"] == "refuse" for x in lines), "ask": 0, "by_class": _by_class(lines),
+              "uncertain_seen": sum(1 for x in script if x["uncertain"]), "sample": len(sample),
+              "instructions_ignored": 0, "stopped": "none"}
+    return {"hand-labels.jsonl": "".join(json.dumps(x) + "\n" for x in lines), "result.json": json.dumps(result)}
+
+
+def prog_labels2(cwd, a):
+    """Labeller 2, round 2: one hand label per line of input/sample.jsonl (``bad``: S30's broken files;
+    ``class_form``/``bad_class``: S31's forms)."""
+    sample = _jsonl(os.path.join(cwd, "input", "sample.jsonl"))
+    lines = [{"id": x["id"], "label": LABELS[k % 3], "rule_class": 11 if k % 3 else 14, "clauses": ["DEC-820 (4)"],
+              "how": "hand", "reason": "names docs/ and DEC-820 (4) only"} for k, x in enumerate(sample)]
+    lines = _class_forms(lines, a)
+    bad = a.get("bad")
+    if bad == "missing":
+        lines = lines[:-1]
+    elif bad == "extra":
+        lines = lines + [dict(lines[0], id="x-a998-not-in-the-sample")]
+    elif bad == "repeat":
+        lines = lines + [dict(lines[0])]
+    elif bad == "label":
+        lines[0]["label"] = "maybe"
+    elif bad == "how":
+        lines[0]["how"] = "script"
+    elif bad == "clauses":
+        lines[0]["clauses"] = "DEC-820 (4)"
+    result = {"round": 2, "sample": len(sample), "labelled": len(lines),
+              "allow": sum(x["label"] == "allow" for x in lines), "refuse": sum(x["label"] == "refuse" for x in lines),
+              "ask": sum(x["label"] == "ask" for x in lines), "by_class": _by_class(lines), "instructions_ignored": 0,
+              "stopped": "none"}
+    return {"labels-2.jsonl": "".join(json.dumps(x) + "\n" for x in lines), "result.json": json.dumps(result)}
+
+
+def prog_decide(cwd, a):
+    """The overlap auditor: one decision per case of input/disputes.jsonl, in order; by index mod 5: agrees x, agrees
+    y, neither (the third label), x flagged cannot-settle, y flagged may-change-verdict. ``bad`` breaks the file."""
+    cases = _jsonl(os.path.join(cwd, "input", "disputes.jsonl"))
+    out = []
+    for i, c in enumerate(cases):
+        m = i % 5
+        pick, agree = {0: (c["x"], "x"), 1: (c["y"], "y"), 3: (c["x"], "x"), 4: (c["y"], "y")}.get(m, (None, "neither"))
+        label = pick["label"] if pick else [x for x in LABELS if x not in (c["x"]["label"], c["y"]["label"])][0]
+        flag = {3: "cannot-settle", 4: "may-change-verdict"}.get(m, "none")
+        out.append({"id": c["id"], "label": label, "rule_class": int(pick["rule_class"]) if pick else 9,
+                    "basis": ["DEC-1113 (2)", "DEC-820 (4)"], "agrees_with": agree, "flag": flag,
+                    "reason": "" if flag == "none" else "DEC-820 (4) against DEC-1093 (2) on docs/ only"})
+    out = _class_forms(out, a)
+    bad = a.get("bad")
+    if bad == "drop_last":
+        out = out[:-1]
+    elif bad == "swap":
+        out[0], out[1] = out[1], out[0]
+    elif bad == "reason_on_none":
+        next(x for x in out if x["flag"] == "none")["reason"] = "a reason on a case flagged none"
+    elif bad == "flag_word":
+        out[0]["flag"] = "unsure"
+    result = {"cases": len(cases), "decided": len(out), "allow": sum(x["label"] == "allow" for x in out),
+              "refuse": sum(x["label"] == "refuse" for x in out), "ask": sum(x["label"] == "ask" for x in out),
+              "agrees_x": sum(x["agrees_with"] == "x" for x in out), "agrees_y": sum(x["agrees_with"] == "y" for x in out),
+              "neither": sum(x["agrees_with"] == "neither" for x in out),
+              "cannot_settle": sum(x["flag"] == "cannot-settle" for x in out),
+              "may_change_verdict": sum(x["flag"] == "may-change-verdict" for x in out), "by_class": _by_class(out),
+              "instructions_ignored": 0, "stopped": "none"}
+    return {"decisions.jsonl": "".join(json.dumps(x) + "\n" for x in out), "result.json": json.dumps(result)}
+
+
+PROGRAMS = {"hand_labels": prog_hand_labels, "labels2": prog_labels2, "decide": prog_decide}
+
+
+def main():
+    argv = sys.argv[1:]
+    with open(CFG) as f:
+        cfg = json.load(f)
+    flags, adds, prompt = parse(argv)
+    cwd = os.getcwd()
+    target = target_of(prompt)
+    canary = target is not None
+    try:
+        with open("/proc/%d/cmdline" % os.getppid(), "rb") as f:
+            parent = [x.decode(errors="replace") for x in f.read().split(b"\0") if x]
+    except OSError:
+        parent = []
+    try:
+        devnull = os.path.samestat(os.fstat(0), os.stat(os.devnull))
+    except OSError:
+        devnull = False
+    listing = {}
+    for dp, _dn, fn in os.walk(os.path.join(cwd, "input")):
+        for n in fn:
+            fp = os.path.join(dp, n)
+            with open(fp, "rb") as f:
+                listing[os.path.relpath(fp, os.path.join(cwd, "input"))] = hashlib.sha256(f.read()).hexdigest()
+    sid = (cfg.get("canary_session_id") if canary else (cfg.get("session") or {}).get("session_id")) \
+        or str(uuid.uuid4())
+    user_rec, user = user_source(flags)
+    record("calls.jsonl", {"argv": argv, "flags": flags, "adds": adds, "prompt": prompt, "cwd": cwd,
+                           "env": dict(os.environ), "pid": os.getpid(), "pgid": os.getpgrp(), "ppid": os.getppid(),
+                           "parent": parent, "stdin_devnull": devnull, "canary": canary, "target": target,
+                           "input": listing, "session_id": sid, "user_settings": user_rec, "t": time.time_ns()})
+    if user is not None:
+        run_hooks(user, "SessionStart", cwd, sid, source="startup")
+    if canary:
+        mode = cfg.get("canary", "model")
+        if mode == "sleep":
+            time.sleep(cfg.get("canary_sleep", 30))
+        if mode == "garbage":
+            sys.stdout.write("this is not the JSON of a result\n")
+            return 0
+        settings = flags.get("--settings")
+        loaded = settings_ok(os.path.join(cwd, settings)) if isinstance(settings, str) else None
+        rt = os.path.realpath(target)
+        dirs = [os.path.realpath(cwd)] + [os.path.realpath(os.path.join(cwd, d)) for d in adds]
+        why = None
+        if flags.get("--restricted") and not any(inside(rt, d) for d in dirs):
+            why = "restricted"
+        elif any(s is not None and hook_denies(s, "Read", {"file_path": target}, cwd, sid) for s in (user, loaded)):
+            why = "hook"
+        denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_canary", "tool_input": {"file_path": target}}] \
+            if why else []
+        if mode == "wrong_denial":
+            denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_other",
+                        "tool_input": {"file_path": "/etc/hostname"}}]
+        record("outcomes.jsonl", {"pid": os.getpid(), "canary": True, "settings_loaded": loaded is not None,
+                                  "user_settings_loaded": user is not None, "why": why, "mode": mode})
+        print(json.dumps({"type": "result", "subtype": "success", "is_error": False, "session_id": sid,
+                          "num_turns": 2, "total_cost_usd": 0.0005, "duration_ms": 40,
+                          "permission_denials": denials, "result": "done"}))
+        return 0
+    s = cfg.get("session")
+    if s is None:
+        record("outcomes.jsonl", {"pid": os.getpid(), "canary": False, "tripwire": True})
+        sys.stderr.write("W2-149 stub: no session was expected in this case\n")
+        return 97
+    if s.get("trace"):
+        d = os.path.join(os.environ.get("HOME", "/nonexistent"), ".claude", "projects", "-w2-149-stub")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, sid + ".jsonl"), "w") as f:
+            f.write("{}\n")
+    if s.get("child"):
+        c = subprocess.Popen(["sleep", "300"])
+        with open(os.path.join(REC, "child.pid"), "w") as f:
+            f.write(str(c.pid))
+    if s.get("sleep"):
+        time.sleep(s["sleep"])
+    files = dict(s.get("out") or {})
+    if s.get("program"):
+        files.update(PROGRAMS[s["program"]](cwd, s.get("program_args") or {}))
+        extra = (s.get("program_args") or {}).get("extra_result")
+        if extra:
+            files["result.json"] = json.dumps(dict(json.loads(files["result.json"]), **extra))
+    for rel, text in files.items():
+        p = os.path.join(cwd, "out", rel)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "w") as f:
+            f.write(text)
+    budget = bool(s.get("budget"))
+    print(json.dumps({"type": "result", "subtype": "error_max_budget_usd" if budget else "success",
+                      "is_error": budget, "session_id": sid, "num_turns": 3, "total_cost_usd": 0.0123,
+                      "duration_ms": 2345, "permission_denials": s.get("denials") or [],
+                      "result": s.get("result", "done")}))
+    sys.stdout.flush()
+    record("outcomes.jsonl", {"pid": os.getpid(), "canary": False, "budget": budget})
+    return 1 if budget else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

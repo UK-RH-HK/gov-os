@@ -1,2 +1,3 @@
-...                                                                      [100%]
-3 passed in 59.77s
+gov_close_serial_only: not in this run: tests/acceptance/W1-16/test_w1_16_ui_off.py
+.................................................                        [100%]
+49 passed, 15 deselected in 265.99s (0:04:25)

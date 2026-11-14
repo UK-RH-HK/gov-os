@@ -1,0 +1,6 @@
+W2-187 (DAEO-0cd2): merge w2/integrate (the ticket's amendments: DEC-1180 (1) N2 (b) in S10 (6)/I10, the CTO's path case W2-187-P1 (a), S12 and F7 under DEC-1182 (2)); no file of the ticket's paths changed there
+
+Task: DAEO-0cd2
+Role: orchestrator
+Implements: DEC-1182, DEC-1179, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

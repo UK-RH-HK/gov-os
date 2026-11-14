@@ -1,0 +1,24 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 17:12:06)
+F...............................................F.                       [100%]
+=================================== FAILURES ===================================
+________ test_s5_the_argument_parser_offers_no_path_or_path_list_option ________
+tests/acceptance/W2-149/test_w2_149_seed_content.py:114: in test_s5_the_argument_parser_offers_no_path_or_path_list_option
+    assert not extra, f"options beyond the interface's: {sorted(extra)}"
+E   AssertionError: options beyond the interface's: ['--fix', '--reason']
+E   assert not {'--fix', '--reason'}
+______________ test_counts_schema_closes_every_object_and_string _______________
+tests/unit/orchestration/test_w2_149_indep_launch.py:1116: in test_counts_schema_closes_every_object_and_string
+    walk(whole)
+tests/unit/orchestration/test_w2_149_indep_launch.py:1106: in walk
+    assert set(node.get("required", [])) == want, node
+E   AssertionError: {'$id': 'indep-counts.schema.json', '$schema': 'https://json-schema.org/draft/2020-12/schema', 'additionalProperties':...9a-f]{64}$', 'type': ['string', 'null']}, 'code': {'enum': [0, 10, 11, 12, 13, 14, ...], 'type': 'integer'}, ...}, ...}
+E   assert {'act', 'appr...livered', ...} == {'act', 'appr...livered', ...}
+E     
+E     Extra items in the right set:
+E     'fix'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-149/test_w2_149_seed_content.py::test_s5_the_argument_parser_offers_no_path_or_path_list_option
+FAILED tests/unit/orchestration/test_w2_149_indep_launch.py::test_counts_schema_closes_every_object_and_string
+2 failed, 48 passed, 23 deselected in 18.98s
+rc=1

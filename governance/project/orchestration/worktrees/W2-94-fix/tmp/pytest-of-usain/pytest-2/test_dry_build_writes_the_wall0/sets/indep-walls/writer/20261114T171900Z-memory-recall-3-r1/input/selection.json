@@ -1,0 +1,11 @@
+{
+ "commit": "82d13fe5cf5e3a2a1a269a6f579f2a1ae2dbb831",
+ "last_audit": null,
+ "seed_sha256": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5",
+ "changed": [],
+ "sample": [
+  "src/mod_0.py",
+  "governance/project/indep-walls/tree-exclude.txt",
+  "governance/project/indep-walls/CLAUDE.md.tmpl"
+ ]
+}

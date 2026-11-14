@@ -40,7 +40,26 @@ pin's own `gov.release.build` (what `gov release 0.1.0` runs, without the typed 
 checks the hash list, and runs the filled script against the mirror. The main tree got no tag, ref or commit: every
 log's "main tree tags v*" and "docs/releases" lines are the same before and after.
 
-**Final logs (the files as in this bundle):**
+**Final logs, after the review's fixes (`-f7`; all 8 modes on stand-in C `f2f28ed4ef40`, 2026-11-14 16:47 to 17:23).**
+The scripts, README and `fill_release.sh` that ran are byte for byte the ones in BUNDLE.sha256. Only NOTES.md changed
+after the runs started; every run's own `fill_release.sh` passed `sha256sum -c BUNDLE.sha256` against the list as it
+stood before that change (review F4: the neg-check log now postdates every script change).
+
+| log | outcome |
+|---|---|
+| `log/repin-rel-rehearsal-run-f7.txt` | **REHEARSAL OK, exit 0, 2,142 s.** R: tag on the record commit `d49f63081ab2`, record only, record sha256 `88c7df9abd06`, `verify` holds. A: both builds `cb69013f7c04…7250` = the record's wheel sha256. S: 1,786 s, nearly all of it waiting for a heavy-job slot (R-6). B: ALL CHECKS PASS: guard4 453; FIX-4 2 failed, **both named** ("fix3 python heredoc reading .env (gap as today)", "fix3 unterminated heredoc naming acceptance judged as before"); live hook 267; g14 151, and the staged pair's 4 red by name; FIX-3 49 failed under both pins, 48 under both, **the two differing cases named** (F1, F2). C: the reranker has the new pin's bytes. D: §5's two lines; P-2. E: trailers `Task: decision-record`, `Implements: DEC-1178`, `Role: owner`; one gov entry, `approved_by` DEC-1178. Live fixed paths UNCHANGED; the live store moved with the CTO's W2-188 landing `28acb676c` (no `src/` change). |
+| `-neg-check-f7.txt` | NEGATIVE RUN OK: STOP at part B (171 s), "the store link is back on W2-00-store-a", gov link unchanged |
+| `-neg-int-f7.txt` (new, F7) | NEGATIVE RUN OK: TERM 1,911 s in, while part S's refresh ran (after its GPU-slot wait). "the store refresh (pid 294354, its process group) was stopped", "STOP: interrupted (TERM) before the switch", exit 1. 20 s later the store link was still on W2-00-store-a and the group was gone; gov link unchanged |
+| `-neg-tag-f7.txt` | NEGATIVE RUN OK: STOP at part R (the tag on C itself); `fill_release.sh` REFUSED too; nothing built |
+| `-neg-manifest-f7.txt` | NEGATIVE RUN OK: STOP at part R (manifest.json does not match manifest.sha256); `fill_release.sh` REFUSED too |
+| `-neg-sha-f7.txt` | NEGATIVE RUN OK: the hash list fails on the edited script; run anyway, STOP at part R (the manifest's wheel sha256 is not the one filled in) |
+| `-neg-src-f7.txt` | NEGATIVE RUN OK: STOP at part 0 (src differs), before R |
+| `-neg-uncommitted-f7.txt` | NEGATIVE RUN OK: STOP at part 0 (uncommitted src) |
+
+F6 tested by hand: a copy of the bundle with one byte added to `rel_checks.sh` gave "rel_checks.sh: FAILED" and
+"REFUSED, nothing written", exit 1, with no file written.
+
+**The logs the review read (before its fixes; kept):**
 
 | log | stand-in C | outcome |
 |---|---|---|
@@ -50,7 +69,7 @@ log's "main tree tags v*" and "docs/releases" lines are the same before and afte
 | `-neg-tag.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part R ("not on the record commit whose parent is C"); `fill_release.sh` REFUSED too; nothing built |
 | `-neg-manifest.txt` | `18a279055d99` | NEGATIVE RUN OK: STOP at part R (manifest.json does not match manifest.sha256); `fill_release.sh` REFUSED too |
 | `-neg-sha.txt` | `18a279055d99` | NEGATIVE RUN OK: the hash list fails on the edited script (the operator's line would stop there); run anyway, STOP at part R (the manifest's wheel sha256 is not the one filled in) |
-| `-neg-check.txt` | `4ac8f7955359` | NEGATIVE RUN OK: STOP at part B (the staged pair's planted import), "the store link is back on W2-00-store-b", gov link unchanged |
+| `-neg-check.txt` | `4ac8f7955359` | NEGATIVE RUN OK: STOP at part B (the staged pair's planted import), "the store link is back on W2-00-store-b", gov link unchanged. It ran 15:17 to 15:24, before rel_checks.sh's last change (15:30, section 7, after the stop); `-neg-check-f7.txt` replaces it (F4) |
 
 **Earlier runs (kept, each fixed before the final logs):**
 - `-run-r1-stopped.txt`: stopped by me at part S. I had edited the rehearsal script during the run, and bash reads a
@@ -64,7 +83,9 @@ log's "main tree tags v*" and "docs/releases" lines are the same before and afte
   was built (B comes after A). Fixed.
 - In runs r2, r4 and r5, two separate commits gave the same bytes from the release's build and from the re-pin's:
   `494d5c9335fa` gave `4376c78ba335…`, `eb63df3c349c` gave `e68caaa25c6d…` and `bf04ed69c893` gave `59cfc7237dae…`
-  (R-4).
+  (R-4). In run f7, a fourth commit, `f2f28ed4ef40`, gave `cb69013f7c04…`. The two scratch releases of `run-f7` and
+  `neg-int-f7`, each built separately, gave the same filled script (sha256 `e735535d10c6…`), so the record at a given C
+  is reproducible.
 
 ## 4. Open points for the review and the owner
 - **R-1, `approved_by` in the registry entry.** Every window's gov entry so far cites DEC-1037 (the re-pin windows).

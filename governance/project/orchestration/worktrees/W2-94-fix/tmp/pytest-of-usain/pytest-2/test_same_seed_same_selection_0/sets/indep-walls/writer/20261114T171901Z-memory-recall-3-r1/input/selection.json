@@ -1,0 +1,14 @@
+{
+ "commit": "fdd54fdfbc1a78fca8db635f8590481efe66f07a",
+ "last_audit": "6d45ed61ac6b99212ab59f3d80f96b04ae720014",
+ "seed_sha256": "7e332bcee418f7d700927c946d36341f0651d6d90997b58d3d5441dec96b2e74",
+ "changed": [
+  "docs/new.md",
+  "docs/note-1.md"
+ ],
+ "sample": [
+  "governance/project/indep-walls/tree-exclude.txt",
+  "docs/note-6.md",
+  "src/mod_4.py"
+ ]
+}

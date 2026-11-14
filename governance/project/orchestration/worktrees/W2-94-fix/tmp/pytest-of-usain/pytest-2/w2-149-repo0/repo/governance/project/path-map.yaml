@@ -1,0 +1,14 @@
+# Planted path map (W2-149 acceptance tests): the block the launch script counts the hidden part by, and the
+# evaluation set writer 2's seal is read from (S24).
+evaluation_sets:
+  sandbox-guard-exp-1:
+    visible: []
+    hidden: ["fixtures/evaluation/sandbox-guard-exp-1/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+sets_root_hidden:
+  root: "~/gov-os-eval"
+  hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
+           "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**",
+           "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**"]
+  refused_roles: [orchestrator, engineer, research, product-spec, independent-test-designer, independent-auditor]

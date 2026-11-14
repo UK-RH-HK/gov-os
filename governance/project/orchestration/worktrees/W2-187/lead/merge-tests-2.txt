@@ -1,0 +1,6 @@
+W2-187 (DAEO-0cd2): merge the test designer's fix batch td-2 (5516754c8: S2's order with the pre-flight line first, S8's later status --repair at REPAIR none; 3bd0142f3: W2-172's helper makes the log's parent on write, S7 F2 under the key folder)
+
+Task: DAEO-0cd2
+Role: orchestrator
+Implements: DEC-1179, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
