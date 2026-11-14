@@ -7,7 +7,7 @@ type: task
 class: spec
 role: product-spec
 profile: STANDARD
-status: open
+status: in_progress
 state_class: AUTHORITATIVE
 priority: 1
 created: 2026-11-14
@@ -21,7 +21,7 @@ allowed_paths:
 - docs/probes/DAEO-zlog/**
 reads:
 - .gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md
-- .gov-runtime/scratch/orchestrator/governance/project/orchestration/packages/MEMORY-AUDIT-P1.md
+- governance/project/orchestration/packages/MEMORY-AUDIT-P1.md
 - .gov-runtime/scratch/orchestrator/drafts/memory-scope-20261113/MEMORY-AUDIT.md
 - docs/changes/W2-88a-CIT-P.md
 - docs/changes/W2-98-CIT-P.md
@@ -77,3 +77,87 @@ the `.claude` copies ACT come after W2-187 merges (W2-88a's finding F4).
 - Do not write the below-95 rule before DEC-1179 (4) is recorded. Copy it word for word.
 
 **Filed 2026-11-14 on the owner's decision (DEC-1179, MEMORY-AUDIT-P1), by the CIT-P route (W2-188's CIT-P draft: `.gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md`).** The kernel bytes need the owner's approval of the CIT-P before the merge (DEC-1166 (4)); the `.claude` copy follows by a copies ACT.
+
+## Interface (the CTO at claim, DEC-1179 (8), DEC-1157 (3) and (12); listed for the owner's reading)
+
+- **I1, the skill's three copies and the four places (S1, S2, S4, F1).** `template/governance/kernel/skills/adopt/SKILL.md`
+  is edited. `.rulesync/skills/adopt/SKILL.md` and `template/.rulesync/skills/adopt/SKILL.md` are then byte copies of it,
+  all three at base sha256 `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574d8bff5270bb0d60d0a0`, 74 lines. Exactly four
+  places change:
+  - **Line 4:** `version: "1.0.0"` becomes `version: "1.1.0"` (W2-88a is closed and the kernel copy still reads 1.0.0
+    at `10c0ca52b`). If the version line reads anything other than 1.0.0 at claim, use the next minor after it (S4).
+  - **Line 58, step 6:** replaced in place by one numbered line, `6. Declare ...`.
+  - **A new paragraph** after line 59 (step 7), with one blank line before it, before line 61's
+    `## Verify clauses for adopted tickets`.
+  - **Line 74, the sources line:** adds DEC-1101, DEC-1125 and DEC-1179 in numeric order.
+
+  `git diff <base> -- template/governance/kernel/skills/adopt/SKILL.md` shows those four hunks and no other.
+  `.claude/skills/adopt/SKILL.md` is not touched (the copies ACT).
+
+- **I2, step 6's text constraints (S1, F1, F3; W2-88a's `check_steps` at `tests/acceptance/W2-88a/w2_88a_support.py:207`).**
+  - **The step-6 anchor:** step 6 opens with `Declare`, and no word starting `declar` stands earlier in steps 1 to 5.
+  - **The step-6 checks:** it says `measure`, `the verdict set` and `once`.
+  - **The step-7 anchor** (`record\w*` then, within one sentence, `every|each|all` then `method`) must not occur in step 6.
+  - **No subcommand:** it names no `gov.memaudit` and no `standing declare`.
+  - **No second reranking model:** it never calls the reader one.
+  - **The literal phrases step 6 holds:** `standing set`, `every week`, `same questions`, `95 %`, `counts only`,
+    `never chooses or judges a fix`, `fresh set` with `month`, `fitted` with `replaced`, and `DEC-1179`. S1's
+    statement that a miss is never re-run in the same week and never re-scored is kept in words as well, though the
+    S1 Verify list does not test it.
+
+- **I3, the paragraph after step 7 (S2).** One paragraph that holds the literal words `cron`, `ACT`, `operator`,
+  `never installs` (or `never installed`) and `95 %`, and points to the practice record's section 9. It names no
+  subcommand, and the step-7 anchor rule does not apply after step 7.
+
+- **I4, the practice record `docs/research/W2-88-memory-practice.md` (280 lines at the base; S3, F3).**
+  - **The places re-worded as the CIT-P quotes:** §3's bullet at lines 91-92; §5 item 6's two sub-bullets at lines
+    190-191; §6 step 6 at line 221.
+  - **§6 still passes `check_steps`:** the same anchor rules as I2, and step 6 keeps `Declare`, `measure`,
+    `the verdict set` and `once`.
+  - **A new `## 9. The standing set (DEC-1179)`,** appended after §8 at the end of the file. It holds:
+    - what the set is;
+    - the method: the reader ranking the whole bundle and searching again once, A2, with E2's 115 and 128 of 138 and
+      E3's 114 against 84;
+    - the bar, ceil(0.95 n);
+    - the walls, with the literal `counts only`;
+    - the literal `never chooses or judges a fix`;
+    - the sentence that W2-88 S10's second reranking model stays forbidden;
+    - staleness by count;
+    - the monthly check with its two 5-point rules;
+    - DEC-1179 (4)'s text as recorded, word for word: the bytes of the register's DEC-1179 line `  - (4) ...` after
+      `(4) `, from `**Below 95 %:**` to its closing `.`.
+
+- **I5, the checks the session runs and records under `docs/probes/DAEO-zlog/` (S1, S3, S4).**
+  - `check_steps` on A9's region of each copy (`a9_regions`) and on the practice record's §6: no problems;
+  - `check_pointer` on A9's region: no problems;
+  - `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt`: exit 0;
+  - `sha256sum` of the three copies: equal;
+  - `grep -c 'gov.memaudit\|standing declare'` of the three copies: 0;
+  - the I1 `git diff --stat` and hunk count.
+
+  It runs no test suite.
+
+- **I6, the CIT-P record `docs/changes/W2-188-CIT-P.md` (S5).** Built from the draft
+  `.gov-runtime/scratch/orchestrator/drafts/memory-audit-p1/W2-188-CIT-P.md`. It holds:
+  - the skill's sha256 before (`16fd341f...`) and after; the after equals the kernel copy at the ticket's last commit, so
+    the record is the last file changed;
+  - the lines added and removed;
+  - the old and new text of each changed place;
+  - the impact table: W2-11's body case `test_every_copy_carries_the_kernel_skills_body[adopt]` red until the copies ACT;
+    W2-88a's cases unchanged;
+  - the reviewer's `verdict: PASS` as the last verdict line;
+  - in the front matter, `owner_approval: '<sha256 after> approved by the owner, <date>, <reference>'`, written before
+    the merge.
+
+- **How the code-bound clauses read:**
+  - **S1:** "never chooses a fix" reads as F3's literal `never chooses or judges a fix`. "Fresh set monthly" reads as
+    `fresh set` and `month` within step 6. "Fitted replaced" reads as `fitted` and `replaced` within step 6. "Counts only"
+    is the literal phrase.
+  - **S4:** "the next minor" is 1.1.0. "Those four places" are I1's four hunks.
+  - **S3:** "equals DEC-1179 (4)'s as recorded" is I4's verbatim substring.
+  - **F2:** the close's diff names no `.claude/` path and no `tests/` path.
+
+- **Gaps:** none inside `allowed_paths`. The draft's text needs four changes to meet these clauses (see discoveries):
+  - its step 6 says "with only counts leaving its run" and lacks the literal `counts only`;
+  - its §9 lacks the literal `counts only` and `never chooses or judges a fix`;
+  - its §9 last bullet must be replaced by DEC-1179 (4)'s recorded text, recorded at `976e53791`.
