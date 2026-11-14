@@ -149,7 +149,7 @@ takes no `reason`, `trial` or `owner_named`: the child ends 97).
 | success-4 | `test_w2_184_s4_reviews.py::test_s4_a_record_that_is_not_a_launch_record_is_not_counted` | no keys |
 | success-4 | `test_w2_184_s4_reviews.py::test_s4_a_resumed_review_is_not_a_second_review` | no keys |
 | success-4 | `test_w2_184_s4_reviews.py::test_s4_a_launch_record_that_is_not_json_refuses_a_review_of_a_full_ticket_naming_it` | no refusal |
-| success-4 | `test_w2_184_s4_reviews.py::test_s4_a_launch_record_that_is_not_json_does_not_matter_where_nothing_is_counted` | no table |
+| success-4 | `test_w2_184_s4_reviews.py::test_s4_a_launch_record_that_is_not_json_does_not_matter_where_nothing_is_counted` | no keys (revised in td-5, interface 5.1a: now set with no `criticality.yaml`; its earlier setting refuses, see "Review round 2's F1") |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_two_failed_reviews_promote_the_next_round_to_opus_at_the_table_s_effort` (3) | no promotion: the launch line carries the default, not Opus |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_a_fail_open_finding_promotes_the_next_round` | no promotion |
 | success-5 | `test_w2_184_s5_promotion.py::test_s5_the_first_record_holding_a_fail_open_finding_is_the_one_recorded` | no promotion |
@@ -297,3 +297,50 @@ paths are strings in the tickets the cases build).
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_the_owner_naming_a_decision_opens_a_fourth_round_too` | no table / no option |
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_a_ticket_that_is_not_full_has_no_round_limit` (2: STANDARD, LITE) | no table; guard |
 | success-4 | `test_w2_184_r1_rows.py::test_r1_f2_another_role_on_a_full_ticket_has_no_round_limit` | no table; guard |
+
+## Review round 2's F1 (batch td-5): a test designer launched from the tests worktree sees the ticket's probe records
+
+The FULL review's round 2 failed on F1; the owner decided it: P-W2-184-1 (a), DEC-1010 (interface **5.1a**: the probe
+records are also read under each worktree root the ticket's launch records name, as one set by root-relative path; a
+named root that is gone is skipped; a launch record that is not JSON refuses). File `test_w2_184_f1_tests_worktree.py`
+(21 cases: 19 red, 2 green at the head; several launches per case, 24.5 s in all, at most 1.8 s each, measured). Written from the described behaviour only; the engineer's work
+and the review records were not read; nothing under `fixtures/evaluation/` or any `hidden` folder is opened.
+
+- **The fixture:** the fixture project's main checkout commits the tickets (`DAEO-f1aa`, C2, STANDARD or FULL; another,
+  `DAEO-f1ab`), then two real linked worktrees are added with `git worktree add`: the ticket's (`w2/W2-f1aa`) and the
+  tests' (`w2/W2-f1aa-tests`), sharing the main checkout's launch record folder. Probe records are committed on the branch
+  each case names; an engineer (or an auditor) is launched from the trees the case names, so its launch record names that
+  root; the test designer is launched with `gov launch` from the tests worktree. Some cases plant a launch record (a real
+  launch's record with `root`, `ticket` or `role` changed and a new session id).
+- **Support:** `w2_184_support.launch` takes `cwd=` (the tree launched from; default the main checkout, so every earlier
+  case is unchanged), and gained `commit_all`, `add_worktree`, `remove_worktree` and `plant_launch_record`.
+- **Revised (committed with `Rewrite-Reason: DEC-1010, P-W2-184-1 (a)`):**
+  `test_w2_184_s4_reviews.py::test_s4_a_launch_record_that_is_not_json_does_not_matter_where_nothing_is_counted`.
+  Its setting (an auditor on a STANDARD ticket, a `criticality.yaml`, a garbled launch record) launched before td-5; under
+  5.1a that launch reads the record folder too, so it refuses (now
+  `test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_the_s4_setting_now_that_every_launch_reads_the_folder`).
+  The S4 case is now set with no `criticality.yaml`, where nothing reads the folder (interface 1.4: "launches exactly as
+  before, whatever its role files and records"). Green at the head.
+
+"Red" is why the case fails at this tree's head `e99c8059c` (the engineer's head before the F1 fix, which reads probe
+records under the launch root only). **Not promoted:** the test designer's launch from the tests worktree carries the
+table's Sonnet, xhigh, because the other roots are not read (`the launch line does not carry --model claude-opus-5-5 and
+--effort xhigh once each: {'--model': ['claude-sonnet-5-5'], '--effort': ['xhigh']}`). **Not refused:** that launch is
+accepted (`the launch was not refused with exit code 1`): the head reads no other root, and reads the record folder only
+for a FULL ticket's auditor. Every setup launch passes at the head (the engineer's launch from the ticket worktree is
+promoted in the first case: the record is well formed and seen from its own root).
+
+| KPI | Test | Red because (at `e99c8059c`; and on a launcher that reads 5.1a wrongly) |
+|---|---|---|
+| failure-1 | `test_w2_184_f1_tests_worktree.py::test_f1_a_fail_open_record_on_the_ticket_branch_promotes_the_test_designer_in_the_tests_worktree` (2: STANDARD, FULL; plus Opus after `--` accepted, Sonnet after `--` refused naming both) | not promoted |
+| failure-1 | `test_w2_184_f1_tests_worktree.py::test_f1_two_failed_records_on_the_ticket_branch_promote_the_test_designer_in_the_tests_worktree` (2: STANDARD, FULL) | not promoted |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_root_named_by_a_launch_record_of_any_role_under_a_name_of_the_ticket_is_read` (2: `wbs_id` with an auditor record, `id` with a product-spec record) | not promoted at the second launch (the first, before any record names the ticket worktree, is on the table: green there) |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_named_root_that_no_longer_exists_is_skipped_and_the_other_roots_count` (3: a removed worktree, a record naming a missing folder, one naming a file) | not promoted; refused on a launcher that does not skip the gone root |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_with_no_probe_record_of_the_ticket_under_any_named_root_the_launch_is_as_before` (2: no probe folder, only another ticket's) | green at the head (guard: as before; the table's model, `promotion: null`, Opus after `--` refused naming both) |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_naming_the_file` (2: front matter not YAML, verdict not JSON) | not refused |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_a_launch_from_the_tests_worktree_naming_it` (2: with a probe record under the ticket worktree, with none anywhere) | not refused |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_the_s4_setting_now_that_every_launch_reads_the_folder` | not refused |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_the_same_record_under_both_roots_counts_once` | not promoted at the second test-designer launch; a launcher that counts the record twice promotes at the first (`two failed reviews`) |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_both_roots_is_read_from_the_launch_root_s_copy` | not promoted; a launcher that reads the ticket worktree's copy gives `a fail-open finding` on `01-review.md`, not `two failed reviews` on `03-review.md` |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_two_other_roots_is_read_from_the_first_root_in_sorted_order` | not promoted; the later root's copy gives `a fail-open finding` on `01-review.md` |
+| success-5 | `test_w2_184_f1_tests_worktree.py::test_f1_a_root_no_launch_record_of_this_ticket_names_is_not_read` (2: another ticket's worktree, the main checkout) | not promoted; a launcher that reads that tree gives `a fail-open finding` on `00-open.md` |

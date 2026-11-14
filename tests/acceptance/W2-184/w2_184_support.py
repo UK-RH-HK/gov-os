@@ -20,6 +20,7 @@ import json
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 
 import yaml
@@ -194,6 +195,38 @@ def promote_two_failed(project, tk):
 
 
 # --------------------------------------------------------------------------
+# Linked worktrees and launch records (batch td-5: interface 5.1a)
+# --------------------------------------------------------------------------
+
+def commit_all(tree, message):
+    """Commit everything in ``tree`` (the main checkout or a linked worktree) on its own branch."""
+    b.git(tree, "add", "-A")
+    b.git(tree, "commit", "-q", "-m", message)
+
+
+def add_worktree(project, path, branch):
+    """A linked worktree of the fixture project at ``path`` on a new ``branch`` from the main checkout's HEAD: it shares
+    the main checkout and its launch record folder."""
+    b.git(project, "worktree", "add", "-q", "-b", branch, str(path))
+    return Path(path)
+
+
+def remove_worktree(project, path):
+    b.git(project, "worktree", "remove", "--force", str(path))
+
+
+def plant_launch_record(sandbox, template, **changes):
+    """A launch record in the shared folder: ``template`` (a real launch's record) with ``changes`` and a new session
+    id, as ``<session id>.json``. Returns the session id."""
+    data = dict(template)
+    data.update(changes)
+    sid = str(uuid.uuid4())
+    data["session_id"] = sid
+    b.write(Path(sandbox.records) / f"{sid}.json", json.dumps(data, indent=2) + "\n")
+    return sid
+
+
+# --------------------------------------------------------------------------
 # Launching
 # --------------------------------------------------------------------------
 
@@ -222,19 +255,22 @@ sys.exit(code)
 '''
 
 
-def launch(sandbox, cli, role, tk, *cli_args, reason=NOT_GIVEN, trial=NOT_GIVEN, owner_named=NOT_GIVEN):
+def launch(sandbox, cli, role, tk, *cli_args, reason=NOT_GIVEN, trial=NOT_GIVEN, owner_named=NOT_GIVEN, cwd=None):
     """``gov launch <role> <ticket> [-- <cli_args>]``; with ``reason``, ``trial`` or ``owner_named`` the launcher's
-    function is called with that keyword argument instead (interface 7.2). Returns W2-60a's ``Launch``."""
+    function is called with that keyword argument instead (interface 7.2). ``cwd``: the tree launched from (a linked
+    worktree of the fixture project; its records go to the main checkout's folder), else the project. Returns W2-60a's
+    ``Launch``."""
     options = {name: value for name, value in (("reason", reason), ("trial", trial), ("owner_named", owner_named))
                if value is not NOT_GIVEN}
+    root = Path(cwd) if cwd is not None else Path(sandbox.project)
     records = Path(sandbox.records)
     before_calls, before = len(b.calls(cli)), b._listing(records)
     started = time.time()
     if not options:
-        run = b.run_gov(sandbox, sandbox.project, "launch", role, tk, *(("--", *cli_args) if cli_args else ()))
+        run = b.run_gov(sandbox, root, "launch", role, tk, *(("--", *cli_args) if cli_args else ()))
     else:
-        spec = {"root": str(sandbox.project), "role": role, "ticket": tk, "cli_args": list(cli_args), "kw": options}
-        done = subprocess.run([sys.executable, "-c", DRIVER, json.dumps(spec)], cwd=str(sandbox.project),
+        spec = {"root": str(root), "role": role, "ticket": tk, "cli_args": list(cli_args), "kw": options}
+        done = subprocess.run([sys.executable, "-c", DRIVER, json.dumps(spec)], cwd=str(root),
                               env=b.base_environment(sandbox), capture_output=True, text=True,
                               timeout=b.COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
         shown = ("gov", "launch", role, tk, *(f"--{k.replace('_', '-')}={v!r}" for k, v in options.items()),
