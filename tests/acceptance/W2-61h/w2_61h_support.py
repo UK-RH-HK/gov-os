@@ -216,27 +216,49 @@ def _heading_found(lines: list[str], heading) -> bool:
     return any(line.rstrip() == str(heading).rstrip() for line in lines)
 
 
+def _text_of(lines: list[str], source: dict) -> list[str]:
+    """A cited span's text for comparison (DEC-1180 (1)): the lines ``span_of`` resolves, each with its trailing
+    whitespace stripped, and the span's trailing blank lines dropped. Trailing whitespace is invisible to a reader and
+    to the measure's own heading match (which strips it); a trailing blank line is a separator, not content, and a
+    section moved to the end of a file loses it. Any other difference (a word, a line added or removed, a blank line
+    inside) is a difference. No span: an empty text."""
+    span = span_of(lines, source)
+    text = [line.rstrip() for line in lines[span[0] - 1:span[1]]] if span else []
+    while text and not text[-1]:
+        text.pop()
+    return text
+
+
 def judge_sources(data: dict, root: Path = REPO_ROOT, rev: str = "HEAD") -> tuple[list[tuple[int, str]], list[int]]:
-    """Every gold source of a question, judged at its own commit (DEC-1178 (1); S4, F3). Returns ``(faults,
-    changed)``: ``faults`` are ``(entry number, words)`` for a source that does not hold its answer where it was
-    written (it is red); ``changed`` are the entry numbers whose cited block changed at ``rev`` (listed, never red).
-    The words never quote the file or the question.
+    """Every gold source of a question, judged at its own commit (DEC-1178 (1), DEC-1180 (1), (4); S4, F3). Returns
+    ``(faults, changed)``: ``faults`` are ``(entry number, words)`` for a source that does not hold its answer where
+    it was written (it is red); ``changed`` are the entry numbers whose cited block or section changed at ``rev``
+    (listed, never red; each entry once, however many of its alternatives changed). The words never quote the file or
+    the question.
 
     Red: the source is in the evaluation files; its path is not a file at its own commit (its ``commit``, else the
     question's); its heading or lines are no span there (``span_of``, the measure's rule). A source that names no
     commit at all is judged at ``rev`` instead, and cannot be listed.
 
     Listed, at ``rev``, for a source that holds its answer at its own commit: the path is no longer a file; or the
-    heading is no longer a line of the file and no lines are stated; or, for lines (the heading absent or not cited),
-    the block, the stated lines of the file at its own commit, is found nowhere at ``rev`` or more than once away from
-    its stated lines. A block that moved unchanged (the same lines, or exactly one other place: the measure's and
-    ``repin_gold.py``'s re-anchor) is no fault and is not listed. A source cited by a path alone is the whole file; a
-    heading still found at ``rev`` is followed by the measure, so neither is listed while the file stands."""
+    heading is still a line of the file and the section it governs (``span_of`` at ``rev``: to the next heading of the
+    same or a higher level, or the end of the file; a heading that is not a ``#`` heading spans the stated width) has
+    different text from the section at its own commit (``_text_of``), wherever the section now sits (DEC-1180 (1),
+    N2 (b)); or the heading is no longer a line of the file and no lines are stated; or, for lines (the heading absent
+    or not cited), the block, the stated lines of the file at its own commit, is found nowhere at ``rev`` or more than
+    once away from its stated lines. A block that moved unchanged (the same lines, or exactly one other place: the
+    measure's and ``repin_gold.py``'s re-anchor) and a section that moved unchanged are no fault and are not listed.
+    A source cited by a path alone is the whole file and is not listed while the file stands."""
     items = [(n, a) for n, alts in enumerate(entries(data) or [], 1) for a in alts]
     specs = [f"{rev}:{a['path'].removeprefix('./')}" for _, a in items]
     then = [f"{own_commit(data, a)}:{a['path'].removeprefix('./')}" for _, a in items if own_commit(data, a)]
     blobs = cat_file(sorted(set(specs + then)), root)
     faults, changed = [], []
+
+    def list_entry(n: int) -> None:
+        if n not in changed:            # an entry is listed once, however many of its alternatives changed (N1)
+            changed.append(n)
+
     for n, alt in items:
         rel = alt["path"].removeprefix("./")
         if rel.startswith("fixtures/evaluation/"):
@@ -256,26 +278,28 @@ def judge_sources(data: dict, root: Path = REPO_ROOT, rev: str = "HEAD") -> tupl
         if not own:
             continue
         if now is None:
-            changed.append(n)
+            list_entry(n)
             continue
         now_lines = now.decode("utf-8", "replace").splitlines()
         heading, stated = alt.get("heading"), alt.get("lines")
         if heading is not None and _heading_found(now_lines, heading):
+            if _text_of(old_lines, alt) != _text_of(now_lines, alt):    # N2 (b): the section's text changed
+                list_entry(n)
             continue
         if stated is None:
             if heading is not None:
-                changed.append(n)
+                list_entry(n)
             continue
         first, last = stated
         if last > len(old_lines):
-            changed.append(n)
+            list_entry(n)
             continue
         block = old_lines[first - 1:last]
         if now_lines[first - 1:last] == block:
             continue
         width = len(block)
         if sum(now_lines[i:i + width] == block for i in range(len(now_lines) - width + 1)) != 1:
-            changed.append(n)
+            list_entry(n)
     return faults, changed
 
 
@@ -291,7 +315,8 @@ def judge_all(named: dict[str, dict], root: Path = REPO_ROOT) -> tuple[list[str]
 
 
 class GoldBlockChanged(UserWarning):
-    """The maintenance list (DEC-1178 (1)): gold blocks whose lines changed at HEAD, named by file and entry only."""
+    """The maintenance list (DEC-1178 (1), DEC-1180 (1)): gold blocks or sections that changed at HEAD, named by file
+    and entry only."""
 
 
 def notify_changed(changed: list[str]) -> None:
@@ -300,8 +325,8 @@ def notify_changed(changed: list[str]) -> None:
     warning would raise, so the list is printed instead: the check never fails for it."""
     if not changed:
         return
-    message = (f"W2-61h S4 maintenance list (DEC-1178 (1)): {len(changed)} cited block(s) changed at HEAD, for the "
-               f"walled writer: " + "; ".join(changed))
+    message = (f"W2-61h S4 maintenance list (DEC-1178 (1), DEC-1180 (1)): {len(changed)} cited block(s) or "
+               f"section(s) changed at HEAD, for the walled writer: " + "; ".join(changed))
     try:
         warnings.warn(message, GoldBlockChanged, stacklevel=2)
     except GoldBlockChanged:
