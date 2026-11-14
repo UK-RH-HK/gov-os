@@ -11,8 +11,8 @@ import w2_130_support as s
 LIVE = ("open", "in_progress")
 
 
-def _ticket_at_head(head_tree, ticket: str) -> str | None:
-    path = head_tree / ".tickets" / f"{ticket}.md"
+def _ticket_in(tree, ticket: str) -> str | None:
+    path = tree / ".tickets" / f"{ticket}.md"
     return path.read_text(encoding="utf-8") if path.is_file() else None
 
 
@@ -184,36 +184,47 @@ def test_s4_no_clean_up_commit_the_record_names_changes_a_ticket_closed_at_its_p
     assert not bad, f"{bad[:5]}"
 
 
-def test_s4_closed_missing_lists_per_closed_ticket_the_ids_its_sources_lack(record, head_findings, head_tree):
+def test_s4_closed_missing_lists_per_closed_ticket_the_ids_its_sources_lack(record, pinned_findings):
+    """Reads the tree at ``counts-after.measured_at``, not HEAD (the tickets' statuses and ``sources:`` in that same
+    tree), and runs that tree's own ``gov links`` (``PYTHONPATH=<clone>/src``), not the branch's. A ticket closed or
+    reopened after the land, or a change to ``gov links``, cannot move it. The name is kept because the README map names
+    it (DEC-1156 (7), DEC-1164 (18) pin run 3)."""
     data = record.data("closed-missing")
     assert isinstance(data, dict), "w2-130:closed-missing is not a mapping ticket -> ids"
+    tree, findings = _pinned(record, pinned_findings)
     expected = {}
-    for finding in head_findings:
+    for finding in findings:
         if finding["code"] == "UNLINKED_ID" and finding["path"].startswith(".tickets/"):
             ticket = finding["ids"][1]
-            if s.ticket_status(_ticket_at_head(head_tree, ticket) or "") == "closed":
+            if s.ticket_status(_ticket_in(tree, ticket) or "") == "closed":
                 expected.setdefault(ticket, set()).add(finding["ids"][0])
     for ticket, ids in data.items():
         assert isinstance(ids, list) and ids and all(isinstance(i, str) for i in ids), f"{ticket}: not a non-empty list"
-        text = _ticket_at_head(head_tree, ticket)
-        assert text is not None and s.ticket_status(text) == "closed", f"{ticket} is not a closed ticket"
+        text = _ticket_in(tree, ticket)
+        assert text is not None and s.ticket_status(text) == "closed", f"{ticket} is not a closed ticket at measured_at"
         assert not set(ids) & set(s.ticket_sources(text)), f"{ticket}: lists an id its sources: already holds"
-    assert {t: set(i) for t, i in data.items()} == expected, "closed-missing differs from gov links' UNLINKED_ID on closed tickets"
+    assert {t: set(i) for t, i in data.items()} == expected, (
+        "closed-missing differs from gov links' UNLINKED_ID on closed tickets at measured_at")
 
 
-def test_s4_no_record_lists_per_ticket_ids_that_name_no_record(record, head_findings, head_tree):
+def test_s4_no_record_lists_per_ticket_ids_that_name_no_record(record, pinned_findings):
+    """Reads the tree at ``counts-after.measured_at``, not HEAD (the register's headings, the ticket stems and the ticket
+    files in that same tree), and runs that tree's own ``gov links`` (``PYTHONPATH=<clone>/src``), not the branch's. A new
+    id on a live ticket after the land, or a change to ``gov links``, cannot move it. The name is kept because the README
+    map names it (DEC-1156 (7), DEC-1164 (18) pin run 3)."""
     data = record.data("no-record")
     assert isinstance(data, dict), "w2-130:no-record is not a mapping ticket -> ids"
-    headings = set(re.findall(r"(?m)^### (DEC-\d+)\b", (head_tree / s.REGISTER).read_text(encoding="utf-8")))
-    stems = {p.stem for p in (head_tree / ".tickets").glob("*.md")}
+    tree, findings = _pinned(record, pinned_findings)
+    headings = set(re.findall(r"(?m)^### (DEC-\d+)\b", (tree / s.REGISTER).read_text(encoding="utf-8")))
+    stems = {p.stem for p in (tree / ".tickets").glob("*.md")}
     for ticket, ids in data.items():
         assert isinstance(ids, list) and ids and all(isinstance(i, str) for i in ids), f"{ticket}: not a non-empty list"
-        text = _ticket_at_head(head_tree, ticket)
-        assert text is not None, f"{ticket} is no ticket"
+        text = _ticket_in(tree, ticket)
+        assert text is not None, f"{ticket} is no ticket at measured_at"
         for ident in ids:
             assert ident not in headings and ident not in stems, f"{ticket}: {ident} names a record"
             assert ident in text, f"{ticket}: {ident} is in neither its brackets nor its sources"
-    named = {(f["ids"][1], f["ids"][0]) for f in head_findings if f["code"] == "UNKNOWN_ID"
+    named = {(f["ids"][1], f["ids"][0]) for f in findings if f["code"] == "UNKNOWN_ID"
              and f["path"].startswith(".tickets/") and not f["ids"][0].startswith("tests/")}
     left = [(t, i) for t, i in named if i not in data.get(t, [])]
-    assert not left, f"gov links reports unknown ids the record does not list per ticket: {left[:5]}"
+    assert not left, f"gov links reports unknown ids at measured_at the record does not list per ticket: {left[:5]}"

@@ -77,7 +77,9 @@ def start_findings(pinned_findings) -> list:
 @pytest.fixture(scope="session")
 def variant_findings(tmp_path_factory, home):
     """``variant_findings(commit)``: ``gov links --all`` on ``commit``'s tree with the marks it appends taken off. Run by
-    the branch's tool on purpose (README.md and test_w2_130_audit.py state "HEAD's tool"); not pinned in pin run 2."""
+    the commit's own tool (``PYTHONPATH=<clone>/src``, the variant clone's ``src`` being the commit's own: only the
+    register is changed), not the branch's, so a later change to ``gov links`` cannot move which marks are free text
+    (DEC-1156 (7), DEC-1164 (18) pin run 3)."""
     made: dict = {}
 
     def get(commit: str) -> list:
@@ -86,7 +88,7 @@ def variant_findings(tmp_path_factory, home):
             tree = support.make_clone(tmp_path_factory.mktemp("w2-130-variant") / "repo", sha)
             (tree / support.REGISTER).write_text(support.variant_register(sha), encoding="utf-8")
             support.commit_all(tree, "the register without the marks the commit appends")
-            made[sha] = support.links_json(tree, home)
+            made[sha] = support.links_json(tree, home, src=support.pinned_src(tree))
         return made[sha]
 
     return get

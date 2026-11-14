@@ -3,7 +3,8 @@ no wrong mark was committed and no free-text mark went unchecked (the check's da
 comparison with each commit's diff).
 
 A mark "derived from free text" is one ``gov links`` flags ``text: true`` on the commit's register with the marks it
-appends taken off (``variant_findings``: HEAD's tool, the commit's own tree) or one the audit lists in ``free_text``.
+appends taken off (``variant_findings``: the commit's own tool, its tree's ``src``, on the commit's own tree) or one the
+audit lists in ``free_text``.
 """
 
 from __future__ import annotations
