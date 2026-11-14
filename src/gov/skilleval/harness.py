@@ -32,6 +32,7 @@ from gov.cli.errors import GovError
 
 DEFAULT_MODEL, DEFAULT_EFFORT = "claude-opus-5-5", "high"  # DEC-839's worker defaults, until roles state their own
 SCENARIOS, RECORD = "scenarios.md", "scenario-records.yaml"
+SUMMARIES = "scenario-summaries.md"  # hand-written beside them (W2-100's and W2-101's interface); never shown to the session
 IMPORTS = "governance/project/skill-imports.yaml"
 # Keeps the session to its folder's own settings and skills: no user settings or skills, no MCP servers, no saved
 # session (claude --help). --bare is not used: it would refuse the program's own sign-in.
@@ -165,7 +166,7 @@ def run_scenario(skill_dir: Path, name: str, scenario: dict, model: str, effort:
     try:
         with tempfile.TemporaryDirectory(prefix="gov-skilleval-session-") as folder:
             shutil.copytree(skill_dir, Path(folder, ".claude", "skills", skill_dir.name),
-                            ignore=shutil.ignore_patterns(SCENARIOS, RECORD))
+                            ignore=shutil.ignore_patterns(SCENARIOS, RECORD, SUMMARIES))
             prompt = SESSION_PROMPT.format(name=name, situation=scenario["situation"])
             reply, cost = ask("session", prompt, folder, model, effort, timeout)
         with tempfile.TemporaryDirectory(prefix="gov-skilleval-judge-") as folder:

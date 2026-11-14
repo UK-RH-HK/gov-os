@@ -1,0 +1,98 @@
+"""Fixtures for the W2-130 acceptance cases.
+
+``gov links --all --json`` takes seconds, so each run is made once per session, on a clone (``git clone --shared``)
+in a temporary folder: the tree under test is never written. A case whose record block is missing fails in its own
+body (``Record.block`` calls ``pytest.fail``); no fixture skips.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import w2_130_support as support  # noqa: E402
+
+
+@pytest.fixture(scope="session")
+def record() -> support.Record:
+    return support.Record(support.ROOT / support.RECORD)
+
+
+@pytest.fixture(scope="session")
+def home(tmp_path_factory) -> Path:
+    return tmp_path_factory.mktemp("w2-130-home")
+
+
+@pytest.fixture(scope="session")
+def clone_at(tmp_path_factory):
+    """``clone_at(rev)``: a shared clone checked out at ``rev``, made once."""
+    made: dict = {}
+
+    def get(rev: str) -> Path:
+        sha = support.full(rev)
+        if sha not in made:
+            made[sha] = support.make_clone(tmp_path_factory.mktemp("w2-130-clone") / "repo", sha)
+        return made[sha]
+
+    return get
+
+
+@pytest.fixture(scope="session")
+def head_tree(clone_at) -> Path:
+    """HEAD's files: a clone checked out at HEAD (the cases read the committed tree, as ``gov links`` does)."""
+    return clone_at(support.head())
+
+
+@pytest.fixture(scope="session")
+def head_findings(head_tree, home) -> list:
+    return support.links_json(head_tree, home)
+
+
+@pytest.fixture(scope="session")
+def start_findings(clone_at, home) -> list:
+    return support.links_json(clone_at(support.START), home)
+
+
+@pytest.fixture(scope="session")
+def variant_findings(tmp_path_factory, home):
+    """``variant_findings(commit)``: ``gov links --all`` on ``commit``'s tree with the marks it appends taken off."""
+    made: dict = {}
+
+    def get(commit: str) -> list:
+        sha = support.full(commit)
+        if sha not in made:
+            tree = support.make_clone(tmp_path_factory.mktemp("w2-130-variant") / "repo", sha)
+            (tree / support.REGISTER).write_text(support.variant_register(sha), encoding="utf-8")
+            support.commit_all(tree, "the register without the marks the commit appends")
+            made[sha] = support.links_json(tree, home)
+        return made[sha]
+
+    return get
+
+
+@pytest.fixture(scope="session")
+def propose_sources_at(clone_at, home):
+    """``propose_sources_at(commit)``: ``{ticket path: [ids]}`` of ``gov links --propose-sources`` on the commit's
+    parent, for the tickets open or in progress there."""
+    made: dict = {}
+
+    def get(commit: str) -> dict:
+        before = support.parent(commit)
+        if before not in made:
+            tree = clone_at(before)
+            done = support.run_links(tree, home, "--propose-sources", "--all")
+            if done.returncode not in (0, 1):
+                pytest.fail(f"gov links --propose-sources failed at {before}: {done.stderr.strip()[-300:]}")
+            wanted = {}
+            for path, ids in support.patch_source_ids(done.stdout).items():
+                text = support.show(before, path)
+                if text is not None and support.ticket_status(text) in ("open", "in_progress"):
+                    wanted[path] = ids
+            made[before] = wanted
+        return made[before]
+
+    return get
