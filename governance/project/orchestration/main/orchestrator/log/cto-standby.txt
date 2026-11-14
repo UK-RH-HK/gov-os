@@ -1,1 +1,1 @@
-2026-11-11 11:36:24 CTO 8ddb8b14 waits on the owner: the re-pin (ACT-REPIN-W5, ready) and the 09:30 digest answers (sent 09:34)
+standby since 19:44: waiting on the owner (P-W2-88-S27-1 with packages 1 and 2; q02 four commands; W2-61h walled run; Q-REFRESH-1, Q-SCAN-1, Q-SCAN-2) and the W2-187 lead (pid 3815645, review running). Inbox waiter armed.

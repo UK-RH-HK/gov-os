@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-187
+status: interim result a9842b15a: W2-187 (DAEO-0cd2): probe record of the narrow check of the fix batch after review round 1 (F-A, F-B, R1), pass at 89d291eac; the round-1 record kept as PR-DAEO-0cd2-round-1.md

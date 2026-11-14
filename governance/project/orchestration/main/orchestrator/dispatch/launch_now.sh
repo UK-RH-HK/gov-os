@@ -7,7 +7,8 @@ ORCH=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrato
 echo "$(date '+%F %T') admitted by the dispatcher; launching $W2" >&2
 bash "$ORCH/tools/disk_gate.sh" || exit 2
 cd "/home/usain/gov-os-worktrees/$W2" || exit 2
-exec /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json --permission-mode acceptEdits \
+# DEC-838: no lead inherits a compaction threshold from whoever started the dispatcher (the CTO trial runs at 300k)
+exec env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW -u CLAUDE_AUTOCOMPACT_PCT_OVERRIDE -u CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS /home/usain/.local/bin/claude -p --model claude-opus-5-5 --effort high --output-format json --permission-mode acceptEdits \
   --allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob" \
   --settings "{\"env\":{\"GOV_ROLE\":\"orchestrator\",\"GOV_TICKET\":\"$ID\",\"CLAUDE_CODE_SUBAGENT_MODEL\":\"claude-opus-5-5\"}}" \
   < "$ORCH/briefs/$BRIEF" > "$ORCH/log/$LOGF"

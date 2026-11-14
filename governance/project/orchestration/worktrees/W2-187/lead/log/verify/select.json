@@ -4,10 +4,10 @@
  "core_changed": [],
  "unplaced": [],
  "base": "144d993d39b7eb5f23fbfe3a4bc0a55a882b6e4b",
- "head": "5b82d1d53868625c43a5b8b2bb58492bad3f8038",
+ "head": "a9842b15ad9f7b82a3d394914d3bbb951eab3761",
  "governance_left_out": [
-  "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md",
-  "docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md",
+  "docs/probes/DAEO-0cd2/PR-DAEO-0cd2-round-1.md",
+  "docs/probes/DAEO-0cd2/PR-DAEO-0cd2.md",
   "governance/project/orchestration/tools/memaudit_cron.sh"
  ],
  "changed": [

@@ -4,6 +4,14 @@
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 
+- **21:35:** RE-PIN fold narrow review r3 PASS, 0 blocking (drafts/repin-rel-0.1.0/review-r3.md; reviewed BUNDLE d58ae15b48ad…, = current; sha256sum -c OK). Rows: N1 README '60 s at most' vs 70 s; N2 HUP kills tee (log loses STOP line); N3 NOTES count 14->15; N4 tools/rebuild_semantic_check.py not in fill_release's 18-file list (fails open, narrow, backstop rel_checks s4; out of scope) -> fold N1/N2/N3/N4 AT FILL and cover them in the post-fill review (changes BUNDLE sha; F4 then compares against the post-fill review's sha); N8 harnesses COPIED to log/repin-rel-harness/. Tonight's chain no longer needs the fold review.
+- **21:33:** OWNER asked for the brief (status, runs, timetable, all packages in full) + repeat `yes ACT-CLAUDE-COPIES-12 22865f2a` (already logged 18:15, same yes) + VS Code panel handover steps + EXAMIN repos. FOUND: claudeCode.environmentVariables is scope MACHINE (workspace .vscode ignored) -> Remote [WSL] machine settings, window var only; GOV_ROLE/GOV_TICKET already from .claude/settings.local.json; settings.local.json env REACHES LEADS in worktrees (GOV_DEV_TIERS seen in W2-187's Bash) -> never put the window there. launch_now.sh HARDENED: env -u the 3 compaction vars (backup .pre-compact-strip). EXAMIN real repo a7cf346 + 6 M + 40 untracked = 0a82082's content (42 files equal, 4 CRLF-only). Re-pin fold narrow review RUNNING (Opus auditor, text reply -> drafts/repin-rel-0.1.0/review-r3.md). Handover window: now (no land) until W2-187 DONE.
+- **21:21:** W2-187 fix-batch NARROW CHECK PASS at 89d291eac (interim a9842b15a; round-1 record PR-DAEO-0cd2-round-1.md). Next: lead_verify, DONE -> land -> W2-188 hand merge + COPIES-12 .req.
+- **20:29:** W2-187 F-A batch RUNNING: td-5 pid 2840008, eng-5 pid 2840522 (Opus, --promoted for F-B fail-open; C2); interim 46d131ab9 filed. Next: narrow check, verify, DONE.
+- **20:18:** W2-187 review r1 PASS at 5b82d1d53 (rev-1-2). F-A (standing + fresh children get the repository as root -> search the repo's own store, not the link's; on Gov OS 31 commits apart -> every week STOPPED, fails closed) -> (a) BY THE CTO (I6 says link's worktree; DEC-1157 (12), DEC-1180 (4)): TD batch (both paths; W2-172 root-pinning cases revised = mine DEC-1156 (7)), engineer, narrow check, verify, DONE ~1.5-2 h. F-B (push the scanned sha) + R1 (gitleaks on step 6's cron PATH) ride along. Path cases outside allowed_paths -> me. LIST FOR THE OWNER'S READING. Lead removing 2 PACKAGE files from docs/probes/ (probe schema reds).
+- **20:02:** W2-187 review relaunched as rev-1-2 (pid 2696971) with --reason; launch checks passed, running. lead_verify running at 5b82d1d53. Both brief defects in the lead's brief_gaps.
+- **19:49:** W2-187 rev-1 LAUNCH_REFUSED (effort max needs --reason, DEC-1120 (3)); my brief named "Opus, max" with no --reason = MISSED 8 (lead told by SendMessage to relaunch with --reason). Trial: stale 6, corrections 0, missed 8, compactions 7.
+- **19:44 (compaction 7 at ~19:40):** W2-187 lead QA message ANSWERED (a) BY THE CTO: no qa-engineer launch path (gov launch WORKER_ROLES lacks it; my brief's defect); its Opus review carries the qa-review KPI trace; brief gap + residual. DND row 217 (3866f95f6). LIST FOR THE OWNER'S READING in the next report (with P-W2-88-S27-1 still open). Inbox empty; W2-187 lead alive (wait b8abxe8rc); waiter bc0pr5gge armed. Trial: stale 6, corrections 0, missed 7, compactions 7.
 - **19:04:** W2-94 LANDED 19:01 (fdf397527) -> kept open 61793c613 (closes on q02 20/20). W2-88 RETURNED ESCALATION at 2491c9bec (DO NOT LAND; log/W2-88-A5-p1.json): P-W2-88-S27-1 (a) folder mode ~4-5 h / (b) revert S27 ~2 h / (c) fence (fails), + pkg 1 (pool/walls/MEMORY-AUDIT-1 briefs ship nowhere: (a) src/gov/_shipped + pyproject package data, widen), pkg 2 (codeintel 100k-row cap: redis + likely EXAMIN A9 refuse CODEGRAPH_TOO_LARGE: (a) widen to src/gov/codeintel/__init__.py, page by edge type), pkg 3 (test_safety.py:95 revision: MINE DEC-1156 (7)). PACKAGE TO THE OWNER 19:04 (paths X tonight / Y tomorrow; rec Y). Pushed. On the answer: record DEC-1183 (+ COPIES-12 yes), widen DAEO-2bdu, brief run 8 (resume), release.
 - **18:59:** W2-88 interim 2491c9bec: S27 narrow re-check FAIL P1R-1 (curl-auth-user 5-line gap + private-key body cross the `#` fence; filtered match swallows next file's secret; fails open, ordinary yes). DEC-1010: 2nd check -> lead packages to the OWNER once. MY EVIDENCE: `gitleaks dir` scans files separately (A+B stdin 0 findings, dir 1 on B; 403 files 0.34 s; scratchpad/glk) -> sent to lead w2-88-c3 as an option to cost with (b) drop S27 from this run (land S24-S26 for tonight's release) and (c) a fence fix. Release ready waits on W2-88. W2-94 land in flight (4480c451c955).
 - **18:40:** W2-94 s13c DONE 4480c451c955 -> LAND QUEUED (NO COMMIT DURING THE LAND). The queue closes W2-94 -> REOPEN at once to in_progress (it closes on the operator's q02 20 of 20; DEC-1182 (5)).
@@ -1629,10 +1637,9 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-14T17:58:59Z a962cbe47ec660aac0741ea592e0e98033df7e74295c74dc5e0faebded62b443
-git head: 41ab6597992d97522c33d1c81f93ccfa61e21aa6
+generated: 2026-11-14T19:43:17Z b65fe456edaca2313e8efcaa80b6b89cd575a273380f612c3c5426017ac61e8a
+git head: 3866f95f6c44ddfeb65357753cdfb594fa7012c0
 tickets in progress (`tk ls --status=in_progress`):
-  DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0cd2 [in_progress] - W2-187 The standing hidden set, judged every week at 95 %, counts only <- [DAEO-f58b, DAEO-rmhj]
   DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
@@ -1642,13 +1649,13 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
   DAEO-zlog [in_progress] - W2-188 The adopt skill's step 6 and the practice record: the standing set <- [DAEO-pg6i]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS        41ab65979 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS        3866f95f6 [w2/integrate]
   /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record         b1eeb8823 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a        41ab65979 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b        3c48b79fa (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record         eb016491e [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a        3866f95f6 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b        61793c613 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-122               3fc448601 [w2/W2-122]
   /home/usain/gov-os-worktrees/W2-123               3de9bcf44 [w2/W2-123]
   /home/usain/gov-os-worktrees/W2-128-tests         eb1c4fbb8 [w2/W2-128-tests]
@@ -1663,24 +1670,23 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-155               8da607e3d [w2/W2-155]
   /home/usain/gov-os-worktrees/W2-15a               fd637510d [w2/W2-15a]
   /home/usain/gov-os-worktrees/W2-184               315a6a125 [w2/W2-184]
-  /home/usain/gov-os-worktrees/W2-187               f4fdc7fa1 [w2/W2-187]
-  /home/usain/gov-os-worktrees/W2-187-tests         5708b4385 [w2/W2-187-tests]
+  /home/usain/gov-os-worktrees/W2-187               5b82d1d53 [w2/W2-187]
+  /home/usain/gov-os-worktrees/W2-187-tests         f9b228e32 [w2/W2-187-tests]
   /home/usain/gov-os-worktrees/W2-188               790357f02 [w2/W2-188]
   /home/usain/gov-os-worktrees/W2-20-1017           1a54976c7 [w2/W2-20-1017]
   /home/usain/gov-os-worktrees/W2-27-citp           33f72aab2 [w2/W2-27-citp]
   /home/usain/gov-os-worktrees/W2-32-proto          f8a5fdade [w2/W2-32-proto]
-  /home/usain/gov-os-worktrees/W2-42a               b42e8628b [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a               2376e2a33 [w2/W2-42a]
   /home/usain/gov-os-worktrees/W2-56-f-tests        3ea3411e1 [w2/W2-56-f-tests]
   /home/usain/gov-os-worktrees/W2-61h-c39           1a2bf4a16 [w2/W2-61h-c39]
   /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
   /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
   /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-88                8e3c3def6 [w2/W2-88]
-  /home/usain/gov-os-worktrees/W2-88-tests          e66a9cb58 [w2/W2-88-tests]
+  /home/usain/gov-os-worktrees/W2-88                2491c9bec [w2/W2-88]
   /home/usain/gov-os-worktrees/W2-91-tests          3191a7948 [w2/W2-91-tests]
   /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
   /home/usain/gov-os-worktrees/W2-94                72a339b9d [w2/W2-94]
-  /home/usain/gov-os-worktrees/W2-94-fix            f192e50da [w2/W2-94-fix]
+  /home/usain/gov-os-worktrees/W2-94-fix            4480c451c [w2/W2-94-fix]
   /home/usain/gov-os-worktrees/research-retrieval   a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

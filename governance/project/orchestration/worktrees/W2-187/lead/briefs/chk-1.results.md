@@ -1,0 +1,2 @@
+- `gov accept W2-187`: pass, 210 passed, 0 failed, every line success-1 to success-12 and failure-1 to failure-7 pass.
+- `tests/acceptance/W2-187` 210 passed; `W2-172` 162 passed; `W2-171` 140 passed (the engineer also ran W2-170 184, W2-173 91, W2-88 215, unit memaudit 363: all green).

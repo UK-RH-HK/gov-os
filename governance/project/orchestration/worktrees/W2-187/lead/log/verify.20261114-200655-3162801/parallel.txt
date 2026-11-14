@@ -1,0 +1,247 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+.......................................................F................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+...........................................s............................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+.......................................s................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+...................................F...........F.........F.............. [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+......s................................................................. [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........sss............................................................. [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+...........s...........s................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+.......................................................sss.............. [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+.......................................................................F [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.............................                                            [100%]
+=================================== FAILURES ===================================
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_INVALID_TYPE', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing o...CKAGE-W2-187-S12.md: 'type' field is missing or not a string", 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md'}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 2 findings on this repository: [{'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing or not a string"}, {'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md: 'type' field is missing or not a string"}]
+E       assert [{'code': 'SC...-187-S12.md'}] == []
+E         
+E         Left contains 2 more items, first extra item: {'code': 'SCHEMA_INVALID_TYPE', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing or not a string", 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x7736f7a04950>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+        documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+>       check.accepts_all(schema, documents, "a probe record of this repository")
+
+tests/acceptance/W1-08/test_w1_08_probe.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7736f7a04950>
+schema = PosixPath('/home/usain/gov-os-worktrees/W2-187/template/governance/kernel/schemas/probe.schema.json')
+documents = {'DAEO-03ub-PR-DAEO-03ub': {'commissioned_by': 'orchestrator (W2-42a ticket lead, session w2-42a-f7)', 'implementer_se...154', 'DEC-409', 'DEC-958', 'DEC-1028', ...], 'implementer_session': 'f09387c1-5b62-4ec7-8753-0bd972964efb', ...}, ...}
+what = 'a probe record of this repository'
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+>       assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: probe.schema.json refuses a probe record of this repository (exit code 1):
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'type' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'reviewer_session' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'implementer_session' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'reviewer_wrote_nothing' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'commissioned_by' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'judged_by' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'judgement' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-P1.json::$: 'probed_commit' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'type' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'reviewer_session' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'implementer_session' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'reviewer_wrote_nothing' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'commissioned_by' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'judged_by' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'judgement' is a required property
+E         /tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw0/test_the_probe_schema_accepts_0/instances-0/DAEO-0cd2-PACKAGE-W2-187-S12.json::$: 'probed_commit' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:293: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x7736f7153d70>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md': [{'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing or not a string"}], 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md': [{'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md: 'type' field is missing or not a string"}]}
+E       assert not {'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md': [{'code': 'SCHEMA_INVALID_TYPE', 'message': "docs/probes/DAEO-0cd2/PACK...CKAGE-W2-187-S12.md: 'type' field is missing or not a string", 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md'}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 2 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing or not a string"}, {'code': 'SCHEMA_INVALID_TYPE', 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md: 'type' field is missing or not a string"}])
+E       assert not [{'code': 'SCHEMA_INVALID_TYPE', 'message': "docs/probes/DAEO-0cd2/PACKAGE-W2-187-P1.md: 'type' field is missing or no...ACKAGE-W2-187-S12.md: 'type' field is missing or not a string", 'path': 'docs/probes/DAEO-0cd2/PACKAGE-W2-187-S12.md'}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-lead-W2-187/pytest-of-usain/pytest-0/popen-gw4/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+            assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+>       assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+E       AssertionError: assert ['released', 'released'] == ['released', ...', 'released']
+E         
+E         Right contains one more item: 'released'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:564: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-worktrees/W2-187/tests/unit/resources/test_w2_20_round3.py:114: DeprecationWarning: This process (pid=2498199) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-170/test_w2_170_f5_paths.py:49: F5 judges only the branch w2/W2-170; this is the branch w2/W2-187: not judged here
+SKIPPED [1] tests/acceptance/W2-171/test_w2_171_f5_paths.py:53: F5 judges only the branch w2/W2-171; this is the branch w2/W2-187: not judged here
+SKIPPED [1] tests/acceptance/W2-88/test_w2_88_s7_s9_proofs.py:172: S9's branch check judges only the branch w2/W2-88; this is w2/W2-187: not judged here
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/acceptance/W2-88/test_w2_88_f5_paths.py:40: this check judges only the branch w2/W2-88; this is the branch w2/W2-187: not judged here
+SKIPPED [1] tests/acceptance/W2-172/test_w2_172_f5_paths.py:30: F5 judges only the ticket's branch w2/W2-172 (this one is 'w2/W2-187'): not judged here
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+5 failed, 7285 passed, 11 skipped, 6 warnings in 1385.85s (0:23:05)

@@ -1,0 +1,6 @@
+W2-187 (DAEO-0cd2): merge the test designer's fix batch td-5 (fc634374b: review round 1's F-A, the searched store is the declared store on both paths; F-B, push only the scanned commit; R1, step 6 names the scanner; the CTO's (a))
+
+Task: DAEO-0cd2
+Role: orchestrator
+Implements: DEC-1179, DEC-1182, DEC-1156
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

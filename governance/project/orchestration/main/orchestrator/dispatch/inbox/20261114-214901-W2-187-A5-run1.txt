@@ -1,0 +1,7 @@
+log: W2-187-A5-run1.json
+W2: W2-187
+status: DONE
+
+I've finished W2-187 and verified it; the head to land is a9842b15ad9f and the tree is clean. Everything the ticket asks for is built, including S12/F7 and the N2 (b) amendment added during the run. The review passed, and so did the narrow check of the fix the CTO then ordered. Two things to know:
+- QA never ran as a separate session: `gov launch` has no `qa-engineer` role. The CTO chose to let the review carry the KPI trace instead.
+- The ticket's own code is 1,779 lines against the 700 estimated, and the pre-approved split was not taken. The trigger was the test designer's suite showing over
