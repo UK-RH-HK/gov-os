@@ -1,10 +1,10 @@
 ---
 name: api
-version: "1.0.1"
+version: "1.0.2"
 description: "The engineer's method for API work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that adds or changes an interface other code or clients call."
 output: none
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # API
@@ -39,9 +39,13 @@ Read first, before anything else:
 - Versioning: a published interface carries a version in its path, header or package; a breaking change gets a new
   version, never a quiet change to the old one.
 - Backward compatibility: within a version only additive change (a new optional field, a new endpoint, a new
-  enum value the caller can ignore). A rename, a removal, a type change or a stricter rule is breaking.
+  enum value the caller can ignore). A rename, a removal, a type change or a stricter rule is breaking, so a rename
+  is done as add-the-new, keep-the-old (below).
 - Deprecation: mark the old shape deprecated in the contract, keep it working, and name what replaces it and when it can
   go; removal is its own change, later.
+- A ticket that asks for a rename or removal inside a published version is made additive where it can be: keep the
+  old field, add the new one beside it, mark the old one deprecated in the contract, and test the old client's
+  request for the old shape. What cannot be made additive (the old field really must go) is the only part escalated.
 - One error shape for the whole interface, one status code per kind of failure, stable error codes callers can match
   on; a message is for people, a code is for programs.
 - Names: nouns for resources, one casing, the same word for the same thing everywhere; follow the existing contract.
@@ -52,10 +56,10 @@ Copy this checklist into your notes and tick each step as you go.
 
 - [ ] 1. Read the ticket's KPI lines and paths and the current contract; list who calls what you change.
 - [ ] 2. Write or change the contract first: requests, responses, every error, the version.
-- [ ] 3. Mark each change as additive or breaking against the published version; a breaking one is not made in place
-  (Escalation).
-- [ ] 4. Write the unit tests from the contract, following the test-driven-development skill, including the old shape
-  where one is kept (Unit-test focus below).
+- [ ] 3. Mark each change as additive or breaking against the published version; make a requested breaking one
+  additive where it can be (Conventions), and escalate only the rest (Escalation); never make it in place.
+- [ ] 4. Write the unit tests from the contract, following the test-driven-development skill, including a
+  backward-compatibility test for the old shape where one is kept (Unit-test focus below).
 - [ ] 5. Write the handler or client code, and check it against the contract.
 - [ ] 6. Run the unit suite of the touched area and the Pre-commit checklist below.
 - [ ] 7. Run the acceptance tests only through `gov accept`; read the pass or fail and never the test code.
@@ -76,7 +80,9 @@ Copy this checklist into your notes and tick each step as you go.
 The method is the test-driven-development skill's; this is only where an interface's tests look.
 
 - Each response and each error of the contract, checked against its schema, not only the happy path.
-- Backward compatibility: a request in the old shape still gets the old response shape.
+- Backward compatibility: a request in the old shape still gets the old response shape. Name that test for the old
+  client and the shape it reads (for example "old v1 client: GET /v1/orders/{id} still returns `total`, as published"),
+  next to any test that the new and old fields agree; the second does not stand in for the first.
 - Input at the edges: a missing field, an extra field, a wrong type, an empty list, a value at the limit.
 - Versioning: the same call on two versions answers each as published.
 - Idempotent verbs repeat safely; a pagination or sort order is stable across calls.
@@ -106,6 +112,8 @@ The method is the test-driven-development skill's; this is only where an interfa
   `AUTH_REQUIRED` (the orchestration skill's briefs-and-returns.md).
 - This skill adds no output path of its own (`output: none`). Name in `discoveries` each point the contract left open
   and the simplest reading taken, and in `risks` each caller you could not identify.
+- In `tests`, name each test with its input and the result it expects, including the backward-compatibility test for
+  the old shape, whether it was written and run or only planned because a write or run was refused; say which.
 
 ## Escalation
 

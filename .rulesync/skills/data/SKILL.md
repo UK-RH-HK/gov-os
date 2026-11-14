@@ -1,10 +1,10 @@
 ---
 name: data
-version: "1.0.1"
+version: "1.0.2"
 description: "The engineer's method for data work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that changes a schema, moves or transforms stored data, or loads data from outside."
 output: none
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Data
@@ -53,7 +53,7 @@ Copy this checklist into your notes and tick each step as you go.
 - [ ] 1. Read the ticket's KPI lines and paths, the current schema and a sample; list what reads and writes the data.
 - [ ] 2. State the data-quality rules for each field the ticket touches, and the counts that will be reported.
 - [ ] 3. Write the unit tests first, following the test-driven-development skill, with bad rows and a small fixture
-  (Unit-test focus below).
+  (Unit-test focus below); name each test with its bad row, in your notes and in the return.
 - [ ] 4. Write the schema change as small steps, each with its down step, and say which are reversible.
 - [ ] 5. Run each step forward and back on a fixture or a throw-away database in the sandbox, never on live data,
   comparing counts before and after.
@@ -76,6 +76,9 @@ Copy this checklist into your notes and tick each step as you go.
 The method is the test-driven-development skill's; this is only where data tests look.
 
 - Each data-quality rule with a row that breaks it (empty, duplicate, out of range, orphaned) and a row that passes.
+  Name the test for the rule and its bad row, and the reason the row is rejected with (for example "test_missing_id:
+  a row with a blank `shipment_id` is rejected as `id_missing` and kept in the rejected rows"); a count of tests is
+  not a name.
 - A migration forward and back on a small fixture: the shape, the counts and a sample of values.
 - A backfill stopped half-way and restarted: no row done twice, none skipped.
 - The old reader against the new schema, and the new reader against old rows.
@@ -106,6 +109,8 @@ The method is the test-driven-development skill's; this is only where data tests
   `AUTH_REQUIRED` (the orchestration skill's briefs-and-returns.md).
 - This skill adds no output path of its own (`output: none`). State in `evidence` the counts before and after, and in
   `risks` each step that cannot be undone and each rule left unchecked.
+- In `tests`, list each test by name with its bad row and the rejection reason it expects, one line per rule, whether
+  it was written and run or only planned because a write or run was refused; say which. Never only a count of tests.
 
 ## Escalation
 
