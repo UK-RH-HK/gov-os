@@ -10,7 +10,7 @@ ticket: DAEO-zlog (W2-188)
 author: product-spec session of W2-188, from the CTO's draft (DAEO-sdxk)
 review: 'PASS (round 1, docs/probes/DAEO-zlog/PR-DAEO-zlog.md)'
 decisions_carried: [DEC-1179, DEC-1176, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1072, DEC-1071, DEC-105, CAP-33]
-owner_approval: 'pending'
+owner_approval: '"yes W2-188 adopt skill 6a884cf1" (the owner, chat, 2026-11-14 ~15:40; DEC-1181 (1)): the skill''s bytes at sha256 6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489'
 state_class: EVIDENCE
 ---
 
