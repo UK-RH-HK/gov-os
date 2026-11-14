@@ -1,0 +1,6 @@
+log: W2-42a-A5-r4.json
+W2: W2-42a
+status: LAUNCH_BLOCKED. R4 and R5 are built and verified at b42e8628b835. The narrow independent check (step 5) did not start: `gov launch` refused it as review round 3 of DAEO-03ub (DEC-1010), and a third round needs `--owner-named <DEC-id>`. The brief said not to pass `--owner-named` because this tree's l
+
+task: DAEO-03ub (W2-42a), ticket lead, build run for R4 (blob revision-colon-paths) and R5 (the guard's judge never raises), plus the F3 failure line (DEC-1157 (12), DEC-1180 (4))
+status: LAUNCH_BLOCKED. R4 and R5 are built and verified at b42e8628b835. The narrow independent check (step 5) did not start: `gov launch` refused it as review round 3 of DAEO-03ub (DEC-1010), and a third round needs `--owner-named <DEC-id>`. The brief said not to pass `--owner-named` because this tree's launcher lacked it, but merging w2/integrate brought in W2-184's launcher, which has it. I did not pass it and di

@@ -1,0 +1,130 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-14 17:34:44)
+{
+  "ticket": "DAEO-03ub",
+  "outcome": "pass",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "pass",
+      "passed": 339,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "pass",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "pass",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-5",
+      "outcome": "pass",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-6",
+      "outcome": "pass",
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-7",
+      "outcome": "pass",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-8",
+      "outcome": "pass",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-9",
+      "outcome": "pass",
+      "passed": 83,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-10",
+      "outcome": "pass",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-11",
+      "outcome": "pass",
+      "passed": 232,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-12",
+      "outcome": "pass",
+      "passed": 69,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-13",
+      "outcome": "pass",
+      "passed": 190,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-1",
+      "outcome": "pass",
+      "passed": 427,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-2",
+      "outcome": "pass",
+      "passed": 301,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "failure-3",
+      "outcome": "pass",
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 2
+  },
+  "totals": {
+    "passed": 1292,
+    "failed": 0,
+    "skipped": 2
+  }
+}

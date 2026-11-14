@@ -1,9 +1,9 @@
-Status at 2026-11-14 16:34:31 (the last report's block)
-- Progress: 159 closed / 3 merged-not-closed / 0 built-and-held / 7 in flight / 23 not started, of 192.
-- Leads: 6 running (W2-184, W2-187, W2-188, W2-42a, W2-88, W2-94); queued next: W2-88, W2-187, W2-42a, W2-184; the gate: open.
+Status at 2026-11-14 17:49:26 (the last report's block)
+- Progress: 160 closed / 3 merged-not-closed / 0 built-and-held / 6 in flight / 23 not started, of 192.
+- Leads: 4 running (W2-187, W2-42a, W2-88, W2-94); queued next: W2-88, W2-187, W2-42a, W2-94; the gate: open.
 - Closes: none running; next: W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28), W2-134 (12:42), W2-100 (12:52), W2-101 (13:19); refused since the last report: none.
-- Reopened since the last report: W2-94 ((DEC-1180 (4), DEC-1157 (12)): kept open for q02's run with variant v2 (DEC-1182 (5)); S13 for the review's P4, the …). New tickets since the last report: none.
+- Reopened since the last report: none. New tickets since the last report: none.
 - Memory chain: W2-61 closed; W2-61h REOPENED 11-14 for F3's test revision (DEC-1178 (1)): each source at its own commit; changed lines listed for the walled writer; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 closed; W2-55 closed; W2-64 closed; W2-04 closed; W2-06 closed; W2-13 closed; W2-15a not started.
 - Toward EXAMIN's copy: EXAMIN's copy: W2-27 waits on release 0.1.0 (DEC-1178 (3)): W2-88's reopen (P-1, F-1, F-3, scan speed) running since 12:43; W2-100/W2-101 closed; then 'release ready', the re-pin bundle, your evening sitting, the clone, kit, A0 and the EXAMIN CTO.
 - Emergency plan: none (lifted, DEC-1158).
-- OWNER_ACTION: now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); later: `yes ACT-CLAUDE-COPIES-12 <sha8>`; the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))
+- OWNER_ACTION: now: your operator's four q02 commands (v2 7aa6d88c, sent 16:22), W2-94 closes on 20 of 20; now: your operator's walled run of W2-61h (command given 15:58); now: Q-REFRESH-1, Q-SCAN-1 and Q-SCAN-2 (the guard's 100 ms: file tools pass after a sweep, Bash over); now: `yes ACT-CLAUDE-COPIES-12 22865f2a` (review PASS; applies at W2-188's hand merge after W2-187 lands); the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO (brief now b70ff233, DEC-1182 (2))

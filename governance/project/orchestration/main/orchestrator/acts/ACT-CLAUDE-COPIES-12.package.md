@@ -89,7 +89,14 @@ git commit -m "ACT-CLAUDE-COPIES-12: the generated .claude copy of W2-188's adop
 
 ## 5. The undo
 
-`bash $G/apply.sh undo` restores the before-bytes `77faaa13…`. Then commit with `Role: owner`; the operator's form is `undo ACT-CLAUDE-COPIES-12 22865f2a`. The full close is W2-188's own rollback: revert the merge.
+`bash $G/apply.sh undo` restores the before-bytes `77faaa13…`. Then commit, naming the ACT in the subject (W2-188's commit case excuses only a `Role: owner` commit whose subject names `ACT-CLAUDE-COPIES-`; review F3):
+
+```
+git add .claude/skills/adopt/SKILL.md
+git commit -m "ACT-CLAUDE-COPIES-12 undo: the .claude copy of the adopt skill back to its before-bytes" --trailer "Task: DAEO-zlog" --trailer "Role: owner"
+```
+
+The operator's form is `undo ACT-CLAUDE-COPIES-12 22865f2a`. The full close is W2-188's own rollback: revert the merge.
 
 ## 6. Not in this ACT
 

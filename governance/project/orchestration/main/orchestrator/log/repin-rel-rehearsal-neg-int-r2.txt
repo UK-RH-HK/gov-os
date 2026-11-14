@@ -1,0 +1,80 @@
+======== rehearsal of the re-pin from release 0.1.0 (neg-int), 2026-11-14 17:39:54
+======== the live paths before
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at 41ab6597992d
+store halves: a at 41ab6597992d, b at 3c48b79fac00
+w2/integrate: 41ab6597992d
+the stand-in C: 41ab6597992d (the main tree's w2/integrate head now)
+======== the scratch release 0.1.0 at the stand-in C (a scratch clone only)
+record: /tmp/gov-os-rel-repin/neg-int-r2/release/docs/releases/0.1.0
+manifest.json: OK
+scratch status: ?? docs/releases/0.1.0/ 
+scratch tag: v0.1.0 -> a3da106013d5 (parent 41ab6597992d), tag
+scratch record: version 0.1.0 commit 41ab6597992d cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl 0cd21b275808 files 278
+======== fill_release.sh from the scratch release
+C=41ab6597992d (tag v0.1.0 on a3da106013d5)
+EPOCH=1794677543
+SHA=0cd21b2758080bc1dd5ebb2878fe58cde6bb202b323d7edea83bf7caff8fb232 (the record's wheel sha256)
+RECORD=4d24875429be41405920f3978f406df3f5e204783586a6678e15637144d5729d (manifest.json's sha256)
+filled: /tmp/gov-os-rel-repin/neg-int-r2/REPIN-COMMANDS-REL-0.1.0.sh sha256 98a6027d63fbe726ebc9f80519a2100d8f8852848c9a8353b19584f21f91b83f
+hash list: /tmp/gov-os-rel-repin/neg-int-r2/REPIN-REL-0.1.0.sha256 (18 files) sha256 cb79aeaf30fb44a67b3a437a9e40c3a3522aae6f7d86dea5c78d85e0ac908399
+the filled script differs from the template in the four value lines only
+half a: 41ab6597992d, store 587M
+half b: 3c48b79fac00, store 587M
+registry clone at 41ab6597992d on w2/integrate
+scratch hook: 099de326c45b (a copy of the live one)
+mirror ready: gov -> /tmp/gov-os-rel-repin/neg-int-r2/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/neg-int-r2/home/gov-os-worktrees/W2-00-store-a
+======== the operator's script (filled from the scratch release), against the mirror
+the hash list: 18 files OK (the operator's first check)
+neg-int: TERM to the script (pid 742031) 20 s in, the store refresh started
+neg-int: the script ended 1 s after the TERM (exit 1)
+== 0. preconditions
+ok (gov -> pin-797495bdfc70; store -> W2-00-store-a at 41ab6597992d; w2/integrate at 41ab6597992d, 41ab6597992d and it the same wheel inputs; the hook is only read)
+== R. release 0.1.0: the tag v0.1.0 and its record, checked against the values filled in (RL-1)
+manifest.json: OK
+verify: 4d24875429be41405920f3978f406df3f5e204783586a6678e15637144d5729d
+ok (v0.1.0 -> a3da106013d5, parent 41ab6597992d; the record only; manifest.sha256 holds; record sha256 4d24875429be; version, commit, cli_version, wheel name and sha256 as filled in; verify holds)
+== A. the wheel of 41ab6597992d, built twice from clean exports, checked against the release record's sha256; its own environment
+build 1 0cd21b2758080bc1dd5ebb2878fe58cde6bb202b323d7edea83bf7caff8fb232
+build 2 0cd21b2758080bc1dd5ebb2878fe58cde6bb202b323d7edea83bf7caff8fb232
+/tmp/gov-os-rel-repin/neg-int-r2/home/.local/share/gov-os/wheels/41ab6597992d/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-rel-repin/neg-int-r2/home/.local/share/gov-os/pin-41ab6597992d/bin/python
+== S. the integration store rebuilt at w2/integrate's head in the spare half, by the code of 41ab6597992d (the same bytes as that head's); the link flips on success
+GPU before the rebuild: 8166 MiB used
+
+the store refresh (pid 751100, its process group) was stopped, 0 s after the signal
+
+STOP: interrupted (TERM) before the switch
+Nothing was switched: /tmp/gov-os-rel-repin/neg-int-r2/home/.local/bin/gov is still pin-797495bdfc70. Tell the CTO.
+(to run this again later, the CTO says when: rm -rf /tmp/gov-os-rel-repin/neg-int-r2/home/.local/share/gov-os/pin-41ab6597992d)
+neg-int: 20 s after the script ended, the store link -> W2-00-store-a (at the start W2-00-store-a); the refresh's process group 751100: gone
+======== the script ended: exit 1, 45 s
+======== the live paths after
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-a -> /home/usain/gov-os-worktrees/W2-00-store-a at 41ab6597992d
+store halves: a at 41ab6597992d, b at 3c48b79fac00
+w2/integrate: 41ab6597992d
+the live gov link, script, pins, wheels, hook, registry file, reranker pid, main-tree tags and docs/releases: UNCHANGED (every line equal before and after)
+the live store link, its halves and w2/integrate: UNCHANGED
+the scratch hook after: 099de326c45b (the script only reads it)
+NEGATIVE RUN OK (neg-int): TERM during part S's refresh: the refresh's group stopped, STOP 1 s after the TERM, the store link on W2-00-store-a 20 s later, the gov link unchanged

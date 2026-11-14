@@ -1,0 +1,8 @@
+Merge w2/W2-88-tests: run 7 P1-1 acceptance cases (td-12, e66a9cb58ce7)
+
+The narrow check finding P1-1 as a described behaviour (DEC-136): a bare-key tail in one file must not hide the next file s generic key from the batched scan.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.b, CAP-44.f
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,20 @@
+== the hand check of on_signal, 2026-11-14 17:42:14; template drafts/repin-rel-0.1.0/REPIN-COMMANDS-REL.template.sh sha256 fc587c627717
+-- the handler's lines in the harness that are not, word for word, in the template (expected: none):
+-- (the two lines left out: the harness's STOP stands for the template's case on PHASE; its echo has no 'echo;')
+== case dies
+before any background job: ${!:-} = []
+the fake refresh: pid 819094
+the store refresh (pid 819094, its process group) was stopped, 0 s after the signal
+STOP: interrupted (TERM) before the switch
+exit 1, 1.027 s wall (the harness sleeps 1 s before the signal)
+== case early
+before any background job: ${!:-} = []
+the store refresh (pid 820216, its process group) was stopped, 0 s after the signal
+STOP: interrupted (TERM) before the switch
+exit 1, .5421 s wall (the harness sleeps 1 s before the signal)
+== case ignores
+before any background job: ${!:-} = []
+the fake refresh: pid 820782
+the store refresh (pid 820782, its process group) was stopped, 60 s after the signal
+STOP: interrupted (TERM) before the switch
+exit 1, 69.86 s wall (the harness sleeps 1 s before the signal)

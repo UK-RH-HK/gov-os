@@ -11,8 +11,9 @@
 # Run in a PLAIN TERMINAL (not inside a Claude session: it reinstalls gov, DEC-928 item 3):
 #     bash REPIN-COMMANDS-REL-0.1.0.sh 2>&1 | tee -ai ~/repin-rel-0.1.0.log
 # (tee -a keeps an earlier run's log; -i keeps tee writing through a Ctrl-C, so the log shows what the script did then.)
-# It stops at the first failure. A Ctrl-C or a TERM is handled as a failure of the part it lands in: before the switch,
-# the store rebuild (if running) is stopped, the store link goes back, STOP; after it, ROLLED BACK. Before the switch (parts 0, R, A, S, B, C) a failure prints STOP and leaves what
+# It stops at the first failure. A Ctrl-C, a TERM or a hang-up (a closed terminal) is handled as a failure of the part
+# it lands in: before the switch, the store rebuild (if running) is stopped within seconds (60 s at most), the store
+# link goes back, STOP; after it, ROLLED BACK. Before the switch (parts 0, R, A, S, B, C) a failure prints STOP and leaves what
 # sessions use as it was (the new pin beside the old; the store link back on its old half). After the switch (parts D,
 # H) a failed check switches straight back to the old pin, restarts the reranker from it, and prints ROLLED BACK: then
 # tell the CTO.
@@ -57,7 +58,7 @@ SMI=/usr/lib/wsl/lib/nvidia-smi
 # What the wheel is built from: src/ (the packages and their package data) and pyproject.toml; and, should they ever
 # appear, the files setuptools would also read from the export's root.
 INPUTS=(src pyproject.toml setup.py setup.cfg MANIFEST.in ':(glob)LICEN[CS]E*' ':(glob)COPYING*' ':(glob)NOTICE*' ':(glob)AUTHORS*')
-PREV=""; PHASE=before; SVC_RESTARTED=""; STOREREF=""; TAGC=""; PREV_CUR=""; rp=""
+PREV=""; PHASE=before; SVC_RESTARTED=""; STOREREF=""; TAGC=""; PREV_CUR=""; rp=""; RP_STARTING=""
 # An earlier run's folder is kept, moved aside with its time (its diagnostics), never removed.
 if [ -e "$X" ]; then XOLD=$X.$(date +%Y%m%d-%H%M%S); mv -T "$X" "$XOLD" && echo "an earlier run's $X is kept as $XOLD"; fi
 mkdir -p "$X"
@@ -98,17 +99,23 @@ on_err() {
   esac
 }
 trap 'on_err $LINENO' ERR
-# A Ctrl-C or a TERM (window 5's review F5, this act's F7). The store refresh of part S runs in its own session
-# (setsid), so a Ctrl-C does not reach it: it is stopped here by its process group, given 60 s, then killed; if it moved
-# the store link, the link goes back (restore_store). Then as a failure of the phase: STOP, or ROLLED BACK.
+# A Ctrl-C, a TERM or a hang-up (window 5's review F5, this act's F7; review r2 F1). The store refresh of part S runs in
+# its own session (setsid), so a Ctrl-C does not reach it: it is stopped here by its process group (TERM), polled every
+# half second until no live process is left in it, KILLed after 60 s; if it moved the store link, the link goes back
+# (restore_store). Then as a failure of the phase: STOP, or ROLLED BACK. No watchdog process: the handler polls.
+grp_alive() { ps -o stat= -g "$1" 2> /dev/null | awk '$1 !~ /^Z/ {n++} END {exit n ? 0 : 1}'; }  # a live member left
 on_signal() {  # $1 the signal
-  trap - ERR; trap '' INT TERM PIPE; set +e
-  if [ -n "$rp" ] && kill -0 "$rp" 2> /dev/null; then
+  trap - ERR; trap '' INT TERM HUP PIPE; set +e
+  # The refresh's pid, also when the signal came between its start and `rp=$!` (review r2 F5): $! is set as soon as
+  # the background job is forked; RP_STARTING says that job is the refresh.
+  if [ -z "$rp" ] && [ -n "$RP_STARTING" ]; then rp=${!:-}; fi
+  if [ -n "$rp" ]; then
     kill -TERM -- "-$rp" 2> /dev/null
-    ( sleep 60; kill -KILL -- "-$rp" 2> /dev/null ) & local wd=$!
-    wait "$rp" 2> /dev/null; kill "$wd" 2> /dev/null; wait "$wd" 2> /dev/null
-    [ -z "$(ps -o pid= -g "$rp" 2> /dev/null)" ] || kill -KILL -- "-$rp" 2> /dev/null
-    echo; echo "the store refresh (pid $rp, its process group) was stopped"
+    local n=0  # TERM again at each poll: a signal right after the fork can come before the child's setsid made the group
+    while grp_alive "$rp" && [ $n -lt 120 ]; do sleep 0.5; n=$((n + 1)); kill -TERM -- "-$rp" 2> /dev/null; done
+    if grp_alive "$rp"; then kill -KILL -- "-$rp" 2> /dev/null; sleep 0.5; fi
+    wait "$rp" 2> /dev/null
+    echo; echo "the store refresh (pid $rp, its process group) was stopped, $((n / 2)) s after the signal$(grp_alive "$rp" && echo ', BUT A PROCESS OF IT IS STILL LIVE: tell the CTO')"
   fi
   if [ -z "$PREV" ] && [ -n "$PREV_CUR" ] && [ "$(readlink -f "$LINK")" != "$PREV_CUR" ]; then PREV=$PREV_CUR; fi
   case $PHASE in
@@ -119,6 +126,7 @@ on_signal() {  # $1 the signal
 }
 trap 'on_signal INT' INT
 trap 'on_signal TERM' TERM
+trap 'on_signal HUP' HUP
 
 # The frozen-src rule (RL-3): the wheel is built from C's clean export, so nothing it is built from may differ between C
 # and the branch's head now (the CTO's hold keeps src/ still from "release ready" to this act; record commits go on),
@@ -228,6 +236,7 @@ echo "GPU before the rebuild: $used MiB used"
 [ "$used" -le $GPU_BEFORE ] || stop "the GPU has $used MiB used, above $GPU_BEFORE: the rebuild waits (tell the CTO)"
 PREV_CUR=$(readlink -f "$LINK")
 t0=$(date +%s)
+RP_STARTING=1   # from here the trap takes $! as the refresh's pid, should it come before the next line
 setsid flock -w 7200 -o "$GPU_LOCK" env -u SEED_REBUILD_CMD GOV_STORE_LINK="$LINK" GOV_STORE_REF="$STOREREF" \
   bash "$T/refresh_integration_store.sh" --force > "$X/refresh.out" 2>&1 < /dev/null &
 rp=$!
@@ -239,7 +248,7 @@ while kill -0 $rp 2>/dev/null; do
   sleep 2
 done
 rrc=0; wait $rp || rrc=$?
-rp=""
+rp=""; RP_STARTING=""
 t1=$(date +%s)
 cat "$X/refresh.out"
 [ "$(readlink -f "$LINK")" != "$PREV_CUR" ] && PREV=$PREV_CUR

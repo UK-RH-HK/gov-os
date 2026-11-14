@@ -1,0 +1,12 @@
+== a changed byte in one of the 5 files part B also runs: the operator's check stops the line, 2026-11-14 17:42:07
+bundle: BUNDLE.sha256 sha256 d58ae15b48ad; the release read: /tmp/gov-os-rel-repin/run-f7/release (run f7's scratch clone)
+-- the list of the positive, with test_g14.py's line naming a copy with one byte added (its hash: the real file's):
+15c15
+< ae30c088cc07…  /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py
+---
+> ae30c088cc07…  /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/byte/test_g14.py
+-- the operator's line: sha256sum -c <list> && bash <script>
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/byte/test_g14.py: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+line exit 1
+the real test_g14.py unchanged: ae30c088cc07 = ae30c088cc07

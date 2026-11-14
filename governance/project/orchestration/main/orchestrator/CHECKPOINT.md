@@ -4,6 +4,10 @@
 
 ### NOW (12:10, HANDOVER to a new CTO session: the 300k compaction trial, DEC-1171 (6)) — the whole state in one place
 
+- **17:49:** COPIES-12 REVIEW 2b PASS (0 blocking, 6 checks; record reviews/act-claude-copies-12.md -> acts/ACT-CLAUDE-COPIES-12/review.md, verdict block ok, manifest 22865f2a). Package §5 undo subject fixed (F3). Rows: F1 manifest dec names DEC-1166 (4) not DEC-1181 (1) + CIT-P status: PROPOSED -> set APPROVED at the hand merge (CIT-P on w2/W2-188); F5 copy case pins the after-bytes. OWNER LINE GIVEN 17:50: `yes ACT-CLAUDE-COPIES-12 22865f2a`.
+- **17:44:** RE-PIN r2 rows FOLDED: BUNDLE now d58ae15b48ad… (template fc587c62, rel_checks b6418de1, rehearse_rel ec502b81, README 9ea2ac7f, NOTES 4206d183; fill_release 99f8260c unchanged); neg-int-r2 STOP 1 s after TERM; hand checks logged log/repin-rel-hand-*.txt. NOT YET REVIEWED since 5dae7e86 -> the post-fill review at "released" MUST cover the diff 5dae7e86 -> d58ae15b (review-r2 F1/F5/F7 fold) and then compare BUNDLE's own sha with ITS reviewed_sha256 (F4). Run f7 was at stand-in C before W2-184's src change: the real-C rehearsal (8 modes) is required at "release ready".
+- **17:36:** RE-PIN narrow re-review PASS 0 blocking (drafts/repin-rel-0.1.0/review-r2.md, reviewed 5dae7e86); rows F1 (watchdog uncancellable, 60 s), F7 (FIX-3 ignores pytest errors: fails open, not ordinary) etc. -> builder FOLDING F1/F5/F7 + NOTES F2 + hand-check logs F3. F4 (BUNDLE's own sha vs reviewed): MINE at hand-over/post-fill review. After the fold: the post-fill review at "released" covers the change (DEC-1010: 2 rounds done).
+- **17:33:** STORE REFRESHED (main tree, 47 s; DEC-1180 found). gov context BLOCKED causes were plan keys in sources: W2-184 drops W2-60a (3c48b79fa), W2-88 drops W2-124/W2-26 (41ab65979). Now no in-flight ticket is BLOCKED (only CONTEXT_OVER_CEILING at small budgets; W2-88 63k, W2-187 73k).
 - **17:30:** W2-184 LANDED + CLOSED 17:29 (cf8d92828). COPIES-12 review round 2 STOPPED (guard refused a listing-driven rendering compare twice; no ACT defect; F1 package missing, F2 operator commit form, F3 round-1 gates, F4 later head). FIXED: gates re-run for 22865f2a (pass, class b); package WRITTEN acts/ACT-CLAUDE-COPIES-12.package.md (operator commits Role: operator/Act:, no Task -> W2-188 case skips them). Review 2b RUNNING (render in place + git status form). Store refresh: rebuild_pinned.sh /home/usain/Dynamic-Agentic-Engineering-OS RUNNING (bg b7pw1t3as) -> check gov context DAEO-6f0s no longer BLOCKED.
 - **17:28:** W2-184 r DONE 315a6a1250f0 (verify GREEN 8118/0; accept 507/507; narrow PASS PR-DAEO-6f0s-r.md) -> LAND QUEUED (land.txt). NO COMMIT DURING THE LAND. The queue closes W2-184: leave closed (R1-R3 done). rv-r F1 (no hard-link fallback: fails closed) + F2 (unlink+cleanup double failure leaves a record) -> DND rows (ordinary work no, neither fails open). Brief gap: gov context BLOCKED (DEC-1180, W2-60a not in the store) -> store refresh after the land (rebuild_pinned.sh on the main tree).
 - **17:27:** RE-PIN 18-file hash list DONE: BUNDLE 5dae7e86c51f… (fill_release.sh 99f8260c; 4/4 hand checks; template unchanged so run f7 stands). Builder's proposal (pin the 14 external files in BUNDLE) NOT taken: the post-fill review diffs against the reviewed template (backstop). NARROW RE-REVIEW RUNNING (text -> drafts/repin-rel-0.1.0/review-r2.md).
@@ -1614,27 +1618,26 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-14T16:23:51Z 33f259d4bcd5847e9870b91ff306461f09303288a65c10d0ed1c811e84e35445
-git head: f2f28ed4ef40506677d972adba4c43a6ea69d340
+generated: 2026-11-14T17:58:59Z a962cbe47ec660aac0741ea592e0e98033df7e74295c74dc5e0faebded62b443
+git head: 41ab6597992d97522c33d1c81f93ccfa61e21aa6
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0cd2 [in_progress] - W2-187 The standing hidden set, judged every week at 95 %, counts only <- [DAEO-f58b, DAEO-rmhj]
   DAEO-2bdu [in_progress] - W2-88 Memory for any repository <- [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
   DAEO-2tfd [in_progress] - W2-145 No private reranker beside the shared service
-  DAEO-6f0s [in_progress] - W2-184 RUBRIC-2 at launch (from W2-60a) <- [DAEO-cv58]
   DAEO-ar89 [in_progress] - W2-155 The warm query path profiled: W1-19's 0.5 s budget
   DAEO-g87r [in_progress] - W2-94 EXAMIN's question set <- [DAEO-m1u3]
   DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
   DAEO-rmhj [in_progress] - W2-138 The store's commit in every search result, and the line-hash check
   DAEO-zlog [in_progress] - W2-188 The adopt skill's step 6 and the practice record: the standing set <- [DAEO-pg6i]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS        f2f28ed4e [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS        41ab65979 [w2/integrate]
   /home/usain/gov-os-worktrees/D6-F-tests           2761682a2 [w2/D6-F-tests]
   /home/usain/gov-os-worktrees/EMG-queue            04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/W2-00-d10r2-records  66303c373 [w2/W2-00-d10r2-records]
-  /home/usain/gov-os-worktrees/W2-00-record         9d1567035 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a        f2f28ed4e (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b        0b43625da (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record         b1eeb8823 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a        41ab65979 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b        3c48b79fa (detached HEAD)
   /home/usain/gov-os-worktrees/W2-122               3fc448601 [w2/W2-122]
   /home/usain/gov-os-worktrees/W2-123               3de9bcf44 [w2/W2-123]
   /home/usain/gov-os-worktrees/W2-128-tests         eb1c4fbb8 [w2/W2-128-tests]
@@ -1648,29 +1651,25 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-149-f11           ee534d2bc [w2/W2-149-f11]
   /home/usain/gov-os-worktrees/W2-155               8da607e3d [w2/W2-155]
   /home/usain/gov-os-worktrees/W2-15a               fd637510d [w2/W2-15a]
-  /home/usain/gov-os-worktrees/W2-184               f2f76a154 [w2/W2-184]
-  /home/usain/gov-os-worktrees/W2-184-tests         19324ca4b [w2/W2-184-tests]
-  /home/usain/gov-os-worktrees/W2-187               c0dbba313 [w2/W2-187]
-  /home/usain/gov-os-worktrees/W2-187-tests         c0dbba313 [w2/W2-187-tests]
-  /home/usain/gov-os-worktrees/W2-188               84ca16727 [w2/W2-188]
-  /home/usain/gov-os-worktrees/W2-188-tests         1734f7422 [w2/W2-188-tests]
+  /home/usain/gov-os-worktrees/W2-184               315a6a125 [w2/W2-184]
+  /home/usain/gov-os-worktrees/W2-187               f4fdc7fa1 [w2/W2-187]
+  /home/usain/gov-os-worktrees/W2-187-tests         5708b4385 [w2/W2-187-tests]
+  /home/usain/gov-os-worktrees/W2-188               790357f02 [w2/W2-188]
   /home/usain/gov-os-worktrees/W2-20-1017           1a54976c7 [w2/W2-20-1017]
   /home/usain/gov-os-worktrees/W2-27-citp           33f72aab2 [w2/W2-27-citp]
   /home/usain/gov-os-worktrees/W2-32-proto          f8a5fdade [w2/W2-32-proto]
-  /home/usain/gov-os-worktrees/W2-42a               eca7a7017 [w2/W2-42a]
-  /home/usain/gov-os-worktrees/W2-42a-tests         e3e7badb2 [w2/W2-42a-tests]
+  /home/usain/gov-os-worktrees/W2-42a               b42e8628b [w2/W2-42a]
   /home/usain/gov-os-worktrees/W2-56-f-tests        3ea3411e1 [w2/W2-56-f-tests]
   /home/usain/gov-os-worktrees/W2-61h-c39           1a2bf4a16 [w2/W2-61h-c39]
   /home/usain/gov-os-worktrees/W2-61h-d10r2-tests   35396225e [w2/W2-61h-d10r2-tests]
   /home/usain/gov-os-worktrees/W2-61h-q23-tests     53affe533 [w2/W2-61h-q23-tests]
   /home/usain/gov-os-worktrees/W2-78                8e7640b96 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-88                2da02b28e [w2/W2-88]
-  /home/usain/gov-os-worktrees/W2-88-tests          2da02b28e [w2/W2-88-tests]
+  /home/usain/gov-os-worktrees/W2-88                8e3c3def6 [w2/W2-88]
+  /home/usain/gov-os-worktrees/W2-88-tests          e66a9cb58 [w2/W2-88-tests]
   /home/usain/gov-os-worktrees/W2-91-tests          3191a7948 [w2/W2-91-tests]
   /home/usain/gov-os-worktrees/W2-92-proto          e884675b4 [w2/W2-92-proto]
   /home/usain/gov-os-worktrees/W2-94                72a339b9d [w2/W2-94]
-  /home/usain/gov-os-worktrees/W2-94-fix            5285ef173 [w2/W2-94-fix]
-  /home/usain/gov-os-worktrees/W2-94-fix-tests      5285ef173 [w2/W2-94-fix-tests]
+  /home/usain/gov-os-worktrees/W2-94-fix            f192e50da [w2/W2-94-fix]
   /home/usain/gov-os-worktrees/research-retrieval   a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

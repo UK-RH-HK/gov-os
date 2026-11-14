@@ -1,0 +1,8 @@
+== F6: fill_release.sh refuses a bundle that differs from BUNDLE.sha256, 2026-11-14 17:42:07
+bundle: BUNDLE.sha256 sha256 d58ae15b48ad; the release read: /tmp/gov-os-rel-repin/run-f7/release (run f7's scratch clone)
+-- the copy: one line added to rel_checks.sh; BUNDLE.sha256 as reviewed
+rel_checks.sh: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+REFUSED, nothing written: the bundle's files differ from BUNDLE.sha256 (the reviewed list)
+exit 1
+files written: 0 (expect 0)

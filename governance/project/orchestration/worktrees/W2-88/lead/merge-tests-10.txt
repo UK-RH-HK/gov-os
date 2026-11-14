@@ -1,0 +1,8 @@
+Merge w2/W2-88-tests: run 7 whole-tree copies limited to named paths (td-11, a4eff2312a95)
+
+The W1-28 and W1-50 checks (DEC-385): the S24 and S27 helpers archive and before_src export named paths only.
+
+Task: DAEO-2bdu
+Role: orchestrator
+Implements: DEC-954, CAP-44.f, CAP-20
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

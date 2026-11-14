@@ -1,0 +1,122 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "3c48b79fac00",
+   "after": "41ab6597992d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/tools/memaudit_cron.sh"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M src/gov/adopt/memory_sets.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M src/gov/memaudit/__main__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M tests/unit/adopt/test_w2_187_walls_act.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": " M tests/unit/memaudit/test_cron.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "status line added",
+   "line": "?? tests/unit/memaudit/test_push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "head",
+   "before": "7d8c2aedfeb1",
+   "after": "5708b43855d4"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-187/test_w2_187_s12_push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-187/w2_187_push.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-171/test_w2_171_cli_layout_ledger.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-171/test_w2_171_s5_misses_f2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187-tests",
+   "change": "acceptance folder",
+   "folder": "W2-187"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "head",
+   "before": "ef9c773c3036",
+   "after": "8e3c3def63af"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88",
+   "change": "acceptance folder",
+   "folder": "W2-88"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "head",
+   "before": "ef9c773c3036",
+   "after": "e66a9cb58ce7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-88/test_w2_88_p1_installed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-88/test_w2_88_scan_speed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-88-tests",
+   "change": "acceptance folder",
+   "folder": "W2-88"
+  }
+ ]
+}

@@ -287,7 +287,12 @@ for who in new old; do
      test_guard_fix_3.py > "$S/fix3-$who.txt" 2>&1) || true
   grep '^FAILED' "$S/fix3-$who.txt" | sed 's/ - .*//' | sort > "$S/fix3-$who.failed"
 done
-grep -q ' passed' <(tail -1 "$S/fix3-new.txt") || fail "test_guard_fix_3.py under the new pin: $(tail -1 "$S/fix3-new.txt")"
+# Under either pin the run must end with passes and no error (review r2 F7, as FIX-4 and g14): a case that errors is in
+# neither FAILED list, so it would be neither compared nor counted.
+for who in new old; do
+  f3last=$(tail -1 "$S/fix3-$who.txt")
+  grep -q ' passed' <<<"$f3last" && ! grep -qE ' errors?( |$)' <<<"$f3last" || fail "test_guard_fix_3.py under the $who pin: $f3last"
+done
 # Where the two pins differ, only in the stricter direction (W2-42a's fail-closed shell reading since pin-797495bdfc70)
 # and only in the cases named (review F1): failing only under the new pin, the one let-through now refused, as "want
 # allow, got deny"; failing only under the old pin, the one gap now refused, "want deny, got allow" there. Any other

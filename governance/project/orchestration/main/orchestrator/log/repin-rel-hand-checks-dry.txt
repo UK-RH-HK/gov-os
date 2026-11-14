@@ -1,0 +1,28 @@
+== dry run of the FIX-4 and FIX-3 comparisons, 2026-11-14 17:40:28
+rel_checks.sh sha256 b6418de1ccf4; the block cut from it: 45 lines; the inputs: /tmp/gov-os-rel-repin/run-f7/x/checks
+-- positive: run-f7's outputs unchanged (expect: two ok lines, the differing cases named)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are named let-throughs now refused (W2-42a, stricter): fix3 python heredoc reading .env (gap as today);fix3 unterminated heredoc naming acceptance judged as before;
+ok   test_guard_fix_3.py: 49 failed, 236 passed, 1 skipped (old pin: 49 failed, 236 passed, 1 skipped); 48 cases fail under both (ACT-GUARD-FIX-4's LET_THROUGH); differing only in the named stricter cases (W2-42a): now refused (failing under the old pin only): fix3 unterminated heredoc naming acceptance judged as before; let-throughs now refused (failing under the new pin only): fix3 python heredoc reading .env (gap as today);
+   exit 0
+-- FIX-4: an unnamed false refusal of ordinary work (expect: CHECK FAILED, not a named case)
+CHECK FAILED: test_guard_fix_4.py: failures other than the two named let-throughs now refused (W2-42a): not a named case: test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer's record];
+   exit 1
+-- FIX-4: a pytest error (expect: CHECK FAILED)
+CHECK FAILED: test_guard_fix_4.py (2 failed, 464 passed, 1 error in 9.0s)
+   exit 1
+-- FIX-3: an unnamed case failing only under the new pin, as a refusal (expect: CHECK FAILED, not a named case)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are named let-throughs now refused (W2-42a, stricter): fix3 python heredoc reading .env (gap as today);fix3 unterminated heredoc naming acceptance judged as before;
+CHECK FAILED: test_guard_fix_3.py: the new pin differs from the old other than in the named stricter cases: new-only, not a named case: fix3 plain echo to a reviewer record;
+   exit 1
+-- FIX-3: the named old-only case in the wrong direction (expect: CHECK FAILED, not now refused)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are named let-throughs now refused (W2-42a, stricter): fix3 python heredoc reading .env (gap as today);fix3 unterminated heredoc naming acceptance judged as before;
+CHECK FAILED: test_guard_fix_3.py: the new pin differs from the old other than in the named stricter cases: old-only, not now refused: fix3 unterminated heredoc naming acceptance judged as before;
+   exit 1
+-- FIX-3: one case errors under the new pin (review r2 F7) (expect: CHECK FAILED, under the new pin)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are named let-throughs now refused (W2-42a, stricter): fix3 python heredoc reading .env (gap as today);fix3 unterminated heredoc naming acceptance judged as before;
+CHECK FAILED: test_guard_fix_3.py under the new pin: 49 failed, 235 passed, 1 skipped, 1 error in 30.0s
+   exit 1
+-- FIX-3: one case errors under the old pin (review r2 F7) (expect: CHECK FAILED, under the old pin)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are named let-throughs now refused (W2-42a, stricter): fix3 python heredoc reading .env (gap as today);fix3 unterminated heredoc naming acceptance judged as before;
+CHECK FAILED: test_guard_fix_3.py under the old pin: 49 failed, 235 passed, 1 skipped, 1 error in 30.0s
+   exit 1

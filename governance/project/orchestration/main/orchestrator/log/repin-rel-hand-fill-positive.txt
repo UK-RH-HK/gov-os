@@ -1,0 +1,35 @@
+== the positive: fill_release.sh writes the filled script and the 18-file list; the operator's check, 2026-11-14 17:42:07
+bundle: BUNDLE.sha256 sha256 d58ae15b48ad; the release read: /tmp/gov-os-rel-repin/run-f7/release (run f7's scratch clone)
+C=f2f28ed4ef40 (tag v0.1.0 on d49f63081ab2)
+EPOCH=1794673131
+SHA=cb69013f7c047cd5a5298c8cfc17e31615170d8df67ab3b87bf9b2a85df97250 (the record's wheel sha256)
+RECORD=88c7df9abd06f8ef424866d737963aa988c576ac0691d0dac177764537ce7bf6 (manifest.json's sha256)
+filled: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/pos/REPIN-COMMANDS-REL-0.1.0.sh sha256 37d3d20cf025274248092534f62b749fe14db9249ef06f77c250ca515b3a0679
+hash list: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/pos/REPIN-REL-0.1.0.sha256 (18 files) sha256 8b6ec2b91f8a13d9f615316e40ad1c2f8a3b4d1fa314bc72c8b23c637f6701cd
+fill exit 0
+-- the operator's check (sha256sum -c):
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/pos/REPIN-COMMANDS-REL-0.1.0.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/repin-rel-0.1.0/rel_checks.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/repin-rel-0.1.0/rel_registry.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/pin/smoke_repin5.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/guard4_check.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/hook_timing.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/refresh_integration_store.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/seed_store.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/test_guard_fix_3.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/proc.sh: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slots.conf: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/docs/changes/W2-141-hook/pretooluse.py: OK
+/home/usain/Dynamic-Agentic-Engineering-OS/docs/changes/W2-141-hook/role_reads.py: OK
+check exit 0, 18 lines
+the filled script differs from the template in the four value lines only:
+C=f2f28ed4ef40                     # the
+EPOCH=1794673131             # C's commi
+SHA=cb69013f7c047cd5a5298c8cfc17e3161517
+RECORD=88c7df9abd06f8ef424866d737963aa98
+run f7's own values: C=f2f28ed4ef40 EPOCH=1794673131 SHA=cb69013f7c047cd5a5298c8cfc RECORD=88c7df9abd06f8ef424866d 

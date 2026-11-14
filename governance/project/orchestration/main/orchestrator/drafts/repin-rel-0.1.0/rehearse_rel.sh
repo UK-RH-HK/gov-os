@@ -32,7 +32,8 @@
 #   neg-sha          the filled script's SHA is not the record's wheel sha256 (a hand-copy slip; part R);
 #   neg-int          a TERM to the script while part S's store refresh runs (the INT/TERM trap, review F7; a Ctrl-C
 #                    takes the same handler, but a background job in a script ignores INT, so TERM is sent): the
-#                    refresh's process group must be gone, the store link as at the start 20 s later, STOP.
+#                    refresh's process group must be gone, STOP within 30 s of the TERM (review r2 F1), the store
+#                    link as at the start 20 s later.
 set -euo pipefail
 R=/home/usain/Dynamic-Agentic-Engineering-OS
 B=$R/.gov-runtime/scratch/orchestrator/drafts/repin-rel-0.1.0
@@ -186,7 +187,7 @@ RUNENV=(GOV_REPIN_LINK_HOME="$S/home" GOV_REPIN_PINS="$S/home/.local/share/gov-o
     GOV_REPIN_HOLD="$S/hold" GOV_REPIN_TMP="$S/x" GOV_REPIN_HOOKS="$S/hooks" GOV_REPIN_SKIP_RERANK=1
     GOV_REPIN_RELEASE_REPO="$REL"
     GOV_STORE_LOG="$S/integration-store.log" SEED_LOG="$S/seed.jsonl" "${EXTRA[@]}" TMPDIR="$S/tmp")
-INTPID=""; INTLATE=""
+INTPID=""; INTLATE=""; INTSECS=999
 if [ "$MODE" = neg-int ]; then
   env "${RUNENV[@]}" bash "$F" > "$S/script.out" 2>&1 &
   sp=$!
@@ -194,8 +195,11 @@ if [ "$MODE" = neg-int ]; then
   while kill -0 "$sp" 2> /dev/null && [ ! -e "$S/x/refresh.out" ] && [ $waited -lt 7200 ]; do sleep 2; waited=$((waited + 2)); done
   sleep 10
   echo "neg-int: TERM to the script (pid $sp) $(( $(date +%s) - t0 )) s in, $([ -e "$S/x/refresh.out" ] && echo 'the store refresh started' || echo 'the store refresh NOT started')"
+  tk=$(date +%s.%N)
   kill -TERM "$sp" 2> /dev/null
   wait "$sp"; rc=$?
+  INTSECS=$(echo "$(date +%s.%N) - $tk" | bc); INTSECS=${INTSECS%.*}; INTSECS=${INTSECS:-0}
+  echo "neg-int: the script ended ${INTSECS} s after the TERM (exit $rc)"
   cat "$S/script.out"
   INTPID=$(sed -n 's/^the store refresh (pid \([0-9]*\),.*/\1/p' "$S/script.out" | head -1)
   sleep 20
@@ -253,8 +257,8 @@ case "$MODE" in
   neg-int)
     if nothing_switched && grep -q "^STOP: interrupted (TERM) before the switch" "$S/script.out" && grep -q '^== S\.' "$S/script.out" \
        && ! grep -q '^== B\.' "$S/script.out" && [ -n "$INTPID" ] && [ -z "$(ps -o pid= -g "$INTPID" 2> /dev/null)" ] \
-       && [ "$INTLATE" = "$START_STORE" ]; then
-      echo "NEGATIVE RUN OK ($MODE): TERM during part S's refresh: the refresh's group stopped, STOP, the store link on $(basename "$START_STORE") 20 s later, the gov link unchanged"; exit 0
+       && [ "$INTLATE" = "$START_STORE" ] && [ "$INTSECS" -lt 30 ]; then
+      echo "NEGATIVE RUN OK ($MODE): TERM during part S's refresh: the refresh's group stopped, STOP ${INTSECS} s after the TERM, the store link on $(basename "$START_STORE") 20 s later, the gov link unchanged"; exit 0
     fi;;
   neg-tag|neg-manifest|neg-sha)
     case "$MODE" in

@@ -13,7 +13,7 @@ For the CTO and the reviewer. The operator's page is `README.md` beside this fil
 | `rel_registry.py` | part E's registry edit | `repin7_registry.py`: replaces window 5's entry (`797495bdfc70`, `04b094fb…7c3`); six arguments (adds version, tag, record sha256); the note names the release and the record; `approved_by: DEC-1178` (see 4, R-1) |
 | `rehearse_rel.sh` | the rehearsal: the scratch mirror plus a scratch release in a scratch clone | `rehearse_repin7.sh` plus the scratch release, fill and three new negative modes |
 | `README.md` | the operator's page (draft) | `ACT-REPIN-W5.md`'s form |
-| `pin/smoke_repin5.sh` and the 9 CTO tools | used by path; in the hash list `fill_release.sh` writes | 12 of them are window 5's reviewed bytes (`sha256sum -c pin/REPIN-W5.sha256` OK). **`tools/heavy_slot.sh` is not:** it is the DEC-1157 version (11-12 23:46, `heavy_slot.sh.pre-dec1157` beside it), which no review record covers. This bundle's rehearsals ran with it, and `fill_release.sh` hashes whatever is there at fill time, so the post-fill review covers its bytes (review F3) |
+| `pin/smoke_repin5.sh` and the 9 CTO tools | used by path; in the hash list `fill_release.sh` writes | 9 of these 10 files are window 5's reviewed bytes (`sha256sum -c pin/REPIN-W5.sha256`: 12 of its 13 lines OK). **`tools/heavy_slot.sh` is not:** it is the DEC-1157 version (11-12 23:46, `heavy_slot.sh.pre-dec1157` beside it), which no review record covers. This bundle's rehearsals ran with it, and `fill_release.sh` hashes whatever is there at fill time, so the post-fill review covers its bytes (review F3) |
 | the 5 files part B also runs, **now in the hash list** (18 files; the CTO's decision on review F3, 2026-11-14) | read or run by path | `drafts/act-guard-fix-4/test_guard_fix_4.py`, `drafts/g14/test_g14.py`, `tools/heavy_slots.conf`, the staged W2-141 pair `docs/changes/W2-141-hook/{pretooluse.py,role_reads.py}`. Window 5 left them outside its list. Part B also runs files that stay outside the list because they are the main tree's committed files: `tests/unit/hooks/test_live_hook.py`, `tests/unit/guard/test_w2_141_search.py` and the live `.claude/hooks/` |
 
 ## 2. Part R (RL-1), in order; each failure is `STOP`, nothing built
@@ -41,9 +41,17 @@ checks the hash list, and runs the filled script against the mirror. The main tr
 log's "main tree tags v*" and "docs/releases" lines are the same before and after.
 
 **Final logs, after the review's fixes (`-f7`; all 8 modes on stand-in C `f2f28ed4ef40`, 2026-11-14 16:47 to 17:23).**
-The scripts, README and `fill_release.sh` that ran are byte for byte the ones in BUNDLE.sha256. Only NOTES.md changed
-after the runs started; every run's own `fill_release.sh` passed `sha256sum -c BUNDLE.sha256` against the list as it
-stood before that change (review F4: the neg-check log now postdates every script change).
+Provenance (review r2 F2). The f7 runs ran the bundle of 16:45 (BUNDLE before 5dae7e86), and their logs show the
+13-file list. Files changed after every f7 run:
+- `fill_release.sh` (17:25, the 18-file list) and README.md (17:25, "18 OK lines"). `-neg-sha-h18` ran with that
+  fill_release.sh.
+- After review r2, these changed again: the template (the trap: polling, HUP, the pid of an early signal), `rel_checks.sh`
+  (FIX-3 refuses an error), `rehearse_rel.sh` (neg-int times the STOP) and README.md (the Ctrl-C line).
+  `-neg-int-r2` and the hand logs below ran with them.
+- `rel_registry.py` is unchanged since every f7 run. The template's parts 0, R, A, B, C, D, H and E are unchanged since
+  run f7. The FIX-3 change does not alter run f7's outcome: its kept outputs pass the new check
+  (`log/repin-rel-hand-checks-dry.txt`). So run f7 still stands for the full run, and the other f7 negatives for theirs.
+- The neg-check log postdates every change to its path (review F4).
 
 | log | outcome |
 |---|---|
@@ -56,20 +64,50 @@ stood before that change (review F4: the neg-check log now postdates every scrip
 | `-neg-src-f7.txt` | NEGATIVE RUN OK: STOP at part 0 (src differs), before R |
 | `-neg-uncommitted-f7.txt` | NEGATIVE RUN OK: STOP at part 0 (uncommitted src) |
 
-F6 tested by hand: a copy of the bundle with one byte added to `rel_checks.sh` gave "rel_checks.sh: FAILED" and
-"REFUSED, nothing written", exit 1, with no file written.
+F6 tested by hand (`log/repin-rel-hand-f6-refusal.txt`): a copy of the bundle with one byte added to `rel_checks.sh`
+gave "rel_checks.sh: FAILED" and "REFUSED, nothing written", exit 1, with no file written.
 
 **The 18-file hash list (the CTO's decision on F3, after run f7; the template unchanged, so run f7 stands):**
-- Positive: `fill_release.sh f2f28ed4ef40` on `run-f7`'s scratch release wrote an 18-line list, and
-  `sha256sum -c` printed 18 OK. The filled script is byte-identical to run f7's (`e735535d10c6…`).
-- Changed byte: a copy of `test_g14.py` with one byte added, named in a copy of the list in place of the real file
+- Positive (`log/repin-rel-hand-fill-positive.txt`): `fill_release.sh f2f28ed4ef40` on `run-f7`'s scratch release wrote
+  an 18-line list, and `sha256sum -c` printed 18 OK. The filled script carries run f7's four values; it differs from
+  the template only in the four value lines.
+- Changed byte (`log/repin-rel-hand-changed-byte.txt`): a copy of `test_g14.py` with one byte added, named in a copy of the list in place of the real file
   (the real file was not touched). The operator's line printed "FAILED" and exit 1, so the script would not run.
   `fill_release.sh` itself hashes these 14 files as they stand at fill time; they are not in BUNDLE.sha256, so the
   operator's check and the post-fill review cover them.
-- Unreadable file: in a scratch copy of the bundle with its root moved, `fill_release.sh` printed "REFUSED, nothing
+- Unreadable file (`log/repin-rel-hand-unreadable.txt`): in a scratch copy of the bundle with its root moved, `fill_release.sh` printed "REFUSED, nothing
   written: a file the script runs cannot be read", exit 1, with neither the script nor the list written.
 - `log/repin-rel-rehearsal-neg-sha-h18.txt`: NEGATIVE RUN OK. The 18-file list fails only on the edited script, then
   STOP at part R.
+
+**After review r2 (`review-r2.md`, PASS, 0 blocking; its F1, F5 and F7 folded in):**
+- `log/repin-rel-rehearsal-neg-int-r2.txt` (stand-in C `41ab6597992d`, the head then; the slots were free): NEGATIVE
+  RUN OK. TERM 20 s in, while part S's refresh ran. The script ended **1 s after the TERM**, saying "the store refresh
+  (pid 751100, its process group) was stopped, 0 s after the signal", then "STOP: interrupted (TERM) before the switch",
+  exit 1. 20 s later the link was still on W2-00-store-a and the group was gone; live paths unchanged.
+  (`-neg-int-f7` took about 72 s: its watchdog inherited the ignored TERM, review r2 F1.)
+- `log/repin-rel-hand-signal.txt`: the template's handler lines, word for word, in a harness with a fake refresh in
+  its own session:
+  - a refresh that dies on TERM: STOP 0 s after the signal;
+  - a signal between the fork and `rp=$!` (review r2 F5): the handler takes `$!` and stops the group, 0 s;
+  - a refresh that ignores TERM: KILLed after 60 s, then STOP.
+- `log/repin-rel-hand-checks-dry.txt`: the FIX-4 and FIX-3 blocks cut from `rel_checks.sh` as it stands, on run f7's
+  kept outputs: the positive passes, naming the differing cases. Six planted variants each fail part B:
+  - an unnamed FIX-4 refusal;
+  - a FIX-4 error;
+  - an unnamed FIX-3 new-only refusal;
+  - the named old-only case in the wrong direction;
+  - a FIX-3 error under the new pin;
+  - a FIX-3 error under the old pin (review r2 F7).
+- Not rehearsed, shown by reading only (review r2 F6):
+  - a real Ctrl-C to the whole foreground group;
+  - the link put back after the refresh flipped it;
+  - a signal after the switch;
+  - the move-aside of an earlier folder.
+- Review r2 F4 (BUNDLE.sha256 itself is not checked against the reviewed value) is for the hand-over: before handing
+  over, the CTO compares BUNDLE.sha256's own sha256 with the last review's `reviewed_sha256`.
+- Since run f7's stand-in, `src/gov/launch/` changed (W2-184 `f2f76a154`, 3 files). Run f7 shows the method, not the
+  wheel at the real C; the rehearsal at the real C is required in any case.
 
 **The logs the review read (before its fixes; kept):**
 
@@ -121,11 +159,14 @@ F6 tested by hand: a copy of the bundle with one byte added to `rel_checks.sh` g
   before", "want deny, got allow" there). Any other failure fails part B: a lost refusal, and also a new false refusal
   of ordinary work (such as "rule 5: a reviewer's record"). Both ok lines print the case names, so the logs keep them
   (review F2). A dry run on r5's kept outputs passed, and three planted variants failed: an unnamed FIX-4 refusal, an
-  unnamed FIX-3 new-only refusal, and the named old-only case in the wrong direction. g14 and FIX-4 also fail on a
-  pytest error now, not only on a failure (window 5's review F6).
-- **R-8, an interrupt, a rerun (review F7, window 5's F5).** An INT/TERM trap (`on_signal`): before the switch it stops
-  part S's store refresh by its process group (TERM, 60 s, then KILL; the refresh runs under `setsid`, so a Ctrl-C does
-  not reach it), puts the store link back if the refresh moved it, and STOPs; after the switch it rolls back. An
+  unnamed FIX-3 new-only refusal, and the named old-only case in the wrong direction (now kept:
+  `log/repin-rel-hand-checks-dry.txt`). g14, FIX-4 and FIX-3 (under both pins) also fail on a pytest error now, not
+  only on a failure (window 5's review F6; review r2 F7).
+- **R-8, an interrupt, a rerun (review F7, window 5's F5; review r2 F1, F5).** An INT/TERM/HUP trap (`on_signal`).
+  Before the switch it stops part S's store refresh by its process group: TERM, re-sent at each half-second poll until
+  no live process is left, KILL after 60 s. The refresh runs under `setsid`, so a Ctrl-C does not reach it. It also
+  takes `$!` as the refresh's pid when the signal came before `rp=$!`. It puts the store link back if the refresh moved
+  it, and STOPs. After the switch it rolls back. An
   earlier run's `/tmp/repin-rel-0.1.0` is moved aside with its time, never removed, and the operator's line uses
   `tee -ai` (it appends, and tee keeps logging through a Ctrl-C). The new mode `neg-int` rehearses the trap: a TERM
   while the refresh runs. A refresh stopped part-way leaves the spare half unfinished; the next forced refresh rebuilds

@@ -1,0 +1,7 @@
+== an unreadable file of the list: fill_release.sh refuses, nothing written, 2026-11-14 17:42:07
+bundle: BUNDLE.sha256 sha256 d58ae15b48ad; the release read: /tmp/gov-os-rel-repin/run-f7/release (run f7's scratch clone)
+-- a copy of the bundle whose hash-list root is an empty folder: 48:R=/tmp/cl…; its BUNDLE.sha256 rewritten for the copy
+sha256sum: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/6ff2ee7c-f234-443c-8484-b5e93fc3d159/scratchpad/hand/unread/root/docs/changes/W2-141-hook/role_reads.py: No such file or directory
+REFUSED, nothing written: a file the script runs cannot be read (above)
+exit 1
+files written: 0 (expect 0)
