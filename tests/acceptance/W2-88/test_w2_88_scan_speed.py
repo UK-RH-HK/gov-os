@@ -319,3 +319,117 @@ def test_s27_a_five_thousand_file_tree_is_judged_at_least_ten_times_faster_with_
     texts = W.all_text(Path(box.base) / "systmp", runs=[SimpleNamespace(stdout=run.stdout, stderr=run.stderr)])
     for held in tree.helds[:6]:
         W.assert_no_secret(held, texts, "S27 speed case")
+
+
+# ------------------------------------------------------------------------------------------------------------
+# The narrow check's finding P1-1 (DEC-136): a match must not run from one file's text into the next file's
+# ------------------------------------------------------------------------------------------------------------
+
+BARE_KEYS = [                       # (the last line of file A: a generic key with no value, whether A ends with a newline)
+    pytest.param("password:", True, id="password-colon"),
+    pytest.param("token =", True, id="token-equals"),
+    pytest.param("secret:", False, id="secret-colon-no-newline"),
+]
+
+
+def generic_secret(seed: int, salt: str):
+    """A value that only gitleaks' ``generic-api-key`` rule catches (no prefix of any other rule): 32 characters drawn from the seed, built in
+    the case's memory, withheld by the ``Held`` object."""
+    return W.W81S.Held(W.W81S._draw(W.W81S._ALNUM, 32, f"w2-88:p1-1:{seed}:{salt}"), "generic-api-key")
+
+
+def plant_shadow_tree(box, name: str, n_clean: int, pairs) -> tuple:
+    """A planted repository of ``n_clean`` clean files, each pair of ``pairs`` = ``(position, bare key, A ends with a newline, A comes first)``
+    put into the list asked at ``position``, A and B adjacent. File A: clean lines, then the bare key as its last line. File B: the first line
+    ``API_KEY=<value>`` (only ``generic-api-key`` catches it), then a clean line. Returns ``(tree, paths of the A files)``; ``tree.secret_paths``
+    holds the B files."""
+    tree = plant_tree(box.base, name, n_clean, every=10 ** 6, extras=False)
+    clean = list(tree.paths)
+    bare_paths = []
+    inserts = []
+    for number, (position, key, newline, bare_first) in enumerate(pairs):
+        rel_a, rel_b = f"src/config/{number:02d}-base.env", f"src/config/{number:02d}-prod.env"
+        held = generic_secret(number, name)
+        tree.helds.append(held)
+        W.write(tree.root, rel_a, "harbour = 1\nrows = 2\n" + key + ("\n" if newline else ""))
+        W.write(tree.root, rel_b, held.line("API_KEY={value}\nrows = 2\n"))
+        tree.secret_paths.add(rel_b)
+        bare_paths.append(rel_a)
+        inserts.append((position, [rel_a, rel_b] if bare_first else [rel_b, rel_a]))
+    paths = []
+    for index, rel in enumerate(clean):
+        for position, pair in inserts:
+            if position == index:
+                paths += pair
+        paths.append(rel)
+    tree.paths = paths
+    return tree, bare_paths
+
+
+def rules_that_catch(box, tree: Tree, rel: str) -> list:
+    """The rule ids of the project's ``.gitleaks.toml`` that catch the file ``rel`` of the tree alone (a real gitleaks run on that one file, its
+    report redacted and read back; no value is kept or printed)."""
+    report = Path(box.base) / "plant-check.json"
+    report.unlink(missing_ok=True)
+    done = subprocess.run([W.S124.REAL_GITLEAKS, "dir", str(tree.root / rel), "--config", str(tree.root / ".gitleaks.toml"), "--no-banner",
+                           "--redact", "--exit-code", "0", "--report-format", "json", "--report-path", str(report)],
+                          cwd=str(tree.root), env=W.env(box, "127.0.0.1:9"), capture_output=True, text=True, timeout=120,
+                          stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, f"gitleaks failed on {rel} (exit {done.returncode}):\n{done.stderr[-800:]}"
+    found = json.loads(report.read_text(encoding="utf-8") or "[]") if report.is_file() else []
+    return sorted({item["RuleID"] for item in found})
+
+
+def check_shadow(box, before_src, name: str, n_clean: int, pairs) -> None:
+    """The oracle is the one-per-file form (the base's ``indexable`` over a copy of the tree, no reuse record); then this worktree's
+    ``indexable`` twice in the same empty ``HOME`` with a reuse record of clean results named under it."""
+    tree, bare_paths = plant_shadow_tree(box, name, n_clean, pairs)
+    for rel in sorted(tree.secret_paths):
+        assert rules_that_catch(box, tree, rel) == ["generic-api-key"], f"the plant did not take: {rel} alone is not caught by generic-api-key only"
+    for rel in bare_paths:
+        assert rules_that_catch(box, tree, rel) == [], f"the plant did not take: {rel} alone is caught"
+    before_tree = twin(tree, f"{name}-before")
+    before, _ = judge(before_src, before_tree, box, "paths-before.json")
+    assert not (set(before["kept"]) & tree.secret_paths), \
+        f"the plant did not take: the one-per-file form keeps {sorted(set(before['kept']) & tree.secret_paths)[:4]}"
+    assert set(bare_paths) <= set(before["kept"]), "the plant did not take: the one-per-file form leaves out a file with a bare key only"
+    reuse = Path(box.home) / ".cache" / "gov-os" / "secrets-reuse.json"
+    reuse.parent.mkdir(parents=True, exist_ok=True)
+    runs = []
+    for number in (1, 2):
+        after, run = judge(W.SRC, tree, box, f"paths-after-{number}.json", GOV_SECRETS_CACHE=str(reuse))
+        runs.append(SimpleNamespace(stdout=run.stdout, stderr=run.stderr))
+        assert after["module"].startswith(str(W.SRC)), f"the after run did not use this worktree's gov.secrets: {after['module']}"
+        which = "first" if number == 1 else "second (the reuse record of clean results is in play)"
+        kept = set(after["kept"])
+        for rel in sorted(tree.secret_paths & kept):
+            pytest.fail(f"{which} call: {rel} is kept: the batch's finding is put back on A only (P1-1)")
+        for rel in bare_paths:
+            assert rel in kept, f"{which} call: {rel}, clean alone (one bare key, no value), is left out: the verdict is not the one-per-file form's"
+        assert after["kept"] == before["kept"], (
+            f"{which} call: the verdict differs from the one-per-file form's\n"
+            f"only before: {sorted(set(before['kept']) - kept)[:8]}\nonly after: {sorted(kept - set(before['kept']))[:8]}")
+    texts = W.all_text(tree.root / ".gov-runtime", tree.root / ".git", Path(box.base) / "systmp", Path(box.home), runs=runs)
+    for held in tree.helds:
+        W.assert_no_secret(held, texts, "S27 P1-1")
+
+
+@pytest.mark.parametrize("bare_first", [True, False], ids=["bare-key-file-first", "secret-file-first"])
+@pytest.mark.parametrize("key,newline", BARE_KEYS)
+def test_s27_p1_1_a_bare_key_ending_one_file_does_not_swallow_the_next_files_secret(box, before_src, key, newline, bare_first):
+    """success-S27 (the narrow check's P1-1, DEC-136): a file A whose last line is a bare generic key with no value (``password:``, ``token =``,
+    ``secret:``; the last with no trailing newline) and a file B whose first line holds a secret only ``generic-api-key`` catches
+    (``API_KEY=<value>``), adjacent in the order asked in the middle of 21 clean files, in both orders. With the texts judged many per gitleaks
+    process, gitleaks' ``\\s`` classes cross a text's end: one match from A's last line into B's first swallows B's own. The verdict per file is
+    still the one-per-file form's (the base's, the oracle): B left out of ``indexable``'s answer, A kept; a second call in the same empty
+    ``HOME`` (the reuse record of clean results) answers the same, never B clean."""
+    check_shadow(box, before_src, "shadow", 21, [(10, key, newline, bare_first)])
+
+
+def test_s27_p1_1_pairs_of_each_form_spread_through_a_long_list_are_each_judged_as_one_per_file(box, before_src):
+    """success-S27 (P1-1): the pairs of the three bare-key forms, in both orders, are put at every 13th place of a list of 80 clean files (some
+    pair is inside any batch, wherever a batch ends); every B is left out, every A kept, as the one-per-file form's verdict, on a first and on a
+    second call in the same empty ``HOME``."""
+    pairs = [(8 + 13 * number, key.values[0], key.values[1], number % 2 == 0)
+             for number, key in enumerate([*BARE_KEYS, *BARE_KEYS])]
+    check_shadow(box, before_src, "spread", 80, pairs)
