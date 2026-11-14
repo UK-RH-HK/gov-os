@@ -81,7 +81,7 @@ The method is the test-driven-development skill's; this is only where an interfa
 
 - Each response and each error of the contract, checked against its schema, not only the happy path.
 - Backward compatibility: a request in the old shape still gets the old response shape. Name that test for the old
-  client and the shape it reads (for example "old v1 client: GET /v1/orders/{id} still returns `total`, as published"),
+  client and the shape it reads (for example "old client: the published read of a resource still returns the field it always did"),
   next to any test that the new and old fields agree; the second does not stand in for the first.
 - Input at the edges: a missing field, an extra field, a wrong type, an empty list, a value at the limit.
 - Versioning: the same call on two versions answers each as published.

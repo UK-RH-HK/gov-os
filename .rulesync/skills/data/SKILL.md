@@ -76,8 +76,8 @@ Copy this checklist into your notes and tick each step as you go.
 The method is the test-driven-development skill's; this is only where data tests look.
 
 - Each data-quality rule with a row that breaks it (empty, duplicate, out of range, orphaned) and a row that passes.
-  Name the test for the rule and its bad row, and the reason the row is rejected with (for example "test_missing_id:
-  a row with a blank `shipment_id` is rejected as `id_missing` and kept in the rejected rows"); a count of tests is
+  Name the test for the rule and its bad row, and the reason the row is rejected with (for example "test_blank_key:
+  a row with a blank key is rejected as `key_missing` and kept in the rejected rows"); a count of tests is
   not a name.
 - A migration forward and back on a small fixture: the shape, the counts and a sample of values.
 - A backfill stopped half-way and restarted: no row done twice, none skipped.
