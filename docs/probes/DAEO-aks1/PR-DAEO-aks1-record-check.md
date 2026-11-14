@@ -9,7 +9,19 @@ record: experiments/W2-88/smoke-run.md
 record_commit: 9aa5957befb4f3b49f60889c5a63c20b07b8e616
 auditor_session: 30c7b3dc-fd25-4f92-8889-53c75cea0877
 verdict: pass
+reviewer_session: 30c7b3dc-fd25-4f92-8889-53c75cea0877
+implementer_session: 2d0b0986-61a1-4bf2-808e-ea8e9cff5da6 (research, batch 1, cbe94d9e1) and 79a56dcf-47fc-4b86-9b13-dace78e6fe9b (research, batch 2, 9aa5957be)
+reviewer_wrote_nothing: true
+commissioned_by: orchestrator (W2-88b ticket lead, session 78e25410-0a68-4374-ae4c-e575a3f2d350)
+judged_by: orchestrator (W2-88b ticket lead)
+judgement: pass
+probed_commit: 9aa5957befb4f3b49f60889c5a63c20b07b8e616
 ---
+
+## The lead's judgement
+
+Pass, on the reviewer's verdict block below (every KPI line S1 to S5 and F1 to F3 pass). Its two findings are rows, neither a round (DEC-1010 item 1): R1 (the logs' `wrapper:` header names the wrapper order differently from the driver; scope out, ordinary work yes, consequence other) and R2 (the record names `~/workspace` once, only to say it was not read; scope in, ordinary work yes, consequence other). The lead added the probe schema's keys above (`reviewer_session` to `probed_commit`) after the reviewer committed, because lead_verify's probe-schema tests found them missing; the reviewer's text and verdict below are unchanged.
+
 # PR-DAEO-aks1-record-check: the narrow independent check of the smoke run's record
 
 A fresh independent-auditor session (`30c7b3dc-fd25-4f92-8889-53c75cea0877`) checked `experiments/W2-88/smoke-run.md` at
