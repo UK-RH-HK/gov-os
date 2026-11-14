@@ -52,13 +52,41 @@ def session_sandbox(tmp_path):
     return hooks.make_session_sandbox(tmp_path / "session")
 
 
-def _one_generated(settings, event):
-    commands = hooks.registered_commands(settings, PROGRAMS, event)
-    assert len(commands) == 1, (
-        f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers {len(commands)} guard hook entries "
-        f"under {event}; one is expected: {commands}"
+def _the_guard_line(commands, event, where):
+    """The command line of the one guard entry among ``commands``, the entries held under ``event``.
+
+    Revised after implementation (Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 3)). The template's
+    ``postToolUse`` holds two entries since DEC-1167 (4): the guard's (``posttooluse.py``) and the context watch's
+    (``context_watch.py``, a handover aid, not a guard line: DEC-917's rule is the guard entry's). So under a guard
+    event the guard's entry is picked by its program, the one the kernel template's settings register for that
+    event, never by index or by count of all entries: two entries running it, or none, is a failure. Any other
+    entry under the event must be the context watch's, and only under PostToolUse (its own line is held elsewhere,
+    in the root's form; it is not held to the guard's form here). Under a lifecycle event the single entry is
+    taken as before."""
+    if event in KERNEL_EVENTS:
+        program = hooks.own_program(hooks.kernel_command_line(event, PROGRAMS), PROGRAMS,
+                                    f"{hooks.KERNEL_SETTINGS_REL}, {event}")
+        mine = [command for command in commands if program in hooks.own_programs(command, PROGRAMS)]
+        others = [command for command in commands if command not in mine]
+    else:
+        program, mine, others = None, list(commands), []
+    assert len(mine) == 1, (
+        f"{where}: {len(mine)} hook entries run {program or 'a kernel hook program'} under {event}; one is "
+        f"expected: {mine}"
     )
-    return commands[0]
+    if event == "PostToolUse":
+        assert len(others) == 1 and hooks.own_programs(others[0], (hooks.WATCH_PROGRAM,)), (
+            f"{where}: under {event} the entry beside the guard's is expected to be the context watch's "
+            f"(`{hooks.WATCH_PROGRAM}`, DEC-1167 (4)); the other entries are: {others}"
+        )
+    else:
+        assert not others, f"{where}: {event} holds an entry beside the guard's, which DEC-1167 (4) gives only to PostToolUse: {others}"
+    return mine[0]
+
+
+def _one_generated(settings, event):
+    return _the_guard_line(hooks.registered_commands(settings, PROGRAMS, event), event,
+                           f"{hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}")
 
 
 # ===================================================================
@@ -149,16 +177,18 @@ def test_the_source_s_command_line_is_the_kernel_template_s_form(event):
     event with the kernel template's command line for that event, under a lifecycle event with DEC-608's plain
     form and the entry's own program. Revised after implementation (Rewrite-Reason: DEC-917): a lifecycle line
     was compared with the kernel template's form, now the guard lines' only."""
+    # Revised after implementation (Rewrite-Reason: DEC-1167 (4), DEC-1156 (7) (W2-185 run 3)): under PostToolUse
+    # the source holds the guard's entry and the context watch's; the guard's is picked by its program.
     commands = hooks.source_command_lines()[event]
-    assert len(commands) == 1, f"{hooks.SOURCE_REL} holds {len(commands)} entries under {event}; one is expected"
-    expected = hooks.expected_command_line(event, commands[0], PROGRAMS, f"{hooks.SOURCE_REL}, {event}")
+    line = _the_guard_line(commands, event, hooks.SOURCE_REL)
+    expected = hooks.expected_command_line(event, line, PROGRAMS, f"{hooks.SOURCE_REL}, {event}")
     if event in KERNEL_EVENTS:
         rule = (f"in {hooks.KERNEL_SETTINGS_REL} it is `{expected}` (DEC-917: a guard line is the kernel "
                 f"template's exit-mapping line exactly)")
     else:
         rule = (f"in DEC-608's plain form it is `{expected}` (DEC-917: a lifecycle line is "
                 f"`{hooks.PLAIN_FORM_AS_WORDED}` exactly)")
-    assert commands[0] == expected, f"{event}: {hooks.SOURCE_REL} holds the command line `{commands[0]}`; {rule}"
+    assert line == expected, f"{event}: {hooks.SOURCE_REL} holds the command line `{line}`; {rule}"
 
 
 # ===================================================================
