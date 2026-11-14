@@ -17,8 +17,8 @@
     "EXAMIN CTO: clone, kit, A0 by your operator, then the start (~1 h after the re-pin); W2-81 on the release alongside",
     "W2-187 (DAEO-0cd2) and W2-188 (DAEO-zlog) CLAIMED 5336a6fca with the interface; ready lines in (FULL; CIT-P route)"
   ],
-  "owner_action": "now: P-Q02-V2 (q02 variant (a) as approved, or (b) version 2, self-contained; rec (b), sha follows within ~30 min); your operator: the stale .git/config.lock (still present 15:44); at W2-61h's land (~16:00): your operator's walled run, W2-61h closes on it; at W2-94's land (~16:30): your operator's four q02 commands (your yes given); later: `yes ACT-CLAUDE-COPIES-12 <sha8>`; the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO",
-  "last_report": "2026-11-14 15:45:12",
+  "owner_action": "now: Q-REFRESH-1 (seeded rebuild accepted as the refresh (a), or a changes-only ticket (b)); now: Q-SCAN-1 (EXAMIN also gets the staged commit scan (b), rec, or the path rule alone (a)); now: your operator's walled run of W2-61h (command given 15:58); at W2-94's land (~16:30): your operator's four q02 commands (v2, 7aa6d88c); soon: Q-SCAN-2 (the guard's 100 ms, measuring now); later: `yes ACT-CLAUDE-COPIES-12 <sha8>`; the evening sitting ~20:30-21:00 (release + re-pin), then the EXAMIN CTO",
+  "last_report": "2026-11-14 16:10:22",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],

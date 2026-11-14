@@ -1,0 +1,95 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "eb63df3c349c",
+   "after": "bf04ed69c893"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "063fb97d5e01",
+   "after": "f26bcb370fe3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "eb63df3c349c",
+   "after": "d3f3326c4a56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "eb63df3c349c",
+   "after": "dc67c4f6be39"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "ad0b102ffd38",
+   "after": "d3f3326c4a56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-61h"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-184/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-184-tests",
+   "change": "acceptance folder",
+   "folder": "W2-184"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-187",
+   "change": "head",
+   "before": "87d6fd835c8f",
+   "after": "c0dbba313ed9"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-42a/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-42a/test_w2_42a_r5_error_path.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-42a-tests",
+   "change": "acceptance folder",
+   "folder": "W2-42a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix",
+   "change": "head",
+   "before": "fac8d2026c73",
+   "after": "66dd6e77abbd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-94-fix-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

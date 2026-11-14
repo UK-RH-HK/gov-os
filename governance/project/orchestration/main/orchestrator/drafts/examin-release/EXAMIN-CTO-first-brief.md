@@ -46,7 +46,8 @@ Gov OS 0.1.0.
    - `governance/project/held-out.yaml`;
    - `.claude/settings.json`;
    - the hooks under `governance/kernel/hooks/` and `.claude/hooks/`.
-7. **No push, no tag**, and no `sudo`.
+7. **No push, no tag**, and no `sudo`. EXAMIN's weekly push is not yours: it runs in the weekly memory-audit cycle
+   that the owner's operator installs from A9's ACT package, after the audit and a clean gitleaks scan (DEC-1182 (2)).
 8. **No install** outside the clone's own virtual environment. Install even there only with the owner's approval,
    given in the replies file (section 4).
 9. **Wait for a job by its pid** (`gov wait`). Never stop or wait for a process by its name.
@@ -183,7 +184,10 @@ The number in brackets is the line's place in W2-27's list.
    - `governance/project/facts.yaml` holds EXAMIN's commands: `launch_worker` = `gov launch`, `wait_for` = `gov wait`,
      `lead_verify` = EXAMIN's own verify command, and the rest from the adoption's defaults.
    - `gov brief <role> <ticket>` must exit 0 for each worker role and each lead run kind.
-   - No `secrets.yaml`, or one with `scan: on`. `gov check` must show the secrets-indexing check measured.
+   - `governance/project/secrets.yaml` holds `scan: off`: no secret scan at a ticket's close or at a store refresh
+     (DEC-1182 (2)). EXAMIN's scan is on as one full gitleaks scan a week, in the weekly memory-audit cycle, before its
+     weekly push; it is not yours to run. `gov check` must show the secrets-indexing check switched off by
+     configuration, and the guard's secret-path rule still refusing a planted read of a secret path.
 9. **Preserved [3, 12].** Report how EXAMIN's own `CLAUDE.md`, settings and untracked files compare with
    `0a82082` (`git diff`, `git status --ignored`).
 10. **`gov doctor` green, and `gov check` [4, 14].**

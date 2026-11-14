@@ -1,0 +1,100 @@
+_______ test_s2_a_run_writes_the_declaration_then_used_before_any_search _______
+
+ran_std = <function ran_std.<locals>.get at 0x7bfbe1c4c2c0>
+
+    def test_s2_a_run_writes_the_declaration_then_used_before_any_search(ran_std):
+        world, run = ran_std("pass")
+        assert run.code == 0, run
+        declaration, used = world.std_week / "DECLARATION.json", world.std_week / "USED"
+        assert declaration.is_file() and used.is_file()
+        assert declaration.stat().st_mtime_ns < used.stat().st_mtime_ns, "DECLARATION.json before USED, by file time"
+        first = min(c["t"] for c in world.searches())
+        assert used.stat().st_mtime_ns / 1e9 <= first, "USED before the first search (the planted gov's own clock)"
+        events = [e["event"] for e in world.std_ledger()]
+>       assert events[:2] == ["declaration", "used"], f"the ledger's first lines: {events[:4]}"
+E       AssertionError: the ledger's first lines: ['preflight', 'declaration', 'used', 'search']
+E       assert ['preflight', 'declaration'] == ['declaration', 'used']
+E         
+E         At index 0 diff: 'preflight' != 'declaration'
+E         Use -v to get more diff
+
+tests/acceptance/W2-187/test_w2_187_s2_week.py:43: AssertionError
+___________ test_s8_the_owners_decision_id_closes_it_and_is_recorded ___________
+
+make_world = <function make_world.<locals>.make at 0x7bfbe1a2dda0>
+
+    def test_s8_the_owners_decision_id_closes_it_and_is_recorded(make_world):
+        world = repair_world(make_world)
+        run = world.status_repair("--residual", "DEC-1")
+        assert run.code == 0 and run.lines == ["REPAIR residual DEC-1"], run
+        last = world.history()[-1]
+        assert last["kind"] == "repair" and last["word"] == "MEMORY_REPAIR residual" and last["decision"] == "DEC-1", last
+        after = world.status_repair()
+>       assert after.code == 0 and after.lines == ["REPAIR residual DEC-1"], after
+E       AssertionError: <exit 0; stdout 'REPAIR none
+E         '; stderr ''>
+E       assert (0 == 0 and ['REPAIR none'] == ['REPAIR residual DEC-1']
+E        +  where 0 = <exit 0; stdout 'REPAIR none\n'; stderr ''>.code
+E         
+E         At index 0 diff: 'REPAIR none' != 'REPAIR residual DEC-1'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-187/test_w2_187_s8_cadence_repair.py:249: AssertionError
+=========================== 
+
+# tests/acceptance/W2-172 at 87d6fd835
+==================================
+___________________ test_s6_a_log_present_but_empty_is_empty ___________________
+
+repo = <w2_172_git.Light object at 0x7e9b4227c290>
+
+    def test_s6_a_log_present_but_empty_is_empty(repo):
+>       repo.audits_log.write_text("")
+
+tests/acceptance/W2-172/test_w2_172_s6_baseline.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1049: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/gov-w2-187-lead/pytest-of-usain/pytest-2/test_s6_a_log_present_but_empt0/w/launch-log/indep/memaudit/repo-48b42837/indep/AUDITS.log')
+mode = 'w', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-w2-187-lead/pytest-of-usain/pytest-2/test_s6_a_log_present_but_empt0/w/launch-log/indep/memaudit/repo-48b42837/indep/AUDITS.log'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_ test_f2_no_question_gold_answer_answer_or_source_path_reaches_the_digest_the_output_or_a_log _
+
+ran = <function ran.<locals>.get at 0x7e9b4218b2e0>
+
+    def test_f2_no_question_gold_answer_answer_or_source_path_reaches_the_digest_the_output_or_a_log(ran):
+        world, run = ran("words")
+        assert_ok(run)
+        words = [w.encode() for w in W171.UNIQUE]
+        planted = {"question": (world.delivery / "hidden" / "q07.yaml").read_bytes(),
+                   "answers": (world.run_dir / "misses.jsonl").read_bytes()}
+        assert W171.QWORD.encode() in planted["question"] and W171.GWORD.encode() in planted["question"]
+        assert W171.PWORD.encode() in planted["question"] and W171.AWORD.encode() in planted["answers"], \
+            "the words are really planted: the question, its gold answer, its gold path and the reader's answer"
+        assert W171.QWORD.encode() in planted["answers"] and W171.GWORD.encode() in planted["answers"]
+        targets = {"stdout": run.out.encode(), "stderr": run.err.encode()}
+        for path in sorted(world.runs.rglob("*")):
+            if path.is_file():
+                targets[str(path.relative_to(world.runs))] = path.read_bytes() + path.name.encode()
+>       assert "indep/memaudit/%s/DIGEST.txt" % world.audit in targets
+E       assert ('indep/memaudit/%s/DIGEST.txt' % 'memory-audit-20261110') in {'indep/memaudit/repo-f061f2e8/HISTORY.jsonl': b'{"audit": "memory-audit-20261110", "commit": "826c8078691ccce8c9270b0...e8c9270b0ba02b24938737abc2", "run": "20261110T130000Z-auditor-r1", "audit": "memory-audit-20261110"}\nAUDITS.log', ...}
+E        +  where 'memory-audit-20261110' = <w2_172_world.World object at 0x7e9b4217f8c0>.audit
+
+tests/acceptance/W2-172/test_w2_172_s7_digest.py:216: AssertionError
+=========================== 

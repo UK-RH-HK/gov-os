@@ -2,7 +2,7 @@
 
 You are a fresh engineer for DAEO-6f0s (W2-184), launched on Opus because the ticket is promoted (DEC-1120 (3)). The
 ticket was reopened on 2026-11-14 under DEC-1180 (4) (a defect spotted is fixed in the same flow) for KPI lines R1-R3.
-The head is the merge of the test designer's new cases (named in TESTS-READY below). New cases are red; make them
+The head is bf7b93bcf, the merge of the test designer's new cases (td-7, tests 19324ca4b). New cases are red; make them
 green within the ticket's paths. The behaviour they test is interface **section 10** (at the end of this brief); the
 rest of the interface is unchanged and its cases are green.
 

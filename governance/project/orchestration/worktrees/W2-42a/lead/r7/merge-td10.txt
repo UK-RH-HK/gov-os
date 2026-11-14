@@ -1,0 +1,6 @@
+Merge w2/W2-42a-tests (e3e7badb255b): td-10's cases for R4 (blob revision-colon-paths judged as reads), R5 (the judge never raises) and F3 (no fail-open) (245; red 48 on d9e7dc859: the revision fault, a one-sided blob diff of a refused path, an unresolved git show, a NUL or non-string write path, the property case) and their README map rows (DEC-1157 (12), W2-42a R4 R5)
+
+Task: DAEO-03ub
+Role: orchestrator
+Implements: DEC-1157, DEC-1180
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

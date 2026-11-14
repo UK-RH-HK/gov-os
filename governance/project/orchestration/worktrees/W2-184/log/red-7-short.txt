@@ -1,0 +1,73 @@
+28 failed, 41 passed at bf7b93bcf (tests/unit/launch/test_w2_184_r_fixes.py and tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py)
+
+## Assertion lines (counted)
+     26 E     
+     16 E   
+     13 E     stdout:
+     13 E     stderr:
+     12 E   AssertionError: the lead launch was not refused with exit code 2
+     12 E     records before: []
+     12 E     records after: []
+     10 E   assert 0 == 2
+     10 E     exit code: 0
+     10 E     CLI starts recorded: 1
+      8 E   stdout:
+      8 E   stderr:
+      8 E   exit code: 0
+      8 E   CLI starts recorded: 1
+      8 E   AssertionError: the launch was not refused with exit code 1
+      6 E   records before: []
+      6 E   records after: []
+      3 E     exit code: 1
+      3 E     CLI starts recorded: 0
+      2 E   gov launch independent-test-designer DAEO-r3aa
+      2 E   expected {'model': 'claude-opus-5-5', 'effort': 'xhigh', 'tier': 'opus', 'criticality': 'C2', 'model_source': 'promotion', 'effort_source': 'by criticality', 'trial': None, 'promotion': {'reason': 'a fail-open finding', 'record': 'docs/probes/DAEO-f1aa/01-review.md'}, 'effort_reason': None, 'owner_named': None, 'review_round': None, 'subagent_model': 'claude-opus-5-5'}
+      2 E   assert not True
+      2 E   assert 1 == 2
+      2 E   AssertionError: the launch record differs from what RUBRIC-2 states:
+      2 E   AssertionError: the launch line does not carry --model claude-opus-5-5 and --effort xhigh once each: {'--model': ['claude-sonnet-5-5'], '--effort': ['xhigh']}
+      2 E    +  where True = exists()
+      2 E     gov launch orchestrator DAEO-ld01 --reason x --trial t1 --owner-named DEC-1
+      2 E     gov launch orchestrator DAEO-ld01 --reason x
+      1 E   records before: ['947ace9d-99f9-4322-b57a-b23e2de98cec.json']
+      1 E   records before: ['326b1e3e-3803-4604-9f53-0515f5a0854d.json']
+      1 E   records after: ['26e63e7d-f3c7-44e9-ba8d-4c3288303eae.json', '326b1e3e-3803-4604-9f53-0515f5a0854d.json']
+      1 E   records after: ['0c8630b8-7002-4ce0-8d28-b0a7b202474f.json', '947ace9d-99f9-4322-b57a-b23e2de98cec.json']
+      1 E   gov launch orchestrator DAEO-ld01 --trial='t1'
+      1 E   gov launch orchestrator DAEO-ld01 --reason='x'
+      1 E   gov launch orchestrator DAEO-ld01 --owner-named='DEC-1'
+      1 E   gov launch lead DAEO-ld01 --trial='t1'
+      1 E   gov launch lead DAEO-ld01 --reason='x'
+      1 E   gov launch lead DAEO-ld01 --owner-named='DEC-1'
+      1 E   got      {'model': 'claude-opus-5-5', 'effort': 'xhigh', 'tier': 'opus', 'criticality': 'C2', 'model_source': 'promotion', 'effort_source': 'by criticality', 'trial': None, 'promotion': {'reason': 'two failed reviews', 'record': 'docs/probes/DAEO-f1aa/03-review.md'}, 'effort_reason': None, 'owner_named': None, 'review_round': None, 'subagent_model': 'claude-opus-5-5'}
+      1 E   got      {'model': 'claude-opus-5-5', 'effort': 'xhigh', 'tier': 'opus', 'criticality': 'C2', 'model_source': 'promotion', 'effort_source': 'by criticality', 'trial': None, 'promotion': {'reason': 'two failed reviews', 'record': 'docs/probes/DAEO-f1aa/02-review.md'}, 'effort_reason': None, 'owner_named': None, 'review_round': None, 'subagent_model': 'claude-opus-5-5'}
+
+## Failing cases
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[orchestrator-all-three]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[orchestrator-empty-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[orchestrator-owner-named]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[orchestrator-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[orchestrator-trial]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[lead-all-three]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[lead-empty-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[lead-owner-named]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[lead-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_with_exit_2_and_nothing_starts[lead-trial]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_before_the_resource_gate_is_consulted[reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_a_lead_given_an_option_is_refused_before_the_resource_gate_is_consulted[all-three]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[orchestrator-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[orchestrator-trial]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[orchestrator-owner_named]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[lead-reason]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[lead-trial]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r1_the_launcher_called_directly_with_a_lead_role_and_an_option_refuses[lead-owner_named]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r2_a_write_killed_after_the_create_leaves_no_final_name_file[kill-at-first-byte]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r2_a_write_killed_after_the_create_leaves_no_final_name_file[kill-at-fsync]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r2_a_launch_killed_inside_its_record_write_does_not_refuse_the_next_worker_launch
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r3_a_stale_launch_root_copy_and_a_newer_ticket_copy_with_the_finding_promote_the_test_designer
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r3_the_reverse_a_launch_root_copy_with_the_finding_and_another_root_s_copy_without_it_promote
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r3_a_path_is_a_failed_review_when_any_copy_failed
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_refuses_naming_the_file[a-front-matter-that-is-not-yaml]
+FAILED tests/unit/launch/test_w2_184_r_fixes.py::test_r3_another_root_s_unreadable_copy_of_a_path_the_launch_root_also_holds_refuses_naming_the_file[a-verdict-block-that-is-not-json]
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_both_roots_is_promoted_by_the_other_root_s_copy_that_holds_a_fail_open_finding
+FAILED tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py::test_f1_a_path_under_two_other_roots_is_read_from_every_root

@@ -372,8 +372,12 @@ W2-187 DAEO-0cd2 W2-187-A5-run1.md W2-187-A5-run1.json
 # 14:48 W2-184 f2: narrow check rv-f1 with --owner-named DEC-1177 (P-W2-184-4 (a))
 # W2-184 DAEO-6f0s W2-184-A5-f2.md W2-184-A5-f2.json  # DONE 15:17 0a2dde35c0cc (narrow PASS; accept 507/0) -> LAND
 # 15:04 W2-188 s5: one case revised (P-W2-188-S5 (a)), narrow check
-W2-188 DAEO-zlog W2-188-A5-s5.md W2-188-A5-s5.json
+# W2-188 DAEO-zlog W2-188-A5-s5.md W2-188-A5-s5.json  # DONE 16:05 at 5ada20fef (S5 narrow PASS)
 # 15:18 W2-42a r4: R4 (D1) + R5 (error path), DEC-1157 (12), DND 122/123
 W2-42a DAEO-03ub W2-42a-A5-r4.md W2-42a-A5-r4.json
 # 15:21 W2-184 r: R1-R3 for rv-f1 F1-F3 (DEC-1180 (4))
 W2-184 DAEO-6f0s W2-184-A5-r.md W2-184-A5-r.json
+# 16:07 16:10 W2-188 P-C12-1 (a) round + owner_approval 0db33e558 (DEC-1181 (1))
+# W2-188 DAEO-zlog W2-188-A5-c12.md W2-188-A5-c12.json  # LAUNCH_BLOCKED 16:12: class map C2 vs criticality C3 (my brief named Sonnet; missed 6) -> c12b
+# 16:13 16:16 W2-188 c12b: P-W2-188-C12-L (a), class C3, TD on Opus
+W2-188 DAEO-zlog W2-188-A5-c12b.md W2-188-A5-c12b.json

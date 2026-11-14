@@ -1,0 +1,82 @@
+======== rehearsal of the re-pin from release 0.1.0 (run), 2026-11-14 16:04:29
+======== the live paths before
+gov link: /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov -> /home/usain/.local/share/gov-os/pin-797495bdfc70/bin/gov
+gov script sha256: bdb6107b19f8
+pins: pin-5c401220 pin-6a4696eb pin-797495bdfc70 pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-bcea09060ebc pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+pin dirs sha256 of their gov scripts: pin-5c401220:a47e1af7 pin-6a4696eb:850465fb pin-797495bdfc70:bdb6107b pin-8284fb408bd4:2091dce8 pin-9894b0cf:9d90a791 pin-a7182f6c:2e4e0529 pin-bcea09060ebc:53352b17 pin-fecb870c:bd93f7fd 
+wheels: 5c401220 6a4696eb 797495bdfc70 8284fb408bd4 9894b0cf a7182f6c bcea09060ebc fecb870c 
+hooks: reference-transaction 
+hook reference-transaction sha256: 099de326c45b
+registry file sha256: e5d41b8de325
+shared reranker pid: 32310
+main tree tags v*: v4.1.3-rc1 v4.1.4-rc1 v4.1.5-rc1 (end)
+main tree docs/releases: README.md 
+store link: /home/usain/gov-os-worktrees/W2-00-store-b -> /home/usain/gov-os-worktrees/W2-00-store-b at d3f3326c4a56
+store halves: a at dc67c4f6be39, b at d3f3326c4a56
+w2/integrate: bf04ed69c893
+the stand-in C: bf04ed69c893 (the main tree's w2/integrate head now)
+======== the scratch release 0.1.0 at the stand-in C (a scratch clone only)
+record: /tmp/gov-os-rel-repin/run/release/docs/releases/0.1.0
+manifest.json: OK
+scratch status: ?? docs/releases/0.1.0/ 
+scratch tag: v0.1.0 -> d15644bf63b5 (parent bf04ed69c893), tag
+scratch record: version 0.1.0 commit bf04ed69c893 cli 0.1.0 wheel gov-0.1.0-py3-none-any.whl 59cfc7237dae files 278
+======== fill_release.sh from the scratch release
+C=bf04ed69c893 (tag v0.1.0 on d15644bf63b5)
+EPOCH=1794671739
+SHA=59cfc7237dae91001a0950e2b79957674addab3d3c28300e9215f4ff7b42df7b (the record's wheel sha256)
+RECORD=71e998f490e1e16fb65797bf83806579c2d2d965bae6738f348d1bd03f830636 (manifest.json's sha256)
+filled: /tmp/gov-os-rel-repin/run/REPIN-COMMANDS-REL-0.1.0.sh sha256 b46085ea4855daf5f63ecd47bbdc36bc3e8e6c7612c32fc820f897b2bb81c9f0
+hash list: /tmp/gov-os-rel-repin/run/REPIN-REL-0.1.0.sha256 (13 files) sha256 5ab2e4c3825ce01a1e944cd3ec4baa66f52ec132403f6ea48e40593e5127c965
+the filled script differs from the template in the four value lines only
+half a: dc67c4f6be39, store 585M
+half b: d3f3326c4a56, store 585M
+registry clone at bf04ed69c893 on w2/integrate
+scratch hook: 099de326c45b (a copy of the live one)
+mirror ready: gov -> /tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-797495bdfc70/bin/gov; store -> /tmp/gov-os-rel-repin/run/home/gov-os-worktrees/W2-00-store-b
+======== the operator's script (filled from the scratch release), against the mirror
+the hash list: 13 files OK (the operator's first check)
+== 0. preconditions
+ok (gov -> pin-797495bdfc70; store -> W2-00-store-b at d3f3326c4a56; w2/integrate at bf04ed69c893, bf04ed69c893 and it the same wheel inputs; the hook is only read)
+== R. release 0.1.0: the tag v0.1.0 and its record, checked against the values filled in (RL-1)
+manifest.json: OK
+verify: 71e998f490e1e16fb65797bf83806579c2d2d965bae6738f348d1bd03f830636
+ok (v0.1.0 -> d15644bf63b5, parent bf04ed69c893; the record only; manifest.sha256 holds; record sha256 71e998f490e1; version, commit, cli_version, wheel name and sha256 as filled in; verify holds)
+== A. the wheel of bf04ed69c893, built twice from clean exports, checked against the release record's sha256; its own environment
+build 1 59cfc7237dae91001a0950e2b79957674addab3d3c28300e9215f4ff7b42df7b
+build 2 59cfc7237dae91001a0950e2b79957674addab3d3c28300e9215f4ff7b42df7b
+/tmp/gov-os-rel-repin/run/home/.local/share/gov-os/wheels/bf04ed69c893/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-bf04ed69c893/bin/python
+== S. the integration store rebuilt at w2/integrate's head in the spare half, by the code of bf04ed69c893 (the same bytes as that head's); the link flips on success
+GPU before the rebuild: 8176 MiB used
+2026-11-14 16:07:47 built bf04ed69c893 in W2-00-store-a rc=0 in 182 s; link -> W2-00-store-a
+the rebuild: exit 0, 183 s wall, GPU peak 8177 MiB
+the store: /tmp/gov-os-rel-repin/run/home/gov-os-worktrees/W2-00-store -> W2-00-store-a at bf04ed69c893 (w2/integrate's head)
+== B. every check before the switch, through /tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-bf04ed69c893 by its path
+ok   gov imports from the pin (/tmp/gov-os-rel-repin/run/home/.local/share/gov-os/pin-bf04ed69c893/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint, brief, links, plan, resources
+ok   gov accept --help and gov launch --help (with --gate-override)
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 64 texts (W2-137) and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   window 4's builds: W2-112's release, gov links, gov rebuild --integration, the launcher's GOV_STORE, the line cap, the measure's families
+ok   W2-32 S11: the pool module; the new pin accepts the five pool settings, and the main tree's own retrieval.yaml (the pool is on since window 4)
+ok   W2-137, W2-145: the service's bound, no private reranker beside it, the service holds the free slots
+ok   W2-141: the guard's search rule in gov.guard.reads; W2-150: the gov.util modules, and the old names still import
+ok   W2-56, W2-20, W2-136, W2-153: the launcher's sandbox, gate, environment and plan check import; the role template flag; portability.compose
+ok   W2-96: gov accept's opt-in suites
+ok   W2-152: gov brief --run; W2-20: gov resources --slot
+ok   3d: gov adapters, wait, dispatch, impact, session-watch, skilleval and release answer --help (P-2); gov.release's build and verify import
+ok   W2-20: gov resources reads this machine's gate.json, no fault (the gate is open)
+ok   W2-56: gov launch refuses an unknown ticket by name (LAUNCH_REFUSED), starting nothing
+ok   W2-136: gov plan --json answers (read-only)
+ok   W2-129, W2-55, W2-92: gov links --since HEAD~1 answers
+ok   the store W2-00-store-a at bf04ed69c893: embed_headers true, 31037 vectors
+ok   gov retrieve on the store: lexical and semantic available, rerank.by service, the result names the store's commit and folder (W2-138), 2.584163432 s (not a latency gate: DEC-1125 (1))
+ok   gov context DAEO-sdxk builds with a wide budget; at the default ceiling it answers CONTEXT_OVER_CEILING, as the old pin does; --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   the live hooks' 8 gov imports resolve in the new pin
+ok   the staged W2-141 pair's 8 gov imports resolve in the new pin
+ok   guard4_check.py: PASS (453 cases)
+ok   test_guard_fix_4.py: 2 failed, 465 passed; the 2 failed are let-throughs now refused (W2-42a, stricter): fix3 unterminated heredoc naming acceptance judged as before;fix3 python heredoc reading .env (gap as today);
+ok   tests/unit/hooks/test_live_hook.py and tests/unit/guard/test_w2_141_search.py: 267 passed

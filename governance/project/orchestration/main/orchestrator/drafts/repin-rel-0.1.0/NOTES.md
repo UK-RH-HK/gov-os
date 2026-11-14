@@ -51,9 +51,13 @@ REHEARSAL-OUTCOMES
   `rel_checks.sh` now accepts a difference only in the stricter direction: FIX-4 failures only "want allow, got deny";
   FIX-3 cases failing only under the new pin only "want allow, got deny", and those failing only under the old pin only
   "want deny, got allow" there. A lost refusal still fails the check. Reviewer: check this is the right bar.
-- **R-6, the heavy slots.** In every run, part S waited for a free heavy-job slot (other sessions' tests): the rebuild
-  took 695 to 1,013 s wall against window 5's 39 s, nearly all of it waiting. At the owner's sitting the CTO's hold
-  should also leave the slots free (no worker test runs from the hand-over), or the act runs long.
+- **R-6, the heavy slots.** In runs r2 and r3, part S waited for a free heavy-job slot (other sessions' tests): the
+  rebuild took 1,013 and 695 s wall, nearly all of it waiting; with the slots free (r4) it took 71 s. Part B's suites
+  wait the same way. At the owner's sitting the CTO's hold should also leave the slots free (no worker test runs from
+  the hand-over), or the act runs long.
+- **R-7, the quiet point is live.** Run r4 passed every check (ALL CHECKS PASS) and then STOPped at part C because the
+  CTO's own merge queue was landing (`merge_queue.py run`): the right stop (the store link went back, nothing
+  switched). At the sitting the hold keeps the merge queue still; the CTO checks no landing runs before the hand-over.
 - **R-4, the epoch:** the release's own build (`gov.release._wheel`, setuptools' `build_wheel` on `git archive C
   pyproject.toml src`) and the re-pin's (`pip wheel --no-build-isolation` on `git archive C`) gave the same bytes in the
   rehearsal (part A against the scratch record). This is P-RELEASE-1 §5's claim, now shown on one commit; the rehearsal

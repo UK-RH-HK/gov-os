@@ -1,2 +1,3 @@
 TESTS-READY W2-184 td-5: merge 7d275b97f (tests a4ad2e380): tests/acceptance/W2-184/test_w2_184_f1_tests_worktree.py (21 cases), S4 case rewritten (no criticality.yaml setting)
 TESTS-READY W2-184 td-6: merge 0a4ce21fd (tests 3e3d275a0): tests/acceptance/W2-184/test_w2_184_cli_options.py (35 cases)
+TESTS-READY W2-184 td-7: merge bf7b93bcf (tests 19324ca4b): tests/unit/launch/test_w2_184_r_fixes.py (52 cases), test_w2_184_f1_tests_worktree.py two cases revised to R3 (Rewrite-Reason: DEC-1180 (4), rv-f1 F3)

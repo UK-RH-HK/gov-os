@@ -1,0 +1,7 @@
+log: W2-188-A5-s5.json
+W2: W2-188
+status: DONE
+
+task: DAEO-zlog (W2-188), resumed after the CTO's answer (a) to P-W2-188-S5
+status: DONE
+work_completed: I merged `w2/integrate` cleanly (ccc5b3225). A fresh test designer (td-2) revised the one S5 impact case to the re-baselined clause (f71c82430, merged 1074c9d04). The revised case was red on one statement: the CIT-P's W2-11 row did not say in one place that W2-11's body and version cases do not cover `adopt`. A fresh product-spec worker (ps-5) re-worded that one row of the CIT-P (c1c8685b8). lead_verify ran once on c1c8685b8, with the allowed red only. The narrow independent check (au-s5) p

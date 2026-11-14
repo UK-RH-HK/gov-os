@@ -141,6 +141,17 @@ mapped=$(python3 -I -c 'import json,sys
 try: print(json.load(open(sys.argv[1])).get(sys.argv[2],""))
 except Exception: print("")' "$CLASS_MAP" "$ID" 2> /dev/null)
 case "$mapped" in C0|C1|C2|C3) [ "$mapped" != "$cls" ] && say "RUBRIC-2: class $cls -> $mapped (the CTO's class map for $ID)"; cls=$mapped;; esac
+# the floor (2026-11-14, W2-188 c12 / W2-42a td-10): where the code root has W2-184's criticality rules, the class is
+# never below what they give the ticket's paths, so the map can never rewrite a C3 ticket's worker to Sonnet
+floor=$(cd "$tree" && python3 -c 'import sys,yaml
+sys.path.insert(0, "src")
+try:
+    from gov.launch import criticality as c
+    t = open(".tickets/%s.md" % sys.argv[1], encoding="utf-8").read().split("\n---", 1)[0].lstrip("-")
+    print(c.ticket_criticality(".", yaml.safe_load(t)))
+except Exception:
+    print("")' "$ID" 2> /dev/null)
+case "$floor" in C0|C1|C2|C3) [[ "$floor" > "$cls" ]] && { say "RUBRIC-2: class $cls -> $floor (criticality.yaml's rules for $ID's paths: the floor)"; cls=$floor; };; esac
 if [ -z "$promoted" ]; then
   want=$MODEL
   case "$role" in
