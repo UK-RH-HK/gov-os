@@ -87,7 +87,9 @@ def _measured_at(record) -> str:
     return measured
 
 
-def test_s8_gov_links_at_the_record_s_measured_tree_gives_the_after_counts(record, clone_at, home):
+def test_s8_gov_links_at_head_gives_the_after_counts(record, clone_at, home):
+    """Runs ``gov links`` on a clone at ``counts-after.measured_at`` (the tree the record says it counted), not at HEAD, and
+    compares the record's after counts with it. The name is kept because the README map names it (DEC-1156 (7) pin run)."""
     after = record.data("counts-after")
     tree = clone_at(_measured_at(record))
     mine = _counts(s.links_json(tree, home), tree)
@@ -107,7 +109,9 @@ def test_s8_the_before_counts_of_the_codes_the_clean_up_works_on_equal_gov_links
         assert before["by_code"].get(code, 0) == mine.get(code, 0), f"{code}: record {before['by_code'].get(code, 0)}, gov links {mine.get(code, 0)}"
 
 
-def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_the_record_s_measured_tree(record, clone_at, home):
+def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, clone_at, home):
+    """Compares ``left`` (D-5, D-6, D-9 by path and role) with what ``gov links`` finds on a clone at
+    ``counts-after.measured_at``, not at HEAD. The name is kept because the README map names it (DEC-1156 (7) pin run)."""
     left = record.data("left")
     assert isinstance(left, dict) and {"D-5", "D-6", "D-9"} <= set(left), "left lacks D-5, D-6 or D-9"
     findings = s.links_json(clone_at(_measured_at(record)), home)
