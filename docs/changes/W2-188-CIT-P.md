@@ -8,7 +8,7 @@ base: '5336a6fca (the adopt skill at sha256 16fd341f267b4300c3e7e7ef779933e889b1
 head: 'd782640dee6b0ff547ea7254498c482f416a4e69 (the commit holding the skill''s final bytes, sha256 6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489)'
 ticket: DAEO-zlog (W2-188)
 author: product-spec session of W2-188, from the CTO's draft (DAEO-sdxk)
-review: PENDING
+review: 'PASS (round 1, docs/probes/DAEO-zlog/PR-DAEO-zlog.md)'
 decisions_carried: [DEC-1179, DEC-1176, DEC-1101, DEC-1125, DEC-1126, DEC-1098, DEC-1097, DEC-1074, DEC-1072, DEC-1071, DEC-105, CAP-33]
 owner_approval: 'pending'
 state_class: EVIDENCE
@@ -126,7 +126,7 @@ The kernel skill's sha256 before: `16fd341f267b4300c3e7e7ef779933e889b1cc8d6a574
 
 The kernel skill's sha256 after: `6a884cf1639f2e803400205ace80aeabe23badbd59be8df92c06e24cf9a29489`
 
-The practice record's sha256 after: `76eaaeb5487739643cef6d79d8f736331ee5396756b1f123c5236c9bcb60d312` (the first sub-bullet of §5 item 6's practice lines is unchanged; the standing-set line was re-worded once, after the independent test designer's acceptance run).
+The practice record's sha256 after: `76eaaeb5487739643cef6d79d8f736331ee5396756b1f123c5236c9bcb60d312` (the first sub-bullet of §5 item 6's practice lines is unchanged by the re-word in be8b99ccb; the standing-set line was re-worded once, after the independent test designer's acceptance run).
 
 | File | Before (sha256) | After (sha256) | Lines before / after | Added / removed (`git diff --numstat`) |
 |---|---|---|---|---|
@@ -151,7 +151,7 @@ and the new paragraph, governing sources).
 | Area | Impact |
 |---|---|
 | Kernel skills | One skill: one step re-worded, one paragraph added, the sources line and the version. No other skill, role file, hook or guard rule changes |
-| Generated copies | `.rulesync/skills/adopt/` and `template/.rulesync/skills/adopt/` byte-equal to the kernel copy. `.claude/skills/adopt/SKILL.md` (front matter without a version) comes from the copies ACT after the owner's approval; this ticket does not write it, so until then its body differs |
+| Generated copies | `.rulesync/skills/adopt/` and `template/.rulesync/skills/adopt/` byte-equal to the kernel copy. `.claude/skills/adopt/SKILL.md` (front matter without a version) comes from the copies ACT after the owner's approval; this ticket does not write it, so until then its body differs. The adapter-portability check (`python3 -m gov.adapters.portability`, a G1 hard-block check that `gov check`'s structural pass runs when a diff touches the kernel skills or `.rulesync/`) reports one finding, `GENERATED_DIFFERS` on `.claude/skills/adopt/SKILL.md` ("is not what rulesync generates from its sources"), from the merge of these bytes until the copies ACT regenerates that copy. Run on `b75472d48` it gives exactly that one finding (`compared`: `rulesync_version` true, 78 kernel files, 93 generated files; exit 1). So the copies ACT should ride in the same landing as this merge |
 | W2-11's cases | `test_every_copy_carries_the_kernel_skills_body[adopt]` (`tests/acceptance/W2-11/test_w2_11_skills.py`) is not a case: the test is parametrized over `test-design`, `orchestration`, `audit` and `qa-review` only (line 124), so `adopt` is left out. W2-11 therefore stays green after the merge (`tests/acceptance/W2-11` and `tests/acceptance/W2-88a`: 276 passed, 1 skipped on `599fa2a22`), and the `.claude/skills/adopt/SKILL.md` copy's drift from the kernel body, from the merge until the copies ACT regenerates it, is caught by no W2-11 case. W2-11's version case and its round-2 twin (`test_w2_11_round2.py`) exclude `adopt`, so the bump does not touch them |
 | W2-88a's cases | Step 6's matcher (`tests/acceptance/W2-88a/w2_88a_support.py`: "declar...", "measur...", "verdict set", "once") passes on the new text, the seven steps in order: `check_steps` was run on A9's region of each of the three copies and on the practice record's §6, and `check_pointer` on A9's region, all with no problem (`docs/probes/DAEO-zlog/checks.md`). The COPIES case diffs the base against the current kernel copy, so it passes while the three copies are byte-equal. The CIT-P cases read W2-88a's own record and fixed commits; unchanged. No W2-88a test is revised |
 | Skill check | `python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/adopt` exits 0 on the new text |
@@ -160,9 +160,19 @@ and the new paragraph, governing sources).
 
 ## 6. Independent review and approval
 
-Review: PENDING. One fresh read-only reviewer (independent-auditor, Opus) reads the three copies, the practice record,
-this record and DEC-1179 as recorded, and gives a PASS or FAIL verdict with findings; at most two rounds
-(DEC-1010). The lead adds the reviewer's verdict line to this record after the review.
+Review: round 1, by a fresh read-only independent auditor (au-1, session `2bd2339c-ba97-4e67-bf75-69f84af5a970`,
+Opus, high), on the probed commit `b75472d4825cece64936451f21b259787b5ecf97`; its record is
+`docs/probes/DAEO-zlog/PR-DAEO-zlog.md`. It gave four findings:
+
+- **F1:** the ticket's S5/I6 premise; it goes to the CTO.
+- **F2:** the adapter-portability finding on `.claude/skills/adopt/SKILL.md` until the copies ACT; fixed in this record
+  (§5, "Generated copies").
+- **F3:** the "unchanged" parenthesis of §3 misread against the base; fixed in this record (§3).
+- **F4:** ordinary work no; a Wave 3 row.
+
+None blocks (DEC-1010).
+
+verdict: PASS
 
 The owner's approval of the skill's bytes (sha256 after, §3) is written in `owner_approval:` of the front matter by the
 CTO after the owner's yes, before the merge (CAP-33). This record holds none yet.
