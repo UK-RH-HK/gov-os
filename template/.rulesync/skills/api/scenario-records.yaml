@@ -1,0 +1,67 @@
+records:
+- skill: api
+  skill_version: 1.0.0
+  scenario: 1
+  title: A new endpoint with no contract
+  verdict: pass
+  cause: null
+  cost_usd: 0.237823
+  seconds: 36.305
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:28:18+00:00'
+- skill: api
+  skill_version: 1.0.0
+  scenario: 2
+  title: A rename in a published response
+  verdict: fail
+  cause: judged FAIL against the pass line
+  cost_usd: 0.212408
+  seconds: 34.408
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:28:56+00:00'
+- skill: api
+  skill_version: 1.0.0
+  scenario: 3
+  title: A contract that is silent on one error
+  verdict: pass
+  cause: null
+  cost_usd: 0.198428
+  seconds: 28.092
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:29:32+00:00'
+- skill: api
+  skill_version: 1.0.0
+  scenario: 1
+  title: A new endpoint with no contract
+  verdict: pass
+  cause: null
+  cost_usd: 0.212538
+  seconds: 34.751
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:36:46+00:00'
+- skill: api
+  skill_version: 1.0.0
+  scenario: 2
+  title: A rename in a published response
+  verdict: pass
+  cause: null
+  cost_usd: 0.221451
+  seconds: 40.46
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:37:22+00:00'
+- skill: api
+  skill_version: 1.0.0
+  scenario: 3
+  title: A contract that is silent on one error
+  verdict: pass
+  cause: null
+  cost_usd: 0.192853
+  seconds: 27.289
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:38:04+00:00'

@@ -1,0 +1,67 @@
+records:
+- skill: data
+  skill_version: 1.0.0
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.362725
+  seconds: 76.702
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:28:18+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.450633
+  seconds: 101.511
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:29:38+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.192311
+  seconds: 27.643
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:31:25+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 1
+  title: A NOT NULL column on a populated table
+  verdict: pass
+  cause: null
+  cost_usd: 0.448231
+  seconds: 104.061
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:39:07+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 2
+  title: An import that lets bad rows through
+  verdict: pass
+  cause: null
+  cost_usd: 0.340445
+  seconds: 66.216
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:40:57+00:00'
+- skill: data
+  skill_version: 1.0.0
+  scenario: 3
+  title: A migration that destroys the only copy
+  verdict: pass
+  cause: null
+  cost_usd: 0.188404
+  seconds: 28.666
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:42:06+00:00'
