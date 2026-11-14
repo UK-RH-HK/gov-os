@@ -1,0 +1,37 @@
+.FFFFFFFFF..F..                                                          [100%]
+=================================== FAILURES ===================================
+E   Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:136: Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+E   AssertionError: assert ('claude-sonn... criticality') == ('claude-opus..., 'promotion')
+      
+      At index 0 diff: 'claude-sonnet-5-5' != 'claude-opus-5-5'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:884: AssertionError: assert ('claude-sonn... criticality') == ('claude-opus..., 'promotion')
+E   AssertionError: assert None == {'reason': 'two failed reviews', 'record': 'docs/probes/T-1/b.md'}
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:895: AssertionError: assert None == {'reason': 'two failed reviews', 'record': 'docs/probes/T-1/b.md'}
+E   AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/W9-1/r.md'}
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:906: AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/W9-1/r.md'}
+E   AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/T-1/r.md'}
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:906: AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/T-1/r.md'}
+E   AssertionError: assert None == {'reason': 'two failed reviews', 'record': 'docs/probes/T-1/k2.md'}
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:927: AssertionError: assert None == {'reason': 'two failed reviews', 'record': 'docs/probes/T-1/k2.md'}
+E   Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:136: Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+E   Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:136: Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+E   Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:136: Failed: DID NOT RAISE <class 'gov.cli.errors.GovError'>
+E   AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/T-1/a.md'}
+/home/usain/gov-os-worktrees/W2-184/tests/unit/launch/test_w2_184_launch.py:981: AssertionError: assert None == {'reason': 'a fail-open finding', 'record': 'docs/probes/T-1/a.md'}
+=========================== short test summary info ============================
+FAILED tests/unit/launch/test_w2_184_launch.py::test_a_launch_record_that_is_not_json_refuses_a_full_auditor_launch_naming_it
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_fail_open_record_under_a_root_a_launch_record_names_promotes
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_two_failed_records_across_the_launch_root_and_another_root_promote
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_root_named_under_any_name_of_the_ticket_by_any_role_is_read[wbs_id-independent-auditor]
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_root_named_under_any_name_of_the_ticket_by_any_role_is_read[id-product-spec]
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_named_root_that_is_missing_or_a_file_is_skipped_and_the_others_count
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_naming_it[<lambda>0]
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_an_unreadable_probe_record_only_under_another_named_root_refuses_naming_it[<lambda>1]
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_launch_record_that_is_not_json_refuses_every_launch_where_the_file_is
+FAILED tests/unit/launch/test_w2_184_launch.py::test_f1_a_path_under_two_other_roots_is_read_from_the_first_in_sorted_order
+10 failed, 5 passed, 122 deselected in 0.31s

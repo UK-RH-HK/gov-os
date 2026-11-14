@@ -1363,3 +1363,4 @@
 2026-11-14 12:13:07 land started: ['W2-88b=266ec245e792'] -> land-dispatch-20261114-121307.out (launcher exit 0)
 2026-11-14 12:25:09 interim result: W2-184 a4ad2e380 W2-184 (DAEO-6f0s) tests: review round 2's F1: a test designer launched from the
 2026-11-14 12:30:05 land finished: {'W2-88b=266ec245e792': 'CLOSED'}
+2026-11-14 12:35:08 interim result: W2-184 94b48c130 W2-184 (DAEO-6f0s): review round 2's F1: the probe records are also read under e

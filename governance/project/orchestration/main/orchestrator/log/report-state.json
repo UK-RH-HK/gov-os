@@ -9,18 +9,18 @@
     "W2-100",
     "W2-101"
   ],
-  "closes_next": "W2-88b landing since 12:13 (regression running), then close; W2-134 on your P-W2-61H-HEAD-1 Q2 (fresh accept 28/0 at c451c2180); W2-100 and W2-101 after your CIT-P yeses (hand merge, then COPIES-10/-11); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56)",
+  "closes_next": "W2-134 on your P-W2-61H-HEAD-1 Q2 (fresh accept 28/0 at c451c2180); W2-100 and W2-101 after your CIT-P yeses (hand merge, then COPIES-10/-11); W2-145 after the re-pin plus a day (S7); W2-138, W2-155 after W2-145. CLOSED since the last morning package: W2-130 (09:56), W2-88b (12:28)",
   "examin": "EXAMIN's copy: W2-88 and W2-60a merged; W2-27 waits on the first numbered release (P-RELEASE-1: your seven lines), then the re-pin, the clone and the EXAMIN CTO (DEC-1174 (2)); about one day from your yeses to its start",
   "emergency": "none (lifted, DEC-1158)",
   "countdown": [
-    "W2-88b: land running (12:13), close, then its findings F-1 (redis A9 code graph) and F-3 (grafana .gitignore) routed (~2 h with P-1)",
+    "W2-88b CLOSED 12:28 (7ccc0bb61); its findings F-1 and F-3 to you (P-W2-88B-FINDINGS-1), to ride with P-1's run",
     "W2-184: F1 fix run (P-W2-184-1 (a)) running since 12:02, narrow check, DONE, land (~2 h)",
     "W2-134: your P-W2-61H-HEAD-1 line, then close (5 min); W2-61h's F3 test revision (~2 h)",
     "W2-100 and W2-101: your CIT-P and copies-ACT yeses, then hand merges and the operator's ACTs (~1 h each)",
     "P-RELEASE-1: your seven lines, then P-1's fix, the release, the hash check and the re-pin (~7 h to one evening sitting)",
     "EXAMIN CTO: clone, kit, A0, start (DEC-1174 (2) probes) (~1 h after the re-pin)"
   ],
-  "owner_action": "P1 P-W2-61H-HEAD-1 (W2-61h check's structural fix + W2-134's close); the eleven lines (P-RELEASE-1 x7, W2-100/101 CIT-Ps + copies ACTs) after reading the packages; approve q02 variant 0703aebf; MEMORY-AUDIT-P1",
+  "owner_action": "P1 P-W2-61H-HEAD-1 (W2-61h check's structural fix + W2-134's close); P-W2-88B-FINDINGS-1 (F-1/F-3 with P-1's run); the eleven lines (P-RELEASE-1 x7, W2-100/101 CIT-Ps + copies ACTs) after reading the packages; approve q02 variant 0703aebf; MEMORY-AUDIT-P1",
   "last_report": "2026-11-14 09:04:17",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
