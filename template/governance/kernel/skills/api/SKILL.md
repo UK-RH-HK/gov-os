@@ -1,10 +1,10 @@
 ---
 name: api
-version: "1.0.0"
+version: "1.0.1"
 description: "The engineer's method for API work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that adds or changes an interface other code or clients call."
 output: none
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # API
@@ -132,7 +132,7 @@ Reminders only: the guard decides.
 - Write the handler before the contract, or leave the contract to describe what the code does.
 - Edit a caller's code or a shared schema outside the ticket's paths, or a test you dispute; both go up as a package.
 - Read the acceptance tests, or code to make them pass; the code fulfils the spec and its KPIs.
-- Write the `.claude/skills/` copy by hand: it is generated from this source (DEC-315).
+- Edit the generated copy of this skill by hand: it is generated from this source (DEC-315).
 
 ## Sources
 

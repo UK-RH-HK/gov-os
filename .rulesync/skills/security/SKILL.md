@@ -1,10 +1,10 @@
 ---
 name: security
-version: "1.0.0"
+version: "1.0.1"
 description: "The engineer's method for security-flagged work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that touches input, authentication, access, secrets or dependencies."
 output: none
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Security
@@ -143,7 +143,7 @@ Reminders only: the guard decides.
 - Fix code outside the ticket's paths because the fix is small; the package goes up and the owner of that code acts.
 - Widen a role, a token or a file mode to make a test or a run pass.
 - Read the acceptance tests, or code to make them pass; the code fulfils the spec and its KPIs.
-- Write the `.claude/skills/` copy by hand: it is generated from this source (DEC-315).
+- Edit the generated copy of this skill by hand: it is generated from this source (DEC-315).
 
 ## Sources
 

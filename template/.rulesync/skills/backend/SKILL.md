@@ -1,10 +1,10 @@
 ---
 name: backend
-version: "1.0.0"
+version: "1.0.1"
 description: "The engineer's method for backend work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that changes server-side code, jobs, queues or migrations."
 output: none
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Backend
@@ -131,7 +131,7 @@ Reminders only: the guard decides.
 - Run a migration against a live database, or one with no way back.
 - Edit shared code outside the ticket's paths, or a test you dispute; both go up as a package.
 - Read the acceptance tests, or code to make them pass; the code fulfils the spec and its KPIs.
-- Write the `.claude/skills/` copy by hand: it is generated from this source (DEC-315).
+- Edit the generated copy of this skill by hand: it is generated from this source (DEC-315).
 
 ## Sources
 

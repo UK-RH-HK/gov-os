@@ -1,10 +1,10 @@
 ---
 name: data
-version: "1.0.0"
+version: "1.0.1"
 description: "The engineer's method for data work: conventions, a pre-commit checklist, unit-test focus, common mistakes and when to escalate. Used for a ticket that changes a schema, moves or transforms stored data, or loads data from outside."
 output: none
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Data
@@ -134,7 +134,7 @@ Reminders only: the guard decides.
 - Drop bad rows without a trace, or put real personal data in a fixture, log or example.
 - Edit another stream's tables or pipelines, or a test you dispute; both go up as a package.
 - Read the acceptance tests, or code to make them pass; the code fulfils the spec and its KPIs.
-- Write the `.claude/skills/` copy by hand: it is generated from this source (DEC-315).
+- Edit the generated copy of this skill by hand: it is generated from this source (DEC-315).
 
 ## Sources
 
