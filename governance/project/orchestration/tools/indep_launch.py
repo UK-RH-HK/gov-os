@@ -40,8 +40,8 @@ The auditor's copy of a set (W2-178; W2-170's Interface, DEC-1101 (2)): every fi
 those under its `hidden/dropped/` folder (any depth below it); the writer's round 2 and the checker's copies are
 unchanged. A link anywhere under `hidden/` still refuses 10, and a set empty after the exclusion refuses 10 as any other.
 
-The one-question fix flow (W2-94, DEC-1180 (2)): `--fix <id> --reason <code>` on the writer's round 2 (together, with
-nothing else of the writer's round 2 changed). It stages `input/<id>.yaml` (the set's hidden question), `input/verdict.txt`
+The one-question fix flow (W2-94, DEC-1180 (2)): a flag pair, the question's id and the check's reason code, given
+together on the writer's round 2 (the usage line above). It stages `input/<id>.yaml` (the set's hidden question), `input/verdict.txt`
 (`<id> <code>`) and `input/sample.json` (the sample list of the latest delivered round-1 run of the set, read from its
 archive), and no other file of the set. A brief's front matter need not name `sample:`. At delivery only
 `hidden/<id>.yaml` is replaced, by `out/<id>.yaml`, the old file packed into the run's tar; the result adds `action`
