@@ -15097,6 +15097,15 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
   - The follow-up on the smoke run: "its only purpose is to test whether gov adopt works on repositories different from ours, small and large, and where it fails. No measuring and no validation."
 - **Basis (the choice):** the owner's message of 2026-11-14 (~00:30): "yes DEC-1176, A5 (a)."
 
+### DEC-1177 — P-W2-184-1 (a), with (c) as the stop-gap: a test designer launched from its tests worktree sees the ticket's probe records
+- **Status:** ACCEPTED (owner, 2026-11-14 ~11:40, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-14)`; written into W2-184's ticket at c451c2180) · **Under:** DEC-1010 (at most two review rounds; to the owner once), DEC-1154 (a narrow independent check of a change decided after review), DEC-1120 (RUBRIC-2's promotion), DEC-1157 (1)
+- **Decision:**
+  - (1) **(a), the fix:** `_probe_files` (`src/gov/launch/launcher.py`) also reads `docs/probes/<id>/` under each worktree root that the ticket's launch records name, so a test designer launched from its tests worktree sees the ticket's probe records and is promoted as RUBRIC-2 says; a root that no longer exists is skipped. Built in W2-184 (DAEO-6f0s)'s own scope, followed by a narrow independent check of that change only (DEC-1154).
+  - (2) **(c), the stop-gap until (a) lands:** before it launches a test designer, a lead brings the ticket branch's probe-record commit into its tests branch.
+  - (3) **Why:** W2-184's FULL review round 2 (the last, DEC-1010) failed on F1: on a promoted ticket the designer launched from the tests worktree started on Sonnet with `promotion: null`, and an Opus request was refused. Ordinary work: yes (it happened twice); consequence: fails open (a promotion silently not applied).
+  - (4) **Not chosen:** (b) refuse the launch when an auditor launch exists but the root has no probe records (1-2 h); (d) accept and narrow as a Wave 3 row (DEC-105).
+- **Basis:** the owner's message of 2026-11-14 (~11:40): "P-W2-184-1 (a), with (c) as the stop-gap until it lands." The package: `governance/project/orchestration/packages/P1-MORNING-20261114.md` (the W2-184 item; costs (a) 2-3 lead-hours, (b) 1-2 h, (c) 0.5 h, (d) 0.2 h; recommendation (a) with (c), about 70 %).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -15208,3 +15217,4 @@ Version-table row (append after the register's last row; the CTO's 0.550 for DEC
 | 0.555 | 2026-11-13 | Owner (recorded by the orchestrator, DEC-861): DEC-1174 (GUARD-FIX-5 (b), the product parser fixed first; P-EXAMIN-CTO-1 approved with two conditions, the write rule named). Next free id: DEC-1175. |
 | 0.556 | 2026-11-14 | Owner (recorded by the orchestrator, DEC-861): DEC-1175 (W2-94 GOLD; the operator's three ACTs, P-9 and P-9b; LANDING-72C6 (a); the corrected merge form; h10 callers (b); the CTO's routings of the evening). Next free id: DEC-1176. |
 | 0.557 | 2026-11-14 | Owner (recorded by the orchestrator, DEC-861): DEC-1176 (memory proven per repository, built, measured and maintained in its own Wave 0; W2-88b a smoke run of gov adopt on grafana and redis, no measure; A5 by a fresh auditor per copy). Next free id: DEC-1177. |
+| 0.558 | 2026-11-14 | Owner (recorded by the orchestrator, DEC-861): DEC-1177 (P-W2-184-1 (a): `_probe_files` reads the probe records under every root the launch records name; (c) the stop-gap until it lands). Next free id: DEC-1178. |
