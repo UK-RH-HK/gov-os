@@ -177,7 +177,7 @@ States, as of 2026-10-30:
 | W2-81's synthetic repositories: visible | W2-81's independent test designer | W2-81 |
 | W2-81's synthetic repositories: hidden | an independent auditor | W2-81's companion (not filed, gap 6) |
 | EXAMIN's set, both halves | an independent auditor, independent of the adopting team | not filed (gap 7) |
-| W2-88's two real GitHub repositories: visible only, 10 each | W2-88's independent test designer | W2-88 |
+| ~~W2-88's two real GitHub repositories: visible only, 10 each~~ (removed by DEC-1176: no question set for a real repository outside its own Wave 0) | W2-88's independent test designer | W2-88 |
 
 **Open for the owner:**
 - (a) the size (48, or 50 as 25 and 25);

@@ -1,6 +1,6 @@
 ---
 id: DAEO-drhj
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-30T23:20:54Z

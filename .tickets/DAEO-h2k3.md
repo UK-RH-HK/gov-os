@@ -1,6 +1,6 @@
 ---
 id: DAEO-h2k3
-status: in_progress
+status: closed
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-29T15:55:50Z
@@ -62,6 +62,11 @@ sources:
 - DEC-1083
 - DEC-1084
 - DEC-866
+- DEC-1097
+- DEC-1122
+- DEC-1123
+- DEC-1124
+- DEC-1171
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-61h/

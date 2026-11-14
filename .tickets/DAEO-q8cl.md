@@ -1,6 +1,6 @@
 ---
 id: DAEO-q8cl
-status: in_progress
+status: closed
 deps: [DAEO-q7lk, DAEO-n0wb]
 links: []
 created: 2026-11-06T13:56:01Z
@@ -51,6 +51,7 @@ sources:
 - DEC-1010
 - DEC-1098
 - DEC-1088
+- DEC-1123
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-130/

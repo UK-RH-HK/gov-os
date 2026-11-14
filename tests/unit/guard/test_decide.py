@@ -2265,3 +2265,35 @@ class TestLiftForm:
     ])
     def test_what_is_not_the_form_is_left_alone(self, command):
         assert lift_refusal(command) == ""
+
+    # DEC-1174 (1): an apostrophe in a comment the shell reads is no quote.
+    @pytest.mark.parametrize("command", [
+        "bash <<'EOF'\n# don't overwrite\necho hi\nEOF",
+        "bash -euo pipefail <<EOF\n  # it's fine\nls # don't\nEOF\necho x > src/ok.py",
+        "cat <<'EOF' | bash -o pipefail\n# it's\nls\nEOF",
+        "ls # don't",
+        "bash <<'A'\nbash <<'B'\n# it's\nB\nA",
+    ])
+    def test_an_apostrophe_comment_a_shell_reads_is_read(self, command):
+        assert lift_refusal(command) == ""
+
+    @pytest.mark.parametrize("command", [
+        "bash <<'EOF'\n# don't\ngov pause --off\nEOF",
+        "bash <<'EOF'\n# don't\nEOF\ngov pause --off",
+        "bash <<'EOF'\n# don't gov pause --off\nEOF",   # a comment holding it, as `echo # gov pause --off`
+        "ls # it's\necho x\\ #y; gov pause --off",       # an escaped blank: no comment, so `;` runs it
+        "bash <<'EOF'\n# don't\nEOF\nx=$(gov pause --off)",
+        "ls # it's\ngov pause --off\nls # don't",          # two apostrophes the old reading paired
+        "bash <<'EOF'\n# it's\ngov pause --off\n# don't\nEOF",
+    ])
+    def test_the_form_after_an_apostrophe_comment_is_refused(self, command):
+        assert lift_refusal(command) == LIFT_REFUSAL
+
+    @pytest.mark.parametrize("command", [
+        "python3 - <<'EOF'\n# don't\nprint(1)\nEOF",    # a Python body: read as before
+        "cat > /tmp/x <<'EOF'\n# it's\nEOF",            # a data body: read as before
+        "bash <<'EOF'\n# it's\necho 'open\nEOF",        # an unclosed quote outside the comment
+        "ls # it's\necho 'open",
+    ])
+    def test_what_a_shell_does_not_read_as_a_comment_is_unreadable_as_before(self, command):
+        assert "cannot be read" in lift_refusal(command)

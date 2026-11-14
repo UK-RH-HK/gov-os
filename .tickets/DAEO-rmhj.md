@@ -44,6 +44,7 @@ sources:
 - DEC-1090
 - DEC-1087
 - DEC-1072
+- DEC-1122
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-138/
