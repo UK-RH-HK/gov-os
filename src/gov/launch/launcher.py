@@ -59,7 +59,7 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
-from gov.launch import environ, record, role as roles, sandbox
+from gov.launch import criticality as crit, environ, record, role as roles, sandbox
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
 
@@ -138,6 +138,17 @@ COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow
 COMPACT_ENVS = (COMPACT_ENV, "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS")
 _UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
+# W2-184 (RUBRIC-2 at launch, DEC-1120): the options' forms, the trial and probe records' places, the effort floor.
+_TRIAL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+_DECISION = re.compile(r"DEC-\d+")
+_PROBE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+_VERDICT = re.compile(r"^```verdict[ \t]*\n(.*?)^```[ \t]*$", re.MULTILINE | re.DOTALL)
+TRIALS_REL = "governance/project/trials"
+PROBES_REL = "docs/probes"
+TRIAL_KEYS = frozenset({"role", "criticality", "model", "effort", "tickets", "reviewer"})
+FLOOR = "high"  # DEC-1120 (3): when the table's effort is high or above, the launch's own choice is not below it
+BELOW_FLOOR = ("low", "medium")
+AUDITOR = "independent-auditor"
 
 
 def _refuse(reason: str) -> GovError:
@@ -459,16 +470,289 @@ def _worker_deny(deny: list[str], records: Path, user_deny: list[str]) -> list[s
     return list(dict.fromkeys([rule for rule in deny if rule not in own] + own + user_deny))
 
 
-def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict) -> dict:
+def _check_options(reason: str | None, trial: str | None, owner_named: str | None) -> None:
+    """W2-184: the forms of ``--reason``, ``--trial`` and ``--owner-named``, before anything is read or made."""
+    if reason is not None and (not isinstance(reason, str) or not reason.strip()):
+        raise _refuse("--reason takes a reason, not an empty text")
+    if trial is not None and (not isinstance(trial, str) or not _TRIAL_ID.fullmatch(trial)):
+        raise _refuse(f"--trial takes a trial id of letters, digits, '.', '_' and '-', not {trial!r}")
+    if owner_named is not None and (not isinstance(owner_named, str) or not _DECISION.fullmatch(owner_named)):
+        raise _refuse(f"--owner-named takes a decision id (DEC-<number>), not {owner_named!r}")
+
+
+def _ticket_names(ticket_id: str, ticket: dict) -> list[str]:
+    """The names one ticket goes by: the id the launch was given, and the ticket's own ``id`` and ``wbs_id``."""
+    names = [ticket_id] + [ticket.get(key) for key in ("id", "wbs_id")]
+    return list(dict.fromkeys(name for name in names if isinstance(name, str) and name))
+
+
+def _launch_records(root: Path) -> list[tuple[str, dict]]:
+    """The shared record folder's launch records (``record: gov-launch``), read once for the probe records' roots
+    (W2-184 5.1a) and the review count (6.1). A file there that cannot be read as JSON refuses: a skipped record could
+    hide a promotion or a review (P-td5-1, fail closed). Each is returned as ``(file stem, record)``."""
+    found = []
+    for path in sorted(record.folder(root).glob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise _refuse(f"the launch record {path.name} cannot be read as JSON, so the roots of the ticket's probe "
+                          f"records cannot be found and its reviews cannot be counted") from None
+        if isinstance(data, dict) and data.get("record") == "gov-launch":
+            found.append((path.stem, data))
+    return found
+
+
+def _probe_roots(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> list[Path]:
+    """W2-184 5.1a (P-W2-184-1 (a), DEC-1010): the launch root, then, in sorted order, every other folder that a
+    launch record of this ticket (under any of its names, any role) gives as its ``root``. A named root that is not
+    there, or is not a folder, is skipped."""
+    others = set()
+    for _, data in launches:
+        named = data.get("root")
+        if not isinstance(data.get("ticket"), str) or data["ticket"] not in names or not isinstance(named, str) \
+                or not os.path.isabs(named) or not os.path.isdir(named):
+            continue
+        real = Path(os.path.realpath(named))
+        if real != root:
+            others.add(real)
+    return [root, *sorted(others, key=str)]
+
+
+def _probe_files(roots: list[Path], names: list[str]) -> list[tuple[str, Path, Path]]:
+    """The ticket's probe records (W2-184 5.1, 5.1a): the ``.md`` files under ``docs/probes/<ticket id>/`` of each root,
+    at any depth, as ``(root-relative path, file, root)`` in sorted path order. A path under two roots counts once: the
+    first root's copy (the launch root, then the others in sorted order; P-td5-2)."""
+    chosen: dict[str, tuple[Path, Path]] = {}
+    for base in roots:
+        for name in names:
+            folder = base / PROBES_REL / name
+            if not _PROBE_NAME.fullmatch(name) or not folder.is_dir():
+                continue
+            for path in folder.rglob("*.md"):
+                if path.is_file():
+                    chosen.setdefault(path.relative_to(base).as_posix(), (path, base))
+    return [(rel, path, base) for rel, (path, base) in sorted(chosen.items())]
+
+
+def _probe_record(rel: str, path: Path) -> tuple[dict, str] | None:
+    """One probe record's front matter and the text after it; ``None`` when it has none, or it is not a map with
+    ``type: probe`` (skipped). A front matter that is not YAML, or a file that cannot be read, refuses, naming the
+    file as ``rel`` (its root-relative path, with the file's own path when it lies under another root)."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        raise _refuse(f"the probe record {rel} cannot be read, so the ticket's promotion cannot be judged") from None
+    if not lines or lines[0].strip() != "---":
+        return None
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        return None
+    try:
+        front = load_yaml_unique("\n".join(lines[1:end]))
+    except yaml.YAMLError:
+        raise _refuse(f"the probe record {rel} has a front matter that is not YAML") from None
+    if not isinstance(front, dict) or front.get("type") != "probe":
+        return None
+    return front, "\n".join(lines[end + 1:])
+
+
+def _fails_open(rel: str, body: str) -> bool:
+    """True when a ``verdict`` block of the record holds a finding whose consequence is ``fails open``; a block that
+    is not JSON of JUDGEMENT.md's shape refuses."""
+    found = False
+    for block in _VERDICT.finditer(body):
+        try:
+            data = json.loads(block.group(1))
+            kpis = data["kpis"]
+            findings = [finding for kpi in kpis for finding in kpi["findings"]]
+            if not isinstance(kpis, list) or not all(isinstance(finding, dict) for finding in findings) \
+                    or not all(isinstance(kpi["findings"], list) for kpi in kpis):
+                raise TypeError
+        except (ValueError, KeyError, TypeError):
+            raise _refuse(f"the probe record {rel} has a verdict block that is not JSON of the form "
+                          f'{{"kpis": [{{"kpi": ..., "verdict": ..., "findings": [{{"id": ..., "consequence": ...}}]}}]}}'
+                          ) from None
+        found = found or any(finding.get("consequence") == "fails open" for finding in findings)
+    return found
+
+
+def _promotion(root: Path, names: list[str], launches: list[tuple[str, dict]]) -> dict | None:
+    """W2-184 5.2: ``{"reason", "record"}`` when the ticket's probe records, under the launch root and every root the
+    ticket's launch records name (5.1a), hold a fail-open finding (checked first), or two or more of them have
+    ``judgement`` fail or failed; ``None`` when neither. The record is named by its root-relative path."""
+    failed, fail_open = [], None
+    for rel, path, base in _probe_files(_probe_roots(root, names, launches), names):
+        shown = rel if base == root else f"{rel} ({path})"
+        loaded = _probe_record(shown, path)
+        if loaded is None:
+            continue
+        front, body = loaded
+        if _fails_open(shown, body) and fail_open is None:
+            fail_open = rel
+        if front.get("judgement") in ("fail", "failed"):
+            failed.append(rel)
+    if fail_open is not None:
+        return {"reason": "a fail-open finding", "record": fail_open}
+    if len(failed) >= 2:
+        return {"reason": "two failed reviews", "record": failed[1]}
+    return None
+
+
+def _counted_reviews(launches: list[tuple[str, dict]], names: list[str], resume: str | None) -> list[dict]:
+    """W2-184 6.1: of the shared record folder's launch records (``_launch_records``), this ticket's auditor launches
+    that resume nothing, leaving out the record of the session being resumed."""
+    counted = []
+    for stem, data in launches:
+        if data.get("role") == AUDITOR and isinstance(data.get("ticket"), str) and data["ticket"] in names \
+                and data.get("resumes") is None and data.get("session_id") != resume:
+            counted.append({"session_id": data.get("session_id") or stem, "model": data.get("model"),
+                            "effort": data.get("effort")})
+    return counted
+
+
+def _trial(root: Path, trial_id: str, role: str, ticket_class: str, names: list[str]) -> dict:
+    """W2-184 4.3: the recorded trial, read from ``governance/project/trials/<id>.yaml`` and judged against this
+    launch; a trial that is missing, malformed or does not fit refuses, naming the file and the field."""
+    rel = f"{TRIALS_REL}/{trial_id}.yaml"
+    try:
+        data = load_yaml_unique((root / rel).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        raise _refuse(f"the trial {rel} cannot be read, is not YAML, or writes a key twice") from None
+
+    def bad(field: str, why: str) -> GovError:
+        return _refuse(f"the trial {rel} does not fit this launch: its {field} {why}")
+
+    if not isinstance(data, dict):
+        raise _refuse(f"the trial {rel} is not a map")
+    for key in sorted(TRIAL_KEYS - set(data)):
+        raise bad(key, "is missing")
+    for key in sorted(map(str, set(data) - TRIAL_KEYS)):
+        raise bad(key, f"is not a field of a trial ({', '.join(sorted(TRIAL_KEYS))})")
+    if data["role"] != role:
+        raise bad("role", f"is {data['role']!r}, not the launch's {role!r}")
+    if data["criticality"] not in crit.CLASSES:
+        raise bad("criticality", f"is not one of {', '.join(crit.CLASSES)}")
+    if data["criticality"] != ticket_class:
+        raise bad("criticality", f"is {data['criticality']}, not the ticket's {ticket_class}")
+    if not isinstance(data["model"], str) or not re.fullmatch(roles.MODEL, data["model"]):
+        raise bad("model", "is not a model id (claude-...)")
+    if data["effort"] not in roles.EFFORTS:
+        raise bad("effort", f"is not one of {', '.join(roles.EFFORTS)}")
+    tickets = data["tickets"]
+    if not isinstance(tickets, list) or len(tickets) < 2 or not all(isinstance(t, str) and t for t in tickets) \
+            or len(set(tickets)) != len(tickets):
+        raise bad("tickets", "is not a list of two or more distinct ticket ids")
+    if not set(tickets) & set(names):
+        raise bad("tickets", f"does not include this launch's ticket {names[0]}")
+    reviewer = data["reviewer"]
+    if not isinstance(reviewer, dict) or set(reviewer) != {"model"} or not isinstance(reviewer["model"], str) \
+            or not crit.OPUS.fullmatch(reviewer["model"]):
+        raise bad("reviewer", "is not a map holding one Opus model (claude-opus-...)")
+    return {"model": data["model"], "effort": data["effort"]}
+
+
+def _rubric(root: Path, role: str, ticket_id: str, ticket: dict, loaded: dict, given: dict, reason: str | None,
+            trial_id: str | None, owner_named: str | None) -> dict:
+    """W2-184, RUBRIC-2 at launch (DEC-1120): the session's model and effort and where each came from, the ticket's
+    criticality, the promotion, the review round and the other record keys. Every refusal comes here, before the gate
+    and before any record or session is made."""
+    table, profile = loaded["by_criticality"], ticket.get("profile")
+    names = _ticket_names(ticket_id, ticket)
+    if not crit.exists(root):
+        # 1.4 (amended 2026-11-14): no criticality.yaml, the launch as before W2-184 (DEC-1167 (2)): the role's default
+        # line for every class; no promotion, no review count, no probe, no same-setting refusal; a trial needs the file
+        if trial_id is not None:
+            raise _refuse(f"--trial {trial_id} is refused: a trial needs the ticket's criticality, and {crit.REL} is "
+                          f"not there")
+        counted, review_round, probe, promotion, opus, ticket_class = [], None, False, None, None, None
+        table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    else:  # the file is read on every worker launch; one that cannot be read or is malformed refuses (1.3)
+        ticket_class = crit.ticket_criticality(root, ticket)
+        launches = _launch_records(root)  # every launch reads the folder, for 5.1a's roots and 6.1's count (P-td5-1)
+        promotion = _promotion(root, names, launches)
+        if promotion is not None and trial_id is not None:
+            raise _refuse(f"--trial {trial_id} is refused: a promotion applies to {ticket_id} ({promotion['reason']}, "
+                          f"{promotion['record']}), and a lower model is refused (DEC-1120 (3))")
+        counted, review_round = [], None
+        if role == AUDITOR and profile == "FULL":
+            counted = _counted_reviews(launches, names, given["resume"])
+            review_round = len(counted) + 1
+        probe = review_round is not None and review_round >= 2
+        opus = crit.opus_model(root) if promotion is not None or probe else None
+        if table is not None:
+            table_model, table_effort = table[ticket_class]["full" if profile == "FULL" else "other"]
+            table_source = "by criticality"
+        else:
+            table_model, table_effort, table_source = loaded["model"], loaded["effort"], "role default"
+    trial = _trial(root, trial_id, role, ticket_class, names) if trial_id is not None else None
+
+    # the model: promotion, trial, probe (only where it changes the model), then the table's
+    if promotion is not None:
+        model, model_source, why = opus, "promotion", f"a promotion applies ({promotion['reason']})"
+    elif trial is not None:
+        model, model_source, why = trial["model"], "trial", f"the trial {trial_id}'s"
+    elif probe and opus != table_model:
+        model, model_source, why = opus, "probe", f"the second review is the probe ({opus})"
+    else:
+        model, model_source, why = table_model, table_source, f"the {role}'s for criticality {ticket_class}"
+    if given["model"] is not None:
+        if given["model"] != model:
+            raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the session's model "
+                          f"{model} ({why}) (DEC-839 item 1, DEC-1120 (3))")
+        if model_source == table_source:
+            model_source = "after --"
+
+    # the effort: trial, after --, probe, then the table's
+    own = True
+    if trial is not None:
+        if given["effort"] is not None and given["effort"] != trial["effort"]:
+            raise _refuse(f"the CLI arguments carry --effort {given['effort']}, which is not the trial "
+                          f"{trial_id}'s effort {trial['effort']}")
+        effort, effort_source = trial["effort"], "trial"
+    else:
+        if given["effort"] in BELOW_FLOOR and table_effort not in BELOW_FLOOR:
+            raise _refuse(f"the CLI arguments carry --effort {given['effort']}, below the floor '{FLOOR}' of "
+                          f"{role}'s {table_effort} (DEC-1120 (3))")
+        resolved = "max" if probe else table_effort  # interface 3.2a: the effort already resolved for this launch
+        if given["effort"] is not None:
+            effort, effort_source = given["effort"], "after --"
+            if effort == resolved:  # not the launch's own choice: needs no --reason; the probe's max stays `probe`
+                own = False
+                if probe:
+                    effort_source = "probe"
+        elif probe:
+            effort, effort_source, own = "max", "probe", False
+        else:
+            effort, effort_source, own = table_effort, table_source, False
+    if effort == "max" and own and reason is None:
+        raise _refuse(f"an effort of max that the launch chooses ({effort_source}) needs --reason \"<text>\" "
+                      f"(DEC-1120 (3))")
+    repeated = next((e for e in counted if (e["model"], e["effort"]) == (model, effort)), None)
+    if review_round is not None and review_round >= 3 and owner_named is None:
+        # 6.3 as amended: at most two review rounds, whatever the setting (DEC-1010); a repeated setting is named too
+        also = (f"; its setting, model {model}, effort {effort}, repeats the review of session "
+                f"{repeated['session_id']}") if repeated is not None else ""
+        raise _refuse(f"review round {review_round} of {ticket_id} is refused: at most two review rounds "
+                      f"(DEC-1010){also}; a third or later needs --owner-named <DEC-id>")
+    if repeated is not None and owner_named is None:  # DEC-1010: the same setting twice only when the owner named it
+        raise _refuse(f"the review of session {repeated['session_id']} ran on model {model}, effort {effort}, "
+                      f"the setting this launch would repeat: it needs --owner-named <DEC-id> (DEC-1010)")
+    return {"model": model, "effort": effort, "model_source": model_source, "effort_source": effort_source,
+            "tier": model.split("-")[1], "criticality": ticket_class,
+            "trial": trial_id, "promotion": promotion, "effort_reason": reason, "owner_named": owner_named,
+            "review_round": review_round}
+
+
+def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: list[str], settings: dict,
+                 options: tuple = (None, None, None)) -> dict:
     """W2-60a, before the gate: the role read once, its model and effort, the resumed session's record, and the
     settings a worker session gets on top of ``build_settings`` (the record folder's deny rules, the user's ask and
     deny rules, no model-side memory, the subagent model in its env). What ``_launch_line`` needs once the session's
     temp folder exists is returned; any refusal comes here, before anything but the record folder is made."""
     loaded = roles.read_role(root, role)
-    if given["model"] is not None and given["model"] != loaded["model"]:
-        raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the {role}'s model "
-                      f"{loaded['model']} (DEC-839 item 1)")
-    model, effort = loaded["model"], given["effort"] or loaded["effort"]
+    ticket = _load_ticket(str(root), ticket_id) or {}
+    chosen = _rubric(root, role, ticket_id, ticket, loaded, given, *options)  # W2-184: every launch-setting refusal
+    model, effort = chosen["model"], chosen["effort"]
     template_path = Path(template[1])
     try:
         template_bytes = template_path.read_bytes()
@@ -476,7 +760,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
         raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {template_path} cannot be read: no '{role}' "
                                              f"session starts without it (DEC-1050)") from None
     user_rules = roles.user_rules(Path.home())  # the ask and deny rules --setting-sources project,local would drop
-    ticket_class = (_load_ticket(str(root), ticket_id) or {}).get("class")
+    ticket_class = ticket.get("class")
     records = record.folder(root)
     # Corrections to Behaviour 8: a resumed, forked session keeps its original's prompt, so its record holds that.
     resumed = record.original(records, given["resume"], role, ticket_id) if given["resume"] else None
@@ -493,7 +777,7 @@ def _worker_plan(root: Path, role: str, ticket_id: str, given: dict, template: l
     origin = resumed or {"role_text": loaded["role_text"], "skills": loaded["skills"],
                          "appended_sha256": roles.sha256(composed), "template": template_entry}
     return {"role": role, "ticket": ticket_id, "root": root, "given": given, "model": model, "effort": effort,
-            "ticket_class": ticket_class, "records": records, "resumed": resumed is not None, "origin": origin,
+            "ticket_class": ticket_class, "chosen": chosen, "records": records, "resumed": resumed is not None, "origin": origin,
             "composed": composed}
 
 
@@ -501,7 +785,7 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
     """W2-60a, once the temp folder exists: the appended file written, the launch record written before the session
     starts and keyed by its id, and the launcher's own arguments: those before the caller's, and the one appended
     file after them (W2-153's place). The record's path is returned, for its removal when the session cannot start."""
-    given, model, effort = plan["given"], plan["model"], plan["effort"]
+    given, model, effort, chosen = plan["given"], plan["model"], plan["effort"], plan["chosen"]
     appended = Path(tmpdir) / f"role-{plan['role']}.md"
     appended.write_bytes(plan["composed"])
     session_id = str(uuid.uuid4())
@@ -510,8 +794,10 @@ def _launch_line(plan: dict, tmpdir: str, cli: Path) -> tuple[list[str], list[st
         "record": "gov-launch", "format": record.FORMAT, "session_id": session_id,
         "resumes": given["resume"], "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "root": str(plan["root"]), "role": plan["role"], "ticket": plan["ticket"], "ticket_class": plan["ticket_class"],
-        "model": model, "model_source": "after --" if given["model"] else "role default",
-        "effort": effort, "effort_source": "after --" if given["effort"] else "role default",
+        "model": model, "model_source": chosen["model_source"], "tier": chosen["tier"],
+        "effort": effort, "effort_source": chosen["effort_source"], "criticality": chosen["criticality"],
+        "trial": chosen["trial"], "promotion": chosen["promotion"], "effort_reason": chosen["effort_reason"],
+        "owner_named": chosen["owner_named"], "review_round": chosen["review_round"],
         "subagent_model": model, "compaction_threshold": "none",
         "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
         "template": origin.get("template"), "skills": origin["skills"], "kept_out": KEPT_OUT,
@@ -623,13 +909,15 @@ def plan(root: Path, role: str, ticket_id: str) -> int:
 
 
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
-           gpu_need_mib: int | None = None) -> int:
+           gpu_need_mib: int | None = None, *, reason: str | None = None, trial: str | None = None,
+           owner_named: str | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
 
     Only a lead (``role`` in ``LEAD_ROLES``) is checked against the plan; a worker launch never is, whoever calls.
     Every launch, lead or worker, passes the resource gate (W2-20 S19), unless ``gate_override`` (a decision id)
     starts it anyway; ``gpu_need_mib`` is the session's declared GPU need. The started session is entered in the
-    machine-wide registry while it runs (W2-20 S1).
+    machine-wide registry while it runs (W2-20 S1). A worker's ``reason`` (``--reason``), ``trial`` (``--trial``) and
+    ``owner_named`` (``--owner-named``) are RUBRIC-2's options (W2-184, DEC-1120); a lead takes none of them.
 
     The machine-wide start lock is held from the gate's check until the session is registered (review F1): launches
     that start together are judged one after another, each with the sessions started before it counted, and one that
@@ -656,6 +944,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_worker_role(role)
     _check_cli_args(cli_args)
     given = _check_own_args(cli_args)
+    _check_options(reason, trial, owner_named)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
     template = template_args(root, role)
@@ -664,8 +953,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
-    # W2-60a: the role read once; the session's model is the role's, and an effort after "--" is the launch's own.
-    plan = _worker_plan(root, role, ticket_id, given, template, settings)
+    # W2-60a: the role read once; W2-184: the session's model and effort are RUBRIC-2's for its role and criticality.
+    plan = _worker_plan(root, role, ticket_id, given, template, settings, (reason, trial, owner_named))
     # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
     # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
     try:

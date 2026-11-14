@@ -1,12 +1,13 @@
 # SANDBOX-GUARD-EXP-1, declared before any run (DEC-1098 (4), DEC-1099 (1), DEC-1101 (2)-(3), DEC-1112 (1), DEC-1113)
 
 - **By:** a research agent for the CTO, 2026-11-09.
+- **Set-up B: not run, dropped (DEC-1128 (4), note of 2026-11-14).** Set-up B's text below is kept as the record of the pre-registration; it is not a Wave 3 row and will not run. Set-up A is the experiment that stays.
 - **Committed before any run.** Nothing here has run. Where a value can only come from the run itself, this record
   leaves a blank in square brackets. The run fills it, and nothing else changes.
 - **How changes are handled:** a change to anything else here is an amendment. Each amendment is listed with its
   reason, before the step it affects.
 - **Amendments** (2026-11-09, before any run; a product-spec agent for the CTO):
-  - **A1 (DEC-1112 (1)): set-up A only.** Set-up B is a Wave 3 row, built by a different route. Its text below (§1,
+  - **A1 (DEC-1112 (1)): set-up A only.** Set-up B is dropped entirely, not a Wave 3 row [Re-worded 2026-11-14 by DEC-1128 (4); the amendment first read: "Set-up B is a Wave 3 row, built by a different route."]. Its text below (§1,
     §3 item 4, §5 Q2, §7 (b), §10 items 1-2, §11's B row, §13 item 8) is kept as the record and is not run. Q8 reads:
     if A as live misses the bar, tuned A's changes come as an ACT when they cut false refusals with no new wrong allow.
   - **A2 (DEC-1113 (1)): the guard rules decided since DEC-1099** (the walls, rule 2c, rule 2d, the call log) are in
