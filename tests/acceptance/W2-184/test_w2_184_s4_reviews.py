@@ -201,9 +201,15 @@ def test_s4_a_launch_record_that_is_not_json_refuses_a_review_of_a_full_ticket_n
 
 
 def test_s4_a_launch_record_that_is_not_json_does_not_matter_where_nothing_is_counted(project, launch):
+    """Revised in td-5 (interface 5.1a; DEC-1010, P-W2-184-1 (a)). With a ``criticality.yaml`` every worker launch now
+    reads the record folder for the roots the ticket's launch records name, so a record that is not JSON refuses this
+    setting too: ``test_w2_184_f1_tests_worktree.py::test_f1_a_launch_record_that_is_not_json_refuses_the_s4_setting_now_that_every_launch_reads_the_folder``.
+    Nothing is counted or read where the project has no ``criticality.yaml``: the launch is as before W2-184, "whatever
+    its role files and records" (interface 1.4)."""
     standard = s.ticket(project, ENG, "C2", "STANDARD", tk="DAEO-rv07")
+    s.drop_criticality(project)
     folder = project / ".gov-runtime" / "launches"
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "garbled-record.json").write_text("{ not json", encoding="utf-8")
-    s.assert_session(launch(AUD, standard), s.OPUS, "high", criticality="C2", model_source="by criticality",
-                     effort_source="by criticality")
+    s.assert_session(launch(AUD, standard), *s.DEFAULT, criticality=None, model_source="role default",
+                     effort_source="role default")
