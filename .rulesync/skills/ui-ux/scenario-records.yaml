@@ -1,0 +1,100 @@
+records:
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 1
+  title: A flow change the owner must be able to review
+  verdict: pass
+  cause: null
+  cost_usd: 0.326955
+  seconds: 75.569
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:31:44+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 2
+  title: A mock with only the happy path
+  verdict: fail
+  cause: judged FAIL against the pass line
+  cost_usd: 0.34004
+  seconds: 73.903
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:33:04+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 3
+  title: An approved flow that cannot be built as approved
+  verdict: pass
+  cause: null
+  cost_usd: 0.315317
+  seconds: 62.229
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:34:21+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 1
+  title: A flow change the owner must be able to review
+  verdict: pass
+  cause: null
+  cost_usd: 0.332003
+  seconds: 71.141
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:43:21+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 2
+  title: A mock with only the happy path
+  verdict: pass
+  cause: null
+  cost_usd: 0.311162
+  seconds: 60.83
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:44:35+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 3
+  title: An approved flow that cannot be built as approved
+  verdict: pass
+  cause: null
+  cost_usd: 0.307244
+  seconds: 63.04
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:45:39+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 1
+  title: A flow change the owner must be able to review
+  verdict: pass
+  cause: null
+  cost_usd: 0.359097
+  seconds: 83.248
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:52:20+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 2
+  title: A mock with only the happy path
+  verdict: pass
+  cause: null
+  cost_usd: 0.313262
+  seconds: 62.734
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:53:46+00:00'
+- skill: ui-ux
+  skill_version: 1.0.0
+  scenario: 3
+  title: An approved flow that cannot be built as approved
+  verdict: pass
+  cause: null
+  cost_usd: 0.283023
+  seconds: 57.824
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T01:54:52+00:00'
