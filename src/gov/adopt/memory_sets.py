@@ -37,6 +37,9 @@ NOT_DUE = "not due: no verdict set used"
 EXIT_UNAPPROVED = 10  # the exit code of a launch under a variant the owner has not approved
 REFRESH = "gov rebuild --integration <branch>"  # S11: installed through the ACT, never by the tool
 CRON = "governance/project/orchestration/tools/memaudit_cron.sh"  # W2-187 I11: the repository's weekly line
+# W2-187 I13 (DEC-1182 (2)): step 6's sentence on the cycle's order and the owner's declaration of the push
+PUSH_ORDER = ("The cycle runs the audit and measure, then one gitleaks scan, then `git push` only on a clean scan; "
+              "declare the push with `GOV_MEMAUDIT_PUSH=\"<remote> <branch>\"` on this line; leave it out for no push.")
 # The audit's cost for 40 questions (MEMORY-AUDIT-1.md section 7, basis E): about $30 with round 2, 35 GPU minutes
 # (10 for the set and its control, 25 for the pool at first), the owner's 5 minutes a week. The tokens follow from the
 # dollars at an assumed blended list price; the first audit measures them all and replaces these.
@@ -175,7 +178,7 @@ def walls_act(out: Path, *, sets_root: str, audit: str, made: dict, blind: list[
         f"5. Install the refresh the operator runs after each update of the integration branch: `{REFRESH}` "
         "(W2-116), with the daily backstop.\n"
         "6. Install the weekly memory audit's cron line for this repository (Mondays 21:00; never installed by adoption): "
-        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} {GOV_OS / CRON} --repo {repo}`\n", encoding="utf-8")
+        f"`0 21 * * 1 GOV_MEMAUDIT_SETS_ROOT={sets_root} {GOV_OS / CRON} --repo {repo}` {PUSH_ORDER}\n", encoding="utf-8")
     return act
 
 

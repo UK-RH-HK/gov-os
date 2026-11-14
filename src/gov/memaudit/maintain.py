@@ -148,16 +148,34 @@ def answers_item(root: Path, state: Path) -> tuple[int, int]:
             sum(1 for r in rows if r.get("searches")))
 
 
+def _sections_changed(q: dict, link, cache: dict) -> list[int]:
+    """The entry numbers of the question's heading-cited sources whose section text at the source's own commit (else the
+    question's) differs from the head's (N2 (b), DEC-1180 (1); the measure's own section rule, in ``matcher``). A fault
+    reading one source skips that source, never the pass."""
+    entries = q.get("raw_sources")
+    out = []
+    for n, entry in enumerate(entries if isinstance(entries, list) else [], 1):
+        for source in entry if isinstance(entry, list) else [entry]:
+            try:
+                if isinstance(source, dict) and matcher.section_changed(source, q.get("commit"), link, cache):
+                    out.append(n)
+                    break
+            except Exception:  # noqa: BLE001: one source that cannot be read is skipped
+                continue
+    return out
+
+
 def reanchor_item(root: Path, state: Path, link, week: str, commit: str) -> int:
     """6. The gold questions whose cited lines changed at the audit commit (the measure's own list of unresolved
-    blocks: a block moved unchanged is found again and not listed), for every set the sets root's path map declares but
-    the standing sets: one request per set with an entry, question id and entry number only, mode 0600."""
+    blocks: a block moved unchanged is found again and not listed; and, with N2 (b), a heading-cited source whose
+    section text differs between its own commit and the head), for every set the sets root's path map declares but the
+    standing sets: one request per set with an entry, question id and entry number only, mode 0600."""
     standing_names = set(record.declared_sets(state))
     total = 0
     for name in sorted(matcher.M.evaluation_sets(str(root))):
         if name in standing_names or layout.STANDING_RE.fullmatch(name):
             continue
-        changed = {}
+        changed, cache = {}, {}
         for part in ("visible", "hidden"):
             try:
                 found = matcher.questions(root, name, part, link)
@@ -168,6 +186,8 @@ def reanchor_item(root: Path, state: Path, link, week: str, commit: str) -> int:
                     m = ENTRY.fullmatch(text)
                     if m:
                         changed[(q["id"], int(m[1]))] = None
+                for n in _sections_changed(q, link, cache):
+                    changed[(q["id"], n)] = None
         if not changed:
             continue
         rows = [{"id": i, "entry": n} for i, n in sorted(changed)]

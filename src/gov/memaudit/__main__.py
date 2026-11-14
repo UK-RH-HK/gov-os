@@ -1,5 +1,5 @@
 """``python3 -m gov.memaudit preflight|void|declare|measure|judge|classes|pool|pool-import|run|due|baseline|status|figures``
-(Interface section 1; S1-S8, F1; W2-172 adds the last five), and W2-187's ``standing declare|run|live`` and ``maintain``.
+(Interface section 1; S1-S8, F1; W2-172 adds the last five), and W2-187's ``standing declare|run|live``, ``maintain`` and ``push``.
 
 A thin wrapper: each subcommand calls its module's entry point and prints, through ``say`` only, the lines it produces
 (the W2-171 subcommands print as they go, a line at a time). Exit codes: 0 ok, 1 refused, 2 void or stopped (the owner
@@ -146,6 +146,9 @@ def _driver(sub):
     mt = base("maintain", "the weekly maintenance pass: six counts, never a gate")
     mt.add_argument("--store-link", metavar="PATH", help="the integration store's link (default: rebuild.yaml's)")
     mt.add_argument("--gov", metavar="EXE", help="the gov executable (default: ~/.local/bin/gov)")
+    from gov.memaudit import push
+    push.add_arguments(sub.add_parser("push", help="the weekly secret scan, then the push on a clean scan",
+                                      description="The weekly secret scan and push (W2-187 I13): one line."))
     sg = sub.add_parser("standing", help="the standing question set: declare, run, live",
                         description="The repository's standing set of questions: judged once a week, counts only.")
     ss = sg.add_subparsers(dest="standing_command", required=True, metavar="SUBCOMMAND", parser_class=_Parser)
@@ -272,6 +275,9 @@ def _run(args, emit) -> str:
     if cmd == "maintain":
         from gov.memaudit import maintain
         return maintain.run(args.sets_root, repo=args.repo, link=args.store_link, gov=args.gov, emit=emit)
+    if cmd == "push":
+        from gov.memaudit import push
+        return push.from_args(args, emit)
     from gov.memaudit import pool
     return pool.importing(args.sets_root, emit=emit, sets=args.sets)
 

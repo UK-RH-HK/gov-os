@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from gov.memaudit import declare, maintain, schedule, standing
+from gov.memaudit import declare, maintain, matcher, schedule, standing
 from gov.memaudit.common import UsageError
 from gov.store import layout as store_layout
 
@@ -255,6 +255,126 @@ def test_one_changed_cited_block_is_listed_by_id_and_entry_a_moved_unchanged_one
     for needle in ("zephyrquokka", "narwhalfjord", "the gold", "docs/x.md", "l2"):
         assert needle not in text
     assert len(list(root.glob("runs/*/REANCHOR-*.json"))) == 1
+
+
+DOC = "# T\nintro\n## Alpha\nalpha 1\nalpha 2\n### Sub\nsub 1\n## Beta\nbeta 1\nbeta 2\n"
+
+
+def doc(world, new, old=DOC):
+    """``docs/h.md`` committed as ``old`` (returns that commit), then as ``new`` on the main line."""
+    world.write("docs/h.md", old)
+    then = world.commit("h old")
+    world.write("docs/h.md", new)
+    run("git", "add", "-A", cwd=world.repo, env=world.env)
+    run("git", "commit", "-q", "--allow-empty", "-m", "h new", cwd=world.repo, env=world.env)
+    run("git", "fetch", "-q", "origin", "main:main", cwd=world.link, env=world.env)  # the stub's rebuild checks main out
+    return then
+
+
+def main_head(world):
+    return run("git", "rev-parse", "HEAD", cwd=world.repo, env=world.env).stdout.strip()
+
+
+def cite(world, qid, sources, commit=None):
+    folder = world.plant.root / "fixtures/evaluation/memory-verdict-2/hidden"
+    folder.mkdir(parents=True, exist_ok=True)
+    body = {"id": qid, "question": f"{qid} wording", "gold_answer": "the gold", "category": "decision", "sources": sources}
+    if commit:
+        body["commit"] = commit
+    (folder / f"{qid}.yaml").write_text(yaml.safe_dump(body, sort_keys=False), encoding="utf-8")
+
+
+def listed(world):
+    file = world.plant.root / "runs/memory-verdict-2" / f"REANCHOR-{WEEK}.json"
+    return [(c["id"], c["entry"]) for c in json.loads(file.read_text())["changed"]] if file.exists() else []
+
+
+def heading(h, **more):
+    return {"path": "docs/h.md", "heading": h, **more}
+
+
+def test_a_rewritten_heading_section_is_listed_and_a_moved_unchanged_one_is_not(world):
+    then = doc(world, "pre\npre\n" + DOC.replace("alpha 2", "alpha two"))
+    cite(world, "qa", [heading("## Alpha")], then)
+    cite(world, "qb", [heading("## Beta")], then)  # moved down two lines, its text the same
+    line = world.maintain()
+    assert listed(world) == [("qa", 1)] and line.endswith(" 6 reanchor 1")
+    text = (world.plant.root / "runs/memory-verdict-2" / f"REANCHOR-{WEEK}.json").read_text() + line
+    for needle in ("qa wording", "the gold", "docs/h.md", "Alpha", "alpha"):
+        assert needle not in text
+
+
+def test_an_unchanged_heading_section_is_not_listed(world):
+    then = doc(world, DOC)
+    cite(world, "qa", [heading("## Alpha")], then)
+    assert world.maintain().endswith(" 6 reanchor 0") and listed(world) == []
+    assert not (world.plant.root / f"runs/memory-verdict-2/REANCHOR-{WEEK}.json").exists()
+
+
+def test_a_section_at_the_end_of_the_file_is_compared_to_the_end_and_the_one_above_it_stops_at_it(world):
+    then = doc(world, DOC.replace("beta 2", "beta 3"))
+    cite(world, "qa", [heading("## Alpha")], then)
+    cite(world, "qb", [heading("## Beta")], then)
+    cite(world, "qc", [heading("# T")], then)
+    world.maintain()
+    assert listed(world) == [("qb", 1), ("qc", 1)]  # Alpha ends at Beta, the top section runs to the end
+
+
+def test_a_sub_section_ends_at_the_next_heading_of_a_higher_level(world):
+    then = doc(world, DOC.replace("beta 1", "beta one"))
+    cite(world, "qs", [heading("### Sub")], then)
+    cite(world, "qa", [heading("## Alpha")], then)
+    world.maintain()
+    assert listed(world) == []  # a change under ## Beta is outside both sections
+
+
+def test_a_change_inside_a_sub_section_lists_it_and_the_section_that_holds_it(world):
+    then = doc(world, DOC.replace("sub 1", "sub one"))
+    for qid, h in (("qs", "### Sub"), ("qa", "## Alpha"), ("qb", "## Beta")):
+        cite(world, qid, [heading(h)], then)
+    world.maintain()
+    assert listed(world) == [("qa", 1), ("qs", 1)]
+
+
+def test_an_entry_both_rules_list_is_listed_once(world):
+    then = doc(world, DOC.replace("alpha 2", "alpha two"))
+    gone = {"path": "docs/x.md", "lines": [2, 3], "commit": world.first}  # l2 and l3 were rewritten: unresolved
+    cite(world, "qa", [[heading("## Alpha"), gone], [heading("## Alpha"), heading("## Alpha")]], then)
+    cite(world, "qb", [gone], then)
+    line = world.maintain()
+    assert listed(world) == [("qa", 1), ("qa", 2), ("qb", 1)] and line.endswith(" 6 reanchor 3")
+
+
+def test_a_source_with_no_commit_is_never_listed_for_its_section(world):
+    doc(world, DOC.replace("alpha 2", "alpha two"))
+    cite(world, "qa", [heading("## Alpha")])  # neither the source nor the question names a commit
+    assert world.maintain().endswith(" 6 reanchor 0") and listed(world) == []
+
+
+def test_the_sources_own_commit_comes_before_the_questions(world):
+    then = doc(world, DOC.replace("alpha 2", "alpha two"))
+    after = main_head(world)
+    cite(world, "qa", [heading("## Alpha", commit=after)], then)  # the source's commit already holds the new text
+    cite(world, "qb", [heading("## Alpha", commit=then)], after)  # the question's is newer, the source's own is not
+    world.maintain()
+    assert listed(world) == [("qb", 1)]
+
+
+def test_a_source_git_cannot_show_at_its_commit_is_skipped_never_the_pass(world):
+    doc(world, DOC.replace("alpha 2", "alpha two"))
+    cite(world, "qa", [heading("## Alpha", commit="0123456789abcdef0123456789abcdef01234567")])
+    cite(world, "qb", [heading("## Alpha", commit=world.first)])  # the file does not exist at that commit
+    assert world.maintain().endswith(" 6 reanchor 0") and listed(world) == []
+
+
+def test_the_section_rule_is_measures_span_rule(tmp_path):
+    from gov.retrieval import measure
+    lines = DOC.splitlines()
+    (tmp_path / "f.md").write_text(DOC)
+    for h in ("# T", "## Alpha", "### Sub", "## Beta"):
+        first, last = measure._span({"path": "f.md", "heading": h}, tmp_path, "hidden", "q")
+        assert matcher.section(lines, h) == lines[first - 1:last]
+    assert matcher.section(lines, "## Missing") is None and matcher.section(["def f():", "x"], "def f():") is None
 
 
 def test_a_standing_set_is_left_out_of_the_reanchor_list(world):

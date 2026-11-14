@@ -39,13 +39,16 @@ engineer's own unit cases only.
 | S8 | `test_standing.py`: `fresh_due` 27 and 28 days, the miss, the repair cases (pass-miss-miss, pass 96 then miss 90, under 5 points), `test_status_repair_exits_1_while_open...`, `test_due_answers_for_the_live_set_and_due_fresh_for_the_fresh_one`; the P1 line in the five-misses case | pass |
 | S9 | `test_standing.py`: the key, two repositories, the pin change, the change of `retrieval.yaml` and the path map, `test_pool_import_sets_imports_exactly_those_sets_once...` | pass |
 | S10 | `test_maintain.py` (13 cases: refresh once, head printed, failing rebuild keeps the store, links count, two unindexed paths, not found and second searches, one changed block listed and one moved block not, standing sets left out, never fails, digests unchanged, no cron writer, usage) | pass |
+| S10 (6), N2 (b) | `test_maintain.py`: `test_a_rewritten_heading_section_is_listed_and_a_moved_unchanged_one_is_not`, `test_an_unchanged_heading_section_is_not_listed`, `test_a_section_at_the_end_of_the_file_is_compared_to_the_end_and_the_one_above_it_stops_at_it`, `test_a_sub_section_ends_at_the_next_heading_of_a_higher_level`, `test_a_change_inside_a_sub_section_lists_it_and_the_section_that_holds_it`, `test_an_entry_both_rules_list_is_listed_once`, `test_a_source_with_no_commit_is_never_listed_for_its_section`, `test_the_sources_own_commit_comes_before_the_questions`, `test_a_source_git_cannot_show_at_its_commit_is_skipped_never_the_pass`, `test_the_section_rule_is_measures_span_rule` | pass (red with the new call disabled) |
 | S11 | `test_cron.py` (10 cases), `tests/unit/adopt/test_w2_187_walls_act.py` (3) | pass |
+| S12 | `test_push.py` (23 cases: a clean scan pushes once and the line is the last of the latest `DIGEST.txt`, a standing week's digest included; findings block the push and no planted secret is written anywhere; a report with entries is a finding whatever the exit; exit 2, an empty or unparsable report, the timeout and a missing binary are `scan failed <word>`; the binary is the flag, else `$GOV_MEMAUDIT_GITLEAKS`, else PATH; no declaration, empty or blank: `PUSH none: no declaration`, nothing called; a malformed declaration is usage 4; a push git refuses is exit 2 with its output in a 0600 `PUSH.log`, never printed); `test_cron.py` (the push is the last step, only when a step started, its line with the step `push`, the wrapper's exit unchanged, never at `maintain`); `tests/unit/adopt/test_w2_187_walls_act.py::test_step_6_names_the_cycles_order_and_how_the_owner_declares_the_push_and_installs_nothing` | pass |
 | F1 | `MS-STANDING` for `classes`, `pool`, `pool-import --sets`; `driver.standing` launches no auditor or writer; S4's planted strings | pass |
 | F2 | week rule cases; `test_an_edited_set_is_refused_before_any_search_and_the_week_is_not_spent`; `test_measure_kept_on_a_standing_set_prints_used_exits_3_and_writes_nothing` | pass |
 | F3 | `test_the_standing_run_has_no_decision_force_or_data_flag`; no command compares configurations | pass |
 | F4 | `test_prompts.py` unchanged; the spy case | pass |
 | F5 | the fresh path without `--week` is byte for byte as before: the existing W2-170, W2-171, W2-173 and W2-88 suites pass but for the cases named under "Acceptance folders" | see below |
 | F6 | `test_maintain.py::test_the_pass_changes_neither_the_retrieval_yaml_nor_the_path_map...`, `test_the_module_writes_no_cron_table_and_applies_no_act` | pass |
+| F7 | `test_push.py`: `test_a_scan_that_finds_something_blocks_the_push_and_no_text_of_a_finding_is_written` (the remote unchanged, `SECRET` absent from stdout, stderr and every file written), the `scan failed` cases, `test_no_declaration_runs_neither_the_scan_nor_the_push_and_says_so`, `test_this_module_holds_the_only_scanner_call_of_the_audit_and_the_wrapper` (one `"detect"` call; no other module of `gov.memaudit` and not the wrapper names the scanner); `test_cron.py::test_a_cycle_where_nothing_is_due_or_due_fails_runs_no_push`, `test_maintain_alone_never_runs_the_push` | pass (red with the findings check disabled) |
 
 ## G6: a store at the main line's head whose layout is stale
 
@@ -170,3 +173,57 @@ separate commits, so a split into W2-187b leaves S1 to S9 clean.
   `MeasureError` there (`_span`), the attempt is a fault and the week stops at `STOPPED fault`. Questions with `lines` and a
   commit (the writer brief's form) resolve to "unresolved" and are measured as not found.
 - The real `gov rebuild --integration`, `gov links` and the model calls were never run (stubs only).
+
+
+## Fix batch 3 (eng-3): S10 (6) with N2 (b), then S12 and F7 (I13)
+
+**S10 (6), N2 (b) (DEC-1180 (1)).** `matcher.section` is measure's `_span` rule for a `#` heading (from the first line equal
+to the heading, trailing whitespace removed, to the line before the next heading of the same or a higher level, else the
+end of the file, with measure's own `_HEADING`); `matcher.section_changed(source, base, repo, cache)` compares that
+section's lines at the source's own commit (else the question's; read with measure's `_lines_at`, one `git show` per file
+and commit) with the section's lines at the head. `maintain._sections_changed` lists the entry (`n` of `n.m`) once, into the
+same set as `matcher.questions`'s `unresolved`, so an entry both rules list is one row. `matcher.questions` now also returns
+the question's `commit`. A source with no commit, no `#` heading, a heading missing at either side or a file git cannot show
+is not listed; a fault reading one source skips that source. The request file, the digest and the printed line keep their
+forms (no question, answer or path). `test_the_section_rule_is_measures_span_rule` checks `matcher.section` against
+`measure._span` for four headings.
+
+**S12, F7 (I13), word for word.** `src/gov/memaudit/push.py` (`python3 -m gov.memaudit push --sets-root R [--repo D]
+[--gitleaks EXE]`; its flags are defined there, so `__main__.py` and the other modules never name the scanner):
+`GOV_MEMAUDIT_PUSH="<remote> <branch>"`; one `detect --source <repo> --no-banner --redact --report-format json --report-path
+<0600 temporary file outside the repository>`; the entries are counted and the report is deleted in a `finally`; exit 0 with
+no entries is clean, exit 1 with entries is `findings <k>`, any other exit, the timeout (`GOV_MEMAUDIT_SCAN_TIMEOUT_S`,
+default 600) or no binary is `scan failed <word>` (`exit`, `timeout`, `missing`, plus `report` for a report that cannot
+be counted, which fails closed); `git push <remote> <branch>` only on a clean scan; the five lines and exits of I13 (1 blocked,
+2 push failed, via the exit words `refused` and `stopped`); git's output in `<key folder>/PUSH.log` (0600); the same line
+appended to the newest `DIGEST.txt` of the key folder (a fresh run's or a standing week's). `say` is the only printer.
+`memaudit_cron.sh`: `push_step` after the audit steps, on the live path always, on today's path only when the cron line
+declares `GOV_MEMAUDIT_PUSH`; its `cron.log` line has the six keys and `mode` `push`, `reason` the line without `PUSH `
+(quotes and backslashes removed); the wrapper's exit stays the audit steps'. `memory_sets.PUSH_ORDER` is I13's sentence on the
+step 6 line.
+
+**Run after the change** (each folder alone through the heavy-slot gate, empty HOME, the same exclusion; the exclusion left
+out the `real`, `green_here` and `time_limit` cases and `local_only`):
+
+- `tests/unit/memaudit` and `tests/unit/adopt/test_w2_187_walls_act.py`: `352 passed, 1 deselected` (the final run, after
+  the last edit).
+- `tests/acceptance/W2-187`: `172 passed`, none red: the test designer's S10 cases naming a rewritten heading section and the
+  S12/F7 cases are not merged yet, so they did not run.
+- `tests/acceptance/W2-172/test_w2_172_s9_cron_gate.py`: `12 passed`; `tests/acceptance/W2-88/test_w2_88_s18_s23_memory_sets.py`
+  with `tests/unit/adopt/test_w2_88_memory_sets.py` and `test_w2_88_fabric.py`: `25 passed`.
+- `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` after the runs: nothing of this session's.
+
+**One case met by a reading of I13 (for the lead).** The live path's S11 case
+`test_s11_a_run_is_logged_with_its_exit_and_the_wrapper_exits_with_the_last_started_steps` takes exactly one `cron.log`
+line a cycle. I13's "one more `cron.log` line" would make two on every live cycle, declared or not, so the line is written
+when a push is declared (the scan or the push started); a cycle with no declaration says `PUSH none: no declaration` on
+standard output and in the digest and adds no log line. If the CTO wants the line for that case too, the one change is the
+`"PUSH none:"*) ;;` arm of `push_step` in the wrapper, and that S11 case then needs its revision (a `Rewrite-Reason`).
+
+## Size after batch 3
+
+`git diff --stat 5336a6fca -- src governance`: `35 files changed, 2303 insertions(+), 271 deletions(-)` (it holds the
+other tickets' merged files). The ticket's own source (`src/gov/memaudit/`, `src/gov/adopt/memory_sets.py` and the
+wrapper): `17 files, 1532 insertions, 145 deletions`; this batch added `push.py` (206 lines with its docstring), the section
+rule (about 45 lines in `matcher.py` and `maintain.py`) and the wrapper's `push_step` (about 18 lines). Tests: `test_push.py`
+(23 cases), nine S10 cases, seven S12 cases in `test_cron.py`, one ACT case.

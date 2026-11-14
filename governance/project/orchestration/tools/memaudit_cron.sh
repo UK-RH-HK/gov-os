@@ -7,6 +7,9 @@
 # With a live standing set (`standing live` exits 0): `due` and `due --fresh`; then, when either is due, `maintain`; then
 # `standing run` when `due`; `maintain` once more when that run's last line ends `misses`; then `run` when `due --fresh`.
 # Any other answer of `standing live` is today's path, unchanged: `due`, then `run`.
+# Last, when a step started that cycle, `push` (the weekly scan, then the push on a clean scan; one more cron.log line, the
+# step `push`, when a push is declared; the exit stays the audit steps' own). On today's path only when the cron line
+# declares GOV_MEMAUDIT_PUSH.
 set -u
 PY="${GOV_MEMAUDIT_PYTHON:-/usr/bin/python3}"
 ROOT="${GOV_MEMAUDIT_SETS_ROOT:-$HOME/gov-os-eval}"
@@ -41,6 +44,19 @@ log() { # <due true|false> <started true|false> <exit>
         "$AT" "$1" "${MODE:-}" "${REASON:-}" "$2" "$3" >> "$LOG"
 }
 
+push_step() { # the weekly scan and push (W2-187 I13): the last step; its line goes to the log, its exit never the cycle's
+    POUT="$("$PY" -m gov.memaudit push --sets-root "$ROOT" --repo "$REPO")"
+    PRC=$?
+    printf '%s\n' "$POUT"
+    PLINE="$(printf '%s\n' "$POUT" | tail -n 1)"
+    MODE=push
+    REASON="$(printf '%s' "${PLINE#PUSH }" | tr -d '"\\')"
+    case "$PLINE" in
+        "PUSH none:"*) ;; # no declaration: neither the scan nor the push started, and the cycle's one log line stands alone
+        *) log true true "$PRC" ;;
+    esac
+}
+
 OUT="$("$PY" -m gov.memaudit due --sets-root "$ROOT" 2>/dev/null)"
 RC=$?
 MODE="$(printf '%s\n' "$OUT" | sed -n 's/^MODE //p')"
@@ -73,6 +89,7 @@ if [ "$LIVE_RC" -eq 0 ]; then # a live standing set: the standing run and the fr
         CODE=$?
     fi
     log true true "$CODE"
+    push_step # a standing or fresh step started this cycle: the weekly scan, then the push on a clean scan
     exit "$CODE"
 fi
 
@@ -88,4 +105,5 @@ fi
 "$PY" -m gov.memaudit run --sets-root "$ROOT" --gate-cmd "$GATE"
 RC=$?
 log true true "$RC"
+[ -z "${GOV_MEMAUDIT_PUSH:-}" ] || push_step # today's path stays byte for byte unless the repository declares its push
 exit "$RC"
