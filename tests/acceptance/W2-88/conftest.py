@@ -18,6 +18,8 @@ import w2_88_support as W  # noqa: E402
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "local_only: needs this machine (the real code-graph tool, a folder outside tmp)")
+    config.addinivalue_line("markers", "slow: a measured case (run 7's S27 speed line: minutes, run once in the acceptance run)")
+    config.addinivalue_line("markers", "real: needs a copy outside the sandbox (run 7's redis case; its name holds `real`, which every whole-folder run excludes)")
 
 
 @pytest.fixture(scope="session")
