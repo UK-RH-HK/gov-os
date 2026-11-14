@@ -1,6 +1,6 @@
 ---
 id: DAEO-aks1
-status: in_progress
+status: closed
 deps: [DAEO-2bdu]
 links: [DAEO-2bdu]
 created: 2026-11-12T16:55:43Z
