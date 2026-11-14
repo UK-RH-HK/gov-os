@@ -65,3 +65,36 @@ records:
   model: claude-opus-5-5
   effort: high
   run_at: '2026-11-14T01:59:10+00:00'
+- skill: devops
+  skill_version: 1.1.0
+  scenario: 1
+  title: A build that is not hermetic
+  verdict: pass
+  cause: null
+  cost_usd: 0.397723
+  seconds: 80.149
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:50:10+00:00'
+- skill: devops
+  skill_version: 1.1.0
+  scenario: 2
+  title: A deploy with no way back
+  verdict: pass
+  cause: null
+  cost_usd: 0.606187
+  seconds: 145.65
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:51:37+00:00'
+- skill: devops
+  skill_version: 1.1.0
+  scenario: 3
+  title: A secret found in a pipeline file
+  verdict: pass
+  cause: null
+  cost_usd: 0.186025
+  seconds: 26.269
+  model: claude-opus-5-5
+  effort: high
+  run_at: '2026-11-14T03:54:11+00:00'

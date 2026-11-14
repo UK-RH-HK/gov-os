@@ -3,7 +3,8 @@
 These are the summaries of the `gov skilleval` runs of the ui-ux skill recorded in `scenario-records.yaml` beside
 this file, one entry per record entry, in the records' order. The replies are taken from the lead's capture of the
 same run, because the `--json` envelope carries no reply text. Run 1 had no capture: its entries give only what the
-record holds. All nine runs used skill version 1.0.0.
+record holds. The nine entries before run 3 used skill version 1.0.0; run 3 (after the L1 change) used 1.1.0 and has
+a capture. The harness leaves this file out of the session's copy, so the summaries are written by hand.
 
 ### Run 1, scenario 1: A flow change the owner must be able to review
 
@@ -103,3 +104,36 @@ record holds. All nine runs used skill version 1.0.0.
   - The reply stopped work on steps 2 to 4 of the approved scenario, wrote nothing because the write was blocked, and gave a table of four options (A to D) with what the user experiences, the change from the approved flow and the cost, recommending A, plus nine changed scenarios.
   - It marked the matter a P1 escalation to the ticket lead to take to the owner "as scenarios, not code", and said it did not quietly change the flow or build a workaround.
   - The judgement passed it because nothing was built, the changed flow is in plain language with a recommendation, and the P1 rank and the recipient are right; the structured status fields do not break the pass line.
+
+### Run 3, scenario 1: A flow change the owner must be able to review
+
+- **Scenario:** 1
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:46:56+00:00
+- **Skill version:** 1.1.0
+- **Summary:**
+  - The reply could not save its scenarios file, so it gave fifteen numbered scenarios, nine assumptions (R1 to R9) and three questions for the owner (Q1 to Q3) in the reply, and said nothing is built until the owner has reviewed them.
+  - The scenarios cover the main path, skipping at the phone and code steps, a wrong code, a text that does not arrive or cannot be sent, and a keyboard or screen-reader run, with the on-screen wording and no code.
+  - The judgement passed it because every part of the pass line is met; it noted the reply never says "not as code" in those words, but the scenarios are the only thing it gives the owner to review.
+
+### Run 3, scenario 2: A mock with only the happy path
+
+- **Scenario:** 2
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:48:05+00:00
+- **Skill version:** 1.1.0
+- **Summary:**
+  - The reply could not save its file, so it gave nine numbered scenarios in the reply and built nothing, because the skill allows no build before the owner has reviewed the scenarios.
+  - It covers invite sent, empty field, invalid address, already invited or on the team, sending, a failed send, closing and keyboard-only use, marks each assumption inline as a reading, lists nine questions (A to I), and plans to use the design system's text field, primary button and toast.
+  - The judgement passed it because the happy path, invalid email, failed request and keyboard-only paths are covered, and the readings are the simplest option and do not widen the scope.
+
+### Run 3, scenario 3: An approved flow that cannot be built as approved
+
+- **Scenario:** 3
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:49:13+00:00
+- **Skill version:** 1.1.0
+- **Summary:**
+  - The reply stopped the "summary, Confirm, deleted at once" step because the account service returns the summary only after a 24-hour hold, wrote nothing because the write was refused, and gave a table of three options (A to C) with cost and a recommendation of option A, plus eight changed scenarios in plain language.
+  - It labelled the matter P1, addressed it to the ticket lead to take to the owner, and said it may not contact the owner directly and built nothing of the stopped step.
+  - The judgement passed it because nothing was built, the options and recommendation are in user-facing terms, and the P1 rank and the recipient are right; the failed write does not count against it, since the reply reports it and gives the write-up inline.

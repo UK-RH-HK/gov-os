@@ -3,8 +3,9 @@
 These are the summaries of the `gov skilleval` runs of the frontend skill recorded in `scenario-records.yaml` beside
 this file, one entry per record entry, in the records' order. The replies are taken from the lead's capture of the
 same run, because the `--json` envelope carries no reply text. Run 1 had no capture: its entries give only what the
-record holds. The diagnostic run and the final run have a capture; the skill version changed between them (1.0.0 to
-1.1.0).
+record holds. The diagnostic run, the final run and run 3 (after the L1 change, skill version 1.2.0) have a capture;
+the skill version changed between them (1.0.0 to 1.1.0, then to 1.2.0). The harness leaves this file out of the
+session's copy, so the summaries are written by hand.
 
 ### Run 1, scenario 1: A control a keyboard cannot reach
 
@@ -104,3 +105,36 @@ record holds. The diagnostic run and the final run have a capture; the skill ver
   - The reply wrote no files, because the ticket's files were not in the workspace and `gov` waited on approval, and it showed `go(path)` rewritten behind a `startViewTransition` feature check with `router.push(path)` as the fallback, also used for reduced motion, plus three tests.
   - It left the browser list unchanged, listing a list change only as option D, and ranked the open question P1 with four options and a recommendation (A, a plain page change in Firefox), addressed to the session's starter.
   - The judgement passed it because every part of the pass line is met, including the explicit P1 rank, which is the part the diagnostic run failed.
+
+### Run 3, scenario 1: A control a keyboard cannot reach
+
+- **Scenario:** 1
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:43:52+00:00
+- **Skill version:** 1.2.0
+- **Summary:**
+  - The reply said it was blocked because saving the three files was refused, so it wrote nothing and ran no test, and gave four problems from the skill's mistakes list with the fixed lines, the stylesheet change and unit tests in the reply.
+  - It replaced the `div` with `<button type="button">`, gave the image an `alt` built from the user's name, made the icon control a `<button>` with `aria-label="Close"`, and deleted the `outline: none` rule, pointing to the design system's focus token if a custom ring is wanted.
+  - The judgement passed it because every part of the pass line is met and the tests find controls by role and name; it held that nothing saved and nothing run does not matter for a pass line that asks only for the fixes and a proposed test.
+
+### Run 3, scenario 2: State copied and mutated
+
+- **Scenario:** 2
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:44:58+00:00
+- **Skill version:** 1.2.0
+- **Summary:**
+  - The reply wrote nothing to disk, because the workspace held no ticket or allowed paths and `gov` needed approval, and said so; it named four defects and gave a fixed `TaskList.jsx` and five unit tests that it did not run.
+  - It removed the prop copied into state and the stored `visible` state, derived the filtered list in render, used `setTasks(prev => [...prev, newTask])`, and moved the fetch into a cancelled `useEffect` with loading, error and empty views.
+  - The judgement passed it because the immutable update, the derived list, the three views and the state-transition tests are all present, and it noted the tests were not run, which the pass line does not require.
+
+### Run 3, scenario 3: A feature outside the support list
+
+- **Scenario:** 3
+- **Verdict:** pass
+- **run_at:** 2026-11-14T03:45:59+00:00
+- **Skill version:** 1.2.0
+- **Summary:**
+  - The reply wrote nothing, because its writes (and `gov --help`) were denied and the navigation component was not in the workspace, and gave a `createGo` fallback that calls `startViewTransition` only behind a feature check, with `router.push(path)` otherwise and for reduced motion.
+  - It left the browser list unchanged, offering a list change only as option C for the spec owner, and ranked the open question P1 with options A to C and a recommendation (A, a plain page change), addressed to the ticket lead; its tests are described for both paths, not written out.
+  - The judgement passed it because every part of the pass line is met, including the P1 rank and the ticket lead as recipient.
