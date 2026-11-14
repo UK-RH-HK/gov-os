@@ -128,6 +128,59 @@ def plant_reanchor_set(world) -> tuple[str, str]:
     return d1, d2
 
 
+SEC = {k: (f"vellumdrift{k}", f"thistlewane{k}", f"marrowpike{k}") for k in range(1, 9)}   # (question, answer, file) words
+SECTION_WORDS = [w for words in SEC.values() for w in words] + ["Sectone", "Subtwo", "Aftern"]
+
+
+def section_doc(file_word: str, *, intro=("intro",), sect="body one", sub="sub body", after="after body", tail=()) -> str:
+    """A document with a ``##`` section that holds a ``###`` sub-section, then a following ``##`` section (a heading-cited
+    source's section runs from its ``## Sectone`` line to the line before ``## Aftern``, the sub-section inside it)."""
+    lines = [f"# {file_word}", *intro, "## Sectone", sect, "### Subtwo", sub, "## Aftern", after, *tail]
+    return "\n".join(lines) + "\n"
+
+
+def plant_section_set(world) -> tuple[str, str, list[tuple[str, int]]]:
+    """DEC-1180 (1) N2 (b): a set of heading-cited questions, each file at ``d1`` (the questions' commit) and at ``d2`` (the
+    link's head). What happens to the cited section between them (each heading is still found at ``d2``):
+    q01 body line rewritten: listed; q02 three lines inserted above the section, section unchanged: not listed (it moved);
+    q03 nothing changed: not listed; q04 a line of the ``###`` sub-section inside it rewritten: listed; q05 a line of the
+    following ``##`` section rewritten, the cited section unchanged: not listed; q06 one entry of two alternatives, a section
+    that both moved (three lines inserted above) and changed, and a line-cited block rewritten, then a control entry: listed
+    once, entry 1; q07 the last section of its file (to the end of the file) with a line appended: listed; q08 a control
+    entry, then a changed section: entry 2. Returns ``(d1, d2, expected)`` with ``expected`` the (id, entry) pairs, sorted."""
+    docs = {f"q0{k}": f"docs/std/{SEC[k][2]}.md" for k in range(1, 9)}
+    lined = "docs/std/{}-lines.md".format(SEC[6][2])
+    v1 = {docs[q]: section_doc(SEC[int(q[1:])][2]) for q in docs}
+    v1[docs["q07"]] = f"# {SEC[7][2]}\nintro\n## Sectone\nbody one\n"
+    v1[lined] = "# lines\n\n" + block(1, 6, "was") + "tail\n"
+    d1 = world.repo_commit("2026-11-10T01:00:00+00:00", v1, "sections v1")
+    v2 = {docs["q01"]: section_doc(SEC[1][2], sect="body one REWRITTEN"),
+          docs["q02"]: section_doc(SEC[2][2], intro=("intro", "new a", "new b", "new c")),
+          docs["q04"]: section_doc(SEC[4][2], sub="sub body REWRITTEN"),
+          docs["q05"]: section_doc(SEC[5][2], after="after body REWRITTEN"),
+          docs["q06"]: section_doc(SEC[6][2], intro=("intro", "new a", "new b", "new c"), sect="body one REWRITTEN"),
+          docs["q07"]: f"# {SEC[7][2]}\nintro\n## Sectone\nbody one\nbody two appended\n",
+          docs["q08"]: section_doc(SEC[8][2], sect="body one REWRITTEN"),
+          lined: "# lines\n\n" + block(1, 6, "became") + "tail\n"}
+    d2 = world.repo_commit("2026-11-10T02:00:00+00:00", v2, "sections v2")
+    world.relink(d2)
+    hidden = world.sets / "fixtures" / "evaluation" / AUDIT_SET / "hidden"
+    hidden.mkdir(parents=True)
+    head = {"heading": "## Sectone"}
+    control = {"path": docs["q03"], **head}
+    sources = {"q01": [{"path": docs["q01"], **head}], "q02": [{"path": docs["q02"], **head}], "q03": [control],
+               "q04": [{"path": docs["q04"], **head}], "q05": [{"path": docs["q05"], **head}],
+               "q06": [[{"path": docs["q06"], **head}, {"path": lined, "lines": [3, 8]}], control],
+               "q07": [{"path": docs["q07"], **head}], "q08": [control, {"path": docs["q08"], **head}]}
+    for q, entries in sources.items():
+        k = int(q[1:])
+        doc = {"id": q, "question": f"Which {SEC[k][0]} section is cited?", "gold_answer": f"The {SEC[k][1]} section.",
+               "sources": entries, "commit": d1, "category": "plan", "drawn": "sample"}
+        (hidden / f"{q}.yaml").write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    W.add_map_entry(world.sets, AUDIT_SET)
+    return d1, d2, [("q01", 1), ("q04", 1), ("q06", 1), ("q07", 1), ("q08", 2)]
+
+
 def maintain_lines(world) -> list[dict]:
     return world.jsonl_file(world.mem / "MAINTAIN.jsonl")
 

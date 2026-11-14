@@ -156,6 +156,63 @@ def test_s10_a_changed_cited_block_is_listed_by_id_and_entry_and_a_moved_unchang
         [request.relative_to(world.sets).as_posix()], "one request, for the one set; the standing set is left out"
 
 
+def entry_of(item: dict) -> int:
+    return int(str(item["entry"]).replace("entry ", "").split(".")[0])
+
+
+def test_s10_a_heading_cited_section_whose_text_changed_is_listed_though_its_heading_is_found_one_that_did_not_is_not(make_world):
+    """DEC-1180 (1), N2 (b), ``Rewrite-Reason: DEC-1180 (1)``. Eight heading-cited questions, every heading still found at the
+    head (``plant_section_set``): a section rewritten (q01), one changed in its ``###`` sub-section (q04), the last section of
+    its file with a line appended (q07) and the second entry of q08 are listed, by question id and entry number; a section that
+    only moved (q02), one untouched (q03) and one whose *following* section changed (q05) are not; q06's entry, whose two
+    alternatives both changed (a section that moved and was rewritten, and a rewritten line-cited block), is listed once.
+    The entry number of an alternative is read as its entry's integer. Red until the engineer builds N2 (b)."""
+    world = world_of(make_world)
+    world.break_anchors(["q05"])
+    world.plant_standing()
+    d1, d2, expected = M.plant_section_set(world)
+    run = world.maintain()
+    assert run.code == 0 and parse_maintain(M.maintain_line(run))["reanchor"] == str(len(expected)), run
+    request = world.sets / "runs" / M.AUDIT_SET / f"REANCHOR-{world.week}.json"
+    doc = json.loads(request.read_text(encoding="utf-8"))
+    assert set(doc) == {"week", "audit_commit", "set", "changed", "count"}, doc
+    assert (doc["week"], doc["set"], doc["count"]) == (world.week, M.AUDIT_SET, len(expected)), doc
+    assert doc["audit_commit"] in (d2, d2[:12])
+    assert all(set(item) == {"id", "entry"} for item in doc["changed"]), "id and entry only"
+    assert sorted((item["id"], entry_of(item)) for item in doc["changed"]) == expected, doc["changed"]
+    assert stat.S_IMODE(os.stat(request).st_mode) == 0o600
+
+
+def test_s10_a_set_of_heading_cited_sections_none_of_which_changed_has_no_request(make_world):
+    """N2 (b)'s other side: sections that moved unchanged, or whose neighbours changed, are not listed, and a set with no entry
+    gets no request file (S10 (6): one request per set with at least one entry)."""
+    world = world_of(make_world)
+    world.plant_standing()
+    M.plant_section_set(world)
+    hidden = world.sets / "fixtures" / "evaluation" / M.AUDIT_SET / "hidden"
+    for q in ("q01", "q04", "q06", "q07", "q08"):
+        (hidden / f"{q}.yaml").unlink()
+    run = world.maintain()
+    assert run.code == 0 and parse_maintain(M.maintain_line(run))["reanchor"] == "0", run
+    assert list((world.sets / "runs").rglob("REANCHOR-*.json")) == []
+
+
+def test_s10_the_section_request_the_line_the_log_and_the_digest_hold_no_question_answer_or_path_text(make_world):
+    world = world_of(make_world)
+    world.plant_standing()
+    M.plant_section_set(world)
+    run = world.maintain()
+    assert run.code == 0, run
+    request = world.sets / "runs" / M.AUDIT_SET / f"REANCHOR-{world.week}.json"
+    assert request.is_file(), "the request exists, so there is something to leak"
+    for path in (world.base, world.sets, world.repo, world.link, world.runs_env):
+        assert not W.hits(str(path) + "/", M.SECTION_WORDS), f"{path} holds a planted word"
+    texts = [run.out, run.err, request.read_text(),
+             *(p.read_bytes().decode("utf-8", "replace") for p in world.scan_targets(world.runs_env))]
+    for text in texts:
+        assert W.hits(text, M.SECTION_WORDS) == [], "a planted question, answer, path or heading word is outside the set"
+
+
 def test_s10_the_request_the_line_the_log_and_the_digest_hold_no_question_answer_or_path_text(make_world):
     world, _ = reanchor_world(make_world)
     run = world.maintain()
