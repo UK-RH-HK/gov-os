@@ -39,14 +39,55 @@ def _sources_commit_problems(commit: str, only_tickets: bool) -> list:
     return bad
 
 
-def test_s4_gov_links_reports_no_unlinked_id_on_an_open_or_in_progress_ticket_at_head(head_findings, head_tree):
-    bad = []
-    for finding in head_findings:
-        if finding["code"] == "UNLINKED_ID" and finding["path"].startswith(".tickets/"):
-            text = (head_tree / finding["path"]).read_text(encoding="utf-8")
-            if s.ticket_status(text) in LIVE:
-                bad.append(tuple(finding["ids"]))
-    assert not bad, f"{len(bad)} UNLINKED_ID on open or in-progress tickets: {bad[:6]}"
+def _linked(record) -> dict:
+    """``w2-130:dec-1123-linked`` as ``{ticket id: [{id, form, via}]}``, its shape checked."""
+    data = record.data("dec-1123-linked")
+    assert isinstance(data, dict), "w2-130:dec-1123-linked is not a mapping ticket id -> list of {id, form, via}"
+    for ticket, items in data.items():
+        assert isinstance(items, list) and items, f"{ticket}: not a non-empty list"
+        for item in items:
+            assert isinstance(item, dict) and all(isinstance(item.get(k), str) for k in ("id", "form", "via")), (
+                f"{ticket}: {item!r} is not {{id, form, via}} with string values")
+            assert item["form"] in s.LINK_FORMS, f"{ticket}: {item['id']} has form {item['form']!r}, not one of {s.LINK_FORMS}"
+    return data
+
+
+def _linked_pairs(linked: dict) -> set:
+    return {(f".tickets/{ticket}.md", item["id"]) for ticket, items in linked.items() for item in items}
+
+
+def _less(by_path: dict, linked: dict) -> dict:
+    """``{path: sorted ids}`` of ``by_path`` without the (ticket, id) pairs ``linked`` lists and without empty entries."""
+    pairs = _linked_pairs(linked)
+    kept = {path: sorted(i for i in ids if (path, i) not in pairs) for path, ids in by_path.items()}
+    return {path: ids for path, ids in kept.items() if ids}
+
+
+def test_s4_every_unlinked_id_on_an_open_or_in_progress_ticket_at_head_is_listed_with_its_dec_1123_2_form(
+        record, head_findings, head_tree):
+    linked = _linked(record)
+    listed = {(ticket, item["id"]) for ticket, items in linked.items() for item in items}
+    unlinked = {(ticket, ident) for ticket, ids in s.unlinked_on_live(head_findings, head_tree).items() for ident in ids}
+    left = sorted(unlinked - listed)
+    assert not left, f"{len(left)} UNLINKED_ID on open or in-progress tickets that dec-1123-linked does not list: {left[:6]}"
+
+
+def test_s4_each_dec_1123_linked_entry_is_of_its_form_at_head(record, head_findings, head_tree):
+    linked = _linked(record)
+    bad = [(ticket, item["id"], item["form"], problem) for ticket, items in linked.items() for item in items
+           if (problem := s.linked_form_problem(head_tree, ticket, item, head_findings))]
+    assert not bad, f"{len(bad)} entries are not of their form at HEAD: {bad[:4]}"
+
+
+def test_s4_dec_1123_linked_lists_only_unlinked_ids_gov_links_reports_at_head_on_open_or_in_progress_tickets(
+        record, head_findings, head_tree):
+    linked = _linked(record)
+    unlinked = s.unlinked_on_live(head_findings, head_tree)
+    listed = [(ticket, item["id"]) for ticket, items in linked.items() for item in items]
+    assert len(listed) == len(set(listed)), "dec-1123-linked lists an id twice for one ticket"
+    extra = sorted(pair for pair in listed if pair[1] not in unlinked.get(pair[0], set()))
+    assert not extra, (f"{len(extra)} entries are no UNLINKED_ID gov links reports at HEAD on an open or in-progress "
+                       f"ticket: {extra[:6]}")
 
 
 def test_s4_the_record_names_e12f8a30c_and_at_most_one_follow_up_as_the_sources_commits(record):
@@ -81,15 +122,16 @@ def test_s4_the_b1_patch_in_the_record_equals_the_ids_e12f8a30c_added(record):
     assert patch == added
 
 
-def test_s4_the_follow_up_ids_equal_patch_sources_2_and_gov_links_propose_sources_at_its_parent(record,
-                                                                                                   propose_sources_at):
-    patch = {path: sorted(ids) for path, ids in s.patch_source_ids(record.block("patch-sources-2", "diff")).items()}
+def test_s4_the_follow_up_ids_equal_patch_sources_2_and_gov_links_propose_sources_at_its_parent_less_the_forms(
+        record, propose_sources_at):
+    linked = _linked(record)
+    patch = _less(s.patch_source_ids(record.block("patch-sources-2", "diff")), linked)
     follow = record.commit_list("sources")[1:]
     assert follow, "commits.sources names no follow-up commit, yet patch-sources-2 exists"
-    added = {path: sorted(ids) for path, ids in s.sources_added(follow[0]).items()}
-    assert patch == added, "the ids the follow-up adds differ from patch-sources-2"
-    assert added == {p: sorted(i) for p, i in propose_sources_at(follow[0]).items()}, (
-        "the ids the follow-up adds differ from gov links --propose-sources at its parent")
+    added = {path: sorted(ids) for path, ids in s.sources_added(follow[0]).items() if ids}
+    assert patch == added, "the ids the follow-up adds differ from patch-sources-2 less the dec-1123-linked pairs"
+    assert added == _less(propose_sources_at(follow[0]), linked), (
+        "the ids the follow-up adds differ from gov links --propose-sources at its parent less the dec-1123-linked pairs")
 
 
 def test_s4_outside_the_sources_commits_a_cleanup_commit_adds_to_sources_only_dec_1098_and_dec_1088_on_this_ticket(
