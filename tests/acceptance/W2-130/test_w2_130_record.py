@@ -71,13 +71,33 @@ def test_s8_counts_before_are_at_the_starting_head_and_counts_after_at_the_last_
     assert s.need_hash(after["head"], "counts-after.head") == record.commit_list("cleanup")[-1]
 
 
-def test_s8_gov_links_at_head_gives_the_after_counts(record, head_findings, head_tree):
+def _measured_at(record) -> str:
+    """``counts-after.measured_at``: the tree the record says it counted. Pinned, not HEAD: a ticket closed or reopened
+    after the land moves what ``gov links`` finds at HEAD (122 -> 124 CLOSED_TICKET_EDITED in five hours), and the
+    record's counts must not turn red for it (DEC-1156 (7), DEC-1164 (18)). The tree is one this branch really holds:
+    ``counts-after.head`` (the last clean-up commit) or a descendant of it, and an ancestor of HEAD."""
     after = record.data("counts-after")
     _shape(after, "counts-after")
-    mine = _counts(head_findings, head_tree)
-    assert {k: v for k, v in after["by_code"].items() if v} == mine["by_code"]
-    assert {c: {r: n for r, n in rs.items() if n} for c, rs in after["by_code_role"].items() if sum(rs.values())} == mine["by_code_role"]
-    assert {k: v for k, v in after["unlinked_by_status"].items() if v} == mine["unlinked_by_status"]
+    if "measured_at" not in after:
+        pytest.fail("counts-after lacks measured_at, the tree the counts were taken at")
+    measured = s.need_hash(after["measured_at"], "counts-after.measured_at")
+    last_cleanup = s.need_hash(after["head"], "counts-after.head")
+    assert s.is_ancestor(last_cleanup, measured), "counts-after.measured_at is not counts-after.head or a descendant of it"
+    assert s.is_ancestor(measured, s.head()), "counts-after.measured_at is not an ancestor of HEAD"
+    return measured
+
+
+def test_s8_gov_links_at_head_gives_the_after_counts(record, clone_at, home):
+    """Runs ``gov links`` on a clone at ``counts-after.measured_at`` (the tree the record says it counted), not at HEAD, and
+    compares the record's after counts with it. The name is kept because the README map names it (DEC-1156 (7) pin run)."""
+    after = record.data("counts-after")
+    tree = clone_at(_measured_at(record))
+    mine = _counts(s.links_json(tree, home), tree)
+    assert {k: v for k, v in after["by_code"].items() if v} == mine["by_code"], "by_code differs from gov links at measured_at"
+    assert {c: {r: n for r, n in rs.items() if n} for c, rs in after["by_code_role"].items() if sum(rs.values())} == mine["by_code_role"], (
+        "by_code_role differs from gov links at measured_at")
+    assert {k: v for k, v in after["unlinked_by_status"].items() if v} == mine["unlinked_by_status"], (
+        "unlinked_by_status differs from gov links at measured_at")
 
 
 def test_s8_the_before_counts_of_the_codes_the_clean_up_works_on_equal_gov_links_at_the_starting_head(record, start_findings):
@@ -89,16 +109,19 @@ def test_s8_the_before_counts_of_the_codes_the_clean_up_works_on_equal_gov_links
         assert before["by_code"].get(code, 0) == mine.get(code, 0), f"{code}: record {before['by_code'].get(code, 0)}, gov links {mine.get(code, 0)}"
 
 
-def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, head_findings):
+def test_s8_left_holds_d_5_d_6_and_d_9_by_path_and_role_as_gov_links_finds_them_at_head(record, clone_at, home):
+    """Compares ``left`` (D-5, D-6, D-9 by path and role) with what ``gov links`` finds on a clone at
+    ``counts-after.measured_at``, not at HEAD. The name is kept because the README map names it (DEC-1156 (7) pin run)."""
     left = record.data("left")
     assert isinstance(left, dict) and {"D-5", "D-6", "D-9"} <= set(left), "left lacks D-5, D-6 or D-9"
+    findings = s.links_json(clone_at(_measured_at(record)), home)
     for area, prefixes in AREAS.items():
         mine = collections.defaultdict(dict)
-        for f in head_findings:
+        for f in findings:
             if f["path"].startswith(prefixes):
                 mine[f["path"]][f["role"]] = mine[f["path"]].get(f["role"], 0) + 1
         assert isinstance(left[area], dict), f"left.{area} is not a mapping path -> role -> n"
-        assert {p: dict(r) for p, r in left[area].items()} == dict(mine), f"left.{area} differs from the findings at HEAD"
+        assert {p: dict(r) for p, r in left[area].items()} == dict(mine), f"left.{area} differs from the findings at measured_at"
 
 
 def test_f4_e12f8a30c_has_w2_129_s_landing_and_w2_92_s_stated_links_as_ancestors():
