@@ -50,7 +50,7 @@ is `{changed: DEC-a, changer: DEC-b}` (or `DEC-a<-DEC-b`); every commit a full 4
 
 ## How the cases read what the interface leaves open
 
-- **A status line "names" a changer** when the changer's `DEC-n` is in a `**Changed by:**` field of that line (up to
+- **A status line "names" a changer** (S1's 87, the 13 archive-only pairs, the two follow-up marks) when the changer's `DEC-n` is in a `**Changed by:**` field of that line (up to
   the next ` · **`) or in a `SUPERSEDED by DEC-a, DEC-b` list. Spelling (zero padding) is the register's.
 - **A mark a commit adds** is the tail appended after the old status line (` · **Changed by:** ...` or
   ` · SUPERSEDED by ...`); its pairs are the entry with each `DEC-n` of the tail. c4420040f's decided statuses are
@@ -109,6 +109,36 @@ mark wrong fails `test_w2_130_audit.py::test_s3_verdicts_and_fates_agree_with_wh
 `test_w2_130_audit.py::test_f3_the_comparison_shows_no_unchecked_and_no_wrong_mark_and_my_comparison_agrees`.
 
 ## KPI lines, tests, and the outcome on the branch base `09542040f`
+
+**Revision, run 3 batch 3 (the lead's run-3 findings 1 to 5), branch head `ba9f5ed4d`:** five cases that read more than
+their Verify line states were cut back to the line; each is still red on the base (no record) and green on a scratch
+record built from the real history, and red for a planted break. 81 tests, **55 red, 26 green** at `ba9f5ed4d` (the same
+counts as before; no other case changed).
+
+- Finding 1 (S1, the a0-a2 patches): patch a0 is ARCHIVE-SUPERSEDED's change and holds no register hunk; the register
+  marks are in a1 and a2. A patch with no register hunk now appends no register pair (a patch with no `diff --git`
+  section still fails); the union of the three patches' register pairs, after the drops and rewrites, must equal the
+  marks e12f8a30c adds; each patch's files must be files e12f8a30c changes; some patch must hold a register mark.
+- Finding 2 (S1, marks added after e12f8a30c): the line is about the clean-up's marks (the census's pairs). A later
+  commit's own change of a status line of the 87 (DEC-866's marking of a new decision's change, e.g. 518772b5c's
+  DEC-989<-DEC-1141) may stay out of a marks commit when it keeps the old line whole (an append) and adds no census
+  pair of that entry. An edit in the middle of the line, or a census pair appended outside a marks commit, fails; in a
+  named marks commit the check is as before (append or decided status).
+- Findings 3 and 4 (S2, the two follow-up marks): the Verify names the pairs (DEC-1115<-DEC-1122, DEC-026<-DEC-086),
+  not the mark's wording, which the independent auditor may correct (S3). The case no longer fixes the appended text:
+  exactly one follow-up marks commit, after both clean-up commits, appends to the old line a mark that makes the line
+  name the changer; the audit's right verdict, ancestor head and earlier date are checked as before.
+- Finding 5 (S2, the 215): "named on its own status line" is read as `gov links` reads it (UNMARKED_CHANGE: the
+  changer's id is on the entry's status line). The form (**Changed by:** or SUPERSEDED by) is S1's, for the 87, and S1's
+  case still checks it. The other census ids name some changers in older forms (**Amended by:**, **Lifted by:**, prose).
+  The 13 archive-only pairs case keeps the form check (it passes on the history).
+
+Proofs (scratch clone under `$TMPDIR`, a record built from the real data, never committed): the original cases fail on it
+(finding 1: no register hunk in a0; 2: `518772b5c272 DEC-989 other`; 3 and 4: the exact text; 5: 7 old-form pairs not on
+their line) and the revised pass; planted breaks fail the revised cases: an a1 patch lacking one hunk (139 marks
+committed, 138 patched); a scratch commit editing DEC-030's status line in its middle; a scratch commit appending a census
+changer to DEC-039 outside a marks commit; a follow-up commit naming DEC-1121 with the right mark in an unlisted commit;
+DEC-150's line with DEC-156 removed.
 
 **Revision, run 3 batch 2 (P-W2-130-4 (a)), branch head `11c4d7a5a`:** S4's head case and its follow-up case were
 rewritten to DEC-1123 (2) and two cases added (`w2-130:dec-1123-linked`, also added to the block list S8 checks): **81
